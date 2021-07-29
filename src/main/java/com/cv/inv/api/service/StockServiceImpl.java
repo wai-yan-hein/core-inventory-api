@@ -5,7 +5,8 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.dao.CharacterNoDao;
+import com.cv.inv.api.common.DuplicateException;
+import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.StockDao;
 import com.cv.inv.api.entity.Stock;
 import java.util.List;
@@ -23,21 +24,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StockServiceImpl implements StockService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StockService.class);
+    private static final Logger log = LoggerFactory.getLogger(StockService.class);
     @Autowired
     private StockDao dao;
-    @Autowired
-    private CharacterNoDao chDao;
     @Autowired
     private SeqTableService seqService;
 
     @Override
-    public Stock save(Stock stock) {
-
-        if (stock.getStockCode() == null || stock.getStockCode().isEmpty()) {
+    public Stock save(Stock stock) throws Exception {
+        if (Util1.isNull(stock.getStockCode())) {
             Integer macId = stock.getMacId();
             String compCode = stock.getCompCode();
-            stock.setStockCode(getStockCode(macId, "Stock", "-", compCode));
+            String stockCode = getStockCode(macId, "Stock", "-", compCode);
+            Stock valid = findById(stockCode);
+            if (valid == null) {
+                stock.setStockCode(stockCode);
+            } else {
+                throw new DuplicateException("Duplicate Stock Code");
+            }
         }
         return dao.save(stock);
     }
@@ -48,8 +52,8 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> findAll() {
-        return dao.findAll();
+    public List<Stock> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 
     @Override
@@ -62,68 +66,6 @@ public class StockServiceImpl implements StockService {
         return dao.delete(id);
     }
 
-    /*private String getMedCode(String stockName, StockType itemType) {
-        String medCode = "";
-        CharacterNo characterNo = null;
-
-        if (!stockName.equals("")) {
-            try {
-                for (int i = 0; i < stockName.length(); i++) {
-                    String strTmp = stockName.substring(i, i + 1).toUpperCase();
-                    if (!strTmp.trim().equals("")) { //Space character detection
-                        if (Util1.isNumber(strTmp)) {
-                            i = stockName.length();
-                            characterNo = new CharacterNo(" ", "00");
-                        } else {
-                            characterNo = chDao.findById(strTmp);
-                            if (characterNo != null) {
-                                i = stockName.length();
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LOGGER.error("getMedCode : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-            }
-            String strType = "";
-            if (characterNo != null) {
-                strType = characterNo.getStrNumber();
-            }
-            medCode = itemType.getItemTypeCode() + strType;
-            int typeLength = itemType.getItemTypeCode().length();
-
-            try {
-                Object maxMedId = dao.getMax("select max(o.stock_code) from stock o where o.stock_code like '" + medCode + "%'");
-                int ttlLength = 5;// get from system property
-                int leftLength = ttlLength - medCode.length();
-
-                if (maxMedId == null) {
-                    for (int i = 0; i < leftLength - 1; i++) {
-                        medCode = medCode + "0";
-                    }
-
-                    medCode = medCode + "1";
-                } else {
-                    int begin = typeLength + 2;
-                    String tmpMedSerial = maxMedId.toString().substring(begin);
-
-                    Integer tmpSerial = Integer.parseInt(tmpMedSerial) + 1;
-                    tmpMedSerial = tmpSerial.toString();
-
-                    for (int i = 0; i < (leftLength - tmpMedSerial.length()); i++) {
-                        medCode = medCode + "0";
-                    }
-
-                    medCode = medCode + tmpMedSerial;
-                }
-            } catch (NumberFormatException ex) {
-                LOGGER.error("getMedCode : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-            }
-        }
-
-        return medCode;
-    }
-     */
     private String getStockCode(Integer macId, String option, String period, String compCode) {
 
         int seqNo = seqService.getSequence(macId, option, period, compCode);

@@ -5,6 +5,7 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.dao.CategoryDao;
 import com.cv.inv.api.entity.Category;
 import java.util.List;
@@ -27,19 +28,24 @@ public class CategoryServiceImpl implements CategoryService {
     private SeqTableService seqService;
 
     @Override
-    public Category save(Category cat) {
+    public Category save(Category cat) throws Exception {
         if (cat.getCatCode() == null || cat.getCatCode().isEmpty()) {
             Integer macId = cat.getMacId();
             String compCode = cat.getCompCode();
-            String getCode=getCatCode(macId, "Category", "-", compCode);
-            cat.setCatCode(getCode);
+            String catCode = getCatCode(macId, "Category", "-", compCode);
+            Category valid = findByCode(catCode);
+            if (valid == null) {
+                cat.setCatCode(catCode);
+            } else {
+                throw new DuplicateException("Duplicate Category Code");
+            }
         }
         return dao.save(cat);
     }
 
     @Override
-    public List<Category> findAll() {
-        return dao.findAll();
+    public List<Category> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 
     @Override
@@ -63,6 +69,11 @@ public class CategoryServiceImpl implements CategoryService {
 
         String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
         return tmpCatCode;
+    }
+
+    @Override
+    public Category findByCode(String code) {
+        return dao.findByCode(code);
     }
 
 }

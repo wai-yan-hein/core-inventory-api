@@ -14,11 +14,11 @@ import java.util.List;
  */
 public interface StockService {
 
-    public Stock save(Stock stock);
+    public Stock save(Stock stock) throws Exception;
 
     public Stock findById(String id);
 
-    public List<Stock> findAll();
+    public List<Stock> findAll(String compCode);
 
     public int delete(String id);
 

@@ -14,9 +14,11 @@ import java.util.List;
  */
 public interface CategoryDao {
 
+    public Category findByCode(String code);
+
     public Category save(Category item);
 
-    public List<Category> findAll();
+    public List<Category> findAll(String compCode);
 
     public List<Category> search(String catName);
 

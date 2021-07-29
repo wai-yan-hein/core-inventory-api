@@ -7,8 +7,11 @@ package com.cv.inv.api.controller;
 
 import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.entity.AppUser;
+import com.cv.inv.api.entity.VUsrCompAssign;
 import com.cv.inv.api.service.UserService;
+import com.cv.inv.api.service.UsrCompRoleService;
 import java.net.URISyntaxException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,22 +37,30 @@ public class UserController {
     private ReturnObject ro;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UsrCompRoleService compService;
 
     @PostMapping(value = "/save")
     public ResponseEntity<ReturnObject> saveUser(@RequestBody AppUser user)
             throws URISyntaxException {
         return ResponseEntity.ok(ro);
     }
+
     @RequestMapping(path = "/login", method = RequestMethod.GET)
     public ResponseEntity<AppUser> getUser(@RequestParam String username, @RequestParam String password) {
         AppUser user = userService.login(username, password);
         return ResponseEntity.ok(user);
-        // code here
     }
+
+    @RequestMapping(path = "/get-assign-company", method = RequestMethod.GET)
+    public ResponseEntity<List<VUsrCompAssign>> getAssignCompany(@RequestParam String userCode) {
+        List<VUsrCompAssign> listComp = compService.getAssignCompany(userCode);
+        return ResponseEntity.ok(listComp);
+    }
+
     @RequestMapping(path = "/test", method = RequestMethod.GET)
     public ResponseEntity<ReturnObject> test() {
         ro.setMeesage("Hello");
         return ResponseEntity.ok(ro);
-        // code here
     }
 }

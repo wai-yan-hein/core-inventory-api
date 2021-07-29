@@ -17,11 +17,11 @@ import javax.persistence.*;
 public class SaleHis implements java.io.Serializable {
 
     @Id
-    @Column(name = "voucher_no", unique = true, nullable = false, length = 20)
+    @Column(name = "vou_no", unique = true, nullable = false, length = 20)
     private String vouNo;
     @ManyToOne
-    @JoinColumn(name = "cus_code")
-    private Trader traderId;
+    @JoinColumn(name = "trader_code")
+    private Trader trader;
     @ManyToOne
     @JoinColumn(name = "saleman_code")
     private SaleMan saleMan;
@@ -33,7 +33,7 @@ public class SaleHis implements java.io.Serializable {
     private Date creditTerm;
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "from_cur_id"),
+        @JoinColumn(name = "cur_code"),
         @JoinColumn(name = "comp_code")
     })
     private Currency currency;
@@ -59,7 +59,7 @@ public class SaleHis implements java.io.Serializable {
     @Column(name = "paid")
     private Float paid;
     @Column(name = "vou_balance")
-    private Float vouBalance;
+    private Float balance;
     @ManyToOne
     @JoinColumn(name = "created_by")
     private AppUser createdBy;
@@ -101,14 +101,6 @@ public class SaleHis implements java.io.Serializable {
 
     public void setSession(Integer session) {
         this.session = session;
-    }
-
-    public Trader getTraderId() {
-        return traderId;
-    }
-
-    public void setTraderId(Trader traderId) {
-        this.traderId = traderId;
     }
 
     public SaleMan getSaleMan() {
@@ -215,14 +207,6 @@ public class SaleHis implements java.io.Serializable {
         this.paid = paid;
     }
 
-    public Float getVouBalance() {
-        return vouBalance;
-    }
-
-    public void setVouBalance(Float vouBalance) {
-        this.vouBalance = vouBalance;
-    }
-
     public AppUser getCreatedBy() {
         return createdBy;
     }
@@ -293,6 +277,22 @@ public class SaleHis implements java.io.Serializable {
 
     public void setVouStatus(VouStatus vouStatus) {
         this.vouStatus = vouStatus;
+    }
+
+    public Trader getTrader() {
+        return trader;
+    }
+
+    public void setTrader(Trader trader) {
+        this.trader = trader;
+    }
+
+    public Float getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Float balance) {
+        this.balance = balance;
     }
 
 }

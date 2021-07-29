@@ -13,8 +13,14 @@ import java.util.List;
  * @author WSwe
  */
 public interface RegionService {
-    public Region save(Region region);
-    public Region findById(String id);
-    public List<Region> search(String code, String name, String compCode,String parentCode);
-    public int delete(String code, String compCode);
+
+    public Region save(Region region) throws Exception;
+
+    public Region findByCode(String id);
+
+    public List<Region> search(String code, String name, String compCode, String parentCode);
+
+    public int delete(String code);
+
+    public List<Region> findAll(String compCode);
 }

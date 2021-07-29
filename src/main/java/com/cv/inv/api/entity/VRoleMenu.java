@@ -29,7 +29,6 @@ public class VRoleMenu implements java.io.Serializable {
     private String parent;
     private String menuType;
     private Integer orderBy;
-    private String soureAccCode;
     private Boolean isAllow;
     private List<VRoleMenu> child;
 
@@ -114,8 +113,6 @@ public class VRoleMenu implements java.io.Serializable {
         return child;
     }
 
-    
-
     public void setChild(List<VRoleMenu> child) {
         this.child = child;
     }
@@ -134,15 +131,6 @@ public class VRoleMenu implements java.io.Serializable {
         return menuName;
     }
 
-    @Column(name = "source_acc_code")
-    public String getSoureAccCode() {
-        return soureAccCode;
-    }
-
-    public void setSoureAccCode(String soureAccCode) {
-        this.soureAccCode = soureAccCode;
-    }
-
     @Column(name = "allow")
     public Boolean getIsAllow() {
         return isAllow;
@@ -151,7 +139,5 @@ public class VRoleMenu implements java.io.Serializable {
     public void setIsAllow(Boolean isAllow) {
         this.isAllow = isAllow;
     }
-
-    
 
 }

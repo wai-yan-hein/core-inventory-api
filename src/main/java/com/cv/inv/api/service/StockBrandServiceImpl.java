@@ -5,6 +5,7 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.dao.StockBrandDao;
 import com.cv.inv.api.entity.StockBrand;
 import java.util.List;
@@ -27,18 +28,24 @@ public class StockBrandServiceImpl implements StockBrandService {
     private SeqTableService seqService;
 
     @Override
-    public StockBrand save(StockBrand sb) {
+    public StockBrand save(StockBrand sb) throws Exception{
         if (sb.getBrandCode() == null || sb.getBrandCode().isEmpty()) {
             Integer macId = sb.getMacId();
             String compCode = sb.getCompCode();
-            sb.setBrandCode(getStockBrandCode(macId, "StockBrand", "-", compCode));
+            String code = getStockBrandCode(macId, "StockBrand", "-", compCode);
+            StockBrand valid = findByCode(code);
+            if (valid == null) {
+                sb.setBrandCode(code);
+            } else {
+                throw new DuplicateException("Duplicate Brand Code");
+            }
         }
         return dao.save(sb);
     }
 
     @Override
-    public List<StockBrand> findAll() {
-        return dao.findAll();
+    public List<StockBrand> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 
     @Override
@@ -52,5 +59,10 @@ public class StockBrandServiceImpl implements StockBrandService {
 
         String tmpCatCode = String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
         return tmpCatCode;
+    }
+
+    @Override
+    public StockBrand findByCode(String code) {
+        return dao.findByCode(code);
     }
 }

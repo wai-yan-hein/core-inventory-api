@@ -28,8 +28,8 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     }
 
     @Override
-    public List<Stock> findAll() {
-        String hsql = "select o from Stock o";
+    public List<Stock> findAll(String compCode) {
+        String hsql = "select o from Stock o where o.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 
@@ -113,8 +113,8 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
 
         return listDH;
     }
-    
-     @Override
+
+    @Override
     public List<Stock> searchM(String updatedDate) {
         String strSql = "select o from Stock o where o.updatedDate > '" + updatedDate + "'";
         List<Stock> listST = findHSQL(strSql);

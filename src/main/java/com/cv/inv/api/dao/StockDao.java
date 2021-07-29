@@ -18,7 +18,7 @@ public interface StockDao {
 
     public Stock findById(String id);
 
-    public List<Stock> findAll();
+    public List<Stock> findAll(String compCode);
 
     public int delete(String id);
 
@@ -31,7 +31,7 @@ public interface StockDao {
     public List<Stock> searchC(String stockType);
 
     public List<Stock> searchB(String stockType);
-    
+
     public List<Stock> searchM(String updatedDate);
 
 }

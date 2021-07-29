@@ -47,9 +47,7 @@ public class Category implements java.io.Serializable {
     @Column(name = "user_code")
     private String userCode;
     @Column(name = "comp_code")
-
     private String compCode;
-
     public Category() {
     }
 

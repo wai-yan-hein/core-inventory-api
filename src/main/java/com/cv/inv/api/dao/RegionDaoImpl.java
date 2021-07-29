@@ -23,13 +23,13 @@ public class RegionDaoImpl extends AbstractDao<Integer, Region> implements Regio
     }
 
     @Override
-    public Region findById(String id) {
+    public Region findByCode(String id) {
         Region region = getByKey(Integer.parseInt(id));
         return region;
     }
 
     @Override
-    public List<Region> search(String code, String name, String compCode,String parentCode) {
+    public List<Region> search(String code, String name, String compCode, String parentCode) {
         String strSql = "select o from Region o ";
         String strFilter = "";
 
@@ -56,7 +56,7 @@ public class RegionDaoImpl extends AbstractDao<Integer, Region> implements Regio
                 strFilter = strFilter + " and o.compCode= '" + compCode + "'";
             }
         }
-         if (!parentCode.equals("-")) {
+        if (!parentCode.equals("-")) {
             if (strFilter.isEmpty()) {
                 strFilter = "o.parentRegion = '" + parentCode + "'";
             } else {
@@ -73,10 +73,16 @@ public class RegionDaoImpl extends AbstractDao<Integer, Region> implements Regio
     }
 
     @Override
-    public int delete(String code, String compCode) {
+    public int delete(String code) {
         String strSql = "delete from Region o where o.regCode = '"
-                + code + "' and o.compCode = " + compCode;
+                + code + "'";
         int cnt = execUpdateOrDelete(strSql);
         return cnt;
+    }
+
+    @Override
+    public List<Region> findAll(String compCode) {
+        String hsql = "select o from Region o where o.compCode = '" + compCode + "'";
+        return findHSQL(hsql);
     }
 }

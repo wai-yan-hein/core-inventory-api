@@ -38,8 +38,6 @@ public class AppUser implements java.io.Serializable {
     private String userName;
     @Column(name = "user_short_name", length = 25)
     private String userShort;
-    @Column(name = "role_code")
-    private String roleCode;
     @Column(name = "create_status", length = 50)
     private String createStatus;
     @Temporal(TemporalType.TIMESTAMP)
@@ -185,13 +183,4 @@ public class AppUser implements java.io.Serializable {
     public void setCompCode(String compCode) {
         this.compCode = compCode;
     }
-
-    public String getRoleCode() {
-        return roleCode;
-    }
-
-    public void setRoleCode(String roleCode) {
-        this.roleCode = roleCode;
-    }
-
 }

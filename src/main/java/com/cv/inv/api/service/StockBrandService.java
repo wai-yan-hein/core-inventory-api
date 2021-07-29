@@ -14,9 +14,12 @@ import java.util.List;
  */
 public interface StockBrandService {
 
-    public StockBrand save(StockBrand brand);
+    public StockBrand save(StockBrand brand)throws Exception;
 
-    public List<StockBrand> findAll();
+    public List<StockBrand> findAll(String compCode);
 
     public int delete(String id);
+
+    public StockBrand findByCode(String code);
+
 }

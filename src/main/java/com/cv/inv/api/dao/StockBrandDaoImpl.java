@@ -23,15 +23,20 @@ public class StockBrandDaoImpl extends AbstractDao<String, StockBrand> implement
     }
 
     @Override
-    public List<StockBrand> findAll() {
-        String hsql = "select o from StockBrand o";
+    public List<StockBrand> findAll(String compCode) {
+        String hsql = "select o from StockBrand o where o.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from StockBrand o where o.brandId='" + id + "'";
+        String hsql = "delete from StockBrand o where o.brandCode='" + id + "'";
         return execUpdateOrDelete(hsql);
+    }
+
+    @Override
+    public StockBrand findByCode(String code) {
+        return getByKey(code);
     }
 
 }

@@ -20,7 +20,7 @@ public interface LocationDao {
 
     public int delete(String id);
 
-    public Location findById(String id);
+    public Location findByCode(String code);
 
     public List<Location> search(String parent);
 

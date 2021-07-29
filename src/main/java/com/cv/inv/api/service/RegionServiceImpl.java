@@ -5,6 +5,7 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.dao.RegionDao;
 import com.cv.inv.api.entity.Region;
 import java.util.List;
@@ -27,18 +28,24 @@ public class RegionServiceImpl implements RegionService {
     private SeqTableService seqService;
 
     @Override
-    public Region save(Region rg) {
+    public Region save(Region rg) throws Exception {
         if (rg.getRegCode() == null || rg.getRegCode().isEmpty()) {
             Integer macId = rg.getMacId();
             String compCode = rg.getCompCode();
-            rg.setRegCode(getRegiionCode(macId, "Region", "-", compCode));
+            String code = getRegiionCode(macId, "Region", "-", compCode);
+            Region valid = findByCode(code);
+            if (valid == null) {
+                rg.setRegCode(code);
+            } else {
+                throw new DuplicateException("Duplicate Region Code");
+            }
         }
         return dao.save(rg);
     }
 
     @Override
-    public Region findById(String id) {
-        Region region = dao.findById(id);
+    public Region findByCode(String id) {
+        Region region = dao.findByCode(id);
         return region;
     }
 
@@ -49,16 +56,19 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
-    public int delete(String code, String compCode) {
-        int cnt = dao.delete(code, compCode);
+    public int delete(String code) {
+        int cnt = dao.delete(code);
         return cnt;
     }
 
     private String getRegiionCode(Integer macId, String option, String period, String compCode) {
-
         int seqNo = seqService.getSequence(macId, option, period, compCode);
-
         String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
         return tmpCatCode;
+    }
+
+    @Override
+    public List<Region> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 }

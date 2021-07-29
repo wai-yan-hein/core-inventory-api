@@ -16,7 +16,9 @@ public interface StockTypeDao {
 
     public StockType save(StockType item);
 
-    public List<StockType> findAll();
+    public List<StockType> findAll(String compCode);
 
     public int delete(String id);
+
+    StockType findByCode(String code);
 }

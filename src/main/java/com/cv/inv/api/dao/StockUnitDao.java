@@ -16,7 +16,10 @@ public interface StockUnitDao {
 
     public StockUnit save(StockUnit unit);
 
-    public List<StockUnit> findAll();
+    public List<StockUnit> findAll(String compCode);
 
     public int delete(String id);
+
+    public StockUnit findByCode(String code);
+
 }

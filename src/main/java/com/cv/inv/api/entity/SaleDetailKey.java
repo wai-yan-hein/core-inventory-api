@@ -17,40 +17,40 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class SaleDetailKey implements Serializable {
 
-    private String vouId;
-    private String saleDetailId;
+    @Column(name = "vou_no")
+    private String vouNo;
+    @Column(name = "sd_code")
+    private String sdCode;
 
     public SaleDetailKey() {
     }
 
-    public SaleDetailKey(String vouId, String saleDetailId) {
-        this.vouId = vouId;
-        this.saleDetailId = saleDetailId;
+    public SaleDetailKey(String vouNo, String sdCode) {
+        this.vouNo = vouNo;
+        this.sdCode = sdCode;
     }
 
-    @Column(name = "vou_id", length = 15)
-    public String getVouId() {
-        return vouId;
+    public String getVouNo() {
+        return vouNo;
     }
 
-    public void setVouId(String vouId) {
-        this.vouId = vouId;
+    public void setVouNo(String vouNo) {
+        this.vouNo = vouNo;
     }
 
-    @Column(name = "sale_detail_id", length = 20)
-    public String getSaleDetailId() {
-        return saleDetailId;
+    public String getSdCode() {
+        return sdCode;
     }
 
-    public void setSaleDetailId(String saleDetailId) {
-        this.saleDetailId = saleDetailId;
+    public void setSdCode(String sdCode) {
+        this.sdCode = sdCode;
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 89 * hash + Objects.hashCode(this.vouId);
-        hash = 89 * hash + Objects.hashCode(this.saleDetailId);
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.vouNo);
+        hash = 79 * hash + Objects.hashCode(this.sdCode);
         return hash;
     }
 
@@ -66,14 +66,10 @@ public class SaleDetailKey implements Serializable {
             return false;
         }
         final SaleDetailKey other = (SaleDetailKey) obj;
-        if (!Objects.equals(this.vouId, other.vouId)) {
+        if (!Objects.equals(this.vouNo, other.vouNo)) {
             return false;
         }
-        if (!Objects.equals(this.saleDetailId, other.saleDetailId)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.sdCode, other.sdCode);
     }
-    
 
 }

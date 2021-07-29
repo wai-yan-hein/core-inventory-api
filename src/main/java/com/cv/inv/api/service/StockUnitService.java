@@ -14,9 +14,11 @@ import java.util.List;
  */
 public interface StockUnitService {
 
+    public StockUnit findByCode(String code);
+
     public StockUnit save(StockUnit unit);
 
-    public List<StockUnit> findAll();
+    public List<StockUnit> findAll(String compCode);
 
     public int delete(String id);
 }

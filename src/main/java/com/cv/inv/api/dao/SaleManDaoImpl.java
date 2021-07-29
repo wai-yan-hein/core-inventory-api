@@ -23,19 +23,19 @@ public class SaleManDaoImpl extends AbstractDao<String, SaleMan> implements Sale
     }
 
     @Override
-    public List<SaleMan> findAll() {
-        String hsql = "select o from SaleMan o";
+    public List<SaleMan> findAll(String compCode) {
+        String hsql = "select o from SaleMan o where o.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from SaleMan o where o.saleManId='" + id + "'";
+        String hsql = "delete from SaleMan o where o.saleManCode ='" + id + "'";
         return execUpdateOrDelete(hsql);
     }
 
     @Override
-    public SaleMan findById(String id) {
+    public SaleMan findByCode(String id) {
         return getByKey(id);
     }
 

@@ -72,11 +72,11 @@ public class SaleDetailServiceImpl implements SaleDetailService {
         String vouNo = saleHis.getVouNo();
         for (SaleHisDetail sd : listSaleDetail) {
             if (sd.getStock() != null) {
-                if (sd.getSaleDetailKey() != null) {
-                    sd.setSaleDetailKey(sd.getSaleDetailKey());
+                if (sd.getSdKey()!= null) {
+                    sd.setSdKey(sd.getSdKey());
                 } else {
                     retInDetailId = vouNo + '-' + sd.getUniqueId();
-                    sd.setSaleDetailKey(new SaleDetailKey(vouNo, retInDetailId));
+                    sd.setSdKey(new SaleDetailKey(vouNo, retInDetailId));
                 }
                 //  pd.setLocation(pur.getLocationId());
                 dao.save(sd);
@@ -116,11 +116,11 @@ public class SaleDetailServiceImpl implements SaleDetailService {
         String vouNo = saleHis.getVouNo();
         for (SaleHisDetail sd : listSaleDetail) {
             if (sd.getStock() != null) {
-                if (sd.getSaleDetailKey() != null) {
-                    sd.setSaleDetailKey(sd.getSaleDetailKey());
+                if (sd.getSdKey()!= null) {
+                    sd.setSdKey(sd.getSdKey());
                 } else {
                     retInDetailId = vouNo + '-' + sd.getUniqueId();
-                    sd.setSaleDetailKey(new SaleDetailKey(vouNo, retInDetailId));
+                    sd.setSdKey(new SaleDetailKey(vouNo, retInDetailId));
                 }
                 //  pd.setLocation(pur.getLocationId());
                 dao.save(sd);

@@ -19,23 +19,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class StockUnitServiceImpl implements StockUnitService {
-
+    
     @Autowired
     private StockUnitDao dao;
-
+    
     @Override
     public StockUnit save(StockUnit unit) {
         return dao.save(unit);
     }
-
+    
     @Override
-    public List<StockUnit> findAll() {
-        return dao.findAll();
+    public List<StockUnit> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
-
+    
     @Override
     public int delete(String id) {
         return dao.delete(id);
     }
-
+    
+    @Override
+    public StockUnit findByCode(String code) {
+        return dao.findByCode(code);
+    }
+    
 }

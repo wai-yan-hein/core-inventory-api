@@ -15,9 +15,6 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "trader")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
-//@DiscriminatorValue(value = "T")
 public class Trader implements java.io.Serializable {
 
     @Id
@@ -31,7 +28,6 @@ public class Trader implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "reg_code")
     private Region region;
-
     @Column(name = "phone", nullable = true, length = 255)
     private String phone;
     @Column(name = "email", nullable = true, length = 25)
@@ -64,6 +60,14 @@ public class Trader implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
+    @Column(name = "credit_days", nullable = true)
+    private Integer creditLimit;
+    @Column(name = "credit_limit", nullable = true)
+    private Integer creditDays;
+    @Column(name = "contact_person")
+    private String contactPerson;
+    @Column(name = "type")
+    private String type;
 
     public Trader(String code, String traderName) {
         this.code = code;
@@ -228,6 +232,38 @@ public class Trader implements java.io.Serializable {
 
     public void setRegion(Region region) {
         this.region = region;
+    }
+
+    public Integer getCreditLimit() {
+        return creditLimit;
+    }
+
+    public void setCreditLimit(Integer creditLimit) {
+        this.creditLimit = creditLimit;
+    }
+
+    public Integer getCreditDays() {
+        return creditDays;
+    }
+
+    public void setCreditDays(Integer creditDays) {
+        this.creditDays = creditDays;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
 }

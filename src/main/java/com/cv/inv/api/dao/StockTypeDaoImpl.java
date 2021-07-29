@@ -23,15 +23,20 @@ public class StockTypeDaoImpl extends AbstractDao<String, StockType> implements 
     }
 
     @Override
-    public List<StockType> findAll() {
-        String hsql = "select o from StockType o";
+    public List<StockType> findAll(String compCode) {
+        String hsql = "select o from StockType o where o.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from StockType o where o.itemTypeCode='" + id + "'";
+        String hsql = "delete from StockType o where o.stockTypeCode ='" + id + "'";
         return execUpdateOrDelete(hsql);
+    }
+
+    @Override
+    public StockType findByCode(String code) {
+        return getByKey(code);
     }
 
 }

@@ -28,7 +28,7 @@ public class MenuController {
 
     @RequestMapping("/get-menu")
     public ResponseEntity<List<VRoleMenu>> getParentChildMenu(@RequestParam String roleCode, @RequestParam String type) {
-        log.info("/get-menu");
+        log.info("/get-menu : " + roleCode);
         List<VRoleMenu> listM = menuService.getParentChildMenu(roleCode, type);
         return ResponseEntity.ok(listM);
     }

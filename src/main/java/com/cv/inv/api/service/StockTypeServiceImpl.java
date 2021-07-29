@@ -5,6 +5,8 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.DuplicateException;
+import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.StockTypeDao;
 import com.cv.inv.api.entity.StockType;
 import java.util.List;
@@ -22,20 +24,42 @@ public class StockTypeServiceImpl implements StockTypeService {
 
     @Autowired
     private StockTypeDao dao;
+    @Autowired
+    private SeqTableService seqService;
 
     @Override
-    public StockType save(StockType item) {
-        return dao.save(item);
+    public StockType save(StockType s) throws Exception {
+        if (Util1.isNull(s.getStockTypeCode())) {
+            String code = getCode(s.getMacId(), "StockType", "-", s.getCompCode());
+            StockType valid = findByCode(code);
+            if (valid == null) {
+                s.setStockTypeCode(code);
+            } else {
+                throw new DuplicateException("Duplicate Stock Type");
+            }
+        }
+        return dao.save(s);
     }
 
     @Override
-    public List<StockType> findAll() {
-        return dao.findAll();
+    public List<StockType> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 
     @Override
     public int delete(String id) {
         return dao.delete(id);
+    }
+
+    @Override
+    public StockType findByCode(String code) {
+        return dao.findByCode(code);
+    }
+
+    private String getCode(Integer macId, String option, String period, String compCode) {
+        int seqNo = seqService.getSequence(macId, option, period, compCode);
+        String tmpCatCode = String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
+        return tmpCatCode;
     }
 
 }

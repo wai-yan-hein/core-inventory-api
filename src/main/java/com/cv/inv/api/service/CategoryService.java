@@ -14,9 +14,11 @@ import java.util.List;
  */
 public interface CategoryService {
 
-    public Category save(Category category);
+    public Category findByCode(String code);
 
-    public List<Category> findAll();
+    public Category save(Category category) throws Exception;
+
+    public List<Category> findAll(String compCode);
 
     public int delete(String id);
 

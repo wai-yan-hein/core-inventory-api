@@ -5,6 +5,7 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.dao.SaleManDao;
 import com.cv.inv.api.entity.SaleMan;
 import java.util.List;
@@ -26,19 +27,19 @@ public class SaleManServiceImpl implements SaleManService {
     private SeqTableService seqService;
 
     @Override
-    public SaleMan save(SaleMan sm) {
-         if (sm.getSaleManCode()== null || sm.getSaleManCode().isEmpty()) {
+    public SaleMan save(SaleMan sm) throws Exception {
+        if (sm.getSaleManCode() == null || sm.getSaleManCode().isEmpty()) {
             Integer macId = sm.getMacId();
             String compCode = sm.getCompCode();
-            String getCode=getSaleManCode(macId, "Category", "-", compCode);
-            sm.setSaleManCode(getCode);
+            String code = getSaleManCode(macId, "Category", "-", compCode);
+            SaleMan valid = findByCode(code);
+            if (valid == null) {
+                sm.setSaleManCode(code);
+            } else {
+                throw new DuplicateException("Duplicate Sale Man Code");
+            }
         }
         return dao.save(sm);
-    }
-
-    @Override
-    public List<SaleMan> findAll() {
-        return dao.findAll();
     }
 
     @Override
@@ -47,15 +48,18 @@ public class SaleManServiceImpl implements SaleManService {
     }
 
     @Override
-    public SaleMan findById(String id) {
-        return dao.findById(id);
+    public SaleMan findByCode(String code) {
+        return dao.findByCode(code);
     }
 
-     private String getSaleManCode(Integer macId, String option, String period, String compCode) {
-
+    private String getSaleManCode(Integer macId, String option, String period, String compCode) {
         int seqNo = seqService.getSequence(macId, option, period, compCode);
-
         String tmpCatCode = String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
         return tmpCatCode;
+    }
+
+    @Override
+    public List<SaleMan> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 }

@@ -14,9 +14,11 @@ import java.util.List;
  */
 public interface StockTypeService {
 
-    public StockType save(StockType item);
+    public StockType findByCode(String code);
 
-    public List<StockType> findAll();
+    public StockType save(StockType item) throws Exception;
+
+    public List<StockType> findAll(String compCode);
 
     public int delete(String id);
 }

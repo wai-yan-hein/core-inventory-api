@@ -14,11 +14,11 @@ import java.util.List;
  */
 public interface SaleManService {
 
-    public SaleMan save(SaleMan saleMan);
+    public SaleMan save(SaleMan saleMan) throws Exception;
 
-    public List<SaleMan> findAll();
+    public List<SaleMan> findAll(String compCode);
 
     public int delete(String id);
-    
-     public SaleMan findById(String id);
+
+    public SaleMan findByCode(String code);
 }

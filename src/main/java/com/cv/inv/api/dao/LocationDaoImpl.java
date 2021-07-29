@@ -35,15 +35,15 @@ public class LocationDaoImpl extends AbstractDao<String, Location> implements Lo
     }
 
     @Override
-    public Location findById(String id) {
-        return getByKey(id);
-    }
-
-    @Override
     public List<Location> search(String parent) {
         String hsql = "select o from Location o where o.parentCode ='" + parent + "'";
         return findHSQL(hsql);
 
+    }
+
+    @Override
+    public Location findByCode(String code) {
+        return getByKey(code);
     }
 
 }

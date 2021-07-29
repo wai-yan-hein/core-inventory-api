@@ -5,6 +5,7 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.dao.LocationDao;
 import com.cv.inv.api.entity.Location;
 import java.util.List;
@@ -27,11 +28,17 @@ public class LocationServiceImpl implements LocationService {
     private SeqTableService seqService;
 
     @Override
-    public Location save(Location loc) {
+    public Location save(Location loc) throws Exception {
         if (loc.getLocationCode() == null || loc.getLocationCode().isEmpty()) {
             Integer macId = loc.getMacId();
             String compCode = loc.getCompCode();
-            loc.setLocationCode(getLocationCode(macId, "Location", "-", compCode));
+            String locCode = getLocationCode(macId, "Location", "-", compCode);
+            Location valid = findByCode(locCode);
+            if (valid == null) {
+                loc.setLocationCode(locCode);
+            } else {
+                throw new DuplicateException("Duplicate Location Code");
+            }
         }
         return dao.save(loc);
     }
@@ -47,11 +54,6 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Location findById(String id) {
-        return dao.findById(id);
-    }
-
-    @Override
     public List<Location> search(String parent) {
         return dao.search(parent);
     }
@@ -62,5 +64,10 @@ public class LocationServiceImpl implements LocationService {
 
         String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
         return tmpCatCode;
+    }
+
+    @Override
+    public Location findByCode(String code) {
+        return dao.findByCode(code);
     }
 }

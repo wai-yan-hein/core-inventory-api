@@ -14,13 +14,13 @@ import java.util.List;
  */
 public interface LocationService {
 
-    public Location save(Location loc);
+    public Location findByCode(String code);
+
+    public Location save(Location loc) throws Exception;
 
     public List<Location> findAll(String compCode);
 
     public int delete(String id);
-
-    public Location findById(String id);
 
     public List<Location> search(String parent);
 

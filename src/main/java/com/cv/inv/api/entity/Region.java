@@ -28,10 +28,6 @@ public class Region implements java.io.Serializable {
     private String regCode;
     @Column(name = "reg_name", length = 255)
     private String regionName;
-    @Column(name = "reg_type_id", length = 15)
-    private String regionType;
-    @Column(name = "parent_reg_id")
-    private String parentRegion;
     @Column(name = "comp_code")
     private String compCode;
     @Temporal(TemporalType.TIMESTAMP)
@@ -57,22 +53,6 @@ public class Region implements java.io.Serializable {
 
     public void setRegionName(String regionName) {
         this.regionName = regionName;
-    }
-
-    public String getRegionType() {
-        return regionType;
-    }
-
-    public void setRegionType(String regionType) {
-        this.regionType = regionType;
-    }
-
-    public String getParentRegion() {
-        return parentRegion;
-    }
-
-    public void setParentRegion(String parentRegion) {
-        this.parentRegion = parentRegion;
     }
 
     public String getRegCode() {

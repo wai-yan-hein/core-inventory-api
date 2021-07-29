@@ -25,9 +25,9 @@ public class StockType implements java.io.Serializable {
 
     @Id
     @Column(name = "stock_type_code", unique = true, nullable = false, length = 5)
-    private String itemTypeCode;
+    private String stockTypeCode;
     @Column(name = "stock_type_name", nullable = false, length = 50, unique = true)
-    private String itemTypeName;
+    private String stockTypeName;
     @Column(name = "account_id")
     private String accountId;
     @Temporal(TemporalType.TIMESTAMP)
@@ -52,30 +52,20 @@ public class StockType implements java.io.Serializable {
     public StockType() {
     }
 
-    public StockType(String itemTypeCode, String itemTypeName) {
-        this.itemTypeCode = itemTypeCode;
-        this.itemTypeName = itemTypeName;
+    public String getStockTypeCode() {
+        return stockTypeCode;
     }
 
-    @Override
-    public String toString() {
-        return this.itemTypeName;
+    public void setStockTypeCode(String stockTypeCode) {
+        this.stockTypeCode = stockTypeCode;
     }
 
-    public String getItemTypeCode() {
-        return itemTypeCode;
+    public String getStockTypeName() {
+        return stockTypeName;
     }
 
-    public void setItemTypeCode(String itemTypeCode) {
-        this.itemTypeCode = itemTypeCode;
-    }
-
-    public String getItemTypeName() {
-        return itemTypeName;
-    }
-
-    public void setItemTypeName(String itemTypeName) {
-        this.itemTypeName = itemTypeName;
+    public void setStockTypeName(String stockTypeName) {
+        this.stockTypeName = stockTypeName;
     }
 
     public String getAccountId() {

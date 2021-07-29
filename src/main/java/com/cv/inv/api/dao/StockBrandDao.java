@@ -16,7 +16,9 @@ public interface StockBrandDao {
 
     public StockBrand save(StockBrand brand);
 
-    public List<StockBrand> findAll();
+    public List<StockBrand> findAll(String compCode);
+
+    public StockBrand findByCode(String code);
 
     public int delete(String id);
 }
