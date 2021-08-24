@@ -6,6 +6,7 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.common.DuplicateException;
+import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.RegionDao;
 import com.cv.inv.api.entity.Region;
 import java.util.List;
@@ -29,7 +30,7 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public Region save(Region rg) throws Exception {
-        if (rg.getRegCode() == null || rg.getRegCode().isEmpty()) {
+        if (Util1.isNull(rg.getRegCode())) {
             Integer macId = rg.getMacId();
             String compCode = rg.getCompCode();
             String code = getRegiionCode(macId, "Region", "-", compCode);

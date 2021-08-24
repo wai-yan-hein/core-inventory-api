@@ -6,6 +6,7 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.common.DuplicateException;
+import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.CategoryDao;
 import com.cv.inv.api.entity.Category;
 import java.util.List;
@@ -29,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category save(Category cat) throws Exception {
-        if (cat.getCatCode() == null || cat.getCatCode().isEmpty()) {
+        if (Util1.isNull(cat.getCatCode())) {
             Integer macId = cat.getMacId();
             String compCode = cat.getCompCode();
             String catCode = getCatCode(macId, "Category", "-", compCode);

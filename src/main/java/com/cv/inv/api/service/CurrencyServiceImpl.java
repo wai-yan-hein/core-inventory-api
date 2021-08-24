@@ -7,7 +7,6 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.dao.CurrencyDao;
 import com.cv.inv.api.entity.Currency;
-import com.cv.inv.api.entity.CurrencyKey;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,14 +30,14 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public Currency findById(CurrencyKey id) {
+    public Currency findById(String id) {
         Currency cur = dao.findById(id);
         return cur;
     }
 
     @Override
-    public List<Currency> search(String code, String name, String compCode) {
-        List<Currency> listCur = dao.search(code, name, compCode);
+    public List<Currency> search(String code, String name) {
+        List<Currency> listCur = dao.search(code, name);
         return listCur;
     }
 
@@ -46,10 +45,5 @@ public class CurrencyServiceImpl implements CurrencyService {
     public int delete(String code, String compCode) {
         int cnt = dao.delete(code, compCode);
         return cnt;
-    }
-
-    @Override
-    public Currency findById(String id) {
-        return dao.findById(id);
     }
 }

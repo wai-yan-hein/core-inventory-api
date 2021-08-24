@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SaleDetailServiceImpl implements SaleDetailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SaleDetailServiceImpl.class);
     @Autowired
     private SaleDetailDao dao;
 

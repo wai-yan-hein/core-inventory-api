@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface StockBrandDao {
 
-    public StockBrand save(StockBrand brand);
+    public StockBrand save(StockBrand brand) throws Exception;
 
     public List<StockBrand> findAll(String compCode);
 

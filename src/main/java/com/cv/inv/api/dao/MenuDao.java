@@ -18,14 +18,14 @@ public interface MenuDao {
 
     public Menu findById(String id);
 
-    public List<Menu> search(String name, String nameMM, String parentId, String coaCode);
+    public List<Menu> search(String compCode, String nameMM, String parentId, String coaCode);
 
     public List<Menu> getParentChildMenu();
 
     public List<Menu> searchM(String updatedDate);
 
-    public List getParentChildMenu(String roleId, String menuType);
-    
+    public List getParentChildMenu(String roleId, String menuType, String compCode);
+
     public List getParentChildMenuSelect(String roleId, String menuType);
 
     public int delete(String id);

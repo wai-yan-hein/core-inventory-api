@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 public class StockBrandDaoImpl extends AbstractDao<String, StockBrand> implements StockBrandDao {
 
     @Override
-    public StockBrand save(StockBrand item) {
+    public StockBrand save(StockBrand item) throws Exception {
         persist(item);
         return item;
     }

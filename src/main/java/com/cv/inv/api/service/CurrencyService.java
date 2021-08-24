@@ -17,11 +17,9 @@ public interface CurrencyService {
 
     public Currency save(Currency cur);
 
-    public Currency findById(CurrencyKey id);
-
     public Currency findById(String id);
 
-    public List<Currency> search(String code, String name, String compCode);
+    public List<Currency> search(String code, String name);
 
     public int delete(String code, String compCode);
 }

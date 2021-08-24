@@ -8,7 +8,6 @@ package com.cv.inv.api.controller;
 import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.entity.Category;
 import com.cv.inv.api.entity.Currency;
-import com.cv.inv.api.entity.CurrencyKey;
 import com.cv.inv.api.entity.Location;
 import com.cv.inv.api.entity.Region;
 import com.cv.inv.api.entity.SaleMan;
@@ -78,14 +77,14 @@ public class SetupController {
     }
 
     @PostMapping(path = "/find-by-id")
-    public ResponseEntity<Currency> findById(@RequestBody CurrencyKey key) {
-        Currency cur = currencyService.findById(key);
+    public ResponseEntity<Currency> findById(@RequestBody String curCode) {
+        Currency cur = currencyService.findById(curCode);
         return ResponseEntity.ok(cur);
     }
 
     @GetMapping(path = "/get-currency")
-    public ResponseEntity<List<Currency>> getCurrency(@RequestParam String compCode) {
-        List<Currency> currency = currencyService.search("-", "-", compCode);
+    public ResponseEntity<List<Currency>> getCurrency() {
+        List<Currency> currency = currencyService.search("-", "-");
         return ResponseEntity.ok(currency);
     }
 

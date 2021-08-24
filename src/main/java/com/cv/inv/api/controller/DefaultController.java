@@ -5,12 +5,13 @@
  */
 package com.cv.inv.api.controller;
 
-import com.cv.inv.api.entity.VRoleMenu;
-import com.cv.inv.api.service.MenuService;
-import java.util.List;
+import com.cv.inv.api.common.ReturnObject;
+import com.cv.inv.api.entity.Location;
+import com.cv.inv.api.service.RoleDefaultService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,17 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Lenovo
  */
 @RestController
+@RequestMapping("/default")
 @Slf4j
-public class MenuController {
+public class DefaultController {
 
     @Autowired
-    private MenuService menuService;
-
-    @RequestMapping("/get-menu")
-    public ResponseEntity<List<VRoleMenu>> getParentChildMenu(@RequestParam String roleCode,
-            @RequestParam String type, @RequestParam String compCode) {
-        log.info("/get-menu : " + roleCode);
-        List<VRoleMenu> listM = menuService.getParentChildMenu(roleCode, type, compCode);
-        return ResponseEntity.ok(listM);
-    }
+    private ReturnObject ro;
+    @Autowired
+    private RoleDefaultService defService;
 }

@@ -30,6 +30,7 @@ public class VRoleMenu implements java.io.Serializable {
     private String menuType;
     private Integer orderBy;
     private Boolean isAllow;
+    private String compCode;
     private List<VRoleMenu> child;
 
     public VRoleMenu() {
@@ -138,6 +139,15 @@ public class VRoleMenu implements java.io.Serializable {
 
     public void setIsAllow(Boolean isAllow) {
         this.isAllow = isAllow;
+    }
+
+    @Column(name = "comp_code")
+    public String getCompCode() {
+        return compCode;
+    }
+
+    public void setCompCode(String compCode) {
+        this.compCode = compCode;
     }
 
 }

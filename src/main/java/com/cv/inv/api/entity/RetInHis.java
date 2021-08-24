@@ -108,8 +108,6 @@ public class RetInHis implements java.io.Serializable {
         this.paid = paid;
     }
 
-   
-
     @Column(name = "remark", length = 25)
     public String getRemark() {
         return remark;
@@ -178,10 +176,7 @@ public class RetInHis implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "cur_code"),
-        @JoinColumn(name = "comp_code")
-    })
+    @JoinColumn(name = "cur_code")
     public Currency getCurrency() {
         return currency;
     }
@@ -215,6 +210,15 @@ public class RetInHis implements java.io.Serializable {
 
     public void setMacId(Integer macId) {
         this.macId = macId;
+    }
+
+    @Column(name = "comp_code")
+    public String getCompCode() {
+        return compCode;
+    }
+
+    public void setCompCode(String compCode) {
+        this.compCode = compCode;
     }
 
 }

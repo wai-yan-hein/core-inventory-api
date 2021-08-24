@@ -6,13 +6,16 @@
 package com.cv.inv.api.entity;
 
 import java.util.Date;
+import java.util.List;
 import javax.persistence.*;
+import lombok.Data;
 
 /**
  *
  * @author Mg Kyaw Thura Aung
  */
 @Entity
+@Data
 @Table(name = "sale_his")
 public class SaleHis implements java.io.Serializable {
 
@@ -32,18 +35,14 @@ public class SaleHis implements java.io.Serializable {
     @Column(name = "credit_term")
     private Date creditTerm;
     @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "cur_code"),
-        @JoinColumn(name = "comp_code")
-    })
+    @JoinColumn(name = "cur_code")
     private Currency currency;
-    @ManyToOne
-    @JoinColumn(name = "vou_status_code")
-    private VouStatus vouStatus;
-    @Column(name = "remark", length = 500)
+    @Column(name = "remark")
     private String remark;
     @Column(name = "vou_total")
     private Float vouTotal;
+    @Column(name = "grand_total")
+    private Float grandTotal;
     @Column(name = "discount")
     private Float discount;
     @Column(name = "disc_p")
@@ -54,8 +53,6 @@ public class SaleHis implements java.io.Serializable {
     private Float taxP;
     @Column(name = "deleted")
     private Boolean deleted;
-    @Column(name = "grand_total")
-    private Float grandTotal;
     @Column(name = "paid")
     private Float paid;
     @Column(name = "vou_balance")
@@ -83,216 +80,13 @@ public class SaleHis implements java.io.Serializable {
     private Location location;
     @Column(name = "mac_id")
     private Integer macId;
-
-    public SaleHis() {
-    }
-
-    public String getVouNo() {
-        return vouNo;
-    }
-
-    public void setVouNo(String vouNo) {
-        this.vouNo = vouNo;
-    }
-
-    public Integer getSession() {
-        return session;
-    }
-
-    public void setSession(Integer session) {
-        this.session = session;
-    }
-
-    public SaleMan getSaleMan() {
-        return saleMan;
-    }
-
-    public void setSaleMan(SaleMan saleMan) {
-        this.saleMan = saleMan;
-    }
-
-    public Date getSaleDate() {
-        return saleDate;
-    }
-
-    public void setSaleDate(Date saleDate) {
-        this.saleDate = saleDate;
-    }
-
-    public Date getCreditTerm() {
-        return creditTerm;
-    }
-
-    public void setCreditTerm(Date creditTerm) {
-        this.creditTerm = creditTerm;
-    }
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public Float getVouTotal() {
-        return vouTotal;
-    }
-
-    public void setVouTotal(Float vouTotal) {
-        this.vouTotal = vouTotal;
-    }
-
-    public Float getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(Float discount) {
-        this.discount = discount;
-    }
-
-    public Float getDiscP() {
-        return discP;
-    }
-
-    public void setDiscP(Float discP) {
-        this.discP = discP;
-    }
-
-    public Float getTaxAmt() {
-        return taxAmt;
-    }
-
-    public void setTaxAmt(Float taxAmt) {
-        this.taxAmt = taxAmt;
-    }
-
-    public Float getTaxP() {
-        return taxP;
-    }
-
-    public void setTaxP(Float taxP) {
-        this.taxP = taxP;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public Float getGrandTotal() {
-        return grandTotal;
-    }
-
-    public void setGrandTotal(Float grandTotal) {
-        this.grandTotal = grandTotal;
-    }
-
-    public Float getPaid() {
-        return paid;
-    }
-
-    public void setPaid(Float paid) {
-        this.paid = paid;
-    }
-
-    public AppUser getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(AppUser createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    public AppUser getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(AppUser updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getOrderCode() {
-        return orderCode;
-    }
-
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
-    public void setRegion(Region region) {
-        this.region = region;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public Integer getMacId() {
-        return macId;
-    }
-
-    public void setMacId(Integer macId) {
-        this.macId = macId;
-    }
-
-    public VouStatus getVouStatus() {
-        return vouStatus;
-    }
-
-    public void setVouStatus(VouStatus vouStatus) {
-        this.vouStatus = vouStatus;
-    }
-
-    public Trader getTrader() {
-        return trader;
-    }
-
-    public void setTrader(Trader trader) {
-        this.trader = trader;
-    }
-
-    public Float getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Float balance) {
-        this.balance = balance;
-    }
+    @Column(name = "comp_code")
+    private String compCode;
+    @Transient
+    private String status = "STATUS";
+    @Transient
+    private List<SaleHisDetail> listSH;
+    @Transient
+    private List<String> listDel;
 
 }

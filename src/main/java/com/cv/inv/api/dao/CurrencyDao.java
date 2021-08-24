@@ -6,7 +6,6 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Currency;
-import com.cv.inv.api.entity.CurrencyKey;
 import java.util.List;
 
 /**
@@ -17,11 +16,9 @@ public interface CurrencyDao {
 
     public Currency save(Currency cur);
 
-    public Currency findById(CurrencyKey id);
-
     public Currency findById(String id);
 
-    public List<Currency> search(String code, String name, String compCode);
+    public List<Currency> search(String code, String name);
 
     public int delete(String code, String compCode);
 }

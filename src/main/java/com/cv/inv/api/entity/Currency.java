@@ -6,8 +6,8 @@ package com.cv.inv.api.entity;
 
 import java.util.Date;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -17,9 +17,10 @@ import javax.persistence.TemporalType;
  * @author WSwe
  */
 @Entity
-@Table(name="currency")
-public class Currency implements java.io.Serializable{
-    private CurrencyKey key;
+@Table(name = "currency")
+public class Currency implements java.io.Serializable {
+
+    private String curCode;
     private String currencyName;
     private String currencySymbol;
     private Boolean active;
@@ -28,16 +29,17 @@ public class Currency implements java.io.Serializable{
     private String updatedBy;
     private Date updatedDt;
 
-    @EmbeddedId
-    public CurrencyKey getKey() {
-        return key;
+    @Id
+    @Column(name = "cur_code", unique = true, nullable = false, length = 15)
+    public String getCurCode() {
+        return curCode;
     }
 
-    public void setKey(CurrencyKey key) {
-        this.key = key;
+    public void setCurCode(String curCode) {
+        this.curCode = curCode;
     }
-    
-    @Column(name="cur_name", unique=true, nullable=false)
+
+    @Column(name = "cur_name", unique = true, nullable = false)
     public String getCurrencyName() {
         return currencyName;
     }
@@ -46,7 +48,7 @@ public class Currency implements java.io.Serializable{
         this.currencyName = currencyName;
     }
 
-    @Column(name="cur_symbol", nullable=true)
+    @Column(name = "cur_symbol", nullable = true)
     public String getCurrencySymbol() {
         return currencySymbol;
     }
@@ -54,13 +56,13 @@ public class Currency implements java.io.Serializable{
     public void setCurrencySymbol(String currencySymbol) {
         this.currencySymbol = currencySymbol;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return currencyName;
     }
 
-    @Column(name="active")
+    @Column(name = "active")
     public Boolean getActive() {
         return active;
     }
@@ -69,7 +71,7 @@ public class Currency implements java.io.Serializable{
         this.active = active;
     }
 
-    @Column(name="created_by", length=15)
+    @Column(name = "created_by", length = 15)
     public String getCreatedBy() {
         return createdBy;
     }
@@ -88,7 +90,7 @@ public class Currency implements java.io.Serializable{
         this.createdDt = createdDt;
     }
 
-    @Column(name="updated_by", length=15)
+    @Column(name = "updated_by", length = 15)
     public String getUpdatedBy() {
         return updatedBy;
     }

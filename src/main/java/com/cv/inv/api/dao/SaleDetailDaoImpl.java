@@ -27,19 +27,14 @@ public class SaleDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDetail>
 
     @Override
     public List<SaleHisDetail> search(String vouId) {
-        String hsql = "select o from SaleHisDetail o where o.saleDetailKey.vouId is '" + vouId + "' order by o.uniqueId";
+        String hsql = "select o from SaleHisDetail o where o.sdKey.vouNo = '" + vouId + "' order by o.uniqueId";
         return findHSQL(hsql);
     }
 
     @Override
-    public int delete(String id) {
-        String strSql = "delete from sale_his_detail where sale_detail_id = '" + id + "' ";
-        try {
-            execSQL(strSql);
-        } catch (Exception ex) {
-            Logger.getLogger(SaleDetailDaoImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return 1;
+    public int delete(String vouNo) {
+        String strSql = "delete from SaleHisDetail o where o.sdKey.sdCode = '" + vouNo + "'";
+        return execUpdateOrDelete(strSql);
     }
 
 }

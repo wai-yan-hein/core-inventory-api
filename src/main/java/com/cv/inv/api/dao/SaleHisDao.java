@@ -6,7 +6,6 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.SaleHis;
-import java.sql.ResultSet;
 import java.util.List;
 
 /**
@@ -17,11 +16,8 @@ public interface SaleHisDao {
 
     public SaleHis save(SaleHis sh);
 
-    public List<SaleHis> search(String fromDate, String toDate, String cusId,
-            String vouStatusId, String remark, String stockCode, String userCode);
-
-    public ResultSet searchM(String fromDate, String toDate, String cusId,
-            String vouStatusId, String remark, String stockCode, String userCode) throws Exception;
+    public List<SaleHis> search(String fromDate, String toDate, String cusCode,
+            String vouNo, String userCode);
 
     public SaleHis findById(String id);
 

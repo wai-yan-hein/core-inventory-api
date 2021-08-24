@@ -6,8 +6,12 @@
 package com.cv.inv.api.controller;
 
 import com.cv.inv.api.common.ReturnObject;
+import com.cv.inv.api.common.SystemSetting;
 import com.cv.inv.api.entity.AppUser;
+import com.cv.inv.api.entity.UserRole;
 import com.cv.inv.api.entity.VUsrCompAssign;
+import com.cv.inv.api.service.RoleDefaultService;
+import com.cv.inv.api.service.UserRoleService;
 import com.cv.inv.api.service.UserService;
 import com.cv.inv.api.service.UsrCompRoleService;
 import java.net.URISyntaxException;
@@ -39,6 +43,10 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UsrCompRoleService compService;
+    @Autowired
+    private RoleDefaultService defaultService;
+    @Autowired
+    private UserRoleService usrService;
 
     @PostMapping(value = "/save")
     public ResponseEntity<ReturnObject> saveUser(@RequestBody AppUser user)
@@ -62,5 +70,29 @@ public class UserController {
     public ResponseEntity<ReturnObject> test() {
         ro.setMeesage("Hello");
         return ResponseEntity.ok(ro);
+    }
+
+    @RequestMapping(path = "/get-role-setting", method = RequestMethod.GET)
+    public ResponseEntity<SystemSetting> getSystemSetting(@RequestParam String roleCode) {
+        SystemSetting loadSS = defaultService.loadSS(roleCode);
+        return ResponseEntity.ok(loadSS);
+    }
+
+    @PostMapping(path = "/save-role-setting")
+    public ResponseEntity<SystemSetting> saveRoleSetting(@RequestBody SystemSetting ss) {
+        SystemSetting loadSS = defaultService.saveSS(ss);
+        return ResponseEntity.ok(loadSS);
+    }
+
+    @RequestMapping(path = "/get-role", method = RequestMethod.GET)
+    public ResponseEntity<List<UserRole>> getRoles(@RequestParam String compCode) {
+        List<UserRole> search = usrService.search("-", compCode);
+        return ResponseEntity.ok(search);
+    }
+
+    @PostMapping(path = "/save-role")
+    public ResponseEntity<UserRole> saveRole(@RequestBody UserRole ur) {
+        UserRole save = usrService.save(ur);
+        return ResponseEntity.ok(save);
     }
 }

@@ -6,6 +6,7 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.common.DuplicateException;
+import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.SaleManDao;
 import com.cv.inv.api.entity.SaleMan;
 import java.util.List;
@@ -28,10 +29,10 @@ public class SaleManServiceImpl implements SaleManService {
 
     @Override
     public SaleMan save(SaleMan sm) throws Exception {
-        if (sm.getSaleManCode() == null || sm.getSaleManCode().isEmpty()) {
+        if (Util1.isNull(sm.getSaleManCode())) {
             Integer macId = sm.getMacId();
             String compCode = sm.getCompCode();
-            String code = getSaleManCode(macId, "Category", "-", compCode);
+            String code = getSaleManCode(macId, "SM", "-", compCode);
             SaleMan valid = findByCode(code);
             if (valid == null) {
                 sm.setSaleManCode(code);

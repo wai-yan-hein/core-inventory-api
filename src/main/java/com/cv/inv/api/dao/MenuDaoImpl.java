@@ -30,15 +30,15 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     }
 
     @Override
-    public List<Menu> search(String name, String nameMM, String parentId, String coaCode) {
+    public List<Menu> search(String compCode, String nameMM, String parentId, String coaCode) {
         String strSql = "select o from Menu o ";
         String strFilter = "";
 
-        if (!name.equals("-")) {
+        if (!compCode.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.text like '" + name + "%'";
+                strFilter = "o.compCode = '" + compCode + "'";
             } else {
-                strFilter = strFilter + " and o.text like '" + name + "%'";
+                strFilter = strFilter + " and o.compCode  '" + compCode + "'";
             }
         }
 
@@ -108,21 +108,21 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     }
 
     @Override
-    public List getParentChildMenu(String roleCode, String menuType) {
+    public List getParentChildMenu(String roleCode, String menuType, String compCode) {
         String strSql = "select o from VRoleMenu o where o.key.roleCode = '" + roleCode
-                + "' and o.parent = '1' order by o.orderBy";
+                + "' and o.parent = '1' and o.compCode = '" + compCode + "' order by o.orderBy";
         List listRootMenu = findHSQL(strSql);
         for (int i = 0; i < listRootMenu.size(); i++) {
             VRoleMenu parent = (VRoleMenu) listRootMenu.get(i);
-            getChild(parent, roleCode, menuType);
+            getChild(parent, roleCode, menuType, compCode);
         }
 
         return listRootMenu;
     }
 
-    private void getChild(VRoleMenu parent, String roleCode, String menuType) {
+    private void getChild(VRoleMenu parent, String roleCode, String menuType, String compCode) {
         String strSql = "select o from VRoleMenu o where o.parent = '" + parent.getKey().getMenuCode()
-                + "' and o.key.roleCode = '" + roleCode + "'";
+                + "' and o.key.roleCode = '" + roleCode + "' and o.compCode = '" + compCode + "'";
         if (!menuType.equals("-")) {
             strSql = strSql + " and o.menuType = '" + menuType + "'";
         }
@@ -133,7 +133,7 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
                 parent.setChild(listChild);
                 for (int i = 0; i < listChild.size(); i++) {
                     VRoleMenu child = (VRoleMenu) listChild.get(i);
-                    getChild(child, roleCode, menuType);
+                    getChild(child, roleCode, menuType, compCode);
                 }
             }
         }

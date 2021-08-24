@@ -172,10 +172,7 @@ public class RetOutHis implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "cur_code"),
-        @JoinColumn(name = "comp_code")
-    })
+    @JoinColumn(name = "cur_code")
     public Currency getCurrency() {
         return currency;
     }

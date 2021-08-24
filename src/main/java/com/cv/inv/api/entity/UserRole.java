@@ -17,19 +17,19 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author Lenovo
+ * @author winswe
  */
 @Entity
-@Table(name = "category")
-public class Category implements java.io.Serializable {
+@Table(name = "user_role")
+public class UserRole implements java.io.Serializable {
 
     @Id
-    @Column(name = "cat_code", unique = true, nullable = false)
-    private String catCode;
-    @Column(name = "cat_name", nullable = false, length = 500, unique = true)
-    private String catName;
-    @Column(name = "mig_id")
-    private Integer migId;
+    @Column(name = "role_code", unique = true, nullable = false)
+    private String roleCode;
+    @Column(name = "role_name", length = 50)
+    private String roleName;
+    @Column(name = "comp_code")
+    private String compCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -46,31 +46,29 @@ public class Category implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
 
-    public Category() {
+    public String getRoleName() {
+        return roleName;
     }
 
-    @Override
-    public String toString() {
-        return this.catName;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
-    public String getCatName() {
-        return catName;
+    public String getCompCode() {
+        return compCode;
     }
 
-    public void setCatName(String catName) {
-        this.catName = catName;
+    public void setCompCode(String compCode) {
+        this.compCode = compCode;
     }
 
-    public Integer getMigId() {
-        return migId;
+    public String getRoleCode() {
+        return roleCode;
     }
 
-    public void setMigId(Integer migId) {
-        this.migId = migId;
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
     }
 
     public Date getUpdatedDate() {
@@ -81,12 +79,12 @@ public class Category implements java.io.Serializable {
         this.updatedDate = updatedDate;
     }
 
-    public String getCatCode() {
-        return catCode;
+    public AppUser getUpdatedBy() {
+        return updatedBy;
     }
 
-    public void setCatCode(String catCode) {
-        this.catCode = catCode;
+    public void setUpdatedBy(AppUser updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public Date getCreatedDate() {
@@ -97,28 +95,20 @@ public class Category implements java.io.Serializable {
         this.createdDate = createdDate;
     }
 
-    public Integer getMacId() {
-        return macId;
-    }
-
-    public void setMacId(Integer macId) {
-        this.macId = macId;
-    }
-
-    public AppUser getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(AppUser updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
     public AppUser getCreatedBy() {
         return createdBy;
     }
 
     public void setCreatedBy(AppUser createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Integer getMacId() {
+        return macId;
+    }
+
+    public void setMacId(Integer macId) {
+        this.macId = macId;
     }
 
     public String getUserCode() {
@@ -129,12 +119,9 @@ public class Category implements java.io.Serializable {
         this.userCode = userCode;
     }
 
-    public String getCompCode() {
-        return compCode;
-    }
-
-    public void setCompCode(String compCode) {
-        this.compCode = compCode;
+    @Override
+    public String toString() {
+        return roleName;
     }
 
 }

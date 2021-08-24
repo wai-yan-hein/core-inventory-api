@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * @author WSwe
  */
 @Repository
-public class CurrencyDaoImpl extends AbstractDao<CurrencyKey, Currency> implements CurrencyDao {
+public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements CurrencyDao {
 
     @Override
     public Currency save(Currency cur) {
@@ -24,27 +24,21 @@ public class CurrencyDaoImpl extends AbstractDao<CurrencyKey, Currency> implemen
     }
 
     @Override
-    public Currency findById(CurrencyKey id) {
+    public Currency findById(String id) {
         Currency cur = getByKey(id);
         return cur;
     }
 
     @Override
-    public Currency findById(String id) {
-
-        return null;
-    }
-
-    @Override
-    public List<Currency> search(String code, String name, String compCode) {
+    public List<Currency> search(String code, String name) {
         String strSql = "select o from Currency o ";
         String strFilter = "";
 
         if (!code.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.key.code like '" + code + "%'";
+                strFilter = "o.curCode like '" + code + "%'";
             } else {
-                strFilter = strFilter + " and o.key.code like '" + code + "%'";
+                strFilter = strFilter + " and o.curCode like '" + code + "%'";
             }
         }
 
@@ -53,14 +47,6 @@ public class CurrencyDaoImpl extends AbstractDao<CurrencyKey, Currency> implemen
                 strFilter = "o.currencyName like '%" + name + "%'";
             } else {
                 strFilter = strFilter + " and o.currencyName like '%" + name + "%'";
-            }
-        }
-
-        if (!compCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.key.compCode = " + compCode;
-            } else {
-                strFilter = strFilter + " and o.key.compCode = " + compCode;
             }
         }
 

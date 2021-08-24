@@ -42,8 +42,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<Menu> search(String name, String nameMM, String parentId, String coaCode) {
-        return dao.search(name, nameMM, parentId, coaCode);
+    public List<Menu> search(String compCode, String nameMM, String parentId, String coaCode) {
+        return dao.search(compCode, nameMM, parentId, coaCode);
     }
 
     @Override
@@ -57,12 +57,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List getParentChildMenu(String roleId, String menuType) {
-        return dao.getParentChildMenu(roleId, menuType);
+    public List getParentChildMenu(String roleId, String menuType, String compCode) {
+        return dao.getParentChildMenu(roleId, menuType, compCode);
     }
-    
+
     @Override
-    public List getParentChildMenuSelect(String roleId, String menuType){
+    public List getParentChildMenuSelect(String roleId, String menuType) {
         return dao.getParentChildMenuSelect(roleId, menuType);
     }
 

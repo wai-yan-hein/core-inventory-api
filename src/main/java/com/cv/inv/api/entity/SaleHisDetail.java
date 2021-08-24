@@ -38,13 +38,15 @@ public class SaleHisDetail implements java.io.Serializable {
     private StockUnit saleUnit;
     @Column(name = "sale_price", nullable = false)
     private Float price;
-    @Column(name = "sale_amount", nullable = false)
+    @Column(name = "sale_amt", nullable = false)
     private Float amount;
     @ManyToOne
     @JoinColumn(name = "loc_code")
     private Location location;
     @Column(name = "unique_id")
     private Integer uniqueId;
+    @Column(name = "sale_wt")
+    private Float saleWt;
 
     public SaleDetailKey getSdKey() {
         return sdKey;
@@ -117,4 +119,13 @@ public class SaleHisDetail implements java.io.Serializable {
     public void setUniqueId(Integer uniqueId) {
         this.uniqueId = uniqueId;
     }
+
+    public Float getSaleWt() {
+        return saleWt;
+    }
+
+    public void setSaleWt(Float saleWt) {
+        this.saleWt = saleWt;
+    }
+
 }
