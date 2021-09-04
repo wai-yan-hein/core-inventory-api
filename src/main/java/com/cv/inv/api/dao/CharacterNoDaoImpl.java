@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CharacterNoDaoImpl extends AbstractDao<String, CharacterNo> implements CharacterNoDao {
 
+
     @Override
     public CharacterNo save(CharacterNo ch) {
         persist(ch);
@@ -23,7 +24,7 @@ public class CharacterNoDaoImpl extends AbstractDao<String, CharacterNo> impleme
     }
 
     @Override
-    public List<CharacterNo> findAll() {
+    public List findAll() {
         String hsql = "select o from CharacterNo o";
         return findHSQL(hsql);
     }

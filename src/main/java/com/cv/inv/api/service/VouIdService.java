@@ -13,14 +13,14 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface VouIdService {
+ public interface VouIdService {
 
-    public VouId save(VouId vouId);
+     VouId save(VouId vouNo);
 
-    public Object getMax(String machineName, String vouType, String vouPeriod) throws Exception;
+     Object getMax(String machineName, String vouType, String vouPeriod) throws Exception;
 
-    public Object find(CompoundKey key);
+     Object find(CompoundKey key);
 
-    public List<VouId> search(String machineName, String vouType, String period);
+     List<VouId> search(String machineName, String vouType, String period);
 
 }

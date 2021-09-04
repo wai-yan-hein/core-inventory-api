@@ -12,14 +12,14 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface SaleHisDao {
+ public interface SaleHisDao {
 
-    public SaleHis save(SaleHis sh);
+     SaleHis save(SaleHis sh);
 
-    public List<SaleHis> search(String fromDate, String toDate, String cusCode,
+     List<SaleHis> search(String fromDate, String toDate, String cusCode,
             String vouNo, String userCode);
 
-    public SaleHis findById(String id);
+     SaleHis findById(String id);
 
-    public int delete(String vouNo) throws Exception;
+     int delete(String vouNo) throws Exception;
 }

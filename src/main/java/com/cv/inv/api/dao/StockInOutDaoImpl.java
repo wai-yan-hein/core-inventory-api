@@ -28,53 +28,48 @@ public class StockInOutDaoImpl extends AbstractDao<String, StockInOut> implement
     }
 
     @Override
-    public List<StockInOut> search(String batchCode, String fromDate, String toDate, String desp, String remark) {
+    public List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
+            String vouNo, String userCode) {
         String strFilter = "";
         if (!fromDate.equals("-") && !toDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.tranDate) between '" + fromDate
-                        + "' and '" + toDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.tranDate) between '"
-                        + fromDate + "' and '" + toDate + "'";
-            }
+            strFilter = "date(o.vouDate) between '" + fromDate
+                    + "' and '" + toDate + "'";
         } else if (!fromDate.endsWith("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.tranDate) >= '" + fromDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.tranDate) >= '" + fromDate + "'";
-            }
+            strFilter = "date(o.vouDate) >= '" + fromDate + "'";
         } else if (!toDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.tranDate) <= '" + toDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.tranDate) <= '" + toDate + "'";
-            }
+            strFilter = "date(o.vouDate) <= '" + toDate + "'";
         }
-        if (!batchCode.equals("-")) {
+        if (!vouNo.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.batchCode = '" + batchCode + "'";
+                strFilter = "o.vouNo = '" + vouNo + "'";
             } else {
-                strFilter = strFilter + " and o.batchCode = '" + batchCode + "'";
+                strFilter = strFilter + " and o.vouNo = '" + vouNo + "'";
             }
         }
         if (!desp.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.description = '" + desp + "'";
+                strFilter = "o.description like '" + desp + "'%";
             } else {
-                strFilter = strFilter + " and o.description = '" + desp + "'";
+                strFilter = strFilter + " and o.description like '" + desp + "'%";
             }
         }
         if (!remark.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.remark = '" + remark + "'";
+                strFilter = "o.remark like '" + remark + "'%";
             } else {
-                strFilter = strFilter + " and o.remark = '" + remark + "'";
+                strFilter = strFilter + " and o.remark like '" + remark + "'%";
+            }
+        }
+        if (!userCode.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.createdBy.appUserCode = '" + userCode + "'";
+            } else {
+                strFilter = strFilter + " and o.createdBy.appUserCode = '" + userCode + "'";
             }
         }
         String strSql = "select o from StockInOut o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + "and o.deleted is not true order by date(o.tranDate) desc, o.batchCode desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo desc";
         }
 
         return findHSQL(strSql);
@@ -82,7 +77,7 @@ public class StockInOutDaoImpl extends AbstractDao<String, StockInOut> implement
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from StockInOut o where o.batchCode '" + id + "'";
+        String hsql = "delete from StockInOut o where o.vouNo '" + id + "'";
         return execUpdateOrDelete(hsql);
 
     }

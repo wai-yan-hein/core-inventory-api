@@ -7,12 +7,12 @@ package com.cv.inv.api.dao;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author Lenovo
  */
 
@@ -39,11 +39,7 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
                 + "from v_stock_loc";
         String andSql = "";
         if (!stockCode.equals("-")) {
-            if (andSql.isEmpty()) {
-                andSql = "stock_code in  (" + stockCode + ")";
-            } else {
-                andSql = andSql + " and stock_code '" + stockCode + "'";
-            }
+            andSql = "stock_code in  (" + stockCode + ")";
         }
         if (!locId.equals("-")) {
             if (andSql.isEmpty()) {
@@ -136,20 +132,11 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
 
     @Override
     public void reportViewer(String reportPath, String filePath, String fontPath, Map<String, Object> parameters) {
-        try {
-            //doReportPDF(reportPath, filePath, parameters, fontPath);
-        } catch (Exception ex) {
-            log.error("Report Viewer Error :" + ex.getMessage());
-        }
     }
 
     @Override
     public void reportJsonViewer(String path, String reportPath, String filePath, String fontPath, Map<String, Object> parameters) {
-        try {
-            //genJsonReport(path, reportPath, filePath, parameters, fontPath);
-        } catch (Exception ex) {
-            log.error("Report Viewer Error :" + ex.getMessage());
-        }
+
     }
 
     @Override

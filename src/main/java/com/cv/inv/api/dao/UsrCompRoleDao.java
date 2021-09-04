@@ -14,22 +14,22 @@ import java.util.List;
  *
  * @author winswe
  */
-public interface UsrCompRoleDao {
+ public interface UsrCompRoleDao {
 
-    public UsrCompRole save(UsrCompRole ucr);
+     UsrCompRole save(UsrCompRole ucr);
 
-    public UsrCompRole findById(UsrCompRoleKey key);
+     UsrCompRole findById(UsrCompRoleKey key);
 
-    public List<UsrCompRole> search(String userCode, String compCode, String roleId);
+     List<UsrCompRole> search(String userCode, String compCode, String roleId);
 
-    public List getAssignRole(String userCode, String compCode);
+     List getAssignRole(String userCode, String compCode);
 
-    public List getAssignCompany(String userCode);
+     List getAssignCompany(String userCode);
 
-    public List getAssignCompany(String userCode, String roleId, String compCode);
+     List getAssignCompany(String userCode, String roleId, String compCode);
 
-    public int delete(String userCode, String compCode, String roleId);
+     int delete(String userCode, String compCode, String roleId);
 
-    public ResultSet getAssignCompanySelect(String userId) throws Exception;
+     ResultSet getAssignCompanySelect(String userId) throws Exception;
 
 }

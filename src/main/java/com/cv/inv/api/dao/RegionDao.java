@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author WSwe
  */
-public interface RegionDao {
+ public interface RegionDao {
 
-    public Region save(Region region);
+     Region save(Region region);
 
-    public Region findByCode(String id);
+     Region findByCode(String id);
 
-    public List<Region> search(String code, String name, String compCode, String parentCode);
+     List<Region> search(String code, String name, String compCode, String parentCode);
 
-    public int delete(String code);
+     int delete(String code);
 
-    public List<Region> findAll(String compCode);
+     List<Region> findAll(String compCode);
 }

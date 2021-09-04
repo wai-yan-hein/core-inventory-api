@@ -28,9 +28,9 @@ public class SaleHis implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "saleman_code")
     private SaleMan saleMan;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "sale_date")
-    private Date saleDate;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "vou_date")
+    private Date vouDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "credit_term")
     private Date creditTerm;
@@ -57,6 +57,9 @@ public class SaleHis implements java.io.Serializable {
     private Float paid;
     @Column(name = "vou_balance")
     private Float balance;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "created_date")
+    private Date createdDate;
     @ManyToOne
     @JoinColumn(name = "created_by")
     private AppUser createdBy;

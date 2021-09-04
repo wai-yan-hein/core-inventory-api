@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface DamageDetailHisDao {
+ public interface DamageDetailHisDao {
 
-    public DamageDetailHis save(DamageDetailHis sdh);
+     DamageDetailHis save(DamageDetailHis sdh);
 
-    public DamageDetailHis findById(Long id);
+     DamageDetailHis findById(Long id);
 
-    public List<DamageDetailHis> search(String saleInvId);
+     List<DamageDetailHis> search(String saleInvId);
 
-    public int delete(String id);
+     int delete(String id);
 }

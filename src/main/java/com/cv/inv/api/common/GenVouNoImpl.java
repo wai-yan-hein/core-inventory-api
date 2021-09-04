@@ -23,8 +23,6 @@ public class GenVouNoImpl implements GenVouNo {
     private String vouNo;
     private int lastVouNo;
     private String machineNo;
-    private final int vouTotalDigit = 5;
-    private final int machineTtlDigit = 2;
     private boolean isError = false;
     private final VouIdService vouIdService;
 
@@ -47,9 +45,9 @@ public class GenVouNoImpl implements GenVouNo {
         lastVouNo += 1;
         try {
 
-            VouId vouId = (VouId) vouIdService.find(new CompoundKey(machineNo, vouType, period));
-            vouId.setVouNo(lastVouNo);
-            vouIdService.save(vouId);
+            VouId vouNo = (VouId) vouIdService.find(new CompoundKey(machineNo, vouType, period));
+            vouNo.setVouNo(lastVouNo);
+            vouIdService.save(vouNo);
         } catch (Exception ex) {
             isError = true;
         }
@@ -61,14 +59,14 @@ public class GenVouNoImpl implements GenVouNo {
             if (objVouNo == null) {
                 //Need to insert new
                 lastVouNo = 1;
-                VouId vouId = new VouId(new CompoundKey(machineNo, vouType, period), lastVouNo);
-                vouIdService.save(vouId);
+                VouId vouNo = new VouId(new CompoundKey(machineNo, vouType, period), lastVouNo);
+                vouIdService.save(vouNo);
             } else {
                 lastVouNo = Integer.parseInt(objVouNo.toString());
             }
 
         } catch (Exception ex) {
-            log.error("getLastVouNo : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+            log.error("getLastVouNo : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex);
             isError = true;
         }
     }
@@ -79,21 +77,21 @@ public class GenVouNoImpl implements GenVouNo {
             vouNo = "-";
             return;
         }
+        int machineTtlDigit = 2;
         if (machineNo.length() < machineTtlDigit) {
             int needToAdd = machineTtlDigit - machineNo.length();
 
             for (int i = 0; i < needToAdd; i++) {
-                machineNo = "0" + machineNo;
+                machineNo = new StringBuilder().append("0").append(machineNo).toString();
             }
         }
 
-        String strVouNo = Integer.toString(lastVouNo);
+        StringBuilder strVouNo = new StringBuilder(Integer.toString(lastVouNo));
+        int vouTotalDigit = 5;
         if (strVouNo.length() < vouTotalDigit) {
             int needToAdd = vouTotalDigit - strVouNo.length();
 
-            for (int i = 0; i < needToAdd; i++) {
-                strVouNo = "0" + strVouNo;
-            }
+            for (int i = 0; i < needToAdd; i++) strVouNo.insert(0, "0");
         }
 
         vouNo = machineNo + strVouNo + period;

@@ -11,9 +11,9 @@ import com.cv.inv.api.entity.Privilege;
  *
  * @author winswe
  */
-public interface PrivilegeDao {
+ public interface PrivilegeDao {
 
-    public Privilege save(Privilege privilege);
+     Privilege save(Privilege privilege);
 
   
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ChargeTypeDaoImpl extends AbstractDao<String, ChargeType> implements ChargeTypeDao {
 
+
     @Override
     public ChargeType save(ChargeType chargeType) {
         persist(chargeType);
@@ -35,41 +36,24 @@ public class ChargeTypeDaoImpl extends AbstractDao<String, ChargeType> implement
     }
     
       @Override
-    public List<ChargeType> search(String ctId, String desp){
+    public List<ChargeType> search(String ctId, String description){
         String strFilter = "";
         
         
-        if(!desp.equals("-")){
-            if(strFilter.isEmpty()){
-                strFilter = "o.chargeTypeId =" + desp ;
-            }else{
-                strFilter = strFilter + " and o.chargeTypeId =" + desp ;
-            }
+        if(!description.equals("-")){
+            strFilter = "o.chargeTypeId =" + description ;
         }
-        if(!desp.equals("-")){
-            if(strFilter.isEmpty()){
-                strFilter = "o.chargeTypeDesp like '%" + desp + "%'";
-            }else{
-                strFilter = strFilter + " and o.chargeTypeDesp like '%" + desp + "%'";
-            }
+        if(!description.equals("-")){
+            strFilter = strFilter + " and o.chargeTypeDesp like '%" + description + "%'";
         }
-        
-       /* if(!updatedDate.equals("-")){
-            if(strFilter.isEmpty()){
-                strFilter = "o.updatedDate = '" + updatedDate + "'";
-            }else{
-                strFilter = strFilter + " and o.updatedDate = '" + updatedDate + "'";
-            }
-        }
-        */
-        if(strFilter.isEmpty()){
+
+          if(strFilter.isEmpty()){
             strFilter = "select o from ChargeType o";
         }else{
             strFilter = "select o from ChargeType o where " + strFilter;
         }
-        
-        List<ChargeType> listCT = findHSQL(strFilter);
-        return listCT;
+
+          return (List<ChargeType>) findHSQL(strFilter);
     }
 
 }

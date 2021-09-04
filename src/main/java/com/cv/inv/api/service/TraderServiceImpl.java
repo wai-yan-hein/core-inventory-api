@@ -5,7 +5,6 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.TraderDao;
 import com.cv.inv.api.entity.Trader;
@@ -35,9 +34,8 @@ public class TraderServiceImpl implements TraderService {
     @Override
     public List<Trader> searchTrader(String code, String name, String address,
             String phone, String parentCode, String compCode, String appTraderCode) {
-        List<Trader> listTR = dao.searchTrader(code, name, address, phone,
+        return dao.searchTrader(code, name, address, phone,
                 parentCode, compCode, appTraderCode);
-        return listTR;
     }
 
     @Override
@@ -51,7 +49,7 @@ public class TraderServiceImpl implements TraderService {
             if (valid == null) {
                 td.setCode(code);
             } else {
-                throw new DuplicateException("Duplicate Trader Code");
+                throw new IllegalStateException("Duplicate Trader Code");
             }
         }
         return dao.saveTrader(td);
@@ -64,8 +62,7 @@ public class TraderServiceImpl implements TraderService {
 
     private String getTraderCode(Integer macId, String option, String period, String compCode) {
         int seqNo = seqService.getSequence(macId, option, period, compCode);
-        String tmpCatCode = option.toUpperCase() + String.format("%0" + 5 + "d", seqNo) + "-" + String.format("%0" + 3 + "d", macId);
-        return tmpCatCode;
+        return option.toUpperCase() + String.format("%0" + 5 + "d", seqNo) + "-" + String.format("%0" + 3 + "d", macId);
     }
 
     @Override

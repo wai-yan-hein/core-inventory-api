@@ -6,11 +6,12 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.UnitPattern;
+
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author Lenovo
  */
 @Repository

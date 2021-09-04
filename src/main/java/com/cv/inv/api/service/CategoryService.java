@@ -12,18 +12,18 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface CategoryService {
+ public interface CategoryService {
 
-    public Category findByCode(String code);
+     Category findByCode(String code);
 
-    public Category save(Category category) throws Exception;
+     Category save(Category category) throws Exception;
 
-    public List<Category> findAll(String compCode);
+     List<Category> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public List<Category> search(String catName);
+     List<Category> search(String catName);
 
-    public List<Category> searchM(String updatedDate);
+     List<Category> searchM(String updatedDate);
 
 }

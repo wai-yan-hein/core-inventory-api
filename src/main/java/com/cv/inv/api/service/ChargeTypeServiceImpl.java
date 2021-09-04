@@ -47,15 +47,14 @@ public class ChargeTypeServiceImpl implements ChargeTypeService {
     }
 
     @Override
-    public List<ChargeType> search(String ctId, String desp) {
-        return dao.search(ctId, desp);
+    public List<ChargeType> search(String ctId, String description) {
+        return dao.search(ctId, description);
     }
 
     private String getChargeTypeCode(Integer macId, String option, String period, String compCode) {
 
         int seqNo = seqService.getSequence(macId, option, period, compCode);
 
-        String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 }

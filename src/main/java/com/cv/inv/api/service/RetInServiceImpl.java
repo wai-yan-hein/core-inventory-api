@@ -5,16 +5,17 @@
  */
 package com.cv.inv.api.service;
 
-
-
+import com.cv.inv.api.common.Util1;
+import com.cv.inv.api.common.Voucher;
 import com.cv.inv.api.dao.RetInDao;
 import com.cv.inv.api.dao.RetInDetailDao;
-import com.cv.inv.api.entity.RetInCompoundKey;
+import com.cv.inv.api.dao.SeqTableDao;
 import com.cv.inv.api.entity.RetInHis;
 import com.cv.inv.api.entity.RetInHisDetail;
+import com.cv.inv.api.entity.RetInKey;
+import com.cv.inv.api.entity.SeqKey;
+import com.cv.inv.api.entity.SeqTable;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,83 +28,90 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RetInServiceImpl implements RetInService {
 
-    private static final Logger log = LoggerFactory.getLogger(RetInServiceImpl.class);
-    private final String SOURCE_PROG = "ACCOUNT";
-    private final String DELETE_OPTION = "INV_DELETE";
-
     @Autowired
-    private RetInDao retInDao;
+    private RetInDao rDao;
     @Autowired
-    private AccSettingService settingService;
-   
-
+    private RetInDetailDao sdDao;
     @Autowired
-    private RetInDetailDao dao;
+    private SeqTableDao seqDao;
 
     @Override
-    public void save(RetInHis retIn, List<RetInHisDetail> listRetIn, List<String> delList) {
-        String retInDetailId;
-        try {
-            for (int i = 0; i < listRetIn.size(); i++) {
-                RetInHisDetail cRD = listRetIn.get(i);
-                if (cRD.getUniqueId() == null) {
-                    if (i == 0) {
-                        cRD.setUniqueId(1);
-                    } else {
-                        RetInHisDetail pRD = listRetIn.get(i - 1);
-                        cRD.setUniqueId(pRD.getUniqueId() + 1);
-                    }
-                }
+    public RetInHis save(RetInHis rin) throws Exception {
+        List<RetInHisDetail> listSD = rin.getListRD();
+        List<String> listDel = rin.getListDel();
+        String vouNo = rin.getVouNo();
+        if (rin.getStatus().equals("NEW")) {
+            RetInHis valid = rDao.findById(vouNo);
+            if (valid != null) {
+                throw new IllegalStateException("Duplicate Sale Voucher");
             }
-            if (delList != null) {
-                delList.forEach(detailId -> {
-                    try {
-                        dao.delete(detailId);
-                    } catch (Exception ex) {
-                        log.error("Delete RetIn :" + ex.getMessage());
-                    }
-                });
-            }
-            retInDao.save(retIn);
-            String vouNo = retIn.getVouNo();
-            for (RetInHisDetail rd : listRetIn) {
-                if (rd.getStock() != null) {
-                    if (rd.getRetInKey() != null) {
-                        rd.setRetInKey(rd.getRetInKey());
-                    } else {
-                        retInDetailId = vouNo + '-' + rd.getUniqueId();
-                        rd.setRetInKey(new RetInCompoundKey(retInDetailId, vouNo));
-                    }
-                    dao.save(rd);
-                }
-            }
-        } catch (Exception ex) {
-            log.error("saveRetIn : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-
         }
-
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    try {
+                        sdDao.delete(detailId);
+                    } catch (Exception ignored) {
+                    }
+                }
+            });
+        }
+        for (int i = 0; i < listSD.size(); i++) {
+            RetInHisDetail cSd = listSD.get(i);
+            if (cSd.getStock() != null) {
+                if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            RetInHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        }
+                    }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setRiKey(new RetInKey(sdCode, vouNo));
+                    sdDao.save(cSd);
+                }
+            }
+        }
+        rDao.save(rin);
+        rin.setListRD(listSD);
+        updateVoucher(rin.getCompCode(), rin.getMacId(), Voucher.RETIN.name());
+        return rin;
     }
 
     @Override
-    public void delete(String retInId) throws Exception {
-        dao.delete(retInId);
+    public List<RetInHis> search(String fromDate, String toDate, String cusCode,
+            String vouNo, String userCode) {
+        return rDao.search(fromDate, toDate, cusCode, vouNo, userCode);
     }
 
-    @Override
-    public List<RetInHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode) {
-        return retInDao.search(fromDate, toDate, cusId, locId, vouNo, filterCode);
-    }
-
-    
     @Override
     public RetInHis findById(String id) {
-        return retInDao.findById(id);
+        return rDao.findById(id);
     }
 
     @Override
-    public RetInHis saveM(RetInHis retIn) {
-        return retInDao.save(retIn);
+    public int delete(String vouNo) throws Exception {
+        return rDao.delete(vouNo);
     }
 
-    
+    private void updateVoucher(String compCode, Integer macId, String option) {
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        SeqKey key = new SeqKey();
+        key.setCompCode(compCode);
+        key.setMacId(macId);
+        key.setPeriod(period);
+        key.setSeqOption(option);
+        SeqTable last = seqDao.findById(key);
+        if (last == null) {
+            last = new SeqTable();
+            last.setKey(key);
+            last.setSeqNo(2);
+        } else {
+            last.setSeqNo(Util1.getInteger(last.getSeqNo()) + 1);
+        }
+        seqDao.save(last);
+    }
+
 }

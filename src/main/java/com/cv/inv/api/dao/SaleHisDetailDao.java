@@ -6,17 +6,17 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.SaleHisDetail;
+
 import java.util.List;
 
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
-public interface SaleDetailDao {
+ public interface SaleHisDetailDao {
 
-    public SaleHisDetail save(SaleHisDetail sdh);
+    SaleHisDetail save(SaleHisDetail sdh);
 
-    public List<SaleHisDetail> search(String vouId);
-    
-     public int delete(String id);
+    List<SaleHisDetail> search(String vouNo);
+
+    int delete(String id);
 }

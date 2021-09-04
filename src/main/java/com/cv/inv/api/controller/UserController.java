@@ -68,7 +68,7 @@ public class UserController {
 
     @RequestMapping(path = "/test", method = RequestMethod.GET)
     public ResponseEntity<ReturnObject> test() {
-        ro.setMeesage("Hello");
+        ro.setMessage("Hello");
         return ResponseEntity.ok(ro);
     }
 

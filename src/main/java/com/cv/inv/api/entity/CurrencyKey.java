@@ -67,10 +67,7 @@ public class CurrencyKey implements Serializable {
         if (!Objects.equals(this.code, other.code)) {
             return false;
         }
-        if (!Objects.equals(this.compCode, other.compCode)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.compCode, other.compCode);
     }
 
 }

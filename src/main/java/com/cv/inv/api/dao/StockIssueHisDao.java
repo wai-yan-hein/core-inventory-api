@@ -12,16 +12,16 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface StockIssueHisDao {
+ public interface StockIssueHisDao {
 
-    public StockIssueHis save(StockIssueHis ph);
+     StockIssueHis save(StockIssueHis ph);
 
-    public StockIssueHis findById(String id);
+     StockIssueHis findById(String id);
 
-    public List<StockIssueHis> search(String from, String to, String location,
+     List<StockIssueHis> search(String from, String to, String location,
             String remark, String vouNo);
     
     
 
-    public int delete(String vouNo);
+     int delete(String vouNo);
 }

@@ -13,19 +13,19 @@ import java.util.List;
  *
  * @author winswe
  */
-public interface SeqTableService {
+ public interface SeqTableService {
 
-    public SeqTable save(SeqTable st);
+     SeqTable save(SeqTable st);
 
-    public SeqTable findById(SeqKey id);
+     SeqTable findById(SeqKey id);
 
-    public List<SeqTable> search(String option, String period, String compCode);
+     List<SeqTable> search(String option, String period, String compCode);
 
-    public SeqTable getSeqTable(String option, String period, String compCode);
+     SeqTable getSeqTable(String option, String period, String compCode);
 
-    public int delete(Integer id);
+     int delete(Integer id);
 
-    public int getSequence(Integer macId,String option, String period, String compCode);
+     int getSequence(Integer macId,String option, String period, String compCode);
 
-    public List<SeqTable> findAll();
+     List<SeqTable> findAll();
 }

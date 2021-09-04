@@ -12,14 +12,14 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface ChargeTypeService {
+ public interface ChargeTypeService {
 
-    public ChargeType save(ChargeType chargeType);
+     ChargeType save(ChargeType chargeType);
 
-    public List<ChargeType> findAll();
+     List<ChargeType> findAll();
 
-    public int delete(String id);
-      public List<ChargeType> search(String ctId, String desp);
+     int delete(String id);
+       List<ChargeType> search(String ctId, String description);
 
 
 }

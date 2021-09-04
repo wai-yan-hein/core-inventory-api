@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class OrderDaoImpl extends AbstractDao<String, Order> implements OrderDao {
 
+
     @Override
     public Order save(Order order) {
         persist(order);
@@ -32,25 +33,12 @@ public class OrderDaoImpl extends AbstractDao<String, Order> implements OrderDao
         String hsql = "select o from Order o ";
         String strFilter = "";
         if (!fromDate.equals("-") && !toDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.orderDate) between '" + fromDate
-                        + "' and '" + toDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.orderDate) between '"
-                        + fromDate + "' and '" + toDate + "'";
-            }
+            strFilter = "date(o.orderDate) between '" + fromDate
+                    + "' and '" + toDate + "'";
         } else if (!fromDate.endsWith("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.orderDate) >= '" + fromDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.orderDate) >= '" + fromDate + "'";
-            }
+            strFilter = "date(o.orderDate) >= '" + fromDate + "'";
         } else if (!toDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.orderDate) <= '" + toDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.orderDate) <= '" + toDate + "'";
-            }
+            strFilter = "date(o.orderDate) <= '" + toDate + "'";
         }
         if (!cusId.equals("-")) {
             if (strFilter.isEmpty()) {

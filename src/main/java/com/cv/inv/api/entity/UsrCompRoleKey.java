@@ -75,10 +75,7 @@ public class UsrCompRoleKey implements Serializable {
         if (!Objects.equals(this.compCode, other.compCode)) {
             return false;
         }
-        if (!Objects.equals(this.roleCode, other.roleCode)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.roleCode, other.roleCode);
     }
 
 }

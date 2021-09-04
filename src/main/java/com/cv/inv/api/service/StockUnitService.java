@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockUnitService {
+ public interface StockUnitService {
 
-    public StockUnit findByCode(String code);
+     StockUnit findByCode(String code);
 
-    public StockUnit save(StockUnit unit);
+     StockUnit save(StockUnit unit);
 
-    public List<StockUnit> findAll(String compCode);
+     List<StockUnit> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 }

@@ -84,16 +84,13 @@ public class UserRoleServiceImpl implements UserRoleService {
 
         int seqNo = seqService.getSequence(macId, option, period, compCode);
 
-        String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 
     private void savePrivilege(String compCode, String roleCode) {
         List<Menu> listM = menuDao.search(compCode, "-", "-", "-");
         if (!listM.isEmpty()) {
-            listM.stream().map(_item -> new Privilege(new PrivilegeKey(roleCode, compCode), false)).forEachOrdered(p -> {
-                pDao.save(p);
-            });
+            listM.stream().map(_item -> new Privilege(new PrivilegeKey(roleCode, compCode), false)).forEachOrdered(p -> pDao.save(p));
         }
     }
 }

@@ -5,7 +5,6 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.CategoryDao;
 import com.cv.inv.api.entity.Category;
@@ -33,12 +32,12 @@ public class CategoryServiceImpl implements CategoryService {
         if (Util1.isNull(cat.getCatCode())) {
             Integer macId = cat.getMacId();
             String compCode = cat.getCompCode();
-            String catCode = getCatCode(macId, "Category", "-", compCode);
+            String catCode = getCatCode(macId, compCode);
             Category valid = findByCode(catCode);
             if (valid == null) {
                 cat.setCatCode(catCode);
             } else {
-                throw new DuplicateException("Duplicate Category Code");
+                throw new IllegalStateException("Duplicate Category Code");
             }
         }
         return dao.save(cat);
@@ -64,12 +63,11 @@ public class CategoryServiceImpl implements CategoryService {
         return dao.searchM(updatedDate);
     }
 
-    private String getCatCode(Integer macId, String option, String period, String compCode) {
+    private String getCatCode(Integer macId, String compCode) {
 
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
+        int seqNo = seqService.getSequence(macId, "Category", "-", compCode);
 
-        String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 
     @Override

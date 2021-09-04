@@ -12,16 +12,16 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface LocationDao {
+ public interface LocationDao {
 
-    public Location save(Location loc);
+     Location save(Location loc);
 
-    public List<Location> findAll(String compCode);
+     List<Location> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public Location findByCode(String code);
+     Location findByCode(String code);
 
-    public List<Location> search(String parent);
+     List<Location> search(String parent);
 
 }

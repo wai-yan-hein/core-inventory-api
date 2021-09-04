@@ -5,9 +5,16 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.Util1;
+import static com.cv.inv.api.common.Voucher.STOCKINOUT;
+import com.cv.inv.api.dao.SeqTableDao;
 import com.cv.inv.api.dao.StockInOutDao;
+import com.cv.inv.api.dao.StockInOutDetailDao;
+import com.cv.inv.api.entity.SeqKey;
+import com.cv.inv.api.entity.SeqTable;
 import com.cv.inv.api.entity.StockInOut;
 import com.cv.inv.api.entity.StockInOutDetail;
+import com.cv.inv.api.entity.StockInOutKey;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,55 +29,86 @@ import org.springframework.transaction.annotation.Transactional;
 public class StockInOutServiceImpl implements StockInOutService {
 
     @Autowired
-    private StockInOutDao dao;
+    private StockInOutDao ioDao;
     @Autowired
-    private StockInOutDetailService detailService;
+    private StockInOutDetailDao iodDao;
+    @Autowired
+    private SeqTableDao seqDao;
+
+    @Override
+    public StockInOut save(StockInOut io) throws Exception {
+        List<StockInOutDetail> listSD = io.getListSH();
+        List<String> listDel = io.getListDel();
+        String vouNo = io.getVouNo();
+        if (io.getStatus().equals("NEW")) {
+            StockInOut valid = ioDao.findById(vouNo);
+            if (valid != null) {
+                throw new IllegalStateException("Duplicate Stock In/Out Voucher");
+            }
+        }
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    iodDao.delete(detailId);
+                }
+            });
+        }
+        for (int i = 0; i < listSD.size(); i++) {
+            StockInOutDetail cSd = listSD.get(i);
+            if (cSd.getStock() != null) {
+                if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            StockInOutDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        }
+                    }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setIoKey(new StockInOutKey(sdCode, vouNo));
+                    iodDao.save(cSd);
+                }
+            }
+        }
+        ioDao.save(io);
+        io.setListSH(listSD);
+        updateVoucher(io.getCompCode(), io.getMacId(), STOCKINOUT.name());
+        return io;
+    }
+
+    @Override
+    public List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
+            String vouNo, String userCode) {
+        return ioDao.search(fromDate, toDate, remark, desp, vouNo, userCode);
+    }
 
     @Override
     public StockInOut findById(String id) {
-        return dao.findById(id);
+        return ioDao.findById(id);
     }
 
     @Override
-    public StockInOut save(StockInOut stock) {
-        return dao.save(stock);
+    public int delete(String vouNo) throws Exception {
+        return ioDao.delete(vouNo);
     }
 
-    @Override
-    public List<StockInOut> search(String batchCode, String fromDate, String toDate, String desp, String remark) {
-        return dao.search(batchCode, fromDate, toDate, desp, remark);
-    }
-
-    @Override
-    public int delete(String id) {
-        return dao.delete(id);
-    }
-
-    @Override
-    public StockInOut save(StockInOut stock, List<StockInOutDetail> listDetail) {
-        for (int i = 0; i < listDetail.size(); i++) {
-            StockInOutDetail cRD = listDetail.get(i);
-            if (cRD.getUniqueId() == null) {
-                if (i == 0) {
-                    cRD.setUniqueId(1);
-                } else {
-                    StockInOutDetail pRD = listDetail.get(i - 1);
-                    cRD.setUniqueId(pRD.getUniqueId() + 1);
-                }
-            }
+    private void updateVoucher(String compCode, Integer macId, String option) {
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        SeqKey key = new SeqKey();
+        key.setCompCode(compCode);
+        key.setMacId(macId);
+        key.setPeriod(period);
+        key.setSeqOption(option);
+        SeqTable last = seqDao.findById(key);
+        if (last == null) {
+            last = new SeqTable();
+            last.setKey(key);
+            last.setSeqNo(2);
+        } else {
+            last.setSeqNo(Util1.getInteger(last.getSeqNo()) + 1);
         }
-        String vouNo = stock.getBatchCode();
-        for (StockInOutDetail rd : listDetail) {
-            if (rd.getStock().getStockCode() != null) {
-                if (rd.getCode() == null || rd.getCode().isEmpty()) {
-                    String code = vouNo + "-" + rd.getUniqueId();
-                    rd.setCode(code);
-                    rd.setBatchCode(vouNo);
-                }
-            }
-            detailService.save(rd);
-        }
-        return dao.save(stock);
+        seqDao.save(last);
     }
 
 }

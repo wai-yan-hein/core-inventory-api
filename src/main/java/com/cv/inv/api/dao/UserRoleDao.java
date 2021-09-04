@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author winswe
  */
-public interface UserRoleDao {
+ public interface UserRoleDao {
 
-    public UserRole save(UserRole role);
+     UserRole save(UserRole role);
 
-    public UserRole findById(Integer id);
+     UserRole findById(Integer id);
 
-    public List<UserRole> search(String roleName, String compCode);
+     List<UserRole> search(String roleName, String compCode);
 
-    public List<UserRole> searchM(String updatedDate);
+     List<UserRole> searchM(String updatedDate);
 
-    public int delete(String id);
+     int delete(String id);
 }

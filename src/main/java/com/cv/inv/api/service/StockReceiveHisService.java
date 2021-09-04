@@ -13,16 +13,16 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface StockReceiveHisService {
+ public interface StockReceiveHisService {
 
-    public StockReceiveHis save(StockReceiveHis sdh);
+     StockReceiveHis save(StockReceiveHis sdh);
 
-    public List<StockReceiveHis> search(String from, String to, String location,
+     List<StockReceiveHis> search(String from, String to, String location,
             String remark, String vouNo);
 
-    public void save(StockReceiveHis sdh, List<StockReceiveDetailHis> listDamageDetail, String vouStatus, List<String> delList);
+     void save(StockReceiveHis sdh, List<StockReceiveDetailHis> listDamageDetail, String vouStatus, List<String> delList);
 
-    public StockReceiveHis findById(String id);
+     StockReceiveHis findById(String id);
 
-    public int delete(String vouNo);
+     int delete(String vouNo);
 }

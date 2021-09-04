@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements AccountDao {
-    //private BCryptPasswordEncoder cryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public AppUser saveAccount(AppUser au) {
@@ -26,8 +25,7 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
 
     @Override
     public AppUser findUserById(Integer id) {
-        AppUser au = getByKey(id);
-        return au;
+        return getByKey(id);
     }
 
     @Override
@@ -65,11 +63,7 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
         String strFilter = null;
 
         if (!id.equals("-")) {
-            if (strFilter == null) {
-                strFilter = "o.userCode like '" + id + "%'";
-            } else {
-                strFilter = strFilter + " and o.userCode like '" + id + "%'";
-            }
+            strFilter = "o.userCode like '" + id + "%'";
         }
 
         if (!userShort.equals("-")) {
@@ -100,8 +94,7 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
             strSql = strSql + " where " + strFilter;
         }
 
-        List<AppUser> listAU = findHSQL(strSql);
-        return listAU;
+        return (List<AppUser>) findHSQL(strSql);
     }
 
     @Override
@@ -110,13 +103,13 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
 
         if (au == null) {
             throw new AuthenticationException(
-                    "Either username/password is worng.");
+                    "Either username/password is wrong.");
         } else if (!au.getActive()) {
             throw new AuthenticationException(
-                    "Either username/password is worng.");
+                    "Either username/password is wrong.");
         } else if (!au.getPassword().equals(password)) {
             throw new AuthenticationException(
-                    "Either username/password is worng.");
+                    "Either username/password is wrong.");
         }
 
         return au;
@@ -125,12 +118,11 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
     @Override
     public int delete(String userCode) {
         String strSql = "delete from AppUser o where o.userCode = " + userCode;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
     @Override
-    public AppUser finfById(String id) {
+    public AppUser findById(String id) {
         return getByKey(Integer.parseInt(id));
     }
 
@@ -138,8 +130,7 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
     public List<AppUser> findAll(String compCode) {
 
         String strSql = "select o from AppUser  o where o.compCode = '" + compCode + "'";
-        List<AppUser> ListAU = findHSQL(strSql);
-        return ListAU;
+        return (List<AppUser>) findHSQL(strSql);
 
     }
 }

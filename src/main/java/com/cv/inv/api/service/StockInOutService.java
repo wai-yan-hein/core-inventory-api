@@ -6,22 +6,20 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.StockInOut;
-import com.cv.inv.api.entity.StockInOutDetail;
+
 import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
-public interface StockInOutService {
+ public interface StockInOutService {
 
-    public StockInOut findById(String id);
+    StockInOut save(StockInOut io) throws Exception;
 
-    public StockInOut save(StockInOut stock);
+    List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
+                            String vouNo, String userCode);
 
-    public StockInOut save(StockInOut stock, List<StockInOutDetail> listDetail);
+    StockInOut findById(String id);
 
-    public List<StockInOut> search(String batchCode, String fromDate, String toDate, String desp, String remark);
-
-    public int delete(String id);
+    int delete(String vouNo) throws Exception;
 }

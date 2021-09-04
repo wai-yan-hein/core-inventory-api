@@ -44,7 +44,7 @@ public class VoucherController {
         SeqTable seq = seqService.findById(key);
         int sequence = seq == null ? 1 : seq.getSeqNo();
         String vouNo = getVouNo(macId, sequence, period);
-        ro.setMeesage(vouNo);
+        ro.setMessage(vouNo);
         return ResponseEntity.ok(ro);
     }
 
@@ -53,16 +53,20 @@ public class VoucherController {
         if (machineNo.length() < 2) {
             int needToAdd = 2 - machineNo.length();
 
+            StringBuilder machineNoBuilder = new StringBuilder(machineNo);
             for (int i = 0; i < needToAdd; i++) {
-                machineNo = "0" + machineNo;
+                machineNoBuilder.insert(0, "0");
             }
+            machineNo = machineNoBuilder.toString();
         }
         String strVouNo = Integer.toString(lastVouNo);
         if (strVouNo.length() < 5) {
             int needToAdd = 5 - strVouNo.length();
+            StringBuilder strVouNoBuilder = new StringBuilder(strVouNo);
             for (int i = 0; i < needToAdd; i++) {
-                strVouNo = "0" + strVouNo;
+                strVouNoBuilder.insert(0, "0");
             }
+            strVouNo = strVouNoBuilder.toString();
         }
         vouNo = machineNo + strVouNo + period;
         return vouNo;

@@ -12,24 +12,24 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockService {
+ public interface StockService {
 
-    public Stock save(Stock stock) throws Exception;
+     Stock save(Stock stock) throws Exception;
 
-    public Stock findById(String id);
+     Stock findById(String id);
 
-    public List<Stock> findAll(String compCode);
+     List<Stock> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public List<Stock> findActiveStock();
+     List<Stock> findActiveStock();
 
-    public List<Stock> search(String stockType);
+     List<Stock> search(String stockType);
 
-    public List<Stock> searchC(String stockCat);
+     List<Stock> searchC(String stockCat);
 
-    public List<Stock> searchB(String stockBrand);
+     List<Stock> searchB(String stockBrand);
 
-    public List<Stock> searchM(String updatedDate);
+     List<Stock> searchM(String updatedDate);
 
 }

@@ -58,9 +58,6 @@ public class VRoleMenuKey implements Serializable {
         if (!Objects.equals(this.roleCode, other.roleCode)) {
             return false;
         }
-        if (!Objects.equals(this.menuCode, other.menuCode)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.menuCode, other.menuCode);
     }
 }

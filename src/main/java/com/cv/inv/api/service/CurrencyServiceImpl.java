@@ -31,19 +31,16 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public Currency findById(String id) {
-        Currency cur = dao.findById(id);
-        return cur;
+        return dao.findById(id);
     }
 
     @Override
     public List<Currency> search(String code, String name) {
-        List<Currency> listCur = dao.search(code, name);
-        return listCur;
+        return dao.search(code, name);
     }
 
     @Override
     public int delete(String code, String compCode) {
-        int cnt = dao.delete(code, compCode);
-        return cnt;
+        return dao.delete(code, compCode);
     }
 }

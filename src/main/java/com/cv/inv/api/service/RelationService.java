@@ -13,13 +13,13 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface RelationService {
+ public interface RelationService {
 
-    public UnitRelation save(UnitRelation relation);
+     UnitRelation save(UnitRelation relation);
 
-    public UnitRelation findByKey(RelationKey key);
+     UnitRelation findByKey(RelationKey key);
 
-    public List<UnitRelation> search(String patternId);
+     List<UnitRelation> search(String patternId);
 
-    public List<UnitRelation> findAll();
+     List<UnitRelation> findAll();
 }

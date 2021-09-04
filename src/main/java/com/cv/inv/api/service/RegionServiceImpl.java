@@ -5,17 +5,16 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.RegionDao;
 import com.cv.inv.api.entity.Region;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
- *
  * @author WSwe
  */
 @Service
@@ -33,12 +32,12 @@ public class RegionServiceImpl implements RegionService {
         if (Util1.isNull(rg.getRegCode())) {
             Integer macId = rg.getMacId();
             String compCode = rg.getCompCode();
-            String code = getRegiionCode(macId, "Region", "-", compCode);
+            String code = getRegionCode(macId, "Region", "-", compCode);
             Region valid = findByCode(code);
             if (valid == null) {
                 rg.setRegCode(code);
             } else {
-                throw new DuplicateException("Duplicate Region Code");
+                throw new IllegalStateException("Duplicate Region Code");
             }
         }
         return dao.save(rg);
@@ -46,26 +45,22 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public Region findByCode(String id) {
-        Region region = dao.findByCode(id);
-        return region;
+        return dao.findByCode(id);
     }
 
     @Override
     public List<Region> search(String code, String name, String compCode, String parentCode) {
-        List<Region> listRegion = dao.search(code, name, compCode, parentCode);
-        return listRegion;
+        return dao.search(code, name, compCode, parentCode);
     }
 
     @Override
     public int delete(String code) {
-        int cnt = dao.delete(code);
-        return cnt;
+        return dao.delete(code);
     }
 
-    private String getRegiionCode(Integer macId, String option, String period, String compCode) {
+    private String getRegionCode(Integer macId, String option, String period, String compCode) {
         int seqNo = seqService.getSequence(macId, option, period, compCode);
-        String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 
     @Override

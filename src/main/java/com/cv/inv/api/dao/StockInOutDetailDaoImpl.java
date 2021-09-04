@@ -23,73 +23,14 @@ public class StockInOutDetailDaoImpl extends AbstractDao<Integer, StockInOutDeta
     }
 
     @Override
-    public List<StockInOutDetail> search(String fromDate, String toDate, String stockCode, String locId, String option, String remark) {
-        String hsql = "select o from  StockInOutDetail o";
-        String hFilter = "";
-        if (!fromDate.equals("-") && !toDate.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "date(o.date) between '" + fromDate
-                        + "' and '" + toDate + "'";
-            } else {
-                hFilter = hFilter + " and date(o.date) between '"
-                        + fromDate + "' and '" + toDate + "'";
-            }
-        } else if (!fromDate.endsWith("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "date(o.date) >= '" + fromDate + "'";
-            } else {
-                hFilter = hFilter + " and date(o.date) >= '" + fromDate + "'";
-            }
-        } else if (!toDate.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "date(o.date) <= '" + toDate + "'";
-            } else {
-                hFilter = hFilter + " and date(o.date) <= '" + toDate + "'";
-            }
-        }
-        if (!stockCode.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.stock.stockCode = '" + stockCode + "'";
-            } else {
-                hFilter = hFilter + " and o.stock.stockCode = '" + stockCode + "'";
-            }
-        }
-        if (!locId.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.location.locId = '" + locId + "'";
-            } else {
-                hFilter = hFilter + " and o.location.locId = '" + locId + "'";
-            }
-        }
-        if (!option.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.optionType = '" + option + "'";
-            } else {
-                hFilter = hFilter + " and o.optionType = '" + option + "'";
-            }
-        }
-        if (!remark.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.remark = '" + remark + "'";
-            } else {
-                hFilter = hFilter + " and o.remark = '" + remark + "'";
-            }
-        }
-        if (!hFilter.isEmpty()) {
-            hsql = hsql + " where " + hFilter;
-        }
-        return findHSQL(hsql);
-    }
-
-    @Override
-    public int delete(Integer id) {
-        String hsql = "delete from StockInOut o where o.id = '" + id.toString() + "'";
+    public int delete(String code) {
+        String hsql = "delete from StockInOut o where o.id = '" + code + "'";
         return execUpdateOrDelete(hsql);
     }
 
     @Override
-    public List<StockInOutDetail> search(String batchCode) {
-        String hsql = "select o from StockInOutDetail o where o.batchCode ='" + batchCode + "'";
+    public List<StockInOutDetail> search(String vouNo) {
+        String hsql = "select o from StockInOutDetail o where o.ioKey.vouNo ='" + vouNo + "'";
         return findHSQL(hsql);
 
     }

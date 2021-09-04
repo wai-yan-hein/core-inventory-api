@@ -12,6 +12,6 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface DamageDetailHisService {
-     public List<DamageDetailHis> search(String dmgVouId);
+ public interface DamageDetailHisService {
+      List<DamageDetailHis> search(String dmgVouId);
 }

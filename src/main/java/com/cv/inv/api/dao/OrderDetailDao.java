@@ -12,14 +12,14 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface OrderDetailDao {
+ public interface OrderDetailDao {
 
-    public OrderDetail save(OrderDetail order);
+     OrderDetail save(OrderDetail order);
 
-    public List<OrderDetail> findActiveOrder();
+     List<OrderDetail> findActiveOrder();
 
-    public int delete(String id);
+     int delete(String id);
 
-    public List<OrderDetail> search(String orderCode);
+     List<OrderDetail> search(String orderCode);
 
 }

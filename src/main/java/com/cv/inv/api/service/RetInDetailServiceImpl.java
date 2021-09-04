@@ -5,8 +5,8 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.dao.RetOutDetailDao;
-import com.cv.inv.api.entity.RetOutHisDetail;
+import com.cv.inv.api.dao.RetInDetailDao;
+import com.cv.inv.api.entity.RetInHisDetail;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,25 +20,26 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class RetOutDetatilServiceImpl implements RetOutDetailService {
+public class RetInDetailServiceImpl implements RetInDetailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RetOutServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(RetInServiceImpl.class);
 
     @Autowired
-    private RetOutDetailDao dao;
+    private RetInDetailDao dao;
 
     @Override
-    public RetOutHisDetail save(RetOutHisDetail pd) {
+    public RetInHisDetail save(RetInHisDetail pd) {
+
         return dao.save(pd);
     }
 
     @Override
-    public List<RetOutHisDetail> search(String glCode) {
+    public List<RetInHisDetail> search(String glCode) {
         return dao.search(glCode);
     }
 
     @Override
-    public int delete(String id) throws Exception{
+    public int delete(String id) throws Exception {
         return dao.delete(id);
     }
 

@@ -5,80 +5,115 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.Util1;
+import com.cv.inv.api.common.Voucher;
 import com.cv.inv.api.dao.RetOutDao;
-import com.cv.inv.api.entity.RetOutCompoundKey;
+import com.cv.inv.api.dao.RetOutDetailDao;
+import com.cv.inv.api.dao.SeqTableDao;
 import com.cv.inv.api.entity.RetOutHis;
 import com.cv.inv.api.entity.RetOutHisDetail;
+import com.cv.inv.api.entity.RetOutKey;
+import com.cv.inv.api.entity.SeqKey;
+import com.cv.inv.api.entity.SeqTable;
+
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
- * @author lenovo
+ * @author Wai Yan
  */
 @Service
 @Transactional
 public class RetOutServiceImpl implements RetOutService {
 
-    private static final Logger log = LoggerFactory.getLogger(RetOutServiceImpl.class);
     @Autowired
-    private RetOutDao retOutDao;
+    private RetOutDao rDao;
     @Autowired
-    private RetOutDetailService outDetailService;
+    private RetOutDetailDao rd;
+    @Autowired
+    private SeqTableDao seqDao;
 
     @Override
-    public void save(RetOutHis retOut, List<RetOutHisDetail> listRetIn, List<String> delList) {
-        for (int i = 0; i < listRetIn.size(); i++) {
-            RetOutHisDetail cRD = listRetIn.get(i);
-            if (cRD.getUniqueId() == null) {
-                if (i == 0) {
-                    cRD.setUniqueId(1);
-                } else {
-                    RetOutHisDetail pRD = listRetIn.get(i - 1);
-                    cRD.setUniqueId(pRD.getUniqueId() + 1);
-                }
+    public RetOutHis save(RetOutHis rin) throws Exception {
+        List<RetOutHisDetail> listSD = rin.getListRD();
+        List<String> listDel = rin.getListDel();
+        String vouNo = rin.getVouNo();
+        if (rin.getStatus().equals("NEW")) {
+            RetOutHis valid = rDao.findById(vouNo);
+            if (valid != null) {
+                throw new IllegalStateException("Duplicate Return Out Voucher");
             }
         }
-        if (delList != null) {
-            delList.forEach(detailId -> {
-                try {
-                    outDetailService.delete(detailId);
-                } catch (Exception ex) {
-                    log.error("Delete Return Out Detail :" + ex.getMessage());
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    try {
+                        rd.delete(detailId);
+                    } catch (Exception ex) {
+                        throw new IllegalStateException(String.format("Return Out Delete : %s", ex.getMessage()));
+                    }
                 }
             });
         }
-        retOutDao.save(retOut);
-        String vouNo = retOut.getVouNo();
-        listRetIn.stream().filter(rd -> (rd.getStock() != null)).map(rd -> {
-            if (rd.getOutCompoundKey() != null) {
-                rd.setOutCompoundKey(rd.getOutCompoundKey());
-            } else {
-                String retInDetailId = vouNo + '-' + rd.getUniqueId();
-                rd.setOutCompoundKey(new RetOutCompoundKey(retInDetailId, vouNo));
+        for (int i = 0; i < listSD.size(); i++) {
+            RetOutHisDetail cSd = listSD.get(i);
+            if (cSd.getStock() != null) {
+                if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            RetOutHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        }
+                    }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setRoKey(new RetOutKey(sdCode, vouNo));
+                    rd.save(cSd);
+                }
             }
-            return rd;
-        }).forEachOrdered(rd -> {
-            outDetailService.save(rd);
-        });
+        }
+        rDao.save(rin);
+        rin.setListRD(listSD);
+        updateVoucher(rin.getCompCode(), rin.getMacId(), Voucher.RETOUT.name());
+        return rin;
     }
 
     @Override
-    public void delete(String retInId) throws Exception {
-        retOutDao.delete(retInId);
-    }
-
-    @Override
-    public List<RetOutHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode) {
-        return retOutDao.search(fromDate, toDate, cusId, locId, vouNo, filterCode);
+    public List<RetOutHis> search(String fromDate, String toDate, String cusCode,
+                                  String vouNo, String userCode) {
+        return rDao.search(fromDate, toDate, cusCode, vouNo, userCode);
     }
 
     @Override
     public RetOutHis findById(String id) {
-        return retOutDao.findById(id);
+        return rDao.findById(id);
     }
+
+    @Override
+    public int delete(String vouNo) throws Exception {
+        return rDao.delete(vouNo);
+    }
+
+    private void updateVoucher(String compCode, Integer macId, String option) {
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        SeqKey key = new SeqKey();
+        key.setCompCode(compCode);
+        key.setMacId(macId);
+        key.setPeriod(period);
+        key.setSeqOption(option);
+        SeqTable last = seqDao.findById(key);
+        if (last == null) {
+            last = new SeqTable();
+            last.setKey(key);
+            last.setSeqNo(2);
+        } else {
+            last.setSeqNo(Util1.getInteger(last.getSeqNo()) + 1);
+        }
+        seqDao.save(last);
+    }
+
 }

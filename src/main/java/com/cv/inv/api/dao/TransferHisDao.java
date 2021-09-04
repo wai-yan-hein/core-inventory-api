@@ -12,16 +12,16 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface TransferHisDao {
+ public interface TransferHisDao {
 
-    public TransferHis save(TransferHis ph);
+     TransferHis save(TransferHis ph);
 
-    public TransferHis findById(String id);
+     TransferHis findById(String id);
 
-    public List<TransferHis> search(String from, String to, String location,
+     List<TransferHis> search(String from, String to, String location,
             String remark, String vouNo);
     
     
 
-    public int delete(String vouNo);
+     int delete(String vouNo);
 }

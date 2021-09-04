@@ -10,7 +10,7 @@ package com.cv.inv.api.common;
  * @author lenovo
  */
 public interface GenVouNo {
-    public String genVouNo();
-    public void updateVouNo();
+    String genVouNo();
+    void updateVouNo();
     
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PrivilegeDaoImpl extends AbstractDao<PrivilegeKey, Privilege> implements PrivilegeDao {
 
+
     @Override
     public Privilege save(Privilege privilege) {
         persist(privilege);

@@ -106,7 +106,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteCategory(@RequestParam String code) {
         log.info("/delete-category");
         categoryService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -119,7 +119,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-location")
     public ResponseEntity<Location> saveLocation(@RequestBody Location location, HttpServletRequest request) throws Exception {
-        log.info("/save-locaiton");
+        log.info("/save-location");
         Location loc = locationService.save(location);
         return ResponseEntity.ok(loc);
     }
@@ -135,7 +135,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteLocation(@RequestParam String code) {
         log.info("/delete-location");
         locationService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -164,7 +164,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteSaleMan(@RequestParam String code) {
         log.info("/delete-saleman");
         saleManService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -193,7 +193,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteBrand(@RequestParam String code) {
         log.info("delete-brand");
         brandService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -222,7 +222,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteType(@RequestParam String code) {
         log.info("/delete-type");
         typeService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -251,7 +251,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteUnit(@RequestParam String code) {
         log.info("/delete-unit");
         unitService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -282,9 +282,9 @@ public class SetupController {
         List<Trader> search = traderService.search(code, "-");
         if (search.isEmpty()) {
             regionService.delete(code);
-            ro.setMeesage("Deleted.");
+            ro.setMessage("Deleted.");
         } else {
-            ro.setMeesage("Can't delete.");
+            ro.setMessage("Can't delete.");
         }
         return ResponseEntity.ok(ro);
     }
@@ -328,7 +328,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteTrader(@RequestParam String code) {
         log.info("/delete-trader");
         traderService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 
@@ -357,7 +357,7 @@ public class SetupController {
     public ResponseEntity<ReturnObject> deleteStock(@RequestParam String code) {
         log.info("/delete-stock");
         stockService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 

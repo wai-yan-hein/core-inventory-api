@@ -13,16 +13,16 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface TransferHisService {
+ public interface TransferHisService {
 
-    public TransferHis save(TransferHis sdh);
+     TransferHis save(TransferHis sdh);
 
-    public List<TransferHis> search(String from, String to, String location,
+     List<TransferHis> search(String from, String to, String location,
             String remark, String vouNo);
 
-    public void save(TransferHis sdh, List<TransferDetailHis> listTransferDetail, String vouStatus, List<String> delList);
+     void save(TransferHis sdh, List<TransferDetailHis> listTransferDetail, String vouStatus, List<String> delList);
 
-    public TransferHis findById(String id);
+     TransferHis findById(String id);
 
-    public int delete(String vouNo);
+     int delete(String vouNo);
 }

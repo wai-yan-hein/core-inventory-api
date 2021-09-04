@@ -14,11 +14,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import lombok.Data;
 
 /**
  *
  * @author Mg Kyaw Thura Aung
  */
+@Data
 @Entity
 @Table(name = "sale_his_detail")
 public class SaleHisDetail implements java.io.Serializable {
@@ -47,85 +49,4 @@ public class SaleHisDetail implements java.io.Serializable {
     private Integer uniqueId;
     @Column(name = "sale_wt")
     private Float saleWt;
-
-    public SaleDetailKey getSdKey() {
-        return sdKey;
-    }
-
-    public void setSdKey(SaleDetailKey sdKey) {
-        this.sdKey = sdKey;
-    }
-
-    public Stock getStock() {
-        return stock;
-    }
-
-    public void setStock(Stock stock) {
-        this.stock = stock;
-    }
-
-    public Date getExpDate() {
-        return expDate;
-    }
-
-    public void setExpDate(Date expDate) {
-        this.expDate = expDate;
-    }
-
-    public Float getQty() {
-        return qty;
-    }
-
-    public void setQty(Float qty) {
-        this.qty = qty;
-    }
-
-    public StockUnit getSaleUnit() {
-        return saleUnit;
-    }
-
-    public void setSaleUnit(StockUnit saleUnit) {
-        this.saleUnit = saleUnit;
-    }
-
-    public Float getPrice() {
-        return price;
-    }
-
-    public void setPrice(Float price) {
-        this.price = price;
-    }
-
-    public Float getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Float amount) {
-        this.amount = amount;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public Integer getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(Integer uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
-    public Float getSaleWt() {
-        return saleWt;
-    }
-
-    public void setSaleWt(Float saleWt) {
-        this.saleWt = saleWt;
-    }
-
 }

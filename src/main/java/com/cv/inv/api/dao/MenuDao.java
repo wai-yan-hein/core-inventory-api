@@ -12,25 +12,25 @@ import java.util.List;
  *
  * @author winswe
  */
-public interface MenuDao {
+ public interface MenuDao {
 
-    public Menu saveMenu(Menu menu);
+     Menu saveMenu(Menu menu);
 
-    public Menu findById(String id);
+     Menu findById(String id);
 
-    public List<Menu> search(String compCode, String nameMM, String parentId, String coaCode);
+     List<Menu> search(String compCode, String nameMM, String parentId, String coaCode);
 
-    public List<Menu> getParentChildMenu();
+     List<Menu> getParentChildMenu();
 
-    public List<Menu> searchM(String updatedDate);
+     List<Menu> searchM(String updatedDate);
 
-    public List getParentChildMenu(String roleId, String menuType, String compCode);
+     List getParentChildMenu(String roleId, String menuType, String compCode);
 
-    public List getParentChildMenuSelect(String roleId, String menuType);
+     List getParentChildMenuSelect(String roleId, String menuType);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public List getReports(String roleId);
+     List getReports(String roleId);
 
-    public List getReportList(String roleId, String partentCode);
+     List getReportList(String roleId, String parentCode);
 }

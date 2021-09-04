@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockReportDao {
+ public interface StockReportDao {
 
-    public StockReport save(StockReport report);
+     StockReport save(StockReport report);
 
-    public List<StockReport> getReports();
+     List<StockReport> getReports();
     
-    public List<StockReport> findAll();
+     List<StockReport> findAll();
     
     
 }

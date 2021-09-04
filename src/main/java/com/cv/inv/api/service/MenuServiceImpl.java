@@ -7,13 +7,13 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.dao.MenuDao;
 import com.cv.inv.api.entity.Menu;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
- *
  * @author winswe
  */
 @Service
@@ -72,8 +72,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List getReportList(String roleId, String partentCode) {
-        return dao.getReportList(roleId, partentCode);
+    public List getReportList(String roleId, String parentCode) {
+        return dao.getReportList(roleId, parentCode);
     }
 
     @Override
@@ -85,7 +85,6 @@ public class MenuServiceImpl implements MenuService {
 
         int seqNo = seqService.getSequence(macId, option, period, compCode);
 
-        String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 }

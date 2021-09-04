@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DamageHisServiceImpl implements DamageHisService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DamageHisServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(DamageHisServiceImpl.class);
 
     @Autowired
     private DamageHisDao dao;

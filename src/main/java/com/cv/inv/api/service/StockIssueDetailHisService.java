@@ -12,6 +12,6 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface StockIssueDetailHisService {
-     public List<StockIssueDetailHis> search(String dmgVouId);
+ public interface StockIssueDetailHisService {
+      List<StockIssueDetailHis> search(String dmgVouId);
 }

@@ -12,10 +12,10 @@ import java.util.List;
  *
  * @author winswe
  */
-public interface UserService {
-    public AppUser save(AppUser user);
-    public List<AppUser> search(String id, String userShort, String email, String owner);
-    public int delete(String userCode);
-    public AppUser login(String userShort, String password);
-    public AppUser findById(String id);
+ public interface UserService {
+     AppUser save(AppUser user);
+     List<AppUser> search(String id, String userShort, String email, String owner);
+     int delete(String userCode);
+     AppUser login(String userShort, String password);
+     AppUser findById(String id);
 }

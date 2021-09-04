@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class DamageDetailHisDaoImpl extends AbstractDao<Long, DamageDetailHis> implements DamageDetailHisDao {
 
+
     @Override
     public DamageDetailHis save(DamageDetailHis sdh) {
         persist(sdh);
@@ -24,20 +25,15 @@ public class DamageDetailHisDaoImpl extends AbstractDao<Long, DamageDetailHis> i
 
     @Override
     public DamageDetailHis findById(Long id) {
-        DamageDetailHis sdh = getByKey(id);
-        return sdh;
+        return getByKey(id);
     }
 
     @Override
     public List<DamageDetailHis> search(String saleInvId) {
         String strFilter = "";
           if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.dmgVouId = '" + saleInvId+"'";
-            } else {
-                strFilter = strFilter + " and v.dmgVouId = '" + saleInvId+"'";
-            }
-        }
+              strFilter = "v.dmgVouId = '" + saleInvId+"'";
+          }
             String strSql = "select v from DamageDetailHis v";
 
         List<DamageDetailHis> listDH = null;
@@ -52,8 +48,7 @@ public class DamageDetailHisDaoImpl extends AbstractDao<Long, DamageDetailHis> i
     @Override
     public int delete(String id) {
         String strSql = "delete from DamageDetailHis o where o.dmgDetailId = " + id;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

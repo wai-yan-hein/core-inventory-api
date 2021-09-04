@@ -5,9 +5,8 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.common.Util1;
-import com.cv.inv.api.dao.SaleDetailDao;
+import com.cv.inv.api.common.Voucher;
 import com.cv.inv.api.dao.SaleHisDao;
 import com.cv.inv.api.dao.SeqTableDao;
 import com.cv.inv.api.entity.SaleDetailKey;
@@ -19,6 +18,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.cv.inv.api.dao.SaleHisDetailDao;
 
 /**
  *
@@ -31,7 +31,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     @Autowired
     private SaleHisDao shDao;
     @Autowired
-    private SaleDetailDao sdDao;
+    private SaleHisDetailDao sdDao;
     @Autowired
     private SeqTableDao seqDao;
 
@@ -43,7 +43,7 @@ public class SaleHisServiceImpl implements SaleHisService {
         if (saleHis.getStatus().equals("NEW")) {
             SaleHis valid = shDao.findById(vouNo);
             if (valid != null) {
-                throw new DuplicateException("Duplicate Slae Voucher");
+                throw new IllegalStateException("Duplicate Sale Voucher");
             }
         }
         if (listDel != null) {
@@ -55,26 +55,25 @@ public class SaleHisServiceImpl implements SaleHisService {
         }
         for (int i = 0; i < listSD.size(); i++) {
             SaleHisDetail cSd = listSD.get(i);
-            if (cSd.getUniqueId() == null) {
-                if (i == 0) {
-                    cSd.setUniqueId(1);
-                } else {
-                    SaleHisDetail pSd = listSD.get(i - 1);
-                    cSd.setUniqueId(pSd.getUniqueId() + 1);
+            if (cSd.getStock() != null) {
+                if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            SaleHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        }
+                    }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setSdKey(new SaleDetailKey(vouNo, sdCode));
+                    sdDao.save(cSd);
                 }
             }
         }
-
-        listSD.stream().filter(sd -> (sd.getStock() != null)).filter(sd -> (sd.getSdKey() == null)).map(sd -> {
-            String sdCode = vouNo + '-' + sd.getUniqueId();
-            sd.setSdKey(new SaleDetailKey(vouNo, sdCode));
-            return sd;
-        }).forEachOrdered(sd -> {
-            sdDao.save(sd);
-        });
         shDao.save(saleHis);
         saleHis.setListSH(listSD);
-        updateVoucher(saleHis.getCompCode(), saleHis.getMacId(), "Sale");
+        updateVoucher(saleHis.getCompCode(), saleHis.getMacId(), Voucher.SALE.name());
         return saleHis;
     }
 

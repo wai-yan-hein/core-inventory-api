@@ -28,8 +28,7 @@ public class StockIssueHisDaoImpl extends AbstractDao<String, StockIssueHis> imp
 
     @Override
     public StockIssueHis findById(String id) {
-        StockIssueHis ph = getByKey(id);
-        return ph;
+        return getByKey(id);
     }
 
     @Override
@@ -37,25 +36,12 @@ public class StockIssueHisDaoImpl extends AbstractDao<String, StockIssueHis> imp
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.issueDate between '" + from
-                        + "' and '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.issueDate between '" + from
-                        + "' and '" + to + "'";
-            }
+            strFilter = "v.issueDate between '" + from
+                    + "' and '" + to + "'";
         } else if (!from.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.issueDate >= '" + from + "'";
-            } else {
-                strFilter = strFilter + " and v.issueDate >= '" + from + "'";
-            }
+            strFilter = "v.issueDate >= '" + from + "'";
         } else if (!to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.issueDate <= '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.issueDate <= '" + to + "'";
-            }
+            strFilter = "v.issueDate <= '" + to + "'";
         }
 
         if (!location.equals("-")) {
@@ -100,8 +86,7 @@ public class StockIssueHisDaoImpl extends AbstractDao<String, StockIssueHis> imp
         String strSql1 = "delete from StockIssueDetailHis o where o.issueId = '" + vouNo + "'";
         execUpdateOrDelete(strSql1);
         String strSql = "delete from StockIssueHis o where o.issueId = '" + vouNo + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

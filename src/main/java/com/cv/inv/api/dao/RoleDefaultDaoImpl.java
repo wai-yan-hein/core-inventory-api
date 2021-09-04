@@ -48,7 +48,7 @@ public class RoleDefaultDaoImpl extends AbstractDao<RoleDefaultKey, RoleDefault>
             String strSql = "delete from role_setting where role_code = '" + roleCode + "'"
                     + " and comp_code = '" + compCode + "' and default_key = '" + key + "'";
             execSQL(strSql);
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 

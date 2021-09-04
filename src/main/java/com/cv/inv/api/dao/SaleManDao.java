@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface SaleManDao {
+ public interface SaleManDao {
 
-    public SaleMan save(SaleMan saleMan);
+     SaleMan save(SaleMan saleMan);
 
-    public List<SaleMan> findAll(String compCode);
+     List<SaleMan> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public SaleMan findByCode(String code);
+     SaleMan findByCode(String code);
 }

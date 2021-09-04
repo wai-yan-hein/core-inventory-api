@@ -24,11 +24,13 @@ public class SystemSetting {
     private Trader defaultCustomer;
     private Trader defaultSupplier;
     private String cashDown;
+    private String calStock;
     private String curKey = "D-CUR";
     private String locKey = "D-LOC";
     private String saleManKey = "D-SM";
     private String cusKey = "D-CUS";
     private String supKey = "D-SUP";
     private String cashDownKey = "IS-CD";
+    private String calStockKey = "IS-CS";
     private String roleCode;
 }

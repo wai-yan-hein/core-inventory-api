@@ -24,9 +24,9 @@ import javax.persistence.TemporalType;
 public class Location implements java.io.Serializable {
 
     @Id
-    @Column(name = "location_code", unique = true, nullable = false)
+    @Column(name = "loc_code", unique = true, nullable = false)
     private String locationCode;
-    @Column(name = "location_name", nullable = false, length = 50, unique = true)
+    @Column(name = "loc_name", nullable = false, length = 50, unique = true)
     private String locationName;
     @Column(name = "parent")
     private String parentCode;

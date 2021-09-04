@@ -6,70 +6,29 @@
 package com.cv.inv.api.entity;
 
 import java.io.Serializable;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
+@Data
 @Embeddable
 public class PurDetailKey implements Serializable {
 
-    @Column(name = "vou_id", length = 15)
-    private String vouId;
-    @Column(name = "pur_detail_code", length = 20)
-    private String purDetailId;
+    @Column(name = "vou_no", length = 15)
+    private String vouNo;
+    @Column(name = "pd_code", length = 20)
+    private String pdCode;
 
     public PurDetailKey() {
     }
 
-    public String getVouId() {
-        return vouId;
+    public PurDetailKey(String vouNo, String pdCode) {
+        this.vouNo = vouNo;
+        this.pdCode = pdCode;
     }
 
-    public void setVouId(String vouId) {
-        this.vouId = vouId;
-    }
-
-    public String getPurDetailId() {
-        return purDetailId;
-    }
-
-    public void setPurDetailId(String purDetailId) {
-        this.purDetailId = purDetailId;
-    }
-
-    public PurDetailKey(String vouId, String purDetailId) {
-        this.vouId = vouId;
-        this.purDetailId = purDetailId;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.vouId);
-        hash = 67 * hash + Objects.hashCode(this.purDetailId);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final PurDetailKey other = (PurDetailKey) obj;
-        if (!Objects.equals(this.vouId, other.vouId)) {
-            return false;
-        }
-        return Objects.equals(this.purDetailId, other.purDetailId);
-    }
-    
 }

@@ -12,16 +12,16 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface LocationService {
+ public interface LocationService {
 
-    public Location findByCode(String code);
+     Location findByCode(String code);
 
-    public Location save(Location loc) throws Exception;
+     Location save(Location loc) throws Exception;
 
-    public List<Location> findAll(String compCode);
+     List<Location> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public List<Location> search(String parent);
+     List<Location> search(String parent);
 
 }

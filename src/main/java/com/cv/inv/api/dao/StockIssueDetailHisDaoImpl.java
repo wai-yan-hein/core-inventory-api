@@ -24,20 +24,15 @@ public class StockIssueDetailHisDaoImpl extends AbstractDao<Long, StockIssueDeta
 
     @Override
     public StockIssueDetailHis findById(Long id) {
-        StockIssueDetailHis sdh = getByKey(id);
-        return sdh;
+        return getByKey(id);
     }
 
     @Override
     public List<StockIssueDetailHis> search(String saleInvId) {
         String strFilter = "";
           if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.issueId = '" + saleInvId+"'";
-            } else {
-                strFilter = strFilter + " and v.issueId = '" + saleInvId+"'";
-            }
-        }
+              strFilter = "v.issueId = '" + saleInvId+"'";
+          }
             String strSql = "select v from StockIssueDetailHis v";
 
         List<StockIssueDetailHis> listDH = null;
@@ -52,8 +47,7 @@ public class StockIssueDetailHisDaoImpl extends AbstractDao<Long, StockIssueDeta
     @Override
     public int delete(String id) {
         String strSql = "delete from StockIssueDetailHis o where o.tranId = " + id;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

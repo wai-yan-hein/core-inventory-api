@@ -17,25 +17,25 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Objects;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author WSwe
  */
 public class Util1 {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Util1.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Util1.class);
 
     public static String getEngChar(int i) {
         String[] engChar = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-            "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-            "U", "V", "W", "X", "Y", "Z"};
+                "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                "U", "V", "W", "X", "Y", "Z"};
 
         if ((i + 1) < 0 || (i + 1) > engChar.length) {
             return null;
@@ -50,26 +50,14 @@ public class Util1 {
         try {
             if (number != null && !number.isEmpty()) {
                 double tmp = Double.parseDouble(number);
-                status = true;
-            } else {
-                status = true;
             }
-        } catch (Exception ex) {
-            logger.error("NumberUtil.isNumber : " + ex.getMessage());
+            status = true;
+        } catch (NumberFormatException ex) {
+            log.error("NumberUtil.isNumber : " + ex.getMessage());
         }
         return status;
     }
 
-    /*public static String getPropValue(String key) {
-        String strFilter = "v.propKey = '" + key + "'";
-        List<SystemProperty> listSP = HibernateUtil.findAllHSQL("SystemProperty", strFilter);
-
-        if (!listSP.isEmpty()) {
-            return listSP.get(0).getPropValue();
-        } else {
-            return null;
-        }
-    }*/
     public static Date toDate(Object objDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date date = null;
@@ -79,7 +67,7 @@ public class Util1 {
                 date = formatter.parse(objDate.toString());
             }
         } catch (ParseException ex) {
-            logger.info("toDateStr Error : " + ex.getMessage());
+            log.info("toDateStr Error : " + ex.getMessage());
         }
 
         return date;
@@ -94,7 +82,7 @@ public class Util1 {
                 date = formatter.parse(objDate.toString());
             }
         } catch (ParseException ex) {
-            logger.info("toDateStr Error : " + ex.getMessage());
+            log.info("toDateStr Error : " + ex.getMessage());
         }
 
         return date;
@@ -121,24 +109,10 @@ public class Util1 {
         try {
             date = formatter.format(toDate(strDate));
         } catch (Exception ex) {
-            logger.info("toDateTimeStrMYSQL : " + ex.getMessage());
+            log.info("toDateTimeStrMYSQL : " + ex.getMessage());
         }
 
         return date;
-    }
-
-    public static boolean isMySqLDate(String strDate) {
-        boolean status = true;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String date = null;
-        try {
-            date = formatter.format(toDate(strDate));
-        } catch (Exception ex) {
-            status = false;
-            logger.info("toDateTimeStrMYSQL : " + ex.getMessage());
-        }
-
-        return status;
     }
 
     public static String toDateTimeStrMYSQL(String strDate) {
@@ -148,20 +122,7 @@ public class Util1 {
         try {
             date = formatter.format(toDate(strDate, "dd/MM/yyyy"));
         } catch (Exception ex) {
-            logger.info("toDateTimeStrMYSQL : " + ex.getMessage());
-        }
-
-        return date;
-    }
-
-    public static String getTodayDateTimeStrMySql() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = null;
-
-        try {
-            date = formatter.format(new Date());
-        } catch (Exception ex) {
-
+            log.info("toDateTimeStrMYSQL : " + ex.getMessage());
         }
 
         return date;
@@ -181,7 +142,7 @@ public class Util1 {
             try {
                 date = formatter.format(toDate(strDate, outFormat));
             } catch (Exception ex1) {
-                logger.info("toDateStr : " + ex1.getMessage());
+                log.info("toDateStr : " + ex1.getMessage());
             }
         }
 
@@ -195,7 +156,7 @@ public class Util1 {
         try {
             date = formatter.format(toDate(strDate, "dd/MM/yyyy")) + " 23:59:59";
         } catch (Exception ex) {
-            logger.info("toDateStrMYSQL Error : " + ex.getMessage());
+            log.info("toDateStrMYSQL Error : " + ex.getMessage());
         }
 
         return date;
@@ -212,7 +173,7 @@ public class Util1 {
                 formatter = new SimpleDateFormat("yyyy-MM-dd");
                 date = formatter.parse(objDate.toString());
             } catch (ParseException ex1) {
-                logger.info("toDateStr Error : " + ex1.getMessage());
+                log.info("toDateStr Error : " + ex1.getMessage());
             }
         }
 
@@ -251,8 +212,7 @@ public class Util1 {
     }
 
     public static Date getTodayDate() {
-        Date todayDate = Calendar.getInstance().getTime();
-        return todayDate;
+        return Calendar.getInstance().getTime();
     }
 
     public static String toDateStrMYSQL(String strDate, String format) {
@@ -262,7 +222,7 @@ public class Util1 {
         try {
             date = formatter.format(toDate(strDate, format));
         } catch (Exception ex) {
-            logger.info("toDateTimeStrMYSQL : " + ex.getMessage());
+            log.info("toDateTimeStrMYSQL : " + ex.getMessage());
         }
 
         return date;
@@ -278,7 +238,7 @@ public class Util1 {
             c.add(Calendar.DATE, ttlDay);
             output = formatter.format(c.getTime());
         } catch (Exception ex) {
-            logger.info("addDateTo : " + ex.getMessage());
+            log.info("addDateTo : " + ex.getMessage());
         }
 
         return output;
@@ -295,7 +255,7 @@ public class Util1 {
             c.add(Calendar.DATE, ttlDay);
             tmp = c.getTime();
         } catch (Exception ex) {
-            logger.info("addDateTo : " + ex.getMessage());
+            log.info("addDateTo : " + ex.getMessage());
         }
 
         return tmp;
@@ -304,7 +264,7 @@ public class Util1 {
     public static String isNull(String strValue, String value) {
         if (strValue == null) {
             return value;
-        } else if (strValue.isEmpty() || strValue.equals("")) {
+        } else if (strValue.isEmpty()) {
             return value;
         } else {
             return strValue;
@@ -322,11 +282,7 @@ public class Util1 {
     }
 
     public static String isNullObj(Object obj, String value) {
-        if (obj == null) {
-            return value;
-        } else {
-            return value;
-        }
+        return value;
     }
 
     public static Date getLastDayOfMonth(String strDate, String format) {
@@ -337,47 +293,11 @@ public class Util1 {
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         calendar.add(Calendar.DATE, -1);
 
-        Date lastDayOfMonth = calendar.getTime();
-        return lastDayOfMonth;
-    }
-
-    public static int getDatePart(Date d, String format) {
-        int intValue = 0;
-
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(format);
-            String value = sdf.format(d);
-
-            if (!value.isEmpty()) {
-                intValue = Integer.parseInt(value);
-            }
-        } catch (Exception ex) {
-
-        }
-
-        return intValue;
-    }
-
-    public static Double NZeroDouble(Object number) {
-        Double value = 0.0;
-
-        try {
-            if (number == null) {
-                return new Double(0);
-            } else {
-                return value = Double.parseDouble(number.toString());
-            }
-        } catch (NumberFormatException ex) {
-            return new Double(0);
-        }
+        return calendar.getTime();
     }
 
     public static int isNullZero(Integer value) {
-        if (value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return Objects.requireNonNullElse(value, 0);
     }
 
     public static double nullZero(String value) {
@@ -390,14 +310,6 @@ public class Util1 {
         }
 
         return Double.parseDouble(value);
-    }
-
-    public static boolean getNullTo(Boolean value) {
-        if (value == null) {
-            return false;
-        } else {
-            return value;
-        }
     }
 
     public static String getPeriod(String strDate, String format) {
@@ -421,38 +333,6 @@ public class Util1 {
         }
 
         return strPeriod;
-    }
-
-    public static String getZawgyiText(HashMap<Integer, Integer> hmIngZgy, String text) {
-        String tmpStr = "";
-
-        if (text != null) {
-            for (int i = 0; i < text.length(); i++) {
-                String tmpS = Character.toString(text.charAt(i));
-                int tmpChar = (int) text.charAt(i);
-
-                if (hmIngZgy.containsKey(tmpChar)) {
-                    char tmpc = (char) hmIngZgy.get(tmpChar).intValue();
-                    if (tmpStr.isEmpty()) {
-                        tmpStr = Character.toString(tmpc);
-                    } else {
-                        tmpStr = tmpStr + Character.toString(tmpc);
-                    }
-                } else if (tmpS.equals("ƒ")) {
-                    if (tmpStr.isEmpty()) {
-                        tmpStr = "ႏ";
-                    } else {
-                        tmpStr = tmpStr + "ႏ";
-                    }
-                } else if (tmpStr.isEmpty()) {
-                    tmpStr = tmpS;
-                } else {
-                    tmpStr = tmpStr + tmpS;
-                }
-            }
-        }
-
-        return tmpStr;
     }
 
     public static Double getDouble(Object number) {
@@ -528,13 +408,11 @@ public class Util1 {
     public static boolean isValidDateFormat(Object dateStr, String dateFromat) {
         boolean status = true;
         DateFormat formatter = new SimpleDateFormat(dateFromat);
-
-        Date date = null;
         if (isDate(dateStr.toString())) {
             try {
-                date = formatter.parse(dateStr.toString());
+                formatter.parse(dateStr.toString());
             } catch (ParseException ex) {
-                logger.info("isValidDateFormat Error : " + ex.getMessage());
+                log.info("isValidDateFormat Error : " + ex.getMessage());
                 status = false;
 
             }
@@ -546,14 +424,10 @@ public class Util1 {
     }
 
     public static String toFormatDate(String obj) {
-        String[] arr = null;
-        //int year = Calendar.getInstance().get(Calendar.YEAR);
-        //String strYear = String.valueOf(year).substring(0, 2);
-        //logger.info("String year .." + strYear);
+        String[] arr;
         arr = obj.split("(?<=\\G.{2})");
 
-        String format = arr[0] + "/" + arr[1] + "/" + arr[2] + arr[3];
-        return format;
+        return arr[0] + "/" + arr[1] + "/" + arr[2] + arr[3];
 
     }
 
@@ -591,9 +465,8 @@ public class Util1 {
     public static Dimension getScreenSize() {
         //Calculate dialog position to centre.
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Dimension screen = toolkit.getScreenSize();
 
-        return screen;
+        return toolkit.getScreenSize();
     }
 
     public static String getComputerName() {
@@ -602,7 +475,7 @@ public class Util1 {
         try {
             computerName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logger.info("getComputerName : " + e.toString());
+            log.info("getComputerName : " + e);
         }
 
         return computerName;
@@ -614,7 +487,7 @@ public class Util1 {
         try {
             iPAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            logger.info("getIPAddress : " + e.toString());
+            log.info("getIPAddress : " + e);
         }
 
         return iPAddress;
@@ -627,5 +500,4 @@ public class Util1 {
         return df.format(value);
 
     }
-
 }

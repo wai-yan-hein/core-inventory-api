@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface SaleManService {
+ public interface SaleManService {
 
-    public SaleMan save(SaleMan saleMan) throws Exception;
+     SaleMan save(SaleMan saleMan) throws Exception;
 
-    public List<SaleMan> findAll(String compCode);
+     List<SaleMan> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public SaleMan findByCode(String code);
+     SaleMan findByCode(String code);
 }

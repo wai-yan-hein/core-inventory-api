@@ -6,25 +6,20 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RetOutHis;
-import java.sql.ResultSet;
+
 import java.util.List;
 
 /**
- *
  * @author lenovo
  */
-public interface RetOutDao {
+ public interface RetOutDao {
 
-    public RetOutHis save(RetOutHis retOutHis);
+    RetOutHis save(RetOutHis saleHis) throws Exception;
 
-    public RetOutHis findById(String id);
+    List<RetOutHis> search(String fromDate, String toDate, String cusCode,
+                           String vouNo, String userCode);
 
-    public List<RetOutHis> search(String fromDate, String toDate,
-            String cusId, String locId, String vouNo, String filterCode);
+    RetOutHis findById(String id);
 
-    public ResultSet searchM(String fromDate, String toDate,
-            String cusId, String locId, String vouNo, String filterCode) throws Exception;
-
-    public int delete(String id) throws Exception;
-
+    int delete(String vouNo) throws Exception;
 }

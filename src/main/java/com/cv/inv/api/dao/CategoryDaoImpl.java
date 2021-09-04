@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CategoryDaoImpl extends AbstractDao<String, Category> implements CategoryDao {
 
+
     @Override
     public Category save(Category item) {
         persist(item);
@@ -23,7 +24,7 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     }
 
     @Override
-    public List<Category> findAll(String compCode) {
+    public List findAll(String compCode) {
         String hsql = "select o from Category o where o.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
@@ -39,11 +40,7 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
         String strFilter = "";
 
         if (!catName.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.catName like '%" + catName + "%'";
-            } else {
-                strFilter = strFilter + " and o.catName like '%" + catName + "%'";
-            }
+            strFilter = "o.catName like '%" + catName + "%'";
         }
 
         if (strFilter.isEmpty()) {
@@ -52,15 +49,13 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
             strFilter = "select o from Category o where " + strFilter;
         }
 
-        List<Category> listCat = findHSQL(strFilter);
-        return listCat;
+        return (List<Category>) findHSQL(strFilter);
     }
 
     @Override
     public List<Category> searchM(String updatedDate) {
         String strSql = "select o from Category o where o.updatedDate > '" + updatedDate + "'";
-        List<Category> listCat = findHSQL(strSql);
-        return listCat;
+        return (List<Category>) findHSQL(strSql);
     }
 
     @Override

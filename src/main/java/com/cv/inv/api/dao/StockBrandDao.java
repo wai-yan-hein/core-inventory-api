@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockBrandDao {
+ public interface StockBrandDao {
 
-    public StockBrand save(StockBrand brand) throws Exception;
+     StockBrand save(StockBrand brand) throws Exception;
 
-    public List<StockBrand> findAll(String compCode);
+     List<StockBrand> findAll(String compCode);
 
-    public StockBrand findByCode(String code);
+     StockBrand findByCode(String code);
 
-    public int delete(String id);
+     int delete(String id);
 }

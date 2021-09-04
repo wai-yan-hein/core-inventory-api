@@ -55,11 +55,7 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     public List<Stock> search(String saleInvId) {
         String strFilter = "";
         if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.stockType = '" + saleInvId + "'";
-            } else {
-                strFilter = strFilter + " and v.stockType = '" + saleInvId + "'";
-            }
+            strFilter = "v.stockType = '" + saleInvId + "'";
         }
         String strSql = "select v from Stock v";
 
@@ -76,11 +72,7 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     public List<Stock> searchC(String saleInvId) {
         String strFilter = "";
         if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.category = '" + saleInvId + "'";
-            } else {
-                strFilter = strFilter + " and v.category = '" + saleInvId + "'";
-            }
+            strFilter = "v.category = '" + saleInvId + "'";
         }
         String strSql = "select v from Stock v";
 
@@ -97,11 +89,7 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     public List<Stock> searchB(String saleInvId) {
         String strFilter = "";
         if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.brand = '" + saleInvId + "'";
-            } else {
-                strFilter = strFilter + " and v.brand = '" + saleInvId + "'";
-            }
+            strFilter = "v.brand = '" + saleInvId + "'";
         }
         String strSql = "select v from Stock v";
 
@@ -117,8 +105,7 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     @Override
     public List<Stock> searchM(String updatedDate) {
         String strSql = "select o from Stock o where o.updatedDate > '" + updatedDate + "'";
-        List<Stock> listST = findHSQL(strSql);
-        return listST;
+        return (List<Stock>) findHSQL(strSql);
 
     }
 }

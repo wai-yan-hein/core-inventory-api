@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RegionDaoImpl extends AbstractDao<String, Region> implements RegionDao {
 
+
     @Override
     public Region save(Region region) {
         persist(region);
@@ -24,8 +25,7 @@ public class RegionDaoImpl extends AbstractDao<String, Region> implements Region
 
     @Override
     public Region findByCode(String id) {
-        Region region = getByKey(id);
-        return region;
+        return getByKey(id);
     }
 
     @Override
@@ -34,11 +34,7 @@ public class RegionDaoImpl extends AbstractDao<String, Region> implements Region
         String strFilter = "";
 
         if (!code.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.regionCode = '" + code + "'";
-            } else {
-                strFilter = strFilter + " and o.regionCode = '" + code + "'";
-            }
+            strFilter = "o.regionCode = '" + code + "'";
         }
 
         if (!name.equals("-")) {
@@ -68,16 +64,14 @@ public class RegionDaoImpl extends AbstractDao<String, Region> implements Region
             strSql = strSql + " where " + strFilter + " order by o.regionName";
         }
 
-        List<Region> listRegion = findHSQL(strSql);
-        return listRegion;
+        return (List<Region>) findHSQL(strSql);
     }
 
     @Override
     public int delete(String code) {
         String strSql = "delete from Region o where o.regCode = '"
                 + code + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
     @Override

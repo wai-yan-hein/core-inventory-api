@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TransferHisServiceImpl implements TransferHisService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransferHisServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TransferHisServiceImpl.class);
 
     @Autowired
     private TransferHisDao dao;

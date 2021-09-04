@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
 
+
     @Override
     public Menu saveMenu(Menu menu) {
         persist(menu);
@@ -25,8 +26,7 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
 
     @Override
     public Menu findById(String id) {
-        Menu menu = getByKey(id);
-        return menu;
+        return getByKey(id);
     }
 
     @Override
@@ -35,11 +35,7 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         String strFilter = "";
 
         if (!compCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.compCode = '" + compCode + "'";
-            } else {
-                strFilter = strFilter + " and o.compCode  '" + compCode + "'";
-            }
+            strFilter = "o.compCode = '" + compCode + "'";
         }
 
         if (!nameMM.equals("-")) {
@@ -59,9 +55,9 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         }
         if (!coaCode.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.soureAccCode = " + coaCode;
+                strFilter = "o.sourceAccCode = " + coaCode;
             } else {
-                strFilter = strFilter + " and o.soureAccCode = " + coaCode;
+                strFilter = strFilter + " and o.sourceAccCode = " + coaCode;
             }
         }
 
@@ -69,24 +65,20 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
             strSql = strSql + " where " + strFilter;
         }
 
-        List<Menu> listMenu = findHSQL(strSql);
-        return listMenu;
+        return (List<Menu>) findHSQL(strSql);
     }
 
     @Override
     public int delete(String id) {
         String strSql = "delete from Menu o where o.code = '" + id + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
     @Override
     public List<Menu> getParentChildMenu() {
         String strSql = "select o from Menu o where o.parent = '1'";
         List<Menu> listRootMenu = findHSQL(strSql);
-        listRootMenu.forEach(parent -> {
-            getChild(parent);
-        });
+        listRootMenu.forEach(this::getChild);
 
         return listRootMenu;
     }
@@ -98,9 +90,7 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-                listChild.forEach(parentMenu -> {
-                    getChild(parentMenu);
-                });
+                listChild.forEach(this::getChild);
             }
         }
 
@@ -112,8 +102,8 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         String strSql = "select o from VRoleMenu o where o.key.roleCode = '" + roleCode
                 + "' and o.parent = '1' and o.compCode = '" + compCode + "' order by o.orderBy";
         List listRootMenu = findHSQL(strSql);
-        for (int i = 0; i < listRootMenu.size(); i++) {
-            VRoleMenu parent = (VRoleMenu) listRootMenu.get(i);
+        for (Object rootMenu : listRootMenu) {
+            VRoleMenu parent = (VRoleMenu) rootMenu;
             getChild(parent, roleCode, menuType, compCode);
         }
 
@@ -131,8 +121,8 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-                for (int i = 0; i < listChild.size(); i++) {
-                    VRoleMenu child = (VRoleMenu) listChild.get(i);
+                for (Object o : listChild) {
+                    VRoleMenu child = (VRoleMenu) o;
                     getChild(child, roleCode, menuType, compCode);
                 }
             }
@@ -144,8 +134,8 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         String strSql = "select m from Menu m where m.parent = '1' and "
                 + " m.code in(select p.key.menuCode from Privilege p where p.isAllow=true and p.key.roleCode = " + roleCode + ") order by m.orderBy";
         List listRootMenu = findHSQL(strSql);
-        for (int i = 0; i < listRootMenu.size(); i++) {
-            Menu parent = (Menu) listRootMenu.get(i);
+        for (Object rootMenu : listRootMenu) {
+            Menu parent = (Menu) rootMenu;
             getChildSelect(parent, roleCode, "-");
         }
 
@@ -163,8 +153,8 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-                for (int i = 0; i < listChild.size(); i++) {
-                    Menu child = (Menu) listChild.get(i);
+                for (Object o : listChild) {
+                    Menu child = (Menu) o;
                     getChildSelect(child, roleCode, menuType);
                 }
             }
@@ -174,8 +164,7 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     @Override
     public List<Menu> searchM(String updatedDate) {
         String strSql = "select o from Menu o where o.updatedDate > '" + updatedDate + "'";
-        List<Menu> listMU = findHSQL(strSql);
-        return listMU;
+        return (List<Menu>) findHSQL(strSql);
 
     }
 

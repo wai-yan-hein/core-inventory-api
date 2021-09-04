@@ -41,7 +41,7 @@ public class SaleController {
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-sale")
-    public ResponseEntity<SaleHis> saveCategory(@RequestBody SaleHis sale, HttpServletRequest request) throws Exception {
+    public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale, HttpServletRequest request) throws Exception {
         log.info("/save-sale");
         sale = shService.save(sale);
         return ResponseEntity.ok(sale);
@@ -63,7 +63,7 @@ public class SaleController {
     public ResponseEntity<ReturnObject> deleteSale(@RequestParam String code) throws Exception {
         log.info("/delete-sale");
         shService.delete(code);
-        ro.setMeesage("Deleted.");
+        ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
 

@@ -15,21 +15,21 @@ import javax.naming.AuthenticationException;
  */
 public interface AccountDao {
 
-    public AppUser saveAccount(AppUser au);
+     AppUser saveAccount(AppUser au);
 
-    public AppUser findUserById(Integer id);
+     AppUser findUserById(Integer id);
 
-    public AppUser findUserByShort(String userShort);
+     AppUser findUserByShort(String userShort);
 
-    public AppUser findUserByEmail(String email);
+     AppUser findUserByEmail(String email);
 
-    public List<AppUser> search(String id, String userShort, String email, String owner);
+     List<AppUser> search(String id, String userShort, String email, String owner);
 
-    public AppUser login(String user, String password) throws AuthenticationException;
+     AppUser login(String user, String password) throws AuthenticationException;
 
-    public int delete(String userCode);
+     int delete(String userCode);
 
-    public AppUser finfById(String id);
+     AppUser findById(String id);
 
-    public List<AppUser> findAll(String compCode);
+     List<AppUser> findAll(String compCode);
 }

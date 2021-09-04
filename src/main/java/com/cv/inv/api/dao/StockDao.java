@@ -12,26 +12,26 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockDao {
+ public interface StockDao {
 
-    public Stock save(Stock stock);
+     Stock save(Stock stock);
 
-    public Stock findById(String id);
+     Stock findById(String id);
 
-    public List<Stock> findAll(String compCode);
+     List<Stock> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public Object getMax(String sql);
+     Object getMax(String sql);
 
-    public List<Stock> findActiveStock();
+     List<Stock> findActiveStock();
 
-    public List<Stock> search(String stockType);
+     List<Stock> search(String stockType);
 
-    public List<Stock> searchC(String stockType);
+     List<Stock> searchC(String stockType);
 
-    public List<Stock> searchB(String stockType);
+     List<Stock> searchB(String stockType);
 
-    public List<Stock> searchM(String updatedDate);
+     List<Stock> searchM(String updatedDate);
 
 }

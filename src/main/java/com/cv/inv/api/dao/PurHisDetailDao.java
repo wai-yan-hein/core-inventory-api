@@ -6,18 +6,19 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.PurHisDetail;
+
 import java.util.List;
 
 /**
  *
  * @author Lenovo
  */
-public interface PurchaseDetailDao {
+ public interface PurHisDetailDao {
 
-    public PurHisDetail save(PurHisDetail pd);
+    PurHisDetail save(PurHisDetail pd);
 
-    public List<PurHisDetail> search(String glCode);
+    List<PurHisDetail> search(String glCode);
 
-    public int delete(String id) throws Exception;
+    int delete(String id) throws Exception;
 
 }

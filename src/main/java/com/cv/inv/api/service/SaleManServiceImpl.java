@@ -5,7 +5,6 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.SaleManDao;
 import com.cv.inv.api.entity.SaleMan;
@@ -37,7 +36,7 @@ public class SaleManServiceImpl implements SaleManService {
             if (valid == null) {
                 sm.setSaleManCode(code);
             } else {
-                throw new DuplicateException("Duplicate Sale Man Code");
+                throw new IllegalStateException("Duplicate Sale Man Code");
             }
         }
         return dao.save(sm);
@@ -55,8 +54,7 @@ public class SaleManServiceImpl implements SaleManService {
 
     private String getSaleManCode(Integer macId, String option, String period, String compCode) {
         int seqNo = seqService.getSequence(macId, option, period, compCode);
-        String tmpCatCode = String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
     }
 
     @Override

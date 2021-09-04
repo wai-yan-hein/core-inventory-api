@@ -69,10 +69,7 @@ public class RoleDefaultKey implements Serializable {
         if (!Objects.equals(this.key, other.key)) {
             return false;
         }
-        if (!Objects.equals(this.roleCode, other.roleCode)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.roleCode, other.roleCode);
     }
 
 }

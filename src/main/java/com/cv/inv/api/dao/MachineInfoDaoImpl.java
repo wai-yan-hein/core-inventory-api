@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implements MachineInfoDao {
 
+
     @Override
     public MachineInfo save(MachineInfo machineInfo) throws Exception {
         persist(machineInfo);
@@ -24,8 +25,8 @@ public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implem
 
     @Override
     public int getMax(String machineName) throws Exception {
-        int maxId = 0;
-        Object obj = null;
+        int maxId;
+        Object obj;
         String strSQL = "select max(o.machineId) from MachineInfo o where o.machineName = '" + machineName + "'";
         obj = exeSQL(strSQL);
         if (obj == null) {
@@ -73,9 +74,8 @@ public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implem
         }else{
             strSql = "select o from MachineInfo o where " + strSql;
         }
-        
-        List<MachineInfo> listMI = findHSQL(strSql);
-        return listMI;
+
+         return (List<MachineInfo>) findHSQL(strSql);
     }
     
      @Override
@@ -95,8 +95,7 @@ public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implem
         }else{
             strSql = "select o from MachineInfo o where " + strSql;
         }
-       List<MachineInfo> listMI = findHSQL(strSql);
-        return listMI; 
+         return (List<MachineInfo>) findHSQL(strSql);
     }
     
 

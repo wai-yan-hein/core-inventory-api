@@ -16,7 +16,7 @@ import lombok.Data;
 public class ReturnObject {
 
     private String status;
-    private String meesage;
+    private String message;
     private List list;
     private Object obj;
 }

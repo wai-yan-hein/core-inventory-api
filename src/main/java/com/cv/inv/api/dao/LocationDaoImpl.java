@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LocationDaoImpl extends AbstractDao<String, Location> implements LocationDao {
 
+
     @Override
     public Location save(Location ch) {
         persist(ch);

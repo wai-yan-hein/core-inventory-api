@@ -14,19 +14,19 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface RoleDefaultService {
+ public interface RoleDefaultService {
 
-    public RoleDefault save(RoleDefault du);
+     RoleDefault save(RoleDefault du);
 
-    public RoleDefault findById(RoleDefaultKey key);
+     RoleDefault findById(RoleDefaultKey key);
 
-    public List<RoleDefault> search(String roleCode, String compCode, String key);
+     List<RoleDefault> search(String roleCode, String compCode, String key);
 
-    public List<RoleDefault> search(String user);
+     List<RoleDefault> search(String user);
 
-    public void delete(String roleCode, String compCode, String key);
+     void delete(String roleCode, String compCode, String key);
 
-    public SystemSetting loadSS(String roleCode);
+     SystemSetting loadSS(String roleCode);
 
-    public SystemSetting saveSS(SystemSetting ss);
+     SystemSetting saveSS(SystemSetting ss);
 }

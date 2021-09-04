@@ -5,17 +5,16 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.dao.SaleDetailDao;
 import com.cv.inv.api.dao.SaleHisDao;
 import com.cv.inv.api.entity.SaleDetailKey;
 import com.cv.inv.api.entity.SaleHis;
 import com.cv.inv.api.entity.SaleHisDetail;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.cv.inv.api.dao.SaleHisDetailDao;
 
 /**
  *
@@ -26,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SaleDetailServiceImpl implements SaleDetailService {
 
     @Autowired
-    private SaleDetailDao dao;
+    private SaleHisDetailDao dao;
 
     @Autowired
     private SaleHisDao hisDao;
@@ -37,8 +36,8 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     }
 
     @Override
-    public List<SaleHisDetail> search(String vouId) {
-        return dao.search(vouId);
+    public List<SaleHisDetail> search(String vouNo) {
+        return dao.search(vouNo);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
 
     @Override
     public void saveH2(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
-            String vouStatus, List<String> deleteList) throws Exception {
+            String vouStatus, List<String> deleteList) {
         String retInDetailId;
         //serialize unique id
         for (int i = 0; i < listSaleDetail.size(); i++) {

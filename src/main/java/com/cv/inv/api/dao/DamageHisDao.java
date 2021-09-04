@@ -15,17 +15,17 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface DamageHisDao {
+ public interface DamageHisDao {
 
-    public DamageHis save(DamageHis ph);
+     DamageHis save(DamageHis ph);
 
-    public DamageHis findById(String id);
+     DamageHis findById(String id);
 
-    public List<DamageHis> search(String from, String to, String location,
+     List<DamageHis> search(String from, String to, String location,
             String remark, String vouNo);
 
-    public ResultSet searchM(String from, String to, String location,
+     ResultSet searchM(String from, String to, String location,
             String remark, String vouNo) throws Exception;
 
-    public int delete(String vouNo);
+     int delete(String vouNo);
 }

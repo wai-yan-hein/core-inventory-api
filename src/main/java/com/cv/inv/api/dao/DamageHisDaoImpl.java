@@ -7,22 +7,20 @@ package com.cv.inv.api.dao;
 
 
 import com.cv.inv.api.entity.DamageHis;
+
 import java.sql.ResultSet;
 
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author lenovo
  */
 @Repository
 public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements DamageHisDao {
-
-    @Autowired
-    private DamageDetailHisDao detaildao;
 
     @Override
     public DamageHis save(DamageHis ph) {
@@ -32,8 +30,7 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
 
     @Override
     public DamageHis findById(String id) {
-        DamageHis ph = getByKey(id);
-        return ph;
+        return getByKey(id);
     }
 
     @Override
@@ -41,25 +38,12 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate between '" + from
-                        + "' and '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.dmgDate between '" + from
-                        + "' and '" + to + "'";
-            }
+            strFilter = "v.dmgDate between '" + from
+                    + "' and '" + to + "'";
         } else if (!from.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate >= '" + from + "'";
-            } else {
-                strFilter = strFilter + " and v.dmgDate >= '" + from + "'";
-            }
+            strFilter = "v.dmgDate >= '" + from + "'";
         } else if (!to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate <= '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.dmgDate <= '" + to + "'";
-            }
+            strFilter = "v.dmgDate <= '" + to + "'";
         }
 
         if (!location.equals("-")) {
@@ -99,29 +83,16 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
 
     @Override
     public ResultSet searchM(String from, String to, String location,
-            String remark, String vouNo) throws Exception {
+                             String remark, String vouNo) throws Exception {
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(dmg.dmg_date) between '" + from
-                        + "' and '" + to + "'";
-            } else {
-                strFilter = strFilter + " and date(dmg.dmg_date) between '" + from
-                        + "' and '" + to + "'";
-            }
+            strFilter = "date(dmg.dmg_date) between '" + from
+                    + "' and '" + to + "'";
         } else if (!from.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(dmg.dmg_date) >= '" + from + "'";
-            } else {
-                strFilter = strFilter + " and date(dmg.dmg_date) >= '" + from + "'";
-            }
+            strFilter = "date(dmg.dmg_date) >= '" + from + "'";
         } else if (!to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(dmg.dmg_date) <= '" + to + "'";
-            } else {
-                strFilter = strFilter + " and date(dmg.dmg_date) <= '" + to + "'";
-            }
+            strFilter = "date(dmg.dmg_date) <= '" + to + "'";
         }
 
         if (!location.equals("-")) {
@@ -150,19 +121,17 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
 
         ResultSet rs = null;
         if (!strFilter.isEmpty()) {
-            strFilter = "select date(dmg.dmg_date)as dmg_date, dmg.dmg_id, dmg.remark,dmg.amount, "
-                    + " dmg.deleted, l.location_name, \n"
-                    + " apu.user_short_name from dmg_his dmg\n"
-                    + " join dmg_detail_his ddh on ddh.dmg_id=dmg.dmg_id\n"
-                    + " left join location l on dmg.location = l.location_id\n"
-                    + " left join appuser apu on dmg.created_by = apu.user_code\n"
-                    + " where "+strFilter
-                    + " and dmg.deleted=false\n"
-                    + " group by dmg.dmg_date, dmg.dmg_id\n"
-                    + " order by dmg_date desc";
+            strFilter = new StringBuilder().
+                    append("select date(dmg.dmg_date)as dmg_date, dmg.dmg_id, dmg.remark,dmg.amount, ")
+                    .append(" dmg.deleted, l.location_name, \n")
+                    .append(" apu.user_short_name from dmg_his dmg\n")
+                    .append(" join dmg_detail_his ddh on ddh.dmg_id=dmg.dmg_id\n")
+                    .append(" left join location l on dmg.location = l.location_id\n")
+                    .append(" left join appuser apu on dmg.created_by = apu.user_code\n")
+                    .append(" where ").append(strFilter).append(" and dmg.deleted=false\n")
+                    .append(" group by dmg.dmg_date, dmg.dmg_id\n").append(" order by dmg_date desc").toString();
             rs = getResultSet(strFilter);
         }
-
         return rs;
     }
 
@@ -171,8 +140,7 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
         String strSql1 = "delete from DamageDetailHis o where o.dmgVouId = '" + vouNo + "'";
         execUpdateOrDelete(strSql1);
         String strSql = "delete from DamageHis o where o.dmgVouId = '" + vouNo + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

@@ -24,8 +24,7 @@ public class UserRoleDaoImpl extends AbstractDao<Integer, UserRole> implements U
 
     @Override
     public UserRole findById(Integer id) {
-        UserRole role = getByKey(id);
-        return role;
+        return getByKey(id);
     }
 
     @Override
@@ -34,11 +33,7 @@ public class UserRoleDaoImpl extends AbstractDao<Integer, UserRole> implements U
         String strFilter = "";
 
         if (!roleName.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.roleName like '" + roleName + "%'";
-            } else {
-                strFilter = strFilter + " and o.roleName like '" + roleName + "%'";
-            }
+            strFilter = "o.roleName like '" + roleName + "%'";
         }
 
         if (!compCode.equals("-")) {
@@ -53,26 +48,18 @@ public class UserRoleDaoImpl extends AbstractDao<Integer, UserRole> implements U
             strSql = strSql + " where " + strFilter;
         }
 
-        List<UserRole> listUserRole = findHSQL(strSql);
-        return listUserRole;
+        return (List<UserRole>) findHSQL(strSql);
     }
 
     @Override
     public int delete(String id) {
         String strSql = "delete from UserRole o where o.roleCode = " + id;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
     @Override
     public List<UserRole> searchM(String updatedDate) {
         String strSql = "select o from UserRole o where o.updatedDate > '" + updatedDate + "'";
-        List<UserRole> listUR = findHSQL(strSql);
-        /*for (UserRole ur : listUR) {
-            if (ur.getPrivilege().size() > 0) {
-                ur.setPrivilege(ur.getPrivilege());
-            }
-        }*/
-        return listUR;
+        return (List<UserRole>) findHSQL(strSql);
     }
 }

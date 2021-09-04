@@ -18,8 +18,7 @@ public class TraderDaoImpl extends AbstractDao<String, Trader> implements Trader
 
     @Override
     public Trader findByCode(String id) {
-        Trader trader = getByKey(id);
-        return trader;
+        return getByKey(id);
     }
 
     @Override
@@ -29,11 +28,7 @@ public class TraderDaoImpl extends AbstractDao<String, Trader> implements Trader
         String strFilter = "";
 
         if (!compCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.compCode = '" + compCode + "'";
-            } else {
-                strFilter = strFilter + " and o.compCode = '" + compCode + "'";
-            }
+            strFilter = "o.compCode = '" + compCode + "'";
         }
 
         if (!code.equals("-")) {
@@ -88,8 +83,7 @@ public class TraderDaoImpl extends AbstractDao<String, Trader> implements Trader
         }
 
         strSql = strSql + " order by o.traderName";
-        List<Trader> listTR = findHSQL(strSql);
-        return listTR;
+        return (List<Trader>) findHSQL(strSql);
     }
 
     @Override
@@ -101,8 +95,7 @@ public class TraderDaoImpl extends AbstractDao<String, Trader> implements Trader
     @Override
     public List<Trader> searchM(String updatedDate) {
         String strSql = "select o from Trader o where o.updatedDate > '" + updatedDate + "'";
-        List<Trader> listTrader = findHSQL(strSql);
-        return listTrader;
+        return (List<Trader>) findHSQL(strSql);
     }
 
     @Override

@@ -44,11 +44,7 @@ public class VouStatusDaoImpl extends AbstractDao<String, VouStatus> implements 
         String strSql = "";
 
         if (!statusDesp.equals("-")) {
-            if (strSql.isEmpty()) {
-                strSql = "o.statusDesp like '%" + statusDesp + "%'";
-            } else {
-                strSql = strSql + " and o.statusDesp like '%" + statusDesp + "%'";
-            }
+            strSql = "o.statusDesp like '%" + statusDesp + "%'";
         }
 
         if (strSql.isEmpty()) {
@@ -57,7 +53,6 @@ public class VouStatusDaoImpl extends AbstractDao<String, VouStatus> implements 
             strSql = "select o from VouStatus o where " + strSql;
         }
 
-        List<VouStatus> listVS = findHSQL(strSql);
-        return listVS;
+        return (List<VouStatus>) findHSQL(strSql);
     }
 }

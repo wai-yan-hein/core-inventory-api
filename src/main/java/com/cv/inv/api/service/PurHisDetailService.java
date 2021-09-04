@@ -13,15 +13,15 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface PurchaseDetailService {
+ public interface PurHisDetailService {
 
-    public PurHisDetail save(PurHisDetail pd);
+     PurHisDetail save(PurHisDetail pd);
     
-    public void saveH2(PurHis pur, List<PurHisDetail> listPD, List<String> delList);
-    public List<PurHisDetail> search(String glCode);
+     void saveH2(PurHis pur, List<PurHisDetail> listPD, List<String> delList);
+     List<PurHisDetail> search(String glCode);
 
-    public void save(PurHis gl, List<PurHisDetail> pd, List<String> delList);
+     void save(PurHis gl, List<PurHisDetail> pd, List<String> delList);
 
-    public int delete(String code) throws Exception;
+     int delete(String code) throws Exception;
 
 }

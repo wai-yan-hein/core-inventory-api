@@ -8,8 +8,7 @@ package com.cv.inv.api.dao;
 import com.cv.inv.api.entity.SaleDetailKey;
 import com.cv.inv.api.entity.SaleHisDetail;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Repository;
  * @author Mg Kyaw Thura Aung
  */
 @Repository
-public class SaleDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDetail> implements SaleDetailDao {
+public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDetail> implements SaleHisDetailDao {
 
     @Override
     public SaleHisDetail save(SaleHisDetail sdh) {
@@ -26,8 +25,8 @@ public class SaleDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDetail>
     }
 
     @Override
-    public List<SaleHisDetail> search(String vouId) {
-        String hsql = "select o from SaleHisDetail o where o.sdKey.vouNo = '" + vouId + "' order by o.uniqueId";
+    public List<SaleHisDetail> search(String vouNo) {
+        String hsql = "select o from SaleHisDetail o where o.sdKey.vouNo = '" + vouNo + "' order by o.uniqueId";
         return findHSQL(hsql);
     }
 

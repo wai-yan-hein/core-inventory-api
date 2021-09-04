@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockTypeDao {
+ public interface StockTypeDao {
 
-    public StockType save(StockType item);
+     StockType save(StockType item);
 
-    public List<StockType> findAll(String compCode);
+     List<StockType> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
     StockType findByCode(String code);
 }

@@ -16,8 +16,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AccSettingDaoImpl extends AbstractDao<String, AccSetting> implements AccSettingDao {
 
+
     @Override
-    public List<AccSetting> findAll() {
+    public List findAll() {
         String hsql = "select o from AccSetting o";
         return findHSQL(hsql);
     }

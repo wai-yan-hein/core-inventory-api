@@ -19,4 +19,6 @@ public class FilterObject {
     private String cusCode;
     private String vouNo;
     private String userCode;
+    private String description;
+    private String remark;
 }

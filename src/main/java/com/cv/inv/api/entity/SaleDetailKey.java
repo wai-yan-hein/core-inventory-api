@@ -6,14 +6,15 @@
 package com.cv.inv.api.entity;
 
 import java.io.Serializable;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import lombok.Data;
 
 /**
  *
  * @author Mg Kyaw Thura Aung
  */
+@Data
 @Embeddable
 public class SaleDetailKey implements Serializable {
 
@@ -29,47 +30,4 @@ public class SaleDetailKey implements Serializable {
         this.vouNo = vouNo;
         this.sdCode = sdCode;
     }
-
-    public String getVouNo() {
-        return vouNo;
-    }
-
-    public void setVouNo(String vouNo) {
-        this.vouNo = vouNo;
-    }
-
-    public String getSdCode() {
-        return sdCode;
-    }
-
-    public void setSdCode(String sdCode) {
-        this.sdCode = sdCode;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.vouNo);
-        hash = 79 * hash + Objects.hashCode(this.sdCode);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SaleDetailKey other = (SaleDetailKey) obj;
-        if (!Objects.equals(this.vouNo, other.vouNo)) {
-            return false;
-        }
-        return Objects.equals(this.sdCode, other.sdCode);
-    }
-
 }

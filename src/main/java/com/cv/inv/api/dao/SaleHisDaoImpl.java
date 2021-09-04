@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements SaleHisDao {
 
+
     @Override
     public SaleHis save(SaleHis sh) {
         persist(sh);
@@ -28,25 +29,12 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.saleDate) between '" + fromDate
-                        + "' and '" + toDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.saleDate) between '"
-                        + fromDate + "' and '" + toDate + "'";
-            }
+            strFilter = "date(o.vouDate) between '" + fromDate
+                    + "' and '" + toDate + "'";
         } else if (!fromDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.saleDate) >= '" + fromDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.saleDate) >= '" + fromDate + "'";
-            }
+            strFilter = "date(o.vouDate) >= '" + fromDate + "'";
         } else if (!toDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "date(o.saleDate) <= '" + toDate + "'";
-            } else {
-                strFilter = strFilter + " and date(o.saleDate) <= '" + toDate + "'";
-            }
+            strFilter = "date(o.vouDate) <= '" + toDate + "'";
         }
         if (!cusCode.equals("-")) {
             if (strFilter.isEmpty()) {
@@ -71,17 +59,15 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
         }
         String strSql = "select o from SaleHis o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by date(o.saleDate) desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
         }
 
-        List<SaleHis> listSaleHis = findHSQL(strSql);
-        return listSaleHis;
+        return (List<SaleHis>) findHSQL(strSql);
     }
 
     @Override
     public SaleHis findById(String id) {
-        SaleHis sh = getByKey(id);
-        return sh;
+        return getByKey(id);
     }
 
     @Override

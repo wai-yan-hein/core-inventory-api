@@ -13,15 +13,15 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface SaleDetailService {
+ public interface SaleDetailService {
 
-    public SaleHisDetail save(SaleHisDetail sdh);
+     SaleHisDetail save(SaleHisDetail sdh);
 
-    public List<SaleHisDetail> search(String vouId);
+     List<SaleHisDetail> search(String vouNo);
 
-    public void save(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
+     void save(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
             String vouStatus, List<String> deleteList) throws Exception;
     
-       public void saveH2(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
+        void saveH2(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
             String vouStatus, List<String> deleteList) throws Exception;
 }

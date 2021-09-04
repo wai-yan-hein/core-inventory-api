@@ -28,8 +28,7 @@ public class StockReceiveHisDaoImpl extends AbstractDao<String, StockReceiveHis>
 
     @Override
     public StockReceiveHis findById(String id) {
-        StockReceiveHis ph = getByKey(id);
-        return ph;
+        return getByKey(id);
     }
 
     @Override
@@ -37,25 +36,12 @@ public class StockReceiveHisDaoImpl extends AbstractDao<String, StockReceiveHis>
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.receiveDate between '" + from
-                        + "' and '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.receiveDate between '" + from
-                        + "' and '" + to + "'";
-            }
+            strFilter = "v.receiveDate between '" + from
+                    + "' and '" + to + "'";
         } else if (!from.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.receiveDate >= '" + from + "'";
-            } else {
-                strFilter = strFilter + " and v.receiveDate >= '" + from + "'";
-            }
+            strFilter = "v.receiveDate >= '" + from + "'";
         } else if (!to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.receiveDate <= '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.receiveDate <= '" + to + "'";
-            }
+            strFilter = "v.receiveDate <= '" + to + "'";
         }
 
         if (!location.equals("-")) {
@@ -98,8 +84,7 @@ public class StockReceiveHisDaoImpl extends AbstractDao<String, StockReceiveHis>
         String strSql1 = "delete from StockReceiveDetailHis o where o.refVou = '" + vouNo + "'";
         execUpdateOrDelete(strSql1);
         String strSql = "delete from StockReceiveHis o where o.receivedId = '" + vouNo + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

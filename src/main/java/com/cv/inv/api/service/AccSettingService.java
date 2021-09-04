@@ -12,12 +12,12 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface AccSettingService {
+ public interface AccSettingService {
 
-    public List<AccSetting> findAll();
+     List<AccSetting> findAll();
 
-    public AccSetting save(AccSetting setting);
+     AccSetting save(AccSetting setting);
 
-    public AccSetting findByCode(String code);
+     AccSetting findByCode(String code);
 
 }

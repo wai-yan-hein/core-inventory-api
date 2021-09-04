@@ -24,19 +24,14 @@ public class TransferDetailHisDaoImpl extends AbstractDao<Long, TransferDetailHi
 
     @Override
     public TransferDetailHis findById(Long id) {
-        TransferDetailHis sdh = getByKey(id);
-        return sdh;
+        return getByKey(id);
     }
 
     @Override
     public List<TransferDetailHis> search(String saleInvId) {
         String strFilter = "";
           if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.tranVouId = '" + saleInvId+"'";
-            } else {
-                strFilter = strFilter + " and v.tranVouId = '" + saleInvId+"'";
-            }
+              strFilter = "v.tranVouId = '" + saleInvId + "'";
         }
             String strSql = "select v from TransferDetailHis v";
 
@@ -52,8 +47,7 @@ public class TransferDetailHisDaoImpl extends AbstractDao<Long, TransferDetailHi
     @Override
     public int delete(String id) {
         String strSql = "delete from TransferDetailHis o where o.tranDetailId = " + id;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

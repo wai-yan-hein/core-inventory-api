@@ -89,10 +89,7 @@ public class SeqKey implements Serializable {
         if (!Objects.equals(this.compCode, other.compCode)) {
             return false;
         }
-        if (!Objects.equals(this.macId, other.macId)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.macId, other.macId);
     }
     
 

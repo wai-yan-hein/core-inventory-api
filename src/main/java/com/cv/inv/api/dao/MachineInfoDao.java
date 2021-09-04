@@ -12,17 +12,17 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface MachineInfoDao {
+ public interface MachineInfoDao {
 
-    public MachineInfo save(MachineInfo machineInfo) throws Exception;
+     MachineInfo save(MachineInfo machineInfo) throws Exception;
 
-    public int getMax(String machineName) throws Exception;
+     int getMax(String machineName) throws Exception;
 
-    public List<MachineInfo> findAll() throws Exception;
+     List<MachineInfo> findAll() throws Exception;
 
-    public MachineInfo findById(String id) throws Exception;
+     MachineInfo findById(String id) throws Exception;
 
-    public List<MachineInfo> search(String name, String ip);
+     List<MachineInfo> search(String name, String ip);
 
-    public List<MachineInfo> searchM(String name);
+     List<MachineInfo> searchM(String name);
 }

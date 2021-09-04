@@ -19,9 +19,9 @@ import org.springframework.stereotype.Repository;
 public class VouIdDaoImpl extends AbstractDao<String, VouId> implements VouIdDao {
 
     @Override
-    public VouId save(VouId vouId) {
-        persist(vouId);
-        return vouId;
+    public VouId save(VouId vouNo) {
+        persist(vouNo);
+        return vouNo;
     }
 
     @Override
@@ -29,14 +29,12 @@ public class VouIdDaoImpl extends AbstractDao<String, VouId> implements VouIdDao
 
         String strSQl = "select max(o.vouNo) from VouId o where o.key.machineName='" 
                 + machineName + "' and  o.key.vouType='" + vouType + "' and o.key.period ='" + vouPeriod + "'";
-        Object obj = exeSQL(strSQl);
-        return obj;
+        return exeSQL(strSQl);
     }
 
     @Override
     public Object find(CompoundKey key) {
-        Object obj = findByKey(VouId.class, key);
-        return obj;
+        return findByKey(VouId.class, key);
         }
     
       @Override
@@ -44,11 +42,7 @@ public class VouIdDaoImpl extends AbstractDao<String, VouId> implements VouIdDao
         String strSql = "";
 
         if (!machineName.equals("-")) {
-            if (strSql.isEmpty()) {
-                strSql = "o.key.machineName = '" + machineName + "'";
-            } else {
-                strSql = strSql + " and o.key.machineName = '" + machineName + "'";
-            }
+            strSql = "o.key.machineName = '" + machineName + "'";
         }
 
         if (!vouType.equals("-")) {
@@ -73,8 +67,7 @@ public class VouIdDaoImpl extends AbstractDao<String, VouId> implements VouIdDao
             strSql = "select o from VouId o where " + strSql;
         }
 
-        List<VouId> listVI = findHSQL(strSql);
-        return listVI;
+          return (List<VouId>) findHSQL(strSql);
     }
 
 }

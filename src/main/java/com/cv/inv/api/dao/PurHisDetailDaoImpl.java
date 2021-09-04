@@ -14,7 +14,8 @@ import org.springframework.stereotype.Repository;
  * @author Lenovo
  */
 @Repository
-public class PurchaseDetailDaoImpl extends AbstractDao<String, PurHisDetail> implements PurchaseDetailDao {
+public class PurHisDetailDaoImpl extends AbstractDao<String, PurHisDetail> implements PurHisDetailDao {
+
 
     @Override
     public PurHisDetail save(PurHisDetail pd) {
@@ -23,8 +24,8 @@ public class PurchaseDetailDaoImpl extends AbstractDao<String, PurHisDetail> imp
     }
 
     @Override
-    public List<PurHisDetail> search(String vouId) {
-        String hsql = "select o from PurHisDetail o where o.purDetailKey.vouId = '" + vouId + "' order by o.uniqueId";
+    public List<PurHisDetail> search(String vouNo) {
+        String hsql = "select o from PurHisDetail o where o.pdKey.vouNo = '" + vouNo + "' order by o.uniqueId";
         return findHSQL(hsql);
 
     }

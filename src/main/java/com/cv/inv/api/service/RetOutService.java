@@ -6,20 +6,20 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.RetOutHis;
-import com.cv.inv.api.entity.RetOutHisDetail;
 import java.util.List;
 
 /**
  *
  * @author lenovo
  */
-public interface RetOutService {
+ public interface RetOutService {
 
-    public void save(RetOutHis retIn, List<RetOutHisDetail> listRetIn, List<String> delList);
+    RetOutHis save(RetOutHis saleHis) throws Exception;
 
-    public void delete(String retInId) throws Exception;
+    List<RetOutHis> search(String fromDate, String toDate, String cusCode,
+            String vouNo, String userCode);
 
-    public List<RetOutHis> search(String fromDate, String toDate, String cusId,
-            String locId, String vouNo, String filterCode);
-    public RetOutHis findById(String id);
+    RetOutHis findById(String id);
+
+    int delete(String vouNo) throws Exception;
 }

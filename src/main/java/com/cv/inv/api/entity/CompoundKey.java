@@ -83,10 +83,7 @@ public class CompoundKey implements Serializable {
         if (!Objects.equals(this.vouType, other.vouType)) {
             return false;
         }
-        if (!Objects.equals(this.period, other.period)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.period, other.period);
     }
 
 }

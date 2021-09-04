@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class OrderDetailDaoImpl extends AbstractDao<String, OrderDetail> implements OrderDetailDao {
 
+
     @Override
     public OrderDetail save(OrderDetail od) {
         persist(od);

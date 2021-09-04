@@ -25,8 +25,8 @@ public class VouIdServiceImpl implements VouIdService {
     private VouIdDao voudIdDao;
 
     @Override
-    public VouId save(VouId vouId) {
-        return voudIdDao.save(vouId);
+    public VouId save(VouId vouNo) {
+        return voudIdDao.save(vouNo);
     }
 
     @Override

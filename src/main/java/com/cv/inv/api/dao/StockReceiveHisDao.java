@@ -12,14 +12,14 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface StockReceiveHisDao {
+ public interface StockReceiveHisDao {
 
-    public StockReceiveHis save(StockReceiveHis ph);
+     StockReceiveHis save(StockReceiveHis ph);
 
-    public StockReceiveHis findById(String id);
+     StockReceiveHis findById(String id);
 
-    public List<StockReceiveHis> search(String from, String to, String location,
+     List<StockReceiveHis> search(String from, String to, String location,
             String remark, String vouNo);
 
-    public int delete(String vouNo);
+     int delete(String vouNo);
 }

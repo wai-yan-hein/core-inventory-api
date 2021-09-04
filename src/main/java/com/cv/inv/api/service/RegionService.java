@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author WSwe
  */
-public interface RegionService {
+ public interface RegionService {
 
-    public Region save(Region region) throws Exception;
+     Region save(Region region) throws Exception;
 
-    public Region findByCode(String id);
+     Region findByCode(String id);
 
-    public List<Region> search(String code, String name, String compCode, String parentCode);
+     List<Region> search(String code, String name, String compCode, String parentCode);
 
-    public int delete(String code);
+     int delete(String code);
 
-    public List<Region> findAll(String compCode);
+     List<Region> findAll(String compCode);
 }

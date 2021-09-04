@@ -24,20 +24,15 @@ public class StockReceiveDetailHisDaoImpl extends AbstractDao<Long, StockReceive
 
     @Override
     public StockReceiveDetailHis findById(Long id) {
-        StockReceiveDetailHis sdh = getByKey(id);
-        return sdh;
+        return getByKey(id);
     }
 
     @Override
     public List<StockReceiveDetailHis> search(String saleInvId) {
         String strFilter = "";
           if (!saleInvId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.refVou = '" + saleInvId+"'";
-            } else {
-                strFilter = strFilter + " and v.refVou = '" + saleInvId+"'";
-            }
-        }
+              strFilter = "v.refVou = '" + saleInvId+"'";
+          }
             String strSql = "select v from StockReceiveDetailHis v";
 
         List<StockReceiveDetailHis> listDH = null;
@@ -52,8 +47,7 @@ public class StockReceiveDetailHisDaoImpl extends AbstractDao<Long, StockReceive
     @Override
     public int delete(String id) {
         String strSql = "delete from StockReceiveDetailHis o where o.tranId = " + id;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

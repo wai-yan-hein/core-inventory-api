@@ -5,7 +5,6 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.StockTypeDao;
 import com.cv.inv.api.entity.StockType;
@@ -35,7 +34,7 @@ public class StockTypeServiceImpl implements StockTypeService {
             if (valid == null) {
                 s.setStockTypeCode(code);
             } else {
-                throw new DuplicateException("Duplicate Stock Type");
+                throw new IllegalStateException("Duplicate Stock Type");
             }
         }
         return dao.save(s);
@@ -58,8 +57,7 @@ public class StockTypeServiceImpl implements StockTypeService {
 
     private String getCode(Integer macId, String option, String period, String compCode) {
         int seqNo = seqService.getSequence(macId, option, period, compCode);
-        String tmpCatCode = String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
     }
 
 }

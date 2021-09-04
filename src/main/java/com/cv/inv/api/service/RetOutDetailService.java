@@ -12,13 +12,13 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface RetOutDetailService {
+ public interface RetOutDetailService {
 
-    public RetOutHisDetail save(RetOutHisDetail pd);
+     RetOutHisDetail save(RetOutHisDetail pd);
 
-    public List<RetOutHisDetail> search(String glCode);
+     List<RetOutHisDetail> search(String glCode);
 
-    public int delete(String id) throws Exception;
+     int delete(String id) throws Exception;
 
-    //  public void save(PurHis gl, List<PurchaseDetail> pd,List<String> delList);
+    //   void save(PurHis gl, List<PurchaseDetail> pd,List<String> delList);
 }

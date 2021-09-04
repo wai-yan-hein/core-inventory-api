@@ -6,19 +6,16 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.TransferHis;
+
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author lenovo
  */
 @Repository
 public class TransferHisDaoImpl extends AbstractDao<String, TransferHis> implements TransferHisDao {
-
-    @Autowired
-    private TransferDetailHisDao detaildao;
 
     @Override
     public TransferHis save(TransferHis ph) {
@@ -28,8 +25,7 @@ public class TransferHisDaoImpl extends AbstractDao<String, TransferHis> impleme
 
     @Override
     public TransferHis findById(String id) {
-        TransferHis ph = getByKey(id);
-        return ph;
+        return getByKey(id);
     }
 
     @Override
@@ -37,25 +33,12 @@ public class TransferHisDaoImpl extends AbstractDao<String, TransferHis> impleme
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.tranDate between '" + from
-                        + "' and '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.tranDate between '" + from
-                        + "' and '" + to + "'";
-            }
+            strFilter = "v.tranDate between '" + from
+                    + "' and '" + to + "'";
         } else if (!from.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.tranDate >= '" + from + "'";
-            } else {
-                strFilter = strFilter + " and v.tranDate >= '" + from + "'";
-            }
+            strFilter = "v.tranDate >= '" + from + "'";
         } else if (!to.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.tranDate <= '" + to + "'";
-            } else {
-                strFilter = strFilter + " and v.tranDate <= '" + to + "'";
-            }
+            strFilter = "v.tranDate <= '" + to + "'";
         }
 
         if (!location.equals("-")) {
@@ -98,8 +81,7 @@ public class TransferHisDaoImpl extends AbstractDao<String, TransferHis> impleme
         String strSql1 = "delete from TransferDetailHis o where o.tranVouId = '" + vouNo + "'";
         execUpdateOrDelete(strSql1);
         String strSql = "delete from TransferHis o where o.tranVouId = '" + vouNo + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
 }

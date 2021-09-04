@@ -12,12 +12,12 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface RetInDetailDao {
+ public interface RetInDetailDao {
 
-    public RetInHisDetail save(RetInHisDetail pd);
+     RetInHisDetail save(RetInHisDetail pd);
 
-    public List<RetInHisDetail> search(String glCode);
+     List<RetInHisDetail> search(String glCode);
 
-    public int delete(String id) throws Exception;
+     int delete(String id) throws Exception;
 
 }

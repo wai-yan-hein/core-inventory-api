@@ -5,40 +5,32 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.dao.AccSettingDao;
-import com.cv.inv.api.dao.PurchaseDetailDao;
 import com.cv.inv.api.entity.PurDetailKey;
 import com.cv.inv.api.entity.PurHis;
 import com.cv.inv.api.entity.PurHisDetail;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.cv.inv.api.dao.PurHisDetailDao;
 
 /**
  *
  * @author Lenovo
  */
+@Slf4j
 @Service
 @Transactional
-public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
-
-    private static final Logger logger = LoggerFactory.getLogger(RetInServiceImpl.class);
-    private final String DELETE_OPTION = "INV_DELETE";
-    private final String SOURCE_PROG = "ACCOUNT";
+public class PurHisDetailServiceImpl implements PurHisDetailService {
+ 
     @Autowired
-    private AccSettingDao settingDao;
-
+    private PurHisService purService;
     @Autowired
-    private PurchaseHisService purService;
-    @Autowired
-    private PurchaseDetailDao dao;
+    private PurHisDetailDao dao;
 
     @Override
     public PurHisDetail save(PurHisDetail pd) {
-
         return dao.save(pd);
     }
 
@@ -67,7 +59,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
                     try {
                         dao.delete(detailId);
                     } catch (Exception ex) {
-                        logger.error("delete purchase detail :" + ex.getMessage());
+                        log.error("delete purchase detail :" + ex.getMessage());
                     }
                 });
             }
@@ -75,18 +67,18 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
             String vouNo = pur.getVouNo();
             for (PurHisDetail pd : listPD) {
                 if (pd.getStock() != null) {
-                    if (pd.getPurDetailKey() != null) {
-                        pd.setPurDetailKey(pd.getPurDetailKey());
+                    if (pd.getPdKey() != null) {
+                        pd.setPdKey(pd.getPdKey());
                     } else {
                         retInDetailId = vouNo + '-' + pd.getUniqueId();
-                        pd.setPurDetailKey(new PurDetailKey(vouNo, retInDetailId));
+                        pd.setPdKey(new PurDetailKey(vouNo, retInDetailId));
                     }
                     //  pd.setLocation(pur.getLocationId());
                     dao.save(pd);
                 }
             }
         } catch (Exception ex) {
-            logger.error("Save Purchase Detail :" + ex.getMessage());
+            log.error("Save Purchase Detail :" + ex.getMessage());
         }
 
     }
@@ -111,7 +103,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
                     try {
                         delete(detailId);
                     } catch (Exception ex) {
-                        logger.error("delete purchase detail :" + ex.getMessage());
+                        log.error("delete purchase detail :" + ex.getMessage());
                     }
                 });
             }
@@ -119,18 +111,18 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
             String vouNo = pur.getVouNo();
             for (PurHisDetail pd : listPD) {
                 if (pd.getStock() != null) {
-                    if (pd.getPurDetailKey() != null) {
-                        pd.setPurDetailKey(pd.getPurDetailKey());
+                    if (pd.getPdKey() != null) {
+                        pd.setPdKey(pd.getPdKey());
                     } else {
                         retInDetailId = vouNo + '-' + pd.getUniqueId();
-                        pd.setPurDetailKey(new PurDetailKey(vouNo, retInDetailId));
+                        pd.setPdKey(new PurDetailKey(vouNo, retInDetailId));
                     }
                     //  pd.setLocation(pur.getLocationId());
                     dao.save(pd);
                 }
             }
         } catch (Exception ex) {
-            logger.error("Save Purchase :" + ex.getMessage());
+            log.error("Save Purchase :" + ex.getMessage());
         }
     }
 

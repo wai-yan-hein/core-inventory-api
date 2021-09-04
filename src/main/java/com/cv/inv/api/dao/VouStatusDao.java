@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface VouStatusDao {
+ public interface VouStatusDao {
 
-    public VouStatus save(VouStatus vouStatus);
+     VouStatus save(VouStatus vouStatus);
 
-    public List<VouStatus> findAll();
+     List<VouStatus> findAll();
 
-    public int delete(String id);
+     int delete(String id);
 
-    public VouStatus findById(String id);
-    public List<VouStatus> search(String statusDesp);
+     VouStatus findById(String id);
+     List<VouStatus> search(String statusDesp);
 
 }

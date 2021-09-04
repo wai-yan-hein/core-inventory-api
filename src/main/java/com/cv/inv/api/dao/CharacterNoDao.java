@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface CharacterNoDao {
+ public interface CharacterNoDao  {
 
-    public CharacterNo save(CharacterNo ch);
+     CharacterNo save(CharacterNo ch);
 
-    public List<CharacterNo> findAll();
+     List<CharacterNo> findAll();
 
-    public int delete(String id);
+     int delete(String id);
 
-    public CharacterNo findById(String id);
+     CharacterNo findById(String id);
     
-    public Object search(String id);
+     Object search(String id);
 }

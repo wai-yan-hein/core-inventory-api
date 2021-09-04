@@ -19,14 +19,14 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> im
     @Override
     public List<RetOutHisDetail> search(String code) {
 
-        String hsql = "select v from RetOutHisDetail v where v.outCompoundKey.vouNo = '" + code + "' "
+        String hsql = "select v from RetOutHisDetail v where v.roKey.vouNo = '" + code + "' "
                 + " order by v.uniqueId";
         return findHSQL(hsql);
     }
 
     @Override
     public int delete(String id) throws Exception {
-        String strSql = "delete from ret_out_detail_his where ret_out_detail_id = '" + id + "'";
+        String strSql = "delete from ret_out_detail_his where rd_code = '" + id + "'";
         execSQL(strSql);
         return 1;
     }

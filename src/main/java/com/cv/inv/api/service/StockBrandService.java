@@ -12,14 +12,14 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockBrandService {
+ public interface StockBrandService {
 
-    public StockBrand save(StockBrand brand)throws Exception;
+     StockBrand save(StockBrand brand)throws Exception;
 
-    public List<StockBrand> findAll(String compCode);
+     List<StockBrand> findAll(String compCode);
 
-    public int delete(String id);
+     int delete(String id);
 
-    public StockBrand findByCode(String code);
+     StockBrand findByCode(String code);
 
 }

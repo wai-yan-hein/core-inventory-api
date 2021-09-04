@@ -12,11 +12,11 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface OrderDao {
+ public interface OrderDao {
 
-    public Order save(Order order);
+     Order save(Order order);
 
-    public List<Order> findActiveOrder(String fromDate, String toDate, String cusId, String orderCode);
+     List<Order> findActiveOrder(String fromDate, String toDate, String cusId, String orderCode);
 
-    public int delete(String id);
+     int delete(String id);
 }

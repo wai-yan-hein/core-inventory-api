@@ -12,6 +12,6 @@ import java.util.List;
  *
  * @author lenovo
  */
-public interface TransferDetailHisService {
-     public List<TransferDetailHis> search(String dmgVouId);
+ public interface TransferDetailHisService {
+      List<TransferDetailHis> search(String dmgVouId);
 }

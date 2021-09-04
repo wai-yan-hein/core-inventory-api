@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StockIssueHisServiceImpl implements StockIssueHisService {
 
-    private static final Logger logger = LoggerFactory.getLogger(StockIssueHisServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(StockIssueHisServiceImpl.class);
 
     @Autowired
     private StockIssueHisDao dao;

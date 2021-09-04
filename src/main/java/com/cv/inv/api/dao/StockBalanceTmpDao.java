@@ -12,10 +12,10 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface StockBalanceTmpDao {
+ public interface StockBalanceTmpDao {
 
-    public StockBalanceTmp save(StockBalanceTmp balance);
+     StockBalanceTmp save(StockBalanceTmp balance);
 
-    public List<StockBalanceTmp> search(String machineId);
+     List<StockBalanceTmp> search(String machineId);
 
 }

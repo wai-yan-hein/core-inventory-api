@@ -12,17 +12,17 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface CategoryDao {
+ public interface CategoryDao {
 
-    public Category findByCode(String code);
+     Category findByCode(String code);
 
-    public Category save(Category item);
+     Category save(Category item);
 
-    public List<Category> findAll(String compCode);
+     List<Category> findAll(String compCode);
 
-    public List<Category> search(String catName);
+     List<Category> search(String catName);
 
-    public List<Category> searchM(String updatedDate);
+     List<Category> searchM(String updatedDate);
 
-    public int delete(String id);
+     int delete(String id);
 }

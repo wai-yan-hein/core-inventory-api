@@ -25,15 +25,13 @@ public class RelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> impl
 
     @Override
     public UnitRelation findByKey(RelationKey key) {
-        UnitRelation byKey = getByKey(key);
-        return byKey;
+        return getByKey(key);
     }
 
     @Override
     public List<UnitRelation> findAll() {
         String hsql = "select o from UnitRelation o";
-        List<UnitRelation> listRelation = findHSQL(hsql);
-        return listRelation;
+        return (List<UnitRelation>) findHSQL(hsql);
     }
 
     @Override

@@ -6,20 +6,21 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.StockInOut;
+
 import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
-public interface StockInOutDao {
+ public interface StockInOutDao {
 
-    public StockInOut findById(String id);
+    StockInOut save(StockInOut saleHis) throws Exception;
 
-    public StockInOut save(StockInOut stock);
+    List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
+                            String vouNo, String userCode);
 
-    public List<StockInOut> search(String batchCode, String fromDate, String toDate, String desp, String remark);
+    StockInOut findById(String id);
 
-    public int delete(String id);
+    int delete(String vouNo) throws Exception;
 
 }

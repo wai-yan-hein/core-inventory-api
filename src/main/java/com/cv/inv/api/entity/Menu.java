@@ -5,6 +5,8 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -21,6 +23,7 @@ import javax.persistence.Transient;
  *
  * @author winswe
  */
+@Data
 @Entity
 @Table(name = "menu")
 public class Menu implements java.io.Serializable {
@@ -41,7 +44,7 @@ public class Menu implements java.io.Serializable {
     @Column(name = "order_by")
     private Integer orderBy;
     @Column(name = "source_acc_code")
-    private String soureAccCode;
+    private String sourceAccCode;
     @Column(name = "menu_class")
     private String menuClass;
     @Temporal(TemporalType.TIMESTAMP)
@@ -64,157 +67,4 @@ public class Menu implements java.io.Serializable {
     private String compCode;
     @Transient
     private List<Menu> child;
-
-    public Menu() {
-
-    }
-
-    public Menu(String code, String menuName, String menuType) {
-        this.code = code;
-        this.menuName = menuName;
-        this.menuType = menuType;
-    }
-
-    public String getParent() {
-        return parent;
-    }
-
-    public void setParent(String parent) {
-        this.parent = parent;
-    }
-
-    public String getMenuName() {
-        return menuName;
-    }
-
-    public void setMenuName(String menuName) {
-        this.menuName = menuName;
-    }
-
-    public String getMenuNameMM() {
-        return menuNameMM;
-    }
-
-    public void setMenuNameMM(String menuNameMM) {
-        this.menuNameMM = menuNameMM;
-    }
-
-    public String getMenuUrl() {
-        return menuUrl;
-    }
-
-    public void setMenuUrl(String menuUrl) {
-        this.menuUrl = menuUrl;
-    }
-
-    public String getMenuType() {
-        return menuType;
-    }
-
-    public void setMenuType(String menuType) {
-        this.menuType = menuType;
-    }
-
-    public List<Menu> getChild() {
-        return child;
-    }
-
-    public void setChild(List<Menu> child) {
-        this.child = child;
-    }
-
-    @Override
-    public String toString() {
-        return menuName;
-    }
-
-    public Integer getOrderBy() {
-        return orderBy;
-    }
-
-    public void setOrderBy(Integer orderBy) {
-        this.orderBy = orderBy;
-    }
-
-    public String getSoureAccCode() {
-        return soureAccCode;
-    }
-
-    public void setSoureAccCode(String soureAccCode) {
-        this.soureAccCode = soureAccCode;
-    }
-
-    public String getMenuClass() {
-        return menuClass;
-    }
-
-    public void setMenuClass(String menuClass) {
-        this.menuClass = menuClass;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    public AppUser getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(AppUser updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public AppUser getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(AppUser createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Integer getMacId() {
-        return macId;
-    }
-
-    public void setMacId(Integer macId) {
-        this.macId = macId;
-    }
-
-    public String getUserCode() {
-        return userCode;
-    }
-
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
-    }
-
-    public String getCompCode() {
-        return compCode;
-    }
-
-    public void setCompCode(String compCode) {
-        this.compCode = compCode;
-    }
-
-    
 }

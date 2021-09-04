@@ -29,18 +29,13 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
     }
 
     @Override
-    public List<StockInOutDetail> search(String fromDate, String toDate, String stockCode, String locId, String option, String remark) {
-        return dao.search(fromDate, toDate, stockCode, locId, option, remark);
+    public int delete(String code) {
+        return dao.delete(code);
     }
 
     @Override
-    public int delete(Integer id) {
-        return dao.delete(id);
-    }
-
-    @Override
-    public List<StockInOutDetail> search(String batchCode) {
-        return dao.search(batchCode);
+    public List<StockInOutDetail> search(String vouNo) {
+        return dao.search(vouNo);
     }
 
 }

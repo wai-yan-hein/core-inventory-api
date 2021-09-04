@@ -1,15 +1,5 @@
 package com.cv.inv.api.dao;
 
-import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.hibernate.Criteria;
-import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
@@ -19,10 +9,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 public abstract class AbstractDao<PK extends Serializable, T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDao.class);
-    private final Class<T> persistentClass;
+    private static final Logger log = LoggerFactory.getLogger(AbstractDao.class);
+    private Class<T> persistentClass;
     private ResultSet rs = null;
 
     @SuppressWarnings("unchecked")
@@ -33,7 +31,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     @Autowired
     private SessionFactory sessionFactory;
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public AbstractDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
@@ -41,16 +39,15 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         return sessionFactory.getCurrentSession();
     }
 
-    @SuppressWarnings("unchecked")
     public T getByKey(PK key) {
-        return (T) getSession().get(persistentClass, key);
+        return getSession().get(persistentClass, key);
     }
 
     public void persist(T entity) {
         try {
             getSession().saveOrUpdate(entity);
         } catch (Exception e) {
-            logger.error("persiste  :" + e.getMessage());
+            throw new IllegalStateException("persist" + e.getMessage());
         }
     }
 
@@ -58,83 +55,58 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         getSession().delete(entity);
     }
 
-    protected Criteria createEntityCriteria() {
-        return getSession().createCriteria(persistentClass);
-    }
 
-    public List<T> findHSQL(String hsql) {
-        List<T> list = null;
+    public List findHSQL(String hsql) {
+        List list = null;
         try {
             Query query = getSession().createQuery(hsql);
             list = query.list();
         } catch (Exception e) {
-            logger.error("findHSQL  :" + e.getMessage());
+            log.error("findHSQL  :" + e.getMessage());
         }
         return list;
 
-    }
-
-    public List findHSQLPC(String hsql, String filterName, String paramName, String paramValue) {
-        Session session = getSession();
-        Filter filter = session.enableFilter(filterName);
-        filter.setParameter(paramName, paramValue);
-        Query query = session.createQuery(hsql);
-        List list = query.list();
-        session.disableFilter(filterName);
-        return list;
     }
 
     public List findHSQLList(String hsql) {
         Query query = getSession().createQuery(hsql);
-        List list = query.list();
-        return list;
+        return query.list();
     }
 
     public int execUpdateOrDelete(String hsql) {
         Query query = getSession().createQuery(hsql);
-        int cnt = query.executeUpdate();
-        return cnt;
+        return query.executeUpdate();
     }
 
     public Object exeSQL(String hsql) {
         Query query = getSession().createQuery(hsql);
-        Object obj = query.uniqueResult();
-        return obj;
+        return query.uniqueResult();
 
     }
 
+    @SuppressWarnings("unchecked")
     public Object findByKey(Class type, Serializable id) {
         Object obj = null;
 
         try {
-            if (!id.equals("")) {
-
-                obj = getSession().get(type, id);
-                //tran.commit();
-            }
+            //tran.commit();
+            if (!id.equals("")) obj = getSession().get(type, id);
         } catch (Exception ex) {
-            logger.error("find1 : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+            log.error("find1 : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex);
         }
         return obj;
 
     }
 
-    public List<T> saveBatch(List<T> list) {
-        list.forEach(obj -> {
-            persist(obj);
-        });
-        return list;
-    }
-
     public void execProc(String procName, String... parameters) {
         String strSQL = "{call " + procName + "(";
-        String tmpStr = "";
+        StringBuilder tmpStr = new StringBuilder();
 
         for (String parameter : parameters) {
-            if (tmpStr.isEmpty()) {
-                tmpStr = "?";
+            if (tmpStr.length() == 0) {
+                tmpStr = new StringBuilder("?");
             } else {
-                tmpStr = tmpStr + ",?";
+                tmpStr.append(",?");
             }
         }
 
@@ -157,49 +129,24 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         }
     }
 
-    /*public void execSQL(List<String> listSql) throws Exception {
-        listSql.stream().map(sql -> getSession().createSQLQuery(sql)).forEachOrdered(query -> {
-            query.executeUpdate();
-        });
-    }*/
-    public String getGlLogSql(String glCode, String actionType, String userCode, Integer macId) {
-        String strSql = "insert \n"
-                + "into gl_log(gl_code, gl_date, created_date, modify_date, modify_by, description,\n"
-                + "            source_ac_id, account_id, to_cur_id,from_cur_id, ex_rate, dr_amt,\n"
-                + "            cr_amt, reference, dept_code, voucher_no, user_code, trader_code, \n"
-                + "            cheque_no, comp_code, gst, tran_source, bank_code, gl_vou_no, split_id, \n"
-                + "            intg_upd_status, remark, from_desp, to_desp, naration, project_id, location_id,\n"
-                + "            ref_no, cerdit_term, mac_id,log_user_code,log_mac_id)\n"
-                + "     select gl_code, gl_date, created_date, modify_date, modify_by, description,\n"
-                + "            source_ac_id, account_id, to_cur_id,from_cur_id, ex_rate, dr_amt,\n"
-                + "            cr_amt, reference, dept_code, voucher_no, user_code, trader_code, \n"
-                + "            cheque_no, comp_code, gst, '" + actionType + "', bank_code, gl_vou_no, split_id, \n"
-                + "            intg_upd_status, remark, from_desp, to_desp, naration, project_id, location_id,\n"
-                + "            ref_no, cerdit_term, mac_id,'" + userCode + "'," + macId + "\n"
-                + "	from gl where gl_code = '" + glCode + "'";
-        return strSql;
-    }
-
     public Object getAggregate(String sql) {
         NativeQuery query = getSession().createSQLQuery(sql);
-        Object obj = query.uniqueResult();
-        return obj;
+        return query.uniqueResult();
     }
 
     public void doWork(Work work) {
-        Session sess = getSession();
-        sess.doWork(work);
+        Session sees = getSession();
+        sees.doWork(work);
     }
 
-    public ResultSet getResultSet(final String strSql) throws Exception {
+    public ResultSet getResultSet(final String strSql) {
         rs = null;
-
         Work work = (Connection con) -> {
             try {
-                PreparedStatement pstmt = con.prepareStatement(strSql);
-                rs = pstmt.executeQuery();
+                PreparedStatement stmt = con.prepareStatement(strSql);
+                rs = stmt.executeQuery();
             } catch (SQLException ex) {
-                logger.error("getResultSet : " + strSql + " : " + ex.getMessage());
+                throw new IllegalStateException(ex.getMessage());
             }
         };
         doWork(work);

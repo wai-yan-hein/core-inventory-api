@@ -5,7 +5,6 @@
  */
 package com.cv.inv.api.service;
 
-import com.cv.inv.api.common.DuplicateException;
 import com.cv.inv.api.dao.LocationDao;
 import com.cv.inv.api.entity.Location;
 import java.util.List;
@@ -37,7 +36,7 @@ public class LocationServiceImpl implements LocationService {
             if (valid == null) {
                 loc.setLocationCode(locCode);
             } else {
-                throw new DuplicateException("Duplicate Location Code");
+                throw new IllegalStateException("Duplicate Location Code");
             }
         }
         return dao.save(loc);
@@ -62,8 +61,7 @@ public class LocationServiceImpl implements LocationService {
 
         int seqNo = seqService.getSequence(macId, option, period, compCode);
 
-        String tmpCatCode = String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
-        return tmpCatCode;
+        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 
     @Override

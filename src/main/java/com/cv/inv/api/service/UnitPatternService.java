@@ -12,11 +12,11 @@ import java.util.List;
  *
  * @author Lenovo
  */
-public interface UnitPatternService {
+ public interface UnitPatternService {
 
-    public UnitPattern save(UnitPattern unit);
+     UnitPattern save(UnitPattern unit);
 
-    public List<UnitPattern> findAll();
+     List<UnitPattern> findAll();
 
-    public int delete(String id);
+     int delete(String id);
 }

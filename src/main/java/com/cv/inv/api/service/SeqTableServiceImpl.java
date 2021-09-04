@@ -33,32 +33,27 @@ public class SeqTableServiceImpl implements SeqTableService{
     
     @Override
     public SeqTable findById(SeqKey id){
-        SeqTable st = dao.findById(id);
-        return st;
+        return dao.findById(id);
     }
     
     @Override
     public List<SeqTable> search(String option, String period, String compCode){
-        List<SeqTable> listST = dao.search(option, period, compCode);
-        return listST;
+        return dao.search(option, period, compCode);
     }
     
     @Override
     public SeqTable getSeqTable(String option, String period, String compCode){
-        SeqTable st = dao.getSeqTable(option, period, compCode);
-        return st;
+        return dao.getSeqTable(option, period, compCode);
     }
     
     @Override
     public int delete(Integer id){
-        int cnt = dao.delete(id);
-        return cnt;
+        return dao.delete(id);
     }
     
     @Override
     public int getSequence(Integer macId,String option, String period, String compCode){
-        int seq = dao.getSequence(macId,option, period, compCode);
-        return seq;
+        return dao.getSequence(macId,option, period, compCode);
     }
     
     @Override

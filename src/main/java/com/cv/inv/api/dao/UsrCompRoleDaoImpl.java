@@ -26,8 +26,7 @@ public class UsrCompRoleDaoImpl extends AbstractDao<UsrCompRoleKey, UsrCompRole>
 
     @Override
     public UsrCompRole findById(UsrCompRoleKey key) {
-        UsrCompRole ucr = getByKey(key);
-        return ucr;
+        return getByKey(key);
     }
 
     @Override
@@ -36,11 +35,7 @@ public class UsrCompRoleDaoImpl extends AbstractDao<UsrCompRoleKey, UsrCompRole>
         String strFilter = "";
 
         if (!userCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.key.userCode = " + userCode;
-            } else {
-                strFilter = strFilter + " and o.key.userCode = " + userCode;
-            }
+            strFilter = "o.key.userCode = " + userCode;
         }
 
         if (!compCode.equals("-")) {
@@ -63,37 +58,31 @@ public class UsrCompRoleDaoImpl extends AbstractDao<UsrCompRoleKey, UsrCompRole>
             strSql = strSql + " where " + strFilter;
         }
 
-        List<UsrCompRole> listUsrCompRole = findHSQL(strSql);
-        return listUsrCompRole;
+        return (List<UsrCompRole>) findHSQL(strSql);
     }
 
     @Override
     public List getAssignRole(String userCode, String compCode) {
         String strSql = "select o from VUsrCompRole o where o.key.userCode = '" + userCode + "' "
                 + "and o.key.compCode ='" + compCode + "'";
-        List listAssignRole = findHSQL(strSql);
-        return listAssignRole;
+        return findHSQL(strSql);
     }
 
     @Override
     public List getAssignCompany(String userCode) {
         String strSql = "select o from VUsrCompAssign o where o.key.userCode = '" + userCode + "'";
-        List listAssignComp = findHSQL(strSql);
-        return listAssignComp;
+        return findHSQL(strSql);
     }
 
     @Override
     public List getAssignCompany(String userCode, String roleCode, String compCode) {
         String strSql = "select o from VUsrCompAssign o where o.key.userCode = "
                 + userCode + " and o.key.roleCode = " + roleCode + " and o.key.compCode = " + compCode;
-        List listAssignComp = findHSQL(strSql);
-        return listAssignComp;
+        return findHSQL(strSql);
     }
 
     @Override
     public ResultSet getAssignCompanySelect(String userCode) throws Exception {
-        /* String strSql = "select ucr from UsrCompRole ucr  where ucr.key.userCode= '" + userCode + "' and "
-                + "ucr.key.compCode in (select  ci.compCode from CompanyInfo ci)";*/
         String strSql = " SELECT ci.comp_code ,ci.name,ci.finicial_period_from,\n"
                 + "        ci.finicial_period_to,ucr.user_code,ucr.role_code\n"
                 + "    FROM\n"
@@ -101,15 +90,13 @@ public class UsrCompRoleDaoImpl extends AbstractDao<UsrCompRoleKey, UsrCompRole>
                 + "        JOIN usr_comp_role ucr)\n"
                 + "    WHERE\n"
                 + "        ci.comp_code = ucr.comp_code  and ucr.user_code='" + userCode + "'";
-        ResultSet rs = getResultSet(strSql);
-        return rs;
+        return getResultSet(strSql);
     }
 
     @Override
     public int delete(String userCode, String compCode, String roleCode) {
         String strSql = "delete from UsrCompRole o where o.key.userCode = '"
                 + userCode + "' and o.key.compCode = '" + compCode + "' and o.key.roleCode = '" + roleCode + "'";
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 }

@@ -6,7 +6,7 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Currency;
-import com.cv.inv.api.entity.CurrencyKey;
+
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements CurrencyDao {
 
+
     @Override
     public Currency save(Currency cur) {
         persist(cur);
@@ -25,8 +26,7 @@ public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements Cu
 
     @Override
     public Currency findById(String id) {
-        Currency cur = getByKey(id);
-        return cur;
+        return getByKey(id);
     }
 
     @Override
@@ -35,11 +35,7 @@ public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements Cu
         String strFilter = "";
 
         if (!code.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.curCode like '" + code + "%'";
-            } else {
-                strFilter = strFilter + " and o.curCode like '" + code + "%'";
-            }
+            strFilter = "o.curCode like '" + code + "%'";
         }
 
         if (!name.equals("-")) {
@@ -54,15 +50,13 @@ public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements Cu
             strSql = strSql + " where " + strFilter;
         }
 
-        List<Currency> listCurrency = findHSQL(strSql);
-        return listCurrency;
+        return (List<Currency>) findHSQL(strSql);
     }
 
     @Override
     public int delete(String code, String compCode) {
         String strSql = "delete from Currency o where o.key.code = '" + code
                 + "' and o.key.compCode = " + compCode;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 }

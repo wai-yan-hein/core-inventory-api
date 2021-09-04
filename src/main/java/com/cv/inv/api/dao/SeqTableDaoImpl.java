@@ -25,8 +25,7 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
 
     @Override
     public SeqTable findById(SeqKey id) {
-        SeqTable st = getByKey(id);
-        return st;
+        return getByKey(id);
     }
 
     @Override
@@ -38,8 +37,7 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
             strSql = strSql + " and o.period = '" + period + "'";
         }
 
-        List<SeqTable> listST = findHSQL(strSql);
-        return listST;
+        return (List<SeqTable>) findHSQL(strSql);
     }
 
     @Override
@@ -59,8 +57,7 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
     @Override
     public int delete(Integer id) {
         String strSql = "delete from SeqTable o where o.id = " + id;
-        int cnt = execUpdateOrDelete(strSql);
-        return cnt;
+        return execUpdateOrDelete(strSql);
     }
 
     @Override
@@ -79,14 +76,12 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
             st.setSeqNo(st.getSeqNo() + 1);
         }
         save(st);
-        int seq = st.getSeqNo();
-        return seq;
+        return st.getSeqNo();
     }
 
     @Override
     public List<SeqTable> findAll() {
         String strSql = "select o from SeqTable o";
-        List<SeqTable> ListSTAB = findHSQL(strSql);
-        return ListSTAB;
+        return (List<SeqTable>) findHSQL(strSql);
     }
 }

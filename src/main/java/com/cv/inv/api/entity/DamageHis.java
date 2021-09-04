@@ -154,14 +154,6 @@ public class DamageHis implements java.io.Serializable {
     public void setMigId(String migId) {
         this.migId = migId;
     }
-    
 
-//    @Transient
-//    public List<DamageDetailHis> getListDetail() {
-//        return listDetail;
-//    }
-//
-//    public void setListDetail(List<DamageDetailHis> listDetail) {
-//        this.listDetail = listDetail;
-//    }
+
 }
