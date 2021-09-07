@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.cv.inv.api.dao.SaleHisDetailDao;
+import com.cv.inv.api.view.VSale;
 
 /**
  *
@@ -109,5 +110,10 @@ public class SaleHisServiceImpl implements SaleHisService {
             last.setSeqNo(Util1.getInteger(last.getSeqNo()) + 1);
         }
         seqDao.save(last);
+    }
+
+    @Override
+    public List<VSale> search(String vouNo) {
+        return shDao.search(vouNo);
     }
 }

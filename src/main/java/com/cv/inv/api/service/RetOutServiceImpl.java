@@ -18,6 +18,7 @@ import com.cv.inv.api.entity.SeqTable;
 
 import java.util.List;
 
+import com.cv.inv.api.view.VReturnOut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,6 +97,11 @@ public class RetOutServiceImpl implements RetOutService {
     @Override
     public int delete(String vouNo) throws Exception {
         return rDao.delete(vouNo);
+    }
+
+    @Override
+    public List<VReturnOut> search(String vouNo) {
+        return rDao.search(vouNo);
     }
 
     private void updateVoucher(String compCode, Integer macId, String option) {

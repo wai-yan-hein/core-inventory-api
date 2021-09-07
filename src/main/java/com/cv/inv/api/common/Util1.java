@@ -4,10 +4,16 @@
  */
 package com.cv.inv.api.common;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonWriter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -22,20 +28,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author WSwe
  */
+@Slf4j
 public class Util1 {
-
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Util1.class);
 
     public static String getEngChar(int i) {
         String[] engChar = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-                "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-                "U", "V", "W", "X", "Y", "Z"};
+            "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+            "U", "V", "W", "X", "Y", "Z"};
 
         if ((i + 1) < 0 || (i + 1) > engChar.length) {
             return null;
@@ -499,5 +503,12 @@ public class Util1 {
         df.applyPattern(pattern);
         return df.format(value);
 
+    }
+
+    public static void writeJsonFile(Object data, String exportPath) throws IOException {
+        try ( Writer writer = new FileWriter(exportPath)) {
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            gson.toJson(data, writer);
+        }
     }
 }

@@ -13,6 +13,8 @@ import com.cv.inv.api.entity.SeqKey;
 import com.cv.inv.api.entity.SeqTable;
 
 import java.util.List;
+
+import com.cv.inv.api.view.VPurchase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,6 @@ import com.cv.inv.api.entity.PurHisDetail;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Slf4j
@@ -85,7 +86,7 @@ public class PurHisServiceImpl implements PurHisService {
 
     @Override
     public List<PurHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                               String vouNo, String userCode) {
         return phDao.search(fromDate, toDate, cusCode, vouNo, userCode);
     }
 
@@ -97,6 +98,11 @@ public class PurHisServiceImpl implements PurHisService {
     @Override
     public int delete(String vouNo) throws Exception {
         return phDao.delete(vouNo);
+    }
+
+    @Override
+    public List<VPurchase> search(String vouNo) {
+        return phDao.search(vouNo);
     }
 
     private void updateVoucher(String compCode, Integer macId, String option) {

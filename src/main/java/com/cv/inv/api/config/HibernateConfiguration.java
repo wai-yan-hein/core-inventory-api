@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@PropertySource(value = {"classpath:application.properties"})
+@PropertySource(value = {"file:config/application.properties"})
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
 public class HibernateConfiguration {
 
@@ -32,10 +32,9 @@ public class HibernateConfiguration {
 
     @Bean
     public LocalSessionFactoryBean sessionFactory() {
-
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("com.cv.inv.api.entity");
+        sessionFactory.setPackagesToScan("com.cv.inv.api.entity", "com.cv.inv.api.view");
         sessionFactory.setHibernateProperties(hibernateProperties());
         log.info("sessionFactory");
         return sessionFactory;

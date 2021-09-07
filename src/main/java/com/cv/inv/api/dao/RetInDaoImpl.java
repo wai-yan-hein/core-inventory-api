@@ -8,10 +8,11 @@ package com.cv.inv.api.dao;
 import com.cv.inv.api.entity.RetInHis;
 
 import java.util.List;
+
+import com.cv.inv.api.view.VReturnIn;
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author lenovo
  */
 @Repository
@@ -25,7 +26,7 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
 
     @Override
     public List<RetInHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                                 String vouNo, String userCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -62,7 +63,7 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
             strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
         }
 
-        return (List<RetInHis>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
@@ -75,5 +76,11 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
         String strSql = "update ret_in_his set deleted = true where voucher_no = '" + vouNo + "'";
         execSQL(strSql);
         return 1;
+    }
+
+    @Override
+    public List<VReturnIn> search(String vouNo) {
+        String hsql = "select o from VReturnIn o where o.vouNo = '" + vouNo + "' order by uniqueId";
+        return findHSQL(hsql);
     }
 }

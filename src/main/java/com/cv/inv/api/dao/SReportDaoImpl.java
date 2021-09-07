@@ -15,8 +15,6 @@ import org.springframework.stereotype.Repository;
 /**
  * @author Lenovo
  */
-
-
 @Repository
 public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements SReportDao {
 
@@ -152,5 +150,10 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
     @Override
     public String genJsonFile(final String strSql) throws Exception {
         return "test";
+    }
+
+    @Override
+    public void generatePDF(String reportPath, String exportPath, String fontPath, Map<String, Object> param) throws Exception{
+        exportPDF(reportPath, exportPath, fontPath, param);
     }
 }

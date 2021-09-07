@@ -6,16 +6,18 @@
 package com.cv.inv.api.controller;
 
 import com.cv.inv.api.common.ReturnObject;
-import com.cv.inv.api.common.SystemSetting;
 import com.cv.inv.api.entity.AppUser;
+import com.cv.inv.api.entity.RoleProperty;
 import com.cv.inv.api.entity.UserRole;
 import com.cv.inv.api.entity.VUsrCompAssign;
-import com.cv.inv.api.service.RoleDefaultService;
 import com.cv.inv.api.service.UserRoleService;
 import com.cv.inv.api.service.UserService;
 import com.cv.inv.api.service.UsrCompRoleService;
+
 import java.net.URISyntaxException;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +28,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.cv.inv.api.service.RolePropertyService;
+
+import java.util.HashMap;
 
 /**
- *
  * @author Lenovo
  */
 @RestController
 @RequestMapping("/user")
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class UserController {
 
@@ -44,13 +48,13 @@ public class UserController {
     @Autowired
     private UsrCompRoleService compService;
     @Autowired
-    private RoleDefaultService defaultService;
+    private RolePropertyService rolePropertyService;
     @Autowired
     private UserRoleService usrService;
 
     @PostMapping(value = "/save")
-    public ResponseEntity<ReturnObject> saveUser(@RequestBody AppUser user)
-            throws URISyntaxException {
+    public ResponseEntity<ReturnObject> saveUser(@RequestBody AppUser user) {
+        userService.save(user);
         return ResponseEntity.ok(ro);
     }
 
@@ -72,16 +76,21 @@ public class UserController {
         return ResponseEntity.ok(ro);
     }
 
-    @RequestMapping(path = "/get-role-setting", method = RequestMethod.GET)
-    public ResponseEntity<SystemSetting> getSystemSetting(@RequestParam String roleCode) {
-        SystemSetting loadSS = defaultService.loadSS(roleCode);
-        return ResponseEntity.ok(loadSS);
+    @RequestMapping(path = "/get-role-property", method = RequestMethod.GET)
+    public ResponseEntity<HashMap<String, String>> getRoleProperty(@RequestParam String roleCode) {
+        HashMap<String, String> hm = rolePropertyService.getRoleProperty(roleCode);
+        return ResponseEntity.ok(hm);
     }
 
-    @PostMapping(path = "/save-role-setting")
-    public ResponseEntity<SystemSetting> saveRoleSetting(@RequestBody SystemSetting ss) {
-        SystemSetting loadSS = defaultService.saveSS(ss);
-        return ResponseEntity.ok(loadSS);
+    @PostMapping(path = "/save-role-property")
+    public ResponseEntity<ReturnObject> saveRoleProperty(
+            @RequestBody List<RoleProperty> properties) {
+        log.info("/save-role-property");
+        if (!properties.isEmpty()) {
+            properties.forEach(rp -> rolePropertyService.save(rp));
+        }
+        ro.setMessage("Sucess.");
+        return ResponseEntity.ok(ro);
     }
 
     @RequestMapping(path = "/get-role", method = RequestMethod.GET)

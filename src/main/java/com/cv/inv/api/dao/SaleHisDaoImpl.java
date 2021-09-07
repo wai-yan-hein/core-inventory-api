@@ -6,6 +6,7 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.SaleHis;
+import com.cv.inv.api.view.VSale;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements SaleHisDao {
-
 
     @Override
     public SaleHis save(SaleHis sh) {
@@ -62,7 +62,7 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
             strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
         }
 
-        return (List<SaleHis>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
@@ -75,5 +75,11 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
         String strSql = "update sale_his set deleted = true where voucher_no = '" + vouNo + "'";
         execSQL(strSql);
         return 1;
+    }
+
+    @Override
+    public List<VSale> search(String vouNo) {
+        String hsql = "select o from VSale o where o.vouNo ='" + vouNo + "' order by o.uniqueId";
+        return findHSQL(hsql);
     }
 }

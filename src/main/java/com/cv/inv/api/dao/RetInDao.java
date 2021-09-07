@@ -6,20 +6,24 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RetInHis;
+import com.cv.inv.api.view.VReturnIn;
+
 import java.util.List;
 
 /**
- *
  * @author lenovo
  */
- public interface RetInDao {
+public interface RetInDao {
 
     RetInHis save(RetInHis saleHis) throws Exception;
 
     List<RetInHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode);
+                          String vouNo, String userCode);
 
     RetInHis findById(String id);
 
     int delete(String vouNo) throws Exception;
+
+    List<VReturnIn> search(String vouNo);
+
 }

@@ -6,13 +6,14 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RetOutHis;
+import com.cv.inv.api.view.VReturnOut;
 
 import java.util.List;
 
 /**
  * @author lenovo
  */
- public interface RetOutDao {
+public interface RetOutDao {
 
     RetOutHis save(RetOutHis saleHis) throws Exception;
 
@@ -22,4 +23,6 @@ import java.util.List;
     RetOutHis findById(String id);
 
     int delete(String vouNo) throws Exception;
+
+    List<VReturnOut> search(String vouNo);
 }

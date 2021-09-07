@@ -11,17 +11,19 @@ import java.util.Map;
  *
  * @author Lenovo
  */
- public interface SReportDao {
+public interface SReportDao {
 
-     void generateStockBalance(String stockCode, String locId, String compCode, String macId);
+    void generateStockBalance(String stockCode, String locId, String compCode, String macId);
 
-     void generateSaleByStock(String stockCode, String regionCode, String macId);
+    void generateSaleByStock(String stockCode, String regionCode, String macId);
 
-     void reportViewer(String reportPath, String filePath, String fontPath,
+    void reportViewer(String reportPath, String filePath, String fontPath,
             Map<String, Object> parameters);
 
-     void reportJsonViewer(String path, String reportPath, String filePath, String fontPath,
+    void reportJsonViewer(String path, String reportPath, String filePath, String fontPath,
             Map<String, Object> parameters);
 
-     String genJsonFile(final String strSql) throws Exception;
+    String genJsonFile(final String strSql) throws Exception;
+
+    void generatePDF(String reportPath, String exportPath, String fontPath, Map<String, Object> param) throws Exception;
 }

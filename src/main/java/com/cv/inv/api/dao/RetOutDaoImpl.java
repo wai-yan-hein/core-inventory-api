@@ -8,10 +8,11 @@ package com.cv.inv.api.dao;
 import com.cv.inv.api.entity.RetOutHis;
 
 import java.util.List;
+
+import com.cv.inv.api.view.VReturnOut;
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author lenovo
  */
 @Repository
@@ -25,7 +26,7 @@ public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements Ret
 
     @Override
     public List<RetOutHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                                  String vouNo, String userCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -75,5 +76,11 @@ public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements Ret
         String strSql = "update ret_in_his set deleted = true where voucher_no = '" + vouNo + "'";
         execSQL(strSql);
         return 1;
+    }
+
+    @Override
+    public List<VReturnOut> search(String vouNo) {
+        String hsql = "select o from VReturnOut o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
+        return findHSQL(hsql);
     }
 }

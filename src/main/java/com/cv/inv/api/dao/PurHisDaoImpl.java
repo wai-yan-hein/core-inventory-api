@@ -9,10 +9,11 @@ import com.cv.inv.api.entity.PurHis;
 
 
 import java.util.List;
+
+import com.cv.inv.api.view.VPurchase;
 import org.springframework.stereotype.Repository;
 
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Repository
@@ -27,16 +28,16 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
 
     @Override
     public List<PurHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                               String vouNo, String userCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
-            strFilter = "date(o.purDate) between '" + fromDate
+            strFilter = "date(o.vouDate) between '" + fromDate
                     + "' and '" + toDate + "'";
         } else if (!fromDate.equals("-")) {
-            strFilter = "date(o.purDate) >= '" + fromDate + "'";
+            strFilter = "date(o.vouDate) >= '" + fromDate + "'";
         } else if (!toDate.equals("-")) {
-            strFilter = "date(o.purDate) <= '" + toDate + "'";
+            strFilter = "date(o.vouDate) <= '" + toDate + "'";
         }
         if (!cusCode.equals("-")) {
             if (strFilter.isEmpty()) {
@@ -61,7 +62,7 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
         }
         String strSql = "select o from PurHis o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by date(o.purDate) desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
         }
 
         return (List<PurHis>) findHSQL(strSql);
@@ -77,6 +78,12 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
         String strSql = "update pur_his set deleted = true where vou_no = '" + vouNo + "'";
         execSQL(strSql);
         return 1;
+    }
+
+    @Override
+    public List<VPurchase> search(String vouNo) {
+        String hsql = "select o from VPurchase o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
+        return findHSQL(hsql);
     }
 
 }

@@ -16,6 +16,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReportsContext;
 
 public abstract class AbstractDao<PK extends Serializable, T> {
 
@@ -55,7 +61,6 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         getSession().delete(entity);
     }
 
-
     public List findHSQL(String hsql) {
         List list = null;
         try {
@@ -90,7 +95,9 @@ public abstract class AbstractDao<PK extends Serializable, T> {
 
         try {
             //tran.commit();
-            if (!id.equals("")) obj = getSession().get(type, id);
+            if (!id.equals("")) {
+                obj = getSession().get(type, id);
+            }
         } catch (Exception ex) {
             log.error("find1 : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex);
         }
@@ -153,4 +160,32 @@ public abstract class AbstractDao<PK extends Serializable, T> {
 
         return rs;
     }
+
+    public void exportPDF(final String reportPath, final String exportPath,
+            final String fontPath, final Map<String, Object> parameters) throws Exception {
+        Work work = (Connection con) -> {
+            try {
+                parameters.put("REPORT_CONNECTION", con);
+                JasperPrint jp = getReport(reportPath, parameters, con, fontPath);
+                JasperExportManager.exportReportToPdfFile(jp, exportPath.concat(".pdf"));
+                log.info("exportPDF.");
+            } catch (Exception ex) {
+                throw new IllegalStateException(ex.getMessage());
+            }
+        };
+        doWork(work);
+    }
+
+    private JasperPrint getReport(String reportPath, Map<String, Object> parameters,
+            Connection con, String fontPath) throws Exception {
+        JasperPrint jp;
+        reportPath = reportPath + ".jasper";
+        JasperReportsContext jasperReportsContext = DefaultJasperReportsContext.getInstance();
+        jasperReportsContext.setProperty("net.sf.jasperreports.default.pdf.font.name", fontPath);
+        jasperReportsContext.setProperty("net.sf.jasperreports.default.pdf.encoding", "Identity-H");
+        jasperReportsContext.setProperty("net.sf.jasperreports.default.pdf.embedded", "true");
+        jp = JasperFillManager.fillReport(reportPath, parameters, con);
+        return jp;
+    }
+
 }

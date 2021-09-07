@@ -6,11 +6,11 @@
 package com.cv.inv.api.controller;
 
 import com.cv.inv.api.common.ReturnObject;
-import com.cv.inv.api.service.RoleDefaultService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.cv.inv.api.service.RolePropertyService;
 
 /**
  *
@@ -24,5 +24,5 @@ public class DefaultController {
     @Autowired
     private ReturnObject ro;
     @Autowired
-    private RoleDefaultService defService;
+    private RolePropertyService defService;
 }

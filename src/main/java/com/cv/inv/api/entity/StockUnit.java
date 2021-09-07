@@ -14,19 +14,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import lombok.Data;
+
 /**
  *
  * @author Lenovo
  */
+@Data
 @Entity
 @Table(name = "stock_unit")
 public class StockUnit implements java.io.Serializable {
 
     @Id
-    @Column(name = "item_unit_code", unique = true, nullable = false, length = 10)
-    private String itemUnitCode;
-    @Column(name = "item_unit_name", nullable = false, length = 45, unique = true)
-    private String itemUnitName;
+    @Column(name = "unit_code", unique = true, nullable = false, length = 10)
+    private String unitCode;
+    @Column(name = "unit_name", nullable = false, length = 45, unique = true)
+    private String unit_name;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -45,92 +48,4 @@ public class StockUnit implements java.io.Serializable {
     private String userCode;
     @Column(name = "comp_code")
     private String compCode;
-    
-
-    public StockUnit(String itemUnitCode) {
-        this.itemUnitCode = itemUnitCode;
-    }
-    
-    public StockUnit() {
-    }
-
-    @Override
-    public String toString() {
-        return this.itemUnitCode;
-    }
-
-    public String getItemUnitCode() {
-        return itemUnitCode;
-    }
-
-    public void setItemUnitCode(String itemUnitCode) {
-        this.itemUnitCode = itemUnitCode;
-    }
-
-    public String getItemUnitName() {
-        return itemUnitName;
-    }
-
-    public void setItemUnitName(String itemUnitName) {
-        this.itemUnitName = itemUnitName;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    public AppUser getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(AppUser updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public AppUser getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(AppUser createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Integer getMacId() {
-        return macId;
-    }
-
-    public void setMacId(Integer macId) {
-        this.macId = macId;
-    }
-
-    public String getUserCode() {
-        return userCode;
-    }
-
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
-    }
-
-    public String getCompCode() {
-        return compCode;
-    }
-
-    public void setCompCode(String compCode) {
-        this.compCode = compCode;
-    }
-
-    
-
 }

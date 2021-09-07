@@ -24,7 +24,7 @@ public class PurHis implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "trader_code")
     private Trader trader;
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.DATE)
     @Column(name = "vou_date")
     private Date vouDate;
     @Temporal(TemporalType.DATE)
@@ -47,12 +47,12 @@ public class PurHis implements java.io.Serializable {
     @JoinColumn(name = "created_by")
     private AppUser createdBy;
     @Column(name = "created_date")
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @ManyToOne
     @JoinColumn(name = "updated_by")
     private AppUser updatedBy;
-    @Column(name = "updated_date", nullable = true)
+    @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @Column(name = "remark")

@@ -6,13 +6,14 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.PurHis;
+import com.cv.inv.api.view.VPurchase;
 
 import java.util.List;
 
 /**
  * @author Mg Kyaw Thura Aung
  */
- public interface PurHisService {
+public interface PurHisService {
 
 
     PurHis save(PurHis ph) throws Exception;
@@ -23,4 +24,6 @@ import java.util.List;
     PurHis findById(String id);
 
     int delete(String vouNo) throws Exception;
+
+    List<VPurchase> search(String vouNo);
 }

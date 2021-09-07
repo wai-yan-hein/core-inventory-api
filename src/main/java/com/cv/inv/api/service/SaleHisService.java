@@ -6,20 +6,23 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.SaleHis;
+import com.cv.inv.api.view.VSale;
 import java.util.List;
 
 /**
  *
  * @author Mg Kyaw Thura Aung
  */
- public interface SaleHisService {
+public interface SaleHisService {
 
-     SaleHis save(SaleHis saleHis) throws Exception;
+    SaleHis save(SaleHis saleHis) throws Exception;
 
-     List<SaleHis> search(String fromDate, String toDate, String cusCode,
+    List<SaleHis> search(String fromDate, String toDate, String cusCode,
             String vouNo, String userCode);
 
-     SaleHis findById(String id);
+    SaleHis findById(String id);
 
-     int delete(String vouNo) throws Exception;
+    int delete(String vouNo) throws Exception;
+
+    List<VSale> search(String vouNo);
 }

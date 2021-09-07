@@ -16,6 +16,8 @@ import com.cv.inv.api.entity.RetInKey;
 import com.cv.inv.api.entity.SeqKey;
 import com.cv.inv.api.entity.SeqTable;
 import java.util.List;
+
+import com.cv.inv.api.view.VReturnIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,6 +96,11 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public int delete(String vouNo) throws Exception {
         return rDao.delete(vouNo);
+    }
+
+    @Override
+    public List<VReturnIn> search(String vouNo) {
+        return rDao.search(vouNo);
     }
 
     private void updateVoucher(String compCode, Integer macId, String option) {
