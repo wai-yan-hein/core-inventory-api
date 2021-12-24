@@ -6,11 +6,11 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.VouStatus;
-import java.util.List;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Repository
@@ -23,8 +23,8 @@ public class VouStatusDaoImpl extends AbstractDao<String, VouStatus> implements 
     }
 
     @Override
-    public List<VouStatus> findAll() {
-        String hsql = "select o from VouStatus o";
+    public List<VouStatus> findAll(String compCode) {
+        String hsql = "select o from VouStatus o where o.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 

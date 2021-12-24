@@ -10,20 +10,15 @@ import com.cv.inv.api.common.Voucher;
 import com.cv.inv.api.dao.RetInDao;
 import com.cv.inv.api.dao.RetInDetailDao;
 import com.cv.inv.api.dao.SeqTableDao;
-import com.cv.inv.api.entity.RetInHis;
-import com.cv.inv.api.entity.RetInHisDetail;
-import com.cv.inv.api.entity.RetInKey;
-import com.cv.inv.api.entity.SeqKey;
-import com.cv.inv.api.entity.SeqTable;
-import java.util.List;
-
+import com.cv.inv.api.entity.*;
 import com.cv.inv.api.view.VReturnIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
- *
  * @author Wai Yan
  */
 @Service
@@ -37,54 +32,64 @@ public class RetInServiceImpl implements RetInService {
     @Autowired
     private SeqTableDao seqDao;
 
+
     @Override
     public RetInHis save(RetInHis rin) throws Exception {
-        List<RetInHisDetail> listSD = rin.getListRD();
-        List<String> listDel = rin.getListDel();
-        String vouNo = rin.getVouNo();
-        if (rin.getStatus().equals("NEW")) {
-            RetInHis valid = rDao.findById(vouNo);
-            if (valid != null) {
-                throw new IllegalStateException("Duplicate Sale Voucher");
-            }
-        }
-        if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    try {
-                        sdDao.delete(detailId);
-                    } catch (Exception ignored) {
-                    }
+        if (Util1.getBoolean(rin.getDeleted())) {
+            rDao.save(rin);
+        } else {
+            List<RetInHisDetail> listSD = rin.getListRD();
+            List<String> listDel = rin.getListDel();
+            String vouNo = rin.getVouNo();
+            if (rin.getStatus().equals("NEW")) {
+                RetInHis valid = rDao.findById(vouNo);
+                if (valid != null) {
+                    throw new IllegalStateException("Duplicate Sale Voucher");
                 }
-            });
-        }
-        for (int i = 0; i < listSD.size(); i++) {
-            RetInHisDetail cSd = listSD.get(i);
-            if (cSd.getStock() != null) {
-                if (cSd.getStock().getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            RetInHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+            }
+            if (listDel != null) {
+                listDel.forEach(detailId -> {
+                    if (detailId != null) {
+                        try {
+                            sdDao.delete(detailId);
+                        } catch (Exception ignored) {
                         }
                     }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setRiKey(new RetInKey(sdCode, vouNo));
-                    sdDao.save(cSd);
+                });
+            }
+            for (int i = 0; i < listSD.size(); i++) {
+                RetInHisDetail cSd = listSD.get(i);
+                if (cSd.getStock() != null) {
+                    if (cSd.getStock().getStockCode() != null) {
+                        if (cSd.getUniqueId() == null) {
+                            if (i == 0) {
+                                cSd.setUniqueId(1);
+                            } else {
+                                RetInHisDetail pSd = listSD.get(i - 1);
+                                cSd.setUniqueId(pSd.getUniqueId() + 1);
+                            }
+                        }
+                        String sdCode = vouNo + "-" + cSd.getUniqueId();
+                        cSd.setRiKey(new RetInKey(sdCode, vouNo));
+                        sdDao.save(cSd);
+                    }
                 }
             }
+            rDao.save(rin);
+            rin.setListRD(listSD);
+            updateVoucher(rin.getCompCode(), rin.getMacId(), Voucher.RETIN.name());
         }
-        rDao.save(rin);
-        rin.setListRD(listSD);
-        updateVoucher(rin.getCompCode(), rin.getMacId(), Voucher.RETIN.name());
         return rin;
     }
 
     @Override
+    public RetInHis update(RetInHis ri) {
+        return rDao.save(ri);
+    }
+
+    @Override
     public List<RetInHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                                 String vouNo, String userCode) {
         return rDao.search(fromDate, toDate, cusCode, vouNo, userCode);
     }
 

@@ -5,25 +5,25 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import lombok.Data;
+import java.util.Objects;
 
 /**
- *
  * @author Lenovo
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "stock_in_out")
 public class StockInOut implements Serializable {
@@ -49,6 +49,9 @@ public class StockInOut implements Serializable {
     private Date createdDate;
     @Column(name = "comp_code")
     private String compCode;
+    @ManyToOne
+    @JoinColumn(name = "vou_status")
+    private VouStatus vouStatus;
     @Column(name = "mac_id")
     private Integer macId;
     @Temporal(TemporalType.TIMESTAMP)
@@ -62,4 +65,17 @@ public class StockInOut implements Serializable {
     private List<StockInOutDetail> listSH;
     @Transient
     private List<String> listDel;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        StockInOut that = (StockInOut) o;
+        return Objects.equals(vouNo, that.vouNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
 }

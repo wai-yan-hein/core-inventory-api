@@ -32,7 +32,7 @@ public class RegionServiceImpl implements RegionService {
         if (Util1.isNull(rg.getRegCode())) {
             Integer macId = rg.getMacId();
             String compCode = rg.getCompCode();
-            String code = getRegionCode(macId, "Region", "-", compCode);
+            String code = getRegionCode(macId, compCode);
             Region valid = findByCode(code);
             if (valid == null) {
                 rg.setRegCode(code);
@@ -58,8 +58,8 @@ public class RegionServiceImpl implements RegionService {
         return dao.delete(code);
     }
 
-    private String getRegionCode(Integer macId, String option, String period, String compCode) {
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
+    private String getRegionCode(Integer macId, String compCode) {
+        int seqNo = seqService.getSequence(macId, "Region", "-", compCode);
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 

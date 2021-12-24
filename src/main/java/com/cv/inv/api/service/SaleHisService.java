@@ -7,18 +7,20 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.SaleHis;
 import com.cv.inv.api.view.VSale;
+
 import java.util.List;
 
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 public interface SaleHisService {
 
     SaleHis save(SaleHis saleHis) throws Exception;
 
+    SaleHis update(SaleHis saleHis);
+
     List<SaleHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode);
+                         String vouNo, String userCode);
 
     SaleHis findById(String id);
 

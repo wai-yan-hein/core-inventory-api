@@ -5,10 +5,11 @@
  */
 package com.cv.inv.api.entity;
 
-import java.io.Serializable;
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import lombok.Data;
+import java.io.Serializable;
 
 /**
  *

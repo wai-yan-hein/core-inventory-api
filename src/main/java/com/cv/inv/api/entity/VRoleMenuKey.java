@@ -5,59 +5,20 @@
  */
 package com.cv.inv.api.entity;
 
-import java.io.Serializable;
-import java.util.Objects;
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 /**
- *
  * @author winswe
  */
+@Data
 @Embeddable
 public class VRoleMenuKey implements Serializable {
-
-    private String roleCode;
-    private String menuCode;
-
     @Column(name = "role_code")
-    public String getRoleCode() {
-        return roleCode;
-    }
-
-    public void setRoleCode(String roleCode) {
-        this.roleCode = roleCode;
-    }
-
+    private String roleCode;
     @Column(name = "menu_code")
-    public String getMenuCode() {
-        return menuCode;
-    }
-
-    public void setMenuCode(String menuCode) {
-        this.menuCode = menuCode;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.roleCode);
-        hash = 89 * hash + Objects.hashCode(this.menuCode);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final VRoleMenuKey other = (VRoleMenuKey) obj;
-        if (!Objects.equals(this.roleCode, other.roleCode)) {
-            return false;
-        }
-        return Objects.equals(this.menuCode, other.menuCode);
-    }
+    private String menuCode;
 }

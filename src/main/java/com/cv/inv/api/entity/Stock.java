@@ -5,22 +5,23 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import lombok.Data;
+import java.util.Objects;
 
 /**
- *
  * @author Lenovo
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "stock")
 public class Stock implements java.io.Serializable {
@@ -78,8 +79,8 @@ public class Stock implements java.io.Serializable {
     private Float salePriceC;
     @Column(name = "sale_price_d")
     private Float salePriceD;
-    @Column(name = "cost_price_std")
-    private Float sttCostPrice;
+    @Column(name = "sale_price_e")
+    private Float salePriceE;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -95,9 +96,20 @@ public class Stock implements java.io.Serializable {
     @Column(name = "mac_id")
     private Integer macId;
 
-    @Override
-    public String toString() {
-        return "Stock{" + "stockName=" + stockName + '}';
+    public Stock(String stockCode) {
+        this.stockCode = stockCode;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Stock stock = (Stock) o;
+        return stockCode != null && Objects.equals(stockCode, stock.stockCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

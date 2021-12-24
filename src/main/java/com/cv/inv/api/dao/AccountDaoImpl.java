@@ -6,16 +6,16 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.AppUser;
-import java.util.List;
-import javax.naming.AuthenticationException;
 import org.springframework.stereotype.Repository;
 
+import javax.naming.AuthenticationException;
+import java.util.List;
+
 /**
- *
  * @author WSwe
  */
 @Repository
-public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements AccountDao {
+public class AccountDaoImpl extends AbstractDao<String, AppUser> implements AccountDao {
 
     @Override
     public AppUser saveAccount(AppUser au) {
@@ -25,7 +25,7 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
 
     @Override
     public AppUser findUserById(Integer id) {
-        return getByKey(id);
+        return getByKey(id.toString());
     }
 
     @Override
@@ -93,8 +93,7 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
         if (strFilter != null) {
             strSql = strSql + " where " + strFilter;
         }
-
-        return (List<AppUser>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
@@ -123,14 +122,12 @@ public class AccountDaoImpl extends AbstractDao<Integer, AppUser> implements Acc
 
     @Override
     public AppUser findById(String id) {
-        return getByKey(Integer.parseInt(id));
+        return getByKey(id);
     }
 
     @Override
     public List<AppUser> findAll(String compCode) {
-
         String strSql = "select o from AppUser  o where o.compCode = '" + compCode + "'";
-        return (List<AppUser>) findHSQL(strSql);
-
+        return findHSQL(strSql);
     }
 }

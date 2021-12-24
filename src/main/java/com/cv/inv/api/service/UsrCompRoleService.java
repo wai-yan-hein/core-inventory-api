@@ -7,6 +7,8 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.UsrCompRole;
 import com.cv.inv.api.entity.UsrCompRoleKey;
+import com.cv.inv.api.entity.VUsrCompAssign;
+
 import java.util.List;
 
 /**
@@ -20,15 +22,9 @@ import java.util.List;
      UsrCompRole findById(UsrCompRoleKey key);
 
      List<UsrCompRole> search(String userCode, String compCode, String roleId);
-
-     List getAssignRole(String userCode, String compCode);
-
-     List getAssignCompany(String userCode);
-
-     List getAssignCompany(String userCode, String roleId, String compCode);
+     List<VUsrCompAssign> getAssignCompany(String userCode);
 
      int delete(String userCode, String compCode, String roleId);
 
-     List getAssignCompanySelect(String userId) throws Exception;
 
 }

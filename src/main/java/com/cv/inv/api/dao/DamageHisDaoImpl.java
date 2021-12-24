@@ -7,20 +7,20 @@ package com.cv.inv.api.dao;
 
 
 import com.cv.inv.api.entity.DamageHis;
-
-import java.sql.ResultSet;
-
-
-import java.util.List;
-
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author lenovo
  */
 @Repository
 public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements DamageHisDao {
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public DamageHis save(DamageHis ph) {
@@ -75,64 +75,11 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
         List<DamageHis> listDH = null;
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter;
-            listDH = findHSQL(strSql);
+            Query<DamageHis> query = sessionFactory.getCurrentSession().createQuery(strSql, DamageHis.class);
+            listDH = query.list();
         }
 
         return listDH;
-    }
-
-    @Override
-    public ResultSet searchM(String from, String to, String location,
-                             String remark, String vouNo) throws Exception {
-        String strFilter = "";
-
-        if (!from.equals("-") && !to.equals("-")) {
-            strFilter = "date(dmg.dmg_date) between '" + from
-                    + "' and '" + to + "'";
-        } else if (!from.equals("-")) {
-            strFilter = "date(dmg.dmg_date) >= '" + from + "'";
-        } else if (!to.equals("-")) {
-            strFilter = "date(dmg.dmg_date) <= '" + to + "'";
-        }
-
-        if (!location.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "dmg.location = " + location;
-            } else {
-                strFilter = strFilter + " and dmg.location = " + location;
-            }
-        }
-
-        if (!remark.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "dmg.remark like '%" + remark + "%'";
-            } else {
-                strFilter = strFilter + " like dmg.remark '%" + remark + "%'";
-            }
-        }
-
-        if (!vouNo.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "dmg.dmg_id like '%" + vouNo + "%'";
-            } else {
-                strFilter = strFilter + " like dmg.dmg_id '%" + vouNo + "%'";
-            }
-        }
-
-        ResultSet rs = null;
-        if (!strFilter.isEmpty()) {
-            strFilter = new StringBuilder().
-                    append("select date(dmg.dmg_date)as dmg_date, dmg.dmg_id, dmg.remark,dmg.amount, ")
-                    .append(" dmg.deleted, l.location_name, \n")
-                    .append(" apu.user_short_name from dmg_his dmg\n")
-                    .append(" join dmg_detail_his ddh on ddh.dmg_id=dmg.dmg_id\n")
-                    .append(" left join location l on dmg.location = l.location_id\n")
-                    .append(" left join appuser apu on dmg.created_by = apu.user_code\n")
-                    .append(" where ").append(strFilter).append(" and dmg.deleted=false\n")
-                    .append(" group by dmg.dmg_date, dmg.dmg_id\n").append(" order by dmg_date desc").toString();
-            rs = getResultSet(strFilter);
-        }
-        return rs;
     }
 
     @Override

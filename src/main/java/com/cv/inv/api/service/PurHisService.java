@@ -18,6 +18,8 @@ public interface PurHisService {
 
     PurHis save(PurHis ph) throws Exception;
 
+    PurHis update(PurHis ph);
+
     List<PurHis> search(String fromDate, String toDate, String cusCode,
                         String vouNo, String userCode);
 

@@ -5,6 +5,7 @@
  */
 package com.cv.inv.api.controller;
 
+import com.cv.inv.api.MessageSender;
 import com.cv.inv.api.common.FilterObject;
 import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.common.Util1;
@@ -12,21 +13,15 @@ import com.cv.inv.api.entity.SaleHis;
 import com.cv.inv.api.entity.SaleHisDetail;
 import com.cv.inv.api.service.SaleDetailService;
 import com.cv.inv.api.service.SaleHisService;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
 @RestController
@@ -38,12 +33,27 @@ public class SaleController {
     private SaleHisService shService;
     @Autowired
     private SaleDetailService sdService;
+    @Autowired
+    private MessageSender messageSender;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-sale")
-    public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale, HttpServletRequest request) throws Exception {
+    public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale, HttpServletRequest request) {
         log.info("/save-sale");
-        sale = shService.save(sale);
+        try {
+            sale = shService.save(sale);
+        } catch (Exception e) {
+            log.error(String.format("saveSale %s", e.getMessage()));
+        }
+        //send message to service
+        try {
+            messageSender.sendMessage("SALE", sale.getVouNo());
+        } catch (Exception e) {
+            SaleHis sh = shService.findById(sale.getVouNo());
+            sh.setIntgUpdStatus(null);
+            shService.update(sh);
+            log.error(String.format("sendMessage: SALE %s", e.getMessage()));
+        }
         return ResponseEntity.ok(sale);
     }
 

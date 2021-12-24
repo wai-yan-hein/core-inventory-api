@@ -6,16 +6,20 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Order;
-import java.util.List;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author Lenovo
  */
 @Repository
 public class OrderDaoImpl extends AbstractDao<String, Order> implements OrderDao {
-
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public Order save(Order order) {
@@ -57,7 +61,8 @@ public class OrderDaoImpl extends AbstractDao<String, Order> implements OrderDao
         if (!strFilter.isEmpty()) {
             hsql = hsql + " where " + strFilter + " and o.isOrder = true";
         }
-        return findHSQL(hsql);
+        Query<Order> query = sessionFactory.getCurrentSession().createQuery(hsql, Order.class);
+        return query.list();
 
     }
 

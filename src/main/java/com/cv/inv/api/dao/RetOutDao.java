@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface RetOutDao {
 
-    RetOutHis save(RetOutHis saleHis) throws Exception;
+    RetOutHis save(RetOutHis saleHis);
 
     List<RetOutHis> search(String fromDate, String toDate, String cusCode,
                            String vouNo, String userCode);

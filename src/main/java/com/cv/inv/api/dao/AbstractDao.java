@@ -3,7 +3,6 @@ package com.cv.inv.api.dao;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
-import net.sf.jasperreports.engine.DefaultJasperReportsContext;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReportsContext;
 
 public abstract class AbstractDao<PK extends Serializable, T> {
 
@@ -41,7 +34,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         this.sessionFactory = sessionFactory;
     }
 
-    protected Session getSession() {
+    public Session getSession() {
         return sessionFactory.getCurrentSession();
     }
 
@@ -61,84 +54,26 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         getSession().delete(entity);
     }
 
-    public List findHSQL(String hsql) {
-        List list = null;
+    public List<T> findHSQL(String hsql) {
+        List<T> list = null;
         try {
-            Query query = getSession().createQuery(hsql);
+            Query<T> query = getSession().createQuery(hsql, persistentClass);
             list = query.list();
         } catch (Exception e) {
             log.error("findHSQL  :" + e.getMessage());
         }
         return list;
-
-    }
-
-    public List findHSQLList(String hsql) {
-        Query query = getSession().createQuery(hsql);
-        return query.list();
     }
 
     public int execUpdateOrDelete(String hsql) {
-        Query query = getSession().createQuery(hsql);
+        Query<T> query = getSession().createQuery(hsql, persistentClass);
         return query.executeUpdate();
     }
 
-    public Object exeSQL(String hsql) {
-        Query query = getSession().createQuery(hsql);
-        return query.uniqueResult();
-
-    }
-
-    @SuppressWarnings("unchecked")
-    public Object findByKey(Class type, Serializable id) {
-        Object obj = null;
-
-        try {
-            //tran.commit();
-            if (!id.equals("")) {
-                obj = getSession().get(type, id);
-            }
-        } catch (Exception ex) {
-            log.error("find1 : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex);
-        }
-        return obj;
-
-    }
-
-    public void execProc(String procName, String... parameters) {
-        String strSQL = "{call " + procName + "(";
-        StringBuilder tmpStr = new StringBuilder();
-
-        for (String parameter : parameters) {
-            if (tmpStr.length() == 0) {
-                tmpStr = new StringBuilder("?");
-            } else {
-                tmpStr.append(",?");
-            }
-        }
-
-        strSQL = strSQL + tmpStr + ")}";
-
-        NativeQuery query = getSession().createSQLQuery(strSQL);
-        int i = 0;
-        for (String prm : parameters) {
-            query.setParameter(i, prm);
-            i++;
-        }
-
-        query.executeUpdate();
-    }
-
-    public void execSQL(String... strSql) throws Exception {
+    public void execSQL(String... strSql) {
         for (String sql : strSql) {
-            NativeQuery query = getSession().createSQLQuery(sql);
-            query.executeUpdate();
+            getSession().createNativeQuery(sql).executeUpdate();
         }
-    }
-
-    public Object getAggregate(String sql) {
-        NativeQuery query = getSession().createSQLQuery(sql);
-        return query.uniqueResult();
     }
 
     public void doWork(Work work) {
@@ -160,32 +95,4 @@ public abstract class AbstractDao<PK extends Serializable, T> {
 
         return rs;
     }
-
-    public void exportPDF(final String reportPath, final String exportPath,
-            final String fontPath, final Map<String, Object> parameters) throws Exception {
-        Work work = (Connection con) -> {
-            try {
-                parameters.put("REPORT_CONNECTION", con);
-                JasperPrint jp = getReport(reportPath, parameters, con, fontPath);
-                JasperExportManager.exportReportToPdfFile(jp, exportPath.concat(".pdf"));
-                log.info("exportPDF.");
-            } catch (Exception ex) {
-                throw new IllegalStateException(ex.getMessage());
-            }
-        };
-        doWork(work);
-    }
-
-    private JasperPrint getReport(String reportPath, Map<String, Object> parameters,
-            Connection con, String fontPath) throws Exception {
-        JasperPrint jp;
-        reportPath = reportPath + ".jasper";
-        JasperReportsContext jasperReportsContext = DefaultJasperReportsContext.getInstance();
-        jasperReportsContext.setProperty("net.sf.jasperreports.default.pdf.font.name", fontPath);
-        jasperReportsContext.setProperty("net.sf.jasperreports.default.pdf.encoding", "Identity-H");
-        jasperReportsContext.setProperty("net.sf.jasperreports.default.pdf.embedded", "true");
-        jp = JasperFillManager.fillReport(reportPath, parameters, con);
-        return jp;
-    }
-
 }

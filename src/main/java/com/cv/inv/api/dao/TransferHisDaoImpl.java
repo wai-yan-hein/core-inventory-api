@@ -6,10 +6,9 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.TransferHis;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import org.springframework.stereotype.Repository;
 
 /**
  * @author lenovo

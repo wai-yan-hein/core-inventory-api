@@ -6,31 +6,23 @@
 package com.cv.inv.api.controller;
 
 import com.cv.inv.api.common.ReturnObject;
+import com.cv.inv.api.common.RoleDefault;
 import com.cv.inv.api.entity.AppUser;
 import com.cv.inv.api.entity.RoleProperty;
 import com.cv.inv.api.entity.UserRole;
 import com.cv.inv.api.entity.VUsrCompAssign;
+import com.cv.inv.api.service.RolePropertyService;
 import com.cv.inv.api.service.UserRoleService;
 import com.cv.inv.api.service.UserService;
 import com.cv.inv.api.service.UsrCompRoleService;
-
-import java.net.URISyntaxException;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.cv.inv.api.service.RolePropertyService;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Lenovo
@@ -51,6 +43,7 @@ public class UserController {
     private RolePropertyService rolePropertyService;
     @Autowired
     private UserRoleService usrService;
+
 
     @PostMapping(value = "/save")
     public ResponseEntity<ReturnObject> saveUser(@RequestBody AppUser user) {
@@ -77,19 +70,25 @@ public class UserController {
     }
 
     @RequestMapping(path = "/get-role-property", method = RequestMethod.GET)
-    public ResponseEntity<HashMap<String, String>> getRoleProperty(@RequestParam String roleCode) {
-        HashMap<String, String> hm = rolePropertyService.getRoleProperty(roleCode);
-        return ResponseEntity.ok(hm);
+    public ResponseEntity<List<RoleProperty>> getRoleProperty(@RequestParam String roleCode) {
+        List<RoleProperty> roleProperty = rolePropertyService.getRoleProperty(roleCode);
+        return ResponseEntity.ok(roleProperty);
     }
 
     @PostMapping(path = "/save-role-property")
-    public ResponseEntity<ReturnObject> saveRoleProperty(
-            @RequestBody List<RoleProperty> properties) {
+    public ResponseEntity<ReturnObject> saveRoleProperty(@RequestBody RoleProperty rp) {
         log.info("/save-role-property");
-        if (!properties.isEmpty()) {
-            properties.forEach(rp -> rolePropertyService.save(rp));
+        if (Objects.isNull(rp.getKey()) || Objects.isNull(rp.getKey().getPropKey())) {
+            ro.setMessage("Invalid Property Key.");
+        } else if (Objects.isNull(rp.getCompCode())) {
+            ro.setMessage("Invalid Company Code");
+        } else if (Objects.isNull(rp.getKey().getRoleCode())) {
+            ro.setMessage("Invalid Role Code");
+        } else {
+            RoleProperty property = rolePropertyService.save(rp);
+            ro.setObj(property);
+            ro.setMessage("Saved.");
         }
-        ro.setMessage("Sucess.");
         return ResponseEntity.ok(ro);
     }
 
@@ -103,5 +102,11 @@ public class UserController {
     public ResponseEntity<UserRole> saveRole(@RequestBody UserRole ur) {
         UserRole save = usrService.save(ur);
         return ResponseEntity.ok(save);
+    }
+
+    @RequestMapping(value = "/role-default", method = RequestMethod.GET)
+    public ResponseEntity<RoleDefault> getRoleDefault(@RequestParam String roleCode) {
+        RoleDefault roleDefault = rolePropertyService.getRoleDefault(roleCode);
+        return ResponseEntity.ok(roleDefault);
     }
 }

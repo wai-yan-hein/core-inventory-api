@@ -21,4 +21,5 @@ public class FilterObject {
     private String userCode;
     private String description;
     private String remark;
+    private String compCode;
 }

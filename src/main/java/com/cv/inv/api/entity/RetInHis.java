@@ -4,16 +4,25 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
-import lombok.Data;
+import java.util.Objects;
 
 /**
  *
  * @author WSwe
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "ret_in_his")
 public class RetInHis implements java.io.Serializable {
@@ -24,7 +33,7 @@ public class RetInHis implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "trader_code")
     private Trader trader;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     @Column(name = "vou_date")
     private Date vouDate;
     @ManyToOne
@@ -49,7 +58,7 @@ public class RetInHis implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "updated_by")
     private AppUser updatedBy;
-    @Column(name = "updated_date", nullable = true)
+    @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @Column(name = "remark")
@@ -74,4 +83,16 @@ public class RetInHis implements java.io.Serializable {
     @Transient
     private List<String> listDel;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        RetInHis retInHis = (RetInHis) o;
+        return vouNo != null && Objects.equals(vouNo, retInHis.vouNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

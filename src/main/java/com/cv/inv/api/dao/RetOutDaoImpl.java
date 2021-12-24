@@ -6,17 +6,21 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RetOutHis;
+import com.cv.inv.api.view.VReturnOut;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import com.cv.inv.api.view.VReturnOut;
-import org.springframework.stereotype.Repository;
 
 /**
  * @author lenovo
  */
 @Repository
 public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements RetOutDao {
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public RetOutHis save(RetOutHis sh) {
@@ -60,10 +64,10 @@ public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements Ret
         }
         String strSql = "select o from RetOutHis o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
         }
 
-        return (List<RetOutHis>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
@@ -81,6 +85,6 @@ public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements Ret
     @Override
     public List<VReturnOut> search(String vouNo) {
         String hsql = "select o from VReturnOut o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
-        return findHSQL(hsql);
+        return sessionFactory.getCurrentSession().createQuery(hsql, VReturnOut.class).list();
     }
 }

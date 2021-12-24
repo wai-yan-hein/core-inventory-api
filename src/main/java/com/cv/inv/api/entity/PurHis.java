@@ -4,16 +4,23 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
-import lombok.Data;
+import java.util.Objects;
 
 /**
  *
  * @author winswe
  */
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "pur_his")
 public class PurHis implements java.io.Serializable {
@@ -84,4 +91,16 @@ public class PurHis implements java.io.Serializable {
     public PurHis() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        PurHis purHis = (PurHis) o;
+        return vouNo != null && Objects.equals(vouNo, purHis.vouNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

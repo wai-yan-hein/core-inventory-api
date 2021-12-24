@@ -6,6 +6,7 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Stock;
+
 import java.util.List;
 
 /**
@@ -21,8 +22,6 @@ import java.util.List;
      List<Stock> findAll(String compCode);
 
      int delete(String id);
-
-     Object getMax(String sql);
 
      List<Stock> findActiveStock();
 

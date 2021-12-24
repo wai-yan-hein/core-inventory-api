@@ -6,16 +6,20 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Category;
-import java.util.List;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author Lenovo
  */
 @Repository
 public class CategoryDaoImpl extends AbstractDao<String, Category> implements CategoryDao {
-
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public Category save(Category item) {
@@ -24,9 +28,10 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     }
 
     @Override
-    public List findAll(String compCode) {
+    public List<Category> findAll(String compCode) {
         String hsql = "select o from Category o where o.compCode = '" + compCode + "'";
-        return findHSQL(hsql);
+        Query<Category> query = sessionFactory.getCurrentSession().createQuery(hsql, Category.class);
+        return query.list();
     }
 
     @Override
@@ -48,14 +53,15 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
         } else {
             strFilter = "select o from Category o where " + strFilter;
         }
-
-        return (List<Category>) findHSQL(strFilter);
+        Query<Category> query = sessionFactory.getCurrentSession().createQuery(strFilter, Category.class);
+        return query.list();
     }
 
     @Override
     public List<Category> searchM(String updatedDate) {
         String strSql = "select o from Category o where o.updatedDate > '" + updatedDate + "'";
-        return (List<Category>) findHSQL(strSql);
+        Query<Category> query = sessionFactory.getCurrentSession().createQuery(strSql, Category.class);
+        return query.list();
     }
 
     @Override

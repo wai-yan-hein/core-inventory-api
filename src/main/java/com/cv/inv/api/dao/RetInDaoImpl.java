@@ -6,17 +6,21 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RetInHis;
+import com.cv.inv.api.view.VReturnIn;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import com.cv.inv.api.view.VReturnIn;
-import org.springframework.stereotype.Repository;
 
 /**
  * @author lenovo
  */
 @Repository
 public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetInDao {
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public RetInHis save(RetInHis sh) {
@@ -60,7 +64,7 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
         }
         String strSql = "select o from RetInHis o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
         }
 
         return findHSQL(strSql);
@@ -81,6 +85,6 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
     @Override
     public List<VReturnIn> search(String vouNo) {
         String hsql = "select o from VReturnIn o where o.vouNo = '" + vouNo + "' order by uniqueId";
-        return findHSQL(hsql);
+        return sessionFactory.getCurrentSession().createQuery(hsql, VReturnIn.class).list();
     }
 }

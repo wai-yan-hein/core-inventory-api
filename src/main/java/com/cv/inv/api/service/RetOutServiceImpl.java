@@ -5,23 +5,19 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.MessageSender;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.common.Voucher;
 import com.cv.inv.api.dao.RetOutDao;
 import com.cv.inv.api.dao.RetOutDetailDao;
 import com.cv.inv.api.dao.SeqTableDao;
-import com.cv.inv.api.entity.RetOutHis;
-import com.cv.inv.api.entity.RetOutHisDetail;
-import com.cv.inv.api.entity.RetOutKey;
-import com.cv.inv.api.entity.SeqKey;
-import com.cv.inv.api.entity.SeqTable;
-
-import java.util.List;
-
+import com.cv.inv.api.entity.*;
 import com.cv.inv.api.view.VReturnOut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author Wai Yan
@@ -36,51 +32,63 @@ public class RetOutServiceImpl implements RetOutService {
     private RetOutDetailDao rd;
     @Autowired
     private SeqTableDao seqDao;
+    @Autowired
+    private MessageSender messageSender;
 
     @Override
     public RetOutHis save(RetOutHis rin) throws Exception {
-        List<RetOutHisDetail> listSD = rin.getListRD();
-        List<String> listDel = rin.getListDel();
-        String vouNo = rin.getVouNo();
-        if (rin.getStatus().equals("NEW")) {
-            RetOutHis valid = rDao.findById(vouNo);
-            if (valid != null) {
-                throw new IllegalStateException("Duplicate Return Out Voucher");
-            }
-        }
-        if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    try {
-                        rd.delete(detailId);
-                    } catch (Exception ex) {
-                        throw new IllegalStateException(String.format("Return Out Delete : %s", ex.getMessage()));
-                    }
+        if (Util1.getBoolean(rin.getDeleted())) {
+            rDao.save(rin);
+        } else {
+            List<RetOutHisDetail> listSD = rin.getListRD();
+            List<String> listDel = rin.getListDel();
+            String vouNo = rin.getVouNo();
+            if (rin.getStatus().equals("NEW")) {
+                RetOutHis valid = rDao.findById(vouNo);
+                if (valid != null) {
+                    throw new IllegalStateException("Duplicate Return Out Voucher");
                 }
-            });
-        }
-        for (int i = 0; i < listSD.size(); i++) {
-            RetOutHisDetail cSd = listSD.get(i);
-            if (cSd.getStock() != null) {
-                if (cSd.getStock().getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            RetOutHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+            }
+            if (listDel != null) {
+                listDel.forEach(detailId -> {
+                    if (detailId != null) {
+                        try {
+                            rd.delete(detailId);
+                        } catch (Exception ex) {
+                            throw new IllegalStateException(String.format("Return Out Delete : %s", ex.getMessage()));
                         }
                     }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setRoKey(new RetOutKey(sdCode, vouNo));
-                    rd.save(cSd);
+                });
+            }
+            for (int i = 0; i < listSD.size(); i++) {
+                RetOutHisDetail cSd = listSD.get(i);
+                if (cSd.getStock() != null) {
+                    if (cSd.getStock().getStockCode() != null) {
+                        if (cSd.getUniqueId() == null) {
+                            if (i == 0) {
+                                cSd.setUniqueId(1);
+                            } else {
+                                RetOutHisDetail pSd = listSD.get(i - 1);
+                                cSd.setUniqueId(pSd.getUniqueId() + 1);
+                            }
+                        }
+                        String sdCode = vouNo + "-" + cSd.getUniqueId();
+                        cSd.setRoKey(new RetOutKey(sdCode, vouNo));
+                        rd.save(cSd);
+                    }
                 }
             }
+            rDao.save(rin);
+            rin.setListRD(listSD);
+            updateVoucher(rin.getCompCode(), rin.getMacId(), Voucher.RETOUT.name());
+            messageSender.sendMessage("RETURN_OUT", vouNo);
         }
-        rDao.save(rin);
-        rin.setListRD(listSD);
-        updateVoucher(rin.getCompCode(), rin.getMacId(), Voucher.RETOUT.name());
         return rin;
+    }
+
+    @Override
+    public RetOutHis update(RetOutHis ro) {
+        return rDao.save(ro);
     }
 
     @Override

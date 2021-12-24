@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface PurHisDao {
 
-    PurHis save(PurHis ph) throws Exception;
+    PurHis save(PurHis ph);
 
     List<PurHis> search(String fromDate, String toDate, String cusCode,
                         String vouNo, String userCode);

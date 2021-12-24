@@ -6,9 +6,8 @@
 package com.cv.inv.api.common;
 
 /**
- *
  * @author Lenovo
  */
 public enum Voucher {
-    SALE, PURCHASE, RETIN, RETOUT, STOCKINOUT
+    SALE, PURCHASE, RETIN, RETOUT, STOCKINOUT, OPENING
 }

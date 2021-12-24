@@ -5,28 +5,23 @@
  */
 package com.cv.inv.api.controller;
 
+import com.cv.inv.api.MessageSender;
 import com.cv.inv.api.common.FilterObject;
 import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.entity.RetOutHis;
 import com.cv.inv.api.entity.RetOutHisDetail;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import com.cv.inv.api.service.RetOutDetailService;
+import com.cv.inv.api.service.RetOutService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.cv.inv.api.service.RetOutDetailService;
-import com.cv.inv.api.service.RetOutService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
 @RestController
@@ -38,12 +33,26 @@ public class RetOutController {
     private RetOutService roService;
     @Autowired
     private RetOutDetailService rdService;
+    @Autowired
+    private MessageSender messageSender;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-retout")
-    public ResponseEntity<RetOutHis> saveRO(@RequestBody RetOutHis retout, HttpServletRequest request) throws Exception {
-        log.info("/save-retout");
-        retout = roService.save(retout);
+    public ResponseEntity<RetOutHis> saveReturnOut(@RequestBody RetOutHis retout,
+                                                   HttpServletRequest request) {
+        try {
+            retout = roService.save(retout);
+        } catch (Exception e) {
+            log.error(String.format("saveReturnOut: %s", e.getMessage()));
+        }
+        try {
+            messageSender.sendMessage("RETURN_OUT", retout.getVouNo());
+        } catch (Exception e) {
+            RetOutHis rh = roService.findById(retout.getVouNo());
+            rh.setIntgUpdStatus(null);
+            roService.update(rh);
+            log.error(String.format("sendMessage RETURN_OUT : %s", e.getMessage()));
+        }
         return ResponseEntity.ok(retout);
     }
 

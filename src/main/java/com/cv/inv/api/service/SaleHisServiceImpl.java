@@ -8,21 +8,17 @@ package com.cv.inv.api.service;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.common.Voucher;
 import com.cv.inv.api.dao.SaleHisDao;
+import com.cv.inv.api.dao.SaleHisDetailDao;
 import com.cv.inv.api.dao.SeqTableDao;
-import com.cv.inv.api.entity.SaleDetailKey;
-import com.cv.inv.api.entity.SaleHis;
-import com.cv.inv.api.entity.SaleHisDetail;
-import com.cv.inv.api.entity.SeqKey;
-import com.cv.inv.api.entity.SeqTable;
-import java.util.List;
+import com.cv.inv.api.entity.*;
+import com.cv.inv.api.view.VSale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.cv.inv.api.dao.SaleHisDetailDao;
-import com.cv.inv.api.view.VSale;
+
+import java.util.List;
 
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Service
@@ -36,28 +32,33 @@ public class SaleHisServiceImpl implements SaleHisService {
     @Autowired
     private SeqTableDao seqDao;
 
+    public SaleHisServiceImpl() {
+    }
+
     @Override
     public SaleHis save(SaleHis saleHis) throws Exception {
-        List<SaleHisDetail> listSD = saleHis.getListSH();
-        List<String> listDel = saleHis.getListDel();
-        String vouNo = saleHis.getVouNo();
-        if (saleHis.getStatus().equals("NEW")) {
-            SaleHis valid = shDao.findById(vouNo);
-            if (valid != null) {
-                throw new IllegalStateException("Duplicate Sale Voucher");
-            }
-        }
-        if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    sdDao.delete(detailId);
+        if (Util1.getBoolean(saleHis.getDeleted())) {
+            shDao.save(saleHis);
+        } else {
+            List<SaleHisDetail> listSD = saleHis.getListSH();
+            List<String> listDel = saleHis.getListDel();
+            String vouNo = saleHis.getVouNo();
+            if (saleHis.getStatus().equals("NEW")) {
+                SaleHis valid = shDao.findById(vouNo);
+                if (valid != null) {
+                    throw new IllegalStateException("Duplicate Sale Voucher");
                 }
-            });
-        }
-        for (int i = 0; i < listSD.size(); i++) {
-            SaleHisDetail cSd = listSD.get(i);
-            if (cSd.getStock() != null) {
-                if (cSd.getStock().getStockCode() != null) {
+            }
+            if (listDel != null) {
+                listDel.forEach(detailId -> {
+                    if (detailId != null) {
+                        sdDao.delete(detailId);
+                    }
+                });
+            }
+            for (int i = 0; i < listSD.size(); i++) {
+                SaleHisDetail cSd = listSD.get(i);
+                if (cSd.getStock() != null) {
                     if (cSd.getUniqueId() == null) {
                         if (i == 0) {
                             cSd.setUniqueId(1);
@@ -71,16 +72,21 @@ public class SaleHisServiceImpl implements SaleHisService {
                     sdDao.save(cSd);
                 }
             }
+            shDao.save(saleHis);
+            saleHis.setListSH(listSD);
+            updateVoucher(saleHis.getCompCode(), saleHis.getMacId(), Voucher.SALE.name());
         }
-        shDao.save(saleHis);
-        saleHis.setListSH(listSD);
-        updateVoucher(saleHis.getCompCode(), saleHis.getMacId(), Voucher.SALE.name());
         return saleHis;
     }
 
     @Override
+    public SaleHis update(SaleHis saleHis) {
+        return shDao.save(saleHis);
+    }
+
+    @Override
     public List<SaleHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                                String vouNo, String userCode) {
         return shDao.search(fromDate, toDate, cusCode, vouNo, userCode);
     }
 

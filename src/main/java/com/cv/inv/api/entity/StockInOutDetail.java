@@ -5,20 +5,23 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import lombok.Data;
+import java.util.Objects;
 
 /**
- *
  * @author Lenovo
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "stock_in_out_detail")
 public class StockInOutDetail implements Serializable {
@@ -45,11 +48,21 @@ public class StockInOutDetail implements Serializable {
     @ManyToOne
     @JoinColumn(name = "out_unit")
     private StockUnit outUnit;
-    @Column(name = "desp")
-    private String description;
-    @Column(name = "remark")
-    private String remark;
     @Column(name = "unique_id")
     private Integer uniqueId;
+    @Column(name = "cost_price")
+    private Float costPrice;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        StockInOutDetail that = (StockInOutDetail) o;
+        return ioKey != null && Objects.equals(ioKey, that.ioKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ioKey);
+    }
 }

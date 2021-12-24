@@ -6,6 +6,7 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.StockUnit;
+
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
 
      StockUnit findByCode(String code);
 
-     StockUnit save(StockUnit unit);
+     StockUnit save(StockUnit unit) throws Exception;
 
      List<StockUnit> findAll(String compCode);
 

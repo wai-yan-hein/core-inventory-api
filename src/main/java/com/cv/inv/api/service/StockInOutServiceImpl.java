@@ -6,22 +6,19 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.common.Util1;
-import static com.cv.inv.api.common.Voucher.STOCKINOUT;
 import com.cv.inv.api.dao.SeqTableDao;
 import com.cv.inv.api.dao.StockInOutDao;
 import com.cv.inv.api.dao.StockInOutDetailDao;
-import com.cv.inv.api.entity.SeqKey;
-import com.cv.inv.api.entity.SeqTable;
-import com.cv.inv.api.entity.StockInOut;
-import com.cv.inv.api.entity.StockInOutDetail;
-import com.cv.inv.api.entity.StockInOutKey;
-import java.util.List;
+import com.cv.inv.api.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static com.cv.inv.api.common.Voucher.STOCKINOUT;
+
 /**
- *
  * @author Lenovo
  */
 @Service
@@ -37,49 +34,53 @@ public class StockInOutServiceImpl implements StockInOutService {
 
     @Override
     public StockInOut save(StockInOut io) throws Exception {
-        List<StockInOutDetail> listSD = io.getListSH();
-        List<String> listDel = io.getListDel();
-        String vouNo = io.getVouNo();
-        if (io.getStatus().equals("NEW")) {
-            StockInOut valid = ioDao.findById(vouNo);
-            if (valid != null) {
-                throw new IllegalStateException("Duplicate Stock In/Out Voucher");
-            }
-        }
-        if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    iodDao.delete(detailId);
+        if (Util1.getBoolean(io.getDeleted())) {
+            ioDao.save(io);
+        } else {
+            List<StockInOutDetail> listSD = io.getListSH();
+            List<String> listDel = io.getListDel();
+            String vouNo = io.getVouNo();
+            if (io.getStatus().equals("NEW")) {
+                StockInOut valid = ioDao.findById(vouNo);
+                if (valid != null) {
+                    throw new IllegalStateException("Duplicate Stock In/Out Voucher");
                 }
-            });
-        }
-        for (int i = 0; i < listSD.size(); i++) {
-            StockInOutDetail cSd = listSD.get(i);
-            if (cSd.getStock() != null) {
-                if (cSd.getStock().getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            StockInOutDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
-                        }
+            }
+            if (listDel != null) {
+                listDel.forEach(detailId -> {
+                    if (detailId != null) {
+                        iodDao.delete(detailId);
                     }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setIoKey(new StockInOutKey(sdCode, vouNo));
-                    iodDao.save(cSd);
+                });
+            }
+            for (int i = 0; i < listSD.size(); i++) {
+                StockInOutDetail cSd = listSD.get(i);
+                if (cSd.getStock() != null) {
+                    if (cSd.getStock().getStockCode() != null) {
+                        if (cSd.getUniqueId() == null) {
+                            if (i == 0) {
+                                cSd.setUniqueId(1);
+                            } else {
+                                StockInOutDetail pSd = listSD.get(i - 1);
+                                cSd.setUniqueId(pSd.getUniqueId() + 1);
+                            }
+                        }
+                        String sdCode = vouNo + "-" + cSd.getUniqueId();
+                        cSd.setIoKey(new StockInOutKey(sdCode, vouNo));
+                        iodDao.save(cSd);
+                    }
                 }
             }
+            ioDao.save(io);
+            io.setListSH(listSD);
+            updateVoucher(io.getCompCode(), io.getMacId(), STOCKINOUT.name());
         }
-        ioDao.save(io);
-        io.setListSH(listSD);
-        updateVoucher(io.getCompCode(), io.getMacId(), STOCKINOUT.name());
         return io;
     }
 
     @Override
     public List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
-            String vouNo, String userCode) {
+                                   String vouNo, String userCode) {
         return ioDao.search(fromDate, toDate, remark, desp, vouNo, userCode);
     }
 

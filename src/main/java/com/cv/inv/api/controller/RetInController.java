@@ -5,28 +5,23 @@
  */
 package com.cv.inv.api.controller;
 
+import com.cv.inv.api.MessageSender;
 import com.cv.inv.api.common.FilterObject;
 import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.entity.RetInHis;
 import com.cv.inv.api.entity.RetInHisDetail;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import com.cv.inv.api.service.RetInDetailService;
+import com.cv.inv.api.service.RetInService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.cv.inv.api.service.RetInDetailService;
-import com.cv.inv.api.service.RetInService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
 @RestController
@@ -38,12 +33,27 @@ public class RetInController {
     private RetInService riService;
     @Autowired
     private RetInDetailService rdService;
+    @Autowired
+    private MessageSender messageSender;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-retin")
-    public ResponseEntity<RetInHis> saveRI(@RequestBody RetInHis retin, HttpServletRequest request) throws Exception {
+    public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin, HttpServletRequest request) {
         log.info("/save-retin");
-        retin = riService.save(retin);
+        try {
+            retin = riService.save(retin);
+        } catch (Exception e) {
+            log.error(String.format("saveReturnIn: %s", e.getMessage()));
+        }
+        //send message to service
+        try {
+            messageSender.sendMessage("RETURN_IN", retin.getVouNo());
+        } catch (Exception e) {
+            RetInHis ri = riService.findById(retin.getVouNo());
+            ri.setIntgUpdStatus(null);
+            riService.update(ri);
+            log.error(String.format("sendMessage: RETURN_IN %s", e.getMessage()));
+        }
         return ResponseEntity.ok(retin);
     }
 

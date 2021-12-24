@@ -8,10 +8,11 @@ package com.cv.inv.api.service;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.dao.TraderDao;
 import com.cv.inv.api.entity.Trader;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  *

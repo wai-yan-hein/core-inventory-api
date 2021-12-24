@@ -6,6 +6,7 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.VouStatus;
+
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
 
      VouStatus save(VouStatus vouStatus);
 
-     List<VouStatus> findAll();
+     List<VouStatus> findAll(String compCode);
 
      int delete(String id);
 

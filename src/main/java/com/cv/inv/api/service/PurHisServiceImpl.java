@@ -7,21 +7,16 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.common.Voucher;
+import com.cv.inv.api.dao.PurHisDao;
 import com.cv.inv.api.dao.SeqTableDao;
-import com.cv.inv.api.entity.PurHis;
-import com.cv.inv.api.entity.SeqKey;
-import com.cv.inv.api.entity.SeqTable;
-
-import java.util.List;
-
+import com.cv.inv.api.entity.*;
 import com.cv.inv.api.view.VPurchase;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.cv.inv.api.dao.PurHisDao;
-import com.cv.inv.api.entity.PurDetailKey;
-import com.cv.inv.api.entity.PurHisDetail;
-import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * @author Mg Kyaw Thura Aung
@@ -38,50 +33,60 @@ public class PurHisServiceImpl implements PurHisService {
     @Autowired
     private SeqTableDao seqDao;
 
+
     @Override
     public PurHis save(PurHis ph) throws Exception {
-        List<PurHisDetail> listSD = ph.getListPD();
-        List<String> listDel = ph.getListDel();
-        String vouNo = ph.getVouNo();
-        if (ph.getStatus().equals("NEW")) {
-            PurHis valid = phDao.findById(vouNo);
-            if (valid != null) {
-                throw new IllegalStateException("Duplicate Purchase Voucher");
-            }
-        }
-        if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    try {
-                        pdDao.delete(detailId);
-                    } catch (Exception ex) {
-                        log.error("listDel : " + ex.getMessage());
-                    }
+        if (Util1.getBoolean(ph.getDeleted())) {
+            phDao.save(ph);
+        } else {
+            List<PurHisDetail> listSD = ph.getListPD();
+            List<String> listDel = ph.getListDel();
+            String vouNo = ph.getVouNo();
+            if (ph.getStatus().equals("NEW")) {
+                PurHis valid = phDao.findById(vouNo);
+                if (valid != null) {
+                    throw new IllegalStateException("Duplicate Purchase Voucher");
                 }
-            });
-        }
-        for (int i = 0; i < listSD.size(); i++) {
-            PurHisDetail cSd = listSD.get(i);
-            if (cSd.getStock() != null) {
-                if (cSd.getStock().getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            PurHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+            }
+            if (listDel != null) {
+                listDel.forEach(detailId -> {
+                    if (detailId != null) {
+                        try {
+                            pdDao.delete(detailId);
+                        } catch (Exception ex) {
+                            log.error("listDel : " + ex.getMessage());
                         }
                     }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setPdKey(new PurDetailKey(vouNo, sdCode));
-                    pdDao.save(cSd);
+                });
+            }
+            for (int i = 0; i < listSD.size(); i++) {
+                PurHisDetail cSd = listSD.get(i);
+                if (cSd.getStock() != null) {
+                    if (cSd.getStock().getStockCode() != null) {
+                        if (cSd.getUniqueId() == null) {
+                            if (i == 0) {
+                                cSd.setUniqueId(1);
+                            } else {
+                                PurHisDetail pSd = listSD.get(i - 1);
+                                cSd.setUniqueId(pSd.getUniqueId() + 1);
+                            }
+                        }
+                        String sdCode = vouNo + "-" + cSd.getUniqueId();
+                        cSd.setPdKey(new PurDetailKey(vouNo, sdCode));
+                        pdDao.save(cSd);
+                    }
                 }
             }
+            phDao.save(ph);
+            ph.setListPD(listSD);
+            updateVoucher(ph.getCompCode(), ph.getMacId(), Voucher.PURCHASE.name());
         }
-        phDao.save(ph);
-        ph.setListPD(listSD);
-        updateVoucher(ph.getCompCode(), ph.getMacId(), Voucher.PURCHASE.name());
         return ph;
+    }
+
+    @Override
+    public PurHis update(PurHis ph) {
+        return phDao.save(ph);
     }
 
     @Override

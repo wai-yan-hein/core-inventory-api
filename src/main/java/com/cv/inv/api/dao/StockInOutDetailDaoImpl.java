@@ -6,15 +6,16 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.StockInOutDetail;
-import java.util.List;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  *
  * @author Lenovo
  */
 @Repository
-public class StockInOutDetailDaoImpl extends AbstractDao<Integer, StockInOutDetail> implements StockInOutDetailDao {
+public class StockInOutDetailDaoImpl extends AbstractDao<String, StockInOutDetail> implements StockInOutDetailDao {
 
     @Override
     public StockInOutDetail save(StockInOutDetail stock) {

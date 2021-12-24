@@ -11,10 +11,10 @@ package com.cv.inv.api.common;
  */
 public enum SettingKey {
     DEFAULT_CURRENCY,
-    DEFALUT_LOCATION,
+    DEFAULT_LOCATION,
     DEFAULT_SALEMAN,
-    DEFALUT_CUSTOMER,
+    DEFAULT_CUSTOMER,
     DEFAULT_SUPPLIER,
-    IS_CASHDOWN,
-    IS_CALCULAT_STOCK,
+    IS_CASH_DOWN,
+    IS_CALCULATE_STOCK,
 }

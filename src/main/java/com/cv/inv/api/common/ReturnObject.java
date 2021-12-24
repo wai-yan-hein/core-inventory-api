@@ -5,18 +5,19 @@
  */
 package com.cv.inv.api.common;
 
-import java.util.List;
 import lombok.Data;
 
+import java.util.List;
+
 /**
- *
  * @author Lenovo
  */
 @Data
 public class ReturnObject {
-
     private String status;
     private String message;
-    private List list;
+    private String errorMessage;
+    private List<Object> list;
     private Object obj;
+    private byte[] file;
 }

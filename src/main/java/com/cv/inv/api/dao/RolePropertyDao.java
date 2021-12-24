@@ -7,10 +7,11 @@ package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RoleProperty;
 import com.cv.inv.api.entity.RolePropertyKey;
+
 import java.util.HashMap;
+import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
 public interface RolePropertyDao {
@@ -19,6 +20,7 @@ public interface RolePropertyDao {
 
     RoleProperty findByKey(RolePropertyKey key);
 
-    HashMap<String, String> getRoleProperty(String roleCode);
+    List<RoleProperty> getRoleProperty(String roleCode);
+
 
 }

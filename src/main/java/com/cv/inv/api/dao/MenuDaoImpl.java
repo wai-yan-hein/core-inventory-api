@@ -7,16 +7,20 @@ package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Menu;
 import com.cv.inv.api.entity.VRoleMenu;
-import java.util.List;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author winswe
  */
 @Repository
 public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
-
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public Menu saveMenu(Menu menu) {
@@ -64,8 +68,8 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter;
         }
-
-        return (List<Menu>) findHSQL(strSql);
+        Query<Menu> query = sessionFactory.getCurrentSession().createQuery(strSql, Menu.class);
+        return query.list();
     }
 
     @Override
@@ -77,15 +81,17 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     @Override
     public List<Menu> getParentChildMenu() {
         String strSql = "select o from Menu o where o.parent = '1'";
-        List<Menu> listRootMenu = findHSQL(strSql);
+        Query<Menu> query = sessionFactory.getCurrentSession().createQuery(strSql, Menu.class);
+        List<Menu> listRootMenu = query.list();
         listRootMenu.forEach(this::getChild);
 
         return listRootMenu;
     }
 
-    private Menu getChild(Menu parent) {
+    private void getChild(Menu parent) {
         String strSql = "select o from Menu o where o.parent = '" + parent.getCode() + "'";
-        List<Menu> listChild = findHSQL(strSql);
+        Query<Menu> query = sessionFactory.getCurrentSession().createQuery(strSql, Menu.class);
+        List<Menu> listChild = query.list();
 
         if (listChild != null) {
             if (listChild.size() > 0) {
@@ -94,17 +100,16 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
             }
         }
 
-        return parent;
     }
 
     @Override
-    public List getParentChildMenu(String roleCode, String menuType, String compCode) {
+    public List<VRoleMenu> getParentChildMenu(String roleCode, String menuType, String compCode) {
         String strSql = "select o from VRoleMenu o where o.key.roleCode = '" + roleCode
                 + "' and o.parent = '1' and o.compCode = '" + compCode + "' order by o.orderBy";
-        List listRootMenu = findHSQL(strSql);
-        for (Object rootMenu : listRootMenu) {
-            VRoleMenu parent = (VRoleMenu) rootMenu;
-            getChild(parent, roleCode, menuType, compCode);
+        Query<VRoleMenu> query = sessionFactory.getCurrentSession().createQuery(strSql, VRoleMenu.class);
+        List<VRoleMenu> listRootMenu = query.list();
+        for (VRoleMenu menu : listRootMenu) {
+            getChild(menu, roleCode, menuType, compCode);
         }
 
         return listRootMenu;
@@ -116,13 +121,13 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (!menuType.equals("-")) {
             strSql = strSql + " and o.menuType = '" + menuType + "'";
         }
-        List listChild = findHSQL(strSql);
+        Query<VRoleMenu> query = sessionFactory.getCurrentSession().createQuery(strSql, VRoleMenu.class);
+        List<VRoleMenu> listChild = query.list();
 
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-                for (Object o : listChild) {
-                    VRoleMenu child = (VRoleMenu) o;
+                for (VRoleMenu child : listChild) {
                     getChild(child, roleCode, menuType, compCode);
                 }
             }
@@ -130,12 +135,12 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     }
 
     @Override
-    public List getParentChildMenuSelect(String roleCode, String menuType) {
+    public List<Menu> getParentChildMenuSelect(String roleCode, String menuType) {
         String strSql = "select m from Menu m where m.parent = '1' and "
                 + " m.code in(select p.key.menuCode from Privilege p where p.isAllow=true and p.key.roleCode = " + roleCode + ") order by m.orderBy";
-        List listRootMenu = findHSQL(strSql);
-        for (Object rootMenu : listRootMenu) {
-            Menu parent = (Menu) rootMenu;
+        Query<Menu> query = sessionFactory.getCurrentSession().createQuery(strSql, Menu.class);
+        List<Menu> listRootMenu = query.list();
+        for (Menu parent : listRootMenu) {
             getChildSelect(parent, roleCode, "-");
         }
 
@@ -148,13 +153,13 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (!menuType.equals("-")) {
             strSql = strSql + " and m.menuType = '" + menuType + "'";
         }
-        List listChild = findHSQL(strSql);
+        Query<Menu> query = sessionFactory.getCurrentSession().createQuery(strSql, Menu.class);
+        List<Menu> listChild = query.list();
 
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-                for (Object o : listChild) {
-                    Menu child = (Menu) o;
+                for (Menu child : listChild) {
                     getChildSelect(child, roleCode, menuType);
                 }
             }
@@ -164,20 +169,23 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     @Override
     public List<Menu> searchM(String updatedDate) {
         String strSql = "select o from Menu o where o.updatedDate > '" + updatedDate + "'";
-        return (List<Menu>) findHSQL(strSql);
+        Query<Menu> query = sessionFactory.getCurrentSession().createQuery(strSql, Menu.class);
+        return query.list();
 
     }
 
     @Override
-    public List getReports(String roleCode) {
-        String hsql = "select o from VRoleMenu o where o.key.roleCode = " + roleCode + " and o.menuType = 'Reports' and o.isAllow = true";
-        return findHSQL(hsql);
+    public List<VRoleMenu> getReports(String roleCode) {
+        String hsql = "select o from VRoleMenu o where o.key.roleCode = '" + roleCode + "' and o.menuType = 'Report' and o.isAllow = true";
+        Query<VRoleMenu> query = sessionFactory.getCurrentSession().createQuery(hsql, VRoleMenu.class);
+        return query.list();
     }
 
     @Override
-    public List getReportList(String roleCode, String parentCode) {
+    public List<VRoleMenu> getReportList(String roleCode, String parentCode) {
         String hsql = "select o from VRoleMenu o where o.key.roleCode = " + roleCode + " and o.isAllow = true"
                 + "  and o.parent ='" + parentCode + "'";
-        return findHSQL(hsql);
+        Query<VRoleMenu> query = sessionFactory.getCurrentSession().createQuery(hsql, VRoleMenu.class);
+        return query.list();
     }
 }

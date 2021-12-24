@@ -7,40 +7,40 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.dao.StockUnitDao;
 import com.cv.inv.api.entity.StockUnit;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
- *
  * @author Lenovo
  */
 @Service
 @Transactional
 public class StockUnitServiceImpl implements StockUnitService {
-    
+
     @Autowired
     private StockUnitDao dao;
-    
+
     @Override
-    public StockUnit save(StockUnit unit) {
+    public StockUnit save(StockUnit unit) throws Exception {
         return dao.save(unit);
     }
-    
+
     @Override
     public List<StockUnit> findAll(String compCode) {
         return dao.findAll(compCode);
     }
-    
+
     @Override
     public int delete(String id) {
         return dao.delete(id);
     }
-    
+
     @Override
     public StockUnit findByCode(String code) {
         return dao.findByCode(code);
     }
-    
+
 }

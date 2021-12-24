@@ -6,11 +6,11 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.MachineInfo;
-import java.util.List;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author lenovo
  */
 @Repository
@@ -25,16 +25,12 @@ public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implem
 
     @Override
     public int getMax(String machineName) throws Exception {
-        int maxId;
-        Object obj;
-        String strSQL = "select max(o.machineId) from MachineInfo o where o.machineName = '" + machineName + "'";
-        obj = exeSQL(strSQL);
-        if (obj == null) {
-            maxId = 0;
-        } else {
-            maxId = Integer.parseInt(obj.toString());
+        int maxId = 0;
+        String hsql = "select o from MachineInfo o where o.machineName = '" + machineName + "'";
+        List<MachineInfo> list = findHSQL(hsql);
+        if (!list.isEmpty()) {
+            maxId = list.get(0).getMachineId();
         }
-
         return maxId;
     }
 
@@ -48,55 +44,47 @@ public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implem
     public MachineInfo findById(String id) throws Exception {
         return getByKey(Integer.parseInt(id));
     }
-    
-     @Override
-    public List<MachineInfo> search(String name, String ip){
+
+    @Override
+    public List<MachineInfo> search(String name, String ip) {
         String strSql = "";
-        
-        if(!name.equals("-")){
-            if(strSql.isEmpty()){
-                strSql = "o.machineName like '%" + name + "%'";
-            }else{
-                strSql = strSql + " and o.machineName like '%" + name + "%'";
-            }
+
+        if (!name.equals("-")) {
+            strSql = "o.machineName like '%" + name + "%'";
         }
-        
-        if(!ip.equals("-")){
-            if(strSql.isEmpty()){
+
+        if (!ip.equals("-")) {
+            if (strSql.isEmpty()) {
                 strSql = "o.ipAddress like '%" + ip + "%'";
-            }else{
+            } else {
                 strSql = strSql + " and o.ipAddress like '%" + ip + "%'";
             }
         }
-        
-        if(strSql.isEmpty()){
+
+        if (strSql.isEmpty()) {
             strSql = "select o from MachineInfo o";
-        }else{
+        } else {
             strSql = "select o from MachineInfo o where " + strSql;
         }
 
-         return (List<MachineInfo>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
-    
-     @Override
-    public List<MachineInfo> searchM(String name){
-    
-         String strSql = "";
-        
-        if(!name.equals("-")){
-            if(strSql.isEmpty()){
-                strSql = "o.machineName ='" + name + "'";
-            }else{
-                strSql = strSql + " and o.machineName = '" + name + "'";
-            }
+
+    @Override
+    public List<MachineInfo> searchM(String name) {
+
+        String strSql = "";
+
+        if (!name.equals("-")) {
+            strSql = "o.machineName ='" + name + "'";
         }
-        if(strSql.isEmpty()){
+        if (strSql.isEmpty()) {
             strSql = "select o from MachineInfo o";
-        }else{
+        } else {
             strSql = "select o from MachineInfo o where " + strSql;
         }
-         return (List<MachineInfo>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
-    
+
 
 }

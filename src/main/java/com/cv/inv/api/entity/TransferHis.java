@@ -4,9 +4,10 @@
  */
 package com.cv.inv.api.entity;
 
-import java.util.Date;
-import javax.persistence.*;
 import org.hibernate.annotations.GenerationTime;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  *

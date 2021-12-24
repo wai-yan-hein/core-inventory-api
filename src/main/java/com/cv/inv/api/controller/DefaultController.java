@@ -5,24 +5,28 @@
  */
 package com.cv.inv.api.controller;
 
-import com.cv.inv.api.common.ReturnObject;
+import com.cv.inv.api.common.RoleDefault;
+import com.cv.inv.api.service.RolePropertyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.cv.inv.api.service.RolePropertyService;
 
 /**
- *
  * @author Lenovo
  */
 @RestController
 @RequestMapping("/default")
 @Slf4j
 public class DefaultController {
-
     @Autowired
-    private ReturnObject ro;
-    @Autowired
-    private RolePropertyService defService;
+    private RolePropertyService propertyService;
+    @GetMapping("/default")
+    public ResponseEntity<RoleDefault> getRoleDefault(@RequestParam String roleCode) {
+        RoleDefault roleDefault = propertyService.getRoleDefault(roleCode);
+        return ResponseEntity.ok(roleDefault);
+    }
 }

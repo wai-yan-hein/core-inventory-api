@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface RetInDao {
 
-    RetInHis save(RetInHis saleHis) throws Exception;
+    RetInHis save(RetInHis saleHis);
 
     List<RetInHis> search(String fromDate, String toDate, String cusCode,
                           String vouNo, String userCode);

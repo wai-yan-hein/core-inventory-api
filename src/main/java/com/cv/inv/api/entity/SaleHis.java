@@ -5,13 +5,13 @@
  */
 package com.cv.inv.api.entity;
 
-import java.util.Date;
-import java.util.List;
-import javax.persistence.*;
 import lombok.Data;
 
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Entity
@@ -85,6 +85,8 @@ public class SaleHis implements java.io.Serializable {
     private Integer macId;
     @Column(name = "comp_code")
     private String compCode;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
     @Transient
     private String status = "STATUS";
     @Transient

@@ -6,26 +6,21 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.DamageHis;
+
 import java.sql.ResultSet;
-
-
 import java.util.List;
 
 /**
- *
  * @author lenovo
  */
- public interface DamageHisDao {
+public interface DamageHisDao {
 
-     DamageHis save(DamageHis ph);
+    DamageHis save(DamageHis ph);
 
-     DamageHis findById(String id);
+    DamageHis findById(String id);
 
-     List<DamageHis> search(String from, String to, String location,
-            String remark, String vouNo);
+    List<DamageHis> search(String from, String to, String location,
+                           String remark, String vouNo);
 
-     ResultSet searchM(String from, String to, String location,
-            String remark, String vouNo) throws Exception;
-
-     int delete(String vouNo);
+    int delete(String vouNo);
 }

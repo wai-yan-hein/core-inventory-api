@@ -6,8 +6,9 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.AppUser;
-import java.util.List;
+
 import javax.naming.AuthenticationException;
+import java.util.List;
 
 /**
  *

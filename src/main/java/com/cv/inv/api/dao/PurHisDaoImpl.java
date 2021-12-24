@@ -6,18 +6,21 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.PurHis;
-
+import com.cv.inv.api.view.VPurchase;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import com.cv.inv.api.view.VPurchase;
-import org.springframework.stereotype.Repository;
 
 /**
  * @author Mg Kyaw Thura Aung
  */
 @Repository
 public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHisDao {
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
 
     @Override
@@ -62,10 +65,10 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
         }
         String strSql = "select o from PurHis o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
         }
 
-        return (List<PurHis>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
@@ -83,7 +86,7 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
     @Override
     public List<VPurchase> search(String vouNo) {
         String hsql = "select o from VPurchase o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
-        return findHSQL(hsql);
+        return sessionFactory.getCurrentSession().createQuery(hsql, VPurchase.class).list();
     }
 
 }

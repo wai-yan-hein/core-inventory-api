@@ -4,14 +4,19 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.*;
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
-import lombok.Data;
+import java.util.Objects;
 
 /**
- *
  * @author Lenovo
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "ret_in_his_detail")
 public class RetInHisDetail implements java.io.Serializable {
@@ -26,6 +31,8 @@ public class RetInHisDetail implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "unit", nullable = false)
     private StockUnit unit;
+    @Column(name = "cost_price")
+    private Float costPrice;
     @Column(name = "price", nullable = false)
     private Float price;
     @Column(name = "amt", nullable = false)
@@ -38,4 +45,16 @@ public class RetInHisDetail implements java.io.Serializable {
     @Column(name = "wt")
     private Float wt;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        RetInHisDetail that = (RetInHisDetail) o;
+        return riKey != null && Objects.equals(riKey, that.riKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(riKey);
+    }
 }

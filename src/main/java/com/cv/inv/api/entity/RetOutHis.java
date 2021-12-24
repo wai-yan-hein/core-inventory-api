@@ -4,16 +4,25 @@
  */
 package com.cv.inv.api.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
-import lombok.Data;
+import java.util.Objects;
 
 /**
  *
  * @author WSwe
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "ret_out_his")
 public class RetOutHis implements java.io.Serializable {
@@ -24,7 +33,7 @@ public class RetOutHis implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "trader_code")
     private Trader trader;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     @Column(name = "vou_date")
     private Date vouDate;
     @ManyToOne
@@ -73,4 +82,17 @@ public class RetOutHis implements java.io.Serializable {
     private List<RetOutHisDetail> listRD;
     @Transient
     private List<String> listDel;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        RetOutHis retOutHis = (RetOutHis) o;
+        return vouNo != null && Objects.equals(vouNo, retOutHis.vouNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

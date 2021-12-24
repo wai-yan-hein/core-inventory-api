@@ -10,20 +10,15 @@ import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.entity.StockInOut;
 import com.cv.inv.api.entity.StockInOutDetail;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import com.cv.inv.api.service.StockInOutDetailService;
+import com.cv.inv.api.service.StockInOutService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.cv.inv.api.service.StockInOutDetailService;
-import com.cv.inv.api.service.StockInOutService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  *

@@ -17,6 +17,8 @@ public interface RetOutService {
 
     RetOutHis save(RetOutHis saleHis) throws Exception;
 
+    RetOutHis update(RetOutHis ro);
+
     List<RetOutHis> search(String fromDate, String toDate, String cusCode,
                            String vouNo, String userCode);
 

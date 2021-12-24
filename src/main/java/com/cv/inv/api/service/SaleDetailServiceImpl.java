@@ -6,15 +6,15 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.dao.SaleHisDao;
+import com.cv.inv.api.dao.SaleHisDetailDao;
 import com.cv.inv.api.entity.SaleDetailKey;
 import com.cv.inv.api.entity.SaleHis;
 import com.cv.inv.api.entity.SaleHisDetail;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.cv.inv.api.dao.SaleHisDetailDao;
+
+import java.util.List;
 
 /**
  *

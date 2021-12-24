@@ -6,11 +6,10 @@ package com.cv.inv.api.common;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonWriter;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -24,11 +23,6 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author WSwe
@@ -38,8 +32,8 @@ public class Util1 {
 
     public static String getEngChar(int i) {
         String[] engChar = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-            "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-            "U", "V", "W", "X", "Y", "Z"};
+                "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                "U", "V", "W", "X", "Y", "Z"};
 
         if ((i + 1) < 0 || (i + 1) > engChar.length) {
             return null;
@@ -47,6 +41,19 @@ public class Util1 {
             return engChar[i + 1];
         }
     }
+
+    public static boolean getBoolean(String obj) {
+        boolean status = false;
+        if (!Util1.isNull(obj)) {
+            status = obj.equals("1") || obj.equalsIgnoreCase("true");
+        }
+        return status;
+
+    }
+    public static boolean isNullOrEmpty(Object obj) {
+        return obj == null || obj.toString().isEmpty();
+    }
+
 
     public static boolean isNumber(String number) {
         boolean status = false;
@@ -506,7 +513,7 @@ public class Util1 {
     }
 
     public static void writeJsonFile(Object data, String exportPath) throws IOException {
-        try ( Writer writer = new FileWriter(exportPath)) {
+        try (Writer writer = new FileWriter(exportPath)) {
             Gson gson = new GsonBuilder().serializeNulls().create();
             gson.toJson(data, writer);
         }

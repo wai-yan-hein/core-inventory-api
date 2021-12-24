@@ -6,11 +6,11 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.Stock;
-import java.util.List;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author Lenovo
  */
 @Repository
@@ -37,11 +37,6 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     public int delete(String id) {
         String hsql = "delete from Stock o where o.stock_code = '" + id + "'";
         return execUpdateOrDelete(hsql);
-    }
-
-    @Override
-    public Object getMax(String sql) {
-        return getAggregate(sql);
     }
 
     @Override
@@ -105,7 +100,7 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     @Override
     public List<Stock> searchM(String updatedDate) {
         String strSql = "select o from Stock o where o.updatedDate > '" + updatedDate + "'";
-        return (List<Stock>) findHSQL(strSql);
+        return findHSQL(strSql);
 
     }
 }

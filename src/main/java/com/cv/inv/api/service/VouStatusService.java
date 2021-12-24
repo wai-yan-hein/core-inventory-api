@@ -6,21 +6,21 @@
 package com.cv.inv.api.service;
 
 import com.cv.inv.api.entity.VouStatus;
+
 import java.util.List;
 
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
- public interface VouStatusService {
+public interface VouStatusService {
 
-     VouStatus save(VouStatus vouStatus);
+    VouStatus save(VouStatus vouStatus);
 
-     List<VouStatus> findAll();
+    List<VouStatus> findAll(String compCode);
 
-     int delete(String id);
+    int delete(String id);
 
-     VouStatus findById(String id);
+    VouStatus findById(String id);
 
-     List<VouStatus> search(String statusDesp);
+    List<VouStatus> search(String description);
 }

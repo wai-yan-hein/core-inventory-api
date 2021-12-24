@@ -5,12 +5,14 @@
  */
 package com.cv.inv.api.service;
 
+import com.cv.inv.api.common.RoleDefault;
 import com.cv.inv.api.entity.RoleProperty;
 import com.cv.inv.api.entity.RolePropertyKey;
+
 import java.util.HashMap;
+import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
 public interface RolePropertyService {
@@ -19,6 +21,9 @@ public interface RolePropertyService {
 
     RoleProperty findByKey(RolePropertyKey key);
 
-    HashMap<String, String> getRoleProperty(String roleCode);
+    List<RoleProperty> getRoleProperty(String roleCode);
+
+    RoleDefault getRoleDefault(String roleCode);
+
 
 }

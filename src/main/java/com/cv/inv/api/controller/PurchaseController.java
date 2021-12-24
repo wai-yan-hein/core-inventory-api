@@ -5,28 +5,23 @@
  */
 package com.cv.inv.api.controller;
 
+import com.cv.inv.api.MessageSender;
 import com.cv.inv.api.common.FilterObject;
 import com.cv.inv.api.common.ReturnObject;
 import com.cv.inv.api.common.Util1;
 import com.cv.inv.api.entity.PurHis;
 import com.cv.inv.api.entity.PurHisDetail;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import com.cv.inv.api.service.PurHisDetailService;
+import com.cv.inv.api.service.PurHisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.cv.inv.api.service.PurHisService;
-import com.cv.inv.api.service.PurHisDetailService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
- *
  * @author Lenovo
  */
 @RestController
@@ -38,12 +33,27 @@ public class PurchaseController {
     private PurHisService phService;
     @Autowired
     private PurHisDetailService pdService;
+    @Autowired
+    private MessageSender messageSender;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-pur")
-    public ResponseEntity<PurHis> savePur(@RequestBody PurHis pur, HttpServletRequest request) throws Exception {
+    public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur, HttpServletRequest request) {
         log.info("/save-pur");
-        pur = phService.save(pur);
+        try {
+            pur = phService.save(pur);
+        } catch (Exception e) {
+            log.error(String.format("savePurchase: %s", e.getMessage()));
+        }
+        //send message to service
+        try {
+            messageSender.sendMessage("PURCHASE", pur.getVouNo());
+        } catch (Exception e) {
+            PurHis ph = phService.findById(pur.getVouNo());
+            ph.setIntgUpdStatus(null);
+            phService.update(ph);
+            log.error(String.format("sendMessage: PURCHASE %s", e.getMessage()));
+        }
         return ResponseEntity.ok(pur);
     }
 

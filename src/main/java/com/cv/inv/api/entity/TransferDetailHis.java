@@ -4,8 +4,9 @@
  */
 package com.cv.inv.api.entity;
 
-import java.util.Date;
 import javax.persistence.*;
+import java.util.Date;
+
 import static javax.persistence.GenerationType.IDENTITY;
 
 /**

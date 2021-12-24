@@ -7,13 +7,14 @@ package com.cv.inv.api.service;
 
 import com.cv.inv.api.dao.VouStatusDao;
 import com.cv.inv.api.entity.VouStatus;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Service
@@ -28,17 +29,17 @@ public class VouStatusServiceImpl implements VouStatusService {
 
     @Override
     public VouStatus save(VouStatus vs) {
-        if (vs.getVouStatusCode() == null || vs.getVouStatusCode().isEmpty()) {
+        if (Objects.isNull(vs.getCode())) {
             Integer macId = vs.getMacId();
             String compCode = vs.getCompCode();
-            vs.setVouStatusCode(getVouStatusCode(macId, "VouStatus", "-", compCode));
+            vs.setCode(getVouStatusCode(macId, compCode));
         }
         return vouDao.save(vs);
     }
 
     @Override
-    public List<VouStatus> findAll() {
-        return vouDao.findAll();
+    public List<VouStatus> findAll(String compCode) {
+        return vouDao.findAll(compCode);
     }
 
     @Override
@@ -52,14 +53,12 @@ public class VouStatusServiceImpl implements VouStatusService {
     }
 
     @Override
-    public List<VouStatus> search(String statusDesp) {
-        return vouDao.search(statusDesp);
+    public List<VouStatus> search(String description) {
+        return vouDao.search(description);
     }
 
-    private String getVouStatusCode(Integer macId, String option, String period, String compCode) {
-
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
-
+    private String getVouStatusCode(Integer macId, String compCode) {
+        int seqNo = seqService.getSequence(macId, "VouStatus", "-", compCode);
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 }

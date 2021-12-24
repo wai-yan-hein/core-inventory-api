@@ -7,9 +7,10 @@ package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.RoleProperty;
 import com.cv.inv.api.entity.RolePropertyKey;
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.List;
-import org.springframework.stereotype.Repository;
 
 /**
  *
@@ -30,14 +31,9 @@ public class RolePropertyDaoImpl extends AbstractDao<RolePropertyKey, RoleProper
     }
 
     @Override
-    public HashMap<String, String> getRoleProperty(String roleCode) {
-        HashMap<String, String> hm = new HashMap<>();
+    public List<RoleProperty> getRoleProperty(String roleCode) {
         String hsql = "select o from RoleProperty o where o.key.roleCode ='" + roleCode + "'";
-        List<RoleProperty> listRP = findHSQL(hsql);
-        if (!listRP.isEmpty()) {
-            listRP.forEach(rp -> hm.put(rp.getKey().getPropKey(), rp.getRoleValue()));
-        }
-        return hm;
+        return findHSQL(hsql);
     }
 
 }

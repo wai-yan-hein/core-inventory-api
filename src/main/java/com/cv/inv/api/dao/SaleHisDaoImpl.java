@@ -7,15 +7,20 @@ package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.SaleHis;
 import com.cv.inv.api.view.VSale;
-import java.util.List;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author Mg Kyaw Thura Aung
  */
 @Repository
 public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements SaleHisDao {
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public SaleHis save(SaleHis sh) {
@@ -25,7 +30,7 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
 
     @Override
     public List<SaleHis> search(String fromDate, String toDate, String cusCode,
-            String vouNo, String userCode) {
+                                String vouNo, String userCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -59,7 +64,7 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
         }
         String strSql = "select o from SaleHis o";
         if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
+            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
         }
 
         return findHSQL(strSql);
@@ -80,6 +85,6 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
     @Override
     public List<VSale> search(String vouNo) {
         String hsql = "select o from VSale o where o.vouNo ='" + vouNo + "' order by o.uniqueId";
-        return findHSQL(hsql);
+        return sessionFactory.getCurrentSession().createQuery(hsql, VSale.class).list();
     }
 }

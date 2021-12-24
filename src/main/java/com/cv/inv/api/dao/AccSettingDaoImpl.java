@@ -6,19 +6,18 @@
 package com.cv.inv.api.dao;
 
 import com.cv.inv.api.entity.AccSetting;
-import java.util.List;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- *
  * @author Lenovo
  */
 @Repository
 public class AccSettingDaoImpl extends AbstractDao<String, AccSetting> implements AccSettingDao {
 
-
     @Override
-    public List findAll() {
+    public List<AccSetting> findAll() {
         String hsql = "select o from AccSetting o";
         return findHSQL(hsql);
     }
