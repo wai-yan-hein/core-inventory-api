@@ -131,17 +131,28 @@ public class ReportController {
                 String traderCode = Util1.isNull(filter.getTraderCode(), "-");
                 String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
                 String vouTypeCode = Util1.isNull(filter.getVouTypeCode(), "-");
+                String smCode = Util1.isNull(filter.getSaleManCode(), "-");
                 String reportName = filter.getReportName();
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location");
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         List<VSale> saleByCustomer = reportService.getSaleByCustomerDetail(fromDate,
-                                toDate, curCode, traderCode, compCode, macId);
+                                toDate, curCode, traderCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(saleByCustomer, exportPath);
                     }
                     case "SaleByCustomerSummary" -> {
                         List<VSale> saleByCustomer = reportService.getSaleByCustomerSummary(fromDate,
                                 toDate, curCode, traderCode, compCode, macId);
+                        Util1.writeJsonFile(saleByCustomer, exportPath);
+                    }
+                    case "SaleBySaleManDetail" -> {
+                        List<VSale> saleByCustomer = reportService.getSaleBySaleManDetail(fromDate,
+                                toDate, curCode, smCode, stockCode, compCode, macId);
+                        Util1.writeJsonFile(saleByCustomer, exportPath);
+                    }
+                    case "SaleBySaleManSummary" -> {
+                        List<VSale> saleByCustomer = reportService.getSaleBySaleManSummary(fromDate,
+                                toDate, curCode, smCode, compCode, macId);
                         Util1.writeJsonFile(saleByCustomer, exportPath);
                     }
                     case "SaleByStockSummary" -> {
@@ -156,7 +167,7 @@ public class ReportController {
                     }
                     case "PurchaseBySupplierDetail" -> {
                         List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierDetail(fromDate,
-                                toDate, curCode, traderCode, compCode, macId);
+                                toDate, curCode, traderCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
                     }
                     case "PurchaseBySupplierSummary" -> {
@@ -197,11 +208,11 @@ public class ReportController {
                         Util1.writeJsonFile(general, exportPath);
                     }
                     case "OpeningByLocation" -> {
-                        List<VOpening> opening = reportService.getOpeningByLocation(macId, compCode);
+                        List<VOpening> opening = reportService.getOpeningByLocation(stockCode, macId, compCode);
                         Util1.writeJsonFile(opening, exportPath);
                     }
                     case "OpeningByGroup" -> {
-                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, macId, compCode);
+                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, macId, compCode);
                         Util1.writeJsonFile(opGroup, exportPath);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {

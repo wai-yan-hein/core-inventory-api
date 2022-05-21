@@ -30,13 +30,19 @@ public interface ReportService {
     List<VPurchase> getPurchaseVoucher(String vouNo) throws Exception;
 
     List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode,
-                                        String traderCode, String compCode, Integer macId) throws Exception;
+                                        String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String curCode,
                                          String traderCode, String compCode, Integer macId) throws Exception;
 
+    List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode,
+                                       String smCode, String stockCode, String compCode, Integer macId) throws Exception;
+
+    List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String curCode,
+                                        String smCode, String compCode, Integer macId) throws Exception;
+
     List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode,
-                                                String traderCode, String compCode, Integer macId) throws Exception;
+                                                String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String curCode,
                                                  String traderCode, String compCode, Integer macId) throws Exception;
@@ -99,9 +105,9 @@ public interface ReportService {
                                    String brandCode, String stockCode, String compCode,
                                    Integer macId) throws Exception;
 
-    List<VOpening> getOpeningByLocation(Integer macId, String compCode) throws Exception;
+    List<VOpening> getOpeningByLocation(String stockCode, Integer macId, String compCode) throws Exception;
 
-    List<VOpening> getOpeningByGroup(String typeCode, Integer macId, String compCode) throws Exception;
+    List<VOpening> getOpeningByGroup(String typeCode, String stockCode, Integer macId, String compCode) throws Exception;
 
     List<VStockIO> getStockIODetailByVoucherType(String vouType, String fromDate, String toDate,
                                                  String typeCode, String catCode,

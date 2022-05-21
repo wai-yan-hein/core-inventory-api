@@ -173,8 +173,72 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) throws Exception {
+        List<VSale> saleList = new ArrayList<>();
+        String sql = "select v.vou_date,v.vou_no,v.saleman_code,sm.saleman_name,v.stock_name,v.qty,v.sale_wt,v.sale_unit,v.sale_price,v.sale_amt\n" +
+                "from v_sale v left join sale_man sm on v.saleman_code = sm.saleman_code\n" +
+                "where v.saleman_code = '" + smCode + "' or '-' = '" + smCode + "'\n" +
+                "and v.deleted = false\n" +
+                "and v.comp_code = '" + compCode + "'\n" +
+                "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and v.cur_code = '" + curCode + "'\n" +
+                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "order by sm.saleman_name,v.vou_date,v.vou_no";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VSale sale = new VSale();
+                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                sale.setVouNo(rs.getString("vou_no"));
+                sale.setSaleManCode(rs.getString("saleman_code"));
+                sale.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
+                sale.setStockName(rs.getString("stock_name"));
+                sale.setQty(rs.getFloat("qty"));
+                sale.setSaleWt(rs.getFloat("sale_wt"));
+                sale.setSaleUnit(rs.getString("sale_unit"));
+                sale.setSalePrice(rs.getFloat("sale_price"));
+                sale.setSaleAmount(rs.getFloat("sale_amt"));
+                saleList.add(sale);
+            }
+        }
+        return saleList;
+    }
+
+    @Override
+    public List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String curCode,
+                                               String smCode, String compCode, Integer macId) throws Exception {
+        List<VSale> saleList = new ArrayList<>();
+        String sql = "select sh.vou_date,sh.vou_no,sh.trader_code,t.trader_name,sh.saleman_code,sm.saleman_name,sh.remark,sh.vou_total\n" +
+                "from sale_his sh join trader t\n" +
+                "on sh.trader_code = t.code\n" +
+                "left join sale_man sm\n" +
+                "on sh.saleman_code = sm.saleman_code\n" +
+                "where sh.saleman_code = '" + smCode + "' or '-' = '" + smCode + "'\n" +
+                "and sh.deleted =false\n" +
+                "and sh.comp_code = '" + compCode + "'\n" +
+                "and sh.cur_code = '" + curCode + "'\n" +
+                "and date(sh.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "order by sm.saleman_name,sh.vou_date";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VSale sale = new VSale();
+                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                sale.setVouNo(rs.getString("vou_no"));
+                sale.setTraderCode(rs.getString("trader_code"));
+                sale.setTraderName(rs.getString("trader_name"));
+                sale.setSaleManCode(rs.getString("saleman_code"));
+                sale.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
+                sale.setSaleAmount(rs.getFloat("vou_total"));
+                saleList.add(sale);
+            }
+        }
+        return saleList;
+    }
+
+    @Override
     public List<VSale> getSaleByCustomerDetail(String fromDate, String toDate,
-                                               String curCode, String traderCode,
+                                               String curCode, String traderCode, String stockCode,
                                                String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
         String sql = "select vou_date,vou_no,trader_code,trader_name,stock_name,qty,sale_wt,sale_unit,sale_price,sale_amt\n" +
@@ -182,6 +246,7 @@ public class ReportServiceImpl implements ReportService {
                 "where trader_code = '" + traderCode + "' or '-' = '" + traderCode + "'\n" +
                 "and deleted = false\n" +
                 "and comp_code = '" + compCode + "'\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and cur_code = '" + curCode + "'\n" +
                 "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "order by trader_name,vou_date,vou_no";
@@ -236,7 +301,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode,
-                                                       String traderCode, String compCode, Integer macId) throws Exception {
+                                                       String traderCode, String stockCode, String compCode, Integer macId) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select vou_date,vou_no,trader_code,trader_name,\n" +
                 "stock_name,qty,avg_wt,pur_unit,pur_price,pur_amt\n" +
@@ -244,6 +309,7 @@ public class ReportServiceImpl implements ReportService {
                 "where (trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" +
                 "and deleted = false\n" +
                 "and comp_code = '" + compCode + "'\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and cur_code = '" + curCode + "'\n" +
                 "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "order by trader_name,vou_no;";
@@ -1080,7 +1146,7 @@ public class ReportServiceImpl implements ReportService {
     public List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-        calculatePrice(toDate, opDate, compCode, macId);
+        calculatePrice(toDate, opDate, compCode, stockCode, macId);
         List<StockValue> values = new ArrayList<>();
         String getSql = "select a.*,\n" +
                 "sum(ifnull(tmp.pur_avg_price,0)) pur_avg_price,bal_qty*sum(ifnull(tmp.pur_avg_price,0)) pur_avg_amt,\n" +
@@ -1134,12 +1200,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOpening> getOpeningByLocation(Integer macId, String compCode) throws Exception {
+    public List<VOpening> getOpeningByLocation(String stockCode, Integer macId, String compCode) throws Exception {
         List<VOpening> openings = new ArrayList<>();
         String sql = "select op_date,vou_no,remark,stock_code,stock_user_code,stock_name,loc_name,\n" +
                 "unit,qty,price,amount\n" +
                 "from v_opening\n" +
                 "where deleted = false\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and loc_code in (select f_code from f_location where mac_id = " + macId + ")\n" +
                 "and comp_code ='" + compCode + "' order by loc_name,stock_user_code\n";
         ResultSet rs = reportDao.executeSql(sql);
@@ -1164,7 +1231,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOpening> getOpeningByGroup(String typeCode, Integer macId, String compCode) throws Exception {
+    public List<VOpening> getOpeningByGroup(String typeCode, String stockCode, Integer macId, String compCode) throws Exception {
         List<VOpening> openings = new ArrayList<>();
         String sql = "select a.*,t.stock_type_name\n" +
                 "from (select op_date,remark,stock_type_code,stock_code,stock_user_code,stock_name,loc_name, \n" +
@@ -1172,6 +1239,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_opening \n" +
                 "where deleted = false \n" +
                 "and comp_code = '" + compCode + "'\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n" +
                 "join stock_type t on a.stock_type_code = t.stock_type_code\n" +
                 "order by t.stock_type_name,a.stock_user_code";
@@ -1849,18 +1917,32 @@ public class ReportServiceImpl implements ReportService {
         executeSql(delSql);
     }
 
-    private void calculatePrice(String toDate, String opDate, String compCode, Integer macId) {
+    private void calculatePrice(String toDate, String opDate, String compCode, String stockCode, Integer macId) {
         try {
             String delSql = "delete from tmp_stock_price where mac_id = " + macId + "";
             String purSql = "insert into tmp_stock_price(tran_option,stock_code,pur_avg_price,mac_id)\n" +
-                    "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price," + macId + "\n" +
+                    "select 'PUR-AVG',stock_code,avg(avg_price)," + macId + "\n" +
+                    "from (\n" +
+                    "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price\n" +
                     "from v_purchase pur\n" +
                     "join v_relation rel\n" +
                     "on pur.rel_code = rel.rel_code\n" +
                     "and pur.pur_unit = rel.unit\n" +
                     "where deleted = 0 and comp_code ='" + compCode + "'\n" +
                     "and date(pur.vou_date) <= '" + toDate + "'\n" +
-                    "group by pur.stock_code";
+                    "group by pur.stock_code\n" +
+                    "\tunion all\n" +
+                    "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price\n" +
+                    "from v_opening op\n" +
+                    "join v_relation rel\n" +
+                    "on op.rel_code = rel.rel_code\n" +
+                    "and op.unit = rel.unit\n" +
+                    "where op.price > 0\n" +
+                    "and op.deleted =0 and op.comp_code ='" + compCode + "'\n" +
+                    "and date(op.op_date) = '" + opDate + "'\n" +
+                    "and (op.stock_code = '-' or '-' = '-')\n" +
+                    "group by op.stock_code)a\n" +
+                    "group by stock_code";
             String sInSql = "insert into tmp_stock_price(tran_option,stock_code,in_avg_price,mac_id)\n" +
                     "select 'SIN-AVG',stock_code,avg(avg_price)," + macId + "\n" +
                     "from(\n" +
@@ -1872,6 +1954,7 @@ public class ReportServiceImpl implements ReportService {
                     "where in_qty is not null and in_unit is not null and cost_price >0\n" +
                     "and deleted = 0 and comp_code ='" + compCode + "'\n" +
                     "and date(sio.vou_date) <= '" + toDate + "'\n" +
+                    "and (sio.stock_code = '-' or '-' = '-')\n" +
                     "group by sio.stock_code\n" +
                     "\tunion all\n" +
                     "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price\n" +
@@ -1882,7 +1965,20 @@ public class ReportServiceImpl implements ReportService {
                     "where op.price > 0\n" +
                     "and op.deleted =0 and op.comp_code ='" + compCode + "'\n" +
                     "and date(op.op_date) = '" + opDate + "'\n" +
-                    "group by op.stock_code)a\n" +
+                    "and (op.stock_code = '-' or '-' = '-')\n" +
+                    "group by op.stock_code\n" +
+                    "\tunion all\n" +
+                    "select 'SOUT-AVG',sio.stock_code,avg(sio.cost_price/rel.smallest_qty) avg_price\n" +
+                    "from v_stock_io sio\n" +
+                    "join v_relation rel\n" +
+                    "on sio.rel_code = rel.rel_code\n" +
+                    "and sio.out_unit = rel.unit\n" +
+                    "where out_qty is not null and out_unit is not null and cost_price >0\n" +
+                    "and deleted = 0 and comp_code ='" + compCode + "'\n" +
+                    "and date(sio.vou_date) <= '" + toDate + "'\n" +
+                    "and (sio.stock_code = '-' or '-' = '-')\n" +
+                    "group by sio.stock_code\n" +
+                    ")a\n" +
                     "group by stock_code";
             String purRecentSql = "insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)\n" +
                     "select stock_code,'PUR_RECENT',avg(pur.pur_price/rel.smallest_qty)," + macId + "\n" +
