@@ -70,7 +70,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     public List<Stock> getStock(String str, String compCode) {
         String hsql = "select o from Stock o where o.key.compCode='" + compCode + "' and o.active =1\n";
         String filter = "and o.userCode like '" + str + "%'";
-        int limit = 6;
+        int limit = 8;
         List<Stock> list = findHSQL(hsql + filter, limit);
         if (list.isEmpty()) {
             filter = "and o.stockName like '" + str + "%'";
