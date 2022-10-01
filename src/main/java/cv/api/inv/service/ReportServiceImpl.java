@@ -336,7 +336,7 @@ public class ReportServiceImpl implements ReportService {
                                                        String traderCode, String stockCode, String compCode, Integer macId) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
-                "v.stock_name,v.qty,avg_wt,v.pur_unit,v.pur_price,v.pur_amt\n" +
+                "v.stock_name,v.qty,v.avg_qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
                 "from v_purchase v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" +
@@ -355,8 +355,9 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderCode(rs.getString("trader_code"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
-                p.setAvgWt(rs.getFloat("avg_wt"));
+                float avgQty =rs.getFloat("avg_qty");
+                float qty = rs.getFloat("qty");
+                p.setQty(avgQty==0?qty:avgQty);
                 p.setPurUnit(rs.getString("pur_unit"));
                 p.setPurPrice(rs.getFloat("pur_price"));
                 p.setPurAmount(rs.getFloat("pur_amt"));
@@ -450,7 +451,7 @@ public class ReportServiceImpl implements ReportService {
                                                     String stockCode, String compCode, Integer macId) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
-                "v.s_user_code,v.stock_name,v.qty,v.avg_wt,v.pur_unit,v.pur_price,v.pur_amt\n" +
+                "v.s_user_code,v.stock_name,v.qty,v.avg_qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
                 "from v_purchase v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.stock_code = '" + stockCode + "' or '-'='" + stockCode + "')\n" +
@@ -472,8 +473,9 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockUserCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
-                p.setAvgWt(rs.getFloat("avg_wt"));
+                float avgQty =rs.getFloat("avg_qty");
+                float qty = rs.getFloat("qty");
+                p.setQty(avgQty==0?qty:avgQty);
                 p.setPurUnit(rs.getString("pur_unit"));
                 p.setPurPrice(rs.getFloat("pur_price"));
                 p.setPurAmount(rs.getFloat("pur_amt"));
@@ -1219,15 +1221,20 @@ public class ReportServiceImpl implements ReportService {
                     float outQty = rs.getFloat("out_qty");
                     float balQty = rs.getFloat("bal_qty");
                     String relCode = rs.getString("rel_code");
+                    b.setOpenQty(opQty);
                     b.setOpenRel(getRelStr(relCode, opQty));
+                    b.setPurQty(purQty);
                     b.setPurRel(getRelStr(relCode, purQty));
+                    b.setInQty(inQty);
                     b.setInRel(getRelStr(relCode, inQty));
+                    b.setSaleQty(saleQty);
                     b.setSaleRel(getRelStr(relCode, saleQty));
+                    b.setOutQty(outQty);
                     b.setOutRel(getRelStr(relCode, outQty));
+                    b.setBalQty(balQty);
                     b.setBalRel(getRelStr(relCode, balQty));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
-                    b.setBalQty(balQty);
                     balances.add(b);
                 }
             }

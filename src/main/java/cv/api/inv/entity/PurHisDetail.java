@@ -30,15 +30,11 @@ public class PurHisDetail implements Serializable {
     private Stock stock;
     @Column(name = "qty", nullable = false)
     private Float qty;
-    @Column(name = "std_wt", nullable = false)
-    private Float stdWeight;
+    @Column(name = "avg_qty",nullable = false)
+    private Float avgQty;
     @ManyToOne
     @JoinColumn(name = "pur_unit", nullable = false)
     private StockUnit purUnit;
-    @Column(name = "avg_wt")
-    private Float avgWeight;
-    @Column(name = "avg_price")
-    private Float avgPrice;
     @Column(name = "pur_price", nullable = false)
     private Float price;
     @Column(name = "pur_amt", nullable = false)
