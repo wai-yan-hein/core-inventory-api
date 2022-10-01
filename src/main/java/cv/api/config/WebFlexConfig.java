@@ -57,4 +57,21 @@ public class WebFlexConfig {
                 .baseUrl(Objects.requireNonNull(environment.getProperty("user.url")))
                 .build();
     }
+
+    @Bean
+    public WebClient reportApi() {
+        String reportUrl = environment.getProperty("report.url");
+        if (!Objects.isNull(reportUrl)) {
+            log.info("report api : " + reportUrl);
+            return WebClient.builder()
+                    .exchangeStrategies(ExchangeStrategies.builder()
+                            .codecs(config -> config
+                                    .defaultCodecs()
+                                    .maxInMemorySize(16 * 1024 * 1024))
+                            .build())
+                    .baseUrl(Objects.requireNonNull(reportUrl))
+                    .build();
+        }
+        return WebClient.builder().build();
+    }
 }

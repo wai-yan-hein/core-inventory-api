@@ -5,6 +5,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.Date;
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Entity
 @Table(name = "order_his")
@@ -27,8 +29,6 @@ public class Order implements Serializable {
     private Date orderDate;
     @Column(name = "description")
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "cus_code")
     private Trader trader;
     @Column(name = "order_status")
     private Boolean isOrder;

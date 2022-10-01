@@ -4,6 +4,8 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,6 +14,7 @@ import javax.persistence.Table;
  *
  * @author Thandar
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name="gender")
 public class Gender implements java.io.Serializable{

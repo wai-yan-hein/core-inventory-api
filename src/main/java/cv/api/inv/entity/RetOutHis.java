@@ -4,6 +4,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.Objects;
  *
  * @author WSwe
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -31,9 +33,12 @@ public class RetOutHis implements java.io.Serializable {
     @Column(name = "vou_no", unique = true, nullable = false, length = 15)
     private String vouNo;
     @ManyToOne
-    @JoinColumn(name = "trader_code")
+    @JoinColumns({
+            @JoinColumn(name = "trader_code", referencedColumnName = "code"),
+            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+    })
     private Trader trader;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
     @ManyToOne
@@ -56,7 +61,7 @@ public class RetOutHis implements java.io.Serializable {
     private Date createdDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "updated_date", nullable = true)
+    @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @Column(name = "remark")
@@ -72,8 +77,6 @@ public class RetOutHis implements java.io.Serializable {
     private String intgUpdStatus;
     @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private String status = "STATUS";
     @Transient

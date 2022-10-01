@@ -34,6 +34,7 @@ public class StockInOutServiceImpl implements StockInOutService {
 
     @Override
     public StockInOut save(StockInOut io) throws Exception {
+        io.setVouDate(Util1.toDateTime(io.getVouDate()));
         if (Util1.isNullOrEmpty(io.getVouNo())) {
             io.setVouNo(getVoucherNo(io.getMacId(), io.getCompCode()));
         }
@@ -59,7 +60,7 @@ public class StockInOutServiceImpl implements StockInOutService {
             for (int i = 0; i < listSD.size(); i++) {
                 StockInOutDetail cSd = listSD.get(i);
                 if (cSd.getStock() != null) {
-                    if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getStock().getKey().getStockCode() != null) {
                         if (cSd.getUniqueId() == null) {
                             if (i == 0) {
                                 cSd.setUniqueId(1);
@@ -70,6 +71,7 @@ public class StockInOutServiceImpl implements StockInOutService {
                         }
                         String sdCode = vouNo + "-" + cSd.getUniqueId();
                         cSd.setIoKey(new StockInOutKey(sdCode, vouNo));
+                        cSd.setCompCode(io.getCompCode());
                         iodDao.save(cSd);
                     }
                 }
@@ -97,7 +99,7 @@ public class StockInOutServiceImpl implements StockInOutService {
     }
 
     private String getVoucherNo(Integer macId, String compCode) {
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "STOCKIO", period, compCode);
         return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }

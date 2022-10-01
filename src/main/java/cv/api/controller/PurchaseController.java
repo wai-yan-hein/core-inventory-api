@@ -43,7 +43,6 @@ public class PurchaseController {
 
     @PostMapping(path = "/save-pur")
     public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur, HttpServletRequest request) {
-        log.info("/save-pur");
         try {
             pur = phService.save(pur);
         } catch (Exception e) {
@@ -63,7 +62,6 @@ public class PurchaseController {
 
     @PostMapping(path = "/get-pur")
     public ResponseEntity<List<VPurchase>> getPur(@RequestBody FilterObject filter) throws Exception {
-        log.info("/get-pur");
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -71,15 +69,16 @@ public class PurchaseController {
         String cusCode = Util1.isNull(filter.getCusCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String ref = Util1.isNull(filter.getReference(),"-");
+        String ref = Util1.isNull(filter.getReference(), "-");
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark,ref, userCode, stockCode, compCode);
+        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref,
+                userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listPur);
     }
 
     @DeleteMapping(path = "/delete-pur")
     public ResponseEntity<ReturnObject> deletePur(@RequestParam String code) throws Exception {
-        log.info("/delete-pur");
         phService.delete(code);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
@@ -87,14 +86,12 @@ public class PurchaseController {
 
     @GetMapping(path = "/find-pur")
     public ResponseEntity<PurHis> findPur(@RequestParam String code) {
-        log.info("/find-pur");
         PurHis sh = phService.findById(code);
         return ResponseEntity.ok(sh);
     }
 
     @GetMapping(path = "/get-pur-detail")
     public ResponseEntity<List<PurHisDetail>> getPurDetail(@RequestParam String vouNo) {
-        log.info("/get-pur-detail");
         List<PurHisDetail> listSD = pdService.search(vouNo);
         return ResponseEntity.ok(listSD);
     }

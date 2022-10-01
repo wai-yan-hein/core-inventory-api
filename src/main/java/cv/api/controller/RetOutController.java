@@ -68,9 +68,11 @@ public class RetOutController {
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String cusCode = Util1.isNull(filter.getCusCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(),"-");
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VReturnOut> listRO=reportService.getReturnOutHistory(fromDate,toDate,cusCode,vouNo,remark,userCode,stockCode,compCode);
+        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo,
+                remark, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listRO);
     }
 
@@ -88,8 +90,8 @@ public class RetOutController {
     }
 
     @GetMapping(path = "/get-retout-detail")
-    public ResponseEntity<List<RetOutHisDetail>> getRODetail(@RequestParam String vouNo) {
-        List<RetOutHisDetail> listSD = rdService.search(vouNo);
+    public ResponseEntity<List<RetOutHisDetail>> getRODetail(@RequestParam String vouNo,@RequestParam String compCode) {
+        List<RetOutHisDetail> listSD = rdService.search(vouNo,compCode);
         return ResponseEntity.ok(listSD);
     }
 }

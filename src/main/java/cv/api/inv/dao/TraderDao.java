@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Trader;
+import cv.api.inv.entity.TraderKey;
 
 import java.util.List;
 
@@ -15,21 +16,22 @@ import java.util.List;
  */
  public interface TraderDao {
 
-     Trader findByCode(String id);
+    Trader findById(TraderKey key);
 
-     List<Trader> searchTrader(String code, String name, String address,
-            String phone, String parentCode, String compCode, String appTraderCode);
+    List<Trader> searchTrader(String str,String type, String compCode);
 
      Trader saveTrader(Trader trader);
 
-     List<Trader> search(String regionCode, String coaCode);
+    List<Trader> search(String regionCode, String coaCode);
 
-     List<Trader> findAll(String compCode);
+    List<Trader> findAll(String compCode);
 
-     int delete(String code);
+    int delete(TraderKey code);
 
-     List<Trader> findCustomer(String compCode);
+    List<Trader> findCustomer(String compCode);
 
-     List<Trader> findSupplier(String compCode);
+    List<Trader> findSupplier(String compCode);
+
+    List<Trader> unUploadTrader();
 
 }

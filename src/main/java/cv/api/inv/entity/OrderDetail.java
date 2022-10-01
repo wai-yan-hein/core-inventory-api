@@ -5,6 +5,8 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +14,7 @@ import java.util.Date;
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "order_his_detail")
 public class OrderDetail implements Serializable {
@@ -20,7 +23,10 @@ public class OrderDetail implements Serializable {
     @Column(name = "order_detail_id", unique = true, nullable = false)
     private String id;
     @ManyToOne
-    @JoinColumn(name = "stock_code")
+    @JoinColumns({
+            @JoinColumn(name = "stock_code"),
+            @JoinColumn(name = "comp_code")
+    })
     private Stock stock;
     @Column(name = "qty")
     private Float qty;

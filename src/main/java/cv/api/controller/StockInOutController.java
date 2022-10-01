@@ -54,8 +54,10 @@ public class StockInOutController {
         String description = Util1.isNull(filter.getDescription(), "-");
         String vouStatus = Util1.isNull(filter.getVouStatus(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, compCode);
+        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark,
+                description, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listStockIO);
     }
 

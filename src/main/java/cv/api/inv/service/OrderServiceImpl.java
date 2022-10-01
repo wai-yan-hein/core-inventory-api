@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
     public Order save(Order order, List<OrderDetail> listOD) {
         int uniqueId = 1;
         for (OrderDetail od : listOD) {
-            if (od.getStock().getStockCode() != null) {
+            if (od.getStock().getKey().getStockCode() != null) {
                 od.setUniqueId(uniqueId);
                 od.setId(order.getOrderCode() + "-" + uniqueId);
                 od.setOrderCode(order.getOrderCode());

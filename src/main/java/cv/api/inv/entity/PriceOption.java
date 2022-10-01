@@ -1,5 +1,6 @@
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -26,6 +27,8 @@ public class PriceOption implements java.io.Serializable {
     private String description;
     @Column(name = "comp_code")
     private String compCode;
+    @Column(name = "unique_id")
+    private Integer uniqueId;
 
     @Override
     public boolean equals(Object o) {

@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.PurHis;
+import cv.api.inv.entity.SaleHis;
 import cv.api.inv.view.VPurchase;
 
 import java.util.List;
@@ -25,5 +26,7 @@ public interface PurHisDao {
     int delete(String vouNo) throws Exception;
 
     List<VPurchase> search(String vouNo);
+    List<PurHis> unUploadVoucher(String syncDate);
+
 
 }

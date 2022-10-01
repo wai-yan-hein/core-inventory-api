@@ -33,7 +33,7 @@ public class HibernateConfiguration {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("cv.api.acc.entity", "cv.api.inv.entity");
+        sessionFactory.setPackagesToScan("cv.api.inv.entity", "cv.api.inv.bkentity");
         sessionFactory.setHibernateProperties(hibernateProperties());
         log.info("sessionFactory");
         return sessionFactory;

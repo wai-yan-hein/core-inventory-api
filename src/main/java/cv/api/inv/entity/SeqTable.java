@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 /**
  *
- * @author winswe
+ * @author wai yan
  */
 @Entity
 @Table(name = "seq_table")

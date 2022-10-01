@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Trader;
+import cv.api.inv.entity.TraderKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,76 +15,31 @@ import java.util.List;
  * @author WSwe
  */
 @Repository
-public class TraderDaoImpl extends AbstractDao<String, Trader> implements TraderDao {
-
+public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements TraderDao {
     @Override
-    public Trader findByCode(String id) {
-        return getByKey(id);
+    public Trader findById(TraderKey key) {
+        return getByKey(key);
     }
 
     @Override
-    public List<Trader> searchTrader(String code, String name, String address,
-                                     String phone, String parentCode, String compCode, String appTraderCode) {
-        String strSql = "select o from Trader o ";
-        String strFilter = "";
-
-        if (!compCode.equals("-")) {
-            strFilter = "o.compCode = '" + compCode + "'";
+    public List<Trader> searchTrader(String str, String type, String compCode) {
+        String hsql = "select o from Trader o where o.key.compCode='" + compCode + "'\n" +
+                "and o.active =1\n";
+        if (!type.equals("-")) {
+            hsql += "and (o.multi =1 or o.type ='" + type + "')\n";
         }
-
-        if (!code.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.code like '" + code + "%'";
-            } else {
-                strFilter = strFilter + " and o.code like '" + code + "%'";
+        String filter = "and o.userCode like '" + str + "%'\n";
+        int limit = 5;
+        List<Trader> list = findHSQL(hsql + filter, limit);
+        if (list.isEmpty()) {
+            filter = "and o.traderName like '" + str + "%'\n";
+            list = findHSQL(hsql + filter, limit);
+            if (list.isEmpty()) {
+                filter = "and o.traderName like '%" + str + "%'\n";
+                list = findHSQL(hsql + filter, limit);
             }
         }
-
-        if (!name.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.traderName like '%" + name + "%'";
-            } else {
-                strFilter = strFilter + " and o.traderName like '%" + name + "%'";
-            }
-        }
-
-        if (!address.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.address like '%" + address + "%'";
-            } else {
-                strFilter = strFilter + " and o.address like '%" + address + "%'";
-            }
-        }
-
-        if (!phone.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.phone like '%" + phone + "%'";
-            } else {
-                strFilter = strFilter + " and o.phone like '%" + phone + "%'";
-            }
-        }
-
-        if (!parentCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.coaParent like '%" + parentCode + "%'";
-            } else {
-                strFilter = strFilter + " and o.coaParent like '%" + parentCode + "%'";
-            }
-        }
-        if (!appTraderCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.appTraderCode ='" + appTraderCode + "'";
-            } else {
-                strFilter = strFilter + " and o.appTraderCode  '" + appTraderCode + "'";
-            }
-        }
-
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter;
-        }
-
-        strSql = strSql + " order by o.traderName";
-        return findHSQL(strSql);
+        return list;
     }
 
     @Override
@@ -106,25 +62,32 @@ public class TraderDaoImpl extends AbstractDao<String, Trader> implements Trader
 
     @Override
     public List<Trader> findAll(String compCode) {
-        String hsql = "select o from Trader o where  o.compCode = '" + compCode + "'";
+        String hsql = "select o from Trader o where  o.key.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
-    public int delete(String code) {
-        String hsql = "delete from Trader o where o.code = '" + code + "'";
-        return execUpdateOrDelete(hsql);
+    public int delete(TraderKey key) {
+        String sql = "delete from trader  where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
+        execSQL(sql);
+        return 1;
     }
 
     @Override
     public List<Trader> findCustomer(String compCode) {
-        String hsql = "select o from Trader o where o.compCode = '" + compCode + "' and o.type = 'CUS' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and o.type = 'CUS' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 
     @Override
     public List<Trader> findSupplier(String compCode) {
-        String hsql = "select o from Trader o where o.compCode = '" + compCode + "' and o.type = 'SUP' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and o.type = 'SUP' or o.multi = true order by o.userCode";
+        return findHSQL(hsql);
+    }
+
+    @Override
+    public List<Trader> unUploadTrader() {
+        String hsql = "select o from Trader o where o.intgUpdStatus is null";
         return findHSQL(hsql);
     }
 }

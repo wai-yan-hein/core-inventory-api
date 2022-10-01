@@ -18,5 +18,6 @@ import java.util.List;
 
     List<SaleHisDetail> search(String vouNo);
 
+
     int delete(String code);
 }

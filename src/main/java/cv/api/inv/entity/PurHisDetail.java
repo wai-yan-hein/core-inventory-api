@@ -5,6 +5,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Entity
 @Table(name = "pur_his_detail")
@@ -21,7 +23,10 @@ public class PurHisDetail implements Serializable {
     @EmbeddedId
     private PurDetailKey pdKey;
     @ManyToOne
-    @JoinColumn(name = "stock_code", nullable = false)
+    @JoinColumns({
+            @JoinColumn(name = "stock_code", referencedColumnName = "stock_code"),
+            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+    })
     private Stock stock;
     @Column(name = "qty", nullable = false)
     private Float qty;
@@ -43,4 +48,6 @@ public class PurHisDetail implements Serializable {
     private Location location;
     @Column(name = "unique_id")
     private Integer uniqueId;
+    @Column(name = "comp_code", insertable = false, updatable = false)
+    private String compCode;
 }

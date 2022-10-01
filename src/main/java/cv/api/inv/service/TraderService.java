@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.Trader;
+import cv.api.inv.entity.TraderKey;
 
 import java.util.List;
 
@@ -15,22 +16,22 @@ import java.util.List;
  */
  public interface TraderService {
 
-     Trader findByCode(String code);
+    Trader findById(TraderKey key);
 
-     List<Trader> searchTrader(String code, String name, String address,
-            String phone, String parentCode, String compCode,
-            String appTraderCode);
+    List<Trader> searchTrader(String str,String type, String compCode);
 
      List<Trader> search(String regionCode, String coaCode);
 
 
-     Trader saveTrader(Trader trader) throws Exception;
+    Trader saveTrader(Trader trader) throws Exception;
 
-     List<Trader> findAll(String compCode);
+    List<Trader> findAll(String compCode);
 
-     List<Trader> findCustomer(String compCode);
+    List<Trader> findCustomer(String compCode);
 
-     List<Trader> findSupplier(String compCode);
+    List<Trader> findSupplier(String compCode);
 
-     int delete(String code);
+    List<String> delete(TraderKey key);
+
+    List<Trader> unUploadTrader();
 }

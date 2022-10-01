@@ -19,6 +19,7 @@ import java.util.Objects;
 /**
  * @author wai yan
  */
+
 @Getter
 @Setter
 @ToString

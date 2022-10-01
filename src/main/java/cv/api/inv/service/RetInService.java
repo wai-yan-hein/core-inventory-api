@@ -27,4 +27,6 @@ public interface RetInService {
     int delete(String vouNo) throws Exception;
 
     List<VReturnIn> search(String vouNo);
+
+    List<RetInHis> unUploadVoucher(String syncDate);
 }

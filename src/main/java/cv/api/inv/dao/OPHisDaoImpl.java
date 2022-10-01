@@ -31,43 +31,4 @@ public class OPHisDaoImpl extends AbstractDao<String, OPHis> implements OPHisDao
         return getByKey(vouNo);
     }
 
-    @Override
-    public List<OPHis> search(String fromDate, String toDate, String vouNo, String userCode, String compCode) {
-        String strFilter = "";
-        if (!fromDate.equals("-") && !toDate.equals("-")) {
-            strFilter = "date(o.vouDate) between '" + fromDate
-                    + "' and '" + toDate + "'";
-        } else if (!fromDate.equals("-")) {
-            strFilter = "date(o.vouDate) >= '" + fromDate + "'";
-        } else if (!toDate.equals("-")) {
-            strFilter = "date(o.vouDate) <= '" + toDate + "'";
-        }
-        if (!vouNo.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.vouNo = '" + vouNo + "'";
-            } else {
-                strFilter = strFilter + " and o.vouNo = '" + vouNo + "'";
-            }
-        }
-        if (!userCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.createdBy = '" + userCode + "'";
-            } else {
-                strFilter = strFilter + " and o.createdBy = '" + userCode + "'";
-            }
-        }
-        if (!compCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.compCode = '" + compCode + "'";
-            } else {
-                strFilter = strFilter + " and o.compCode = '" + compCode + "'";
-            }
-        }
-        String strSql = "select o from OPHis o";
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate desc";
-        }
-        Query<OPHis> query = sessionFactory.getCurrentSession().createQuery(strSql, OPHis.class);
-        return query.list();
-    }
 }

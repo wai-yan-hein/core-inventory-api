@@ -20,20 +20,18 @@ import java.io.Serializable;
 @Entity
 @Table(name = "acc_setting")
 public class AccSetting implements Serializable {
-
     @Id
-    @Column(name = "type", unique = true, nullable = false)
     private String type;
-    @Column(name = "dis_acc")
-    private String disAccount;
-    @Column(name = "pay_acc")
-    private String payAccount;
-    @Column(name = "tax_acc")
-    private String taxAccount;
-    @Column(name = "dep_code")
-    private String department;
     @Column(name = "source_acc")
-    private String sourceAccount;
+    private String sourceAcc;
+    @Column(name = "pay_acc")
+    private String payAcc;
+    @Column(name = "dis_acc")
+    private String discountAcc;
     @Column(name = "bal_acc")
-    private String balAccount;
+    private String balanceAcc;
+    @Column(name = "tax_acc")
+    private String taxAcc;
+    @Column(name = "dep_code")
+    private String deptCode;
 }

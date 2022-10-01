@@ -13,6 +13,7 @@ import cv.api.inv.entity.SaleDetailKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisDetail;
 import cv.api.inv.view.VSale;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * @author wai yan
  */
+@Slf4j
 @Service
 @Transactional
 public class SaleHisServiceImpl implements SaleHisService {
@@ -38,9 +40,10 @@ public class SaleHisServiceImpl implements SaleHisService {
 
     @Override
     public SaleHis save(SaleHis saleHis) throws Exception {
+        saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         String status = saleHis.getStatus();
         if (Util1.isNullOrEmpty(saleHis.getVouNo())) {
-            saleHis.setVouNo(getVoucherNo(saleHis.getMacId(), saleHis.getCompCode()));
+            saleHis.setVouNo(getVoucherNo(saleHis.getMacId(), saleHis.getTrader().getKey().getCompCode()));
         }
         if (saleHis.isDeleted()) {
             shDao.save(saleHis);
@@ -48,6 +51,7 @@ public class SaleHisServiceImpl implements SaleHisService {
             List<SaleHisDetail> listSD = saleHis.getListSH();
             List<String> listDel = saleHis.getListDel();
             String vouNo = saleHis.getVouNo();
+            //backup
             if (status.equals("NEW")) {
                 SaleHis valid = shDao.findById(vouNo);
                 if (valid != null) {
@@ -64,17 +68,20 @@ public class SaleHisServiceImpl implements SaleHisService {
             for (int i = 0; i < listSD.size(); i++) {
                 SaleHisDetail cSd = listSD.get(i);
                 if (cSd.getStock() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            SaleHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+                    if (cSd.getStock().getKey().getStockCode() != null) {
+                        if (cSd.getUniqueId() == null) {
+                            if (i == 0) {
+                                cSd.setUniqueId(1);
+                            } else {
+                                SaleHisDetail pSd = listSD.get(i - 1);
+                                cSd.setUniqueId(pSd.getUniqueId() + 1);
+                            }
                         }
+                        String sdCode = vouNo + "-" + cSd.getUniqueId();
+                        cSd.setSdKey(new SaleDetailKey(vouNo, sdCode));
+                        cSd.setCompCode(saleHis.getTrader().getKey().getCompCode());
+                        sdDao.save(cSd);
                     }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setSdKey(new SaleDetailKey(vouNo, sdCode));
-                    sdDao.save(cSd);
                 }
             }
             shDao.save(saleHis);
@@ -105,13 +112,14 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     private String getVoucherNo(Integer macId, String compCode) {
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "SALE", period, compCode);
         return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
+
     @Override
-    public List<VSale> search(String vouNo) {
-        return shDao.search(vouNo);
+    public List<SaleHis> unUploadVoucher(String syncDate) {
+        return shDao.unUploadVoucher(syncDate);
     }
 }

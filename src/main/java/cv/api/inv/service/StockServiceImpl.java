@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.StockDao;
 import cv.api.inv.entity.Stock;
+import cv.api.inv.entity.StockKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +26,18 @@ public class StockServiceImpl implements StockService {
     private StockDao dao;
     @Autowired
     private SeqTableService seqService;
+    @Autowired
+    private ReportService reportService;
 
     @Override
     public Stock save(Stock stock) throws Exception {
-        if (Util1.isNull(stock.getStockCode())) {
+        if (Util1.isNull(stock.getKey().getStockCode())) {
             Integer macId = stock.getMacId();
-            String compCode = stock.getCompCode();
+            String compCode = stock.getKey().getCompCode();
             String stockCode = getStockCode(macId, compCode);
-            Stock valid = findById(stockCode);
+            Stock valid = findById(new StockKey(stockCode, compCode));
             if (valid == null) {
-                stock.setStockCode(stockCode);
+                stock.getKey().setStockCode(stockCode);
             } else {
                 throw new IllegalStateException("Duplicate Stock Code");
             }
@@ -43,8 +46,8 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public Stock findById(String id) {
-        return dao.findById(id);
+    public Stock findById(StockKey key) {
+        return dao.findById(key);
     }
 
     @Override
@@ -58,8 +61,14 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public int delete(String id) {
-        return dao.delete(id);
+    public List<String> delete(StockKey key) {
+        String stockCode = key.getStockCode();
+        String compCode = key.getCompCode();
+        List<String> str = reportService.isStockExist(stockCode, compCode);
+        if (str.isEmpty()) {
+            dao.delete(stockCode);
+        }
+        return str;
     }
 
     private String getStockCode(Integer macId, String compCode) {
@@ -68,22 +77,14 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> search(String stockType) {
-        return dao.search(stockType);
+    public List<Stock> search(String stockCode, String stockType, String cat, String brand) {
+        return dao.search(stockCode, stockType, cat, brand);
     }
 
-    @Override
-    public List<Stock> searchC(String stockCat) {
-        return dao.searchC(stockCat);
-    }
 
     @Override
-    public List<Stock> searchB(String stockBrand) {
-        return dao.searchB(stockBrand);
+    public List<Stock> getStock(String str, String compCode) {
+        return dao.getStock(str, compCode);
     }
 
-    @Override
-    public List<Stock> searchM(String updatedDate) {
-        return dao.searchM(updatedDate);
-    }
 }

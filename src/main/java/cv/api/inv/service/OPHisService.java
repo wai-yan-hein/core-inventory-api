@@ -7,7 +7,7 @@ import java.util.List;
 public interface OPHisService {
     OPHis save(OPHis op);
 
+    OPHis findByCode(String vouNo);
+
     List<OPHis> search(String compCode);
-    
-    List<OPHis> search(String fromDate, String toDate, String vouNo, String userCode, String compCode);
 }

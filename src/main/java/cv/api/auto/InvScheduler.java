@@ -4,7 +4,6 @@ import cv.api.common.Util1;
 import cv.api.inv.entity.ReorderLevel;
 import cv.api.inv.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,6 @@ import javax.jms.MapMessage;
 import javax.jms.Session;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -42,24 +40,12 @@ public class InvScheduler {
             String type = "REORDER";
             try {
                 reportService.generateReorder(compCode);
-                List<ReorderLevel> reorderLevel = reportService.getReorderLevel(compCode);
-                List<ReorderLevel> filter = new ArrayList<>();
-                for (ReorderLevel ol : reorderLevel) {
-                    float minQty = ol.getMinQty();
-                    float balQty = ol.getBalQty();
-                    float orderQty = minQty - balQty;
-                    if (orderQty > 0) {
-                        ol.setOrderQty(orderQty);
-                        ol.setOrderUnit(ol.getBalUnit());
-                        filter.add(ol);
-                    }
-                }
+                List<ReorderLevel> filter = reportService.getReorderLevel("-", "-", "-", "-", compCode, 0);
                 if (!filter.isEmpty()) {
                     Util1.writeJsonFile(filter, exportPath);
-                    byte[] file = IOUtils.toByteArray(new FileInputStream(exportPath));
+                    byte[] file = new FileInputStream(exportPath).readAllBytes();
                     sendMessage(type, file);
                 }
-
             } catch (Exception e) {
                 log.error(String.format("notificationScheduler: %s", e.getMessage()));
             }

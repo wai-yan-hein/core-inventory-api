@@ -1,28 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cv.api.inv.service;
 
-import cv.api.inv.entity.TransferDetailHis;
 import cv.api.inv.entity.TransferHis;
+import cv.api.inv.entity.TransferHisKey;
 
-import java.util.List;
+public interface TransferHisService {
+    TransferHis save(TransferHis th);
 
-/**
- * @author wai yan
- */
- public interface TransferHisService {
-
-     TransferHis save(TransferHis sdh);
-
-     List<TransferHis> search(String from, String to, String location,
-            String remark, String vouNo);
-
-     void save(TransferHis sdh, List<TransferDetailHis> listTransferDetail, String vouStatus, List<String> delList);
-
-     TransferHis findById(String id);
-
-     int delete(String vouNo);
+    TransferHis findById(TransferHisKey key);
 }

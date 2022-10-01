@@ -1,11 +1,13 @@
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -16,7 +18,10 @@ public class OPHisDetail implements java.io.Serializable {
     @Column(name = "op_code")
     private String opCode;
     @ManyToOne
-    @JoinColumn(name = "stock_code")
+    @JoinColumns({
+            @JoinColumn(name = "stock_code", referencedColumnName = "stock_code"),
+            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+    })
     private Stock stock;
     @Column(name = "qty")
     private Float qty;
@@ -36,4 +41,6 @@ public class OPHisDetail implements java.io.Serializable {
     private String vouNo;
     @Column(name = "unique_id")
     private Integer uniqueId;
+    @Column(name = "comp_code", insertable = false, updatable = false)
+    private String compCode;
 }

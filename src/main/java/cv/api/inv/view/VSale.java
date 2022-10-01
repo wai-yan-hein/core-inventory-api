@@ -5,11 +5,13 @@
  */
 package cv.api.inv.view;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class VSale {
 
@@ -65,4 +67,6 @@ public class VSale {
     private String regionName;
     private String stockTypeName;
     private String refNo;
+    private float lastBalance;
+    private String compCode;
 }

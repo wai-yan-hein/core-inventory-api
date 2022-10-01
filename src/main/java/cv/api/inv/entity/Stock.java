@@ -10,11 +10,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @author wai yan
@@ -28,9 +26,8 @@ import java.util.Objects;
 @Table(name = "stock")
 public class Stock implements java.io.Serializable {
 
-    @Id
-    @Column(name = "stock_code", unique = true, nullable = false, length = 15)
-    private String stockCode;
+    @EmbeddedId
+    private StockKey key;
     @Column(name = "active")
     private boolean active;
     @ManyToOne
@@ -89,8 +86,6 @@ public class Stock implements java.io.Serializable {
     private Date createdDate;
     @Column(name = "mig_code")
     private String migCode;
-    @Column(name = "comp_code")
-    private String compCode;
     @Column(name = "user_code")
     private String userCode;
     @ManyToOne
@@ -98,21 +93,11 @@ public class Stock implements java.io.Serializable {
     private UnitRelation unitRelation;
     @Column(name = "mac_id")
     private Integer macId;
+    @Column(name = "calculate")
+    private boolean calculate;
 
-    public Stock(String stockCode) {
-        this.stockCode = stockCode;
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Stock stock = (Stock) o;
-        return stockCode != null && Objects.equals(stockCode, stock.stockCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public Stock(StockKey key) {
+        this.key = key;
     }
 }

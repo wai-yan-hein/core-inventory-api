@@ -6,9 +6,8 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class VOpening {
-
     private String vouNo;
-    private String opDate;
+    private String vouDate;
     private String remark;
     private String locationName;
     private String stockCode;
@@ -19,4 +18,6 @@ public class VOpening {
     private Float price;
     private Float amount;
     private String stockTypeName;
+    private String createdBy;
+    private boolean deleted;
 }

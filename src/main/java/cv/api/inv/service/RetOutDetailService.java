@@ -16,9 +16,8 @@ import java.util.List;
 
      RetOutHisDetail save(RetOutHisDetail pd);
 
-     List<RetOutHisDetail> search(String glCode);
+     List<RetOutHisDetail> search(String vouNo, String compCode);
 
      int delete(String id) throws Exception;
 
-    //   void save(PurHis gl, List<PurchaseDetail> pd,List<String> delList);
 }

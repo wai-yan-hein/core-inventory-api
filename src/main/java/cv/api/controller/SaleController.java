@@ -11,16 +11,17 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisDetail;
+import cv.api.inv.service.BackupService;
 import cv.api.inv.service.ReportService;
 import cv.api.inv.service.SaleDetailService;
 import cv.api.inv.service.SaleHisService;
 import cv.api.inv.view.VSale;
+import cv.api.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -38,19 +39,20 @@ public class SaleController {
     @Autowired
     private ReportService reportService;
     @Autowired
+    private BackupService backupService;
+    @Autowired
     private MessageSender messageSender;
     private final ReturnObject ro = new ReturnObject();
+    @Autowired
+    private AccountRepo accountRepo;
 
     @PostMapping(path = "/save-sale")
-    public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale, HttpServletRequest request) {
-        log.info("/save-sale");
-        try {
-            if (isValidSale(sale, ro)) {
-                sale = shService.save(sale);
-            }
-        } catch (Exception e) {
-            log.error(String.format("saveSale %s", e.getMessage()));
+    public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale) throws Exception {
+        if (isValidSale(sale, ro)) {
+            backupService.backup(sale);
+            sale = shService.save(sale);
         }
+
         //send message to service
         try {
             messageSender.sendMessage("SALE", sale.getVouNo());
@@ -60,6 +62,7 @@ public class SaleController {
             shService.update(sh);
             log.error(String.format("sendMessage: SALE %s", e.getMessage()));
         }
+        accountRepo.sendSale(sale);
         return ResponseEntity.ok(sale);
     }
 
@@ -81,9 +84,6 @@ public class SaleController {
         } else if (Util1.isNullOrEmpty(sale.getLocation())) {
             status = false;
             ro.setMessage("Invalid Location.");
-        } else if (Util1.isNullOrEmpty(sale.getCompCode())) {
-            status = false;
-            ro.setMessage("Invalid Company Id.");
         } else if (Util1.isNullOrEmpty(sale.getCreatedBy())) {
             status = false;
             ro.setMessage("Invalid Created User.");
@@ -109,13 +109,14 @@ public class SaleController {
         String saleManCode = Util1.isNull(filter.getSaleManCode(), "-");
         String reference = Util1.isNull(filter.getReference(), "-");
         String compCode = filter.getCompCode();
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,reference, userCode, stockCode, compCode);
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
+        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode,
+                saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(saleList);
     }
 
     @DeleteMapping(path = "/delete-sale")
     public ResponseEntity<ReturnObject> deleteSale(@RequestParam String code) throws Exception {
-        log.info("/delete-sale");
         shService.delete(code);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
@@ -123,14 +124,12 @@ public class SaleController {
 
     @GetMapping(path = "/find-sale")
     public ResponseEntity<SaleHis> findSale(@RequestParam String code) {
-        log.info("/find-sale");
         SaleHis sh = shService.findById(code);
         return ResponseEntity.ok(sh);
     }
 
     @GetMapping(path = "/get-sale-detail")
     public ResponseEntity<List<SaleHisDetail>> getSaleDetail(@RequestParam String vouNo) {
-        log.info("/get-sale-detail");
         List<SaleHisDetail> listSD = sdService.search(vouNo);
         return ResponseEntity.ok(listSD);
     }

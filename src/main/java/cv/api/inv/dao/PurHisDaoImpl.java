@@ -96,4 +96,10 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
         return sessionFactory.getCurrentSession().createQuery(hsql, VPurchase.class).list();
     }
 
+    @Override
+    public List<PurHis> unUploadVoucher(String syncDate) {
+        String hsql = "select o from PurHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
+        return findHSQL(hsql);
+    }
+
 }

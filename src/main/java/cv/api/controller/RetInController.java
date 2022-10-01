@@ -68,9 +68,10 @@ public class RetInController {
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String cusCode = Util1.isNull(filter.getCusCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(),"-");
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VReturnIn> listRI =reportService.getReturnInHistory(fromDate,toDate,cusCode,vouNo,remark,userCode,stockCode,compCode);
+        List<VReturnIn> listRI =reportService.getReturnInHistory(fromDate,toDate,cusCode,vouNo,remark,userCode,stockCode,locCode,compCode);
         return ResponseEntity.ok(listRI);
     }
 

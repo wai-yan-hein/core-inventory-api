@@ -14,7 +14,6 @@ import cv.api.inv.service.RetOutService;
 import cv.api.inv.view.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -62,12 +61,11 @@ public class ReportController {
     )
     public @ResponseBody
     byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
-        log.info("getSaleReport is called.");
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VSale> listVSale = reportService.getSaleVoucher(vouNo);
         Util1.writeJsonFile(listVSale, exportPath);
-        return IOUtils.toByteArray(new FileInputStream(exportPath));
+        return new FileInputStream(exportPath).readAllBytes();
     }
 
     @GetMapping(
@@ -80,34 +78,37 @@ public class ReportController {
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo);
         Util1.writeJsonFile(listPur, exportPath);
-        return IOUtils.toByteArray(new FileInputStream(exportPath));
+        return new FileInputStream(exportPath).readAllBytes();
     }
 
     @GetMapping(
-            value = "/get-returnIn-report",
+            value = "/get-return-in-report",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    byte[] getReturnInReport(@RequestParam String vouNo,
+                             @RequestParam String compCode,
+                             @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnInVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VReturnIn> listRI = retInService.search(vouNo);
+        List<VReturnIn> listRI = reportService.getReturnInVoucher(vouNo, compCode);
         Util1.writeJsonFile(listRI, exportPath);
-        return IOUtils.toByteArray(new FileInputStream(exportPath));
+        return new FileInputStream(exportPath).readAllBytes();
     }
 
     @GetMapping(
-            value = "/get-returnOut-report",
+            value = "/get-return-out-report",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
-        log.info("getReturnOutReport is called.");
+    byte[] getReturnOutReport(@RequestParam String vouNo,
+                              @RequestParam String compCode,
+                              @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnOutVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VReturnOut> listRO = retOutService.search(vouNo);
+        List<VReturnOut> listRO = reportService.getReturnOutVoucher(vouNo,compCode);
         Util1.writeJsonFile(listRO, exportPath);
-        return IOUtils.toByteArray(new FileInputStream(exportPath));
+        return new FileInputStream(exportPath).readAllBytes();
     }
 
     @PostMapping(
@@ -132,7 +133,10 @@ public class ReportController {
                 String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
                 String vouTypeCode = Util1.isNull(filter.getVouTypeCode(), "-");
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
+                String locCode = Util1.isNull(filter.getLocCode(), "-");
+                String regCode = Util1.isNull(filter.getRegCode(), "-");
                 String reportName = filter.getReportName();
+
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location");
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
@@ -157,12 +161,12 @@ public class ReportController {
                     }
                     case "SaleByStockSummary" -> {
                         List<VSale> saleByStock = reportService.getSaleByStockSummary(fromDate,
-                                toDate, curCode, stockCode, compCode, macId);
+                                toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);
                     }
                     case "SaleByStockDetail" -> {
                         List<VSale> saleByStock = reportService.getSaleByStockDetail(fromDate,
-                                toDate, curCode, stockCode, compCode, macId);
+                                toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);
                     }
                     case "PurchaseBySupplierDetail" -> {
@@ -177,7 +181,7 @@ public class ReportController {
                     }
                     case "PurchaseByStockSummary", "PurchaseByStockDetail" -> {
                         List<VPurchase> purchaseByStock = reportService.getPurchaseByStockDetail(fromDate,
-                                toDate, curCode, stockCode, compCode, macId);
+                                toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(purchaseByStock, exportPath);
                     }
 
@@ -204,15 +208,15 @@ public class ReportController {
                         Util1.writeJsonFile(sale, exportPath);
                     }
                     case "TopSaleByStock" -> {
-                        List<General> general = reportService.getTopSaleByStock(fromDate, toDate, typeCode, compCode);
+                        List<General> general = reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode);
                         Util1.writeJsonFile(general, exportPath);
                     }
                     case "OpeningByLocation" -> {
-                        List<VOpening> opening = reportService.getOpeningByLocation(stockCode, macId, compCode);
+                        List<VOpening> opening = reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode);
                         Util1.writeJsonFile(opening, exportPath);
                     }
                     case "OpeningByGroup" -> {
-                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, macId, compCode);
+                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode);
                         Util1.writeJsonFile(opGroup, exportPath);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
@@ -241,9 +245,19 @@ public class ReportController {
                                 typeCode, catCode, brandCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
+                    case "SalePriceCalender" -> {
+                        List<VSale> values = reportService.getSalePriceCalender(fromDate, toDate,
+                                typeCode, catCode, brandCode, stockCode, compCode, macId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "PurchasePriceCalender" -> {
+                        List<VPurchase> values = reportService.getPurchasePriceCalender(fromDate, toDate,
+                                typeCode, catCode, brandCode, stockCode, compCode, macId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
                     default -> ro.setMessage("Report Not Exists.");
                 }
-                byte[] bytes = IOUtils.toByteArray(new FileInputStream(exportPath));
+                byte[] bytes = new FileInputStream(exportPath).readAllBytes();
                 ro.setFile(bytes);
             }
         } catch (Exception e) {
@@ -318,27 +332,35 @@ public class ReportController {
 
     @GetMapping(path = "/get-stock-balance")
     public ResponseEntity<List<VStockBalance>> getStockBalance(@RequestParam String stockCode,
-                                                               @RequestParam Boolean relation,
+                                                               @RequestParam String compCode,
                                                                @RequestParam Integer macId) {
         List<VStockBalance> balances = new ArrayList<>();
         try {
-            balances = reportService.getStockBalance(stockCode, relation, macId);
+            balances = reportService.getStockBalance("-", "-", "-", stockCode, compCode, macId);
         } catch (Exception e) {
             log.error(String.format("getStockBalance: %s", e.getMessage()));
         }
         return ResponseEntity.ok(balances);
     }
 
-    @GetMapping(path = "/get-reorder-level")
-    public ResponseEntity<ReturnObject> getReorderLevel(@RequestParam String compCode) {
-        try {
-            reportService.generateReorder(compCode);
-            List<ReorderLevel> reorderLevels = reportService.getReorderLevel(compCode);
-            ro.setData(reorderLevels);
-        } catch (Exception e) {
-            ro.setErrorMessage(e.getMessage());
-            log.error(String.format("getReorderLevel: %s", e.getMessage()));
-        }
-        return ResponseEntity.ok(ro);
+    @PostMapping(path = "/get-reorder-level")
+    public ResponseEntity<List<ReorderLevel>> getReorderLevel(@RequestBody ReportFilter filter) throws Exception {
+        String compCode = filter.getCompCode();
+        String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
+        String catCode = Util1.isNull(filter.getCatCode(), "-");
+        String brandCode = Util1.isNull(filter.getBrandCode(), "-");
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        Integer macId = filter.getMacId();
+        reportService.generateReorder(compCode);
+        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, compCode, macId);
+        return ResponseEntity.ok(reorderLevels);
     }
+
+    @GetMapping(path = "/get-smallest_qty")
+    public ResponseEntity<Float> getSaleRecentPrice(@RequestParam String stockCode,
+                                                    @RequestParam String unit) {
+        return ResponseEntity.ok(reportService.getSmallestQty(stockCode, unit));
+    }
+
+
 }

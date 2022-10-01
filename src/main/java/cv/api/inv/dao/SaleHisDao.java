@@ -6,7 +6,6 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.SaleHis;
-import cv.api.inv.view.VSale;
 
 import java.util.List;
 
@@ -24,5 +23,6 @@ public interface SaleHisDao {
 
     int delete(String vouNo) throws Exception;
 
-    List<VSale> search(String vouNo);
+    List<SaleHis> unUploadVoucher(String syncDate);
+
 }

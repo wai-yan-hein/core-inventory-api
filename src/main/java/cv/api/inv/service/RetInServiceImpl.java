@@ -36,8 +36,9 @@ public class RetInServiceImpl implements RetInService {
 
     @Override
     public RetInHis save(RetInHis rin) throws Exception {
+        rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
         if (Util1.isNullOrEmpty(rin.getVouNo())) {
-            rin.setVouNo(getVoucherNo(rin.getMacId(), rin.getCompCode()));
+            rin.setVouNo(getVoucherNo(rin.getMacId(), rin.getTrader().getKey().getCompCode()));
         }
         if (Util1.getBoolean(rin.getDeleted())) {
             rDao.save(rin);
@@ -64,7 +65,7 @@ public class RetInServiceImpl implements RetInService {
             for (int i = 0; i < listSD.size(); i++) {
                 RetInHisDetail cSd = listSD.get(i);
                 if (cSd.getStock() != null) {
-                    if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getStock().getKey().getStockCode() != null) {
                         if (cSd.getUniqueId() == null) {
                             if (i == 0) {
                                 cSd.setUniqueId(1);
@@ -75,6 +76,7 @@ public class RetInServiceImpl implements RetInService {
                         }
                         String sdCode = vouNo + "-" + cSd.getUniqueId();
                         cSd.setRiKey(new RetInKey(sdCode, vouNo));
+                        cSd.setCompCode(rin.getTrader().getKey().getCompCode());
                         sdDao.save(cSd);
                     }
                 }
@@ -86,7 +88,7 @@ public class RetInServiceImpl implements RetInService {
     }
 
     private String getVoucherNo(Integer macId, String compCode) {
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "RETURN_IN", period, compCode);
         return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
@@ -115,6 +117,11 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public List<VReturnIn> search(String vouNo) {
         return rDao.search(vouNo);
+    }
+
+    @Override
+    public List<RetInHis> unUploadVoucher(String syncDate) {
+        return rDao.unUploadVoucher(syncDate);
     }
 
 

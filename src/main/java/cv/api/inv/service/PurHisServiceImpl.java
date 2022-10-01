@@ -37,8 +37,9 @@ public class PurHisServiceImpl implements PurHisService {
 
     @Override
     public PurHis save(PurHis ph) throws Exception {
+        ph.setVouDate(Util1.toDateTime(ph.getVouDate()));
         if (Util1.isNullOrEmpty(ph.getVouNo())) {
-            ph.setVouNo(getVoucherNo(ph.getMacId(), ph.getCompCode()));
+            ph.setVouNo(getVoucherNo(ph.getMacId(), ph.getTrader().getKey().getCompCode()));
         }
         if (Util1.getBoolean(ph.getDeleted())) {
             phDao.save(ph);
@@ -66,7 +67,7 @@ public class PurHisServiceImpl implements PurHisService {
             for (int i = 0; i < listSD.size(); i++) {
                 PurHisDetail cSd = listSD.get(i);
                 if (cSd.getStock() != null) {
-                    if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getStock().getKey().getStockCode() != null) {
                         if (cSd.getUniqueId() == null) {
                             if (i == 0) {
                                 cSd.setUniqueId(1);
@@ -77,6 +78,7 @@ public class PurHisServiceImpl implements PurHisService {
                         }
                         String sdCode = vouNo + "-" + cSd.getUniqueId();
                         cSd.setPdKey(new PurDetailKey(vouNo, sdCode));
+                        cSd.setCompCode(ph.getTrader().getKey().getCompCode());
                         pdDao.save(cSd);
                     }
                 }
@@ -113,8 +115,13 @@ public class PurHisServiceImpl implements PurHisService {
         return phDao.search(vouNo);
     }
 
+    @Override
+    public List<PurHis> unUploadVoucher(String syncDate) {
+        return phDao.unUploadVoucher(syncDate);
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "PURCHASE", period, compCode);
         return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }

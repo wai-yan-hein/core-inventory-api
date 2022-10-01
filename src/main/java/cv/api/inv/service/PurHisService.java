@@ -28,4 +28,6 @@ public interface PurHisService {
     int delete(String vouNo) throws Exception;
 
     List<VPurchase> search(String vouNo);
+
+    List<PurHis> unUploadVoucher(String syncDate);
 }

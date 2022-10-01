@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Stock;
+import cv.api.inv.entity.StockKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao {
+public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockDao {
 
     @Override
     public Stock save(Stock stock) {
@@ -23,84 +24,62 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     }
 
     @Override
-    public Stock findById(String id) {
-        return getByKey(id);
+    public Stock findById(StockKey key) {
+        return getByKey(key);
     }
 
     @Override
     public List<Stock> findAll(String compCode) {
-        String hsql = "select o from Stock o where o.compCode = '" + compCode + "'";
+        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from Stock o where o.stock_code = '" + id + "'";
-        return execUpdateOrDelete(hsql);
+        String sql = "delete from stock where stock_code = '" + id + "'";
+        execSQL(sql);
+        return 1;
     }
 
     @Override
     public List<Stock> findActiveStock(String compCode) {
-        String hsql = "select o from Stock o where o.active is true and o.compCode = '" + compCode + "'";
+        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "'";
         return findHSQL(hsql);
 
     }
 
     @Override
-    public List<Stock> search(String saleInvId) {
-        String strFilter = "";
-        if (!saleInvId.equals("-")) {
-            strFilter = "v.stockType = '" + saleInvId + "'";
+    public List<Stock> search(String stockCode, String stockType, String cat, String brand) {
+        String hsql = "select o from Stock o where o.active = 1";
+        if (!stockCode.equals("-")) {
+            hsql += " and o.key.stockCode ='" + stockCode + "'\n";
         }
-        String strSql = "select v from Stock v";
-
-        List<Stock> listDH = null;
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter;
-            listDH = findHSQL(strSql);
+        if (!stockType.equals("-")) {
+            hsql += " and o.stockType.stockTypeCode ='" + stockType + "'\n";
         }
-
-        return listDH;
+        if (!cat.equals("-")) {
+            hsql += " and o.category.catCode ='" + cat + "'\n";
+        }
+        if (!brand.equals("-")) {
+            hsql += " and o.brand.brandCode ='" + brand + "'\n";
+        }
+        return findHSQL(hsql);
     }
 
     @Override
-    public List<Stock> searchC(String saleInvId) {
-        String strFilter = "";
-        if (!saleInvId.equals("-")) {
-            strFilter = "v.category = '" + saleInvId + "'";
+    public List<Stock> getStock(String str, String compCode) {
+        String hsql = "select o from Stock o where o.key.compCode='" + compCode + "' and o.active =1\n";
+        String filter = "and o.userCode like '" + str + "%'";
+        int limit = 6;
+        List<Stock> list = findHSQL(hsql + filter, limit);
+        if (list.isEmpty()) {
+            filter = "and o.stockName like '" + str + "%'";
+            list = findHSQL(hsql + filter, limit);
+            if (list.isEmpty()) {
+                filter = "and o.stockName like '%" + str + "%'";
+                list = findHSQL(hsql + filter, limit);
+            }
         }
-        String strSql = "select v from Stock v";
-
-        List<Stock> listDH = null;
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter;
-            listDH = findHSQL(strSql);
-        }
-
-        return listDH;
-    }
-
-    @Override
-    public List<Stock> searchB(String saleInvId) {
-        String strFilter = "";
-        if (!saleInvId.equals("-")) {
-            strFilter = "v.brand = '" + saleInvId + "'";
-        }
-        String strSql = "select v from Stock v";
-
-        List<Stock> listDH = null;
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter;
-            listDH = findHSQL(strSql);
-        }
-
-        return listDH;
-    }
-
-    @Override
-    public List<Stock> searchM(String updatedDate) {
-        String strSql = "select o from Stock o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(strSql);
-
+        return list;
     }
 }

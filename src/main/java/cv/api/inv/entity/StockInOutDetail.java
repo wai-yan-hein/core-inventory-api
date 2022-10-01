@@ -5,6 +5,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.Objects;
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -29,7 +31,10 @@ public class StockInOutDetail implements Serializable {
     @EmbeddedId
     private StockInOutKey ioKey;
     @ManyToOne
-    @JoinColumn(name = "stock_code")
+    @JoinColumns({
+            @JoinColumn(name = "stock_code",referencedColumnName = "stock_code"),
+            @JoinColumn(name = "comp_code",referencedColumnName = "comp_code")
+    })
     private Stock stock;
     @ManyToOne
     @JoinColumn(name = "loc_code")
@@ -52,17 +57,6 @@ public class StockInOutDetail implements Serializable {
     private Integer uniqueId;
     @Column(name = "cost_price")
     private Float costPrice;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        StockInOutDetail that = (StockInOutDetail) o;
-        return ioKey != null && Objects.equals(ioKey, that.ioKey);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(ioKey);
-    }
+    @Column(name = "comp_code", insertable = false, updatable = false)
+    private String compCode;
 }

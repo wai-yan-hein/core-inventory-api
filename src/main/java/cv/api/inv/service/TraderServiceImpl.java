@@ -5,11 +5,10 @@
  */
 package cv.api.inv.service;
 
-import cv.api.MessageSender;
 import cv.api.common.Util1;
 import cv.api.inv.dao.TraderDao;
-import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.Trader;
+import cv.api.inv.entity.TraderKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,30 +28,29 @@ public class TraderServiceImpl implements TraderService {
     private TraderDao dao;
     @Autowired
     private SeqTableService seqService;
+    @Autowired
+    private ReportService reportService;
 
 
     @Override
-    public Trader findByCode(String id) {
-        return dao.findByCode(id);
+    public Trader findById(TraderKey key) {
+        return dao.findById(key);
     }
 
     @Override
-    public List<Trader> searchTrader(String code, String name, String address,
-                                     String phone, String parentCode, String compCode, String appTraderCode) {
-        return dao.searchTrader(code, name, address, phone,
-                parentCode, compCode, appTraderCode);
+    public List<Trader> searchTrader(String str,String type, String compCode) {
+        return dao.searchTrader(str,type, compCode);
     }
 
     @Override
     public Trader saveTrader(Trader td) {
-        if (Util1.isNull(td.getCode())) {
-            Integer macId = td.getMacId();
-            String compCode = td.getCompCode();
+        if (Util1.isNull(td.getKey().getCode())) {
+            String compCode = td.getKey().getCompCode();
             String type = td.getType();
-            String code = getTraderCode(macId, type, compCode);
-            Trader valid = findByCode(code);
+            String code = getTraderCode(type, compCode);
+            Trader valid = findById(td.getKey());
             if (valid == null) {
-                td.setCode(code);
+                td.getKey().setCode(code);
             } else {
                 throw new IllegalStateException("Duplicate Trader Code");
             }
@@ -60,9 +58,9 @@ public class TraderServiceImpl implements TraderService {
         return dao.saveTrader(td);
     }
 
-    private String getTraderCode(Integer macId, String option, String compCode) {
-        int seqNo = seqService.getSequence(macId, option, "-", compCode);
-        return option.toUpperCase() + String.format("%0" + 5 + "d", seqNo) + "-" + String.format("%0" + 3 + "d", macId);
+    private String getTraderCode(String option, String compCode) {
+        int seqNo = seqService.getSequence(0, option, "-", compCode);
+        return option.toUpperCase() + String.format("%0" + 6 + "d", seqNo);
     }
 
     @Override
@@ -76,8 +74,17 @@ public class TraderServiceImpl implements TraderService {
     }
 
     @Override
-    public int delete(String code) {
-        return dao.delete(code);
+    public List<String> delete(TraderKey key) {
+        List<String> str = reportService.isTraderExist(key.getCode(), key.getCompCode());
+        if (str.isEmpty()) {
+            dao.delete(key);
+        }
+        return str;
+    }
+
+    @Override
+    public List<Trader> unUploadTrader() {
+        return dao.unUploadTrader();
     }
 
     @Override

@@ -5,6 +5,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class VStockBalance implements Serializable {
 
@@ -23,5 +25,6 @@ public class VStockBalance implements Serializable {
     private Float weight;
     private String unitName;
     private Float smallestQty;
+    private String userCode;
 
 }

@@ -4,18 +4,18 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 /**
  * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -27,7 +27,10 @@ public class RetInHisDetail implements java.io.Serializable {
     @EmbeddedId
     private RetInKey riKey;
     @ManyToOne
-    @JoinColumn(name = "stock_code", nullable = false)
+    @JoinColumns({
+            @JoinColumn(name = "stock_code", referencedColumnName = "stock_code"),
+            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+    })
     private Stock stock;
     @Column(name = "qty", nullable = false)
     private Float qty;
@@ -47,17 +50,6 @@ public class RetInHisDetail implements java.io.Serializable {
     private Integer uniqueId;
     @Column(name = "wt")
     private Float wt;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        RetInHisDetail that = (RetInHisDetail) o;
-        return riKey != null && Objects.equals(riKey, that.riKey);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(riKey);
-    }
+    @Column(name = "comp_code", insertable = false, updatable = false)
+    private String compCode;
 }

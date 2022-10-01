@@ -1,72 +1,86 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cv.api.inv.service;
 
-import cv.api.inv.dao.TransferDetailHisDao;
+import cv.api.common.Util1;
+import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.dao.TransferHisDao;
-import cv.api.inv.entity.TransferDetailHis;
+import cv.api.inv.dao.TransferHisDetailDao;
 import cv.api.inv.entity.TransferHis;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cv.api.inv.entity.TransferHisDetail;
+import cv.api.inv.entity.TransferHisKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * @author wai yan
- */
 @Service
 @Transactional
 public class TransferHisServiceImpl implements TransferHisService {
-
-    private static final Logger log = LoggerFactory.getLogger(TransferHisServiceImpl.class);
-
     @Autowired
     private TransferHisDao dao;
     @Autowired
-    private TransferDetailHisDao detailDao;
+    private TransferHisDetailDao detailDao;
+    @Autowired
+    private SeqTableDao seqDao;
 
     @Override
-    public TransferHis save(TransferHis sdh) {
-        return dao.save(sdh);
-    }
-
-    @Override
-    public void save(TransferHis sdh, List<TransferDetailHis> listTransferDetail, String vouStatus, List<String> delList) {
-        if (vouStatus.equals("EDIT")) {
-            if (delList != null) {
-                for (String detailId : delList) {
-                    detailDao.delete(detailId);
+    public TransferHis save(TransferHis th) {
+        th.setVouDate(Util1.toDateTime(th.getVouDate()));
+        if (Util1.isNullOrEmpty(th.getKey().getVouNo())) {
+            th.getKey().setVouNo(getVoucherNo(th.getMacId(), th.getKey().getCompCode()));
+        }
+        if (Util1.getBoolean(th.isDeleted())) {
+            dao.save(th);
+        } else {
+            List<TransferHisDetail> listTD = th.getListTD();
+            List<String> listDel = th.getDelList();
+            String vouNo = th.getKey().getVouNo();
+            if (th.getStatus().equals("NEW")) {
+                TransferHis valid = dao.findById(th.getKey());
+                if (valid != null) {
+                    throw new IllegalStateException("Duplicate Transfer Voucher");
                 }
             }
-        }
-        dao.save(sdh);
-        for (TransferDetailHis dh : listTransferDetail) {
-            if (dh.getMedicineId().getStockCode() != null) {
-                dh.setTranVouId(sdh.getTranVouId());
-                detailDao.save(dh);
+            if (listDel != null) {
+                listDel.forEach(detailId -> {
+                    if (detailId != null) {
+                        detailDao.delete(detailId);
+                    }
+                });
             }
+            for (int i = 0; i < listTD.size(); i++) {
+                TransferHisDetail cSd = listTD.get(i);
+                if (cSd.getStock() != null) {
+                    if (cSd.getStock().getKey().getStockCode() != null) {
+                        if (cSd.getUniqueId() == null) {
+                            if (i == 0) {
+                                cSd.setUniqueId(1);
+                            } else {
+                                TransferHisDetail pSd = listTD.get(i - 1);
+                                cSd.setUniqueId(pSd.getUniqueId() + 1);
+                            }
+                        }
+                        String sdCode = vouNo + "-" + cSd.getUniqueId();
+                        cSd.setTdCode(sdCode);
+                        cSd.setVouNo(vouNo);
+                        cSd.setCompCode(th.getKey().getCompCode());
+                        detailDao.save(cSd);
+                    }
+                }
+            }
+            th.setListTD(listTD);
         }
+        return dao.save(th);
+    }
+
+    private String getVoucherNo(Integer macId, String compCode) {
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
+        int seqNo = seqDao.getSequence(macId, "TRANSFER", period, compCode);
+        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
     @Override
-    public List<TransferHis> search(String from, String to, String location, String remark, String vouNo) {
-        return dao.search(from, to, location, remark, vouNo);
+    public TransferHis findById(TransferHisKey key) {
+        return dao.findById(key);
     }
-
-    @Override
-    public TransferHis findById(String id) {
-        return dao.findById(id);
-    }
-
-    @Override
-    public int delete(String vouNo) {
-        return dao.delete(vouNo);
-    }
-
 }

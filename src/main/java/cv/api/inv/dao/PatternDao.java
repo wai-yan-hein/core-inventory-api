@@ -1,7 +1,6 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Pattern;
-import cv.api.inv.entity.PatternDetail;
 
 import java.util.List;
 
@@ -10,10 +9,9 @@ public interface PatternDao {
 
     Pattern save(Pattern pattern);
 
-    PatternDetail save(PatternDetail pd);
+    void delete(String stockCode);
 
-    List<Pattern> search(String compCode, Boolean active);
+    List<Pattern> search(String stockCode);
 
-    List<PatternDetail> searchDetail(String code);
 
 }

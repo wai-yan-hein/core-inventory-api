@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  *
- * @author winswe
+ * @author wai yan
  */
  public interface SeqTableService {
 

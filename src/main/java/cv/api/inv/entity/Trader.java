@@ -4,6 +4,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -19,12 +21,8 @@ import java.util.Date;
 @Entity
 @Table(name = "trader")
 public class Trader implements java.io.Serializable {
-
-    @Id
-    @Column(name = "code", unique = true, nullable = false)
-    private String code;
-    @Column(name = "comp_code")
-    private String compCode;
+    @EmbeddedId
+    private TraderKey key;
     @Column(name = "trader_name")
     private String traderName;
     @Column(name = "address")
@@ -76,5 +74,9 @@ public class Trader implements java.io.Serializable {
     private boolean multi;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
-
+    @Column(name = "price_type")
+    private String priceType;
+    @ManyToOne
+    @JoinColumn(name = "group_code")
+    private TraderGroup group;
 }

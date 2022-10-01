@@ -5,7 +5,6 @@
  */
 package cv.api.inv.service;
 
-import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisDetail;
 
 import java.util.List;
@@ -17,10 +16,7 @@ import java.util.List;
 
      PurHisDetail save(PurHisDetail pd);
     
-     void saveH2(PurHis pur, List<PurHisDetail> listPD, List<String> delList);
      List<PurHisDetail> search(String glCode);
-
-     void save(PurHis gl, List<PurHisDetail> pd, List<String> delList);
 
      int delete(String code) throws Exception;
 

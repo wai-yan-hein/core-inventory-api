@@ -94,4 +94,10 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
         String hsql = "select o from VReturnIn o where o.vouNo = '" + vouNo + "' order by uniqueId";
         return sessionFactory.getCurrentSession().createQuery(hsql, VReturnIn.class).list();
     }
+
+    @Override
+    public List<RetInHis> unUploadVoucher(String syncDate) {
+        String hsql = "select o from RetInHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
+        return findHSQL(hsql);
+    }
 }

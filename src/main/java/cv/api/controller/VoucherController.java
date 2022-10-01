@@ -34,7 +34,7 @@ public class VoucherController {
     public ResponseEntity<ReturnObject> getVouNo(@RequestParam String macId,
             @RequestParam String option, @RequestParam String compCode) {
         log.info("/get-vou-no");
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         SeqKey key = new SeqKey();
         key.setCompCode(compCode);
         key.setMacId(Util1.getInteger(macId));

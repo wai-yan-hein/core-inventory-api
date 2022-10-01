@@ -23,9 +23,7 @@ import java.util.List;
 @Service
 @Transactional
 public class PurHisDetailServiceImpl implements PurHisDetailService {
- 
-    @Autowired
-    private PurHisService purService;
+
     @Autowired
     private PurHisDetailDao dao;
 
@@ -37,93 +35,6 @@ public class PurHisDetailServiceImpl implements PurHisDetailService {
     @Override
     public List<PurHisDetail> search(String glCode) {
         return dao.search(glCode);
-    }
-
-    @Override
-    public void saveH2(PurHis pur, List<PurHisDetail> listPD, List<String> delList) {
-        try {
-            String retInDetailId;
-            for (int i = 0; i < listPD.size(); i++) {
-                PurHisDetail cPD = listPD.get(i);
-                if (cPD.getUniqueId() == null) {
-                    if (i == 0) {
-                        cPD.setUniqueId(1);
-                    } else {
-                        PurHisDetail pSd = listPD.get(i - 1);
-                        cPD.setUniqueId(pSd.getUniqueId() + 1);
-                    }
-                }
-            }
-            if (delList != null) {
-                delList.forEach(detailId -> {
-                    try {
-                        dao.delete(detailId);
-                    } catch (Exception ex) {
-                        log.error("delete purchase detail :" + ex.getMessage());
-                    }
-                });
-            }
-            purService.save(pur);
-            String vouNo = pur.getVouNo();
-            for (PurHisDetail pd : listPD) {
-                if (pd.getStock() != null) {
-                    if (pd.getPdKey() != null) {
-                        pd.setPdKey(pd.getPdKey());
-                    } else {
-                        retInDetailId = vouNo + '-' + pd.getUniqueId();
-                        pd.setPdKey(new PurDetailKey(vouNo, retInDetailId));
-                    }
-                    //  pd.setLocation(pur.getLocationId());
-                    dao.save(pd);
-                }
-            }
-        } catch (Exception ex) {
-            log.error("Save Purchase Detail :" + ex.getMessage());
-        }
-
-    }
-
-    @Override
-    public void save(PurHis pur, List<PurHisDetail> listPD, List<String> delList) {
-        try {
-            String retInDetailId;
-            for (int i = 0; i < listPD.size(); i++) {
-                PurHisDetail cPD = listPD.get(i);
-                if (cPD.getUniqueId() == null) {
-                    if (i == 0) {
-                        cPD.setUniqueId(1);
-                    } else {
-                        PurHisDetail pSd = listPD.get(i - 1);
-                        cPD.setUniqueId(pSd.getUniqueId() + 1);
-                    }
-                }
-            }
-            if (delList != null) {
-                delList.forEach(detailId -> {
-                    try {
-                        delete(detailId);
-                    } catch (Exception ex) {
-                        log.error("delete purchase detail :" + ex.getMessage());
-                    }
-                });
-            }
-            purService.save(pur);
-            String vouNo = pur.getVouNo();
-            for (PurHisDetail pd : listPD) {
-                if (pd.getStock() != null) {
-                    if (pd.getPdKey() != null) {
-                        pd.setPdKey(pd.getPdKey());
-                    } else {
-                        retInDetailId = vouNo + '-' + pd.getUniqueId();
-                        pd.setPdKey(new PurDetailKey(vouNo, retInDetailId));
-                    }
-                    //  pd.setLocation(pur.getLocationId());
-                    dao.save(pd);
-                }
-            }
-        } catch (Exception ex) {
-            log.error("Save Purchase :" + ex.getMessage());
-        }
     }
 
     @Override

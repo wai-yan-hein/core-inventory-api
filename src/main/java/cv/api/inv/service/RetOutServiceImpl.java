@@ -38,8 +38,9 @@ public class RetOutServiceImpl implements RetOutService {
 
     @Override
     public RetOutHis save(RetOutHis rin) throws Exception {
+        rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
         if (Util1.isNullOrEmpty(rin.getVouNo())) {
-            rin.setVouNo(getVoucherNo(rin.getMacId(), rin.getCompCode()));
+            rin.setVouNo(getVoucherNo(rin.getMacId(), rin.getTrader().getKey().getCompCode()));
         }
         if (Util1.getBoolean(rin.getDeleted())) {
             rDao.save(rin);
@@ -67,7 +68,7 @@ public class RetOutServiceImpl implements RetOutService {
             for (int i = 0; i < listSD.size(); i++) {
                 RetOutHisDetail cSd = listSD.get(i);
                 if (cSd.getStock() != null) {
-                    if (cSd.getStock().getStockCode() != null) {
+                    if (cSd.getStock().getKey().getStockCode() != null) {
                         if (cSd.getUniqueId() == null) {
                             if (i == 0) {
                                 cSd.setUniqueId(1);
@@ -78,6 +79,7 @@ public class RetOutServiceImpl implements RetOutService {
                         }
                         String sdCode = vouNo + "-" + cSd.getUniqueId();
                         cSd.setRoKey(new RetOutKey(sdCode, vouNo));
+                        cSd.setCompCode(rin.getTrader().getKey().getCompCode());
                         rd.save(cSd);
                     }
                 }
@@ -115,8 +117,13 @@ public class RetOutServiceImpl implements RetOutService {
         return rDao.search(vouNo);
     }
 
+    @Override
+    public List<RetOutHis> unUploadVoucher(String syncDate) {
+        return rDao.unUploadVoucher(syncDate);
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "RETURN_OUT", period, compCode);
         return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }

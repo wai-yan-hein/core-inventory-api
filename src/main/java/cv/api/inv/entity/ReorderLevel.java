@@ -20,7 +20,10 @@ import java.util.Objects;
 public class ReorderLevel implements java.io.Serializable {
     @Id
     @ManyToOne
-    @JoinColumn(name = "stock_code")
+    @JoinColumns({
+            @JoinColumn(name = "stock_code"),
+            @JoinColumn(name = "comp_code")
+    })
     private Stock stock;
     @Column(name = "min_qty")
     private Float minQty;
@@ -32,17 +35,19 @@ public class ReorderLevel implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "max_unit")
     private StockUnit maxUnit;
-    @Column(name = "bal_qty")
-    private Float balQty;
-    @ManyToOne
-    @JoinColumn(name = "bal_unit")
-    private StockUnit balUnit;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private Float orderQty;
     @Transient
     private StockUnit orderUnit;
+    @Transient
+    private float minSmallQty;
+    @Transient
+    private float maxSmallQty;
+    @Transient
+    private float balSmallQty;
+    @Transient
+    private String balUnit;
+
 
     @Override
     public boolean equals(Object o) {

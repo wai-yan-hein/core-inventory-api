@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Stock;
+import cv.api.inv.entity.StockKey;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
      Stock save(Stock stock);
 
-     Stock findById(String id);
+    Stock findById(StockKey key);
 
      List<Stock> findAll(String compCode);
 
@@ -24,12 +25,9 @@ import java.util.List;
 
      List<Stock> findActiveStock(String compCode);
 
-     List<Stock> search(String stockType);
+    List<Stock> search(String stockCode, String stockType, String cat, String brand);
 
-     List<Stock> searchC(String stockType);
+    List<Stock> getStock(String str, String compCode);
 
-     List<Stock> searchB(String stockType);
-
-     List<Stock> searchM(String updatedDate);
 
 }

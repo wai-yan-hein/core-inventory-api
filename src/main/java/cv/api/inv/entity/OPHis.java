@@ -1,5 +1,6 @@
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,7 +8,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -29,8 +30,9 @@ public class OPHis implements java.io.Serializable {
     private Date createdDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "cur_code")
-    private String curCode;
+    @ManyToOne
+    @JoinColumn(name = "cur_code")
+    private Currency currency;
     @ManyToOne
     @JoinColumn(name = "loc_code")
     private Location location;

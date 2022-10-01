@@ -7,10 +7,12 @@ package cv.api.controller;
 
 import cv.api.MessageSender;
 import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.inv.view.VOpening;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +20,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author wai yan
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/setup")
 @Slf4j
@@ -57,8 +58,6 @@ public class SetupController {
     @Autowired
     private OPHisDetailService opHisDetailService;
     @Autowired
-    private SysPropertyService propertyService;
-    @Autowired
     private PatternService patternService;
     @Autowired
     private ReorderService reorderService;
@@ -67,7 +66,15 @@ public class SetupController {
     @Autowired
     private UnitRelationService unitRelationService;
     @Autowired
+    private ReportService reportService;
+    @Autowired
+    private ProcessTypeService processTypeService;
+    @Autowired
+    private FontService fontService;
+    @Autowired
     private MessageSender messageSender;
+    @Autowired
+    private TraderGroupService traderGroupService;
     private final ReturnObject ro = new ReturnObject();
 
 
@@ -270,13 +277,29 @@ public class SetupController {
         return ResponseEntity.ok(b);
     }
 
-    @PostMapping(path = "/save-trader")
-    public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader, HttpServletRequest request) throws Exception {
+    @PostMapping(path = "/save-customer")
+    public ResponseEntity<Trader> saveCustomer(@RequestBody Trader trader) throws Exception {
+        trader.setType("CUS");
+        trader.setMacId(0);
         Trader b = traderService.saveTrader(trader);
         try {
-            messageSender.sendMessage("TRADER", b.getCode());
+            messageSender.sendMessage("TRADER", b.getKey().getCode());
         } catch (Exception e) {
-            Trader t = traderService.findByCode(b.getCode());
+            Trader t = traderService.findById(b.getKey());
+            t.setIntgUpdStatus(null);
+            traderService.saveTrader(t);
+            log.error(String.format("sendMessage: SALE %s", e.getMessage()));
+        }
+        return ResponseEntity.ok(b);
+    }
+
+    @PostMapping(path = "/save-trader")
+    public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) throws Exception {
+        Trader b = traderService.saveTrader(trader);
+        try {
+            messageSender.sendMessage("TRADER", b.getKey().getCode());
+        } catch (Exception e) {
+            Trader t = traderService.findById(b.getKey());
             t.setIntgUpdStatus(null);
             traderService.saveTrader(t);
             log.error(String.format("sendMessage: SALE %s", e.getMessage()));
@@ -296,22 +319,29 @@ public class SetupController {
         return ResponseEntity.ok(listB);
     }
 
+    @GetMapping(path = "/get-trader-list")
+    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text,
+                                                        @RequestParam String type,
+                                                        @RequestParam String compCode) {
+        return ResponseEntity.ok(traderService.searchTrader(text, type, compCode));
+    }
+
     @GetMapping(path = "/get-supplier")
     public ResponseEntity<List<Trader>> getSupplier(@RequestParam String compCode) {
         List<Trader> listB = traderService.findSupplier(compCode);
         return ResponseEntity.ok(listB);
     }
 
-    @DeleteMapping(path = "/delete-trader")
-    public ResponseEntity<ReturnObject> deleteTrader(@RequestParam String code) {
-        traderService.delete(code);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+
+    @PostMapping(path = "/delete-trader")
+    public ResponseEntity<?> deleteTrader(@RequestBody TraderKey key) {
+        List<String> str = traderService.delete(key);
+        return ResponseEntity.ok(str.isEmpty() ? null : str);
     }
 
-    @GetMapping(path = "/find-trader")
-    public ResponseEntity<Trader> findTrader(@RequestParam String traderCode) {
-        Trader b = traderService.findByCode(traderCode);
+    @PostMapping(path = "/find-trader")
+    public ResponseEntity<Trader> findTrader(@RequestBody TraderKey key) {
+        Trader b = traderService.findById(key);
         return ResponseEntity.ok(b);
     }
 
@@ -327,16 +357,29 @@ public class SetupController {
         return ResponseEntity.ok(listB);
     }
 
-    @DeleteMapping(path = "/delete-stock")
-    public ResponseEntity<ReturnObject> deleteStock(@RequestParam String code) {
-        stockService.delete(code);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+    @PostMapping(path = "/search-stock")
+    public ResponseEntity<?> searchStock(@RequestBody ReportFilter filter) {
+        String stockCode = filter.getStockCode();
+        String typCode = filter.getStockTypeCode();
+        String catCode = filter.getCatCode();
+        String brandCode = filter.getBrandCode();
+        return ResponseEntity.ok(stockService.search(stockCode, typCode, catCode, brandCode));
+    }
+
+    @GetMapping(path = "/get-stock-list")
+    public ResponseEntity<?> getStockList(@RequestParam String text, @RequestParam String compCode) {
+        return ResponseEntity.ok(stockService.getStock(text, compCode));
+    }
+
+    @PostMapping(path = "/delete-stock")
+    public ResponseEntity<?> deleteStock(@RequestBody StockKey key) {
+        List<String> str = stockService.delete(key);
+        return ResponseEntity.ok(str.isEmpty() ? null : str);
     }
 
     @GetMapping(path = "/find-stock")
-    public ResponseEntity<Stock> findStock(@RequestParam String code) {
-        Stock b = stockService.findById(code);
+    public ResponseEntity<Stock> findStock(@RequestParam StockKey key) {
+        Stock b = stockService.findById(key);
         return ResponseEntity.ok(b);
     }
 
@@ -383,14 +426,23 @@ public class SetupController {
     }
 
     @PostMapping(path = "/get-opening")
-    public ResponseEntity<List<OPHis>> getOpening(@RequestBody FilterObject filter) {
+    public ResponseEntity<List<VOpening>> getOpening(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String compCode = Util1.isNull(filter.getCompCode(), "-");
-        List<OPHis> opHisList = opHisService.search(fromDate, toDate, vouNo, userCode, compCode);
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        String remark = Util1.isNull(filter.getRemark(), "-");
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
+        List<VOpening> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode);
         return ResponseEntity.ok(opHisList);
+    }
+
+    @GetMapping(path = "/find-opening")
+    public ResponseEntity<OPHis> findOpening(@RequestParam String code) {
+        OPHis b = opHisService.findByCode(code);
+        return ResponseEntity.ok(b);
     }
 
     @PostMapping(path = "/save-opening-detail")
@@ -405,97 +457,22 @@ public class SetupController {
         return ResponseEntity.ok(opHis);
     }
 
-    @PostMapping(path = "/save-system-property")
-    public ResponseEntity<ReturnObject> saveSysProperty(@RequestBody SysProperty property,
-                                                        HttpServletRequest request) {
-        try {
-            if (Util1.isNullOrEmpty(property.getPropKey())) {
-                ro.setMessage("Invalid Property Key.");
-            } else if (Util1.isNullOrEmpty(property.getPropValue())) {
-                ro.setMessage("Invalid Property Value.");
-            } else if (Util1.isNullOrEmpty(property.getCompCode())) {
-                ro.setMessage("Invalid Company Id.");
-            } else {
-                property = propertyService.save(property);
-                ro.setMessage("Save Property.");
-                ro.setData(property);
-            }
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-        }
-        return ResponseEntity.ok(ro);
-    }
-
-    @GetMapping(path = "/get-system-property")
-    public ResponseEntity<ReturnObject> getSystemProperty(@RequestParam String compCode) {
-        List<SysProperty> propertyList = propertyService.search(compCode);
-        ro.setData(propertyList);
-        return ResponseEntity.ok(ro);
-    }
-
     @PostMapping(path = "/save-pattern")
-    public ResponseEntity<Pattern> savePattern(@RequestBody Pattern pattern,
-                                               HttpServletRequest request) {
-        try {
-            if (Util1.isNullOrEmpty(pattern.getPatternName())) {
-                ro.setMessage("Invalid Pattern Name.");
-            } else if (Util1.isNullOrEmpty(pattern.getCompCode())) {
-                ro.setMessage("Invalid Company Id.");
-            } else if (Util1.isNullOrEmpty(pattern.getMacId())) {
-                ro.setMessage("Invalid Mac Id.");
-            } else {
-                pattern = patternService.save(pattern);
-                ro.setMessage("Save Pattern");
-                ro.setData(pattern);
-            }
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-            log.error(String.format("savePattern %s", e.getMessage()));
-        }
+    public ResponseEntity<Pattern> savePattern(@RequestBody Pattern pattern) {
+        patternService.save(pattern);
         return ResponseEntity.ok(pattern);
     }
 
+    @GetMapping(path = "/delete-pattern")
+    public ResponseEntity<?> deletePattern(@RequestParam String stockCode) {
+        patternService.delete(stockCode);
+        ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
     @GetMapping(path = "/get-pattern")
-    public ResponseEntity<ReturnObject> getPattern(@RequestParam String compCode, Boolean active) {
-        List<Pattern> patternList = patternService.search(compCode, active);
-        ro.setList(Arrays.asList(patternList.toArray()));
-        return ResponseEntity.ok(ro);
-    }
-
-    @GetMapping(path = "/get-pattern-detail")
-    public ResponseEntity<ReturnObject> getPatternDetail(@RequestParam String patternCode) {
-        List<PatternDetail> patternList = new ArrayList<>();
-        try {
-            patternList = patternService.searchDetail(patternCode);
-        } catch (Exception e) {
-            ro.setErrorMessage(e.getMessage());
-        }
-        ro.setList(Arrays.asList(patternList.toArray()));
-        return ResponseEntity.ok(ro);
-    }
-
-    @PostMapping(path = "/save-pattern-detail")
-    public ResponseEntity<ReturnObject> savePatternDetail(@RequestBody PatternDetail pattern,
-                                                          HttpServletRequest request) {
-        try {
-            if (Util1.isNullOrEmpty(pattern.getStock())) {
-                ro.setErrorMessage("Invalid Stock");
-            } else if (Util1.isNullOrEmpty(pattern.getPatternCode())) {
-                ro.setErrorMessage("Invalid Invalid Pattern.");
-            } else if (Util1.getFloat(pattern.getInQty()) <= 0 && Util1.getFloat(pattern.getOutQty()) <= 0) {
-                ro.setErrorMessage("Invalid Qty.");
-            } else if (pattern.getOutUnit() == null && pattern.getInUnit() == null) {
-                ro.setErrorMessage("Invalid Unit.");
-            } else {
-                pattern = patternService.save(pattern);
-                ro.setMessage("Save Pattern");
-                ro.setData(pattern);
-            }
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-            log.error(String.format("savePattern %s", e.getMessage()));
-        }
-        return ResponseEntity.ok(ro);
+    public ResponseEntity<?> getPattern(@RequestParam String stockCode) {
+        return ResponseEntity.ok(patternService.search(stockCode));
     }
 
     @PostMapping(path = "/save-reorder")
@@ -562,5 +539,35 @@ public class SetupController {
     public ResponseEntity<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
         return ResponseEntity.ok(b);
+    }
+
+    @PostMapping(path = "/save-process-type")
+    public ResponseEntity<ProcessType> savePType(@RequestBody ProcessType type) {
+        ProcessType t = processTypeService.save(type);
+        return ResponseEntity.ok(t);
+    }
+
+    @GetMapping(path = "/get-process-type")
+    public ResponseEntity<List<ProcessType>> getPType(@RequestParam String compCode) {
+        List<ProcessType> type = processTypeService.getProcessType(compCode);
+        return ResponseEntity.ok(type);
+    }
+
+    @GetMapping(path = "/get-font")
+    public ResponseEntity<List<CFont>> getFont() {
+        List<CFont> type = fontService.getFont();
+        return ResponseEntity.ok(type);
+    }
+
+    @PostMapping(path = "/save-trader-group")
+    public ResponseEntity<?> saveTraderGroup(@RequestBody TraderGroup group) {
+        TraderGroup g = traderGroupService.save(group);
+        return ResponseEntity.ok(g);
+    }
+
+    @GetMapping(path = "/get-trader-group")
+    public ResponseEntity<?> getTraderGroup(@RequestParam String compCode) {
+        List<TraderGroup> g = traderGroupService.getTraderGroup(compCode);
+        return ResponseEntity.ok(g);
     }
 }

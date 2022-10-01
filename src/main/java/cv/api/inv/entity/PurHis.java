@@ -4,6 +4,7 @@
  */
 package cv.api.inv.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,9 +16,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
- * @author winswe
+ * @author wai yan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString
@@ -29,9 +30,12 @@ public class PurHis implements java.io.Serializable {
     @Column(name = "vou_no", unique = true, nullable = false, length = 15)
     private String vouNo;
     @ManyToOne
-    @JoinColumn(name = "trader_code")
+    @JoinColumns({
+            @JoinColumn(name = "trader_code", referencedColumnName = "code"),
+            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+    })
     private Trader trader;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
     @Temporal(TemporalType.DATE)
@@ -79,8 +83,6 @@ public class PurHis implements java.io.Serializable {
     private String intgUpdStatus;
     @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private String status = "STATUS";
     @Transient

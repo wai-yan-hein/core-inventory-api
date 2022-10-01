@@ -12,7 +12,7 @@ import java.util.Objects;
 
 /**
  *
- * @author winswe
+ * @author wai yan
  */
 @Embeddable
 public class CurrencyKey implements Serializable {

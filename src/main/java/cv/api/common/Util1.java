@@ -5,16 +5,17 @@
 package cv.api.common;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -24,6 +25,11 @@ import java.util.Date;
 @Slf4j
 public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.0";
+    private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+
+    public static <T> Object cast(Object from, Class<T> to) {
+        return gson.fromJson(gson.toJson(from), to);
+    }
 
     public static boolean getBoolean(String obj) {
         boolean status = false;
@@ -33,6 +39,7 @@ public class Util1 {
         return status;
 
     }
+
     public static boolean isNullOrEmpty(Object obj) {
         return obj == null || obj.toString().isEmpty();
     }
@@ -68,6 +75,20 @@ public class Util1 {
             }
         }
 
+        return date;
+    }
+
+    public static Date toDateTime(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        SimpleDateFormat f2 = new SimpleDateFormat("dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        String strDate = f2.format(date) + " " + now.getHour() + ":"
+                + now.getMinute() + ":" + now.getSecond();
+        try {
+            date = formatter.parse(strDate);
+        } catch (ParseException ex) {
+            log.error(String.format("toDateTime: %s", ex.getMessage()));
+        }
         return date;
     }
 
@@ -118,9 +139,20 @@ public class Util1 {
         return value;
     }
 
+    public static double getDouble(Object number) {
+        double value = 0.0;
+        if (number != null) {
+            if (!number.toString().isEmpty()) {
+                value = Double.parseDouble(number.toString());
+            }
+        }
+        return value;
+    }
+
     public static Integer getInteger(Object obj) {
         return obj != null ? Integer.parseInt(obj.toString()) : 0;
     }
+
     public static boolean getBoolean(Boolean obj) {
         if (obj == null) {
             obj = false;

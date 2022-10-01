@@ -10,12 +10,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author wai yan
@@ -33,12 +32,15 @@ public class SaleHis implements java.io.Serializable {
     @Column(name = "vou_no", unique = true, nullable = false, length = 20)
     private String vouNo;
     @ManyToOne
-    @JoinColumn(name = "trader_code")
+    @JoinColumns({
+            @JoinColumn(name = "trader_code", referencedColumnName = "code"),
+            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+    })
     private Trader trader;
     @ManyToOne
     @JoinColumn(name = "saleman_code")
     private SaleMan saleMan;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
     @Temporal(TemporalType.TIMESTAMP)
@@ -93,8 +95,6 @@ public class SaleHis implements java.io.Serializable {
     private Location location;
     @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
     @Transient
@@ -103,17 +103,7 @@ public class SaleHis implements java.io.Serializable {
     private List<SaleHisDetail> listSH;
     @Transient
     private List<String> listDel;
+    @Transient
+    private boolean backup;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        SaleHis saleHis = (SaleHis) o;
-        return vouNo != null && Objects.equals(vouNo, saleHis.vouNo);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

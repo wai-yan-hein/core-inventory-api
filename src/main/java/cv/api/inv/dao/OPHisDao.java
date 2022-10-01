@@ -11,6 +11,5 @@ public interface OPHisDao {
 
     OPHis findByCode(String vouNo);
 
-    List<OPHis> search(String fromDate, String toDate, String vouNo, String userCode, String compCode);
 
 }

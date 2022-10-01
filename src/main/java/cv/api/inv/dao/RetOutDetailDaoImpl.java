@@ -17,9 +17,8 @@ import java.util.List;
 public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> implements RetOutDetailDao {
 
     @Override
-    public List<RetOutHisDetail> search(String code) {
-
-        String hsql = "select v from RetOutHisDetail v where v.roKey.vouNo = '" + code + "' "
+    public List<RetOutHisDetail> search(String vouNo, String compCode) {
+        String hsql = "select v from RetOutHisDetail v where v.roKey.vouNo = '" + vouNo + "' and v.compCode ='" + compCode + "'\n"
                 + " order by v.uniqueId";
         return findHSQL(hsql);
     }

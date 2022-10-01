@@ -19,8 +19,6 @@ import java.util.List;
 @Repository
 public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements SaleHisDao {
 
-    @Autowired
-    private SessionFactory sessionFactory;
 
     @Override
     public SaleHis save(SaleHis sh) {
@@ -89,9 +87,10 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
         return 1;
     }
 
+
     @Override
-    public List<VSale> search(String vouNo) {
-        String hsql = "select o from VSale o where o.vouNo ='" + vouNo + "' order by o.uniqueId";
-        return sessionFactory.getCurrentSession().createQuery(hsql, VSale.class).list();
+    public List<SaleHis> unUploadVoucher(String syncDate) {
+        String hsql = "select o from SaleHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
+        return findHSQL(hsql);
     }
 }

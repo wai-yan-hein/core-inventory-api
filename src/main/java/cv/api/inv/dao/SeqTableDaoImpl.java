@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  *
- * @author winswe
+ * @author wai yan
  */
 @Repository
 public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements SeqTableDao {

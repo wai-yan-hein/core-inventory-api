@@ -65,6 +65,19 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         return list;
     }
 
+    public List<T> findHSQL(String hsql, int limit) {
+        List<T> list = null;
+        try {
+            Query<T> query = getSession().createQuery(hsql, persistentClass);
+            query.setMaxResults(limit);
+            list = query.list();
+        } catch (Exception e) {
+            log.error("findHSQL  :" + e.getMessage());
+        }
+        return list;
+
+    }
+
     public int execUpdateOrDelete(String hsql) {
         Query<T> query = getSession().createQuery(hsql, persistentClass);
         return query.executeUpdate();

@@ -94,4 +94,10 @@ public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements Ret
         String hsql = "select o from VReturnOut o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
         return sessionFactory.getCurrentSession().createQuery(hsql, VReturnOut.class).list();
     }
+
+    @Override
+    public List<RetOutHis> unUploadVoucher(String syncDate) {
+        String hsql = "select o from RetOutHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
+        return findHSQL(hsql);
+    }
 }

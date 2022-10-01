@@ -60,6 +60,7 @@ public class OPHisServiceImpl implements OPHisService {
                     String opCode = vouNo + "-" + cSd.getUniqueId();
                     cSd.setOpCode(opCode);
                     cSd.setVouNo(vouNo);
+                    cSd.setCompCode(op.getCompCode());
                     opHisDetailDao.save(cSd);
                 }
             }
@@ -69,8 +70,13 @@ public class OPHisServiceImpl implements OPHisService {
         return opHisDao.save(op);
     }
 
+    @Override
+    public OPHis findByCode(String vouNo) {
+        return opHisDao.findByCode(vouNo);
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyyyy");
+        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "OPENING", period, compCode);
         return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
@@ -80,8 +86,4 @@ public class OPHisServiceImpl implements OPHisService {
         return opHisDao.search(compCode);
     }
 
-    @Override
-    public List<OPHis> search(String fromDate, String toDate, String vouNo, String userCode, String compCode) {
-        return opHisDao.search(fromDate, toDate, vouNo, userCode, compCode);
-    }
 }
