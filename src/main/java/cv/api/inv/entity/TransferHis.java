@@ -29,12 +29,10 @@ public class TransferHis {
     private String remark;
     @Column(name = "updated_by")
     private String updatedBy;
-    @ManyToOne
-    @JoinColumn(name = "loc_code_from")
-    private Location locationFrom;
-    @ManyToOne
-    @JoinColumn(name = "loc_code_to")
-    private Location locationTo;
+    @Column(name = "loc_code_from")
+    private Location locCodeFrom;
+    @Column(name = "loc_code_to")
+    private Location locCodeTo;
     @Column(name = "mac_id")
     private Integer macId;
     @Transient

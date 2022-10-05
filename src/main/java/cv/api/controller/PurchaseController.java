@@ -50,9 +50,9 @@ public class PurchaseController {
         }
         //send message to service
         try {
-            messageSender.sendMessage("PURCHASE", pur.getVouNo());
+            messageSender.sendMessage("PURCHASE", pur.getKey().getVouNo());
         } catch (Exception e) {
-            PurHis ph = phService.findById(pur.getVouNo());
+            PurHis ph = phService.findById(pur.getKey().getVouNo());
             ph.setIntgUpdStatus(null);
             phService.update(ph);
             log.error(String.format("sendMessage: PURCHASE %s", e.getMessage()));

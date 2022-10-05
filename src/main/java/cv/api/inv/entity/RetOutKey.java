@@ -24,12 +24,15 @@ public class RetOutKey implements Serializable {
     private String rdCode;
     @Column(name = "vou_no")
     private String vouNo;
+    @Column(name = "dept_id")
+    private Integer deptId;
 
-    public RetOutKey() {
-    }
-
-    public RetOutKey(String rdCode, String vouNo) {
+    public RetOutKey(String rdCode, String vouNo, Integer deptId) {
         this.rdCode = rdCode;
         this.vouNo = vouNo;
+        this.deptId = deptId;
+    }
+
+    public RetOutKey() {
     }
 }

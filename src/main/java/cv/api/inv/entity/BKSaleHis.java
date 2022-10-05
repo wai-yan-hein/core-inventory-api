@@ -10,9 +10,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -34,21 +31,18 @@ public class BKSaleHis implements java.io.Serializable {
     private Long logId;
     @Column(name = "vou_no", unique = true, nullable = false, length = 20)
     private String vouNo;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "trader_code"))})
-    private Trader trader;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "saleman_code"))})
-    private SaleMan saleMan;
+    @Column(name = "trader_code")
+    private String traderCode;
+    @Column(name = "saleman_code")
+    private String saleManCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "credit_term")
     private Date creditTerm;
-    @ManyToOne
-    @JoinColumn(name = "cur_code")
-    private Currency currency;
+    @Column(name = "cur_code")
+    private String curCode;
     @Column(name = "remark")
     private String remark;
     @Column(name = "reference")
@@ -87,12 +81,10 @@ public class BKSaleHis implements java.io.Serializable {
     private String address;
     @Column(name = "order_code")
     private String orderCode;
-    @ManyToOne
-    @JoinColumn(name = "reg_code")
-    private Region region;
-    @ManyToOne
-    @JoinColumn(name = "loc_code")
-    private Location location;
+    @Column(name = "reg_code")
+    private String  regCode;
+    @Column(name = "loc_code")
+    private String locCode;
     @Column(name = "mac_id")
     private Integer macId;
     @Column(name = "intg_upd_status")

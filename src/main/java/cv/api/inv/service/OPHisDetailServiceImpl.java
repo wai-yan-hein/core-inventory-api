@@ -20,7 +20,7 @@ public class OPHisDetailServiceImpl implements OPHisDetailService {
     }
 
     @Override
-    public List<OPHisDetail> search(String vouNo) {
-        return dao.search(vouNo);
+    public List<OPHisDetail> search(String vouNo,String compCode,Integer deptId) {
+        return dao.search(vouNo,compCode,deptId);
     }
 }

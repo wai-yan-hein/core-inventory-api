@@ -5,6 +5,7 @@
  */
 package cv.api.inv.entity;
 
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -16,21 +17,21 @@ import java.io.Serializable;
  */
 @Data
 @Embeddable
-public class StockInOutKey implements Serializable {
+public class THDetailKey implements Serializable {
 
     @Column(name = "sd_code", unique = true, nullable = false)
-    private String sdCode;
+    private String tdCode;
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "dept_id")
     private Integer deptId;
 
-    public StockInOutKey(String sdCode, String vouNo, Integer deptId) {
-        this.sdCode = sdCode;
+    public THDetailKey(String tdCode, String vouNo, Integer deptId) {
+        this.tdCode = tdCode;
         this.vouNo = vouNo;
         this.deptId = deptId;
     }
 
-    public StockInOutKey() {
+    public THDetailKey() {
     }
 }

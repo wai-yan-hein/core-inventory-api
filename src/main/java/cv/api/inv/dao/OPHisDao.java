@@ -1,6 +1,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.OPHis;
+import cv.api.inv.entity.OPHisKey;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public interface OPHisDao {
 
     List<OPHis> search(String compCode);
 
-    OPHis findByCode(String vouNo);
+    OPHis findByCode(OPHisKey key);
 
 
 }

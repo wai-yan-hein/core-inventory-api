@@ -50,9 +50,9 @@ public class RetOutController {
             log.error(String.format("saveReturnOut: %s", e.getMessage()));
         }
         try {
-            messageSender.sendMessage("RETURN_OUT", retout.getVouNo());
+            messageSender.sendMessage("RETURN_OUT", retout.getKey().getVouNo());
         } catch (Exception e) {
-            RetOutHis rh = roService.findById(retout.getVouNo());
+            RetOutHis rh = roService.findById(retout.getKey().getVouNo());
             rh.setIntgUpdStatus(null);
             roService.update(rh);
             log.error(String.format("sendMessage RETURN_OUT : %s", e.getMessage()));

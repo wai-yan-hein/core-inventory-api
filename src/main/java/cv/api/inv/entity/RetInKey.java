@@ -22,12 +22,15 @@ public class RetInKey implements Serializable {
     private String rdCode;
     @Column(name = "vou_no")
     private String vouNo;
+    @Column(name = "dept_id")
+    private Integer deptId;
 
-    public RetInKey() {
-    }
-
-    public RetInKey(String rdCode, String vouNo) {
+    public RetInKey(String rdCode, String vouNo, Integer deptId) {
         this.rdCode = rdCode;
         this.vouNo = vouNo;
+        this.deptId = deptId;
+    }
+
+    public RetInKey() {
     }
 }

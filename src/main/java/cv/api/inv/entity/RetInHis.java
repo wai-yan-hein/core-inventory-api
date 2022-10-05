@@ -5,10 +5,7 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -21,30 +18,20 @@ import java.util.Objects;
  * @author WSwe
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "ret_in_his")
 public class RetInHis implements java.io.Serializable {
 
-    @Id
-    @Column(name = "vou_no", unique = true, nullable = false, length = 15)
-    private String vouNo;
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "trader_code", insertable = false,updatable = false),
-            @JoinColumn(name = "comp_code", insertable = false,updatable = false),
-            @JoinColumn(name = "dept_id", insertable = false,updatable = false)
-    })
-    private Trader trader;
+    @EmbeddedId
+    private RetInHisKey key;
+    @Column(name = "trader_code")
+    private String traderCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
-    @ManyToOne
-    @JoinColumn(name = "loc_code")
-    private Location location;
+    @Column(name = "loc_code")
+    private String locCode;
     @Column(name = "deleted")
     private Boolean deleted;
     @Column(name = "vou_total")
@@ -69,9 +56,8 @@ public class RetInHis implements java.io.Serializable {
     private String remark;
     @Column(name = "session_id")
     private Integer session;
-    @ManyToOne
-    @JoinColumn(name = "cur_code")
-    private Currency currency;
+    @Column(name = "cur_code")
+    private String curCode;
     @Column(name = "disc_p")
     private Float discP;
     @Column(name = "intg_upd_status")
@@ -85,16 +71,4 @@ public class RetInHis implements java.io.Serializable {
     @Transient
     private List<String> listDel;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        RetInHis retInHis = (RetInHis) o;
-        return vouNo != null && Objects.equals(vouNo, retInHis.vouNo);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

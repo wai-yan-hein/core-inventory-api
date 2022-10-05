@@ -6,6 +6,7 @@ import cv.api.inv.dao.OPHisDetailDao;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.OPHisDetail;
+import cv.api.inv.entity.OPHisKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,21 +25,15 @@ public class OPHisServiceImpl implements OPHisService {
 
     @Override
     public OPHis save(OPHis op) {
-        if (Util1.isNullOrEmpty(op.getVouNo())) {
-            op.setVouNo(getVoucherNo(op.getMacId(), op.getCompCode()));
+        if (Util1.isNullOrEmpty(op.getKey().getVouNo())) {
+            op.getKey().setVouNo(getVoucherNo(op.getMacId(), op.getKey().getCompCode()));
         }
         if (op.isDeleted()) {
             opHisDao.save(op);
         } else {
             List<OPHisDetail> listSD = op.getDetailList();
             List<String> listDel = op.getListDel();
-            String vouNo = op.getVouNo();
-            if (op.getStatus().equals("NEW")) {
-                OPHis valid = opHisDao.findByCode(vouNo);
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Opening Voucher");
-                }
-            }
+            String vouNo = op.getKey().getVouNo();
             if (listDel != null) {
                 listDel.forEach(detailId -> {
                     if (detailId != null) {
@@ -48,7 +43,7 @@ public class OPHisServiceImpl implements OPHisService {
             }
             for (int i = 0; i < listSD.size(); i++) {
                 OPHisDetail cSd = listSD.get(i);
-                if (cSd.getStock() != null) {
+                if (cSd.getStockCode() != null) {
                     if (cSd.getUniqueId() == null) {
                         if (i == 0) {
                             cSd.setUniqueId(1);
@@ -60,7 +55,8 @@ public class OPHisServiceImpl implements OPHisService {
                     String opCode = vouNo + "-" + cSd.getUniqueId();
                     cSd.setOpCode(opCode);
                     cSd.setVouNo(vouNo);
-                    cSd.setCompCode(op.getCompCode());
+                    cSd.setCompCode(op.getKey().getCompCode());
+                    cSd.setDeptId(op.getKey().getDeptId());
                     opHisDetailDao.save(cSd);
                 }
             }
@@ -71,8 +67,8 @@ public class OPHisServiceImpl implements OPHisService {
     }
 
     @Override
-    public OPHis findByCode(String vouNo) {
-        return opHisDao.findByCode(vouNo);
+    public OPHis findByCode(OPHisKey key) {
+        return opHisDao.findByCode(key);
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

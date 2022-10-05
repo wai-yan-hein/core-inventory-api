@@ -39,15 +39,15 @@ public class RetOutServiceImpl implements RetOutService {
     @Override
     public RetOutHis save(RetOutHis rin) throws Exception {
         rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
-        if (Util1.isNullOrEmpty(rin.getVouNo())) {
-            rin.setVouNo(getVoucherNo(rin.getMacId(), rin.getTrader().getKey().getCompCode()));
+        if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
+            rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getVouNo()));
         }
         if (Util1.getBoolean(rin.getDeleted())) {
             rDao.save(rin);
         } else {
             List<RetOutHisDetail> listSD = rin.getListRD();
             List<String> listDel = rin.getListDel();
-            String vouNo = rin.getVouNo();
+            String vouNo = rin.getKey().getVouNo();
             if (rin.getStatus().equals("NEW")) {
                 RetOutHis valid = rDao.findById(vouNo);
                 if (valid != null) {
@@ -67,21 +67,20 @@ public class RetOutServiceImpl implements RetOutService {
             }
             for (int i = 0; i < listSD.size(); i++) {
                 RetOutHisDetail cSd = listSD.get(i);
-                if (cSd.getStock() != null) {
-                    if (cSd.getStock().getKey().getStockCode() != null) {
-                        if (cSd.getUniqueId() == null) {
-                            if (i == 0) {
-                                cSd.setUniqueId(1);
-                            } else {
-                                RetOutHisDetail pSd = listSD.get(i - 1);
-                                cSd.setUniqueId(pSd.getUniqueId() + 1);
-                            }
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            RetOutHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
                         }
-                        String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setRoKey(new RetOutKey(sdCode, vouNo));
-                        cSd.setCompCode(rin.getTrader().getKey().getCompCode());
-                        rd.save(cSd);
                     }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setRoKey(new RetOutKey(sdCode, vouNo, rin.getKey().getDeptId()));
+                    cSd.setCompCode(rin.getKey().getCompCode());
+                    rd.save(cSd);
+
                 }
             }
             rDao.save(rin);

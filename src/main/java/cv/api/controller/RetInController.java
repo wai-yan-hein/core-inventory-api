@@ -50,9 +50,9 @@ public class RetInController {
         }
         //send message to service
         try {
-            messageSender.sendMessage("RETURN_IN", retin.getVouNo());
+            messageSender.sendMessage("RETURN_IN", retin.getKey().getVouNo());
         } catch (Exception e) {
-            RetInHis ri = riService.findById(retin.getVouNo());
+            RetInHis ri = riService.findById(retin.getKey().getVouNo());
             ri.setIntgUpdStatus(null);
             riService.update(ri);
             log.error(String.format("sendMessage: RETURN_IN %s", e.getMessage()));

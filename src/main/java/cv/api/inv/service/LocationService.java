@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.Location;
+import cv.api.inv.entity.LocationKey;
 
 import java.util.List;
 
@@ -14,11 +15,11 @@ import java.util.List;
  */
  public interface LocationService {
 
-     Location findByCode(String code);
+     Location findByCode(LocationKey code);
 
      Location save(Location loc) throws Exception;
 
-     List<Location> findAll(String compCode);
+     List<Location> findAll(String compCode, Integer deptId);
 
      int delete(String id);
 

@@ -50,23 +50,22 @@ public class TransferHisServiceImpl implements TransferHisService {
             }
             for (int i = 0; i < listTD.size(); i++) {
                 TransferHisDetail cSd = listTD.get(i);
-                if (cSd.getStock() != null) {
-                    if (cSd.getStock().getKey().getStockCode() != null) {
-                        if (cSd.getUniqueId() == null) {
-                            if (i == 0) {
-                                cSd.setUniqueId(1);
-                            } else {
-                                TransferHisDetail pSd = listTD.get(i - 1);
-                                cSd.setUniqueId(pSd.getUniqueId() + 1);
-                            }
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            TransferHisDetail pSd = listTD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
                         }
-                        String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setTdCode(sdCode);
-                        cSd.setVouNo(vouNo);
-                        cSd.setCompCode(th.getKey().getCompCode());
-                        detailDao.save(cSd);
                     }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.getKey().setTdCode(sdCode);
+                    cSd.getKey().setVouNo(vouNo);
+                    cSd.setCompCode(th.getKey().getCompCode());
+                    detailDao.save(cSd);
                 }
+
             }
             th.setListTD(listTD);
         }

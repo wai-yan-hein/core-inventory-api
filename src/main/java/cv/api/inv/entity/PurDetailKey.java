@@ -18,17 +18,19 @@ import java.io.Serializable;
 @Embeddable
 public class PurDetailKey implements Serializable {
 
-    @Column(name = "vou_no", length = 15)
+    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "pd_code", length = 20)
+    @Column(name = "pd_code")
     private String pdCode;
+    @Column(name = "dept_id")
+    private Integer deptId;
+
+    public PurDetailKey(String vouNo, String pdCode, Integer deptId) {
+        this.vouNo = vouNo;
+        this.pdCode = pdCode;
+        this.deptId = deptId;
+    }
 
     public PurDetailKey() {
     }
-
-    public PurDetailKey(String vouNo, String pdCode) {
-        this.vouNo = vouNo;
-        this.pdCode = pdCode;
-    }
-
 }

@@ -35,15 +35,15 @@ public class StockInOutServiceImpl implements StockInOutService {
     @Override
     public StockInOut save(StockInOut io) throws Exception {
         io.setVouDate(Util1.toDateTime(io.getVouDate()));
-        if (Util1.isNullOrEmpty(io.getVouNo())) {
-            io.setVouNo(getVoucherNo(io.getMacId(), io.getCompCode()));
+        if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
+            io.getKey().setVouNo(getVoucherNo(io.getMacId(), io.getCompCode()));
         }
         if (Util1.getBoolean(io.getDeleted())) {
             ioDao.save(io);
         } else {
             List<StockInOutDetail> listSD = io.getListSH();
             List<String> listDel = io.getListDel();
-            String vouNo = io.getVouNo();
+            String vouNo = io.getKey().getVouNo();
             if (io.getStatus().equals("NEW")) {
                 StockInOut valid = ioDao.findById(vouNo);
                 if (valid != null) {
@@ -59,21 +59,20 @@ public class StockInOutServiceImpl implements StockInOutService {
             }
             for (int i = 0; i < listSD.size(); i++) {
                 StockInOutDetail cSd = listSD.get(i);
-                if (cSd.getStock() != null) {
-                    if (cSd.getStock().getKey().getStockCode() != null) {
-                        if (cSd.getUniqueId() == null) {
-                            if (i == 0) {
-                                cSd.setUniqueId(1);
-                            } else {
-                                StockInOutDetail pSd = listSD.get(i - 1);
-                                cSd.setUniqueId(pSd.getUniqueId() + 1);
-                            }
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            StockInOutDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
                         }
-                        String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setIoKey(new StockInOutKey(sdCode, vouNo));
-                        cSd.setCompCode(io.getCompCode());
-                        iodDao.save(cSd);
                     }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setIoKey(new StockInOutKey(sdCode, vouNo,io.getKey().getDeptId()));
+                    cSd.setCompCode(io.getCompCode());
+                    iodDao.save(cSd);
+
                 }
             }
             ioDao.save(io);

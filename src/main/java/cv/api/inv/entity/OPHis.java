@@ -15,9 +15,8 @@ import java.util.List;
 @Entity
 @Table(name = "op_his")
 public class OPHis implements java.io.Serializable {
-    @Id
-    @Column(name = "vou_no")
-    private String vouNo;
+    @EmbeddedId
+    private OPHisKey key;
     @Column(name = "op_date")
     @Temporal(TemporalType.DATE)
     private Date vouDate;
@@ -30,12 +29,10 @@ public class OPHis implements java.io.Serializable {
     private Date createdDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @ManyToOne
-    @JoinColumn(name = "cur_code")
-    private Currency currency;
-    @ManyToOne
-    @JoinColumn(name = "loc_code")
-    private Location location;
+    @Column(name = "cur_code")
+    private String curCode;
+    @Column(name = "loc_code")
+    private String locCode;
     @Column(name = "op_amt")
     private float opAmt;
     @Column(name = "updated_date")
@@ -45,8 +42,6 @@ public class OPHis implements java.io.Serializable {
     private boolean deleted;
     @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private List<OPHisDetail> detailList;
     @Transient

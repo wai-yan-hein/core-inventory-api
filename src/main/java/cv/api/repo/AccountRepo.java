@@ -266,12 +266,12 @@ public class AccountRepo {
                 String taxAcc = setting.getTaxAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ph.getVouDate();
-                String traderCode = ph.getTrader().getKey().getCode();
-                String compCode = ph.getTrader().getKey().getCompCode();
-                String curCode = ph.getCurrency().getCurCode();
+                String traderCode = ph.getTraderCode();
+                String compCode = ph.getKey().getCompCode();
+                String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
                 boolean deleted = ph.getDeleted();
-                String vouNo = ph.getVouNo();
+                String vouNo = ph.getKey().getVouNo();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (Util1.getDouble(ph.getVouTotal()) > 0) {
@@ -377,12 +377,12 @@ public class AccountRepo {
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ri.getVouDate();
-                String traderCode = ri.getTrader().getKey().getCode();
-                String compCode = ri.getTrader().getKey().getCompCode();
-                String curCode = ri.getCurrency().getCurCode();
+                String traderCode = ri.getTraderCode();
+                String compCode = ri.getKey().getCompCode();
+                String curCode = ri.getCurCode();
                 String remark = ri.getRemark();
                 boolean deleted = ri.getDeleted();
-                String vouNo = ri.getVouNo();
+                String vouNo = ri.getKey().getVouNo();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (Util1.getDouble(ri.getVouTotal()) > 0) {
@@ -467,12 +467,12 @@ public class AccountRepo {
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ro.getVouDate();
-                String traderCode = ro.getTrader().getKey().getCode();
-                String compCode = ro.getTrader().getKey().getCompCode();
-                String curCode = ro.getCurrency().getCurCode();
+                String traderCode = ro.getTraderCode();
+                String compCode = ro.getKey().getCompCode();
+                String curCode = ro.getCurCode();
                 String remark = ro.getRemark();
                 boolean deleted = ro.getDeleted();
-                String vouNo = ro.getVouNo();
+                String vouNo = ro.getKey().getVouNo();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (Util1.getDouble(ro.getVouTotal()) > 0) {

@@ -13,7 +13,6 @@ import cv.api.inv.entity.SaleDetailKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisDetail;
 import cv.api.inv.entity.SaleHisKey;
-import cv.api.inv.view.VSale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,21 +61,20 @@ public class SaleHisServiceImpl implements SaleHisService {
             }
             for (int i = 0; i < listSD.size(); i++) {
                 SaleHisDetail cSd = listSD.get(i);
-                if (cSd.getStock() != null) {
-                    if (cSd.getStock().getKey().getStockCode() != null) {
-                        if (cSd.getUniqueId() == null) {
-                            if (i == 0) {
-                                cSd.setUniqueId(1);
-                            } else {
-                                SaleHisDetail pSd = listSD.get(i - 1);
-                                cSd.setUniqueId(pSd.getUniqueId() + 1);
-                            }
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            SaleHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
                         }
-                        String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setSdKey(new SaleDetailKey(vouNo, sdCode));
-                        cSd.setCompCode(saleHis.getKey().getCompCode());
-                        sdDao.save(cSd);
                     }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setSdKey(new SaleDetailKey(vouNo, sdCode, saleHis.getKey().getDeptId()));
+                    cSd.setCompCode(saleHis.getKey().getCompCode());
+                    sdDao.save(cSd);
+
                 }
             }
             shDao.save(saleHis);

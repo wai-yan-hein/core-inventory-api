@@ -22,12 +22,15 @@ public class SaleDetailKey implements Serializable {
     private String vouNo;
     @Column(name = "sd_code")
     private String sdCode;
+    @Column(name = "dept_id")
+    private Integer deptId;
 
-    public SaleDetailKey() {
-    }
-
-    public SaleDetailKey(String vouNo, String sdCode) {
+    public SaleDetailKey(String vouNo, String sdCode, Integer deptId) {
         this.vouNo = vouNo;
         this.sdCode = sdCode;
+        this.deptId = deptId;
+    }
+
+    public SaleDetailKey() {
     }
 }

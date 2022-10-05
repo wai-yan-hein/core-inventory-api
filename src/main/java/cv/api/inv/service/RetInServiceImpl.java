@@ -37,15 +37,15 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public RetInHis save(RetInHis rin) throws Exception {
         rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
-        if (Util1.isNullOrEmpty(rin.getVouNo())) {
-            rin.setVouNo(getVoucherNo(rin.getMacId(), rin.getTrader().getKey().getCompCode()));
+        if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
+            rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getCompCode()));
         }
         if (Util1.getBoolean(rin.getDeleted())) {
             rDao.save(rin);
         } else {
             List<RetInHisDetail> listSD = rin.getListRD();
             List<String> listDel = rin.getListDel();
-            String vouNo = rin.getVouNo();
+            String vouNo = rin.getKey().getVouNo();
             if (rin.getStatus().equals("NEW")) {
                 RetInHis valid = rDao.findById(vouNo);
                 if (valid != null) {
@@ -64,8 +64,8 @@ public class RetInServiceImpl implements RetInService {
             }
             for (int i = 0; i < listSD.size(); i++) {
                 RetInHisDetail cSd = listSD.get(i);
-                if (cSd.getStock() != null) {
-                    if (cSd.getStock().getKey().getStockCode() != null) {
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getStockCode() != null) {
                         if (cSd.getUniqueId() == null) {
                             if (i == 0) {
                                 cSd.setUniqueId(1);
@@ -75,8 +75,8 @@ public class RetInServiceImpl implements RetInService {
                             }
                         }
                         String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setRiKey(new RetInKey(sdCode, vouNo));
-                        cSd.setCompCode(rin.getTrader().getKey().getCompCode());
+                        cSd.setRiKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
+                        cSd.setCompCode(rin.getKey().getCompCode());
                         sdDao.save(cSd);
                     }
                 }

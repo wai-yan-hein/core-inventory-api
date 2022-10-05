@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Location;
+import cv.api.inv.entity.LocationKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class LocationDaoImpl extends AbstractDao<String, Location> implements LocationDao {
+public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implements LocationDao {
 
 
     @Override
@@ -24,8 +25,8 @@ public class LocationDaoImpl extends AbstractDao<String, Location> implements Lo
     }
 
     @Override
-    public List<Location> findAll(String compCode) {
-        String hsql = "select o from Location o where o.compCode ='" + compCode + "'";
+    public List<Location> findAll(String compCode, Integer deptId) {
+        String hsql = "select o from Location o where o.key.compCode ='" + compCode + "' and o.key.deptId = " + deptId + "";
         return findHSQL(hsql);
     }
 
@@ -43,7 +44,7 @@ public class LocationDaoImpl extends AbstractDao<String, Location> implements Lo
     }
 
     @Override
-    public Location findByCode(String code) {
+    public Location findByCode(LocationKey code) {
         return getByKey(code);
     }
 

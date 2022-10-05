@@ -7,6 +7,7 @@ package cv.api.inv.service;
 
 import cv.api.inv.dao.LocationDao;
 import cv.api.inv.entity.Location;
+import cv.api.inv.entity.LocationKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,23 +29,18 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location save(Location loc) throws Exception {
-        if (loc.getLocationCode() == null || loc.getLocationCode().isEmpty()) {
+        if (loc.getKey().getLocCode() == null) {
             Integer macId = loc.getMacId();
-            String compCode = loc.getCompCode();
-            String locCode = getLocationCode(macId, "Location", "-", compCode);
-            Location valid = findByCode(locCode);
-            if (valid == null) {
-                loc.setLocationCode(locCode);
-            } else {
-                throw new IllegalStateException("Duplicate Location Code");
-            }
+            String compCode = loc.getKey().getCompCode();
+            String locCode = getLocationCode(macId, compCode);
+            loc.getKey().setLocCode(locCode);
         }
         return dao.save(loc);
     }
 
     @Override
-    public List<Location> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<Location> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode, deptId);
     }
 
     @Override
@@ -57,15 +53,15 @@ public class LocationServiceImpl implements LocationService {
         return dao.search(parent);
     }
 
-    private String getLocationCode(Integer macId, String option, String period, String compCode) {
+    private String getLocationCode(Integer macId, String compCode) {
 
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
+        int seqNo = seqService.getSequence(macId, "Location", "-", compCode);
 
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
     }
 
     @Override
-    public Location findByCode(String code) {
+    public Location findByCode(LocationKey code) {
         return dao.findByCode(code);
     }
 }

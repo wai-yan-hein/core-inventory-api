@@ -38,15 +38,15 @@ public class PurHisServiceImpl implements PurHisService {
     @Override
     public PurHis save(PurHis ph) throws Exception {
         ph.setVouDate(Util1.toDateTime(ph.getVouDate()));
-        if (Util1.isNullOrEmpty(ph.getVouNo())) {
-            ph.setVouNo(getVoucherNo(ph.getMacId(), ph.getTrader().getKey().getCompCode()));
+        if (Util1.isNullOrEmpty(ph.getKey().getVouNo())) {
+            ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getTraderCode()));
         }
         if (Util1.getBoolean(ph.getDeleted())) {
             phDao.save(ph);
         } else {
             List<PurHisDetail> listSD = ph.getListPD();
             List<String> listDel = ph.getListDel();
-            String vouNo = ph.getVouNo();
+            String vouNo = ph.getKey().getVouNo();
             if (ph.getStatus().equals("NEW")) {
                 PurHis valid = phDao.findById(vouNo);
                 if (valid != null) {
@@ -66,21 +66,20 @@ public class PurHisServiceImpl implements PurHisService {
             }
             for (int i = 0; i < listSD.size(); i++) {
                 PurHisDetail cSd = listSD.get(i);
-                if (cSd.getStock() != null) {
-                    if (cSd.getStock().getKey().getStockCode() != null) {
-                        if (cSd.getUniqueId() == null) {
-                            if (i == 0) {
-                                cSd.setUniqueId(1);
-                            } else {
-                                PurHisDetail pSd = listSD.get(i - 1);
-                                cSd.setUniqueId(pSd.getUniqueId() + 1);
-                            }
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            PurHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
                         }
-                        String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setPdKey(new PurDetailKey(vouNo, sdCode));
-                        cSd.setCompCode(ph.getTrader().getKey().getCompCode());
-                        pdDao.save(cSd);
                     }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setPdKey(new PurDetailKey(vouNo, sdCode, ph.getKey().getDeptId()));
+                    cSd.setCompCode(ph.getKey().getCompCode());
+                    pdDao.save(cSd);
+
                 }
             }
             phDao.save(ph);

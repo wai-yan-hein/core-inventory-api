@@ -6,33 +6,23 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "location")
 public class Location implements java.io.Serializable {
-
-    @Id
-    @Column(name = "loc_code", unique = true, nullable = false)
-    private String locationCode;
+    @EmbeddedId
+    private LocationKey key;
     @Column(name = "loc_name", nullable = false, length = 50, unique = true)
-    private String locationName;
+    private String locName;
     @Column(name = "parent")
     private String parentCode;
     @Column(name = "calc_stock")
@@ -51,19 +41,4 @@ public class Location implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Location location = (Location) o;
-        return locationCode != null && Objects.equals(locationCode, location.locationCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

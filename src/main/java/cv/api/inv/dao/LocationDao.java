@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Location;
+import cv.api.inv.entity.LocationKey;
 
 import java.util.List;
 
@@ -16,11 +17,11 @@ import java.util.List;
 
      Location save(Location loc);
 
-     List<Location> findAll(String compCode);
+     List<Location> findAll(String compCode, Integer deptId);
 
      int delete(String id);
 
-     Location findByCode(String code);
+     Location findByCode(LocationKey code);
 
      List<Location> search(String parent);
 

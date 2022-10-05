@@ -128,9 +128,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-location")
-    public ResponseEntity<List<Location>> getLocation(@RequestParam String compCode) {
-        List<Location> listLoc = locationService.findAll(compCode);
-        return ResponseEntity.ok(listLoc);
+    public ResponseEntity<?> getLocation(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(locationService.findAll(compCode, deptId));
     }
 
     @DeleteMapping(path = "/delete-location")
@@ -140,10 +139,9 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-location")
-    public ResponseEntity<Location> findLocation(@RequestParam String locCode) {
-        Location loc = locationService.findByCode(locCode);
-        return ResponseEntity.ok(loc);
+    @PostMapping(path = "/find-location")
+    public ResponseEntity<Location> findLocation(@RequestBody LocationKey key) {
+        return ResponseEntity.ok(locationService.findByCode(key));
     }
 
     @PostMapping(path = "/save-saleman")
@@ -153,8 +151,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-saleman")
-    public ResponseEntity<List<SaleMan>> getSaleMan(@RequestParam String compCode,@RequestParam Integer deptId) {
-        List<SaleMan> listSM = saleManService.findAll(compCode,deptId);
+    public ResponseEntity<List<SaleMan>> getSaleMan(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<SaleMan> listSM = saleManService.findAll(compCode, deptId);
         return ResponseEntity.ok(listSM);
     }
 
@@ -404,13 +402,13 @@ public class SetupController {
     public ResponseEntity<ReturnObject> saveOpening(@RequestBody OPHis opHis, HttpServletRequest request) {
         if (Util1.isNullOrEmpty(opHis.getVouDate())) {
             ro.setMessage("Invalid Opening Date.");
-        } else if (Util1.isNullOrEmpty(opHis.getLocation())) {
+        } else if (Util1.isNullOrEmpty(opHis.getLocCode())) {
             ro.setMessage("Invalid Location.");
         } else if (opHis.getDetailList().size() <= 1) {
             ro.setMessage("Invalid Opening Record.");
         } else {
             List<OPHisDetail> detailList = opHis.getDetailList();
-            detailList.forEach(op -> op.setLocation(opHis.getLocation()));
+            detailList.forEach(op -> op.setLocCode(opHis.getLocCode()));
             opHis.setDetailList(detailList);
             try {
                 opHisService.save(opHis);
@@ -436,10 +434,9 @@ public class SetupController {
         return ResponseEntity.ok(opHisList);
     }
 
-    @GetMapping(path = "/find-opening")
-    public ResponseEntity<OPHis> findOpening(@RequestParam String code) {
-        OPHis b = opHisService.findByCode(code);
-        return ResponseEntity.ok(b);
+    @PostMapping(path = "/find-opening")
+    public ResponseEntity<OPHis> findOpening(@RequestBody OPHisKey key) {
+        return ResponseEntity.ok(opHisService.findByCode(key));
     }
 
     @PostMapping(path = "/save-opening-detail")
@@ -449,8 +446,10 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-opening-detail")
-    public ResponseEntity<List<OPHisDetail>> getOpeningDetail(@RequestParam String vouNo) {
-        List<OPHisDetail> opHis = opHisDetailService.search(vouNo);
+    public ResponseEntity<List<OPHisDetail>> getOpeningDetail(@RequestParam String vouNo,
+                                                              @RequestParam String compCode,
+                                                              @RequestParam Integer deptId) {
+        List<OPHisDetail> opHis = opHisDetailService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(opHis);
     }
 
