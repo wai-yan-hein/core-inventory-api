@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.PurHis;
+import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.view.VPurchase;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHisDao {
+public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements PurHisDao {
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -79,7 +80,7 @@ public class PurHisDaoImpl extends AbstractDao<String, PurHis> implements PurHis
     }
 
     @Override
-    public PurHis findById(String id) {
+    public PurHis findById(PurHisKey id) {
         return getByKey(id);
     }
 

@@ -6,10 +6,7 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -20,21 +17,15 @@ import java.util.Objects;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "region")
 public class Region implements java.io.Serializable {
 
-    @Id
-    @Column(name = "reg_code", unique = true, nullable = false, length = 15)
-    private String regCode;
+    @EmbeddedId
+    private RegionKey key;
     @Column(name = "reg_name")
     private String regionName;
-    @Column(name = "comp_code")
-    private String compCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -50,16 +41,5 @@ public class Region implements java.io.Serializable {
     @Column(name = "user_code")
     private String userCode;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Region region = (Region) o;
-        return regCode != null && Objects.equals(regCode, region.regCode);
-    }
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

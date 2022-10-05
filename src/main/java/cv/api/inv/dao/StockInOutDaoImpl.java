@@ -5,6 +5,7 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -16,10 +17,10 @@ import java.util.List;
  */
 @Slf4j
 @Repository
-public class StockInOutDaoImpl extends AbstractDao<String, StockInOut> implements StockInOutDao {
+public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> implements StockInOutDao {
 
     @Override
-    public StockInOut findById(String id) {
+    public StockInOut findById(StockIOKey id) {
         return getByKey(id);
     }
 

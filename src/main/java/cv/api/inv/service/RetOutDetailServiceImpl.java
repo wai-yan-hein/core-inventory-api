@@ -22,7 +22,6 @@ import java.util.List;
 @Transactional
 public class RetOutDetailServiceImpl implements RetOutDetailService {
 
-    private static final Logger log = LoggerFactory.getLogger(RetOutServiceImpl.class);
 
     @Autowired
     private RetOutDetailDao dao;
@@ -33,8 +32,8 @@ public class RetOutDetailServiceImpl implements RetOutDetailService {
     }
 
     @Override
-    public List<RetOutHisDetail> search(String vouNo,String compCode) {
-        return dao.search(vouNo,compCode);
+    public List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo,compCode,deptId);
     }
 
     @Override

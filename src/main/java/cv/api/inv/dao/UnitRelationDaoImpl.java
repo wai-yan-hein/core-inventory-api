@@ -1,5 +1,6 @@
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.UnitRelation;
 import cv.api.inv.entity.UnitRelationDetail;
 import cv.api.inv.entity.UnitRelationDetailKey;
@@ -8,11 +9,16 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UnitRelationDaoImpl extends AbstractDao<String, UnitRelation> implements UnitRelationDao {
+public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> implements UnitRelationDao {
     @Override
     public UnitRelation save(UnitRelation ur) {
         persist(ur);
         return ur;
+    }
+
+    @Override
+    public UnitRelation findByKey(RelationKey key) {
+        return getByKey(key);
     }
 
     @Override

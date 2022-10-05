@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.RetInHis;
+import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.view.VReturnIn;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetInDao {
+public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements RetInDao {
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -78,7 +79,7 @@ public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetIn
     }
 
     @Override
-    public RetInHis findById(String id) {
+    public RetInHis findById(RetInHisKey id) {
         return getByKey(id);
     }
 

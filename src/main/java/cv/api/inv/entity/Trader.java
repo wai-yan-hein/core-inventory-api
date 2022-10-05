@@ -24,9 +24,8 @@ public class Trader implements java.io.Serializable {
     private String traderName;
     @Column(name = "address")
     private String address;
-    @ManyToOne
-    @JoinColumn(name = "reg_code")
-    private Region region;
+    @Column(name = "reg_code")
+    private String regCode;
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
@@ -73,11 +72,6 @@ public class Trader implements java.io.Serializable {
     private String intgUpdStatus;
     @Column(name = "price_type")
     private String priceType;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-            @JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code", referencedColumnName = "comp_code")),
-            @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id", referencedColumnName = "dept_id")),
-            @JoinColumnOrFormula(column = @JoinColumn(name = "group_code", referencedColumnName = "group_code"))
-    })
-    private TraderGroup group;
+    @Column(name = "group_code")
+    private String groupCode;
 }

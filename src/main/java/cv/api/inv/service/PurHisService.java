@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.PurHis;
+import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.view.VPurchase;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface PurHisService {
     List<PurHis> search(String fromDate, String toDate, String cusCode,
                         String vouNo, String remark, String userCode);
 
-    PurHis findById(String id);
+    PurHis findById(PurHisKey id);
 
     int delete(String vouNo) throws Exception;
 

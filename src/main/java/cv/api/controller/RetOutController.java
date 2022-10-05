@@ -11,10 +11,12 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisDetail;
+import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.service.ReportService;
 import cv.api.inv.service.RetOutDetailService;
 import cv.api.inv.service.RetOutService;
 import cv.api.inv.view.VReturnOut;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,17 +44,12 @@ public class RetOutController {
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-retout")
-    public ResponseEntity<RetOutHis> saveReturnOut(@RequestBody RetOutHis retout,
-                                                   HttpServletRequest request) {
-        try {
-            retout = roService.save(retout);
-        } catch (Exception e) {
-            log.error(String.format("saveReturnOut: %s", e.getMessage()));
-        }
+    public ResponseEntity<RetOutHis> saveReturnOut(@RequestBody RetOutHis retout) throws Exception {
+        retout = roService.save(retout);
         try {
             messageSender.sendMessage("RETURN_OUT", retout.getKey().getVouNo());
         } catch (Exception e) {
-            RetOutHis rh = roService.findById(retout.getKey().getVouNo());
+            RetOutHis rh = roService.findById(retout.getKey());
             rh.setIntgUpdStatus(null);
             roService.update(rh);
             log.error(String.format("sendMessage RETURN_OUT : %s", e.getMessage()));
@@ -71,8 +68,7 @@ public class RetOutController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo,
-                remark, userCode, stockCode, locCode, compCode);
+        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listRO);
     }
 
@@ -83,15 +79,15 @@ public class RetOutController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-retout")
-    public ResponseEntity<RetOutHis> findRO(@RequestParam String code) {
-        RetOutHis sh = roService.findById(code);
+    @PostMapping(path = "/find-retout")
+    public ResponseEntity<RetOutHis> findRO(@RequestBody RetOutHisKey key) {
+        RetOutHis sh = roService.findById(key);
         return ResponseEntity.ok(sh);
     }
 
     @GetMapping(path = "/get-retout-detail")
-    public ResponseEntity<List<RetOutHisDetail>> getRODetail(@RequestParam String vouNo,@RequestParam String compCode) {
-        List<RetOutHisDetail> listSD = rdService.search(vouNo,compCode);
+    public ResponseEntity<List<RetOutHisDetail>> getRODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        List<RetOutHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
 }

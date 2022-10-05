@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.RetOutHis;
+import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface RetOutService {
     List<RetOutHis> search(String fromDate, String toDate, String cusCode,
                            String vouNo, String remark, String userCode);
 
-    RetOutHis findById(String id);
+    RetOutHis findById(RetOutHisKey id);
 
     int delete(String vouNo) throws Exception;
 

@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.RetOutHis;
+import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements RetOutDao {
+public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implements RetOutDao {
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -78,7 +79,7 @@ public class RetOutDaoImpl extends AbstractDao<String, RetOutHis> implements Ret
     }
 
     @Override
-    public RetOutHis findById(String id) {
+    public RetOutHis findById(RetOutHisKey id) {
         return getByKey(id);
     }
 

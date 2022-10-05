@@ -7,6 +7,7 @@ package cv.api.inv.service;
 
 import cv.api.inv.dao.StockBrandDao;
 import cv.api.inv.entity.StockBrand;
+import cv.api.inv.entity.StockBrandKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +56,7 @@ public class StockBrandServiceImpl implements StockBrandService {
     }
 
     @Override
-    public StockBrand findByCode(String code) {
+    public StockBrand findByCode(StockBrandKey code) {
         return dao.findByCode(code);
     }
 }

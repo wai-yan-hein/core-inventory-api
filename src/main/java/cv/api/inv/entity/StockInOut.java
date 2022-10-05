@@ -25,7 +25,7 @@ import java.util.Objects;
 public class StockInOut implements Serializable {
 
     @EmbeddedId
-    private StockInOutKey key;
+    private StockIOKey key;
     @Column(name = "remark")
     private String remark;
     @Column(name = "description")
@@ -40,8 +40,6 @@ public class StockInOut implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date")
     private Date createdDate;
-    @Column(name = "comp_code")
-    private String compCode;
     @Column(name = "vou_status")
     private String vouStatusCode;
     @Column(name = "mac_id")

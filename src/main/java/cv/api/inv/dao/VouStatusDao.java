@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.VouStatus;
+import cv.api.inv.entity.VouStatusKey;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
 
      int delete(String id);
 
-     VouStatus findById(String id);
+     VouStatus findById(VouStatusKey id);
      List<VouStatus> search(String statusDesp);
 
 }

@@ -188,10 +188,14 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-brand")
-    public ResponseEntity<StockBrand> findBrand(@RequestParam String code) {
-        StockBrand b = brandService.findByCode(code);
+    @PostMapping(path = "/find-brand")
+    public ResponseEntity<StockBrand> findBrand(@RequestBody StockBrandKey key) {
+        StockBrand b = brandService.findByCode(key);
         return ResponseEntity.ok(b);
+    }
+    @PostMapping(path = "/find-unit-relation")
+    public ResponseEntity<?> findUnitRelation(@RequestBody RelationKey key) {
+        return ResponseEntity.ok(unitRelationService.findByKey(key));
     }
 
     @PostMapping(path = "/save-type")
@@ -239,10 +243,9 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-unit")
-    public ResponseEntity<StockUnit> findUnit(@RequestParam String code) {
-        StockUnit b = unitService.findByCode(code);
-        return ResponseEntity.ok(b);
+    @PostMapping(path = "/find-unit")
+    public ResponseEntity<StockUnit> findUnit(@RequestBody StockUnitKey key) {
+        return ResponseEntity.ok(unitService.findByCode(key));
     }
 
     @PostMapping(path = "/save-region")
@@ -363,8 +366,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-stock-list")
-    public ResponseEntity<?> getStockList(@RequestParam String text, @RequestParam String compCode) {
-        return ResponseEntity.ok(stockService.getStock(text, compCode));
+    public ResponseEntity<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(stockService.getStock(text, compCode, deptId));
     }
 
     @PostMapping(path = "/delete-stock")
@@ -392,9 +395,9 @@ public class SetupController {
         return ResponseEntity.ok(listB);
     }
 
-    @GetMapping(path = "/find-voucher-status")
-    public ResponseEntity<VouStatus> findVouStatus(@RequestParam String code) {
-        VouStatus b = vouStatusService.findById(code);
+    @PostMapping(path = "/find-voucher-status")
+    public ResponseEntity<VouStatus> findVouStatus(@RequestBody VouStatusKey key) {
+        VouStatus b = vouStatusService.findById(key);
         return ResponseEntity.ok(b);
     }
 
@@ -446,9 +449,7 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-opening-detail")
-    public ResponseEntity<List<OPHisDetail>> getOpeningDetail(@RequestParam String vouNo,
-                                                              @RequestParam String compCode,
-                                                              @RequestParam Integer deptId) {
+    public ResponseEntity<List<OPHisDetail>> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<OPHisDetail> opHis = opHisDetailService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(opHis);
     }
@@ -474,11 +475,11 @@ public class SetupController {
     @PostMapping(path = "/save-reorder")
     public ResponseEntity<ReturnObject> saveReorder(@RequestBody ReorderLevel rl, HttpServletRequest request) {
         try {
-            if (Util1.isNullOrEmpty(rl.getStock())) {
+            if (Util1.isNullOrEmpty(rl.getStockCode())) {
                 ro.setMessage("Invalid Stock.");
-            } else if (Util1.isNullOrEmpty(rl.getMinUnit())) {
+            } else if (Util1.isNullOrEmpty(rl.getMinUnitCode())) {
                 ro.setMessage("Invalid Min Unit.");
-            } else if (Util1.isNullOrEmpty(rl.getMaxUnit())) {
+            } else if (Util1.isNullOrEmpty(rl.getMaxUnitCode())) {
                 ro.setMessage("Invalid Max Unit.");
             } else if (Util1.isNullOrEmpty(rl.getBalUnit())) {
                 ro.setMessage("Invalid Balance Unit.");

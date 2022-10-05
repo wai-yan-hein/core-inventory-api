@@ -11,8 +11,10 @@ import cv.api.inv.dao.RetInDetailDao;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisDetail;
+import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.entity.RetInKey;
 import cv.api.inv.view.VReturnIn;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.util.List;
  */
 @Service
 @Transactional
+@Slf4j
 public class RetInServiceImpl implements RetInService {
 
     @Autowired
@@ -46,12 +49,6 @@ public class RetInServiceImpl implements RetInService {
             List<RetInHisDetail> listSD = rin.getListRD();
             List<String> listDel = rin.getListDel();
             String vouNo = rin.getKey().getVouNo();
-            if (rin.getStatus().equals("NEW")) {
-                RetInHis valid = rDao.findById(vouNo);
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Sale Voucher");
-                }
-            }
             if (listDel != null) {
                 listDel.forEach(detailId -> {
                     if (detailId != null) {
@@ -99,13 +96,12 @@ public class RetInServiceImpl implements RetInService {
     }
 
     @Override
-    public List<RetInHis> search(String fromDate, String toDate, String cusCode,
-                                 String vouNo, String remark, String userCode) {
+    public List<RetInHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
         return rDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
     }
 
     @Override
-    public RetInHis findById(String id) {
+    public RetInHis findById(RetInHisKey id) {
         return rDao.findById(id);
     }
 

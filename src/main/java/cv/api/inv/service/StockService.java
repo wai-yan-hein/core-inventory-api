@@ -27,6 +27,6 @@ import java.util.List;
 
     List<Stock> search(String stockCode, String stockType, String cat, String brand);
 
-    List<Stock> getStock(String str, String compCode);
+    List<Stock> getStock(String str, String compCode,Integer deptId);
 
 }

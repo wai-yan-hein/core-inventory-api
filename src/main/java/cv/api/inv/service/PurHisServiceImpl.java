@@ -11,6 +11,7 @@ import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.entity.PurDetailKey;
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisDetail;
+import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.view.VPurchase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,6 @@ public class PurHisServiceImpl implements PurHisService {
             List<PurHisDetail> listSD = ph.getListPD();
             List<String> listDel = ph.getListDel();
             String vouNo = ph.getKey().getVouNo();
-            if (ph.getStatus().equals("NEW")) {
-                PurHis valid = phDao.findById(vouNo);
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Purchase Voucher");
-                }
-            }
             if (listDel != null) {
                 listDel.forEach(detailId -> {
                     if (detailId != null) {
@@ -94,13 +89,12 @@ public class PurHisServiceImpl implements PurHisService {
     }
 
     @Override
-    public List<PurHis> search(String fromDate, String toDate, String cusCode,
-                               String vouNo, String remark, String userCode) {
+    public List<PurHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
         return phDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
     }
 
     @Override
-    public PurHis findById(String id) {
+    public PurHis findById(PurHisKey id) {
         return phDao.findById(id);
     }
 

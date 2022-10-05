@@ -16,7 +16,7 @@ import java.util.List;
 
     StockInOutDetail save(StockInOutDetail stock);
 
-    List<StockInOutDetail> search(String vouNo);
+    List<StockInOutDetail> search(String vouNo,String compCode,Integer deptId);
 
     int delete(String code);
 }

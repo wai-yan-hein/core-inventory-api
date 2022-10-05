@@ -9,9 +9,11 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.dao.StockInOutDao;
 import cv.api.inv.dao.StockInOutDetailDao;
+import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
 import cv.api.inv.entity.StockInOutDetail;
 import cv.api.inv.entity.StockInOutKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import java.util.List;
  */
 @Service
 @Transactional
+@Slf4j
 public class StockInOutServiceImpl implements StockInOutService {
 
     @Autowired
@@ -36,7 +39,7 @@ public class StockInOutServiceImpl implements StockInOutService {
     public StockInOut save(StockInOut io) throws Exception {
         io.setVouDate(Util1.toDateTime(io.getVouDate()));
         if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
-            io.getKey().setVouNo(getVoucherNo(io.getMacId(), io.getCompCode()));
+            io.getKey().setVouNo(getVoucherNo(io.getMacId(), io.getKey().getCompCode()));
         }
         if (Util1.getBoolean(io.getDeleted())) {
             ioDao.save(io);
@@ -44,12 +47,6 @@ public class StockInOutServiceImpl implements StockInOutService {
             List<StockInOutDetail> listSD = io.getListSH();
             List<String> listDel = io.getListDel();
             String vouNo = io.getKey().getVouNo();
-            if (io.getStatus().equals("NEW")) {
-                StockInOut valid = ioDao.findById(vouNo);
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Stock In/Out Voucher");
-                }
-            }
             if (listDel != null) {
                 listDel.forEach(detailId -> {
                     if (detailId != null) {
@@ -69,10 +66,9 @@ public class StockInOutServiceImpl implements StockInOutService {
                         }
                     }
                     String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setIoKey(new StockInOutKey(sdCode, vouNo,io.getKey().getDeptId()));
-                    cSd.setCompCode(io.getCompCode());
+                    cSd.setIoKey(new StockInOutKey(sdCode, vouNo, io.getKey().getDeptId()));
+                    cSd.setCompCode(io.getKey().getCompCode());
                     iodDao.save(cSd);
-
                 }
             }
             ioDao.save(io);
@@ -82,13 +78,12 @@ public class StockInOutServiceImpl implements StockInOutService {
     }
 
     @Override
-    public List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
-                                   String vouNo, String userCode,String vouStatus) {
-        return ioDao.search(fromDate, toDate, remark, desp, vouNo, userCode,vouStatus);
+    public List<StockInOut> search(String fromDate, String toDate, String remark, String desp, String vouNo, String userCode, String vouStatus) {
+        return ioDao.search(fromDate, toDate, remark, desp, vouNo, userCode, vouStatus);
     }
 
     @Override
-    public StockInOut findById(String id) {
+    public StockInOut findById(StockIOKey id) {
         return ioDao.findById(id);
     }
 

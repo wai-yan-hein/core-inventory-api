@@ -11,6 +11,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisDetail;
+import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.service.ReportService;
 import cv.api.inv.service.RetInDetailService;
 import cv.api.inv.service.RetInService;
@@ -52,7 +53,7 @@ public class RetInController {
         try {
             messageSender.sendMessage("RETURN_IN", retin.getKey().getVouNo());
         } catch (Exception e) {
-            RetInHis ri = riService.findById(retin.getKey().getVouNo());
+            RetInHis ri = riService.findById(retin.getKey());
             ri.setIntgUpdStatus(null);
             riService.update(ri);
             log.error(String.format("sendMessage: RETURN_IN %s", e.getMessage()));
@@ -71,7 +72,7 @@ public class RetInController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VReturnIn> listRI =reportService.getReturnInHistory(fromDate,toDate,cusCode,vouNo,remark,userCode,stockCode,locCode,compCode);
+        List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listRI);
     }
 
@@ -82,15 +83,15 @@ public class RetInController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-retin")
-    public ResponseEntity<RetInHis> findRI(@RequestParam String code) {
-        RetInHis sh = riService.findById(code);
+    @PostMapping(path = "/find-retin")
+    public ResponseEntity<RetInHis> findRI(@RequestBody RetInHisKey key) {
+        RetInHis sh = riService.findById(key);
         return ResponseEntity.ok(sh);
     }
 
     @GetMapping(path = "/get-retin-detail")
-    public ResponseEntity<List<RetInHisDetail>> getRIDetail(@RequestParam String vouNo) {
-        List<RetInHisDetail> listSD = rdService.search(vouNo);
+    public ResponseEntity<List<RetInHisDetail>> getRIDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        List<RetInHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
 }

@@ -28,23 +28,18 @@ public class Stock implements java.io.Serializable {
     private StockKey key;
     @Column(name = "active")
     private boolean active;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "stock_type_code"))})
-    private StockType stockType;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "brand_code"))})
-    private StockBrand brand;
+    @Column(name = "stock_type_code")
+    private String typeCode;
+    @Column(name = "brand_code")
+    private String brandCode;
     @Column(name = "stock_name")
     private String stockName;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "category_code"))})
-    private Category category;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "pur_unit"))})
-    private StockUnit purUnit;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "sale_unit"))})
-    private StockUnit saleUnit;
+    @Column(name = "category_code")
+    private String catCode;
+    @Column(name = "pur_unit")
+    private String purUnitCode;
+    @Column(name = "sale_unit")
+    private String saleUnitCode;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
@@ -82,13 +77,20 @@ public class Stock implements java.io.Serializable {
     private String migCode;
     @Column(name = "user_code")
     private String userCode;
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "rel_code"))})
-    private UnitRelation unitRelation;
+    @Column(name = "rel_code")
+    private String relCode;
     @Column(name = "mac_id")
     private Integer macId;
     @Column(name = "calculate")
     private boolean calculate;
+    @Transient
+    private String relName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
 
 
     public Stock(StockKey key) {

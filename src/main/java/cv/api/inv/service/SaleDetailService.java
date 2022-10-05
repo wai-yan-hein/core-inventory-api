@@ -16,7 +16,7 @@ public interface SaleDetailService {
 
     SaleHisDetail save(SaleHisDetail sdh);
 
-    List<SaleHisDetail> search(String vouNo);
+    List<SaleHisDetail> search(String vouNo, String compCode, Integer deptId);
 
     int delete(String code);
 }

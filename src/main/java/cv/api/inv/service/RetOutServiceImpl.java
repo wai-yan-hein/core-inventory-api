@@ -12,8 +12,10 @@ import cv.api.inv.dao.RetOutDetailDao;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisDetail;
+import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.entity.RetOutKey;
 import cv.api.inv.view.VReturnOut;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import java.util.List;
  */
 @Service
 @Transactional
+@Slf4j
 public class RetOutServiceImpl implements RetOutService {
 
     @Autowired
@@ -33,14 +36,12 @@ public class RetOutServiceImpl implements RetOutService {
     private RetOutDetailDao rd;
     @Autowired
     private SeqTableDao seqDao;
-    @Autowired
-    private MessageSender messageSender;
 
     @Override
     public RetOutHis save(RetOutHis rin) throws Exception {
         rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
         if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
-            rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getVouNo()));
+            rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getCompCode()));
         }
         if (Util1.getBoolean(rin.getDeleted())) {
             rDao.save(rin);
@@ -48,12 +49,6 @@ public class RetOutServiceImpl implements RetOutService {
             List<RetOutHisDetail> listSD = rin.getListRD();
             List<String> listDel = rin.getListDel();
             String vouNo = rin.getKey().getVouNo();
-            if (rin.getStatus().equals("NEW")) {
-                RetOutHis valid = rDao.findById(vouNo);
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Return Out Voucher");
-                }
-            }
             if (listDel != null) {
                 listDel.forEach(detailId -> {
                     if (detailId != null) {
@@ -79,13 +74,11 @@ public class RetOutServiceImpl implements RetOutService {
                     String sdCode = vouNo + "-" + cSd.getUniqueId();
                     cSd.setRoKey(new RetOutKey(sdCode, vouNo, rin.getKey().getDeptId()));
                     cSd.setCompCode(rin.getKey().getCompCode());
-                    rd.save(cSd);
-
+                    //rd.save(cSd);
                 }
             }
-            rDao.save(rin);
+            //rDao.save(rin);
             rin.setListRD(listSD);
-            messageSender.sendMessage("RETURN_OUT", vouNo);
         }
         return rin;
     }
@@ -96,13 +89,12 @@ public class RetOutServiceImpl implements RetOutService {
     }
 
     @Override
-    public List<RetOutHis> search(String fromDate, String toDate, String cusCode,
-                                  String vouNo, String remark, String userCode) {
+    public List<RetOutHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
         return rDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
     }
 
     @Override
-    public RetOutHis findById(String id) {
+    public RetOutHis findById(RetOutHisKey id) {
         return rDao.findById(id);
     }
 

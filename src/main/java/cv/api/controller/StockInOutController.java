@@ -8,6 +8,7 @@ package cv.api.controller;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
+import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
 import cv.api.inv.entity.StockInOutDetail;
 import cv.api.inv.service.ReportService;
@@ -56,8 +57,7 @@ public class StockInOutController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark,
-                description, userCode, stockCode, locCode, compCode);
+        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listStockIO);
     }
 
@@ -68,15 +68,15 @@ public class StockInOutController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-stockio")
-    public ResponseEntity<StockInOut> findStockIO(@RequestParam String code) {
-        StockInOut sh = ioService.findById(code);
+    @PostMapping(path = "/find-stockio")
+    public ResponseEntity<StockInOut> findStockIO(@RequestBody StockIOKey key) {
+        StockInOut sh = ioService.findById(key);
         return ResponseEntity.ok(sh);
     }
 
     @GetMapping(path = "/get-stockio-detail")
-    public ResponseEntity<List<StockInOutDetail>> getStockIODetail(@RequestParam String vouNo) {
-        List<StockInOutDetail> listSD = iodService.search(vouNo);
+    public ResponseEntity<List<StockInOutDetail>> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        List<StockInOutDetail> listSD = iodService.search(vouNo,compCode,deptId);
         return ResponseEntity.ok(listSD);
     }
 }

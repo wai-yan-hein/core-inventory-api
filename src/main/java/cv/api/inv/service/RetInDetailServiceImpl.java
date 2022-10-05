@@ -22,8 +22,6 @@ import java.util.List;
 @Transactional
 public class RetInDetailServiceImpl implements RetInDetailService {
 
-    private static final Logger log = LoggerFactory.getLogger(RetInServiceImpl.class);
-
     @Autowired
     private RetInDetailDao dao;
 
@@ -34,8 +32,8 @@ public class RetInDetailServiceImpl implements RetInDetailService {
     }
 
     @Override
-    public List<RetInHisDetail> search(String glCode) {
-        return dao.search(glCode);
+    public List<RetInHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo, compCode, deptId);
     }
 
     @Override

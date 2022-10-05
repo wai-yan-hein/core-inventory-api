@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -49,4 +46,18 @@ public class StockInOutDetail implements Serializable {
     private Float costPrice;
     @Column(name = "comp_code")
     private String compCode;
+    @Transient
+    private String userCode;
+    @Transient
+    private String stockName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
+    @Transient
+    private String relName;
+    @Transient
+    private String locName;
 }

@@ -5,7 +5,9 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.StockUnit;
+import cv.api.inv.entity.StockUnitKey;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ import java.util.List;
  */
  public interface StockUnitService {
 
-     StockUnit findByCode(String code);
+     StockUnit findByCode(StockUnitKey code);
 
      StockUnit save(StockUnit unit) throws Exception;
 

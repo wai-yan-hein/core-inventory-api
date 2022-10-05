@@ -33,11 +33,11 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     }
 
     @Override
-    public List<SaleHisDetail> search(String vouNo) {
-        return dao.search(vouNo);
+    public List<SaleHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo, compCode, deptId);
     }
 
-        @Override
+    @Override
     public int delete(String code) {
         return dao.delete(code);
     }

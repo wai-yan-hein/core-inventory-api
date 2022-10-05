@@ -16,7 +16,7 @@ import java.util.List;
 
      RetOutHisDetail save(RetOutHisDetail pd);
 
-     List<RetOutHisDetail> search(String vouNo, String compCode);
+     List<RetOutHisDetail> search(String vouNo, String compCode,Integer deptId);
 
      int delete(String id) throws Exception;
 

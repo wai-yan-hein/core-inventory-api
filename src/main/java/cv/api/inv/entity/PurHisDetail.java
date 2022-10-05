@@ -8,10 +8,7 @@ package cv.api.inv.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -32,7 +29,7 @@ public class PurHisDetail implements Serializable {
     @Column(name = "avg_qty", nullable = false)
     private Float avgQty;
     @Column(name = "pur_unit")
-    private StockUnit unitCode;
+    private String unitCode;
     @Column(name = "pur_price", nullable = false)
     private Float price;
     @Column(name = "pur_amt", nullable = false)
@@ -43,4 +40,18 @@ public class PurHisDetail implements Serializable {
     private Integer uniqueId;
     @Column(name = "comp_code")
     private String compCode;
+    @Transient
+    private String userCode;
+    @Transient
+    private String stockName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
+    @Transient
+    private String relName;
+    @Transient
+    private String locName;
 }

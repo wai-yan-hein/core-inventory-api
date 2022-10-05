@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.VouStatus;
+import cv.api.inv.entity.VouStatusKey;
 import io.swagger.models.auth.In;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface VouStatusService {
 
     int delete(String id);
 
-    VouStatus findById(String id);
+    VouStatus findById(VouStatusKey id);
 
     List<VouStatus> search(String description);
 }

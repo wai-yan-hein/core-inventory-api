@@ -18,6 +18,7 @@ import cv.api.inv.service.SaleDetailService;
 import cv.api.inv.service.SaleHisService;
 import cv.api.inv.view.VSale;
 import cv.api.repo.AccountRepo;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -129,8 +130,10 @@ public class SaleController {
     }
 
     @GetMapping(path = "/get-sale-detail")
-    public ResponseEntity<List<SaleHisDetail>> getSaleDetail(@RequestParam String vouNo) {
-        List<SaleHisDetail> listSD = sdService.search(vouNo);
+    public ResponseEntity<List<SaleHisDetail>> getSaleDetail(@RequestParam String vouNo,
+                                                             @RequestParam String compCode,
+                                                             @RequestParam Integer deptId) {
+        List<SaleHisDetail> listSD = sdService.search(vouNo,compCode,deptId);
         return ResponseEntity.ok(listSD);
     }
 }

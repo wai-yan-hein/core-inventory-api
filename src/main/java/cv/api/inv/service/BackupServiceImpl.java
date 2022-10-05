@@ -33,7 +33,7 @@ public class BackupServiceImpl implements BackupService {
                 SaleHis s = shDao.findById(sh.getKey());
                 BKSaleHis bk = (BKSaleHis) Util1.cast(s, BKSaleHis.class);
                 bk = dao.save(bk);
-                List<SaleHisDetail> sd = shdDao.search(sh.getKey().getVouNo());
+                List<SaleHisDetail> sd = shdDao.search(sh.getKey().getVouNo(), sh.getKey().getCompCode(), sh.getKey().getDeptId());
                 for (SaleHisDetail b : sd) {
                     BKSaleHisDetail bks = (BKSaleHisDetail) Util1.cast(b, BKSaleHisDetail.class);
                     bks.setLogId(bk.getLogId());

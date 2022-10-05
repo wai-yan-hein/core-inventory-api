@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.RetInHis;
+import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.view.VReturnIn;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface RetInDao {
     List<RetInHis> search(String fromDate, String toDate, String cusCode,
                           String vouNo, String remark, String userCode);
 
-    RetInHis findById(String id);
+    RetInHis findById(RetInHisKey id);
 
     int delete(String vouNo) throws Exception;
 

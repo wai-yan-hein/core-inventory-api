@@ -5,7 +5,9 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.StockUnit;
+import cv.api.inv.entity.StockUnitKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class StockUnitDaoImpl extends AbstractDao<String, StockUnit> implements StockUnitDao {
+public class StockUnitDaoImpl extends AbstractDao<StockUnitKey, StockUnit> implements StockUnitDao {
 
     @Override
     public StockUnit save(StockUnit item) {
@@ -35,7 +37,7 @@ public class StockUnitDaoImpl extends AbstractDao<String, StockUnit> implements 
     }
 
     @Override
-    public StockUnit findByCode(String code) {
+    public StockUnit findByCode(StockUnitKey code) {
         return getByKey(code);
     }
 

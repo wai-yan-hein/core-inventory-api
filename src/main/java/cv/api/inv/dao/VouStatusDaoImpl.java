@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.VouStatus;
+import cv.api.inv.entity.VouStatusKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class VouStatusDaoImpl extends AbstractDao<String, VouStatus> implements VouStatusDao {
+public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> implements VouStatusDao {
 
     @Override
     public VouStatus save(VouStatus vouStatus) {
@@ -23,8 +24,8 @@ public class VouStatusDaoImpl extends AbstractDao<String, VouStatus> implements 
     }
 
     @Override
-    public List<VouStatus> findAll(String compCode,Integer deptId) {
-        String hsql = "select o from VouStatus o where o.key.compCode = '" + compCode + "' and o.key.department.deptId ='"+deptId+"'";
+    public List<VouStatus> findAll(String compCode, Integer deptId) {
+        String hsql = "select o from VouStatus o where o.key.compCode = '" + compCode + "' and o.key.deptId ='" + deptId + "'";
         return findHSQL(hsql);
     }
 
@@ -35,7 +36,7 @@ public class VouStatusDaoImpl extends AbstractDao<String, VouStatus> implements 
     }
 
     @Override
-    public VouStatus findById(String id) {
+    public VouStatus findById(VouStatusKey id) {
         return getByKey(id);
     }
 

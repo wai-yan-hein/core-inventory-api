@@ -29,16 +29,12 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public Region save(Region rg) throws Exception {
-        if (Util1.isNull(rg.getRegCode())) {
+        if (Util1.isNull(rg.getKey().getRegCode())) {
             Integer macId = rg.getMacId();
-            String compCode = rg.getCompCode();
+            String compCode = rg.getKey().getCompCode();
             String code = getRegionCode(macId, compCode);
-            Region valid = findByCode(code);
-            if (valid == null) {
-                rg.setRegCode(code);
-            } else {
-                throw new IllegalStateException("Duplicate Region Code");
-            }
+            rg.getKey().setRegCode(code);
+
         }
         return dao.save(rg);
     }

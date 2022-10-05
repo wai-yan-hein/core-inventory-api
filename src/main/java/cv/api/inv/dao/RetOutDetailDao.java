@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.RetOutHisDetail;
+import io.swagger.models.auth.In;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
      RetOutHisDetail save(RetOutHisDetail pd);
 
-     List<RetOutHisDetail> search(String vouNo, String compCode);
+     List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId);
 
      int delete(String id) throws Exception;
 

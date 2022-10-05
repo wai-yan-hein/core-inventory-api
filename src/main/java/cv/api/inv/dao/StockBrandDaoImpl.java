@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.StockBrand;
+import cv.api.inv.entity.StockBrandKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class StockBrandDaoImpl extends AbstractDao<String, StockBrand> implements StockBrandDao {
+public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> implements StockBrandDao {
 
     @Override
     public StockBrand save(StockBrand item) throws Exception {
@@ -35,7 +36,7 @@ public class StockBrandDaoImpl extends AbstractDao<String, StockBrand> implement
     }
 
     @Override
-    public StockBrand findByCode(String code) {
+    public StockBrand findByCode(StockBrandKey code) {
         return getByKey(code);
     }
 

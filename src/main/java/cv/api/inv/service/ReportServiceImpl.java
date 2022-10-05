@@ -967,17 +967,14 @@ public class ReportServiceImpl implements ReportService {
                 ReorderLevel r = new ReorderLevel();
                 Stock s = new Stock();
                 String relCode = rs.getString("rel_code");
-                StockKey key = new StockKey();
-                key.setStockCode(rs.getString("stock_code"));
-                key.setCompCode(rs.getString("comp_code"));
-                s.setKey(key);
+
                 s.setStockName(rs.getString("stock_name"));
                 s.setUserCode(rs.getString("user_code"));
-                r.setStock(s);
+                r.setStockCode(rs.getString("stock_code"));
                 r.setMinQty(rs.getFloat("min_qty"));
-                r.setMinUnit(new StockUnit(rs.getString("min_unit")));
+                r.setMinUnitCode(rs.getString("min_unit"));
                 r.setMaxQty(rs.getFloat("max_qty"));
-                r.setMaxUnit(new StockUnit(rs.getString("max_unit")));
+                r.setMaxUnitCode(rs.getString("max_unit"));
                 //max qty
                 r.setMaxSmallQty(rs.getFloat("max_small_qty"));
                 //min qty
@@ -1003,17 +1000,15 @@ public class ReportServiceImpl implements ReportService {
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 String stockCode = rs.getString("stock_code");
-                Integer deptId = rs.getInt("dept_id");
                 String roStockCode = rs.getString("ro_stock_code");
                 String purUnit = rs.getString("pur_unit");
                 if (Objects.isNull(roStockCode)) {
-                    StockUnit unit = new StockUnit(purUnit);
                     ReorderLevel rl = new ReorderLevel();
-                    rl.setStock(new Stock(new StockKey(stockCode, compCode,deptId)));
+                    rl.setStockCode(stockCode);
                     rl.setMinQty(0.0f);
-                    rl.setMinUnit(unit);
+                    rl.setMinUnitCode(purUnit);
                     rl.setMaxQty(0.0f);
-                    rl.setMaxUnit(unit);
+                    rl.setMaxUnitCode(purUnit);
                     getSession().save(rl);
                     log.info("reorder : generate reorder stock");
                 }

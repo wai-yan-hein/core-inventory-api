@@ -5,6 +5,7 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
     List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
                             String vouNo, String userCode,String vouStatus);
 
-    StockInOut findById(String id);
+    StockInOut findById(StockIOKey id);
 
     int delete(String vouNo) throws Exception;
 

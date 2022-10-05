@@ -11,6 +11,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisDetail;
+import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.service.PurHisDetailService;
 import cv.api.inv.service.PurHisService;
 import cv.api.inv.service.ReportService;
@@ -52,7 +53,7 @@ public class PurchaseController {
         try {
             messageSender.sendMessage("PURCHASE", pur.getKey().getVouNo());
         } catch (Exception e) {
-            PurHis ph = phService.findById(pur.getKey().getVouNo());
+            PurHis ph = phService.findById(pur.getKey());
             ph.setIntgUpdStatus(null);
             phService.update(ph);
             log.error(String.format("sendMessage: PURCHASE %s", e.getMessage()));
@@ -72,8 +73,7 @@ public class PurchaseController {
         String ref = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref,
-                userCode, stockCode, locCode, compCode);
+        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(listPur);
     }
 
@@ -84,15 +84,15 @@ public class PurchaseController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-pur")
-    public ResponseEntity<PurHis> findPur(@RequestParam String code) {
-        PurHis sh = phService.findById(code);
+    @PostMapping(path = "/find-pur")
+    public ResponseEntity<PurHis> findPur(@RequestBody PurHisKey key) {
+        PurHis sh = phService.findById(key);
         return ResponseEntity.ok(sh);
     }
 
     @GetMapping(path = "/get-pur-detail")
-    public ResponseEntity<List<PurHisDetail>> getPurDetail(@RequestParam String vouNo) {
-        List<PurHisDetail> listSD = pdService.search(vouNo);
+    public ResponseEntity<List<PurHisDetail>> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        List<PurHisDetail> listSD = pdService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
 }

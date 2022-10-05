@@ -36,7 +36,7 @@ public class SaleHisDetail implements java.io.Serializable {
     @Column(name = "qty", nullable = false)
     private Float qty;
     @Column(name = "sale_unit")
-    private String uniCode;
+    private String unitCode;
     @Column(name = "sale_price", nullable = false)
     private Float price;
     @Column(name = "sale_amt", nullable = false)
@@ -47,4 +47,18 @@ public class SaleHisDetail implements java.io.Serializable {
     private Integer uniqueId;
     @Column(name = "comp_code")
     private String compCode;
+    @Transient
+    private String userCode;
+    @Transient
+    private String stockName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
+    @Transient
+    private String relName;
+    @Transient
+    private String locName;
 }

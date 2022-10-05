@@ -6,7 +6,9 @@
 package cv.api.inv.service;
 
 import cv.api.inv.dao.StockUnitDao;
+import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.StockUnit;
+import cv.api.inv.entity.StockUnitKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +41,7 @@ public class StockUnitServiceImpl implements StockUnitService {
     }
 
     @Override
-    public StockUnit findByCode(String code) {
+    public StockUnit findByCode(StockUnitKey code) {
         return dao.findByCode(code);
     }
 

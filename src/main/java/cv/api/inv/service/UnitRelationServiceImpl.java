@@ -7,6 +7,7 @@ package cv.api.inv.service;
 
 import cv.api.common.Util1;
 import cv.api.inv.dao.UnitRelationDao;
+import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.UnitRelation;
 import cv.api.inv.entity.UnitRelationDetail;
 import cv.api.inv.entity.UnitRelationDetailKey;
@@ -63,6 +64,11 @@ public class UnitRelationServiceImpl implements UnitRelationService {
         detail.forEach(ud -> dao.save(ud));
         ur.setRelName(getRelStr(detail));
         return dao.save(ur);
+    }
+
+    @Override
+    public UnitRelation findByKey(RelationKey key) {
+        return dao.findByKey(key);
     }
 
     private String getRelStr(List<UnitRelationDetail> listRD) {

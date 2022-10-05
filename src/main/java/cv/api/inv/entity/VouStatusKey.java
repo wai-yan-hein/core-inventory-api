@@ -15,7 +15,6 @@ public class VouStatusKey implements Serializable {
     private String code;
     @Column(name = "comp_code")
     private String compCode;
-    @ManyToOne
-    @JoinColumn(name = "dept_id")
-    private Department department;
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

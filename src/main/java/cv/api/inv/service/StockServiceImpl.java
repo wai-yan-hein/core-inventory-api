@@ -84,8 +84,8 @@ public class StockServiceImpl implements StockService {
 
 
     @Override
-    public List<Stock> getStock(String str, String compCode) {
-        return dao.getStock(str, compCode);
+    public List<Stock> getStock(String str, String compCode,Integer deptId) {
+        return dao.getStock(str, compCode,deptId);
     }
 
 }

@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.StockBrand;
+import cv.api.inv.entity.StockBrandKey;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 
      List<StockBrand> findAll(String compCode, Integer deptId);
 
-     StockBrand findByCode(String code);
+     StockBrand findByCode(StockBrandKey code);
 
      int delete(String id);
 }

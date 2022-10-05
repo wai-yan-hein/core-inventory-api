@@ -16,7 +16,7 @@ import java.util.List;
 
      PurHisDetail save(PurHisDetail pd);
     
-     List<PurHisDetail> search(String glCode);
+     List<PurHisDetail> search(String vouNo, String compCode, Integer deptId);
 
      int delete(String code) throws Exception;
 

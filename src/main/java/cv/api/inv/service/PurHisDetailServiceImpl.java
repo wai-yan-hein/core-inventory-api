@@ -33,8 +33,8 @@ public class PurHisDetailServiceImpl implements PurHisDetailService {
     }
 
     @Override
-    public List<PurHisDetail> search(String glCode) {
-        return dao.search(glCode);
+    public List<PurHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo,compCode,deptId);
     }
 
     @Override
