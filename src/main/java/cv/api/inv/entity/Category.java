@@ -9,11 +9,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @author wai yan
@@ -26,10 +24,9 @@ import java.util.Objects;
 @Table(name = "category")
 public class Category implements java.io.Serializable {
 
-    @Id
-    @Column(name = "cat_code", unique = true, nullable = false)
-    private String catCode;
-    @Column(name = "cat_name", nullable = false, length = 500, unique = true)
+    @EmbeddedId
+    private CategoryKey key;
+    @Column(name = "cat_name")
     private String catName;
     @Column(name = "mig_id")
     private Integer migId;
@@ -47,22 +44,8 @@ public class Category implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
 
     public Category() {
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Category category = (Category) o;
-        return catCode != null && Objects.equals(catCode, category.catCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

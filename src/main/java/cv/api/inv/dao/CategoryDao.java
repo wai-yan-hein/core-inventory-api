@@ -18,7 +18,7 @@ import java.util.List;
 
      Category save(Category item);
 
-     List<Category> findAll(String compCode);
+     List<Category> findAll(String compCode, Integer deptId);
 
      List<Category> search(String catName);
 

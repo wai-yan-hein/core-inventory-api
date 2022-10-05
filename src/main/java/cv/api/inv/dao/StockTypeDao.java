@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.StockType;
+import cv.api.inv.entity.StockTypeKey;
 
 import java.util.List;
 
@@ -16,9 +17,9 @@ import java.util.List;
 
      StockType save(StockType item);
 
-     List<StockType> findAll(String compCode);
+     List<StockType> findAll(String compCode, Integer deptId);
 
      int delete(String id);
 
-    StockType findByCode(String code);
+    StockType findByCode(StockTypeKey key);
 }

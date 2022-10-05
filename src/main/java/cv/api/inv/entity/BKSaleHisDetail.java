@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -34,8 +37,10 @@ public class BKSaleHisDetail implements java.io.Serializable {
     private SaleDetailKey sdKey;
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "stock_code", referencedColumnName = "stock_code"),
-            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+            @JoinColumn(name = "stock_code"),
+            @JoinColumn(name = "comp_code"),
+            @JoinColumn(name = "dept_id")
+
     })
     private Stock stock;
     @Temporal(TemporalType.DATE)
@@ -44,7 +49,11 @@ public class BKSaleHisDetail implements java.io.Serializable {
     @Column(name = "qty", nullable = false)
     private Float qty;
     @ManyToOne
-    @JoinColumn(name = "sale_unit", nullable = false)
+    @JoinColumnsOrFormulas(value = {
+            @JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")),
+            @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")),
+            @JoinColumnOrFormula(column = @JoinColumn(name = "sale_unit"))
+    })
     private StockUnit saleUnit;
     @Column(name = "sale_price", nullable = false)
     private Float price;
@@ -55,8 +64,6 @@ public class BKSaleHisDetail implements java.io.Serializable {
     private Location location;
     @Column(name = "unique_id")
     private Integer uniqueId;
-    @Column(name = "sale_wt")
-    private Float saleWt;
     @Column(name = "comp_code", insertable = false, updatable = false)
     private String compCode;
 }

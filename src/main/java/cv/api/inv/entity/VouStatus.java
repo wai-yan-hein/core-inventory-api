@@ -22,9 +22,8 @@ import java.util.Date;
 @Table(name = "vou_status")
 public class VouStatus implements java.io.Serializable {
 
-    @Id
-    @Column(name = "code")
-    private String code;
+    @EmbeddedId
+    private VouStatusKey key;
     @Column(name = "description")
     private String description;
     @Temporal(TemporalType.TIMESTAMP)
@@ -41,8 +40,7 @@ public class VouStatus implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
+
 
     public VouStatus() {
     }

@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 
@@ -27,15 +30,14 @@ public class RetInHisDetail implements java.io.Serializable {
     @EmbeddedId
     private RetInKey riKey;
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "stock_code", referencedColumnName = "stock_code"),
-            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
-    })
+    @JoinColumns({@JoinColumn(name = "stock_code"), @JoinColumn(name = "comp_code"), @JoinColumn(name = "dept_id")})
     private Stock stock;
     @Column(name = "qty", nullable = false)
     private Float qty;
+    @Column(name = "avg_qty", nullable = false)
+    private Float avgQty;
     @ManyToOne
-    @JoinColumn(name = "unit", nullable = false)
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "unit"))})
     private StockUnit unit;
     @Column(name = "cost_price")
     private Float costPrice;
@@ -48,8 +50,6 @@ public class RetInHisDetail implements java.io.Serializable {
     private Location location;
     @Column(name = "unique_id")
     private Integer uniqueId;
-    @Column(name = "wt")
-    private Float wt;
     @Column(name = "comp_code", insertable = false, updatable = false)
     private String compCode;
 }

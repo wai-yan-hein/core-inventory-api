@@ -33,8 +33,8 @@ public class UnitRelationServiceImpl implements UnitRelationService {
 
     @Override
     public UnitRelation save(UnitRelation ur) {
-        if (Objects.isNull(ur.getRelCode())) {
-            ur.setRelCode(getUnitCode());
+        if (Objects.isNull(ur.getKey().getRelCode())) {
+            ur.getKey().setRelCode(getUnitCode());
         }
         List<UnitRelationDetail> detail = ur.getDetailList();
         detail.removeIf(rd -> rd.getUnit() == null);
@@ -46,12 +46,12 @@ public class UnitRelationServiceImpl implements UnitRelationService {
                 // last index
                 if (lastIndex == detail.size() - 1) {
                     UnitRelationDetail ud = detail.get(lastIndex);
-                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getRelCode());
+                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getKey().getRelCode());
                     ud.setKey(key);
                     ud.setSmallestQty(1.0f);
                 } else {
                     UnitRelationDetail rd = detail.get(size - 1);
-                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getRelCode());
+                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getKey().getRelCode());
                     rd.setKey(key);
                     float qty = detail.get(size).getQty();
                     float small = detail.get(size).getSmallestQty();

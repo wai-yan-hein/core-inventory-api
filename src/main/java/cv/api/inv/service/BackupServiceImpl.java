@@ -30,11 +30,10 @@ public class BackupServiceImpl implements BackupService {
     public void backup(SaleHis sh) {
         if (sh.getStatus().equals("EDIT")) {
             if (sh.isBackup()) {
-                String vouNo = sh.getVouNo();
-                SaleHis s = shDao.findById(vouNo);
+                SaleHis s = shDao.findById(sh.getKey());
                 BKSaleHis bk = (BKSaleHis) Util1.cast(s, BKSaleHis.class);
                 bk = dao.save(bk);
-                List<SaleHisDetail> sd = shdDao.search(vouNo);
+                List<SaleHisDetail> sd = shdDao.search(sh.getKey().getVouNo());
                 for (SaleHisDetail b : sd) {
                     BKSaleHisDetail bks = (BKSaleHisDetail) Util1.cast(b, BKSaleHisDetail.class);
                     bks.setLogId(bk.getLogId());

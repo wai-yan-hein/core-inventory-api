@@ -29,8 +29,8 @@ public class StockUnitServiceImpl implements StockUnitService {
     }
 
     @Override
-    public List<StockUnit> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<StockUnit> findAll(String compCode,Integer deptId) {
+        return dao.findAll(compCode,deptId);
     }
 
     @Override

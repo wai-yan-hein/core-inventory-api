@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.SaleHis;
+import cv.api.inv.entity.SaleHisKey;
 import cv.api.inv.view.VSale;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements SaleHisDao {
+public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements SaleHisDao {
 
 
     @Override
@@ -76,7 +77,7 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
     }
 
     @Override
-    public SaleHis findById(String id) {
+    public SaleHis findById(SaleHisKey id) {
         return getByKey(id);
     }
 

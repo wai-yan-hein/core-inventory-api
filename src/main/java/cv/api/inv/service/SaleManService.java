@@ -6,19 +6,20 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.SaleMan;
+import cv.api.inv.entity.SaleManKey;
 
 import java.util.List;
 
 /**
  * @author wai yan
  */
- public interface SaleManService {
+public interface SaleManService {
 
-     SaleMan save(SaleMan saleMan) throws Exception;
+    SaleMan save(SaleMan saleMan) throws Exception;
 
-     List<SaleMan> findAll(String compCode);
+    List<SaleMan> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     SaleMan findByCode(String code);
+    SaleMan findByCode(SaleManKey key);
 }

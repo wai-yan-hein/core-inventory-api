@@ -10,11 +10,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
+
 
 /**
  * @author wai yan
@@ -29,9 +28,8 @@ import java.util.Objects;
 @Table(name = "stock_unit")
 public class StockUnit implements java.io.Serializable {
 
-    @Id
-    @Column(name = "unit_code", unique = true, nullable = false, length = 10)
-    private String unitCode;
+    @EmbeddedId
+    private StockUnitKey key;
     @Column(name = "unit_name", nullable = false, length = 45, unique = true)
     private String unitName;
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,23 +46,10 @@ public class StockUnit implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
 
-    public StockUnit(String unitCode) {
-        this.unitCode = unitCode;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        StockUnit stockUnit = (StockUnit) o;
-        return unitCode != null && Objects.equals(unitCode, stockUnit.unitCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public StockUnit(String unit) {
+        this.key = new StockUnitKey();
+        this.key.setUnitCode(unit);
+        this.unitName = unitName;
     }
 }

@@ -6,6 +6,8 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.SaleMan;
+import cv.api.inv.entity.SaleManKey;
+import io.swagger.models.auth.In;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class SaleManDaoImpl extends AbstractDao<String, SaleMan> implements SaleManDao {
+public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements SaleManDao {
 
     @Override
     public SaleMan save(SaleMan saleMan) {
@@ -23,8 +25,8 @@ public class SaleManDaoImpl extends AbstractDao<String, SaleMan> implements Sale
     }
 
     @Override
-    public List<SaleMan> findAll(String compCode) {
-        String hsql = "select o from SaleMan o where o.compCode = '" + compCode + "'";
+    public List<SaleMan> findAll(String compCode, Integer deptId) {
+        String hsql = "select o from SaleMan o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
         return findHSQL(hsql);
     }
 
@@ -35,7 +37,7 @@ public class SaleManDaoImpl extends AbstractDao<String, SaleMan> implements Sale
     }
 
     @Override
-    public SaleMan findByCode(String id) {
+    public SaleMan findByCode(SaleManKey id) {
         return getByKey(id);
     }
 

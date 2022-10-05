@@ -14,8 +14,8 @@ public class TraderGroupDaoImpl extends AbstractDao<String, TraderGroup> impleme
     }
 
     @Override
-    public List<TraderGroup> getTraderGroup(String compCode) {
-        String hsql = "select o from TraderGroup o where o.compCode ='" + compCode + "'";
+    public List<TraderGroup> getTraderGroup(String compCode,Integer deptId) {
+        String hsql = "select o from TraderGroup o where o.key.compCode ='" + compCode + "' and o.key.deptId = "+deptId+"";
         return findHSQL(hsql);
     }
 }

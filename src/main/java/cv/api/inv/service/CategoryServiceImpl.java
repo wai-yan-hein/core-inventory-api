@@ -29,23 +29,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category save(Category cat) throws Exception {
-        if (Util1.isNull(cat.getCatCode())) {
+        if (Util1.isNull(cat.getKey().getCatCode())) {
             Integer macId = cat.getMacId();
-            String compCode = cat.getCompCode();
+            String compCode = cat.getKey().getCompCode();
             String catCode = getCatCode(macId, compCode);
-            Category valid = findByCode(catCode);
-            if (valid == null) {
-                cat.setCatCode(catCode);
-            } else {
-                throw new IllegalStateException("Duplicate Category Code");
-            }
+            cat.getKey().setCatCode(catCode);
+
         }
         return dao.save(cat);
     }
 
     @Override
-    public List<Category> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<Category> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode,deptId);
     }
 
     @Override

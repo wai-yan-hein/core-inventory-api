@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.StockTypeDao;
 import cv.api.inv.entity.StockType;
+import cv.api.inv.entity.StockTypeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,21 +29,16 @@ public class StockTypeServiceImpl implements StockTypeService {
 
     @Override
     public StockType save(StockType s) throws Exception {
-        if (Util1.isNull(s.getStockTypeCode())) {
-            String code = getCode(s.getMacId(), "StockType", "-", s.getCompCode());
-            StockType valid = findByCode(code);
-            if (valid == null) {
-                s.setStockTypeCode(code);
-            } else {
-                throw new IllegalStateException("Duplicate Stock Type");
-            }
+        if (Util1.isNull(s.getKey().getStockTypeCode())) {
+            String code = getCode(s.getMacId(), s.getKey().getCompCode());
+            s.getKey().setStockTypeCode(code);
         }
         return dao.save(s);
     }
 
     @Override
-    public List<StockType> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<StockType> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode, deptId);
     }
 
     @Override
@@ -51,12 +47,12 @@ public class StockTypeServiceImpl implements StockTypeService {
     }
 
     @Override
-    public StockType findByCode(String code) {
-        return dao.findByCode(code);
+    public StockType findByCode(StockTypeKey key) {
+        return dao.findByCode(key);
     }
 
-    private String getCode(Integer macId, String option, String period, String compCode) {
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
+    private String getCode(Integer macId, String compCode) {
+        int seqNo = seqService.getSequence(macId, "StockType", "-", compCode);
         return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
     }
 

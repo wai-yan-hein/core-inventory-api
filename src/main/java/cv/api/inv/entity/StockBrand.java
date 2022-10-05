@@ -6,10 +6,7 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -20,17 +17,13 @@ import java.util.Objects;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "stock_brand")
-public class StockBrand implements java.io.Serializable {
+public class StockBrand {
 
-    @Id
-    @Column(name = "brand_code", unique = true, nullable = false)
-    private String brandCode;
+    @EmbeddedId
+    private StockBrandKey key;
     @Column(name = "brand_name", nullable = false, length = 80, unique = true)
     private String brandName;
     @Column(name = "mig_id")
@@ -49,19 +42,5 @@ public class StockBrand implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        StockBrand that = (StockBrand) o;
-        return brandCode != null && Objects.equals(brandCode, that.brandCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

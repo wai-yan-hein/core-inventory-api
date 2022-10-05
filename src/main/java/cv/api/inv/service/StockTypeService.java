@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.StockType;
+import cv.api.inv.entity.StockTypeKey;
 
 import java.util.List;
 
@@ -14,11 +15,11 @@ import java.util.List;
  */
  public interface StockTypeService {
 
-     StockType findByCode(String code);
+     StockType findByCode(StockTypeKey key);
 
      StockType save(StockType item) throws Exception;
 
-     List<StockType> findAll(String compCode);
+     List<StockType> findAll(String compCode, Integer deptId);
 
      int delete(String id);
 }

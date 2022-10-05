@@ -12,6 +12,7 @@ import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.entity.SaleDetailKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisDetail;
+import cv.api.inv.entity.SaleHisKey;
 import cv.api.inv.view.VSale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +43,16 @@ public class SaleHisServiceImpl implements SaleHisService {
     public SaleHis save(SaleHis saleHis) throws Exception {
         saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         String status = saleHis.getStatus();
-        if (Util1.isNullOrEmpty(saleHis.getVouNo())) {
-            saleHis.setVouNo(getVoucherNo(saleHis.getMacId(), saleHis.getTrader().getKey().getCompCode()));
+        if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
+            saleHis.getKey().setVouNo(getVoucherNo(saleHis.getMacId(), saleHis.getKey().getCompCode()));
         }
         if (saleHis.isDeleted()) {
             shDao.save(saleHis);
         } else {
             List<SaleHisDetail> listSD = saleHis.getListSH();
             List<String> listDel = saleHis.getListDel();
-            String vouNo = saleHis.getVouNo();
+            String vouNo = saleHis.getKey().getVouNo();
             //backup
-            if (status.equals("NEW")) {
-                SaleHis valid = shDao.findById(vouNo);
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Sale Voucher");
-                }
-            }
             if (listDel != null) {
                 listDel.forEach(code -> {
                     if (code != null) {
@@ -79,7 +74,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                         }
                         String sdCode = vouNo + "-" + cSd.getUniqueId();
                         cSd.setSdKey(new SaleDetailKey(vouNo, sdCode));
-                        cSd.setCompCode(saleHis.getTrader().getKey().getCompCode());
+                        cSd.setCompCode(saleHis.getKey().getCompCode());
                         sdDao.save(cSd);
                     }
                 }
@@ -96,13 +91,12 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public List<SaleHis> search(String fromDate, String toDate, String cusCode,
-                                String vouNo, String remark, String userCode) {
+    public List<SaleHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
         return shDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
     }
 
     @Override
-    public SaleHis findById(String id) {
+    public SaleHis findById(SaleHisKey id) {
         return shDao.findById(id);
     }
 

@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.SaleHis;
+import cv.api.inv.entity.SaleHisKey;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface SaleHisService {
     List<SaleHis> search(String fromDate, String toDate, String cusCode,
                          String vouNo, String remark, String userCode);
 
-    SaleHis findById(String id);
+    SaleHis findById(SaleHisKey id);
 
     int delete(String vouNo) throws Exception;
 

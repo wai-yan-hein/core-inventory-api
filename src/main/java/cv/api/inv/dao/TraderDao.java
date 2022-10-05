@@ -28,9 +28,9 @@ import java.util.List;
 
     int delete(TraderKey code);
 
-    List<Trader> findCustomer(String compCode);
+    List<Trader> findCustomer(String compCode,Integer deptId);
 
-    List<Trader> findSupplier(String compCode);
+    List<Trader> findSupplier(String compCode,Integer deptId);
 
     List<Trader> unUploadTrader();
 

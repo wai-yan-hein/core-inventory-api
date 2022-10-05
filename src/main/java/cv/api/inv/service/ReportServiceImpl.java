@@ -206,7 +206,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.saleman_code,sm.saleman_name,v.stock_name,v.qty,v.sale_wt,v.sale_unit,v.sale_price,v.sale_amt\n" +
+        String sql = "select v.vou_date,v.vou_no,v.saleman_code,sm.saleman_name,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
                 "from v_sale v left join sale_man sm on v.saleman_code = sm.saleman_code\n" +
                 "where (v.saleman_code = '" + smCode + "' or '-' = '" + smCode + "')\n" +
                 "and v.deleted = false\n" +
@@ -225,7 +225,6 @@ public class ReportServiceImpl implements ReportService {
                 sale.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setQty(rs.getFloat("qty"));
-                sale.setSaleWt(rs.getFloat("sale_wt"));
                 sale.setSaleUnit(rs.getString("sale_unit"));
                 sale.setSalePrice(rs.getFloat("sale_price"));
                 sale.setSaleAmount(rs.getFloat("sale_amt"));
@@ -272,7 +271,7 @@ public class ReportServiceImpl implements ReportService {
                                                String curCode, String traderCode, String stockCode,
                                                String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.stock_name,v.qty,v.sale_wt,v.sale_unit,v.sale_price,v.sale_amt\n" +
+        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
                 "from v_sale v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
@@ -292,7 +291,6 @@ public class ReportServiceImpl implements ReportService {
                 sale.setTraderName(rs.getString("trader_name"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setQty(rs.getFloat("qty"));
-                sale.setSaleWt(rs.getFloat("sale_wt"));
                 sale.setSaleUnit(rs.getString("sale_unit"));
                 sale.setSalePrice(rs.getFloat("sale_price"));
                 sale.setSaleAmount(rs.getFloat("sale_amt"));
@@ -336,7 +334,7 @@ public class ReportServiceImpl implements ReportService {
                                                        String traderCode, String stockCode, String compCode, Integer macId) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
-                "v.stock_name,v.qty,v.avg_qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
+                "v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
                 "from v_purchase v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" +
@@ -355,9 +353,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderCode(rs.getString("trader_code"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockName(rs.getString("stock_name"));
-                float avgQty =rs.getFloat("avg_qty");
-                float qty = rs.getFloat("qty");
-                p.setQty(avgQty==0?qty:avgQty);
+                p.setQty(rs.getFloat("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
                 p.setPurPrice(rs.getFloat("pur_price"));
                 p.setPurAmount(rs.getFloat("pur_amt"));
@@ -372,7 +368,7 @@ public class ReportServiceImpl implements ReportService {
                                              String typeCode, String brandCode, String catCode, String locCode,
                                              String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.s_user_code,v.stock_name,v.remark,v.trader_code,t.trader_name,v.qty,v.sale_wt,v.sale_unit,v.sale_amt\n" +
+        String sql = "select v.vou_date,v.vou_no,v.s_user_code,v.stock_name,v.remark,v.trader_code,t.trader_name,v.qty,v.sale_unit,v.sale_amt\n" +
                 "from v_sale v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
@@ -396,8 +392,7 @@ public class ReportServiceImpl implements ReportService {
                 sale.setStockUserCode(rs.getString("s_user_code"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setQty(rs.getFloat("qty"));
-                sale.setSaleWt(rs.getFloat("sale_wt"));
-                sale.setSaleUnit(rs.getString("sale_unit"));
+                                sale.setSaleUnit(rs.getString("sale_unit"));
                 sale.setSaleAmount(rs.getFloat("sale_amt"));
                 sale.setRemark(rs.getString("remark"));
                 saleList.add(sale);
@@ -411,7 +406,7 @@ public class ReportServiceImpl implements ReportService {
                                             String typeCode, String brandCode, String catCode, String locCode,
                                             String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_wt,v.sale_unit,v.sale_price,v.sale_amt\n" +
+        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
                 "from v_sale v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
@@ -435,7 +430,6 @@ public class ReportServiceImpl implements ReportService {
                 sale.setStockUserCode(rs.getString("s_user_code"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setQty(rs.getFloat("qty"));
-                sale.setSaleWt(rs.getFloat("sale_wt"));
                 sale.setSaleUnit(rs.getString("sale_unit"));
                 sale.setSalePrice(rs.getFloat("sale_price"));
                 sale.setSaleAmount(rs.getFloat("sale_amt"));
@@ -451,7 +445,7 @@ public class ReportServiceImpl implements ReportService {
                                                     String stockCode, String compCode, Integer macId) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
-                "v.s_user_code,v.stock_name,v.qty,v.avg_qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
+                "v.s_user_code,v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
                 "from v_purchase v join trader t\n" +
                 "on v.trader_code = t.code\n" +
                 "where (v.stock_code = '" + stockCode + "' or '-'='" + stockCode + "')\n" +
@@ -473,9 +467,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockUserCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
-                float avgQty =rs.getFloat("avg_qty");
-                float qty = rs.getFloat("qty");
-                p.setQty(avgQty==0?qty:avgQty);
+                p.setQty(rs.getFloat("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
                 p.setPurPrice(rs.getFloat("pur_price"));
                 p.setPurAmount(rs.getFloat("pur_amt"));
@@ -591,12 +583,12 @@ public class ReportServiceImpl implements ReportService {
     private void calStockBalanceByLocation(String typeCode, String cateCode, String brandCode, String stockCode,
                                            String compCode, Integer macId) {
         String delSql = "delete from tmp_stock_balance where mac_id = " + macId + "";
-        String sql = "insert into tmp_stock_balance(stock_code, qty, wt, unit, loc_code,smallest_qty, mac_id)\n" +
-                "select stock_code,qty,weight,unit,loc_code,sum(smallest_qty) smallest_qty," + macId + "\n" +
+        String sql = "insert into tmp_stock_balance(stock_code, qty, unit, loc_code,smallest_qty, mac_id)\n" +
+                "select stock_code,qty,unit,loc_code,sum(smallest_qty) smallest_qty," + macId + "\n" +
                 "from (\n" +
-                "\tselect a.stock_code,sum(a.qty) qty,sum(weight) weight,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty\n" +
+                "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty\n" +
                 "\tfrom(\n" +
-                "\t\tselect stock_code,sum(qty) as qty,ifnull(std_wt,1) weight,unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) as qty,unit,loc_code\n" +
                 "\t\tfrom v_opening\n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand (comp_code = '" + compCode + "' or '-' ='" + compCode + "')\n" +
@@ -605,9 +597,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code , std_wt , unit , loc_code \n" +
+                "\t\tgroup by stock_code, unit , loc_code \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) * - 1 as qty,ifnull(sale_wt,1) wt,sale_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code\n" +
                 "\t\tfrom v_sale \n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand (comp_code = '" + compCode + "' or '-' ='" + compCode + "')\n" +
@@ -616,9 +608,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (cat_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code,sale_wt ,sale_unit ,loc_code \n" +
+                "\t\tgroup by stock_code ,sale_unit ,loc_code \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) as qty,ifnull(std_wt,1) wt,pur_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) as qty,pur_unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_purchase \n" +
                 "\t\twhere deleted = 0\n" +
@@ -628,9 +620,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code , std_wt , pur_unit , loc_code \n" +
+                "\t\tgroup by stock_code , pur_unit , loc_code \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) as qty,ifnull(wt,1) wt,unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) as qty,unit,loc_code\n" +
                 "\t\tfrom v_return_in\n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand (comp_code = '" + compCode + "' or '-' ='" + compCode + "')\n" +
@@ -639,9 +631,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code,wt,unit ,loc_code \n" +
+                "\t\tgroup by stock_code,unit ,loc_code \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) * - 1 as qty,ifnull(wt,1) wt,unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) * - 1 as qty,unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_return_out\n" +
                 "\t\twhere deleted = 0\n" +
@@ -651,9 +643,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code , wt , unit , loc_code \n" +
+                "\t\tgroup by stock_code  , unit , loc_code \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(in_qty),ifnull(in_wt,1) wt,in_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(in_qty),in_unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_stock_io\n" +
                 "\t\twhere in_qty is not null\n" +
@@ -665,9 +657,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code ,in_wt ,in_unit ,loc_code \n" +
+                "\t\tgroup by stock_code ,in_unit ,loc_code \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(out_qty) * - 1,ifnull(out_wt,1) wt,out_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(out_qty) * - 1,out_unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_stock_io\n" +
                 "\t\twhere out_qty is not null\n" +
@@ -679,9 +671,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code ,out_wt , out_unit , loc_code\n" +
+                "\t\tgroup by stock_code , out_unit , loc_code\n" +
                 "\t\t\tunion all\n" +
-                "\t\tselect stock_code,sum(qty) * - 1,ifnull(wt,1) wt,unit,loc_code_from\n" +
+                "\t\tselect stock_code,sum(qty) * - 1,unit,loc_code_from\n" +
                 "\t\tfrom v_transfer \n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand (comp_code = '" + compCode + "' or '-' ='" + compCode + "')\n" +
@@ -690,9 +682,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code ,wt , unit , loc_code_from\n" +
+                "\t\tgroup by stock_code, unit , loc_code_from\n" +
                 "\t\t\tunion all\n" +
-                "\t\tselect stock_code,sum(qty),ifnull(wt,1) wt,unit,loc_code_to\n" +
+                "\t\tselect stock_code,sum(qty),unit,loc_code_to\n" +
                 "\t\tfrom v_transfer \n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand (comp_code = '" + compCode + "' or '-' ='" + compCode + "')\n" +
@@ -701,12 +693,12 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code ,wt , unit , loc_code_to) a\n" +
+                "\t\tgroup by stock_code , unit , loc_code_to) a\n" +
                 "join stock s\n" +
                 "on a.stock_code = s.stock_code\n" +
                 "join v_relation rel on s.rel_code = rel.rel_code \n" +
                 "and a.unit = rel.unit\n" +
-                "group by a.stock_code,a.weight,a.unit,a.loc_code) b\n" +
+                "group by a.stock_code,a.unit,a.loc_code) b\n" +
                 "group by b.stock_code,b.loc_code";
         try {
             reportDao.executeSql(delSql, sql);
@@ -717,12 +709,12 @@ public class ReportServiceImpl implements ReportService {
 
     private void calStockBalance(String typeCode, String cateCode, String brandCode, String stockCode, String compCode, Integer macId) {
         String delSql = "delete from tmp_stock_balance where mac_id = " + macId + "";
-        String sql = "insert into tmp_stock_balance(stock_code, qty, wt, unit, loc_code,smallest_qty, mac_id)\n" +
-                "select stock_code,qty,sum(weight),unit,loc_code,sum(smallest_qty) smallest_qty," + macId + "\n" +
+        String sql = "insert into tmp_stock_balance(stock_code, qty, unit, loc_code,smallest_qty, mac_id)\n" +
+                "select stock_code,qty,unit,loc_code,sum(smallest_qty) smallest_qty," + macId + "\n" +
                 "from (\n" +
-                "\tselect a.stock_code,sum(a.qty) qty,sum(weight) weight,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty\n" +
+                "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty\n" +
                 "\tfrom(\n" +
-                "\t\tselect stock_code,sum(qty) as qty,ifnull(std_wt,1) weight,unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) as qty,unit,loc_code\n" +
                 "\t\tfrom v_opening\n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand comp_code = '" + compCode + "'\n" +
@@ -731,9 +723,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code , std_wt , unit \n" +
+                "\t\tgroup by stock_code , unit \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) * - 1 as qty,ifnull(sale_wt,1) wt,sale_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code\n" +
                 "\t\tfrom v_sale \n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand comp_code = '" + compCode + "'\n" +
@@ -742,9 +734,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (cat_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code,sale_wt ,sale_unit \n" +
+                "\t\tgroup by stock_code ,sale_unit \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) as qty,ifnull(std_wt,1) wt,pur_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) as qty,pur_unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_purchase \n" +
                 "\t\twhere deleted = 0\n" +
@@ -754,9 +746,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code , std_wt , pur_unit \n" +
+                "\t\tgroup by stock_code, pur_unit \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) as qty,ifnull(wt,1) wt,unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) as qty,unit,loc_code\n" +
                 "\t\tfrom v_return_in\n" +
                 "\t\twhere deleted = 0\n" +
                 "\t\tand comp_code = '" + compCode + "'\n" +
@@ -765,9 +757,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code,wt,unit \n" +
+                "\t\tgroup by stock_code,unit \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(qty) * - 1 as qty,ifnull(wt,1) wt,unit,loc_code\n" +
+                "\t\tselect stock_code,sum(qty) * - 1 as qty,unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_return_out\n" +
                 "\t\twhere deleted = 0\n" +
@@ -777,9 +769,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code , wt , unit \n" +
+                "\t\tgroup by stock_code, unit \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(in_qty),ifnull(in_wt,1) wt,in_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(in_qty),in_unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_stock_io\n" +
                 "\t\twhere in_qty is not null\n" +
@@ -791,9 +783,9 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code ,in_wt ,in_unit \n" +
+                "\t\tgroup by stock_code ,in_unit \n" +
                 "\t\t\tunion all \n" +
-                "\t\tselect stock_code,sum(out_qty) * - 1,ifnull(out_wt,1) wt,out_unit,loc_code\n" +
+                "\t\tselect stock_code,sum(out_qty) * - 1,out_unit,loc_code\n" +
                 "\t\tfrom\n" +
                 "\t\tv_stock_io\n" +
                 "\t\twhere out_qty is not null\n" +
@@ -805,12 +797,12 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand calculate =1\n" +
-                "\t\tgroup by stock_code ,out_wt , out_unit) a\n" +
+                "\t\tgroup by stock_code , out_unit) a\n" +
                 "join stock s\n" +
                 "on a.stock_code = s.stock_code\n" +
                 "join v_relation rel on s.rel_code = rel.rel_code \n" +
                 "and a.unit = rel.unit\n" +
-                "group by a.stock_code,a.weight,a.unit,a.loc_code) b\n" +
+                "group by a.stock_code,a.unit,a.loc_code) b\n" +
                 "group by b.stock_code";
         try {
             reportDao.executeSql(delSql, sql);
@@ -1003,7 +995,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public void generateReorder(String compCode) throws Exception {
         //generate reorder
-        String rSql = "select s.stock_code,s.pur_unit,rl.stock_code ro_stock_code,s.comp_code\n" +
+        String rSql = "select s.stock_code,s.pur_unit,rl.stock_code ro_stock_code,s.comp_code,s.dept_id\n" +
                 "from stock s left join reorder_level rl\n" +
                 "on s.stock_code = rl.stock_code\n" +
                 "where s.comp_code= '" + compCode + "' and rl.stock_code is null";
@@ -1011,12 +1003,13 @@ public class ReportServiceImpl implements ReportService {
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 String stockCode = rs.getString("stock_code");
+                Integer deptId = rs.getInt("dept_id");
                 String roStockCode = rs.getString("ro_stock_code");
                 String purUnit = rs.getString("pur_unit");
                 if (Objects.isNull(roStockCode)) {
                     StockUnit unit = new StockUnit(purUnit);
                     ReorderLevel rl = new ReorderLevel();
-                    rl.setStock(new Stock(new StockKey(stockCode, compCode)));
+                    rl.setStock(new Stock(new StockKey(stockCode, compCode,deptId)));
                     rl.setMinQty(0.0f);
                     rl.setMinUnit(unit);
                     rl.setMaxQty(0.0f);

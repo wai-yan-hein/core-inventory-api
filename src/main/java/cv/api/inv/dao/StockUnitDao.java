@@ -16,7 +16,7 @@ import java.util.List;
 
      StockUnit save(StockUnit unit);
 
-     List<StockUnit> findAll(String compCode);
+     List<StockUnit> findAll(String compCode,Integer deptId);
 
      int delete(String id);
 

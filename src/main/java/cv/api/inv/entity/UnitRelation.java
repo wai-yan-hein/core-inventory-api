@@ -10,9 +10,8 @@ import java.util.List;
 @Entity
 @Table(name = "unit_relation")
 public class UnitRelation implements java.io.Serializable {
-    @Id
-    @Column(name = "rel_code")
-    private String relCode;
+    @EmbeddedId
+    private RelationKey key;
     @Column(name = "rel_name")
     private String relName;
     @Transient

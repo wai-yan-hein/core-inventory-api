@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.StockType;
+import cv.api.inv.entity.StockTypeKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class StockTypeDaoImpl extends AbstractDao<String, StockType> implements StockTypeDao {
+public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> implements StockTypeDao {
 
     @Override
     public StockType save(StockType item) {
@@ -23,8 +24,8 @@ public class StockTypeDaoImpl extends AbstractDao<String, StockType> implements 
     }
 
     @Override
-    public List<StockType> findAll(String compCode) {
-        String hsql = "select o from StockType o where o.compCode = '" + compCode + "'";
+    public List<StockType> findAll(String compCode, Integer deptId) {
+        String hsql = "select o from StockType o where o.key.compCode = '" + compCode + "' and o.key.deptId=" + deptId + "";
         return findHSQL(hsql);
     }
 
@@ -35,8 +36,8 @@ public class StockTypeDaoImpl extends AbstractDao<String, StockType> implements 
     }
 
     @Override
-    public StockType findByCode(String code) {
-        return getByKey(code);
+    public StockType findByCode(StockTypeKey key) {
+        return getByKey(key);
     }
 
 }

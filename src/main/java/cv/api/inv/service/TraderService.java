@@ -27,9 +27,9 @@ import java.util.List;
 
     List<Trader> findAll(String compCode);
 
-    List<Trader> findCustomer(String compCode);
+    List<Trader> findCustomer(String compCode,Integer deptId);
 
-    List<Trader> findSupplier(String compCode);
+    List<Trader> findSupplier(String compCode,Integer deptId);
 
     List<String> delete(TraderKey key);
 

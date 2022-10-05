@@ -46,7 +46,6 @@ public class VSale {
     private String stockCode;
     private String expiredDate;
     private Float qty;
-    private Float saleWt;
     private String saleUnit;
     private Float salePrice;
     private Float saleAmount;

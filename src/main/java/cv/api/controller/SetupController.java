@@ -103,8 +103,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-category")
-    public ResponseEntity<List<Category>> getCategory(@RequestParam String compCode) {
-        List<Category> listCat = categoryService.findAll(compCode);
+    public ResponseEntity<List<Category>> getCategory(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<Category> listCat = categoryService.findAll(compCode, deptId);
         return ResponseEntity.ok(listCat);
     }
 
@@ -153,8 +153,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-saleman")
-    public ResponseEntity<List<SaleMan>> getSaleMan(@RequestParam String compCode) {
-        List<SaleMan> listSM = saleManService.findAll(compCode);
+    public ResponseEntity<List<SaleMan>> getSaleMan(@RequestParam String compCode,@RequestParam Integer deptId) {
+        List<SaleMan> listSM = saleManService.findAll(compCode,deptId);
         return ResponseEntity.ok(listSM);
     }
 
@@ -165,9 +165,9 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-saleman")
-    public ResponseEntity<SaleMan> findSaleMan(@RequestParam String smCode) {
-        SaleMan sm = saleManService.findByCode(smCode);
+    @PostMapping(path = "/find-saleman")
+    public ResponseEntity<SaleMan> findSaleMan(@RequestBody SaleManKey key) {
+        SaleMan sm = saleManService.findByCode(key);
         return ResponseEntity.ok(sm);
     }
 
@@ -178,8 +178,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-brand")
-    public ResponseEntity<List<StockBrand>> getBrand(@RequestParam String compCode) {
-        List<StockBrand> listB = brandService.findAll(compCode);
+    public ResponseEntity<List<StockBrand>> getBrand(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<StockBrand> listB = brandService.findAll(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -203,8 +203,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-type")
-    public ResponseEntity<List<StockType>> getType(@RequestParam String compCode) {
-        List<StockType> listB = typeService.findAll(compCode);
+    public ResponseEntity<List<StockType>> getType(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<StockType> listB = typeService.findAll(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -215,9 +215,9 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-type")
-    public ResponseEntity<StockType> findType(@RequestParam String code) {
-        StockType b = typeService.findByCode(code);
+    @PostMapping(path = "/find-type")
+    public ResponseEntity<StockType> findType(@RequestBody StockTypeKey key) {
+        StockType b = typeService.findByCode(key);
         return ResponseEntity.ok(b);
     }
 
@@ -229,8 +229,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-unit")
-    public ResponseEntity<List<StockUnit>> getUnit(@RequestParam String compCode) {
-        List<StockUnit> listB = unitService.findAll(compCode);
+    public ResponseEntity<List<StockUnit>> getUnit(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<StockUnit> listB = unitService.findAll(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -314,21 +314,19 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-customer")
-    public ResponseEntity<List<Trader>> getCustomer(@RequestParam String compCode) {
-        List<Trader> listB = traderService.findCustomer(compCode);
+    public ResponseEntity<List<Trader>> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<Trader> listB = traderService.findCustomer(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
     @GetMapping(path = "/get-trader-list")
-    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text,
-                                                        @RequestParam String type,
-                                                        @RequestParam String compCode) {
+    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode) {
         return ResponseEntity.ok(traderService.searchTrader(text, type, compCode));
     }
 
     @GetMapping(path = "/get-supplier")
-    public ResponseEntity<List<Trader>> getSupplier(@RequestParam String compCode) {
-        List<Trader> listB = traderService.findSupplier(compCode);
+    public ResponseEntity<List<Trader>> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<Trader> listB = traderService.findSupplier(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -346,8 +344,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-stock")
-    public ResponseEntity<Stock> saveStock(@RequestBody Stock region, HttpServletRequest request) throws Exception {
-        Stock b = stockService.save(region);
+    public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) throws Exception {
+        Stock b = stockService.save(stock);
         return ResponseEntity.ok(b);
     }
 
@@ -391,8 +389,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-voucher-status")
-    public ResponseEntity<List<VouStatus>> getVoucherStatus(@RequestParam String compCode) {
-        List<VouStatus> listB = vouStatusService.findAll(compCode);
+    public ResponseEntity<List<VouStatus>> getVoucherStatus(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<VouStatus> listB = vouStatusService.findAll(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -403,8 +401,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-opening")
-    public ResponseEntity<ReturnObject> saveOpening(@RequestBody OPHis opHis,
-                                                    HttpServletRequest request) {
+    public ResponseEntity<ReturnObject> saveOpening(@RequestBody OPHis opHis, HttpServletRequest request) {
         if (Util1.isNullOrEmpty(opHis.getVouDate())) {
             ro.setMessage("Invalid Opening Date.");
         } else if (Util1.isNullOrEmpty(opHis.getLocation())) {
@@ -476,8 +473,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-reorder")
-    public ResponseEntity<ReturnObject> saveReorder(@RequestBody ReorderLevel rl,
-                                                    HttpServletRequest request) {
+    public ResponseEntity<ReturnObject> saveReorder(@RequestBody ReorderLevel rl, HttpServletRequest request) {
         try {
             if (Util1.isNullOrEmpty(rl.getStock())) {
                 ro.setMessage("Invalid Stock.");
@@ -566,8 +562,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-trader-group")
-    public ResponseEntity<?> getTraderGroup(@RequestParam String compCode) {
-        List<TraderGroup> g = traderGroupService.getTraderGroup(compCode);
+    public ResponseEntity<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
         return ResponseEntity.ok(g);
     }
 }

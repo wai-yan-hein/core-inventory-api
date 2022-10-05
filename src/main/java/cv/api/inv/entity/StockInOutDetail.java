@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -31,27 +34,20 @@ public class StockInOutDetail implements Serializable {
     @EmbeddedId
     private StockInOutKey ioKey;
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "stock_code",referencedColumnName = "stock_code"),
-            @JoinColumn(name = "comp_code",referencedColumnName = "comp_code")
-    })
+    @JoinColumns({@JoinColumn(name = "stock_code"), @JoinColumn(name = "comp_code"), @JoinColumn(name = "dept_id")})
     private Stock stock;
     @ManyToOne
     @JoinColumn(name = "loc_code")
     private Location location;
     @Column(name = "in_qty")
     private Float inQty;
-    @Column(name = "in_wt")
-    private Float inWt;
     @ManyToOne
-    @JoinColumn(name = "in_unit")
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "in_unit"))})
     private StockUnit inUnit;
     @Column(name = "out_qty")
     private Float outQty;
-    @Column(name = "out_wt")
-    private Float outWt;
     @ManyToOne
-    @JoinColumn(name = "out_unit")
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "out_unit"))})
     private StockUnit outUnit;
     @Column(name = "unique_id")
     private Integer uniqueId;

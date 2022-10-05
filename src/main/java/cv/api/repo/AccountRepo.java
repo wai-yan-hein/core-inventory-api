@@ -33,11 +33,7 @@ public class AccountRepo {
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
-            Mono<Response> result = accountApi.post()
-                    .uri("/account/save-gl-list")
-                    .body(Mono.just(glList), List.class)
-                    .retrieve()
-                    .bodyToMono(Response.class);
+            Mono<Response> result = accountApi.post().uri("/account/save-gl-list").body(Mono.just(glList), List.class).retrieve().bodyToMono(Response.class);
             result.subscribe(response -> {
                 if (response != null) {
                     String vouNo = response.getVouNo();
@@ -47,7 +43,7 @@ public class AccountRepo {
                         case "PURCHASE" -> updatePurchase(vouNo, compCode, ACK);
                         case "RETURN_IN" -> updateReturnIn(vouNo, compCode, ACK);
                         case "RETURN_OUT" -> updateReturnOut(vouNo, compCode, ACK);
-                        case "TRADER" -> updateTrader(vouNo, compCode, ACK);
+                        case "TRADER" -> updateTrader(vouNo, compCode);
                     }
                 }
             }, (e) -> {
@@ -106,8 +102,8 @@ public class AccountRepo {
         }
     }
 
-    private void updateTrader(String traderCode, String compCode, String status) {
-        String sql = "update trader set intg_upd_status = '" + status + "' where code ='" + traderCode + "' and '" + compCode + "'";
+    private void updateTrader(String traderCode, String compCode) {
+        String sql = "update trader set intg_upd_status = '" + "ACK" + "' where code ='" + traderCode + "' and '" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateTrader: %s", traderCode));
@@ -135,13 +131,9 @@ public class AccountRepo {
                     case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
-                Mono<Response> result = accountApi.post()
-                        .uri("/account/save-trader")
-                        .body(Mono.just(accTrader), AccTrader.class)
-                        .retrieve()
-                        .bodyToMono(Response.class).doOnError((e) -> {
-                            log.error(e.getMessage());
-                        });
+                Mono<Response> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(Response.class).doOnError((e) -> {
+                    log.error(e.getMessage());
+                });
                 Response trader = result.block();
                 assert trader != null;
                 //updateTrader(trader.getVouNo(), trader.getCompCode());
@@ -162,12 +154,12 @@ public class AccountRepo {
                 String taxAcc = setting.getTaxAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = sh.getVouDate();
-                String traderCode = sh.getTrader().getKey().getCode();
-                String curCode = sh.getCurrency().getCurCode();
+                String traderCode = sh.getTraderCode();
+                String curCode = sh.getCurCode();
                 String remark = sh.getRemark();
                 boolean deleted = sh.isDeleted();
-                String vouNo = sh.getVouNo();
-                String compCode = sh.getTrader().getKey().getCompCode();
+                String vouNo = sh.getKey().getVouNo();
+                String compCode = sh.getKey().getCompCode();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (Util1.getDouble(sh.getVouTotal()) > 0) {

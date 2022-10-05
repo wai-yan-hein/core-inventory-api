@@ -31,8 +31,9 @@ public class PurHis implements java.io.Serializable {
     private String vouNo;
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "trader_code", referencedColumnName = "code"),
-            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
+            @JoinColumn(name = "trader_code", insertable = false,updatable = false),
+            @JoinColumn(name = "comp_code", insertable = false,updatable = false),
+            @JoinColumn(name = "dept_id", insertable = false,updatable = false)
     })
     private Trader trader;
     @Temporal(TemporalType.TIMESTAMP)

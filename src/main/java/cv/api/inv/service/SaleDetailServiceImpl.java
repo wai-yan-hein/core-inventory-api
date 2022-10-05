@@ -66,7 +66,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             }
         }
         hisDao.save(saleHis);
-        String vouNo = saleHis.getVouNo();
+        String vouNo = saleHis.getKey().getVouNo();
         for (SaleHisDetail sd : listSaleDetail) {
             if (sd.getStock() != null) {
                 if (sd.getSdKey()!= null) {
@@ -110,7 +110,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             }
         }
         hisDao.save(saleHis);
-        String vouNo = saleHis.getVouNo();
+        String vouNo = saleHis.getKey().getVouNo();
         for (SaleHisDetail sd : listSaleDetail) {
             if (sd.getStock() != null) {
                 if (sd.getSdKey()!= null) {

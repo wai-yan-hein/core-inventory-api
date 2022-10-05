@@ -27,24 +27,19 @@ public class StockBrandServiceImpl implements StockBrandService {
     private SeqTableService seqService;
 
     @Override
-    public StockBrand save(StockBrand sb) throws Exception{
-        if (sb.getBrandCode() == null || sb.getBrandCode().isEmpty()) {
+    public StockBrand save(StockBrand sb) throws Exception {
+        if (sb.getKey().getBrandCode() == null) {
             Integer macId = sb.getMacId();
-            String compCode = sb.getCompCode();
+            String compCode = sb.getKey().getCompCode();
             String code = getStockBrandCode(macId, "StockBrand", "-", compCode);
-            StockBrand valid = findByCode(code);
-            if (valid == null) {
-                sb.setBrandCode(code);
-            } else {
-                throw new IllegalStateException("Duplicate Brand Code");
-            }
+            sb.getKey().setBrandCode(code);
         }
         return dao.save(sb);
     }
 
     @Override
-    public List<StockBrand> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<StockBrand> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode, deptId);
     }
 
     @Override

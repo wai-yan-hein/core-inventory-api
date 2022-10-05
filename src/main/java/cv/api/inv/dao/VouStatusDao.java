@@ -16,7 +16,7 @@ import java.util.List;
 
      VouStatus save(VouStatus vouStatus);
 
-     List<VouStatus> findAll(String compCode);
+     List<VouStatus> findAll(String compCode,Integer deptId);
 
      int delete(String id);
 

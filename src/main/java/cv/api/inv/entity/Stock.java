@@ -6,10 +6,10 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,12 +17,10 @@ import java.util.Date;
 /**
  * @author wai yan
  */
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
+@Data
 @Table(name = "stock")
 public class Stock implements java.io.Serializable {
 
@@ -31,16 +29,22 @@ public class Stock implements java.io.Serializable {
     @Column(name = "active")
     private boolean active;
     @ManyToOne
-    @JoinColumn(name = "brand_code")
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "stock_type_code"))})
+    private StockType stockType;
+    @ManyToOne
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "brand_code"))})
     private StockBrand brand;
     @Column(name = "stock_name")
     private String stockName;
     @ManyToOne
-    @JoinColumn(name = "category_code")
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "category_code"))})
     private Category category;
     @ManyToOne
-    @JoinColumn(name = "stock_type_code")
-    private StockType stockType;
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "pur_unit"))})
+    private StockUnit purUnit;
+    @ManyToOne
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "sale_unit"))})
+    private StockUnit saleUnit;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
@@ -49,18 +53,8 @@ public class Stock implements java.io.Serializable {
     private String barcode;
     @Column(name = "short_name")
     private String shortName;
-    @Column(name = "pur_wt")
-    private Float purWeight;
     @Column(name = "pur_price")
     private Float purPrice;
-    @ManyToOne
-    @JoinColumn(name = "pur_unit")
-    private StockUnit purUnit;
-    @Column(name = "sale_wt")
-    private Float saleWeight;
-    @ManyToOne
-    @JoinColumn(name = "sale_unit")
-    private StockUnit saleUnit;
     @Temporal(TemporalType.DATE)
     @Column(name = "licence_exp_date")
     private Date expireDate;
@@ -89,7 +83,7 @@ public class Stock implements java.io.Serializable {
     @Column(name = "user_code")
     private String userCode;
     @ManyToOne
-    @JoinColumn(name = "rel_code")
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "rel_code"))})
     private UnitRelation unitRelation;
     @Column(name = "mac_id")
     private Integer macId;
@@ -99,5 +93,8 @@ public class Stock implements java.io.Serializable {
 
     public Stock(StockKey key) {
         this.key = key;
+    }
+
+    public Stock() {
     }
 }

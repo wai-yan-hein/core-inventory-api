@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.SaleManDao;
 import cv.api.inv.entity.SaleMan;
+import cv.api.inv.entity.SaleManKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,16 +29,11 @@ public class SaleManServiceImpl implements SaleManService {
 
     @Override
     public SaleMan save(SaleMan sm) throws Exception {
-        if (Util1.isNull(sm.getSaleManCode())) {
+        if (Util1.isNull(sm.getKey().getSaleManCode())) {
             Integer macId = sm.getMacId();
-            String compCode = sm.getCompCode();
-            String code = getSaleManCode(macId, "SM", "-", compCode);
-            SaleMan valid = findByCode(code);
-            if (valid == null) {
-                sm.setSaleManCode(code);
-            } else {
-                throw new IllegalStateException("Duplicate Sale Man Code");
-            }
+            String compCode = sm.getKey().getCompCode();
+            String code = getSaleManCode(macId, compCode);
+            sm.getKey().setSaleManCode(code);
         }
         return dao.save(sm);
     }
@@ -48,17 +44,17 @@ public class SaleManServiceImpl implements SaleManService {
     }
 
     @Override
-    public SaleMan findByCode(String code) {
-        return dao.findByCode(code);
+    public SaleMan findByCode(SaleManKey key) {
+        return dao.findByCode(key);
     }
 
-    private String getSaleManCode(Integer macId, String option, String period, String compCode) {
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
+    private String getSaleManCode(Integer macId, String compCode) {
+        int seqNo = seqService.getSequence(macId, "SM", "-", compCode);
         return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
     }
 
     @Override
-    public List<SaleMan> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<SaleMan> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode, deptId);
     }
 }

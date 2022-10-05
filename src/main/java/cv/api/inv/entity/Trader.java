@@ -5,19 +5,16 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "trader")
 public class Trader implements java.io.Serializable {
@@ -77,6 +74,10 @@ public class Trader implements java.io.Serializable {
     @Column(name = "price_type")
     private String priceType;
     @ManyToOne
-    @JoinColumn(name = "group_code")
+    @JoinColumnsOrFormulas(value = {
+            @JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code", referencedColumnName = "comp_code")),
+            @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id", referencedColumnName = "dept_id")),
+            @JoinColumnOrFormula(column = @JoinColumn(name = "group_code", referencedColumnName = "group_code"))
+    })
     private TraderGroup group;
 }

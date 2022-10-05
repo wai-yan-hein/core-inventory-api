@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -32,13 +35,10 @@ public class BKSaleHis implements java.io.Serializable {
     @Column(name = "vou_no", unique = true, nullable = false, length = 20)
     private String vouNo;
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "trader_code", referencedColumnName = "code"),
-            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
-    })
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "trader_code"))})
     private Trader trader;
     @ManyToOne
-    @JoinColumn(name = "saleman_code")
+    @JoinColumnsOrFormulas(value = {@JoinColumnOrFormula(formula = @JoinFormula(value = "comp_code")), @JoinColumnOrFormula(formula = @JoinFormula(value = "dept_id")), @JoinColumnOrFormula(column = @JoinColumn(name = "saleman_code"))})
     private SaleMan saleMan;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")

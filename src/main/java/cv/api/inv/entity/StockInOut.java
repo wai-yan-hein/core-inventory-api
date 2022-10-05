@@ -50,7 +50,11 @@ public class StockInOut implements Serializable {
     @Column(name = "comp_code")
     private String compCode;
     @ManyToOne
-    @JoinColumn(name = "vou_status")
+    @JoinColumns({
+            @JoinColumn(name = "vou_status",insertable = false,updatable = false),
+            @JoinColumn(name = "comp_code",insertable = false,updatable = false),
+            @JoinColumn(name = "dept_id",insertable = false,updatable = false)
+    })
     private VouStatus vouStatus;
     @Column(name = "mac_id")
     private Integer macId;

@@ -16,7 +16,7 @@ import java.util.List;
 
      StockBrand save(StockBrand brand)throws Exception;
 
-     List<StockBrand> findAll(String compCode);
+     List<StockBrand> findAll(String compCode, Integer deptId);
 
      int delete(String id);
 

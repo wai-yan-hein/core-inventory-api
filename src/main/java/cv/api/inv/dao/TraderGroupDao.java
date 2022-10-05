@@ -7,5 +7,5 @@ import java.util.List;
 public interface TraderGroupDao {
     TraderGroup save(TraderGroup group);
 
-    List<TraderGroup> getTraderGroup(String compCode);
+    List<TraderGroup> getTraderGroup(String compCode,Integer deptId);
 }

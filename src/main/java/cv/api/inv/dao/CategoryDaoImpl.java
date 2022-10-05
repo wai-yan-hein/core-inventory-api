@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Category;
+import io.swagger.models.auth.In;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,8 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     }
 
     @Override
-    public List<Category> findAll(String compCode) {
-        String hsql = "select o from Category o where o.compCode = '" + compCode + "'";
+    public List<Category> findAll(String compCode, Integer deptId) {
+        String hsql = "select o from Category o where o.key.compCode = '" + compCode + "' and o.key.deptId ="+deptId+"";
         Query<Category> query = sessionFactory.getCurrentSession().createQuery(hsql, Category.class);
         return query.list();
     }

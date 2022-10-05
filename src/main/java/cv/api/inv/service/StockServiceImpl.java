@@ -35,7 +35,8 @@ public class StockServiceImpl implements StockService {
             Integer macId = stock.getMacId();
             String compCode = stock.getKey().getCompCode();
             String stockCode = getStockCode(macId, compCode);
-            Stock valid = findById(new StockKey(stockCode, compCode));
+            Integer deptId = stock.getKey().getDeptId();
+            Stock valid = findById(new StockKey(stockCode, compCode, deptId));
             if (valid == null) {
                 stock.getKey().setStockCode(stockCode);
             } else {

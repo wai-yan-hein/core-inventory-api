@@ -88,12 +88,12 @@ public class TraderServiceImpl implements TraderService {
     }
 
     @Override
-    public List<Trader> findCustomer(String compCode) {
-        return dao.findCustomer(compCode);
+    public List<Trader> findCustomer(String compCode,Integer deptId) {
+        return dao.findCustomer(compCode,deptId);
     }
 
     @Override
-    public List<Trader> findSupplier(String compCode) {
-        return dao.findSupplier(compCode);
+    public List<Trader> findSupplier(String compCode,Integer deptId) {
+        return dao.findSupplier(compCode,deptId);
     }
 }

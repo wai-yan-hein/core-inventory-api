@@ -20,9 +20,8 @@ import java.util.Date;
 @Entity
 @Table(name = "sale_man")
 public class SaleMan implements Serializable {
-    @Id
-    @Column(name = "saleman_code", unique = true, nullable = false)
-    private String saleManCode;
+    @EmbeddedId
+    private SaleManKey key;
     @Column(name = "saleman_name", unique = true, nullable = false)
     private String saleManName;
     @Column(name = "active")
@@ -36,8 +35,6 @@ public class SaleMan implements Serializable {
     private String address;
     @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Column(name = "user_code")
     private String userCode;
     @Column(name = "created_date")

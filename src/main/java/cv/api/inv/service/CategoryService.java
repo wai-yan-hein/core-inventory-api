@@ -18,7 +18,7 @@ import java.util.List;
 
      Category save(Category category) throws Exception;
 
-     List<Category> findAll(String compCode);
+     List<Category> findAll(String compCode, Integer deptId);
 
      int delete(String id);
 

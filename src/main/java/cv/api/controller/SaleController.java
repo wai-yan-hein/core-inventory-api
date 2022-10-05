@@ -11,6 +11,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisDetail;
+import cv.api.inv.entity.SaleHisKey;
 import cv.api.inv.service.BackupService;
 import cv.api.inv.service.ReportService;
 import cv.api.inv.service.SaleDetailService;
@@ -55,9 +56,9 @@ public class SaleController {
 
         //send message to service
         try {
-            messageSender.sendMessage("SALE", sale.getVouNo());
+            messageSender.sendMessage("SALE", sale.getKey().getVouNo());
         } catch (Exception e) {
-            SaleHis sh = shService.findById(sale.getVouNo());
+            SaleHis sh = shService.findById(sale.getKey());
             sh.setIntgUpdStatus(null);
             shService.update(sh);
             log.error(String.format("sendMessage: SALE %s", e.getMessage()));
@@ -69,19 +70,19 @@ public class SaleController {
     private boolean isValidSale(SaleHis sale, ReturnObject ro) {
         boolean status = true;
         List<SaleHisDetail> listSH = sale.getListSH();
-        if (Util1.isNullOrEmpty(sale.getTrader())) {
+        if (Util1.isNullOrEmpty(sale.getTraderCode())) {
             status = false;
             ro.setMessage("Invalid Trader.");
         } else if (Util1.isNullOrEmpty(sale.getVouDate())) {
             status = false;
             ro.setMessage("Invalid Voucher Date.");
-        } else if (Util1.isNullOrEmpty(sale.getCurrency())) {
+        } else if (Util1.isNullOrEmpty(sale.getCurCode())) {
             status = false;
             ro.setMessage("Invalid Currency.");
         } else if (Util1.getFloat(sale.getVouTotal()) <= 0) {
             status = false;
             ro.setMessage("Invalid Voucher Total.");
-        } else if (Util1.isNullOrEmpty(sale.getLocation())) {
+        } else if (Util1.isNullOrEmpty(sale.getLocCode())) {
             status = false;
             ro.setMessage("Invalid Location.");
         } else if (Util1.isNullOrEmpty(sale.getCreatedBy())) {
@@ -110,8 +111,7 @@ public class SaleController {
         String reference = Util1.isNull(filter.getReference(), "-");
         String compCode = filter.getCompCode();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode,
-                saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode);
+        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode);
         return ResponseEntity.ok(saleList);
     }
 
@@ -122,9 +122,9 @@ public class SaleController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-sale")
-    public ResponseEntity<SaleHis> findSale(@RequestParam String code) {
-        SaleHis sh = shService.findById(code);
+    @PostMapping(path = "/find-sale")
+    public ResponseEntity<SaleHis> findSale(@RequestBody SaleHisKey key) {
+        SaleHis sh = shService.findById(key);
         return ResponseEntity.ok(sh);
     }
 

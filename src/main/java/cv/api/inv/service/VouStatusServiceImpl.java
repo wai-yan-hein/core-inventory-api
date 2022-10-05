@@ -29,17 +29,17 @@ public class VouStatusServiceImpl implements VouStatusService {
 
     @Override
     public VouStatus save(VouStatus vs) {
-        if (Objects.isNull(vs.getCode())) {
+        if (Objects.isNull(vs.getKey().getCode())) {
             Integer macId = vs.getMacId();
-            String compCode = vs.getCompCode();
-            vs.setCode(getVouStatusCode(macId, compCode));
+            String compCode = vs.getKey().getCompCode();
+            vs.getKey().setCode(getVouStatusCode(macId, compCode));
         }
         return vouDao.save(vs);
     }
 
     @Override
-    public List<VouStatus> findAll(String compCode) {
-        return vouDao.findAll(compCode);
+    public List<VouStatus> findAll(String compCode,Integer deptId) {
+        return vouDao.findAll(compCode,deptId);
     }
 
     @Override

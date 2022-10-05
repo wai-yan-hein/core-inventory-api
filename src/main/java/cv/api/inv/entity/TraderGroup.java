@@ -8,11 +8,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "trader_group")
 public class TraderGroup {
-    @Id
-    @Column(name = "group_code")
-    private String groupCode;
-    @Column(name = "comp_code")
-    private String compCode;
+    @EmbeddedId
+    private TraderGroupKey key;
     @Column(name = "user_code")
     private String userCode;
     @Column(name = "group_name")

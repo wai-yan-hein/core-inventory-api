@@ -6,11 +6,10 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,35 +19,25 @@ import java.util.List;
  * @author wai yan
  */
 @Entity
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "sale_his")
-public class SaleHis implements java.io.Serializable {
+public class SaleHis {
 
-    @Id
-    @Column(name = "vou_no", unique = true, nullable = false, length = 20)
-    private String vouNo;
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "trader_code", referencedColumnName = "code"),
-            @JoinColumn(name = "comp_code", referencedColumnName = "comp_code")
-    })
-    private Trader trader;
-    @ManyToOne
-    @JoinColumn(name = "saleman_code")
-    private SaleMan saleMan;
+    @EmbeddedId
+    private SaleHisKey key;
+    @Column(name = "trader_code")
+    private String traderCode;
+    @Column(name = "saleman_code")
+    private String saleManCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "credit_term")
     private Date creditTerm;
-    @ManyToOne
-    @JoinColumn(name = "cur_code")
-    private Currency currency;
+    @Column(name = "cur_code")
+    private String curCode;
     @Column(name = "remark")
     private String remark;
     @Column(name = "reference")
@@ -87,12 +76,10 @@ public class SaleHis implements java.io.Serializable {
     private String address;
     @Column(name = "order_code")
     private String orderCode;
-    @ManyToOne
-    @JoinColumn(name = "reg_code")
-    private Region region;
-    @ManyToOne
-    @JoinColumn(name = "loc_code")
-    private Location location;
+    @Column(name = "reg_code")
+    private String regionCode;
+    @Column(name = "loc_code")
+    private String locCode;
     @Column(name = "mac_id")
     private Integer macId;
     @Column(name = "intg_upd_status")

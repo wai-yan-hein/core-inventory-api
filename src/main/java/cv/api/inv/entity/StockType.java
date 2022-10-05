@@ -6,10 +6,7 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -19,19 +16,15 @@ import java.util.Objects;
 /**
  * @author wai yan
  */
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
 @Entity
 @Table(name = "stock_type")
 public class StockType implements java.io.Serializable {
 
-    @Id
-    @Column(name = "stock_type_code", unique = true, nullable = false, length = 5)
-    private String stockTypeCode;
-    @Column(name = "stock_type_name", nullable = false, length = 50, unique = true)
+    @EmbeddedId
+    private StockTypeKey key;
+    @Column(name = "stock_type_name")
     private String stockTypeName;
     @Column(name = "account_id")
     private String accountId;
@@ -49,19 +42,5 @@ public class StockType implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
-    @Column(name = "comp_code")
-    private String compCode;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        StockType stockType = (StockType) o;
-        return stockTypeCode != null && Objects.equals(stockTypeCode, stockType.stockTypeCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }
