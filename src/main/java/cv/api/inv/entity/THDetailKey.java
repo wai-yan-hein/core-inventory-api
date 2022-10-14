@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Embeddable
 public class THDetailKey implements Serializable {
 
-    @Column(name = "sd_code", unique = true, nullable = false)
+    @Column(name = "td_code", unique = true, nullable = false)
     private String tdCode;
     @Column(name = "vou_no")
     private String vouNo;

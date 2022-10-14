@@ -30,9 +30,9 @@ public class TransferHis {
     @Column(name = "updated_by")
     private String updatedBy;
     @Column(name = "loc_code_from")
-    private Location locCodeFrom;
+    private String locCodeFrom;
     @Column(name = "loc_code_to")
-    private Location locCodeTo;
+    private String locCodeTo;
     @Column(name = "mac_id")
     private Integer macId;
     @Transient

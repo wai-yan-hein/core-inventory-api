@@ -48,5 +48,5 @@ public class OPHisDetail implements java.io.Serializable {
     @Transient
     private String catName;
     @Transient
-    private String relation;
+    private String relName;
 }

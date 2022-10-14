@@ -1,7 +1,6 @@
 package cv.api.inv.service;
 
 import cv.api.inv.dao.TransferHisDetailDao;
-import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ public class TransferHisDetailServiceImpl implements TransferHisDetailService {
     }
 
     @Override
-    public List<TransferHisDetail> search(String vouNo) {
-        return dao.search(vouNo);
+    public List<TransferHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo, compCode, deptId);
     }
 }

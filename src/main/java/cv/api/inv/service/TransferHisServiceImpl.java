@@ -4,6 +4,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.dao.TransferHisDao;
 import cv.api.inv.dao.TransferHisDetailDao;
+import cv.api.inv.entity.THDetailKey;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisDetail;
 import cv.api.inv.entity.TransferHisKey;
@@ -60,12 +61,14 @@ public class TransferHisServiceImpl implements TransferHisService {
                         }
                     }
                     String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.getKey().setTdCode(sdCode);
-                    cSd.getKey().setVouNo(vouNo);
+                    THDetailKey key = new THDetailKey();
+                    key.setVouNo(vouNo);
+                    key.setTdCode(sdCode);
+                    key.setDeptId(th.getKey().getDeptId());
+                    cSd.setKey(key);
                     cSd.setCompCode(th.getKey().getCompCode());
                     detailDao.save(cSd);
                 }
-
             }
             th.setListTD(listTD);
         }

@@ -67,8 +67,8 @@ public class TransferController {
     }
 
     @GetMapping(path = "/get-transfer-detail")
-    public ResponseEntity<List<TransferHisDetail>> getPurDetail(@RequestParam String vouNo) {
-        List<TransferHisDetail> listSD = detailService.search(vouNo);
+    public ResponseEntity<List<TransferHisDetail>> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        List<TransferHisDetail> listSD = detailService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
 }

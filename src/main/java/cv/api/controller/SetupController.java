@@ -272,9 +272,9 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-region")
-    public ResponseEntity<Region> findRegion(@RequestParam String code) {
-        Region b = regionService.findByCode(code);
+    @PostMapping(path = "/find-region")
+    public ResponseEntity<Region> findRegion(@RequestBody RegionKey key) {
+        Region b = regionService.findByCode(key);
         return ResponseEntity.ok(b);
     }
 
@@ -468,8 +468,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-pattern")
-    public ResponseEntity<?> getPattern(@RequestParam String stockCode) {
-        return ResponseEntity.ok(patternService.search(stockCode));
+    public ResponseEntity<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(patternService.search(stockCode,compCode,deptId));
     }
 
     @PostMapping(path = "/save-reorder")

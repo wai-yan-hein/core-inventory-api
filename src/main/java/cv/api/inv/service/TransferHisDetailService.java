@@ -9,5 +9,5 @@ public interface TransferHisDetailService {
 
     int delete(String code);
 
-    List<TransferHisDetail> search(String vouNo);
+    List<TransferHisDetail> search(String vouNo, String compCode, Integer deptId);
 }

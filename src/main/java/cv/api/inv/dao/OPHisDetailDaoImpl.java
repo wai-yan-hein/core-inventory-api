@@ -31,7 +31,8 @@ public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> impleme
                 "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
                 "where op.vou_no ='" + vouNo + "'\n" +
                 "and op.comp_code ='" + compCode + "'\n" +
-                "and op.dept_id = " + deptId + " ";
+                "and op.dept_id = " + deptId + "\n" +
+                "order by unique_id";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {
             try {
@@ -47,7 +48,6 @@ public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> impleme
                     op.setLocCode(rs.getString("loc_code"));
                     op.setUnitCode(rs.getString("unit"));
                     op.setVouNo(rs.getString("vou_no"));
-                    op.setUniqueId(rs.getInt("unique_id"));
                     op.setCompCode(rs.getString("comp_code"));
                     op.setDeptId(rs.getInt("dept_id"));
                     op.setUserCode(rs.getString("user_code"));
@@ -55,7 +55,8 @@ public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> impleme
                     op.setCatName(rs.getString("cat_name"));
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
-                    op.setRelation(rs.getString("rel_name"));
+                    op.setRelName(rs.getString("rel_name"));
+                    op.setUniqueId(rs.getInt("unique_id"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

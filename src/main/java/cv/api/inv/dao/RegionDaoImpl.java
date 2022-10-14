@@ -6,16 +6,16 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Region;
+import cv.api.inv.entity.RegionKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
 @Repository
-public class RegionDaoImpl extends AbstractDao<String, Region> implements RegionDao {
+public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements RegionDao {
 
 
     @Override
@@ -25,7 +25,7 @@ public class RegionDaoImpl extends AbstractDao<String, Region> implements Region
     }
 
     @Override
-    public Region findByCode(String id) {
+    public Region findByCode(RegionKey id) {
         return getByKey(id);
     }
 
@@ -77,7 +77,7 @@ public class RegionDaoImpl extends AbstractDao<String, Region> implements Region
 
     @Override
     public List<Region> findAll(String compCode) {
-        String hsql = "select o from Region o where o.compCode = '" + compCode + "'";
+        String hsql = "select o from Region o where o.key.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 }

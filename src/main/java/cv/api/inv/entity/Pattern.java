@@ -3,10 +3,7 @@ package cv.api.inv.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
@@ -32,5 +29,19 @@ public class Pattern implements java.io.Serializable {
     private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Transient
+    private String userCode;
+    @Transient
+    private String stockName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
+    @Transient
+    private String relName;
+    @Transient
+    private String locName;
 
 }

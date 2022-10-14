@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.RegionDao;
 import cv.api.inv.entity.Region;
+import cv.api.inv.entity.RegionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
-    public Region findByCode(String id) {
+    public Region findByCode(RegionKey id) {
         return dao.findByCode(id);
     }
 

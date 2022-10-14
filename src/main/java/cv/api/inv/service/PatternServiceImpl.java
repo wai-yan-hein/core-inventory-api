@@ -27,8 +27,8 @@ public class PatternServiceImpl implements PatternService {
 
 
     @Override
-    public List<Pattern> search(String stockCode) {
-        return dao.search(stockCode);
+    public List<Pattern> search(String stockCode,String compCode,Integer deptId) {
+        return dao.search(stockCode,compCode,deptId);
     }
 
     @Override

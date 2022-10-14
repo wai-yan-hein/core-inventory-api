@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Region;
+import cv.api.inv.entity.RegionKey;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
      Region save(Region region);
 
-     Region findByCode(String id);
+     Region findByCode(RegionKey id);
 
      List<Region> search(String code, String name, String compCode, String parentCode);
 
