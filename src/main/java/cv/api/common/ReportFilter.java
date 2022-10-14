@@ -30,6 +30,7 @@ public class ReportFilter {
     private String traderCode;
     private String saleManCode;
     private String vouTypeCode;
+    private boolean calSale;
     @NonNull
     private Integer macId;
     @NonNull

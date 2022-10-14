@@ -29,35 +29,23 @@ public interface ReportService {
 
     List<VPurchase> getPurchaseVoucher(String vouNo) throws Exception;
 
-    List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode,
-                                        String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String curCode,
-                                         String traderCode, String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String curCode, String traderCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode,
-                                       String smCode, String stockCode, String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String curCode,
-                                        String smCode, String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String curCode, String smCode, String compCode, Integer macId) throws Exception;
 
-    List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode,
-                                                String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
+    List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String curCode,
-                                                 String traderCode, String compCode, Integer macId) throws Exception;
+    List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String curCode, String traderCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode,
-                                     String stockCode, String typeCode, String brandCode, String catCode, String locCode,
-                                     String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode,
-                                      String stockCode, String typeCode, String brandCode, String catCode, String locCode,
-                                      String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception;
 
-    List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode,
-                                             String typeCode, String catCode, String brandCode,
-                                             String stockCode, String compCode, Integer macId) throws Exception;
+    List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     General getPurchaseAvgPrice(String stockCode) throws Exception;
 
@@ -67,16 +55,11 @@ public interface ReportService {
 
     General getStockIORecentPrice(String stockCode, String purDate, String unit);
 
-    List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode,
-                                        String stockCode, String compCode, Integer macId) throws Exception;
+    List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, String compCode, Integer macId) throws Exception;
 
-    List<ClosingBalance> getClosingStock(String fromDate, String toDate,
-                                         String typeCode, String catCode,
-                                         String brandCode, String stockCode,
-                                         String compCode, Integer macId) throws Exception;
+    List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode,
-                                       String stockCode, String compCode, Integer macId) throws Exception;
+    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     void generateReorder(String compCode) throws Exception;
 
@@ -88,88 +71,44 @@ public interface ReportService {
 
     List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode, String brandCode, String catCode, String compCode) throws Exception;
 
-    List<ClosingBalance> getClosingStockDetail(String fromDate, String toDate,
-                                               String typeCode, String catCode,
-                                               String brandCode, String stockCode,
-                                               String compCode, Integer macId) throws Exception;
+    List<ClosingBalance> getClosingStockDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate,
-                                              String typeCode, String catCode,
-                                              String brandCode, String stockCode, String compCode,
-                                              Integer macId) throws Exception;
+    List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
+                                              String stockCode, boolean calSale, String compCode, Integer macId) throws Exception;
 
-    void calculateStockInOutDetail(String opDate, String fromDate, String toDate,
-                                   String typeCode, String catCode,
-                                   String brandCode, String stockCode, String compCode,
-                                   Integer macId) throws Exception;
+    void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, String compCode, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, Integer macId) throws Exception;
 
-    List<StockValue> getStockValue(String opDate, String fromDate, String toDate,
-                                   String typeCode, String catCode,
-                                   String brandCode, String stockCode, String compCode,
-                                   Integer macId) throws Exception;
+    List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode,
+                                   String brandCode, String stockCode, boolean calSale,
+                                   String compCode, Integer macId) throws Exception;
 
     List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode) throws Exception;
 
     List<VOpening> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode) throws Exception;
 
-    List<VStockIO> getStockIODetailByVoucherType(String vouType, String fromDate, String toDate,
-                                                 String typeCode, String catCode,
-                                                 String brandCode, String stockCode, String compCode,
-                                                 Integer macId) throws Exception;
+    List<VStockIO> getStockIODetailByVoucherType(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate,
-                                           String typeCode, String catCode,
-                                           String brandCode, String stockCode, String compCode,
-                                           Integer macId) throws Exception;
+    List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VStockIO> getStockIOHistory(String fromDate, String toDate,
-                                     String vouStatus, String vouNo, String remark, String desp,
-                                     String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo, String remark, String desp, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VSale> getSaleHistory(String fromDate, String toDate,
-                               String traderCode, String saleManCode,
-                               String vouNo, String remark, String reference,
-                               String userCode, String stockCode, String locCode,
-                               String compCode) throws Exception;
+    List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VPurchase> getPurchaseHistory(String fromDate, String toDate,
-                                       String traderCode,
-                                       String vouNo, String remark, String reference,
-                                       String userCode, String stockCode, String locCode,
-                                       String compCode) throws Exception;
+    List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VReturnIn> getReturnInHistory(String fromDate, String toDate,
-                                       String traderCode,
-                                       String vouNo, String remark,
-                                       String userCode, String stockCode,
-                                       String locCode, String compCode) throws Exception;
+    List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VReturnOut> getReturnOutHistory(String fromDate, String toDate,
-                                         String traderCode,
-                                         String vouNo, String remark,
-                                         String userCode, String stockCode,
-                                         String locCode, String compCode) throws Exception;
+    List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VOpening> getOpeningHistory(String fromDate, String toDate,
-                                     String vouNo, String remark,
-                                     String userCode, String stockCode,
-                                     String locCode, String compCode) throws Exception;
+    List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo,
-                                       String remark, String userCode, String stockCode,
-                                       String locCodeFrom, String locCodeTo, String compCode) throws Exception;
+    List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode) throws Exception;
 
-    List<VSale> getSalePriceCalender(String fromDate, String toDate,
-                                     String typeCode, String catCode,
-                                     String brandCode, String stockCode, String compCode,
-                                     Integer macId) throws Exception;
+    List<VSale> getSalePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VPurchase> getPurchasePriceCalender(String fromDate, String toDate,
-                                             String typeCode, String catCode,
-                                             String brandCode, String stockCode, String compCode,
-                                             Integer macId) throws Exception;
+    List<VPurchase> getPurchasePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     Float getSmallestQty(String stockCode, String unit);
 
