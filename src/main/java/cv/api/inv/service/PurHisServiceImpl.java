@@ -42,41 +42,38 @@ public class PurHisServiceImpl implements PurHisService {
         if (Util1.isNullOrEmpty(ph.getKey().getVouNo())) {
             ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getTraderCode()));
         }
-        if (Util1.getBoolean(ph.getDeleted())) {
-            phDao.save(ph);
-        } else {
-            List<PurHisDetail> listSD = ph.getListPD();
-            List<String> listDel = ph.getListDel();
-            String vouNo = ph.getKey().getVouNo();
-            if (listDel != null) {
-                listDel.forEach(detailId -> {
-                    if (detailId != null) {
-                        try {
-                            pdDao.delete(detailId);
-                        } catch (Exception ex) {
-                            log.error("listDel : " + ex.getMessage());
-                        }
+        List<PurHisDetail> listSD = ph.getListPD();
+        List<String> listDel = ph.getListDel();
+        String vouNo = ph.getKey().getVouNo();
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    try {
+                        pdDao.delete(detailId);
+                    } catch (Exception ex) {
+                        log.error("listDel : " + ex.getMessage());
                     }
-                });
-            }
-            for (int i = 0; i < listSD.size(); i++) {
-                PurHisDetail cSd = listSD.get(i);
-                if (cSd.getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            PurHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
-                        }
-                    }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setPdKey(new PurDetailKey(vouNo, sdCode, ph.getKey().getDeptId()));
-                    cSd.setCompCode(ph.getKey().getCompCode());
-                    pdDao.save(cSd);
-
                 }
+            });
+        }
+        for (int i = 0; i < listSD.size(); i++) {
+            PurHisDetail cSd = listSD.get(i);
+            if (cSd.getStockCode() != null) {
+                if (cSd.getUniqueId() == null) {
+                    if (i == 0) {
+                        cSd.setUniqueId(1);
+                    } else {
+                        PurHisDetail pSd = listSD.get(i - 1);
+                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                    }
+                }
+                String sdCode = vouNo + "-" + cSd.getUniqueId();
+                cSd.setPdKey(new PurDetailKey(vouNo, sdCode, ph.getKey().getDeptId()));
+                cSd.setCompCode(ph.getKey().getCompCode());
+                pdDao.save(cSd);
+
             }
+
             phDao.save(ph);
             ph.setListPD(listSD);
         }
@@ -99,8 +96,8 @@ public class PurHisServiceImpl implements PurHisService {
     }
 
     @Override
-    public int delete(String vouNo) throws Exception {
-        return phDao.delete(vouNo);
+    public void delete(PurHisKey key) throws Exception {
+         phDao.delete(key);
     }
 
     @Override

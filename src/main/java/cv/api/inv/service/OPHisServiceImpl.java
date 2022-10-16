@@ -28,41 +28,37 @@ public class OPHisServiceImpl implements OPHisService {
         if (Util1.isNullOrEmpty(op.getKey().getVouNo())) {
             op.getKey().setVouNo(getVoucherNo(op.getMacId(), op.getKey().getCompCode()));
         }
-        if (op.isDeleted()) {
-            opHisDao.save(op);
-        } else {
-            List<OPHisDetail> listSD = op.getDetailList();
-            List<String> listDel = op.getListDel();
-            String vouNo = op.getKey().getVouNo();
-            if (listDel != null) {
-                listDel.forEach(detailId -> {
-                    if (detailId != null) {
-                        opHisDetailDao.delete(detailId);
-                    }
-                });
-            }
-            for (int i = 0; i < listSD.size(); i++) {
-                OPHisDetail cSd = listSD.get(i);
-                if (cSd.getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            OPHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
-                        }
-                    }
-                    String opCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setOpCode(opCode);
-                    cSd.setVouNo(vouNo);
-                    cSd.setCompCode(op.getKey().getCompCode());
-                    cSd.setDeptId(op.getKey().getDeptId());
-                    opHisDetailDao.save(cSd);
+        List<OPHisDetail> listSD = op.getDetailList();
+        List<String> listDel = op.getListDel();
+        String vouNo = op.getKey().getVouNo();
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    opHisDetailDao.delete(detailId);
                 }
-            }
-            opHisDao.save(op);
-            op.setDetailList(listSD);
+            });
         }
+        for (int i = 0; i < listSD.size(); i++) {
+            OPHisDetail cSd = listSD.get(i);
+            if (cSd.getStockCode() != null) {
+                if (cSd.getUniqueId() == null) {
+                    if (i == 0) {
+                        cSd.setUniqueId(1);
+                    } else {
+                        OPHisDetail pSd = listSD.get(i - 1);
+                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                    }
+                }
+                String opCode = vouNo + "-" + cSd.getUniqueId();
+                cSd.setOpCode(opCode);
+                cSd.setVouNo(vouNo);
+                cSd.setCompCode(op.getKey().getCompCode());
+                cSd.setDeptId(op.getKey().getDeptId());
+                opHisDetailDao.save(cSd);
+            }
+        }
+        opHisDao.save(op);
+        op.setDetailList(listSD);
         return opHisDao.save(op);
     }
 
@@ -85,6 +81,11 @@ public class OPHisServiceImpl implements OPHisService {
     @Override
     public List<OPHis> unUpload() {
         return opHisDao.unUpload();
+    }
+
+    @Override
+    public void delete(OPHisKey key) {
+        opHisDao.delete(key);
     }
 
 }

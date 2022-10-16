@@ -3,6 +3,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.OPHisDetail;
 import cv.api.inv.entity.OPHisKey;
+import io.swagger.models.auth.In;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,15 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
             o.setDetailList(dao.search(vouNo, compCode, deptId));
         });
         return list;
+    }
+
+    @Override
+    public void delete(OPHisKey key) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update op_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
     }
 
 }

@@ -22,7 +22,7 @@ public interface SaleHisDao {
 
     SaleHis findById(SaleHisKey id);
 
-    int delete(String vouNo) throws Exception;
+    void delete(SaleHisKey key) throws Exception;
 
     List<SaleHis> unUploadVoucher(String syncDate);
     List<SaleHis> unUpload();

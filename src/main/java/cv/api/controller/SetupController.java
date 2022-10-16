@@ -446,6 +446,13 @@ public class SetupController {
         return ResponseEntity.ok(opHisService.findByCode(key));
     }
 
+    @PostMapping(path = "/delete-opening")
+    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody OPHisKey key) throws Exception {
+        opHisService.delete(key);
+        ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
     @PostMapping(path = "/save-opening-detail")
     public ResponseEntity<OPHisDetail> saveOpeningDetail(@RequestBody OPHisDetail opHis, HttpServletRequest request) {
         OPHisDetail op = opHisDetailService.save(opHis);

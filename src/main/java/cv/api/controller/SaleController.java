@@ -116,9 +116,9 @@ public class SaleController {
         return ResponseEntity.ok(saleList);
     }
 
-    @DeleteMapping(path = "/delete-sale")
-    public ResponseEntity<ReturnObject> deleteSale(@RequestParam String code) throws Exception {
-        shService.delete(code);
+    @PostMapping(path = "/delete-sale")
+    public ResponseEntity<ReturnObject> deleteSale(@RequestParam SaleHisKey key) throws Exception {
+        shService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }

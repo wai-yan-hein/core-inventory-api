@@ -41,39 +41,37 @@ public class StockInOutServiceImpl implements StockInOutService {
         if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
             io.getKey().setVouNo(getVoucherNo(io.getMacId(), io.getKey().getCompCode()));
         }
-        if (Util1.getBoolean(io.getDeleted())) {
-            ioDao.save(io);
-        } else {
-            List<StockInOutDetail> listSD = io.getListSH();
-            List<String> listDel = io.getListDel();
-            String vouNo = io.getKey().getVouNo();
-            if (listDel != null) {
-                listDel.forEach(detailId -> {
-                    if (detailId != null) {
-                        iodDao.delete(detailId);
-                    }
-                });
-            }
-            for (int i = 0; i < listSD.size(); i++) {
-                StockInOutDetail cSd = listSD.get(i);
-                if (cSd.getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            StockInOutDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
-                        }
-                    }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setIoKey(new StockInOutKey(sdCode, vouNo, io.getKey().getDeptId()));
-                    cSd.setCompCode(io.getKey().getCompCode());
-                    iodDao.save(cSd);
+
+        List<StockInOutDetail> listSD = io.getListSH();
+        List<String> listDel = io.getListDel();
+        String vouNo = io.getKey().getVouNo();
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    iodDao.delete(detailId);
                 }
-            }
-            ioDao.save(io);
-            io.setListSH(listSD);
+            });
         }
+        for (int i = 0; i < listSD.size(); i++) {
+            StockInOutDetail cSd = listSD.get(i);
+            if (cSd.getStockCode() != null) {
+                if (cSd.getUniqueId() == null) {
+                    if (i == 0) {
+                        cSd.setUniqueId(1);
+                    } else {
+                        StockInOutDetail pSd = listSD.get(i - 1);
+                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                    }
+                }
+                String sdCode = vouNo + "-" + cSd.getUniqueId();
+                cSd.setIoKey(new StockInOutKey(sdCode, vouNo, io.getKey().getDeptId()));
+                cSd.setCompCode(io.getKey().getCompCode());
+                iodDao.save(cSd);
+            }
+        }
+        ioDao.save(io);
+        io.setListSH(listSD);
+
         return io;
     }
 
@@ -88,8 +86,8 @@ public class StockInOutServiceImpl implements StockInOutService {
     }
 
     @Override
-    public int delete(String vouNo) throws Exception {
-        return ioDao.delete(vouNo);
+    public void delete(StockIOKey key) throws Exception {
+        ioDao.delete(key);
     }
 
     @Override

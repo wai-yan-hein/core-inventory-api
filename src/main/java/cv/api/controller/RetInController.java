@@ -76,9 +76,9 @@ public class RetInController {
         return ResponseEntity.ok(listRI);
     }
 
-    @DeleteMapping(path = "/delete-retin")
-    public ResponseEntity<ReturnObject> deleteRI(@RequestParam String code) throws Exception {
-        riService.delete(code);
+    @PostMapping(path = "/delete-retin")
+    public ResponseEntity<ReturnObject> deleteRI(@RequestBody RetInHisKey key) throws Exception {
+        riService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }

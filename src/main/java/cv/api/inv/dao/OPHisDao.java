@@ -12,6 +12,7 @@ public interface OPHisDao {
 
     OPHis findByCode(OPHisKey key);
     List<OPHis> unUpload();
+    void delete(OPHisKey key);
 
 
 }

@@ -6,6 +6,7 @@
 package cv.api.controller;
 
 import cv.api.common.FilterObject;
+import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisDetail;
@@ -70,5 +71,13 @@ public class TransferController {
     public ResponseEntity<List<TransferHisDetail>> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<TransferHisDetail> listSD = detailService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
+    }
+
+    @PostMapping(path = "/delete-transfer")
+    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody TransferHisKey key) {
+        thService.delete(key);
+        ReturnObject ro = new ReturnObject();
+        ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
     }
 }

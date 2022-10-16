@@ -30,48 +30,45 @@ public class TransferHisServiceImpl implements TransferHisService {
         if (Util1.isNullOrEmpty(th.getKey().getVouNo())) {
             th.getKey().setVouNo(getVoucherNo(th.getMacId(), th.getKey().getCompCode()));
         }
-        if (Util1.getBoolean(th.isDeleted())) {
-            dao.save(th);
-        } else {
-            List<TransferHisDetail> listTD = th.getListTD();
-            List<String> listDel = th.getDelList();
-            String vouNo = th.getKey().getVouNo();
-            if (th.getStatus().equals("NEW")) {
-                TransferHis valid = dao.findById(th.getKey());
-                if (valid != null) {
-                    throw new IllegalStateException("Duplicate Transfer Voucher");
-                }
+
+        List<TransferHisDetail> listTD = th.getListTD();
+        List<String> listDel = th.getDelList();
+        String vouNo = th.getKey().getVouNo();
+        if (th.getStatus().equals("NEW")) {
+            TransferHis valid = dao.findById(th.getKey());
+            if (valid != null) {
+                throw new IllegalStateException("Duplicate Transfer Voucher");
             }
-            if (listDel != null) {
-                listDel.forEach(detailId -> {
-                    if (detailId != null) {
-                        detailDao.delete(detailId);
-                    }
-                });
-            }
-            for (int i = 0; i < listTD.size(); i++) {
-                TransferHisDetail cSd = listTD.get(i);
-                if (cSd.getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            TransferHisDetail pSd = listTD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
-                        }
-                    }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    THDetailKey key = new THDetailKey();
-                    key.setVouNo(vouNo);
-                    key.setTdCode(sdCode);
-                    key.setDeptId(th.getKey().getDeptId());
-                    cSd.setKey(key);
-                    cSd.setCompCode(th.getKey().getCompCode());
-                    detailDao.save(cSd);
-                }
-            }
-            th.setListTD(listTD);
         }
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    detailDao.delete(detailId);
+                }
+            });
+        }
+        for (int i = 0; i < listTD.size(); i++) {
+            TransferHisDetail cSd = listTD.get(i);
+            if (cSd.getStockCode() != null) {
+                if (cSd.getUniqueId() == null) {
+                    if (i == 0) {
+                        cSd.setUniqueId(1);
+                    } else {
+                        TransferHisDetail pSd = listTD.get(i - 1);
+                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                    }
+                }
+                String sdCode = vouNo + "-" + cSd.getUniqueId();
+                THDetailKey key = new THDetailKey();
+                key.setVouNo(vouNo);
+                key.setTdCode(sdCode);
+                key.setDeptId(th.getKey().getDeptId());
+                cSd.setKey(key);
+                cSd.setCompCode(th.getKey().getCompCode());
+                detailDao.save(cSd);
+            }
+        }
+        th.setListTD(listTD);
         return dao.save(th);
     }
 
@@ -89,5 +86,10 @@ public class TransferHisServiceImpl implements TransferHisService {
     @Override
     public List<TransferHis> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public void delete(TransferHisKey key) {
+        dao.delete(key);
     }
 }

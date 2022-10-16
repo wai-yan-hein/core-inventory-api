@@ -9,6 +9,9 @@ public interface TransferHisService {
     TransferHis save(TransferHis th);
 
     TransferHis findById(TransferHisKey key);
+
     List<TransferHis> unUpload();
+
+    void delete(TransferHisKey key);
 
 }

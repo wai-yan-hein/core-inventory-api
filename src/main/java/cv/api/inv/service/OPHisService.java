@@ -11,6 +11,9 @@ public interface OPHisService {
     OPHis findByCode(OPHisKey key);
 
     List<OPHis> search(String compCode);
+
     List<OPHis> unUpload();
+
+    void delete(OPHisKey key);
 
 }

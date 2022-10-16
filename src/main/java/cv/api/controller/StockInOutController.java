@@ -61,9 +61,9 @@ public class StockInOutController {
         return ResponseEntity.ok(listStockIO);
     }
 
-    @DeleteMapping(path = "/delete-stockio")
-    public ResponseEntity<ReturnObject> deleteStockIO(@RequestParam String code) throws Exception {
-        ioService.delete(code);
+    @PostMapping(path = "/delete-stockio")
+    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody StockIOKey key) throws Exception {
+        ioService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
@@ -76,7 +76,7 @@ public class StockInOutController {
 
     @GetMapping(path = "/get-stockio-detail")
     public ResponseEntity<List<StockInOutDetail>> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        List<StockInOutDetail> listSD = iodService.search(vouNo,compCode,deptId);
+        List<StockInOutDetail> listSD = iodService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
 }
