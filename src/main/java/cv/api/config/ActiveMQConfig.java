@@ -33,7 +33,6 @@ public class ActiveMQConfig {
     @Autowired
     Environment environment;
 
-    @Bean
     public ActiveMQConnectionFactory connectionFactory(String url) {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setBrokerURL(url);
@@ -66,7 +65,6 @@ public class ActiveMQConfig {
     public JmsTemplate cloudMQTemplate() {
         JmsTemplate template = new JmsTemplate();
         String url = environment.getProperty("cloud.activemq.url");
-        template.setDefaultDestinationName("client1");
         template.setConnectionFactory(connectionFactory(url));
         return template;
     }
