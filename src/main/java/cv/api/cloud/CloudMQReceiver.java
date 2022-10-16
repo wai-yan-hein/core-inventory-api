@@ -50,7 +50,6 @@ public class CloudMQReceiver {
             .serializeNulls()
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
             .create();
-
     @JmsListener(destination = "${cloud.activemq.client.queue}")
     public void receivedMessage(final MapMessage message) throws JMSException {
         String entity = message.getString("ENTITY");
@@ -192,7 +191,7 @@ public class CloudMQReceiver {
             return mm;
         };
         cloudMQTemplate.send(senderQ, mc);
-        log.info(String.format("%s received and sent.", entity));
+        log.info(String.format("%s received and sent to %s.", entity, senderQ));
     }
 
     private void updateVouStatus(VouStatus vou) throws Exception {
