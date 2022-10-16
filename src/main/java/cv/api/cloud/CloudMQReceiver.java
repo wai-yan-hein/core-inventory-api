@@ -192,6 +192,7 @@ public class CloudMQReceiver {
             return mm;
         };
         cloudMQTemplate.send(senderQ, mc);
+        log.info(String.format("%s received and sent.", entity));
     }
 
     private void updateVouStatus(VouStatus vou) throws Exception {
