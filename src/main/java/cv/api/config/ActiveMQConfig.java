@@ -69,16 +69,26 @@ public class ActiveMQConfig {
         return template;
     }
 
-    @Bean
-    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
+    @Bean("local")
+    public DefaultJmsListenerContainerFactory localListener() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory(localUrl()));
         factory.setConcurrency("1-1");
-        log.info("active mq configured.");
+        log.info("active mq local configured.");
+        return factory;
+    }
+
+    @Bean("cloud")
+    public DefaultJmsListenerContainerFactory cloudListener() {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        String url = environment.getProperty("cloud.activemq.url");
+        factory.setConnectionFactory(connectionFactory(url));
+        factory.setConcurrency("1-1");
+        log.info("active mq cloud configured.");
         return factory;
     }
 
     public String localUrl() {
-      return environment.getRequiredProperty("activemq.url");
+        return environment.getRequiredProperty("activemq.url");
     }
 }
