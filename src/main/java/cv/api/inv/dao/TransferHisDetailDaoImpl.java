@@ -2,12 +2,14 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.THDetailKey;
 import cv.api.inv.entity.TransferHisDetail;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDetail> implements TransferHisDetailDao {
     @Override
@@ -55,7 +57,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
                     list.add(td);
                 }
             } catch (Exception e) {
-
+                log.error(e.getMessage());
             }
         }
         return list;

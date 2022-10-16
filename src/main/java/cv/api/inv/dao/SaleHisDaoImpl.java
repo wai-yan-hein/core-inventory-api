@@ -99,7 +99,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
 
     @Override
     public List<SaleHis> unUpload() {
-        String hql = "select o from SaleHis o where o.ingUpdStatus ='ACK'";
+        String hql = "select o from SaleHis o where o.intgUpdStatus ='ACK'";
         List<SaleHis> list = findHSQL(hql);
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
