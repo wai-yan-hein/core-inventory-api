@@ -11,6 +11,7 @@ public interface OPHisDao {
     List<OPHis> search(String compCode);
 
     OPHis findByCode(OPHisKey key);
+    List<OPHis> unUpload();
 
 
 }

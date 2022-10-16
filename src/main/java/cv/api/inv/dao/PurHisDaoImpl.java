@@ -22,6 +22,8 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
     @Autowired
     private SessionFactory sessionFactory;
+    @Autowired
+    private PurHisDetailDao dao;
 
 
     @Override
@@ -103,4 +105,16 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         return findHSQL(hsql);
     }
 
+    @Override
+    public List<PurHis> unUpload() {
+        String hsql = "select o from PurHis o where o.intgUpdStatus ='ACK'";
+        List<PurHis> list = findHSQL(hsql);
+        list.forEach((o) -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer depId = o.getKey().getDeptId();
+            o.setListPD(dao.search(vouNo, compCode, depId));
+        });
+        return list;
+    }
 }

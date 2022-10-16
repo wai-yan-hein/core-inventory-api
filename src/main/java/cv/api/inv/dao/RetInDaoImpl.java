@@ -22,6 +22,8 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
 
     @Autowired
     private SessionFactory sessionFactory;
+    @Autowired
+    private RetInDetailDao dao;
 
     @Override
     public RetInHis save(RetInHis sh) {
@@ -100,5 +102,18 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
     public List<RetInHis> unUploadVoucher(String syncDate) {
         String hsql = "select o from RetInHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<RetInHis> unUpload() {
+        String hsql = "select o from RetInHis o where o.intgUpdStatus ='ACK'";
+        List<RetInHis> list = findHSQL(hsql);
+        list.forEach((o) -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setListRD(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 }

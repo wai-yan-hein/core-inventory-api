@@ -20,6 +20,8 @@ import java.util.List;
 @Repository
 public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements SaleHisDao {
 
+    @Autowired
+    private SaleHisDetailDao dao;
 
     @Override
     public SaleHis save(SaleHis sh) {
@@ -93,5 +95,18 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     public List<SaleHis> unUploadVoucher(String syncDate) {
         String hsql = "select o from SaleHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<SaleHis> unUpload() {
+        String hql = "select o from SaleHis o where o.ingUpdStatus ='ACK'";
+        List<SaleHis> list = findHSQL(hql);
+        list.forEach(o -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setListSH(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 }

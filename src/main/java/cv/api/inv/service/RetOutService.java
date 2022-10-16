@@ -30,4 +30,5 @@ public interface RetOutService {
     List<VReturnOut> search(String vouNo);
 
     List<RetOutHis> unUploadVoucher(String syncDate);
+    List<RetOutHis> unUpload();
 }

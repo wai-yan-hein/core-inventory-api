@@ -42,6 +42,8 @@ public class OPHis implements java.io.Serializable {
     private boolean deleted;
     @Column(name = "mac_id")
     private Integer macId;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
     @Transient
     private List<OPHisDetail> detailList;
     @Transient

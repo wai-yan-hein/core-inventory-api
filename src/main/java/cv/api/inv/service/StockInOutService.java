@@ -13,14 +13,16 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockInOutService {
+public interface StockInOutService {
 
     StockInOut save(StockInOut io) throws Exception;
 
     List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
-                            String vouNo, String userCode,String vouStatus);
+                            String vouNo, String userCode, String vouStatus);
 
     StockInOut findById(StockIOKey id);
 
     int delete(String vouNo) throws Exception;
+
+    List<StockInOut> unUpload();
 }

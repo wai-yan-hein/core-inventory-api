@@ -113,6 +113,11 @@ public class RetOutServiceImpl implements RetOutService {
         return rDao.unUploadVoucher(syncDate);
     }
 
+    @Override
+    public List<RetOutHis> unUpload() {
+        return rDao.unUpload();
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "RETURN_OUT", period, compCode);

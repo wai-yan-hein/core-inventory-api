@@ -85,4 +85,9 @@ public class TransferHisServiceImpl implements TransferHisService {
     public TransferHis findById(TransferHisKey key) {
         return dao.findById(key);
     }
+
+    @Override
+    public List<TransferHis> unUpload() {
+        return dao.unUpload();
+    }
 }

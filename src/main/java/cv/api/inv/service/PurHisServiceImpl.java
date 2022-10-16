@@ -113,6 +113,11 @@ public class PurHisServiceImpl implements PurHisService {
         return phDao.unUploadVoucher(syncDate);
     }
 
+    @Override
+    public List<PurHis> unUpload() {
+        return phDao.unUpload();
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "PURCHASE", period, compCode);

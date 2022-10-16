@@ -114,4 +114,9 @@ public class SaleHisServiceImpl implements SaleHisService {
     public List<SaleHis> unUploadVoucher(String syncDate) {
         return shDao.unUploadVoucher(syncDate);
     }
+
+    @Override
+    public List<SaleHis> unUpload() {
+        return shDao.unUpload();
+    }
 }

@@ -25,5 +25,6 @@ public interface SaleHisDao {
     int delete(String vouNo) throws Exception;
 
     List<SaleHis> unUploadVoucher(String syncDate);
+    List<SaleHis> unUpload();
 
 }

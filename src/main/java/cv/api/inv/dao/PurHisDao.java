@@ -28,6 +28,7 @@ public interface PurHisDao {
 
     List<VPurchase> search(String vouNo);
     List<PurHis> unUploadVoucher(String syncDate);
+    List<PurHis> unUpload();
 
 
 }

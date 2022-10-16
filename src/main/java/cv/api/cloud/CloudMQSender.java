@@ -54,6 +54,20 @@ public class CloudMQSender {
     private LocationService locationService;
     @Autowired
     private StockService stockService;
+    @Autowired
+    private SaleHisService saleHisService;
+    @Autowired
+    private PurHisService purHisService;
+    @Autowired
+    private RetInService retInService;
+    @Autowired
+    private RetOutService retOutService;
+    @Autowired
+    private StockInOutService inOutService;
+    @Autowired
+    private TransferHisService transferHisService;
+    @Autowired
+    private OPHisService opHisService;
     private boolean progress = false;
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -91,17 +105,17 @@ public class CloudMQSender {
     private void uploadSetup() {
         info("upload setup start.");
         uploadVouStatus();
-        //uploadUnitRelation();
-        //uploadTraderGroup();
-        //uploadTrader();
-        //uploadStockUnit();
-        //uploadStockType();
-        //uploadStockBrand();
-        //uploadSaleMan();
-        //uploadCategory();
-        //uploadLocation();
-        //uploadPattern();
-        //uploadStock();
+        uploadUnitRelation();
+        uploadTraderGroup();
+        uploadTrader();
+        uploadStockUnit();
+        uploadStockType();
+        uploadStockBrand();
+        uploadSaleMan();
+        uploadCategory();
+        uploadLocation();
+        uploadPattern();
+        uploadStock();
         info("upload setup end.");
     }
 
@@ -119,43 +133,62 @@ public class CloudMQSender {
 
     private void uploadSale() {
         log.info("upload sale.");
-        //sendMessage("SALE", "-", null);
-
+        List<SaleHis> list = saleHisService.unUpload();
+        list.forEach(o -> {
+            sendMessage("SALE", gson.toJson(o));
+        });
     }
 
     private void uploadPurchase() {
         log.info("upload purchase.");
-        //sendMessage("PURCHASE", "-", null);
-
+        List<PurHis> list = purHisService.unUpload();
+        list.forEach(o -> {
+            sendMessage("PURCHASE", gson.toJson(o));
+        });
     }
 
     private void uploadReturnIn() {
         log.info("upload return in.");
-        //sendMessage("RETURN_IN", "-", null);
+        List<RetInHis> list = retInService.unUpload();
+        list.forEach(o -> {
+            sendMessage("RETURN_IN", gson.toJson(o));
+        });
     }
 
     private void uploadReturnOut() {
         log.info("upload return out.");
-        //sendMessage("RETURN_OUT", "-", null);
-
+        List<RetOutHis> list = retOutService.unUpload();
+        list.forEach(o -> {
+            sendMessage("RETURN_OUT", gson.toJson(o));
+        });
 
     }
 
     private void uploadStockInOut() {
         log.info("upload stock in out.");
-        //sendMessage("STOCK_IO", "-", null);
-
+        List<StockInOut> list = inOutService.unUpload();
+        list.forEach(o -> {
+            sendMessage("STOCK_IO", gson.toJson(o));
+        });
 
     }
 
     private void uploadTransfer() {
         log.info("upload transfer.");
+        List<TransferHis> list = transferHisService.unUpload();
+        list.forEach(o -> {
+            sendMessage("TRANSFER", gson.toJson(o));
+        });
         //sendMessage("TRANSFER", "-", null);
 
     }
 
     private void uploadOpening() {
         log.info("upload opening.");
+        List<OPHis> list = opHisService.unUpload();
+        list.forEach(o -> {
+            sendMessage("OPENING", gson.toJson(o));
+        });
         //sendMessage("OPENING", "-", null);
 
 

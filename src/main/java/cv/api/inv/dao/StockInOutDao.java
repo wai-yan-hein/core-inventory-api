@@ -23,5 +23,6 @@ import java.util.List;
     StockInOut findById(StockIOKey id);
 
     int delete(String vouNo) throws Exception;
+    List<StockInOut> unUpload();
 
 }

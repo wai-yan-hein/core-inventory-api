@@ -22,6 +22,8 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
 
     @Autowired
     private SessionFactory sessionFactory;
+    @Autowired
+    private RetOutDetailDao dao;
 
     @Override
     public RetOutHis save(RetOutHis sh) {
@@ -100,5 +102,18 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
     public List<RetOutHis> unUploadVoucher(String syncDate) {
         String hsql = "select o from RetOutHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<RetOutHis> unUpload() {
+        String hsql = "select o from RetOutHis o where o.intgUpdStatus ='ACK'";
+        List<RetOutHis> list = findHSQL(hsql);
+        list.forEach((o) -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setListRD(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 }
