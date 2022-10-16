@@ -55,7 +55,8 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     StockInOutKey key = new StockInOutKey();
                     key.setVouNo(rs.getString("vou_no"));
                     key.setDeptId(rs.getInt("dept_id"));
-                    key.setVouNo(rs.getString("sd_code"));
+                    key.setSdCode(rs.getString("sd_code"));
+                    op.setIoKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setInQty(rs.getFloat("in_qty"));
                     op.setInUnitCode(rs.getString("in_unit"));
@@ -71,6 +72,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
+                    op.setCostPrice(rs.getFloat("cost_price"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

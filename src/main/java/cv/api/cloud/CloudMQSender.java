@@ -81,7 +81,7 @@ public class CloudMQSender {
             if (!progress) {
                 progress = true;
                 uploadSetup();
-                //uploadTransaction();
+                uploadTransaction();
                 progress = false;
             }
         }
@@ -117,7 +117,6 @@ public class CloudMQSender {
         //uploadPattern();
         uploadStock();
         log.info("upload setup end.");
-        uploadPattern();
         uploadStock();
         info("upload setup end.");
     }

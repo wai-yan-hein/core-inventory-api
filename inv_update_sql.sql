@@ -221,6 +221,9 @@ add column intg_upd_status varchar(15);
 
 alter table stock_in_out 
 add column intg_upd_status varchar(15);
+
+alter table op_his
+add column intg_upd_status varchar(15);
 ###
 create table department (
   dept_id int(11) not null,

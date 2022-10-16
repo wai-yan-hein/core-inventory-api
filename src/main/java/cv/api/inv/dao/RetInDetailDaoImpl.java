@@ -47,6 +47,7 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
                     key.setVouNo(rs.getString("vou_no"));
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setRdCode(rs.getString("rd_code"));
+                    op.setRiKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setAvgQty(rs.getFloat("avg_qty"));
