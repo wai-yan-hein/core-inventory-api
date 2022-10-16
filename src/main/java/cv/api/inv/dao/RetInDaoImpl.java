@@ -86,10 +86,12 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
     }
 
     @Override
-    public int delete(String vouNo) throws Exception {
-        String strSql = "update ret_in_his set deleted = true where voucher_no = '" + vouNo + "'";
-        execSQL(strSql);
-        return 1;
+    public void delete(RetInHisKey key) throws Exception {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update ret_in_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
     }
 
     @Override

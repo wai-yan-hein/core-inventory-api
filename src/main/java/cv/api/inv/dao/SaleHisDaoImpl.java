@@ -84,10 +84,12 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     }
 
     @Override
-    public int delete(String vouNo) throws Exception {
-        String strSql = "update sale_his set deleted = true where voucher_no = '" + vouNo + "'";
-        execSQL(strSql);
-        return 1;
+    public void delete(SaleHisKey key) throws Exception {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update sale_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
     }
 
 

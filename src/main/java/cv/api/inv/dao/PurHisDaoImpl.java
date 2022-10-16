@@ -87,10 +87,12 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
     }
 
     @Override
-    public int delete(String vouNo) throws Exception {
-        String strSql = "update pur_his set deleted = true where vou_no = '" + vouNo + "'";
-        execSQL(strSql);
-        return 1;
+    public void delete(PurHisKey key) throws Exception {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update pur_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
     }
 
     @Override

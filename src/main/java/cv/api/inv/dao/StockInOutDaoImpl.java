@@ -90,9 +90,12 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
     }
 
     @Override
-    public int delete(String id) {
-        String hsql = "delete from StockInOut o where o.vouNo '" + id + "'";
-        return execUpdateOrDelete(hsql);
+    public void delete(StockIOKey key) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update stock_in_out set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
 
     }
 

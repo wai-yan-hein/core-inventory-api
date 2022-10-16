@@ -23,7 +23,7 @@ public interface RetInDao {
 
     RetInHis findById(RetInHisKey id);
 
-    int delete(String vouNo) throws Exception;
+    void delete(RetInHisKey key) throws Exception;
 
     List<VReturnIn> search(String vouNo);
 

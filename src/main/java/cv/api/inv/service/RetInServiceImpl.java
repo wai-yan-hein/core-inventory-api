@@ -43,41 +43,39 @@ public class RetInServiceImpl implements RetInService {
         if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
             rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getCompCode()));
         }
-        if (Util1.getBoolean(rin.getDeleted())) {
-            rDao.save(rin);
-        } else {
-            List<RetInHisDetail> listSD = rin.getListRD();
-            List<String> listDel = rin.getListDel();
-            String vouNo = rin.getKey().getVouNo();
-            if (listDel != null) {
-                listDel.forEach(detailId -> {
-                    if (detailId != null) {
-                        try {
-                            sdDao.delete(detailId);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                });
-            }
-            for (int i = 0; i < listSD.size(); i++) {
-                RetInHisDetail cSd = listSD.get(i);
-                if (cSd.getStockCode() != null) {
-                    if (cSd.getStockCode() != null) {
-                        if (cSd.getUniqueId() == null) {
-                            if (i == 0) {
-                                cSd.setUniqueId(1);
-                            } else {
-                                RetInHisDetail pSd = listSD.get(i - 1);
-                                cSd.setUniqueId(pSd.getUniqueId() + 1);
-                            }
-                        }
-                        String sdCode = vouNo + "-" + cSd.getUniqueId();
-                        cSd.setRiKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
-                        cSd.setCompCode(rin.getKey().getCompCode());
-                        sdDao.save(cSd);
+
+        List<RetInHisDetail> listSD = rin.getListRD();
+        List<String> listDel = rin.getListDel();
+        String vouNo = rin.getKey().getVouNo();
+        if (listDel != null) {
+            listDel.forEach(detailId -> {
+                if (detailId != null) {
+                    try {
+                        sdDao.delete(detailId);
+                    } catch (Exception ignored) {
                     }
                 }
+            });
+        }
+        for (int i = 0; i < listSD.size(); i++) {
+            RetInHisDetail cSd = listSD.get(i);
+            if (cSd.getStockCode() != null) {
+                if (cSd.getStockCode() != null) {
+                    if (cSd.getUniqueId() == null) {
+                        if (i == 0) {
+                            cSd.setUniqueId(1);
+                        } else {
+                            RetInHisDetail pSd = listSD.get(i - 1);
+                            cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        }
+                    }
+                    String sdCode = vouNo + "-" + cSd.getUniqueId();
+                    cSd.setRiKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
+                    cSd.setCompCode(rin.getKey().getCompCode());
+                    sdDao.save(cSd);
+                }
             }
+
             rDao.save(rin);
             rin.setListRD(listSD);
         }
@@ -106,8 +104,8 @@ public class RetInServiceImpl implements RetInService {
     }
 
     @Override
-    public int delete(String vouNo) throws Exception {
-        return rDao.delete(vouNo);
+    public void delete(RetInHisKey key) throws Exception {
+        rDao.delete(key);
     }
 
     @Override

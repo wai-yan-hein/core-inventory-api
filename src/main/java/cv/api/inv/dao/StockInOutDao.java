@@ -22,7 +22,7 @@ import java.util.List;
 
     StockInOut findById(StockIOKey id);
 
-    int delete(String vouNo) throws Exception;
+    void delete(StockIOKey key) throws Exception;
     List<StockInOut> unUpload();
 
 }

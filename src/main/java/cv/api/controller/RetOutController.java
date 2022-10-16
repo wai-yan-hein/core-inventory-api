@@ -72,9 +72,9 @@ public class RetOutController {
         return ResponseEntity.ok(listRO);
     }
 
-    @DeleteMapping(path = "/delete-retout")
-    public ResponseEntity<ReturnObject> deleteRO(@RequestParam String code) throws Exception {
-        roService.delete(code);
+    @PostMapping(path = "/delete-retout")
+    public ResponseEntity<ReturnObject> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
+        roService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }

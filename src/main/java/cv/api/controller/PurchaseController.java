@@ -77,9 +77,9 @@ public class PurchaseController {
         return ResponseEntity.ok(listPur);
     }
 
-    @DeleteMapping(path = "/delete-pur")
-    public ResponseEntity<ReturnObject> deletePur(@RequestParam String code) throws Exception {
-        phService.delete(code);
+    @PostMapping(path = "/delete-pur")
+    public ResponseEntity<ReturnObject> deletePur(@RequestBody PurHisKey key) throws Exception {
+        phService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }

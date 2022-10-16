@@ -25,7 +25,7 @@ public interface RetOutService {
 
     RetOutHis findById(RetOutHisKey id);
 
-    int delete(String vouNo) throws Exception;
+    void delete(RetOutHisKey key) throws Exception;
 
     List<VReturnOut> search(String vouNo);
 

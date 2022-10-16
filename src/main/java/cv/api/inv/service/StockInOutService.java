@@ -7,6 +7,7 @@ package cv.api.inv.service;
 
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
+import cv.api.inv.entity.StockInOutKey;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface StockInOutService {
 
     StockInOut findById(StockIOKey id);
 
-    int delete(String vouNo) throws Exception;
+    void delete(StockIOKey key) throws Exception;
 
     List<StockInOut> unUpload();
 }
