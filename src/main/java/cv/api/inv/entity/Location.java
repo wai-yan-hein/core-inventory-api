@@ -41,4 +41,6 @@ public class Location implements java.io.Serializable {
     private Integer macId;
     @Column(name = "user_code")
     private String userCode;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
 }

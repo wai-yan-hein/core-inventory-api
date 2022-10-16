@@ -41,4 +41,10 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
         return getByKey(id);
     }
 
+    @Override
+    public List<SaleMan> unUpload() {
+        String hsql = "select o from SaleMan o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
+
 }

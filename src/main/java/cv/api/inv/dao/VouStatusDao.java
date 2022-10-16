@@ -22,6 +22,8 @@ import java.util.List;
      int delete(String id);
 
      VouStatus findById(VouStatusKey id);
-     List<VouStatus> search(String statusDesp);
+     List<VouStatus> search(String des);
+    List<VouStatus> unUpload();
+
 
 }

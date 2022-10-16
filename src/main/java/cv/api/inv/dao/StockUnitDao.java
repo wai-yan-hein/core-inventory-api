@@ -23,5 +23,6 @@ import java.util.List;
      int delete(String id);
 
      StockUnit findByCode(StockUnitKey code);
+    List<StockUnit> unUpload();
 
 }

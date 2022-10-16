@@ -62,6 +62,26 @@ public class ReportServiceImpl implements ReportService {
         reportDao.executeSql(sql);
     }
 
+    @Override
+    public String getOpeningDate() {
+        String opDate = "1998-10-07";
+        String sql = "select max(op_date) op_date from op_his where deleted =0";
+        try {
+            ResultSet rs = reportDao.executeSql(sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    opDate = Util1.toDateStr(rs.getDate("op_date"), "yyyy-MM-dd");
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        log.info(opDate);
+        return opDate;
+
+    }
+
+
     private Session getSession() {
         return sessionFactory.getCurrentSession();
     }
@@ -522,7 +542,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, String compCode, Integer macId) throws Exception {
+    public List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
+                                               boolean calSale, String compCode, Integer deptId, Integer macId) throws Exception {
         calStockBalanceByLocation(typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
         List<VStockBalance> balances = new ArrayList<>();
         String sql = "select tmp.stock_code,tmp.loc_code,l.loc_name,tmp.unit,tmp.wt,tmp.qty,tmp.smallest_qty,s.user_code,s.rel_code,s.stock_name\n" + "from tmp_stock_balance tmp join location l\n" + "on tmp.loc_code = l.loc_code\n" + "join stock s on tmp.stock_code = s.stock_code\n" + "where tmp.mac_id = " + macId + "";
@@ -539,19 +560,19 @@ public class ReportServiceImpl implements ReportService {
                 float smallQty = rs.getFloat("smallest_qty");
                 String relCode = rs.getString("rel_code");
                 b.setTotalQty(null);
-                b.setUnitName(getRelStr(relCode, smallQty));
+                b.setUnitName(getRelStr(relCode, compCode, deptId, smallQty));
                 balances.add(b);
             }
         }
         return balances;
     }
 
-    private String getRelStr(String relCode, float smallestQty) {
+    private String getRelStr(String relCode, String compCode, Integer deptId, float smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
             if (hmRelation.get(relCode) == null) {
-                hmRelation.put(relCode, relationDao.getRelationDetail(relCode));
+                hmRelation.put(relCode, relationDao.getRelationDetail(relCode, compCode, deptId));
             }
             List<UnitRelationDetail> detailList = hmRelation.get(relCode);
             if (detailList != null) {
@@ -628,7 +649,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
+    public List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) throws Exception {
         calStockBalance(typeCode, catCode, brandCode, stockCode, compCode, macId);
         String sql1 = "select a.*,if(bal_small_qty < min_small_qty,1,if(bal_small_qty > max_qty,2,3)) sorting\n" + "from (\n" + "select r.*,r.min_qty*rel.smallest_qty min_small_qty,r.max_qty*rel.smallest_qty max_small_qty,\n" + "ifnull(tmp.smallest_qty,0) bal_small_qty,s.user_code,s.stock_name,s.rel_code\n" + "from reorder_level r join stock s\n" + "on r.stock_code = s.stock_code\n" + "join v_relation rel on s.rel_code = rel.rel_code \n" + "and r.min_unit = rel.unit\n" + "and r.max_unit = rel.unit\n" + "join tmp_stock_balance tmp\n" + "on r.stock_code = tmp.stock_code\n" + "and tmp.mac_id =" + macId + "\n" + "and r.comp_code = '" + compCode + "'\n" + ")a\n" + "order by sorting";
         ResultSet rs = reportDao.executeSql(sql1);
@@ -652,7 +673,7 @@ public class ReportServiceImpl implements ReportService {
                 r.setMinSmallQty(rs.getFloat("min_small_qty"));
                 //bal qty
                 float balSmallQty = rs.getFloat("bal_small_qty");
-                r.setBalUnit(getRelStr(relCode, balSmallQty));
+                r.setBalUnit(getRelStr(relCode, compCode, deptId, balSmallQty));
                 r.setBalSmallQty(balSmallQty);
                 reorderLevels.add(r);
             }
@@ -742,7 +763,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode, String brandCode, String catCode, String compCode) throws Exception {
+    public List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode, String brandCode, String catCode, String compCode, Integer deptId) throws Exception {
         String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty*rel.smallest_qty) smallest_qty\n" + "from (select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "group by stock_code,sale_unit\n" + ")a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" + "group by stock_code\n" + "order by smallest_qty desc";
         ResultSet rs = reportDao.executeSql(sql);
         List<General> generals = new ArrayList<>();
@@ -753,7 +774,7 @@ public class ReportServiceImpl implements ReportService {
                 g.setStockName(rs.getString("stock_name"));
                 String relCode = rs.getString("rel_code");
                 float smallQty = rs.getFloat("smallest_qty");
-                g.setQtyRel(getRelStr(relCode, smallQty));
+                g.setQtyRel(getRelStr(relCode, compCode, deptId, smallQty));
                 g.setAmount(rs.getFloat("ttl_amt"));
                 generals.add(g);
             }
@@ -796,7 +817,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
-                                                     String stockCode, boolean calSale, String compCode, Integer macId) {
+                                                     String stockCode, boolean calSale, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" + "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "group by stock_code)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "group by stock_code\n" + "order by s.user_code";
@@ -814,17 +835,17 @@ public class ReportServiceImpl implements ReportService {
                     float balQty = rs.getFloat("bal_qty");
                     String relCode = rs.getString("rel_code");
                     b.setOpenQty(opQty);
-                    b.setOpenRel(getRelStr(relCode, opQty));
+                    b.setOpenRel(getRelStr(relCode, compCode, deptId, opQty));
                     b.setPurQty(purQty);
-                    b.setPurRel(getRelStr(relCode, purQty));
+                    b.setPurRel(getRelStr(relCode, compCode, deptId, purQty));
                     b.setInQty(inQty);
-                    b.setInRel(getRelStr(relCode, inQty));
+                    b.setInRel(getRelStr(relCode, compCode, deptId, inQty));
                     b.setSaleQty(saleQty);
-                    b.setSaleRel(getRelStr(relCode, saleQty));
+                    b.setSaleRel(getRelStr(relCode, compCode, deptId, saleQty));
                     b.setOutQty(outQty);
-                    b.setOutRel(getRelStr(relCode, outQty));
+                    b.setOutRel(getRelStr(relCode, compCode, deptId, outQty));
                     b.setBalQty(balQty);
-                    b.setBalRel(getRelStr(relCode, balQty));
+                    b.setBalRel(getRelStr(relCode, compCode, deptId, balQty));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
                     balances.add(b);
@@ -868,7 +889,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ClosingBalance> getStockInOutDetail(String typeCode, Integer macId) {
+    public List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) {
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" + "from (select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "group by tran_date,stock_code,tran_option)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "group by tran_date,stock_code,tran_option\n" + "order by s.user_code,a.tran_date,a.tran_option";
         List<ClosingBalance> balances = new ArrayList<>();
         try {
@@ -883,12 +904,12 @@ public class ReportServiceImpl implements ReportService {
                     float outQty = rs.getFloat("out_qty");
                     float balQty = rs.getFloat("bal_qty");
                     String relCode = rs.getString("rel_code");
-                    b.setOpenRel(getRelStr(relCode, opQty));
-                    b.setPurRel(getRelStr(relCode, purQty));
-                    b.setInRel(getRelStr(relCode, inQty));
-                    b.setSaleRel(getRelStr(relCode, saleQty));
-                    b.setOutRel(getRelStr(relCode, outQty));
-                    b.setBalRel(getRelStr(relCode, balQty));
+                    b.setOpenRel(getRelStr(relCode, compCode, deptId, opQty));
+                    b.setPurRel(getRelStr(relCode, compCode, deptId, purQty));
+                    b.setInRel(getRelStr(relCode, compCode, deptId, inQty));
+                    b.setSaleRel(getRelStr(relCode, compCode, deptId, saleQty));
+                    b.setOutRel(getRelStr(relCode, compCode, deptId, outQty));
+                    b.setBalRel(getRelStr(relCode, compCode, deptId, balQty));
                     b.setVouDate(Util1.toDateStr(rs.getDate("tran_date"), "dd/MM/yyyy"));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
@@ -906,7 +927,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<StockValue> getStockValue(String opDate, String fromDate, String toDate,
                                           String typeCode, String catCode, String brandCode,
-                                          String stockCode, boolean calSale, String compCode, Integer macId) {
+                                          String stockCode, boolean calSale, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
         calculatePrice(toDate, opDate, compCode, stockCode, macId);
@@ -919,7 +940,7 @@ public class ReportServiceImpl implements ReportService {
                     StockValue value = new StockValue();
                     value.setStockUserCode(rs.getString("s_user_code"));
                     value.setStockName(rs.getString("stock_name"));
-                    value.setBalRel(getRelStr(rs.getString("rel_code"), rs.getFloat("bal_qty")));
+                    value.setBalRel(getRelStr(rs.getString("rel_code"), compCode, deptId, rs.getFloat("bal_qty")));
                     value.setPurAvgPrice(rs.getFloat("pur_avg_price"));
                     value.setPurAvgAmount(rs.getFloat("pur_avg_amt"));
                     value.setInAvgPrice(rs.getFloat("in_avg_price"));

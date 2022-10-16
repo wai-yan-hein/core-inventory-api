@@ -22,4 +22,5 @@ public interface SaleManService {
     int delete(String id);
 
     SaleMan findByCode(SaleManKey key);
+    List<SaleMan> unUpload();
 }

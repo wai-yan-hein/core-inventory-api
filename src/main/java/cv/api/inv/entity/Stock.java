@@ -83,6 +83,8 @@ public class Stock implements java.io.Serializable {
     private Integer macId;
     @Column(name = "calculate")
     private boolean calculate;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
     @Transient
     private String relName;
     @Transient

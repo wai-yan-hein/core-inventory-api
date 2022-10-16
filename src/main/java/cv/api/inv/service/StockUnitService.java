@@ -21,6 +21,7 @@ import java.util.List;
      StockUnit save(StockUnit unit) throws Exception;
 
      List<StockUnit> findAll(String compCode,Integer deptId);
+     List<StockUnit> unUpload();
 
      int delete(String id);
 }

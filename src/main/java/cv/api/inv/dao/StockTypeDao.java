@@ -22,4 +22,6 @@ import java.util.List;
      int delete(String id);
 
     StockType findByCode(StockTypeKey key);
+    List<StockType> unUpload();
+
 }

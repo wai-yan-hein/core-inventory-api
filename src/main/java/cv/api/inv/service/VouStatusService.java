@@ -5,6 +5,7 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.Pattern;
 import cv.api.inv.entity.VouStatus;
 import cv.api.inv.entity.VouStatusKey;
 import io.swagger.models.auth.In;
@@ -25,4 +26,6 @@ public interface VouStatusService {
     VouStatus findById(VouStatusKey id);
 
     List<VouStatus> search(String description);
+    List<VouStatus> unUpload();
+
 }

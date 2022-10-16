@@ -16,9 +16,11 @@ public interface UnitRelationService {
 
     UnitRelationDetail save(UnitRelationDetail unit);
 
-    List<UnitRelationDetail> getRelationDetail(String code);
+    List<UnitRelationDetail> getRelationDetail(String code,String compCode,Integer deptId);
 
     UnitRelationDetail findByKey(UnitRelationDetailKey key);
+
+    List<UnitRelation> unUpload();
 
 }
 

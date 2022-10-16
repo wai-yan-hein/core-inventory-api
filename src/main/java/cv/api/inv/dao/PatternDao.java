@@ -12,6 +12,7 @@ public interface PatternDao {
     void delete(String stockCode);
 
     List<Pattern> search(String stockCode,String compCode,Integer deptId);
+    List<Pattern> unUpload();
 
 
 }

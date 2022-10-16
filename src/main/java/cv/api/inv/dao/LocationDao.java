@@ -24,5 +24,6 @@ import java.util.List;
      Location findByCode(LocationKey code);
 
      List<Location> search(String parent);
+    List<Location> unUpload();
 
 }

@@ -56,4 +56,10 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
 
         return findHSQL(strSql);
     }
+
+    @Override
+    public List<VouStatus> unUpload() {
+        String hsql = "select o from VouStatus o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
 }

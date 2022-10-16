@@ -88,11 +88,12 @@ public class ReportController {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
-                String opDate = filter.getOpDate();
+                String opDate = reportService.getOpeningDate();
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
                 String compCode = filter.getCompCode();
+                Integer deptId = filter.getDeptId();
                 Integer macId = filter.getMacId();
                 String stockCode = Util1.isNull(filter.getStockCode(), "-");
                 String brandCode = Util1.isNull(filter.getBrandCode(), "-");
@@ -165,7 +166,7 @@ public class ReportController {
                         Util1.writeJsonFile(sale, exportPath);
                     }
                     case "TopSaleByStock" -> {
-                        List<General> general = reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode);
+                        List<General> general = reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode, deptId);
                         Util1.writeJsonFile(general, exportPath);
                     }
                     case "OpeningByLocation" -> {
@@ -177,16 +178,17 @@ public class ReportController {
                         Util1.writeJsonFile(opGroup, exportPath);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummary(opDate, fromDate, toDate,
+                                typeCode, catCode, brandCode, stockCode, calSale, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetail" -> {
                         reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
-                        List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockValue" -> {
-                        List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
+                        List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
@@ -216,6 +218,7 @@ public class ReportController {
         }
         return ro;
     }
+
 
     private boolean isValidReportFilter(ReportFilter filter, ReturnObject ro) {
         boolean status = true;
@@ -275,8 +278,9 @@ public class ReportController {
     public ResponseEntity<List<VStockBalance>> getStockBalance(@RequestParam String stockCode,
                                                                @RequestParam boolean calSale,
                                                                @RequestParam String compCode,
+                                                               @RequestParam Integer deptId,
                                                                @RequestParam Integer macId) throws Exception {
-        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, compCode, macId));
+        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, compCode, deptId, macId));
     }
 
     @PostMapping(path = "/get-reorder-level")
@@ -286,9 +290,10 @@ public class ReportController {
         String catCode = Util1.isNull(filter.getCatCode(), "-");
         String brandCode = Util1.isNull(filter.getBrandCode(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        Integer deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
         reportService.generateReorder(compCode);
-        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, compCode, macId);
+        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
         return ResponseEntity.ok(reorderLevels);
     }
 

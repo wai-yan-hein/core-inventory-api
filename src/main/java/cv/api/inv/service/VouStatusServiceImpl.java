@@ -58,6 +58,11 @@ public class VouStatusServiceImpl implements VouStatusService {
         return vouDao.search(description);
     }
 
+    @Override
+    public List<VouStatus> unUpload() {
+        return vouDao.unUpload();
+    }
+
     private String getVouStatusCode(Integer macId, String compCode) {
         int seqNo = seqService.getSequence(macId, "VouStatus", "-", compCode);
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);

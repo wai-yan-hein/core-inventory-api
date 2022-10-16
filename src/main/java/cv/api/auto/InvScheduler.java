@@ -40,7 +40,7 @@ public class InvScheduler {
             String type = "REORDER";
             try {
                 reportService.generateReorder(compCode);
-                List<ReorderLevel> filter = reportService.getReorderLevel("-", "-", "-", "-", compCode, 0);
+                List<ReorderLevel> filter = reportService.getReorderLevel("-", "-", "-", "-", compCode,1, 0);
                 if (!filter.isEmpty()) {
                     Util1.writeJsonFile(filter, exportPath);
                     byte[] file = new FileInputStream(exportPath).readAllBytes();

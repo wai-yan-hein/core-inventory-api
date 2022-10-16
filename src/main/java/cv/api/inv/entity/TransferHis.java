@@ -35,6 +35,8 @@ public class TransferHis {
     private String locCodeTo;
     @Column(name = "mac_id")
     private Integer macId;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
     @Transient
     private List<TransferHisDetail> listTD;
     @Transient

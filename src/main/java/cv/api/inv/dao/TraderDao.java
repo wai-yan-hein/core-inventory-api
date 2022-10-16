@@ -18,7 +18,7 @@ import java.util.List;
 
     Trader findById(TraderKey key);
 
-    List<Trader> searchTrader(String str,String type, String compCode);
+    List<Trader> searchTrader(String str,String type, String compCode,Integer deptId);
 
      Trader saveTrader(Trader trader);
 

@@ -67,8 +67,8 @@ public class SetupController {
     private UnitRelationService unitRelationService;
     @Autowired
     private ReportService reportService;
-    @Autowired
-    private ProcessTypeService processTypeService;
+
+
     @Autowired
     private FontService fontService;
     @Autowired
@@ -193,6 +193,7 @@ public class SetupController {
         StockBrand b = brandService.findByCode(key);
         return ResponseEntity.ok(b);
     }
+
     @PostMapping(path = "/find-unit-relation")
     public ResponseEntity<?> findUnitRelation(@RequestBody RelationKey key) {
         return ResponseEntity.ok(unitRelationService.findByKey(key));
@@ -321,8 +322,11 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-trader-list")
-    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode) {
-        return ResponseEntity.ok(traderService.searchTrader(text, type, compCode));
+    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text,
+                                                        @RequestParam String type,
+                                                        @RequestParam String compCode,
+                                                        @RequestParam Integer deptId) {
+        return ResponseEntity.ok(traderService.searchTrader(text, type, compCode, deptId));
     }
 
     @GetMapping(path = "/get-supplier")
@@ -469,7 +473,7 @@ public class SetupController {
 
     @GetMapping(path = "/get-pattern")
     public ResponseEntity<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(patternService.search(stockCode,compCode,deptId));
+        return ResponseEntity.ok(patternService.search(stockCode, compCode, deptId));
     }
 
     @PostMapping(path = "/save-reorder")
@@ -526,8 +530,10 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-unit-relation-detail")
-    public ResponseEntity<List<UnitRelationDetail>> getUnitRelation(@RequestParam String code) {
-        List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code);
+    public ResponseEntity<List<UnitRelationDetail>> getUnitRelation(@RequestParam String code,
+                                                                    @RequestParam String compCode,
+                                                                    @RequestParam Integer deptId) {
+        List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -535,18 +541,6 @@ public class SetupController {
     public ResponseEntity<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
         return ResponseEntity.ok(b);
-    }
-
-    @PostMapping(path = "/save-process-type")
-    public ResponseEntity<ProcessType> savePType(@RequestBody ProcessType type) {
-        ProcessType t = processTypeService.save(type);
-        return ResponseEntity.ok(t);
-    }
-
-    @GetMapping(path = "/get-process-type")
-    public ResponseEntity<List<ProcessType>> getPType(@RequestParam String compCode) {
-        List<ProcessType> type = processTypeService.getProcessType(compCode);
-        return ResponseEntity.ok(type);
     }
 
     @GetMapping(path = "/get-font")

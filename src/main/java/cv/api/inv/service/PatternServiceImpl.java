@@ -35,4 +35,9 @@ public class PatternServiceImpl implements PatternService {
     public void delete(String stockCode) {
         dao.delete(stockCode);
     }
+
+    @Override
+    public List<Pattern> unUpload() {
+        return dao.unUpload();
+    }
 }

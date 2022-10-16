@@ -30,7 +30,7 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
 
     @Override
     public List<Category> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Category o where o.key.compCode = '" + compCode + "' and o.key.deptId ="+deptId+"";
+        String hsql = "select o from Category o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
         Query<Category> query = sessionFactory.getCurrentSession().createQuery(hsql, Category.class);
         return query.list();
     }
@@ -59,10 +59,9 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     }
 
     @Override
-    public List<Category> searchM(String updatedDate) {
-        String strSql = "select o from Category o where o.updatedDate > '" + updatedDate + "'";
-        Query<Category> query = sessionFactory.getCurrentSession().createQuery(strSql, Category.class);
-        return query.list();
+    public List<Category> unUpload() {
+        String hsql = "select o from Category o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
     }
 
     @Override

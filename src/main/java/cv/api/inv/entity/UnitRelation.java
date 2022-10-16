@@ -14,6 +14,8 @@ public class UnitRelation implements java.io.Serializable {
     private RelationKey key;
     @Column(name = "rel_name")
     private String relName;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
     @Transient
     private List<UnitRelationDetail> detailList;
 }

@@ -36,6 +36,12 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
     }
 
     @Override
+    public List<StockBrand> unUpload() {
+        String hsql ="select o from StockBrand o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
+
+    @Override
     public StockBrand findByCode(StockBrandKey code) {
         return getByKey(code);
     }

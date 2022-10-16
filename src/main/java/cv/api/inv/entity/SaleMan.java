@@ -43,4 +43,7 @@ public class SaleMan implements Serializable {
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
+
 }

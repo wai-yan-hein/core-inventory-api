@@ -34,10 +34,10 @@ public class ActiveMQConfig {
     Environment environment;
 
     @Bean
-    public ActiveMQConnectionFactory connectionFactory() {
+    public ActiveMQConnectionFactory connectionFactory(String url) {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setBrokerURL(environment.getRequiredProperty("activemq.url"));
-        connectionFactory.setTrustedPackages(List.of("com.cv.integration"));
+        connectionFactory.setBrokerURL(url);
+        connectionFactory.setTrustedPackages(List.of("com.cv"));
         return connectionFactory;
     }
 
@@ -49,7 +49,7 @@ public class ActiveMQConfig {
     @Bean(name = "topicSender")
     public JmsTemplate topicSender() {
         JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(connectionFactory());
+        template.setConnectionFactory(connectionFactory(localUrl()));
         template.setDefaultDestination(topic());
         template.setPubSubDomain(true);
         return template;
@@ -58,16 +58,29 @@ public class ActiveMQConfig {
     @Bean(name = "queueSender")
     public JmsTemplate queueSender() {
         JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(connectionFactory());
+        template.setConnectionFactory(connectionFactory(localUrl()));
+        return template;
+    }
+
+    @Bean(name = "cloudMQTemplate")
+    public JmsTemplate cloudMQTemplate() {
+        JmsTemplate template = new JmsTemplate();
+        String url = environment.getProperty("cloud.activemq.url");
+        template.setDefaultDestinationName("client1");
+        template.setConnectionFactory(connectionFactory(url));
         return template;
     }
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory());
+        factory.setConnectionFactory(connectionFactory(localUrl()));
         factory.setConcurrency("1-1");
         log.info("active mq configured.");
         return factory;
+    }
+
+    public String localUrl() {
+      return environment.getRequiredProperty("activemq.url");
     }
 }

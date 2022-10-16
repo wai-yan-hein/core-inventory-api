@@ -35,6 +35,7 @@ public class ReportFilter {
     private Integer macId;
     @NonNull
     private String compCode;
+    private Integer deptId;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

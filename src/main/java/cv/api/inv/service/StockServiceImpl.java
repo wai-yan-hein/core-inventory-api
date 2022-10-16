@@ -88,4 +88,9 @@ public class StockServiceImpl implements StockService {
         return dao.getStock(str, compCode,deptId);
     }
 
+    @Override
+    public List<Stock> unUpload() {
+        return dao.unUpload();
+    }
+
 }

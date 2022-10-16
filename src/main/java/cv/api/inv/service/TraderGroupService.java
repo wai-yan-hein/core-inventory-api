@@ -9,4 +9,5 @@ public interface TraderGroupService {
     TraderGroup save(TraderGroup group);
 
     List<TraderGroup> getTraderGroup(String compCode, Integer deptId);
+    List<TraderGroup> unUpload();
 }

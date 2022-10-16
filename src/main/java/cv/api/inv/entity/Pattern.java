@@ -29,6 +29,8 @@ public class Pattern implements java.io.Serializable {
     private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
     @Transient
     private String userCode;
     @Transient

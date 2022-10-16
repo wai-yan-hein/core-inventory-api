@@ -31,6 +31,11 @@ public class TraderGroupServiceImpl implements TraderGroupService {
         return dao.getTraderGroup(compCode,deptId);
     }
 
+    @Override
+    public List<TraderGroup> unUpload() {
+        return dao.unUpload();
+    }
+
     private String getGroupCode(String compCode) {
         int seqNo = seqService.getSequence(0, "TraderGroup", "-", compCode);
         return String.format("%0" + 5 + "d", seqNo);

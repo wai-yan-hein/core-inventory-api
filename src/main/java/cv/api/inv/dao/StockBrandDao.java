@@ -22,4 +22,6 @@ import java.util.List;
      StockBrand findByCode(StockBrandKey code);
 
      int delete(String id);
+    List<StockBrand> unUpload();
+
 }

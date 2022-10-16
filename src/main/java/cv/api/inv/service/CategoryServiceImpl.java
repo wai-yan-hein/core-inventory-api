@@ -55,8 +55,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> searchM(String updatedDate) {
-        return dao.searchM(updatedDate);
+    public List<Category> unUpload() {
+        return  dao.unUpload();
     }
 
     private String getCatCode(Integer macId, String compCode) {

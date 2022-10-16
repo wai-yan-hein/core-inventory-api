@@ -59,4 +59,9 @@ public class StockBrandServiceImpl implements StockBrandService {
     public StockBrand findByCode(StockBrandKey code) {
         return dao.findByCode(code);
     }
+
+    @Override
+    public List<StockBrand> unUpload() {
+        return dao.unUpload();
+    }
 }

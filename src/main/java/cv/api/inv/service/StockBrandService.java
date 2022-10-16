@@ -5,6 +5,7 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.Stock;
 import cv.api.inv.entity.StockBrand;
 import cv.api.inv.entity.StockBrandKey;
 
@@ -22,5 +23,6 @@ import java.util.List;
      int delete(String id);
 
      StockBrand findByCode(StockBrandKey code);
+     List<StockBrand> unUpload();
 
 }

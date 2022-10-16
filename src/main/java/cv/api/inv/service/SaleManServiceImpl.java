@@ -48,6 +48,11 @@ public class SaleManServiceImpl implements SaleManService {
         return dao.findByCode(key);
     }
 
+    @Override
+    public List<SaleMan> unUpload() {
+        return dao.unUpload();
+    }
+
     private String getSaleManCode(Integer macId, String compCode) {
         int seqNo = seqService.getSequence(macId, "SM", "-", compCode);
         return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);

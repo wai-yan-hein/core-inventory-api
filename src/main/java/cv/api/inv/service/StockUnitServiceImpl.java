@@ -36,6 +36,11 @@ public class StockUnitServiceImpl implements StockUnitService {
     }
 
     @Override
+    public List<StockUnit> unUpload() {
+        return dao.unUpload();
+    }
+
+    @Override
     public int delete(String id) {
         return dao.delete(id);
     }

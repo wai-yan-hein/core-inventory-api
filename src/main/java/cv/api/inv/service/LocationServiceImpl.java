@@ -53,6 +53,11 @@ public class LocationServiceImpl implements LocationService {
         return dao.search(parent);
     }
 
+    @Override
+    public List<Location> unUpload() {
+        return dao.unUpload();
+    }
+
     private String getLocationCode(Integer macId, String compCode) {
 
         int seqNo = seqService.getSequence(macId, "Location", "-", compCode);

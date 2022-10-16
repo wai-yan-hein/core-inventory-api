@@ -47,6 +47,11 @@ public class StockTypeServiceImpl implements StockTypeService {
     }
 
     @Override
+    public List<StockType> unUpload() {
+        return dao.unUpload();
+    }
+
+    @Override
     public StockType findByCode(StockTypeKey key) {
         return dao.findByCode(key);
     }

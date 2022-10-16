@@ -14,4 +14,6 @@ public class TraderGroup {
     private String userCode;
     @Column(name = "group_name")
     private String groupName;
+    @Column(name = "intg_upd_status")
+    private String intgUpdStatus;
 }

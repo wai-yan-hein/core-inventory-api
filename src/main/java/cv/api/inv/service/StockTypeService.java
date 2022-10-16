@@ -22,4 +22,6 @@ import java.util.List;
      List<StockType> findAll(String compCode, Integer deptId);
 
      int delete(String id);
+    List<StockType> unUpload();
+
 }

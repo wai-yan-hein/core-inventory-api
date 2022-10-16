@@ -115,4 +115,10 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         }
         return listStock;
     }
+
+    @Override
+    public List<Stock> unUpload() {
+        String hsql = "select o from Stock o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
 }

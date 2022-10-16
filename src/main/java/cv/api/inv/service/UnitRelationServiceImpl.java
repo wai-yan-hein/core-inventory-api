@@ -47,12 +47,12 @@ public class UnitRelationServiceImpl implements UnitRelationService {
                 // last index
                 if (lastIndex == detail.size() - 1) {
                     UnitRelationDetail ud = detail.get(lastIndex);
-                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getKey().getRelCode());
+                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getKey().getRelCode(), ur.getKey().getDeptId(), ur.getKey().getCompCode());
                     ud.setKey(key);
                     ud.setSmallestQty(1.0f);
                 } else {
                     UnitRelationDetail rd = detail.get(size - 1);
-                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getKey().getRelCode());
+                    UnitRelationDetailKey key = new UnitRelationDetailKey(lastIndex + 1, ur.getKey().getRelCode(), ur.getKey().getDeptId(), ur.getKey().getCompCode());
                     rd.setKey(key);
                     float qty = detail.get(size).getQty();
                     float small = detail.get(size).getSmallestQty();
@@ -91,13 +91,18 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     }
 
     @Override
-    public List<UnitRelationDetail> getRelationDetail(String code) {
-        return dao.getRelationDetail(code);
+    public List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId) {
+        return dao.getRelationDetail(code, compCode, deptId);
     }
 
     @Override
     public UnitRelationDetail findByKey(UnitRelationDetailKey key) {
         return dao.findByKey(key);
+    }
+
+    @Override
+    public List<UnitRelation> unUpload() {
+        return dao.unUpload();
     }
 
     private String getUnitCode() {

@@ -22,4 +22,6 @@ import java.util.List;
      int delete(String id);
 
      SaleMan findByCode(SaleManKey key);
+    List<SaleMan> unUpload();
+
 }

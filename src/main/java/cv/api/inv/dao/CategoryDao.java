@@ -22,7 +22,7 @@ import java.util.List;
 
      List<Category> search(String catName);
 
-     List<Category> searchM(String updatedDate);
+    List<Category> unUpload();
 
      int delete(String id);
 }

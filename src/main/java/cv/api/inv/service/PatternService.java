@@ -8,8 +8,8 @@ public interface PatternService {
     Pattern findByCode(String code);
 
     Pattern save(Pattern pattern);
-
     List<Pattern> search(String stockCode,String compCode,Integer deptId);
     void delete(String stockCode);
+    List<Pattern> unUpload();
 
 }

@@ -24,5 +24,6 @@ import java.util.List;
      int delete(String id);
 
      List<Location> search(String parent);
+     List<Location> unUpload();
 
 }

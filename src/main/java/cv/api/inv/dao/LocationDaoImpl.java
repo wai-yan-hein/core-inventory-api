@@ -44,6 +44,12 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     }
 
     @Override
+    public List<Location> unUpload() {
+        String hsql ="select o from Location o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
+
+    @Override
     public Location findByCode(LocationKey code) {
         return getByKey(code);
     }

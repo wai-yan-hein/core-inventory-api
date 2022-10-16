@@ -62,4 +62,10 @@ public class PatternDaoImpl extends AbstractDao<String, Pattern> implements Patt
         }
         return listP;
     }
+
+    @Override
+    public List<Pattern> unUpload() {
+        String hsql = "select o from Pattern o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
 }
