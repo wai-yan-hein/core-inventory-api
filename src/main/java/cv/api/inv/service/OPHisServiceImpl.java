@@ -82,4 +82,9 @@ public class OPHisServiceImpl implements OPHisService {
         return opHisDao.search(compCode);
     }
 
+    @Override
+    public List<OPHis> unUpload() {
+        return opHisDao.unUpload();
+    }
+
 }

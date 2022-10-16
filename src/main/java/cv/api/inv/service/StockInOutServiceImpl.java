@@ -92,6 +92,11 @@ public class StockInOutServiceImpl implements StockInOutService {
         return ioDao.delete(vouNo);
     }
 
+    @Override
+    public List<StockInOut> unUpload() {
+        return ioDao.unUpload();
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "STOCKIO", period, compCode);

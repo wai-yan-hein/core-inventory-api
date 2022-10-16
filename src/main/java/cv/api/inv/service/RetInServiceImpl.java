@@ -120,5 +120,10 @@ public class RetInServiceImpl implements RetInService {
         return rDao.unUploadVoucher(syncDate);
     }
 
+    @Override
+    public List<RetInHis> unUpload() {
+        return rDao.unUpload();
+    }
+
 
 }

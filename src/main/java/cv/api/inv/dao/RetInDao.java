@@ -28,6 +28,6 @@ public interface RetInDao {
     List<VReturnIn> search(String vouNo);
 
     List<RetInHis> unUploadVoucher(String syncDate);
-
+    List<RetInHis> unUpload();
 
 }

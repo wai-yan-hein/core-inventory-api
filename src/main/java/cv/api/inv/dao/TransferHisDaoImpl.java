@@ -2,11 +2,16 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisKey;
-import cv.api.inv.service.TransferHisService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis> implements TransferHisDao {
+    @Autowired
+    private TransferHisDetailDao dao;
+
     @Override
     public TransferHis save(TransferHis th) {
         persist(th);
@@ -16,5 +21,18 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
     @Override
     public TransferHis findById(TransferHisKey key) {
         return getByKey(key);
+    }
+
+    @Override
+    public List<TransferHis> unUpload() {
+        String hsql = "select o from TransferHis o where o.intgUpdStatus is null";
+        List<TransferHis> list = findHSQL(hsql);
+        list.forEach((o) -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer depId = o.getKey().getDeptId();
+            o.setListTD(dao.search(vouNo, compCode, depId));
+        });
+        return list;
     }
 }

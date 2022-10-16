@@ -1,6 +1,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.OPHis;
+import cv.api.inv.entity.OPHisDetail;
 import cv.api.inv.entity.OPHisKey;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -12,7 +13,7 @@ import java.util.List;
 @Repository
 public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisDao {
     @Autowired
-    private SessionFactory sessionFactory;
+    private OPHisDetailDao dao;
 
     @Override
     public OPHis save(OPHis op) {
@@ -23,13 +24,25 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
     @Override
     public List<OPHis> search(String compCode) {
         String hsql = "select o from OPHis o where o.compCode ='" + compCode + "'";
-        Query<OPHis> query = sessionFactory.getCurrentSession().createQuery(hsql, OPHis.class);
-        return query.list();
+        return findHSQL(hsql);
     }
 
     @Override
     public OPHis findByCode(OPHisKey key) {
         return getByKey(key);
+    }
+
+    @Override
+    public List<OPHis> unUpload() {
+        String hsql = "select o from OPHis o where o.intgUpdStatus is null";
+        List<OPHis> list = findHSQL(hsql);
+        list.forEach(o -> {
+            String compCode = o.getKey().getCompCode();
+            String vouNo = o.getKey().getVouNo();
+            Integer deptId = o.getKey().getDeptId();
+            o.setDetailList(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 
 }

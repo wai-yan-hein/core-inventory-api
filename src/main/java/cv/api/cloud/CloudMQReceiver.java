@@ -42,6 +42,20 @@ public class CloudMQReceiver {
     @Autowired
     private StockService stockService;
     @Autowired
+    private OPHisService opHisService;
+    @Autowired
+    private SaleHisService saleHisService;
+    @Autowired
+    private PurHisService purHisService;
+    @Autowired
+    private RetInService retInService;
+    @Autowired
+    private RetOutService retOutService;
+    @Autowired
+    private StockInOutService inOutService;
+    @Autowired
+    private TransferHisService transferHisService;
+    @Autowired
     private ReportService service;
     @Autowired
     private JmsTemplate cloudMQTemplate;
@@ -50,6 +64,7 @@ public class CloudMQReceiver {
             .serializeNulls()
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
             .create();
+
     @JmsListener(destination = "${cloud.activemq.client.queue}")
     public void receivedMessage(final MapMessage message) throws JMSException {
         String entity = message.getString("ENTITY");
@@ -170,7 +185,66 @@ public class CloudMQReceiver {
                             case "RECEIVE" -> updateStock(obj);
                         }
                     }
-
+                    case "OPENING" -> {
+                        OPHis obj = gson.fromJson(data, OPHis.class);
+                        switch (option) {
+                            case "SENT" -> {
+                                obj.setIntgUpdStatus(REC);
+                                opHisService.save(obj);
+                            }
+                            case "RECEIVE" -> updateOpening(obj);
+                        }
+                    }
+                    case "PURCHASE" -> {
+                        PurHis obj = gson.fromJson(data, PurHis.class);
+                        switch (option) {
+                            case "SENT" -> {
+                                obj.setIntgUpdStatus(REC);
+                                purHisService.save(obj);
+                            }
+                            case "RECEIVE" -> updatePurchase(obj);
+                        }
+                    }
+                    case "RETURN_IN" -> {
+                        RetInHis obj = gson.fromJson(data, RetInHis.class);
+                        switch (option) {
+                            case "SENT" -> {
+                                obj.setIntgUpdStatus(REC);
+                                retInService.save(obj);
+                            }
+                            case "RECEIVE" -> updateReturnIn(obj);
+                        }
+                    }
+                    case "RETURN_OUT" -> {
+                        RetOutHis obj = gson.fromJson(data, RetOutHis.class);
+                        switch (option) {
+                            case "SENT" -> {
+                                obj.setIntgUpdStatus(REC);
+                                retOutService.save(obj);
+                            }
+                            case "RECEIVE" -> updateReturnOut(obj);
+                        }
+                    }
+                    case "TRANSFER" -> {
+                        TransferHis obj = gson.fromJson(data, TransferHis.class);
+                        switch (option) {
+                            case "SENT" -> {
+                                obj.setIntgUpdStatus(REC);
+                                transferHisService.save(obj);
+                            }
+                            case "RECEIVE" -> updateTransfer(obj);
+                        }
+                    }
+                    case "STOCK_IO" -> {
+                        StockInOut obj = gson.fromJson(data, StockInOut.class);
+                        switch (option) {
+                            case "SENT" -> {
+                                obj.setIntgUpdStatus(REC);
+                                inOutService.save(obj);
+                            }
+                            case "RECEIVE" -> updateStockIO(obj);
+                        }
+                    }
                 }
                 if (option.equals("SENT")) {
                     sendMessage(senderQ, entity, data);
@@ -280,5 +354,53 @@ public class CloudMQReceiver {
                 + "where stock_code ='" + key.getStockCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update stock.");
+    }
+
+    private void updateOpening(OPHis obj) throws Exception {
+        OPHisKey key = obj.getKey();
+        String sql = "update op_his set intg_upd_status ='" + SENT + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        service.executeSql(sql);
+        log.info("update opening.");
+    }
+
+    private void updatePurchase(PurHis obj) throws Exception {
+        PurHisKey key = obj.getKey();
+        String sql = "update pur_his set intg_upd_status ='" + SENT + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        service.executeSql(sql);
+        log.info("update purchase.");
+    }
+
+    private void updateReturnIn(RetInHis obj) throws Exception {
+        RetInHisKey key = obj.getKey();
+        String sql = "update ret_in_his set intg_upd_status ='" + SENT + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        service.executeSql(sql);
+        log.info("update return in.");
+    }
+
+    private void updateReturnOut(RetOutHis obj) throws Exception {
+        RetOutHisKey key = obj.getKey();
+        String sql = "update ret_out_his set intg_upd_status ='" + SENT + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        service.executeSql(sql);
+        log.info("update return out.");
+    }
+
+    private void updateTransfer(TransferHis obj) throws Exception {
+        TransferHisKey key = obj.getKey();
+        String sql = "update transfer_his set intg_upd_status ='" + SENT + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        service.executeSql(sql);
+        log.info("update transfer.");
+    }
+
+    private void updateStockIO(StockInOut obj) throws Exception {
+        StockIOKey key = obj.getKey();
+        String sql = "update stock_in_out_his set intg_upd_status ='" + SENT + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        service.executeSql(sql);
+        log.info("update stock io.");
     }
 }

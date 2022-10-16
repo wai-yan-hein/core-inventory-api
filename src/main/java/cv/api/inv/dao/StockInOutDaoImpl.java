@@ -7,7 +7,9 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
+import cv.api.inv.entity.StockInOutDetail;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
 @Slf4j
 @Repository
 public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> implements StockInOutDao {
+    @Autowired
+    private StockInOutDetailDao dao;
 
     @Override
     public StockInOut findById(StockIOKey id) {
@@ -32,7 +36,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
 
     @Override
     public List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
-            String vouNo, String userCode,String vouStatus) {
+                                   String vouNo, String userCode, String vouStatus) {
         String strFilter = "";
         if (!fromDate.equals("-") && !toDate.equals("-")) {
             strFilter = "date(o.vouDate) between '" + fromDate
@@ -90,6 +94,19 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         String hsql = "delete from StockInOut o where o.vouNo '" + id + "'";
         return execUpdateOrDelete(hsql);
 
+    }
+
+    @Override
+    public List<StockInOut> unUpload() {
+        String hsql = "select o from StockInOut o where intgUpdStatus is null";
+        List<StockInOut> list = findHSQL(hsql);
+        list.forEach((o) -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer depId = o.getKey().getDeptId();
+            o.setListSH(dao.search(vouNo, compCode, depId));
+        });
+        return list;
     }
 
 }

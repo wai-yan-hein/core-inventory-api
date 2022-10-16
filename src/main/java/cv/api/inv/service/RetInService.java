@@ -30,4 +30,6 @@ public interface RetInService {
     List<VReturnIn> search(String vouNo);
 
     List<RetInHis> unUploadVoucher(String syncDate);
+
+    List<RetInHis> unUpload();
 }
