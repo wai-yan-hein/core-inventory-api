@@ -55,6 +55,7 @@ public class TraderServiceImpl implements TraderService {
                 throw new IllegalStateException("Duplicate Trader Code");
             }
         }
+        td.setIntgUpdStatus(null);
         return dao.saveTrader(td);
     }
 

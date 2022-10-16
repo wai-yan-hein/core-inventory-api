@@ -7,8 +7,6 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
-import cv.api.inv.view.VSale;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -88,7 +86,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update sale_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update sale_his set deleted =1,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(sql);
     }
 

@@ -7,7 +7,6 @@ package cv.api.inv.service;
 
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
-import cv.api.inv.entity.StockInOutKey;
 
 import java.util.List;
 

@@ -5,7 +5,6 @@
  */
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.StockUnit;
 import cv.api.inv.entity.StockUnitKey;
 

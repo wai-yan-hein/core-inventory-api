@@ -7,7 +7,6 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisKey;
-import cv.api.inv.entity.SaleHis;
 import cv.api.inv.view.VPurchase;
 
 import java.util.List;

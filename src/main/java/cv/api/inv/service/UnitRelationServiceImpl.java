@@ -63,6 +63,7 @@ public class UnitRelationServiceImpl implements UnitRelationService {
         }
         detail.forEach(ud -> dao.save(ud));
         ur.setRelName(getRelStr(detail));
+        ur.setIntgUpdStatus(null);
         return dao.save(ur);
     }
 

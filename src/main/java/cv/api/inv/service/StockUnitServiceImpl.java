@@ -6,7 +6,6 @@
 package cv.api.inv.service;
 
 import cv.api.inv.dao.StockUnitDao;
-import cv.api.inv.entity.RelationKey;
 import cv.api.inv.entity.StockUnit;
 import cv.api.inv.entity.StockUnitKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,7 @@ public class StockUnitServiceImpl implements StockUnitService {
 
     @Override
     public StockUnit save(StockUnit unit) throws Exception {
+        unit.setIntgUpdStatus(null);
         return dao.save(unit);
     }
 

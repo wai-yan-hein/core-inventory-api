@@ -5,7 +5,6 @@
  */
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.OPHisDetail;
 import cv.api.inv.entity.SaleDetailKey;
 import cv.api.inv.entity.SaleHisDetail;
 import lombok.extern.slf4j.Slf4j;

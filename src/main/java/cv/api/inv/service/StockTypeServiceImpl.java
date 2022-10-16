@@ -33,6 +33,7 @@ public class StockTypeServiceImpl implements StockTypeService {
             String code = getCode(s.getMacId(), s.getKey().getCompCode());
             s.getKey().setStockTypeCode(code);
         }
+        s.setIntgUpdStatus(null);
         return dao.save(s);
     }
 

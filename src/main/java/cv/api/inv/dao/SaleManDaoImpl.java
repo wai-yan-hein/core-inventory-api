@@ -7,7 +7,6 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.SaleMan;
 import cv.api.inv.entity.SaleManKey;
-import io.swagger.models.auth.In;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

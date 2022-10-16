@@ -68,6 +68,7 @@ public class TransferHisServiceImpl implements TransferHisService {
                 detailDao.save(cSd);
             }
         }
+        th.setIntgUpdStatus(null);
         th.setListTD(listTD);
         return dao.save(th);
     }

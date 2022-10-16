@@ -3,7 +3,6 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.TraderGroupDao;
 import cv.api.inv.entity.TraderGroup;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,7 @@ public class TraderGroupServiceImpl implements TraderGroupService {
         if (Util1.isNullOrEmpty(group.getKey().getGroupCode())) {
             group.getKey().setGroupCode(getGroupCode(group.getKey().getCompCode()));
         }
+        group.setIntgUpdStatus(null);
         return dao.save(group);
     }
 

@@ -5,7 +5,6 @@
  */
 package cv.api.inv.service;
 
-import cv.api.inv.entity.Stock;
 import cv.api.inv.entity.StockBrand;
 import cv.api.inv.entity.StockBrandKey;
 

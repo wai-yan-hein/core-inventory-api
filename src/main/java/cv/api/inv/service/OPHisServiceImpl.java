@@ -59,7 +59,7 @@ public class OPHisServiceImpl implements OPHisService {
         }
         opHisDao.save(op);
         op.setDetailList(listSD);
-        return opHisDao.save(op);
+        return op;
     }
 
     @Override

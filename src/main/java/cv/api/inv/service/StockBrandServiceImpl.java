@@ -35,6 +35,7 @@ public class StockBrandServiceImpl implements StockBrandService {
             String code = getStockBrandCode(macId, "StockBrand", "-", compCode);
             sb.getKey().setBrandCode(code);
         }
+        sb.setIntgUpdStatus(null);
         return dao.save(sb);
     }
 

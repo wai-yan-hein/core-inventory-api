@@ -7,7 +7,6 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
-import cv.api.inv.entity.StockInOutDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

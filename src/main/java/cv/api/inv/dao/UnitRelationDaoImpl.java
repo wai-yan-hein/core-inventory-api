@@ -1,6 +1,9 @@
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.*;
+import cv.api.inv.entity.RelationKey;
+import cv.api.inv.entity.UnitRelation;
+import cv.api.inv.entity.UnitRelationDetail;
+import cv.api.inv.entity.UnitRelationDetailKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

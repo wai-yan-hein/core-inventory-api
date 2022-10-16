@@ -70,6 +70,7 @@ public class SaleHisServiceImpl implements SaleHisService {
 
             }
         }
+        saleHis.setIntgUpdStatus(null);
         shDao.save(saleHis);
         saleHis.setListSH(listSD);
         return saleHis;

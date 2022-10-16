@@ -6,7 +6,6 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.RetOutHisDetail;
-import io.swagger.models.auth.In;
 
 import java.util.List;
 

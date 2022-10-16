@@ -73,7 +73,7 @@ public class PurHisServiceImpl implements PurHisService {
                 pdDao.save(cSd);
 
             }
-
+            ph.setIntgUpdStatus(null);
             phDao.save(ph);
             ph.setListPD(listSD);
         }
@@ -97,7 +97,7 @@ public class PurHisServiceImpl implements PurHisService {
 
     @Override
     public void delete(PurHisKey key) throws Exception {
-         phDao.delete(key);
+        phDao.delete(key);
     }
 
     @Override

@@ -18,7 +18,6 @@ import cv.api.inv.service.SaleDetailService;
 import cv.api.inv.service.SaleHisService;
 import cv.api.inv.view.VSale;
 import cv.api.repo.AccountRepo;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -117,7 +116,7 @@ public class SaleController {
     }
 
     @PostMapping(path = "/delete-sale")
-    public ResponseEntity<ReturnObject> deleteSale(@RequestParam SaleHisKey key) throws Exception {
+    public ResponseEntity<ReturnObject> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);

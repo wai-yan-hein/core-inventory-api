@@ -36,12 +36,13 @@ public class CategoryServiceImpl implements CategoryService {
             cat.getKey().setCatCode(catCode);
 
         }
+        cat.setIntgUpdStatus(null);
         return dao.save(cat);
     }
 
     @Override
     public List<Category> findAll(String compCode, Integer deptId) {
-        return dao.findAll(compCode,deptId);
+        return dao.findAll(compCode, deptId);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> unUpload() {
-        return  dao.unUpload();
+        return dao.unUpload();
     }
 
     private String getCatCode(Integer macId, String compCode) {

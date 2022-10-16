@@ -5,10 +5,8 @@
  */
 package cv.api.inv.service;
 
-import cv.api.inv.entity.Pattern;
 import cv.api.inv.entity.VouStatus;
 import cv.api.inv.entity.VouStatusKey;
-import io.swagger.models.auth.In;
 
 import java.util.List;
 

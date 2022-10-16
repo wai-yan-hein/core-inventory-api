@@ -1,7 +1,6 @@
 package cv.api.model;
 
 import lombok.Data;
-import lombok.NonNull;
 
 @Data
 public class AccTrader implements java.io.Serializable {

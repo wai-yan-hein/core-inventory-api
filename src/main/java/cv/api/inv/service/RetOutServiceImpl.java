@@ -5,7 +5,6 @@
  */
 package cv.api.inv.service;
 
-import cv.api.MessageSender;
 import cv.api.common.Util1;
 import cv.api.inv.dao.RetOutDao;
 import cv.api.inv.dao.RetOutDetailDao;
@@ -71,12 +70,12 @@ public class RetOutServiceImpl implements RetOutService {
                 String sdCode = vouNo + "-" + cSd.getUniqueId();
                 cSd.setRoKey(new RetOutKey(sdCode, vouNo, rin.getKey().getDeptId()));
                 cSd.setCompCode(rin.getKey().getCompCode());
-                //rd.save(cSd);
+                rd.save(cSd);
             }
         }
-        //rDao.save(rin);
+        rin.setIntgUpdStatus(null);
+        rDao.save(rin);
         rin.setListRD(listSD);
-
         return rin;
     }
 

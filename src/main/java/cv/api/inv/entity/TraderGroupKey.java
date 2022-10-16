@@ -1,6 +1,5 @@
 package cv.api.inv.entity;
 
-import io.swagger.models.auth.In;
 import lombok.Data;
 
 import javax.persistence.Column;

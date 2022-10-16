@@ -69,9 +69,9 @@ public class StockInOutServiceImpl implements StockInOutService {
                 iodDao.save(cSd);
             }
         }
+        io.setIntgUpdStatus(null);
         ioDao.save(io);
         io.setListSH(listSD);
-
         return io;
     }
 

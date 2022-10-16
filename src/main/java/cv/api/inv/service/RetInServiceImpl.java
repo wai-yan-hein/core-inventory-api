@@ -75,7 +75,7 @@ public class RetInServiceImpl implements RetInService {
                     sdDao.save(cSd);
                 }
             }
-
+            rin.setIntgUpdStatus(null);
             rDao.save(rin);
             rin.setListRD(listSD);
         }

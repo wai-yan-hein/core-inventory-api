@@ -5,13 +5,11 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-import org.hibernate.Hibernate;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *

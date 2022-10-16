@@ -6,8 +6,6 @@
 package cv.api.inv.service;
 
 import cv.api.inv.dao.PurHisDetailDao;
-import cv.api.inv.entity.PurDetailKey;
-import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

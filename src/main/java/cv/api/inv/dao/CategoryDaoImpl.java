@@ -6,7 +6,6 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Category;
-import io.swagger.models.auth.In;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
