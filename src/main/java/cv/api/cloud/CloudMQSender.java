@@ -60,7 +60,7 @@ public class CloudMQSender {
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
             .create();
 
-    @Scheduled(fixedRate = 100000)
+    @Scheduled(fixedRate = 1000000)
     private void uploadToServer() {
         boolean sync = Util1.getBoolean(environment.getProperty("cloud.upload.server"));
         if (sync) {
@@ -91,17 +91,17 @@ public class CloudMQSender {
     private void uploadSetup() {
         info("upload setup start.");
         uploadVouStatus();
-        uploadUnitRelation();
-        uploadTraderGroup();
-        uploadTrader();
-        uploadStockUnit();
-        uploadStockType();
-        uploadStockBrand();
-        uploadSaleMan();
-        uploadCategory();
-        uploadLocation();
-        uploadPattern();
-        uploadStock();
+        //uploadUnitRelation();
+        //uploadTraderGroup();
+        //uploadTrader();
+        //uploadStockUnit();
+        //uploadStockType();
+        //uploadStockBrand();
+        //uploadSaleMan();
+        //uploadCategory();
+        //uploadLocation();
+        //uploadPattern();
+        //uploadStock();
         info("upload setup end.");
     }
 
