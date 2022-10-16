@@ -89,20 +89,20 @@ public class CloudMQSender {
     }
 
     private void uploadSetup() {
-        info("upload setup start.");
+        log.info("upload setup start.");
         uploadVouStatus();
-        //uploadUnitRelation();
-        //uploadTraderGroup();
-        //uploadTrader();
-        //uploadStockUnit();
-        //uploadStockType();
-        //uploadStockBrand();
-        //uploadSaleMan();
-        //uploadCategory();
-        //uploadLocation();
+        uploadUnitRelation();
+        uploadTraderGroup();
+        uploadTrader();
+        uploadStockUnit();
+        uploadStockType();
+        uploadStockBrand();
+        uploadSaleMan();
+        uploadCategory();
+        uploadLocation();
         //uploadPattern();
-        //uploadStock();
-        info("upload setup end.");
+        uploadStock();
+        log.info("upload setup end.");
     }
 
     private void uploadTransaction() {
@@ -170,7 +170,7 @@ public class CloudMQSender {
     private void uploadPattern() {
         log.info("upload pattern.");
         List<Pattern> list = patternService.unUpload();
-        list.forEach(p -> sendMessage("PATTERN", gson.toJson(p)));
+        list.forEach(p -> sendMessage( "PATTERN", gson.toJson(p)));
     }
 
     private void uploadVouStatus() {
