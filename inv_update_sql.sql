@@ -13,6 +13,9 @@ create table department (
 
 insert into department (dept_id, user_code, dept_name) values ('1', 'H', 'Head Office');
 
+alter table region 
+add column dept_id int not null default 1 ;
+
 alter table pattern 
 add column dept_id int not null default 1;
 
@@ -224,14 +227,4 @@ add column intg_upd_status varchar(15);
 
 alter table op_his
 add column intg_upd_status varchar(15);
-###
-create table department (
-  dept_id int(11) not null,
-  user_code varchar(15) not null,
-  dept_name varchar(255) not null,
-  queue_name varchar(50) default null,
-  primary key (dept_id)
-) engine=innodb default charset=utf8mb3;
-
-
 
