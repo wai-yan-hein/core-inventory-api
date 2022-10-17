@@ -3,6 +3,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.TraderGroupDao;
 import cv.api.inv.entity.TraderGroup;
+import cv.api.inv.entity.TraderGroupKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +29,17 @@ public class TraderGroupServiceImpl implements TraderGroupService {
 
     @Override
     public List<TraderGroup> getTraderGroup(String compCode, Integer deptId) {
-        return dao.getTraderGroup(compCode,deptId);
+        return dao.getTraderGroup(compCode, deptId);
     }
 
     @Override
     public List<TraderGroup> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public TraderGroup findById(TraderGroupKey key) {
+        return dao.findById(key);
     }
 
     private String getGroupCode(String compCode) {

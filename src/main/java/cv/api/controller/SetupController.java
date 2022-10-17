@@ -447,7 +447,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/delete-opening")
-    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody OPHisKey key) throws Exception {
+    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody OPHisKey key) {
         opHisService.delete(key);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
@@ -560,6 +560,11 @@ public class SetupController {
     public ResponseEntity<?> saveTraderGroup(@RequestBody TraderGroup group) {
         TraderGroup g = traderGroupService.save(group);
         return ResponseEntity.ok(g);
+    }
+
+    @PostMapping(path = "/find-trader-group")
+    public ResponseEntity<?> findTraderGroup(@RequestBody TraderGroupKey key) {
+        return ResponseEntity.ok(traderGroupService.findById(key));
     }
 
     @GetMapping(path = "/get-trader-group")
