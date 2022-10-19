@@ -45,7 +45,7 @@ public class ActiveMQConfig {
         return new ActiveMQTopic("INV_MSG");
     }
 
-    @Bean(name = "topicSender")
+    //@Bean(name = "topicSender")
     public JmsTemplate topicSender() {
         JmsTemplate template = new JmsTemplate();
         template.setConnectionFactory(connectionFactory(localUrl()));
@@ -54,7 +54,7 @@ public class ActiveMQConfig {
         return template;
     }
 
-    @Bean(name = "queueSender")
+    //@Bean(name = "queueSender")
     public JmsTemplate queueSender() {
         JmsTemplate template = new JmsTemplate();
         template.setConnectionFactory(connectionFactory(localUrl()));

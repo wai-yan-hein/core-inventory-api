@@ -228,3 +228,15 @@ add column intg_upd_status varchar(15);
 alter table op_his
 add column intg_upd_status varchar(15);
 
+ALTER TABLE trader 
+ADD COLUMN account VARCHAR(15);
+
+ALTER TABLE reorder_level 
+ADD COLUMN dept_id INT NOT NULL DEFAULT 1 AFTER comp_code,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (stock_code, comp_code, dept_id);
+
+CREATE VIEW v_relation AS select r.rel_code AS rel_code,r.rel_name AS rel_name,rd.unit AS unit,rd.qty AS qty,rd.smallest_qty AS smallest_qty,rd.unique_id AS unique_id from (unit_relation r join unit_relation_detail rd on(r.rel_code = rd.rel_code));
+
+
+

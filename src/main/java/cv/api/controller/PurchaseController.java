@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.MessageSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -16,6 +15,7 @@ import cv.api.inv.service.PurHisDetailService;
 import cv.api.inv.service.PurHisService;
 import cv.api.inv.service.ReportService;
 import cv.api.inv.view.VPurchase;
+import cv.api.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,25 +39,14 @@ public class PurchaseController {
     @Autowired
     private ReportService reportService;
     @Autowired
-    private MessageSender messageSender;
+    private AccountRepo accountRepo;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-pur")
-    public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur, HttpServletRequest request) {
-        try {
-            pur = phService.save(pur);
-        } catch (Exception e) {
-            log.error(String.format("savePurchase: %s", e.getMessage()));
-        }
+    public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur) throws Exception {
+        pur = phService.save(pur);
         //send message to service
-        try {
-            messageSender.sendMessage("PURCHASE", pur.getKey().getVouNo());
-        } catch (Exception e) {
-            PurHis ph = phService.findById(pur.getKey());
-            ph.setIntgUpdStatus(null);
-            phService.update(ph);
-            log.error(String.format("sendMessage: PURCHASE %s", e.getMessage()));
-        }
+        accountRepo.sendPurchase(pur);
         return ResponseEntity.ok(pur);
     }
 

@@ -88,12 +88,12 @@ public class ReportController {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
-                String opDate = reportService.getOpeningDate();
+                String compCode = filter.getCompCode();
+                Integer deptId = filter.getDeptId();
+                String opDate = reportService.getOpeningDate(compCode, deptId);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
-                String compCode = filter.getCompCode();
-                Integer deptId = filter.getDeptId();
                 Integer macId = filter.getMacId();
                 String stockCode = Util1.isNull(filter.getStockCode(), "-");
                 String brandCode = Util1.isNull(filter.getBrandCode(), "-");
@@ -292,7 +292,7 @@ public class ReportController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         Integer deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
-        reportService.generateReorder(compCode);
+        reportService.generateReorder(compCode,deptId);
         List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
         return ResponseEntity.ok(reorderLevels);
     }

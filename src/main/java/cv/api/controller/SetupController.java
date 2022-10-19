@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.MessageSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
@@ -13,6 +12,7 @@ import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
 import cv.api.inv.view.VOpening;
+import cv.api.repo.AccountRepo;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,14 +67,12 @@ public class SetupController {
     private UnitRelationService unitRelationService;
     @Autowired
     private ReportService reportService;
-
-
     @Autowired
     private FontService fontService;
     @Autowired
-    private MessageSender messageSender;
-    @Autowired
     private TraderGroupService traderGroupService;
+    @Autowired
+    private AccountRepo accountRepo;
     private final ReturnObject ro = new ReturnObject();
 
 
@@ -97,7 +95,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-category")
-    public ResponseEntity<Category> saveCategory(@RequestBody Category cat, HttpServletRequest request) throws Exception {
+    public ResponseEntity<Category> saveCategory(@RequestBody Category cat) throws Exception {
         Category category = categoryService.save(cat);
         return ResponseEntity.ok(category);
     }
@@ -284,29 +282,15 @@ public class SetupController {
         trader.setType("CUS");
         trader.setMacId(0);
         Trader b = traderService.saveTrader(trader);
-        try {
-            messageSender.sendMessage("TRADER", b.getKey().getCode());
-        } catch (Exception e) {
-            Trader t = traderService.findById(b.getKey());
-            t.setIntgUpdStatus(null);
-            traderService.saveTrader(t);
-            log.error(String.format("sendMessage: SALE %s", e.getMessage()));
-        }
+        accountRepo.sendTrader(b);
         return ResponseEntity.ok(b);
     }
 
     @PostMapping(path = "/save-trader")
     public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) throws Exception {
-        Trader b = traderService.saveTrader(trader);
-        try {
-            messageSender.sendMessage("TRADER", b.getKey().getCode());
-        } catch (Exception e) {
-            Trader t = traderService.findById(b.getKey());
-            t.setIntgUpdStatus(null);
-            traderService.saveTrader(t);
-            log.error(String.format("sendMessage: SALE %s", e.getMessage()));
-        }
-        return ResponseEntity.ok(b);
+        trader = traderService.saveTrader(trader);
+        accountRepo.sendTrader(trader);
+        return ResponseEntity.ok(trader);
     }
 
     @GetMapping(path = "/get-trader")
@@ -484,26 +468,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-reorder")
-    public ResponseEntity<ReturnObject> saveReorder(@RequestBody ReorderLevel rl, HttpServletRequest request) {
-        try {
-            if (Util1.isNullOrEmpty(rl.getStockCode())) {
-                ro.setMessage("Invalid Stock.");
-            } else if (Util1.isNullOrEmpty(rl.getMinUnitCode())) {
-                ro.setMessage("Invalid Min Unit.");
-            } else if (Util1.isNullOrEmpty(rl.getMaxUnitCode())) {
-                ro.setMessage("Invalid Max Unit.");
-            } else if (Util1.isNullOrEmpty(rl.getBalUnit())) {
-                ro.setMessage("Invalid Balance Unit.");
-            } else {
-                reorderService.save(rl);
-                ro.setMessage("Save Reorder.");
-                ro.setData(rl);
-            }
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-            log.error(String.format("savePattern %s", e.getMessage()));
-        }
-        return ResponseEntity.ok(ro);
+    public ResponseEntity<?> saveReorder(@RequestBody ReorderLevel rl) {
+        return ResponseEntity.ok(reorderService.save(rl));
     }
 
     @PostMapping(path = "/save-price-option")

@@ -11,6 +11,8 @@ public class AccTrader implements java.io.Serializable {
     private Boolean active;
     private String traderType;
     private Integer macId;
+    private String accCode;
+
     public AccTrader() {
     }
 }

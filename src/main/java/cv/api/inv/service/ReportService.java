@@ -23,7 +23,7 @@ public interface ReportService {
 
     void executeSql(String... sql) throws Exception;
 
-    String getOpeningDate();
+    String getOpeningDate(String compCode, Integer deptIdF);
 
     void saveReportFilter(ReportFilter filter) throws Exception;
 
@@ -61,9 +61,9 @@ public interface ReportService {
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode,Integer deptId, Integer macId) throws Exception;
+    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
-    void generateReorder(String compCode) throws Exception;
+    void generateReorder(String compCode,Integer deptId) throws Exception;
 
     List<General> getStockListByGroup(String typeCode, String compCode, Integer macId) throws Exception;
 
@@ -71,7 +71,7 @@ public interface ReportService {
 
     List<General> getTopSaleBySaleMan(String fromDate, String toDate, String compCode) throws Exception;
 
-    List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode, String brandCode, String catCode, String compCode,Integer deptId) throws Exception;
+    List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode, String brandCode, String catCode, String compCode, Integer deptId) throws Exception;
 
     List<ClosingBalance> getClosingStockDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
@@ -84,7 +84,7 @@ public interface ReportService {
 
     List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode,
                                    String brandCode, String stockCode, boolean calSale,
-                                   String compCode,Integer deptId, Integer macId) throws Exception;
+                                   String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode) throws Exception;
 

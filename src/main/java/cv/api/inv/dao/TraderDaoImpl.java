@@ -87,7 +87,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public List<Trader> unUploadTrader() {
-        String hsql = "select o from Trader o where o.intgUpdStatus ='ACK'";
+        String hsql = "select o from Trader o where o.intgUpdStatus is null";
         return findHSQL(hsql);
     }
 }

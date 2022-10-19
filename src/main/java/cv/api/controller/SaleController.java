@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.MessageSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -41,8 +40,6 @@ public class SaleController {
     private ReportService reportService;
     @Autowired
     private BackupService backupService;
-    @Autowired
-    private MessageSender messageSender;
     private final ReturnObject ro = new ReturnObject();
     @Autowired
     private AccountRepo accountRepo;
@@ -52,16 +49,6 @@ public class SaleController {
         if (isValidSale(sale, ro)) {
             backupService.backup(sale);
             sale = shService.save(sale);
-        }
-
-        //send message to service
-        try {
-            messageSender.sendMessage("SALE", sale.getKey().getVouNo());
-        } catch (Exception e) {
-            SaleHis sh = shService.findById(sale.getKey());
-            sh.setIntgUpdStatus(null);
-            shService.update(sh);
-            log.error(String.format("sendMessage: SALE %s", e.getMessage()));
         }
         accountRepo.sendSale(sale);
         return ResponseEntity.ok(sale);
@@ -132,7 +119,7 @@ public class SaleController {
     public ResponseEntity<List<SaleHisDetail>> getSaleDetail(@RequestParam String vouNo,
                                                              @RequestParam String compCode,
                                                              @RequestParam Integer deptId) {
-        List<SaleHisDetail> listSD = sdService.search(vouNo,compCode,deptId);
+        List<SaleHisDetail> listSD = sdService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
 }

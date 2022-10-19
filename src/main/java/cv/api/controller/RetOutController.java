@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.MessageSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -16,6 +15,7 @@ import cv.api.inv.service.ReportService;
 import cv.api.inv.service.RetOutDetailService;
 import cv.api.inv.service.RetOutService;
 import cv.api.inv.view.VReturnOut;
+import cv.api.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,20 +38,13 @@ public class RetOutController {
     @Autowired
     private ReportService reportService;
     @Autowired
-    private MessageSender messageSender;
+    private AccountRepo accountRepo;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-retout")
-    public ResponseEntity<RetOutHis> saveReturnOut(@RequestBody RetOutHis retout) throws Exception {
+    public ResponseEntity<?> saveReturnOut(@RequestBody RetOutHis retout) throws Exception {
         retout = roService.save(retout);
-        try {
-            messageSender.sendMessage("RETURN_OUT", retout.getKey().getVouNo());
-        } catch (Exception e) {
-            RetOutHis rh = roService.findById(retout.getKey());
-            rh.setIntgUpdStatus(null);
-            roService.update(rh);
-            log.error(String.format("sendMessage RETURN_OUT : %s", e.getMessage()));
-        }
+        accountRepo.sendReturnOut(retout);
         return ResponseEntity.ok(retout);
     }
 

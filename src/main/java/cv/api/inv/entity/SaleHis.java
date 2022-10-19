@@ -50,7 +50,7 @@ public class SaleHis {
     @Column(name = "tax_amt")
     private Float taxAmt;
     @Column(name = "tax_p")
-    private Float taxP;
+    private Float taxPercent;
     @Column(name = "deleted")
     private boolean deleted;
     @Column(name = "paid")

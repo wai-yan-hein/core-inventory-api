@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class Gl {
 
-    private String glCode;
+    private GlKey key;
     private Date glDate;
     private String description;
     private String srcAccCode;
@@ -20,7 +20,6 @@ public class Gl {
     private String deptCode;
     private String vouNo;
     private String traderCode;
-    private String compCode;
     private Date createdDate;
     private String createdBy;
     private String tranSource;

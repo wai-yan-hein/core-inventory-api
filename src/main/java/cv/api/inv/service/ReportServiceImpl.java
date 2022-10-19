@@ -63,9 +63,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public String getOpeningDate() {
+    public String getOpeningDate(String compCode, Integer deptId) {
         String opDate = "1998-10-07";
-        String sql = "select max(op_date) op_date from op_his where deleted =0";
+        String sql = "select max(op_date) op_date from op_his where deleted =0 and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
@@ -78,7 +78,6 @@ public class ReportServiceImpl implements ReportService {
         }
         log.info(opDate);
         return opDate;
-
     }
 
 
@@ -649,20 +648,38 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) throws Exception {
+    public List<ReorderLevel> getReorderLevel(String typeCode, String catCode,
+                                              String brandCode, String stockCode,
+                                              String compCode, Integer deptId, Integer macId) throws Exception {
         calStockBalance(typeCode, catCode, brandCode, stockCode, compCode, macId);
-        String sql1 = "select a.*,if(bal_small_qty < min_small_qty,1,if(bal_small_qty > max_qty,2,3)) sorting\n" + "from (\n" + "select r.*,r.min_qty*rel.smallest_qty min_small_qty,r.max_qty*rel.smallest_qty max_small_qty,\n" + "ifnull(tmp.smallest_qty,0) bal_small_qty,s.user_code,s.stock_name,s.rel_code\n" + "from reorder_level r join stock s\n" + "on r.stock_code = s.stock_code\n" + "join v_relation rel on s.rel_code = rel.rel_code \n" + "and r.min_unit = rel.unit\n" + "and r.max_unit = rel.unit\n" + "join tmp_stock_balance tmp\n" + "on r.stock_code = tmp.stock_code\n" + "and tmp.mac_id =" + macId + "\n" + "and r.comp_code = '" + compCode + "'\n" + ")a\n" + "order by sorting";
+        String sql1 = "select a.*,if(bal_small_qty < min_small_qty,1,if(bal_small_qty > max_qty,2,3)) sorting\n"
+                + "from (\n"
+                + "select r.*,r.min_qty*rel.smallest_qty min_small_qty,r.max_qty*rel.smallest_qty max_small_qty,\n"
+                + "ifnull(tmp.smallest_qty,0) bal_small_qty,s.user_code,s.stock_name,s.rel_code,rel.rel_name\n"
+                + "from reorder_level r join stock s\n"
+                + "on r.stock_code = s.stock_code\n"
+                + "join v_relation rel on s.rel_code = rel.rel_code \n"
+                + "and r.min_unit = rel.unit\n"
+                + "and r.max_unit = rel.unit\n"
+                + "join tmp_stock_balance tmp\n"
+                + "on r.stock_code = tmp.stock_code\n"
+                + "and tmp.mac_id =" + macId + "\n"
+                + "and r.comp_code = '" + compCode + "' and r.dept_id =" + deptId + "\n" + ")a\n"
+                + "order by sorting";
         ResultSet rs = reportDao.executeSql(sql1);
         List<ReorderLevel> reorderLevels = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 ReorderLevel r = new ReorderLevel();
-                Stock s = new Stock();
+                ReorderKey key = new ReorderKey();
+                key.setDeptId(deptId);
+                key.setCompCode(compCode);
+                key.setStockCode(rs.getString("stock_code"));
+                r.setKey(key);
                 String relCode = rs.getString("rel_code");
-
-                s.setStockName(rs.getString("stock_name"));
-                s.setUserCode(rs.getString("user_code"));
-                r.setStockCode(rs.getString("stock_code"));
+                r.setStockName(rs.getString("stock_name"));
+                r.setUserCode(rs.getString("user_code"));
+                r.setRelName(rs.getString("rel_name"));
                 r.setMinQty(rs.getFloat("min_qty"));
                 r.setMinUnitCode(rs.getString("min_unit"));
                 r.setMaxQty(rs.getFloat("max_qty"));
@@ -682,7 +699,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void generateReorder(String compCode) throws Exception {
+    public void generateReorder(String compCode, Integer deptId) throws Exception {
         //generate reorder
         String rSql = "select s.stock_code,s.pur_unit,rl.stock_code ro_stock_code,s.comp_code,s.dept_id\n" + "from stock s left join reorder_level rl\n" + "on s.stock_code = rl.stock_code\n" + "where s.comp_code= '" + compCode + "' and rl.stock_code is null";
         ResultSet rs = reportDao.executeSql(rSql);
@@ -693,13 +710,16 @@ public class ReportServiceImpl implements ReportService {
                 String purUnit = rs.getString("pur_unit");
                 if (Objects.isNull(roStockCode)) {
                     ReorderLevel rl = new ReorderLevel();
-                    rl.setStockCode(stockCode);
+                    ReorderKey key = new ReorderKey();
+                    key.setDeptId(deptId);
+                    key.setStockCode(stockCode);
+                    key.setCompCode(compCode);
+                    rl.setKey(key);
                     rl.setMinQty(0.0f);
                     rl.setMinUnitCode(purUnit);
                     rl.setMaxQty(0.0f);
                     rl.setMaxUnitCode(purUnit);
                     getSession().save(rl);
-                    log.info("reorder : generate reorder stock");
                 }
             }
         }

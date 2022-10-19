@@ -3,9 +3,7 @@ package cv.api.repo;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.ReportService;
-import cv.api.model.AccTrader;
-import cv.api.model.Gl;
-import cv.api.model.Response;
+import cv.api.model.*;
 import cv.api.model.TraderKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,8 @@ public class AccountRepo {
     private ReportService reportService;
     @Autowired
     private Environment environment;
+    @Autowired
+    private UserRepo userRepo;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -49,7 +49,7 @@ public class AccountRepo {
             }, (e) -> {
                 Gl gl = glList.get(0);
                 String vouNo = gl.getRefNo();
-                String compCode = gl.getCompCode();
+                String compCode = gl.getKey().getCompCode();
                 String tranSource = gl.getTranSource();
                 switch (tranSource) {
                     case "SALE" -> updateSale(vouNo, compCode, null);
@@ -126,20 +126,35 @@ public class AccountRepo {
                 accTrader.setActive(true);
                 accTrader.setAppName(appName);
                 accTrader.setMacId(macId);
+
                 switch (traderType) {
-                    case "CUS" -> accTrader.setTraderType("C");
-                    case "SUP" -> accTrader.setTraderType("S");
+                    case "CUS" -> {
+                        accTrader.setTraderType("C");
+                        accTrader.setAccCode(Util1.isNull(t.getAccount(), getCustomerAcc(key.getCompCode())));
+                    }
+                    case "SUP" -> {
+                        accTrader.setAccCode(Util1.isNull(t.getAccount(), getSupplierAcc(key.getCompCode())));
+                        accTrader.setTraderType("S");
+                    }
                     default -> accTrader.setTraderType("D");
                 }
-                Mono<Response> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(Response.class).doOnError((e) -> {
-                    log.error(e.getMessage());
-                });
+                Mono<Response> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(Response.class).doOnError((e) -> log.error(e.getMessage()));
                 Response trader = result.block();
                 assert trader != null;
-                //updateTrader(trader.getVouNo(), trader.getCompCode());
+                updateTrader(trader.getVouNo(), trader.getCompCode());
 
             }
         }
+    }
+
+    private String getCustomerAcc(String compCode) {
+        SystemProperty p = userRepo.findProperty("customer.account", compCode);
+        return p == null ? null : p.getPropValue();
+    }
+
+    private String getSupplierAcc(String compCode) {
+        SystemProperty p = userRepo.findProperty("supplier.account", compCode);
+        return p == null ? null : p.getPropValue();
     }
 
     public void sendSale(SaleHis sh) {
@@ -160,21 +175,28 @@ public class AccountRepo {
                 boolean deleted = sh.isDeleted();
                 String vouNo = sh.getKey().getVouNo();
                 String compCode = sh.getKey().getCompCode();
+                double vouBal = Util1.getDouble(sh.getBalance());
+                double vouDis = Util1.getDouble(sh.getDiscount());
+                double vouPaid = Util1.getDouble(sh.getPaid());
+                double vouTax = Util1.getDouble(sh.getTaxAmt());
+                double vouTotal = Util1.getDouble(sh.getVouTotal());
+                double taxPercent = Util1.getDouble(sh.getTaxPercent());
                 List<Gl> listGl = new ArrayList<>();
                 //income
-                if (Util1.getDouble(sh.getVouTotal()) > 0) {
+                if (vouBal > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Sale Voucher Balance");
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(Util1.getDouble(sh.getVouTotal()));
-                    gl.setDrAmt(0.0);
+                    gl.setCrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -184,19 +206,26 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (Util1.getDouble(sh.getDiscount()) > 0) {
+                if (vouDis > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
+                    if (vouPaid > 0) {
+                        gl.setSrcAccCode(payAcc);
+                        gl.setCash(true);
+                    } else {
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                    }
+                    gl.setCrAmt(vouDis);
+                    gl.setAccCode(disAcc);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Sale Voucher Discount");
-                    gl.setSrcAccCode(disAcc);
-                    gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(sh.getDiscount()));
-                    gl.setCrAmt(0.0);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -206,19 +235,19 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //payment
-                if (Util1.getDouble(sh.getPaid()) > 0) {
+                if (vouPaid > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Sale Voucher Paid");
                     gl.setSrcAccCode(payAcc);
-                    gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(sh.getPaid()));
-                    gl.setCrAmt(0.0);
+                    gl.setAccCode(srcAcc);
+                    gl.setDrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -228,19 +257,26 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //tax
-                if (Util1.getDouble(sh.getTaxAmt()) > 0) {
+                if (vouTax > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
+                    if (vouPaid > 0) {
+                        gl.setSrcAccCode(payAcc);
+                        gl.setCash(true);
+                    } else {
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                    }
+                    gl.setAccCode(taxAcc);
+                    gl.setDrAmt(vouTax);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Sale Voucher Tax");
-                    gl.setSrcAccCode(taxAcc);
-                    gl.setAccCode(balAcc);
+                    gl.setDescription(String.format("Sale Voucher Tax (%s)", taxPercent));
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(Util1.getDouble(sh.getTaxAmt()));
-                    gl.setDrAmt(0.0);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -248,6 +284,7 @@ public class AccountRepo {
                     gl.setDeleted(deleted);
                     gl.setMacId(macId);
                     listGl.add(gl);
+
                 }
                 sendAccount(listGl);
             }
@@ -263,7 +300,6 @@ public class AccountRepo {
                 String payAcc = setting.getPayAcc();
                 String disAcc = setting.getDiscountAcc();
                 String balAcc = setting.getBalanceAcc();
-                String taxAcc = setting.getTaxAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ph.getVouDate();
                 String traderCode = ph.getTraderCode();
@@ -271,22 +307,27 @@ public class AccountRepo {
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
                 boolean deleted = ph.getDeleted();
+                double vouTotal = Util1.getDouble(ph.getVouTotal());
+                double vouDis = Util1.getDouble(ph.getDiscount());
+                double vouPaid = Util1.getDouble(ph.getPaid());
+                double vouBal = Util1.getDouble(ph.getBalance());
                 String vouNo = ph.getKey().getVouNo();
                 List<Gl> listGl = new ArrayList<>();
                 //income
-                if (Util1.getDouble(ph.getVouTotal()) > 0) {
+                if (vouBal > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Purchase Voucher Balance");
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(ph.getVouTotal()));
-                    gl.setCrAmt(0.0);
+                    gl.setDrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -296,19 +337,25 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (Util1.getDouble(ph.getDiscount()) > 0) {
+                if (vouDis > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
+                    if (vouPaid > 0) {
+                        gl.setSrcAccCode(payAcc);
+                        gl.setCash(true);
+                    } else {
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                    }
+                    gl.setAccCode(disAcc);
+                    gl.setDrAmt(vouDis);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Purchase Voucher Discount");
-                    gl.setSrcAccCode(disAcc);
-                    gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setCrAmt(Util1.getDouble(ph.getDiscount()));
-                    gl.setDrAmt(0.0);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -318,40 +365,19 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //payment
-                if (Util1.getDouble(ph.getPaid()) > 0) {
+                if (vouPaid > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Purchase Voucher Paid");
                     gl.setSrcAccCode(payAcc);
-                    gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setCrAmt(Util1.getDouble(ph.getPaid()));
-                    gl.setDrAmt(0.0);
+                    gl.setAccCode(srcAcc);
+                    gl.setCrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
-                    gl.setCreatedBy(appName);
-                    gl.setTranSource(tranSource);
-                    gl.setRefNo(vouNo);
-                    gl.setDeleted(deleted);
-                    gl.setMacId(macId);
-                    listGl.add(gl);
-                }
-                if (Util1.getDouble(ph.getTaxAmt()) > 0) {
-                    Gl gl = new Gl();
-                    gl.setGlDate(vouDate);
-                    gl.setDescription("Purchase Voucher Tax");
-                    gl.setSrcAccCode(taxAcc);
-                    gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(ph.getTaxAmt()));
-                    gl.setCrAmt(0.0);
-                    gl.setCurCode(curCode);
-                    gl.setReference(remark);
-                    gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -383,21 +409,25 @@ public class AccountRepo {
                 String remark = ri.getRemark();
                 boolean deleted = ri.getDeleted();
                 String vouNo = ri.getKey().getVouNo();
+                double vouBal = Util1.getDouble(ri.getBalance());
+                double vouDis = Util1.getDouble(ri.getDiscount());
+                double vouPaid = Util1.getDouble(ri.getPaid());
                 List<Gl> listGl = new ArrayList<>();
                 //income
-                if (Util1.getDouble(ri.getVouTotal()) > 0) {
+                if (vouBal > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return In Voucher Balance");
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(ri.getVouTotal()));
-                    gl.setCrAmt(0.0);
+                    gl.setDrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -407,19 +437,20 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (Util1.getDouble(ri.getDiscount()) > 0) {
+                if (vouDis > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return In Voucher Discount");
                     gl.setSrcAccCode(disAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(ri.getDiscount()));
-                    gl.setCrAmt(0.0);
+                    gl.setDrAmt(vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -429,19 +460,19 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //payment
-                if (Util1.getDouble(ri.getPaid()) > 0) {
+                if (vouPaid > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return In Voucher Paid");
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setCrAmt(Util1.getDouble(ri.getPaid()));
-                    gl.setDrAmt(0.0);
+                    gl.setCrAmt(vouPaid);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -473,21 +504,25 @@ public class AccountRepo {
                 String remark = ro.getRemark();
                 boolean deleted = ro.getDeleted();
                 String vouNo = ro.getKey().getVouNo();
+                double vouBal = Util1.getDouble(ro.getBalance());
+                double vouDis = Util1.getDouble(ro.getDiscount());
+                double vouPaid = Util1.getDouble(ro.getPaid());
                 List<Gl> listGl = new ArrayList<>();
                 //income
-                if (Util1.getDouble(ro.getVouTotal()) > 0) {
+                if (vouBal > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return Out Voucher Balance");
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(Util1.getDouble(ro.getVouTotal()));
-                    gl.setDrAmt(0.0);
+                    gl.setCrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -497,19 +532,20 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (Util1.getDouble(ro.getDiscount()) > 0) {
+                if (vouDis > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return Out Voucher Discount");
                     gl.setSrcAccCode(disAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(ro.getDiscount()));
-                    gl.setCrAmt(0.0);
+                    gl.setDrAmt(vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
@@ -519,19 +555,19 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //payment
-                if (Util1.getDouble(ro.getPaid()) > 0) {
+                if (vouPaid > 0) {
                     Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return Out Voucher Paid");
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setDrAmt(Util1.getDouble(ro.getPaid()));
-                    gl.setCrAmt(0.0);
+                    gl.setDrAmt(vouPaid);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCompCode(compCode);
                     gl.setCreatedDate(Util1.getTodayDate());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);

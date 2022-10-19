@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.MessageSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -16,6 +15,7 @@ import cv.api.inv.service.ReportService;
 import cv.api.inv.service.RetInDetailService;
 import cv.api.inv.service.RetInService;
 import cv.api.inv.view.VReturnIn;
+import cv.api.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,25 +39,14 @@ public class RetInController {
     @Autowired
     private ReportService reportService;
     @Autowired
-    private MessageSender messageSender;
+    private AccountRepo accountRepo;
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-retin")
-    public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin, HttpServletRequest request) {
-        try {
-            retin = riService.save(retin);
-        } catch (Exception e) {
-            log.error(String.format("saveReturnIn: %s", e.getMessage()));
-        }
+    public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin) throws Exception {
+        retin = riService.save(retin);
         //send message to service
-        try {
-            messageSender.sendMessage("RETURN_IN", retin.getKey().getVouNo());
-        } catch (Exception e) {
-            RetInHis ri = riService.findById(retin.getKey());
-            ri.setIntgUpdStatus(null);
-            riService.update(ri);
-            log.error(String.format("sendMessage: RETURN_IN %s", e.getMessage()));
-        }
+        accountRepo.sendReturnIn(retin);
         return ResponseEntity.ok(retin);
     }
 

@@ -71,4 +71,6 @@ public class Trader implements java.io.Serializable {
     private String priceType;
     @Column(name = "group_code")
     private String groupCode;
+    @Column(name = "account")
+    private String account;
 }

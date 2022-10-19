@@ -10,9 +10,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "reorder_level")
 public class ReorderLevel implements java.io.Serializable {
-    @Id
-    @Column(name = "stock_code")
-    private String stockCode;
+    @EmbeddedId
+    private ReorderKey key;
     @Column(name = "min_qty")
     private Float minQty;
     @Column(name = "min_unit")
@@ -33,4 +32,16 @@ public class ReorderLevel implements java.io.Serializable {
     private float balSmallQty;
     @Transient
     private String balUnit;
+    @Transient
+    private String userCode;
+    @Transient
+    private String stockName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
+    @Transient
+    private String relName;
 }
