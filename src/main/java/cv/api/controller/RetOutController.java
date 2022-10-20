@@ -59,7 +59,9 @@ public class RetOutController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode);
+        Integer deptId = filter.getDeptId();
+        String deleted = String.valueOf(filter.isDeleted());
+        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode,deptId,deleted);
         return ResponseEntity.ok(listRO);
     }
 
@@ -67,6 +69,12 @@ public class RetOutController {
     public ResponseEntity<ReturnObject> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
         roService.delete(key);
         ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+    @PostMapping(path = "/restore-retout")
+    public ResponseEntity<ReturnObject> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
+        roService.restore(key);
+        ro.setMessage("Restored.");
         return ResponseEntity.ok(ro);
     }
 

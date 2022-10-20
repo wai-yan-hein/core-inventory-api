@@ -104,8 +104,10 @@ public class ReportController {
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 boolean calSale = filter.isCalSale();
+                boolean calPur = filter.isCalPur();
+                boolean calRI = filter.isCalRI();
+                boolean calRO = filter.isCalRO();
                 String reportName = filter.getReportName();
-
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location");
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
@@ -179,16 +181,18 @@ public class ReportController {
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummary(opDate, fromDate, toDate,
-                                typeCode, catCode, brandCode, stockCode, calSale, compCode, deptId, macId);
+                                typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetail" -> {
-                        reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, macId);
+                        reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode,
+                                stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockValue" -> {
-                        List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, compCode, deptId, macId);
+                        List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode,
+                                brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
@@ -277,10 +281,13 @@ public class ReportController {
     @GetMapping(path = "/get-stock-balance")
     public ResponseEntity<List<VStockBalance>> getStockBalance(@RequestParam String stockCode,
                                                                @RequestParam boolean calSale,
+                                                               @RequestParam boolean calPur,
+                                                               @RequestParam boolean calRI,
+                                                               @RequestParam boolean calRO,
                                                                @RequestParam String compCode,
                                                                @RequestParam Integer deptId,
                                                                @RequestParam Integer macId) throws Exception {
-        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, compCode, deptId, macId));
+        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId));
     }
 
     @PostMapping(path = "/get-reorder-level")
@@ -292,7 +299,7 @@ public class ReportController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         Integer deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
-        reportService.generateReorder(compCode,deptId);
+        reportService.generateReorder(compCode, deptId);
         List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
         return ResponseEntity.ok(reorderLevels);
     }

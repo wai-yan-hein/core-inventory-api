@@ -19,8 +19,8 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
     }
 
     @Override
-    public int delete(String code) {
-        String delSql = "delete from transfer_his_detail  where td_code = '" + code + "'";
+    public int delete(String code, String compCode, Integer deptId) {
+        String delSql = "delete from transfer_his_detail  where td_code = '" + code + "' and comp_code ='" + compCode + "' and " + deptId + "";
         execSQL(delSql);
         return 1;
     }

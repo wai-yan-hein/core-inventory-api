@@ -18,6 +18,6 @@ public interface RetInDetailDao {
 
     List<RetInHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String id) throws Exception;
+    int delete(String id, String compCode, Integer deptId) throws Exception;
 
 }

@@ -38,7 +38,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     }
 
     @Override
-    public int delete(String code) {
-        return dao.delete(code);
+    public int delete(String code, String compCode, Integer deptId) {
+        return dao.delete(code,compCode,deptId);
     }
 }

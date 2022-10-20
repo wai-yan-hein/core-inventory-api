@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -61,7 +60,9 @@ public class RetInController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode);
+        Integer deptId = filter.getDeptId();
+        String deleted = String.valueOf(filter.isDeleted());
+        List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted);
         return ResponseEntity.ok(listRI);
     }
 
@@ -69,6 +70,13 @@ public class RetInController {
     public ResponseEntity<ReturnObject> deleteRI(@RequestBody RetInHisKey key) throws Exception {
         riService.delete(key);
         ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
+    @PostMapping(path = "/restore-retin")
+    public ResponseEntity<ReturnObject> restoreRI(@RequestBody RetInHisKey key) throws Exception {
+        riService.restore(key);
+        ro.setMessage("Restored.");
         return ResponseEntity.ok(ro);
     }
 

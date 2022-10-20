@@ -9,7 +9,7 @@ public interface PatternService {
 
     Pattern save(Pattern pattern);
     List<Pattern> search(String stockCode,String compCode,Integer deptId);
-    void delete(String stockCode);
+    void delete(Pattern pattern);
     List<Pattern> unUpload();
 
 }

@@ -23,6 +23,8 @@ import java.util.List;
     StockInOut findById(StockIOKey id);
 
     void delete(StockIOKey key) throws Exception;
-    List<StockInOut> unUpload();
+   void restore(StockIOKey key) throws Exception;
+
+   List<StockInOut> unUpload();
 
 }

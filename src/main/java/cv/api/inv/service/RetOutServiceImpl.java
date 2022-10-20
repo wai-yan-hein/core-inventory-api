@@ -49,7 +49,7 @@ public class RetOutServiceImpl implements RetOutService {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
                     try {
-                        rd.delete(detailId);
+                        rd.delete(detailId, rin.getKey().getCompCode(), rin.getKey().getDeptId());
                     } catch (Exception ex) {
                         throw new IllegalStateException(String.format("Return Out Delete : %s", ex.getMessage()));
                     }
@@ -97,6 +97,11 @@ public class RetOutServiceImpl implements RetOutService {
     @Override
     public void delete(RetOutHisKey key) throws Exception {
         rDao.delete(key);
+    }
+
+    @Override
+    public void restore(RetOutHisKey key) throws Exception {
+        rDao.restore(key);
     }
 
     @Override

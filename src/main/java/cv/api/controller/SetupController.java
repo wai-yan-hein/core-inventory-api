@@ -451,13 +451,12 @@ public class SetupController {
 
     @PostMapping(path = "/save-pattern")
     public ResponseEntity<Pattern> savePattern(@RequestBody Pattern pattern) {
-        patternService.save(pattern);
-        return ResponseEntity.ok(pattern);
+        return ResponseEntity.ok(patternService.save(pattern));
     }
 
-    @GetMapping(path = "/delete-pattern")
-    public ResponseEntity<?> deletePattern(@RequestParam String stockCode) {
-        patternService.delete(stockCode);
+    @PostMapping(path = "/delete-pattern")
+    public ResponseEntity<?> deletePattern(@RequestBody Pattern p) {
+        patternService.delete(p);
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }

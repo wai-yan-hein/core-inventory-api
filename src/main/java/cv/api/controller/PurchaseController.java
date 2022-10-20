@@ -62,7 +62,9 @@ public class PurchaseController {
         String ref = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode, stockCode, locCode, compCode);
+        String deleted = String.valueOf(filter.isDeleted());
+        Integer deptId = filter.getDeptId();
+        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode, stockCode, locCode, compCode, deptId, deleted);
         return ResponseEntity.ok(listPur);
     }
 
@@ -70,6 +72,12 @@ public class PurchaseController {
     public ResponseEntity<ReturnObject> deletePur(@RequestBody PurHisKey key) throws Exception {
         phService.delete(key);
         ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+    @PostMapping(path = "/restore-pur")
+    public ResponseEntity<?> restorePur(@RequestBody PurHisKey key) throws Exception {
+        phService.restore(key);
+        ro.setMessage("Restored.");
         return ResponseEntity.ok(ro);
     }
 

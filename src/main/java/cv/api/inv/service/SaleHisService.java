@@ -26,6 +26,8 @@ public interface SaleHisService {
 
     void delete(SaleHisKey key) throws Exception;
 
+    void restore(SaleHisKey key) throws Exception;
+
 
     List<SaleHis> unUploadVoucher(String syncDate);
 

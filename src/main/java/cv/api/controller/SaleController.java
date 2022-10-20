@@ -98,7 +98,9 @@ public class SaleController {
         String reference = Util1.isNull(filter.getReference(), "-");
         String compCode = filter.getCompCode();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode);
+        Integer deptId = filter.getDeptId();
+        String deleted = String.valueOf(filter.isDeleted());
+        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode,deptId,deleted);
         return ResponseEntity.ok(saleList);
     }
 
@@ -106,6 +108,13 @@ public class SaleController {
     public ResponseEntity<ReturnObject> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
         ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
+    @PostMapping(path = "/restore-sale")
+    public ResponseEntity<ReturnObject> restoreSale(@RequestBody SaleHisKey key) throws Exception {
+        shService.restore(key);
+        ro.setMessage("Restored.");
         return ResponseEntity.ok(ro);
     }
 

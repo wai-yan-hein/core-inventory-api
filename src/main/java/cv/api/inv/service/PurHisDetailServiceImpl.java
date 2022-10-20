@@ -32,12 +32,12 @@ public class PurHisDetailServiceImpl implements PurHisDetailService {
 
     @Override
     public List<PurHisDetail> search(String vouNo, String compCode, Integer deptId) {
-        return dao.search(vouNo,compCode,deptId);
+        return dao.search(vouNo, compCode, deptId);
     }
 
     @Override
-    public int delete(String code) throws Exception {
-        return dao.delete(code);
+    public int delete(String code, String compCode, Integer deptId) throws Exception {
+        return dao.delete(code, compCode, deptId);
 
     }
 }

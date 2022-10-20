@@ -22,6 +22,7 @@ public class PatternServiceImpl implements PatternService {
 
     @Override
     public Pattern save(Pattern p) {
+
         return dao.save(p);
     }
 
@@ -32,8 +33,8 @@ public class PatternServiceImpl implements PatternService {
     }
 
     @Override
-    public void delete(String stockCode) {
-        dao.delete(stockCode);
+    public void delete(Pattern pattern) {
+        dao.delete(pattern);
     }
 
     @Override

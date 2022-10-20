@@ -44,4 +44,13 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String sql = "update transfer_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(sql);
     }
+
+    @Override
+    public void restore(TransferHisKey key) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update transfer_his set deleted =0 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
+    }
 }

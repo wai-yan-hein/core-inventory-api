@@ -22,7 +22,7 @@ import java.util.List;
 public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> implements RetOutDetailDao {
 
     @Override
-    public List<RetOutHisDetail> search(String vouNo, String compCode,Integer deptId) {
+    public List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId) {
         List<RetOutHisDetail> listOP = new ArrayList<>();
         String sql = "select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name\n" +
                 "from ret_out_his_detail op\n" + "join location l on op.loc_code = l.loc_code\n"
@@ -69,8 +69,8 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> im
     }
 
     @Override
-    public int delete(String id) throws Exception {
-        String strSql = "delete from ret_out_detail_his where rd_code = '" + id + "'";
+    public int delete(String id, String compCode, Integer deptId) throws Exception {
+        String strSql = "delete from ret_out_detail_his where rd_code = '" + id + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(strSql);
         return 1;
     }

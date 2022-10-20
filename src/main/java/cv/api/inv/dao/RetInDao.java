@@ -24,6 +24,7 @@ public interface RetInDao {
     RetInHis findById(RetInHisKey id);
 
     void delete(RetInHisKey key) throws Exception;
+    void restore(RetInHisKey key) throws Exception;
 
     List<VReturnIn> search(String vouNo);
 

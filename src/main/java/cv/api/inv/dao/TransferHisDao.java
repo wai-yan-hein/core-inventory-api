@@ -11,5 +11,7 @@ public interface TransferHisDao {
     TransferHis findById(TransferHisKey key);
     List<TransferHis> unUpload();
     void delete(TransferHisKey key);
+    void restore(TransferHisKey key);
+
 
 }

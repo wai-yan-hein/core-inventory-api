@@ -19,5 +19,5 @@ import java.util.List;
     List<SaleHisDetail> search(String vouNo, String compCode, Integer deptId);
 
 
-    int delete(String code);
+    int delete(String code, String compCode, Integer deptId);
 }

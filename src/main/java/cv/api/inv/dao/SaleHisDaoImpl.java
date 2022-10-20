@@ -90,6 +90,15 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         execSQL(sql);
     }
 
+    @Override
+    public void restore(SaleHisKey key) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update sale_his set deleted =0,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
+    }
+
 
     @Override
     public List<SaleHis> unUploadVoucher(String syncDate) {

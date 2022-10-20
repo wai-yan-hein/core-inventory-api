@@ -95,6 +95,15 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
     }
 
     @Override
+    public void restore(RetInHisKey key) throws Exception {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update ret_in_his set deleted =0,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
+    }
+
+    @Override
     public List<VReturnIn> search(String vouNo) {
         String hsql = "select o from VReturnIn o where o.vouNo = '" + vouNo + "' order by uniqueId";
         return sessionFactory.getCurrentSession().createQuery(hsql, VReturnIn.class).list();

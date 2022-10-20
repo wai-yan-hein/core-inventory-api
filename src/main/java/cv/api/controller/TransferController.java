@@ -55,9 +55,11 @@ public class TransferController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String locCodeTo = Util1.isNull(filter.getLocCodeTo(), "-");
         String compCode = filter.getCompCode();
+        Integer deptId = filter.getDeptId();
+        String deleted = String.valueOf(filter.isDeleted());
         List<VTransfer> listStockIO = reportService.getTransferHistory(fromDate, toDate, refNo,
                 vouNo, remark, userCode,
-                stockCode, locCode, locCodeTo, compCode);
+                stockCode, locCode, locCodeTo, compCode, deptId, deleted);
         return ResponseEntity.ok(listStockIO);
     }
 
@@ -74,10 +76,18 @@ public class TransferController {
     }
 
     @PostMapping(path = "/delete-transfer")
-    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody TransferHisKey key) {
+    public ResponseEntity<ReturnObject> deleteTransfer(@RequestBody TransferHisKey key) {
         thService.delete(key);
         ReturnObject ro = new ReturnObject();
         ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
+    @PostMapping(path = "/restore-transfer")
+    public ResponseEntity<ReturnObject> restoreTransfer(@RequestBody TransferHisKey key) {
+        thService.restore(key);
+        ReturnObject ro = new ReturnObject();
+        ro.setMessage("Restored.");
         return ResponseEntity.ok(ro);
     }
 }

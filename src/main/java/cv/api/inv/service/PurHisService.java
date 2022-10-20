@@ -27,6 +27,7 @@ public interface PurHisService {
     PurHis findById(PurHisKey id);
 
     void delete(PurHisKey key) throws Exception;
+    void restore(PurHisKey key) throws Exception;
 
     List<VPurchase> search(String vouNo);
 

@@ -18,6 +18,6 @@ import java.util.List;
     
      List<PurHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-     int delete(String code) throws Exception;
+     int delete(String code, String compCode, Integer deptId) throws Exception;
 
 }

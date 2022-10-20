@@ -31,6 +31,9 @@ public class ReportFilter {
     private String saleManCode;
     private String vouTypeCode;
     private boolean calSale;
+    private boolean calPur;
+    private boolean calRI;
+    private boolean calRO;
     @NonNull
     private Integer macId;
     @NonNull

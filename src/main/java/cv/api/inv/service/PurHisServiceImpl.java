@@ -49,7 +49,7 @@ public class PurHisServiceImpl implements PurHisService {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
                     try {
-                        pdDao.delete(detailId);
+                        pdDao.delete(detailId, ph.getKey().getCompCode(), ph.getKey().getDeptId());
                     } catch (Exception ex) {
                         log.error("listDel : " + ex.getMessage());
                     }
@@ -98,6 +98,11 @@ public class PurHisServiceImpl implements PurHisService {
     @Override
     public void delete(PurHisKey key) throws Exception {
         phDao.delete(key);
+    }
+
+    @Override
+    public void restore(PurHisKey key) throws Exception {
+        phDao.restore(key);
     }
 
     @Override

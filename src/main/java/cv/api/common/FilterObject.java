@@ -28,6 +28,8 @@ public class FilterObject {
     private String locCode;
     private String locCodeTo;
     private String refNo;
+    private boolean deleted;
+    private Integer deptId;
 
 
 }

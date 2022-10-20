@@ -35,8 +35,8 @@ public class RetInDetailServiceImpl implements RetInDetailService {
     }
 
     @Override
-    public int delete(String id) throws Exception {
-        return dao.delete(id);
+    public int delete(String id, String compCode, Integer deptId) throws Exception {
+        return dao.delete(id,compCode,deptId);
     }
 
 }

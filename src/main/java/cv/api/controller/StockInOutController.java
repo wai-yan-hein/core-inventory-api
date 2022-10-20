@@ -57,7 +57,9 @@ public class StockInOutController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, locCode, compCode);
+        Integer deptId = filter.getDeptId();
+        String deleted = String.valueOf(filter.isDeleted());
+        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, locCode, compCode, deptId, deleted);
         return ResponseEntity.ok(listStockIO);
     }
 
@@ -65,6 +67,13 @@ public class StockInOutController {
     public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody StockIOKey key) throws Exception {
         ioService.delete(key);
         ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
+    @PostMapping(path = "/restore-stockio")
+    public ResponseEntity<ReturnObject> restoreStockIO(@RequestBody StockIOKey key) throws Exception {
+        ioService.restore(key);
+        ro.setMessage("Restored.");
         return ResponseEntity.ok(ro);
     }
 

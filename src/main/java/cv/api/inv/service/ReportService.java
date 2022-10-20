@@ -12,6 +12,7 @@ import cv.api.common.StockValue;
 import cv.api.inv.entity.ReorderLevel;
 import cv.api.inv.entity.VStockBalance;
 import cv.api.inv.view.*;
+import io.swagger.models.auth.In;
 
 import java.util.List;
 
@@ -57,13 +58,15 @@ public interface ReportService {
 
     General getStockIORecentPrice(String stockCode, String purDate, String unit);
 
-    List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, String compCode, Integer deptId, Integer macId) throws Exception;
+    List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
+                                        boolean calSale, boolean calPur,boolean calRI,boolean calRO,
+                                        String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
-    void generateReorder(String compCode,Integer deptId) throws Exception;
+    void generateReorder(String compCode, Integer deptId) throws Exception;
 
     List<General> getStockListByGroup(String typeCode, String compCode, Integer macId) throws Exception;
 
@@ -76,14 +79,16 @@ public interface ReportService {
     List<ClosingBalance> getClosingStockDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
-                                              String stockCode, boolean calSale, String compCode, Integer deptId, Integer macId) throws Exception;
+                                              String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
-    void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, String compCode, Integer macId) throws Exception;
+    void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode,
+                                   boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode,
-                                   String brandCode, String stockCode, boolean calSale,
+                                   String brandCode, String stockCode,
+                                   boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                    String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode) throws Exception;
@@ -94,19 +99,24 @@ public interface ReportService {
 
     List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo, String remark, String desp, String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo,
+                                     String remark, String desp, String userCode, String stockCode,
+                                     String locCode, String compCode,Integer deptId, String deleted) throws Exception;
 
-    List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
-    List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
-    List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
+                                       String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
-    List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
+                                         String userCode, String stockCode, String locCode, String compCode,Integer deptId, String deleted) throws Exception;
 
     List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
 
-    List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode) throws Exception;
+    List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
+                                       String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode,Integer deptId, String deleted) throws Exception;
 
     List<VSale> getSalePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 

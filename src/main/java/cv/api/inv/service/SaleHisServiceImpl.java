@@ -48,7 +48,7 @@ public class SaleHisServiceImpl implements SaleHisService {
         if (listDel != null) {
             listDel.forEach(code -> {
                 if (code != null) {
-                    sdDao.delete(code);
+                    sdDao.delete(code, saleHis.getKey().getCompCode(), saleHis.getKey().getDeptId());
                 }
             });
         }
@@ -93,7 +93,12 @@ public class SaleHisServiceImpl implements SaleHisService {
 
     @Override
     public void delete(SaleHisKey key) throws Exception {
-         shDao.delete(key);
+        shDao.delete(key);
+    }
+
+    @Override
+    public void restore(SaleHisKey key) throws Exception {
+        shDao.restore(key);
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

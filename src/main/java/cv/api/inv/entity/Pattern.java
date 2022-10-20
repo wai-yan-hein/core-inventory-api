@@ -10,9 +10,8 @@ import javax.persistence.*;
 @Table(name = "pattern")
 @Data
 public class Pattern implements java.io.Serializable {
-    @Id
-    @Column(name = "stock_code")
-    private String stockCode;
+    @EmbeddedId
+    private PatternKey key;
     @Column(name = "qty")
     private Float qty;
     @Column(name = "price")
@@ -23,12 +22,6 @@ public class Pattern implements java.io.Serializable {
     private String locCode;
     @Column(name = "f_stock_code")
     private String mapStockCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
     @Transient

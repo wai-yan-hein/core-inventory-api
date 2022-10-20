@@ -26,11 +26,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "bk_sale_his")
 public class BKSaleHis implements java.io.Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long logId;
-    @Column(name = "vou_no", unique = true, nullable = false, length = 20)
-    private String vouNo;
+
+    @EmbeddedId
+    private BKSaleHisKey key;
     @Column(name = "trader_code")
     private String traderCode;
     @Column(name = "saleman_code")

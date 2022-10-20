@@ -48,7 +48,7 @@ public class StockInOutServiceImpl implements StockInOutService {
         if (listDel != null) {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
-                    iodDao.delete(detailId);
+                    iodDao.delete(detailId,io.getKey().getCompCode(),io.getKey().getDeptId());
                 }
             });
         }
@@ -88,6 +88,11 @@ public class StockInOutServiceImpl implements StockInOutService {
     @Override
     public void delete(StockIOKey key) throws Exception {
         ioDao.delete(key);
+    }
+
+    @Override
+    public void restore(StockIOKey key) throws Exception {
+        ioDao.restore(key);
     }
 
     @Override

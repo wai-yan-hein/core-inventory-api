@@ -51,7 +51,7 @@ public class RetInServiceImpl implements RetInService {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
                     try {
-                        sdDao.delete(detailId);
+                        sdDao.delete(detailId, rin.getKey().getCompCode(), rin.getKey().getDeptId());
                     } catch (Exception ignored) {
                     }
                 }
@@ -106,6 +106,11 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public void delete(RetInHisKey key) throws Exception {
         rDao.delete(key);
+    }
+
+    @Override
+    public void restore(RetInHisKey key) throws Exception {
+        rDao.restore(key);
     }
 
     @Override

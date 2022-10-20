@@ -70,8 +70,8 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
     }
 
     @Override
-    public int delete(String code) {
-        String strSql = "delete from sale_his_detail where sd_code = '" + code + "'";
+    public int delete(String code, String compCode, Integer deptId) {
+        String strSql = "delete from sale_his_detail where sd_code = '" + code + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(strSql);
         return 1;
     }

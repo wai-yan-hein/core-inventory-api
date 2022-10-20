@@ -96,6 +96,15 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
     }
 
     @Override
+    public void restore(PurHisKey key) throws Exception {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql = "update pur_his set deleted =0,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        execSQL(sql);
+    }
+
+    @Override
     public List<VPurchase> search(String vouNo) {
         String hsql = "select o from VPurchase o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
         return sessionFactory.getCurrentSession().createQuery(hsql, VPurchase.class).list();

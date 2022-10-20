@@ -34,7 +34,7 @@ public class OPHisServiceImpl implements OPHisService {
         if (listDel != null) {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
-                    opHisDetailDao.delete(detailId);
+                    opHisDetailDao.delete(detailId, op.getKey().getCompCode(), op.getKey().getDeptId());
                 }
             });
         }

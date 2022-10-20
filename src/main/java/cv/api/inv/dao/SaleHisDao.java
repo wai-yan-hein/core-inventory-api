@@ -23,6 +23,7 @@ public interface SaleHisDao {
     SaleHis findById(SaleHisKey id);
 
     void delete(SaleHisKey key) throws Exception;
+    void restore(SaleHisKey key) throws Exception;
 
     List<SaleHis> unUploadVoucher(String syncDate);
     List<SaleHis> unUpload();

@@ -43,7 +43,7 @@ public class TransferHisServiceImpl implements TransferHisService {
         if (listDel != null) {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
-                    detailDao.delete(detailId);
+                    detailDao.delete(detailId, th.getKey().getCompCode(), th.getKey().getDeptId());
                 }
             });
         }
@@ -92,5 +92,10 @@ public class TransferHisServiceImpl implements TransferHisService {
     @Override
     public void delete(TransferHisKey key) {
         dao.delete(key);
+    }
+
+    @Override
+    public void restore(TransferHisKey key) {
+        dao.restore(key);
     }
 }

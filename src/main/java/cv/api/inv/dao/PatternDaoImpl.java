@@ -1,6 +1,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Pattern;
+import cv.api.inv.entity.PatternKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -24,9 +25,8 @@ public class PatternDaoImpl extends AbstractDao<String, Pattern> implements Patt
     }
 
     @Override
-    public void delete(String stockCode) {
-        String sql = "delete from pattern where stock_code ='" + stockCode + "'";
-        execSQL(sql);
+    public void delete(Pattern pattern) {
+        deleteEntity(pattern);
     }
 
 
@@ -46,7 +46,12 @@ public class PatternDaoImpl extends AbstractDao<String, Pattern> implements Patt
             try {
                 while (rs.next()) {
                     Pattern p = new Pattern();
-                    p.setStockCode(rs.getString("stock_code"));
+                    PatternKey key = new PatternKey();
+                    key.setCompCode(compCode);
+                    key.setDeptId(deptId);
+                    key.setStockCode(rs.getString("stock_code"));
+                    key.setUniqueId(rs.getInt("unique_id"));
+                    p.setKey(key);
                     p.setUserCode(rs.getString("user_code"));
                     p.setStockName(rs.getString("stock_name"));
                     p.setLocCode(rs.getString("loc_code"));

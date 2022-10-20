@@ -7,6 +7,7 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.RetInHisDetail;
 import cv.api.inv.entity.RetInKey;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -74,8 +75,8 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
     }
 
     @Override
-    public int delete(String id) throws Exception {
-        String strSql = "delete from ret_in_his_detail where rd_code = '" + id + "'";
+    public int delete(String id, String compCode, Integer deptId) throws Exception {
+        String strSql = "delete from ret_in_his_detail where rd_code = '" + id + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(strSql);
         return 1;
     }

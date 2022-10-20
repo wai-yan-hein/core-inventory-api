@@ -13,5 +13,7 @@ public interface TransferHisService {
     List<TransferHis> unUpload();
 
     void delete(TransferHisKey key);
+    void restore(TransferHisKey key);
+
 
 }

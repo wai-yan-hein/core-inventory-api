@@ -9,7 +9,7 @@ public interface OPHisDetailDao {
 
     List<OPHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String opCode);
+    int delete(String opCode,String compCode,Integer deptId);
 
 
 }

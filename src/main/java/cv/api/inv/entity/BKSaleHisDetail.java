@@ -6,10 +6,7 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,20 +15,15 @@ import java.util.Date;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "bk_sale_his_detail")
 public class BKSaleHisDetail implements java.io.Serializable {
-    @Id
-    @Column(name = "tran_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tranId;
+    @EmbeddedId
+    private BKSaleDetailKey sdKey;
     @Column(name = "log_id")
     private Long logId;
-    private SaleDetailKey sdKey;
+    @Column(name = "stock_code")
     private String stockCode;
     @Temporal(TemporalType.DATE)
     @Column(name = "expire_date")

@@ -74,8 +74,8 @@ public class PurHisDetailDaoImpl extends AbstractDao<String, PurHisDetail> imple
     }
 
     @Override
-    public int delete(String id) throws Exception {
-        String strSql = "delete from pur_his_detail where pd_code = '" + id + "'";
+    public int delete(String id, String compCode, Integer deptId) throws Exception {
+        String strSql = "delete from pur_his_detail where pd_code = '" + id + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(strSql);
         return 1;
     }

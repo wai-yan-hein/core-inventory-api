@@ -23,6 +23,7 @@ public interface StockInOutService {
     StockInOut findById(StockIOKey id);
 
     void delete(StockIOKey key) throws Exception;
+    void restore(StockIOKey key) throws Exception;
 
     List<StockInOut> unUpload();
 }

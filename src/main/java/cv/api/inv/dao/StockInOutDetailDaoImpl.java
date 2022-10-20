@@ -28,8 +28,8 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
     }
 
     @Override
-    public int delete(String code) {
-        String delSql = "delete from stock_in_out_detail  where sd_code = '" + code + "'";
+    public int delete(String code, String compCode, Integer deptId) {
+        String delSql = "delete from stock_in_out_detail  where sd_code = '" + code + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(delSql);
         return 1;
     }

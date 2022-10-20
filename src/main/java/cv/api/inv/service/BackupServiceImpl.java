@@ -28,7 +28,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void backup(SaleHis sh) {
-        if (sh.getStatus().equals("EDIT")) {
+        /*if (sh.getStatus().equals("EDIT")) {
             if (sh.isBackup()) {
                 SaleHis s = shDao.findById(sh.getKey());
                 BKSaleHis bk = (BKSaleHis) Util1.cast(s, BKSaleHis.class);
@@ -36,11 +36,11 @@ public class BackupServiceImpl implements BackupService {
                 List<SaleHisDetail> sd = shdDao.search(sh.getKey().getVouNo(), sh.getKey().getCompCode(), sh.getKey().getDeptId());
                 for (SaleHisDetail b : sd) {
                     BKSaleHisDetail bks = (BKSaleHisDetail) Util1.cast(b, BKSaleHisDetail.class);
-                    bks.setLogId(bk.getLogId());
+                    bks.setLogId(bk.getKey().getLogId());
                     dao.save(bks);
                 }
                 log.info("backup sale.");
             }
-        }
+        }*/
     }
 }

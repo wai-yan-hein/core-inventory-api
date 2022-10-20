@@ -1,6 +1,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.OPHisDetail;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -67,8 +68,8 @@ public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> impleme
     }
 
     @Override
-    public int delete(String opCode) {
-        String delSql = "delete from op_his_detail where op_code = '" + opCode + "'";
+    public int delete(String opCode, String compCode, Integer deptId) {
+        String delSql = "delete from op_his_detail where op_code = '" + opCode + "' and comp_code ='" + compCode + "' and dept_id=" + deptId + "";
         execSQL(delSql);
         return 1;
     }
