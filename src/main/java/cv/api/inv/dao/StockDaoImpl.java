@@ -54,7 +54,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.active = 1 and o.compCode ='" + compCode + "' and deptId =" + deptId + "\n";
+        String hsql = "select o from Stock o where o.active = 1 and o.key.compCode ='" + compCode + "' and o.key.deptId =" + deptId + "\n";
         if (!stockCode.equals("-")) {
             hsql += " and o.key.stockCode ='" + stockCode + "'\n";
         }
