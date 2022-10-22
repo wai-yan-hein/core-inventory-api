@@ -12,11 +12,11 @@ public interface UnitRelationService {
 
     UnitRelation findByKey(RelationKey key);
 
-    List<UnitRelation> findRelation();
+    List<UnitRelation> findRelation(String compCode, Integer deptId);
 
     UnitRelationDetail save(UnitRelationDetail unit);
 
-    List<UnitRelationDetail> getRelationDetail(String code,String compCode,Integer deptId);
+    List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId);
 
     UnitRelationDetail findByKey(UnitRelationDetailKey key);
 

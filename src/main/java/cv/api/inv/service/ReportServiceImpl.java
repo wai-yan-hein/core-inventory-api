@@ -1142,7 +1142,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode,
                                       String vouNo, String remark, String reference, String userCode, String stockCode,
                                       String locCode, String compCode, Integer deptId, String deleted) throws Exception {
-        String sql = "select a.*,t.trader_name,l.loc_name\n"
+        String sql = "select a.*,t.trader_name\n"
                 + "from (\n"
                 + "select  vou_no,date(vou_date) vou_date,remark,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
                 + "from v_sale s \n"
@@ -1311,8 +1311,20 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception {
-        String sql = "select v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name \n" + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n" + "where v.comp_code = '" + compCode + "'\n" + "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" + "and (v.remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" + "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n" + "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" + "group by v.vou_no\n" + "order by v.op_date,v.vou_no desc\n";
+    public List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode,
+                                            String stockCode, String locCode, String compCode, Integer deptId) throws Exception {
+        String sql = "select v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name \n"
+                + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n"
+                + "where v.comp_code = '" + compCode + "'\n"
+                + "and v.dept_id =" + deptId + "\n"
+                + "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n"
+                + "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
+                + "and (v.remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
+                + "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
+                + "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
+                + "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
+                + "group by v.vou_no\n"
+                + "order by v.op_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VOpening> openingList = new ArrayList<>();
         if (!Objects.isNull(rs)) {

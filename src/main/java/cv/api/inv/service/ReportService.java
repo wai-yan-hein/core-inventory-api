@@ -113,7 +113,7 @@ public interface ReportService {
     List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                          String userCode, String stockCode, String locCode, String compCode,Integer deptId, String deleted) throws Exception;
 
-    List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode) throws Exception;
+    List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode,Integer deptId) throws Exception;
 
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
                                        String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode,Integer deptId, String deleted) throws Exception;

@@ -33,8 +33,8 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     }
 
     @Override
-    public List<Stock> findAll(String compCode) {
-        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "'";
+    public List<Stock> findAll(String compCode, Integer deptId) {
+        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
         return findHSQL(hsql);
     }
 
@@ -46,15 +46,15 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     }
 
     @Override
-    public List<Stock> findActiveStock(String compCode) {
-        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "'";
+    public List<Stock> findActiveStock(String compCode, Integer deptId) {
+        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
         return findHSQL(hsql);
 
     }
 
     @Override
-    public List<Stock> search(String stockCode, String stockType, String cat, String brand) {
-        String hsql = "select o from Stock o where o.active = 1";
+    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId) {
+        String hsql = "select o from Stock o where o.active = 1 and o.compCode ='" + compCode + "' and deptId =" + deptId + "\n";
         if (!stockCode.equals("-")) {
             hsql += " and o.key.stockCode ='" + stockCode + "'\n";
         }

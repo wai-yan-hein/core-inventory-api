@@ -339,8 +339,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-stock")
-    public ResponseEntity<List<Stock>> getStock(@RequestParam String compCode, @RequestParam boolean active) {
-        List<Stock> listB = active ? stockService.findActiveStock(compCode) : stockService.findAll(compCode);
+    public ResponseEntity<List<Stock>> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
+        List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -350,7 +350,9 @@ public class SetupController {
         String typCode = filter.getStockTypeCode();
         String catCode = filter.getCatCode();
         String brandCode = filter.getBrandCode();
-        return ResponseEntity.ok(stockService.search(stockCode, typCode, catCode, brandCode));
+        Integer deptId = filter.getDeptId();
+        String compCode = filter.getCompCode();
+        return ResponseEntity.ok(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId));
     }
 
     @GetMapping(path = "/get-stock-list")
@@ -421,7 +423,8 @@ public class SetupController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        List<VOpening> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode);
+        Integer deptId = filter.getDeptId();
+        List<VOpening> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode,deptId);
         return ResponseEntity.ok(opHisList);
     }
 
@@ -496,8 +499,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-unit-relation")
-    public ResponseEntity<List<UnitRelation>> getUnitRelation() {
-        List<UnitRelation> listB = unitRelationService.findRelation();
+    public ResponseEntity<List<UnitRelation>> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
+        List<UnitRelation> listB = unitRelationService.findRelation(compCode,deptId);
         return ResponseEntity.ok(listB);
     }
 

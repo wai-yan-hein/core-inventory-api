@@ -82,8 +82,8 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     }
 
     @Override
-    public List<UnitRelation> findRelation() {
-        return dao.findRelation();
+    public List<UnitRelation> findRelation( String compCode, Integer deptId) {
+        return dao.findRelation(compCode,deptId);
     }
 
     @Override

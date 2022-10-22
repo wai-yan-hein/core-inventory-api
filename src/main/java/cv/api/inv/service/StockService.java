@@ -19,13 +19,13 @@ public interface StockService {
 
     Stock findById(StockKey key);
 
-    List<Stock> findAll(String compCode);
+    List<Stock> findAll(String compCode, Integer deptId);
 
     List<String> delete(StockKey key);
 
-    List<Stock> findActiveStock(String compCode);
+    List<Stock> findActiveStock(String compCode, Integer deptId);
 
-    List<Stock> search(String stockCode, String stockType, String cat, String brand);
+    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId);
 
     List<Stock> getStock(String str, String compCode, Integer deptId);
 

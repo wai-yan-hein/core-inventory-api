@@ -11,7 +11,7 @@ public interface UnitRelationDao {
     UnitRelation save(UnitRelation ur);
     UnitRelation findByKey(RelationKey key);
 
-    List<UnitRelation> findRelation();
+    List<UnitRelation> findRelation( String compCode, Integer deptId);
 
     UnitRelationDetail save(UnitRelationDetail unit);
 

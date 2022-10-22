@@ -43,7 +43,6 @@ public class AccountRepo {
                         case "PURCHASE" -> updatePurchase(vouNo, compCode, ACK);
                         case "RETURN_IN" -> updateReturnIn(vouNo, compCode, ACK);
                         case "RETURN_OUT" -> updateReturnOut(vouNo, compCode, ACK);
-                        case "TRADER" -> updateTrader(vouNo, compCode);
                     }
                 }
             }, (e) -> {
@@ -102,8 +101,8 @@ public class AccountRepo {
         }
     }
 
-    private void updateTrader(String traderCode, String compCode) {
-        String sql = "update trader set intg_upd_status = '" + "ACK" + "' where code ='" + traderCode + "' and '" + compCode + "'";
+    private void updateTrader(String traderCode, String account, String compCode) {
+        String sql = "update trader set intg_upd_status = '" + "ACK" + "',account = '" + account + "' where code ='" + traderCode + "' and '" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateTrader: %s", traderCode));
@@ -138,10 +137,10 @@ public class AccountRepo {
                     }
                     default -> accTrader.setTraderType("D");
                 }
-                Mono<Response> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(Response.class).doOnError((e) -> log.error(e.getMessage()));
-                Response trader = result.block();
+                Mono<AccTrader> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).doOnError((e) -> log.error(e.getMessage()));
+                AccTrader trader = result.block();
                 assert trader != null;
-                updateTrader(trader.getVouNo(), trader.getCompCode());
+                updateTrader(trader.getKey().getCode(), trader.getAccCode(), trader.getKey().getCompCode());
 
             }
         }

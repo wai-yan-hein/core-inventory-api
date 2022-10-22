@@ -53,13 +53,13 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<Stock> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode, deptId);
     }
 
     @Override
-    public List<Stock> findActiveStock(String compCode) {
-        return dao.findActiveStock(compCode);
+    public List<Stock> findActiveStock(String compCode, Integer deptId) {
+        return dao.findActiveStock(compCode, deptId);
     }
 
     @Override
@@ -79,14 +79,14 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> search(String stockCode, String stockType, String cat, String brand) {
-        return dao.search(stockCode, stockType, cat, brand);
+    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId) {
+        return dao.search(stockCode, stockType, cat, brand, compCode, deptId);
     }
 
 
     @Override
-    public List<Stock> getStock(String str, String compCode,Integer deptId) {
-        return dao.getStock(str, compCode,deptId);
+    public List<Stock> getStock(String str, String compCode, Integer deptId) {
+        return dao.getStock(str, compCode, deptId);
     }
 
     @Override

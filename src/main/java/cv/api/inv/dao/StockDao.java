@@ -13,21 +13,22 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockDao {
+public interface StockDao {
 
-     Stock save(Stock stock);
+    Stock save(Stock stock);
 
     Stock findById(StockKey key);
 
-     List<Stock> findAll(String compCode);
+    List<Stock> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     List<Stock> findActiveStock(String compCode);
+    List<Stock> findActiveStock(String compCode, Integer deptId);
 
-    List<Stock> search(String stockCode, String stockType, String cat, String brand);
+    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId);
 
-    List<Stock> getStock(String str, String compCode,Integer deptId);
+    List<Stock> getStock(String str, String compCode, Integer deptId);
+
     List<Stock> unUpload();
 
 
