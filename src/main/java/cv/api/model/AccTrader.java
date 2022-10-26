@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class AccTrader implements java.io.Serializable {
-    private TraderKey key;
+    private AccTraderKey key;
     private String userCode;
     private String traderName;
     private String appName;

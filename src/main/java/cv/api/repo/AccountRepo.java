@@ -1,10 +1,10 @@
 package cv.api.repo;
 
+import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.ReportService;
 import cv.api.model.*;
-import cv.api.model.TraderKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -116,7 +116,7 @@ public class AccountRepo {
             if (t != null) {
                 String traderType = t.getType();
                 AccTrader accTrader = new AccTrader();
-                TraderKey key = new TraderKey();
+                AccTraderKey key = new AccTraderKey();
                 key.setCode(t.getKey().getCode());
                 key.setCompCode(t.getKey().getCompCode());
                 accTrader.setKey(key);
@@ -144,6 +144,14 @@ public class AccountRepo {
 
             }
         }
+    }
+
+    public void deleteTrader(AccTraderKey key) {
+        Mono<ReturnObject> result = accountApi.post().uri("/account/delete-trader")
+                .body(Mono.just(key), AccTraderKey.class)
+                .retrieve().bodyToMono(ReturnObject.class)
+                .doOnError((e) -> log.error(e.getMessage()));
+        result.block();
     }
 
     private String getCustomerAcc(String compCode) {

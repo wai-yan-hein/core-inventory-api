@@ -12,6 +12,7 @@ import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
 import cv.api.inv.view.VOpening;
+import cv.api.model.AccTraderKey;
 import cv.api.repo.AccountRepo;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -323,6 +324,13 @@ public class SetupController {
     @PostMapping(path = "/delete-trader")
     public ResponseEntity<?> deleteTrader(@RequestBody TraderKey key) {
         List<String> str = traderService.delete(key);
+        if (str.isEmpty()) {
+            AccTraderKey k = new AccTraderKey();
+            k.setCompCode(key.getCompCode());
+            k.setCode(key.getCode());
+            accountRepo.deleteTrader(k);
+            log.info("deleted trader.");
+        }
         return ResponseEntity.ok(str.isEmpty() ? null : str);
     }
 
