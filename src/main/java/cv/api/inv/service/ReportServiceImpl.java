@@ -921,7 +921,16 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) {
-        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" + "from (select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "group by tran_date,stock_code,tran_option)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "group by tran_date,stock_code,tran_option\n" + "order by s.user_code,a.tran_date,a.tran_option";
+        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n"
+                + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n"
+                + "from (select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n"
+                + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark\n"
+                + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n"
+                + "group by tran_date,stock_code,tran_option)a\n"
+                + "join stock s on a.stock_code = s.stock_code\n"
+                + "join stock_type st on s.stock_type_code = st.stock_type_code\n"
+                + "group by tran_date,stock_code,tran_option\n"
+                + "order by s.user_code,a.tran_date,a.tran_option";
         List<ClosingBalance> balances = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(getSql);
