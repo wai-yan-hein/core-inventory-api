@@ -20,8 +20,6 @@ public class Pattern implements java.io.Serializable {
     private String unitCode;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "f_stock_code")
-    private String mapStockCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
     @Transient

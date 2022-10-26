@@ -82,6 +82,8 @@ public class Stock implements java.io.Serializable {
     private boolean calculate;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "explode")
+    private boolean explode;
     @Transient
     private String relName;
     @Transient

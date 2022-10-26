@@ -107,6 +107,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                     s.setGroupName(rs.getString("stock_type_name"));
                     s.setCatName(rs.getString("cat_name"));
                     s.setBrandName(rs.getString("brand_name"));
+                    s.setExplode(rs.getBoolean("explode"));
                     listStock.add(s);
                 }
             } catch (Exception e) {

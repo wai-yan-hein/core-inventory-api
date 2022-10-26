@@ -17,4 +17,6 @@ public class PatternKey implements Serializable {
     private Integer uniqueId;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "f_stock_code")
+    private String mapStockCode;
 }
