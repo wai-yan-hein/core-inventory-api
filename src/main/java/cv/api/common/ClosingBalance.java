@@ -32,4 +32,7 @@ public class ClosingBalance {
     private String balRel;
     private String groupName;
     private String remark;
+    private String compCode;
+    private Integer deptId;
+    private String relCode;
 }

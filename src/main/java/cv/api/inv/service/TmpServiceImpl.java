@@ -18,7 +18,7 @@ public class TmpServiceImpl implements TmpService{
     }
 
     @Override
-    public List<TmpStockIO> getStockIO(String stockCode, Integer macId) {
-        return dao.getStockIO(stockCode,macId);
+    public List<TmpStockIO> getStockIO(String stockCode, String compCode, Integer deptId, Integer macId) {
+        return dao.getStockIO(stockCode,compCode,deptId,macId);
     }
 }

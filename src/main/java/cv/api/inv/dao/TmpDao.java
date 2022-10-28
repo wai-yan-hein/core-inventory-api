@@ -7,5 +7,5 @@ import java.util.List;
 public interface TmpDao {
     TmpStockIO save(TmpStockIO io);
 
-    List<TmpStockIO> getStockIO(String stockCode, Integer macId);
+    List<TmpStockIO> getStockIO(String stockCode, String compCode, Integer deptId, Integer macId);
 }

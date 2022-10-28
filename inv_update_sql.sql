@@ -16,8 +16,7 @@ insert into department (dept_id, user_code, dept_name) values ('1', 'H', 'Head O
 alter table region 
 add column dept_id int not null default 1 ;
 
-alter table pattern 
-add column dept_id int not null default 1;
+
 
 alter table vou_status 
 add column dept_id int not null default 1,
@@ -44,6 +43,12 @@ alter table stock_unit
 add column dept_id int not null default 1,
 drop primary key,
 add primary key (unit_code, dept_id,comp_code);
+
+ALTER TABLE stock_unit 
+DROP INDEX item_unit_name_UNIQUE ,
+DROP INDEX item_unit_code ;
+;
+
 
 alter table stock_type 
 add column dept_id int not null default 1,
@@ -136,10 +141,11 @@ drop primary key,
 add primary key (vou_no, dept_id,comp_code);
 
 alter table pur_his_detail 
+add column dept_id int not null default 1,
 drop column avg_wt,
 drop column avg_price,
 drop column std_wt,
-add column avg_qty float(20,3) not null default 0 after comp_code;
+add column avg_qty float(20,3) not null default 0;
 
 alter table sale_his_detail 
 drop column sale_wt;
@@ -167,12 +173,29 @@ alter table unit_relation_detail
 add column comp_code varchar(15) not null default '0010010' after unique_id,
 add column dept_id int not null default 1 after comp_code;
 
+drop table if exists pattern;
+drop table if exists pattern_detail;
+create table pattern (
+  stock_code varchar(15) not null,
+  loc_code varchar(15) default null,
+  qty float(20,3) not null default 0.000,
+  unit varchar(15) not null,
+  price float(20,3) default null,
+  explode bit(1) not null default b'0',
+  f_stock_code varchar(15) not null,
+  unique_id int(11) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null default 1,
+  intg_upd_status varchar(15) default null,
+  primary key (stock_code,unique_id,comp_code,dept_id,f_stock_code)
+) engine=innodb default charset=utf8mb3;
+
+
 #intg_upd_status
 alter table stock 
+add column explode bit(1) not null default 0,
 add column intg_upd_status varchar(15);
 
-alter table pattern 
-add column intg_upd_status varchar(15);
 
 alter table vou_status 
 add column intg_upd_status varchar(15);
@@ -223,11 +246,40 @@ add column dept_id int not null default 1 after comp_code,
 drop primary key,
 add primary key (td_code, dept_id);
 
-alter table pattern 
-drop primary key,
-add primary key (stock_code, unique_id, comp_code, dept_id, f_stock_code);
 
 #tmp
+drop table if exists tmp_stock_opening;
+create table tmp_stock_opening (
+  tran_date date not null,
+  stock_code varchar(15) not null,
+  ttl_qty float(20,3) default null,
+  loc_code varchar(15) not null,
+  unit varchar(15) not null,
+  mac_id int(11) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  primary key (tran_date,stock_code,loc_code,unit,mac_id,comp_code,dept_id)
+) engine=innodb default charset=utf8mb3 comment='	';
+
+drop table if exists tmp_stock_io_column;
+create table tmp_stock_io_column (
+  tran_option varchar(15) not null,
+  tran_date date not null,
+  stock_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  op_qty float(20,3) not null default 0.000,
+  pur_qty float(20,3) not null default 0.000,
+  in_qty float(20,3) not null default 0.000,
+  sale_qty float(20,3) not null default 0.000,
+  out_qty float(20,3) not null default 0.000,
+  mac_id int(11) not null,
+  remark varchar(255) default null,
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,dept_id,comp_code)
+) engine=innodb default charset=utf8mb3;
+
 drop table if exists tmp_stock_opening;
 create table tmp_stock_opening (
   tran_date date not null,
