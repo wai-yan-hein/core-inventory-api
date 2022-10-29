@@ -15,4 +15,5 @@ public class TraderKey implements Serializable {
     private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
+
 }

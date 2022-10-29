@@ -4,6 +4,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.ReportService;
+import cv.api.inv.service.TraderService;
 import cv.api.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class AccountRepo {
     private Environment environment;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private TraderService traderService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -188,6 +191,11 @@ public class AccountRepo {
                 double vouTax = Util1.getDouble(sh.getTaxAmt());
                 double vouTotal = Util1.getDouble(sh.getVouTotal());
                 double taxPercent = Util1.getDouble(sh.getTaxPercent());
+                TraderKey k = new TraderKey();
+                k.setCode(traderCode);
+                k.setCompCode(compCode);
+                Trader t = traderService.findById(k);
+                String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -228,7 +236,7 @@ public class AccountRepo {
                     gl.setCrAmt(vouDis);
                     gl.setAccCode(disAcc);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Sale Voucher Discount");
+                    gl.setDescription("Sale Voucher Discount : " + traderName);
                     gl.setTraderCode(traderCode);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
@@ -248,7 +256,7 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Sale Voucher Paid");
+                    gl.setDescription("Sale Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(srcAcc);
                     gl.setDrAmt(vouTotal);
@@ -319,6 +327,11 @@ public class AccountRepo {
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
                 String vouNo = ph.getKey().getVouNo();
+                TraderKey k = new TraderKey();
+                k.setCode(traderCode);
+                k.setCompCode(compCode);
+                Trader t = traderService.findById(k);
+                String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -359,7 +372,7 @@ public class AccountRepo {
                     gl.setAccCode(disAcc);
                     gl.setDrAmt(vouDis);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Purchase Voucher Discount");
+                    gl.setDescription("Purchase Voucher Discount : " + traderName);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -378,7 +391,7 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Purchase Voucher Paid");
+                    gl.setDescription("Purchase Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(srcAcc);
                     gl.setCrAmt(vouTotal);
@@ -420,6 +433,11 @@ public class AccountRepo {
                 double vouDis = Util1.getDouble(ri.getDiscount());
                 double vouPaid = Util1.getDouble(ri.getPaid());
                 double vouTotal = Util1.getDouble(ri.getVouTotal());
+                TraderKey k = new TraderKey();
+                k.setCode(traderCode);
+                k.setCompCode(compCode);
+                Trader t = traderService.findById(k);
+                String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -451,7 +469,7 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Return In Voucher Discount");
+                    gl.setDescription("Return In Voucher Discount : " + traderName);
                     gl.setSrcAccCode(disAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
@@ -474,7 +492,7 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Return In Voucher Paid");
+                    gl.setDescription("Return In Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
                     gl.setCrAmt(vouPaid);
@@ -516,6 +534,11 @@ public class AccountRepo {
                 double vouDis = Util1.getDouble(ro.getDiscount());
                 double vouPaid = Util1.getDouble(ro.getPaid());
                 double vouTotal = Util1.getDouble(ro.getVouTotal());
+                TraderKey k = new TraderKey();
+                k.setCode(traderCode);
+                k.setCompCode(compCode);
+                Trader t = traderService.findById(k);
+                String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -547,7 +570,7 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Return Out Voucher Discount");
+                    gl.setDescription("Return Out Voucher Discount : " + traderName);
                     gl.setSrcAccCode(disAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
@@ -570,7 +593,7 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    gl.setDescription("Return Out Voucher Paid");
+                    gl.setDescription("Return Out Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
                     gl.setDrAmt(vouPaid);
