@@ -4,11 +4,12 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Entity;
 import java.io.Serializable;
 
-@Embeddable
 @Data
-public class ProcessHisKey implements Serializable {
+@Embeddable
+public class ProcessHisDetailKey implements Serializable {
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "stock_code")
@@ -19,5 +20,6 @@ public class ProcessHisKey implements Serializable {
     private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
-
+    @Column(name = "unique_id")
+    private Integer uniqueId;
 }

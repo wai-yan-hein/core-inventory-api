@@ -72,6 +72,7 @@ public class SetupController {
     private FontService fontService;
     @Autowired
     private TraderGroupService traderGroupService;
+
     @Autowired
     private AccountRepo accountRepo;
     private final ReturnObject ro = new ReturnObject();
@@ -432,7 +433,7 @@ public class SetupController {
         String remark = Util1.isNull(filter.getRemark(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
-        List<VOpening> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode,deptId);
+        List<VOpening> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode, deptId);
         return ResponseEntity.ok(opHisList);
     }
 
@@ -508,7 +509,7 @@ public class SetupController {
 
     @GetMapping(path = "/get-unit-relation")
     public ResponseEntity<List<UnitRelation>> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<UnitRelation> listB = unitRelationService.findRelation(compCode,deptId);
+        List<UnitRelation> listB = unitRelationService.findRelation(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
 
@@ -548,4 +549,6 @@ public class SetupController {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
         return ResponseEntity.ok(g);
     }
+
+
 }

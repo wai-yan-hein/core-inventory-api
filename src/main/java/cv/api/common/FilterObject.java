@@ -30,6 +30,7 @@ public class FilterObject {
     private String refNo;
     private boolean deleted;
     private Integer deptId;
-
+    private String processNo;
+    private boolean finished;
 
 }

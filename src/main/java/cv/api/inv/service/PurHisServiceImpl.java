@@ -40,7 +40,7 @@ public class PurHisServiceImpl implements PurHisService {
     public PurHis save(PurHis ph) throws Exception {
         ph.setVouDate(Util1.toDateTime(ph.getVouDate()));
         if (Util1.isNullOrEmpty(ph.getKey().getVouNo())) {
-            ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getTraderCode()));
+            ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getKey().getCompCode()));
         }
         List<PurHisDetail> listSD = ph.getListPD();
         List<String> listDel = ph.getListDel();

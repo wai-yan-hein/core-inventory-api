@@ -200,7 +200,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(vouBal);
+                    gl.setCrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -331,7 +331,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouBal);
+                    gl.setDrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -419,6 +419,7 @@ public class AccountRepo {
                 double vouBal = Util1.getDouble(ri.getBalance());
                 double vouDis = Util1.getDouble(ri.getDiscount());
                 double vouPaid = Util1.getDouble(ri.getPaid());
+                double vouTotal = Util1.getDouble(ri.getVouTotal());
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -431,7 +432,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouBal);
+                    gl.setDrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -514,6 +515,7 @@ public class AccountRepo {
                 double vouBal = Util1.getDouble(ro.getBalance());
                 double vouDis = Util1.getDouble(ro.getDiscount());
                 double vouPaid = Util1.getDouble(ro.getPaid());
+                double vouTotal = Util1.getDouble(ro.getVouTotal());
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -526,7 +528,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(vouBal);
+                    gl.setCrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
