@@ -52,4 +52,6 @@ public class VPurchase implements Serializable {
     private String compAddress;
     private String stockUserCode;
     private String stockName;
+    private String relName;
+    private String qtyStr;
 }

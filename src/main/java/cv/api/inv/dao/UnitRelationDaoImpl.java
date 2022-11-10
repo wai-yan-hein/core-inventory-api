@@ -1,14 +1,15 @@
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.RelationKey;
-import cv.api.inv.entity.UnitRelation;
-import cv.api.inv.entity.UnitRelationDetail;
-import cv.api.inv.entity.UnitRelationDetailKey;
+import cv.api.inv.entity.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> implements UnitRelationDao {
     @Override
     public UnitRelation save(UnitRelation ur) {
@@ -25,6 +26,27 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
     public List<UnitRelation> findRelation(String compCode, Integer deptId) {
         String hsql = "select o from UnitRelation o where o.key.compCode ='" + compCode + "' and o.key.deptId =" + deptId + "";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<StockUnit> getRelation(String relCode, String compCode, Integer deptId) {
+        List<StockUnit> list = new ArrayList<>();
+        String sql = "select unit from unit_relation_detail where rel_code ='" + relCode + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
+        ResultSet rs = getResultSet(sql);
+        try {
+            while (rs.next()) {
+                StockUnitKey key = new StockUnitKey();
+                key.setUnitCode(rs.getString("unit"));
+                key.setCompCode(compCode);
+                key.setDeptId(deptId);
+                StockUnit u = new StockUnit();
+                u.setKey(key);
+                list.add(u);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return list;
     }
 
     @Override

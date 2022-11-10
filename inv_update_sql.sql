@@ -3,6 +3,9 @@ drop table if exists stock_op_value_log;
 drop table if exists stock_report;
 drop table if exists sys_prop;
 
+alter table reorder_level 
+change column bal_unit bal_unit varchar(15) null ;
+
 create table department (
   dept_id int(11) not null,
   user_code varchar(15) not null,
@@ -44,9 +47,9 @@ add column dept_id int not null default 1,
 drop primary key,
 add primary key (unit_code, dept_id,comp_code);
 
-ALTER TABLE stock_unit 
-DROP INDEX item_unit_name_UNIQUE ,
-DROP INDEX item_unit_code ;
+alter table stock_unit 
+drop index item_unit_name_UNIQUE ,
+drop index item_unit_code ;
 ;
 
 
@@ -193,7 +196,9 @@ create table pattern (
 
 #intg_upd_status
 alter table stock 
-add column explode bit(1) not null default 0,
+add column explode bit(1) not null default 0;
+
+alter table stock 
 add column intg_upd_status varchar(15);
 
 
@@ -293,6 +298,45 @@ create table tmp_stock_opening (
   primary key (tran_date,stock_code,loc_code,unit,mac_id,comp_code,dept_id)
 ) engine=innodb default charset=utf8mb3 comment='	';
 
+create table process_his (
+  vou_no varchar(15) not null,
+  stock_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  loc_code varchar(15) not null,
+  vou_date datetime not null,
+  end_date datetime not null,
+  unit varchar(45) not null,
+  qty float(20,3) not null,
+  avg_qty float(20,3) not null,
+  price float(20,3) not null,
+  avg_price float(20,3) not null default 0.000,
+  remark varchar(255) default null,
+  process_no varchar(255) default null,
+  pt_code varchar(15) not null,
+  finished bit(1) default b'0',
+  deleted bit(1) not null default b'0',
+  created_by varchar(15) not null,
+  updated_by varchar(15) default null,
+  mac_id int(11) not null,
+  primary key (vou_no,stock_code,comp_code,dept_id,loc_code)
+) engine=innodb default charset=utf8mb3;
+
+create table process_his_detail (
+  vou_no varchar(15) not null,
+  stock_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  unique_id int(11) not null,
+  vou_date timestamp not null default current_timestamp() on update current_timestamp(),
+  qty float(20,3) not null,
+  unit varchar(15) not null,
+  price float(20,3) not null,
+  loc_code varchar(15) not null,
+  primary key (vou_no,stock_code,comp_code,dept_id,unique_id)
+) engine=innodb default charset=utf8mb3;
+
+
 #view
 drop view if exists v_opening;
 create  view v_opening as select op.op_date as op_date,op.remark as remark,op.created_by as created_by,op.created_date as created_date,op.updated_date as updated_date,op.updated_by as updated_by,op.mac_id as mac_id,op.comp_code as comp_code,op.deleted as deleted,op.op_amt as op_amt,op.dept_id as dept_id,opd.op_code as op_code,opd.stock_code as stock_code,opd.qty as qty,opd.price as price,opd.amount as amount,opd.loc_code as loc_code,opd.unit as unit,opd.vou_no as vou_no,opd.unique_id as unique_id,s.user_code as stock_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((op_his op join op_his_detail opd on(op.vou_no = opd.vou_no)) join stock s on(opd.stock_code = s.stock_code));
@@ -321,3 +365,50 @@ create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.de
 drop view if exists v_transfer;
 create  view v_transfer as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.ref_no as ref_no,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code_from as loc_code_from,th.loc_code_to as loc_code_to,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,td.td_code as td_code,td.stock_code as stock_code,td.qty as qty,td.unit as unit,td.unique_id as unique_id,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((transfer_his th join transfer_his_detail td on(th.vou_no = td.vou_no)) join stock s on(td.stock_code = s.stock_code));
 
+drop view if exists v_process_his;
+create view v_process_his as select p.vou_no as vou_no,p.stock_code as stock_code,p.comp_code as comp_code,p.dept_id as dept_id,p.loc_code as loc_code,p.vou_date as vou_date,p.end_date as end_date,p.qty as qty,p.unit as unit,p.avg_qty as avg_qty,p.price as price,p.remark as remark,p.process_no as process_no,p.pt_code as pt_code,p.finished as finished,p.deleted as deleted,p.created_by as created_by,p.updated_by as updated_by,p.mac_id as mac_id,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from (process_his p join stock s on(p.stock_code = s.stock_code and p.comp_code = s.comp_code and p.dept_id = s.dept_id));
+
+drop view if exists v_process_his_detail;
+create  view v_process_his_detail as select pd.vou_no as vou_no,pd.stock_code as stock_code,pd.comp_code as comp_code,pd.dept_id as dept_id,pd.unique_id as unique_id,pd.vou_date as vou_date,pd.qty as qty,pd.unit as unit,pd.price as price,pd.loc_code as loc_code,p.deleted as deleted,p.pt_code as pt_code,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.calculate as calculate,s.rel_code as rel_code from ((process_his_detail pd join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code and pd.dept_id = s.dept_id)) join process_his p on(pd.vou_no = p.vou_no and pd.comp_code = p.comp_code and pd.dept_id = p.dept_id));
+
+create table process_his (
+  vou_no varchar(15) not null,
+  stock_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  loc_code varchar(15) not null,
+  vou_date datetime not null,
+  end_date datetime not null,
+  unit varchar(45) not null,
+  qty float(20,3) not null,
+  avg_qty float(20,3) not null,
+  price float(20,3) not null,
+  avg_price float(20,3) not null default 0.000,
+  remark varchar(255) default null,
+  process_no varchar(255) default null,
+  pt_code varchar(15) not null,
+  finished bit(1) default b'0',
+  deleted bit(1) not null default b'0',
+  created_by varchar(15) not null,
+  updated_by varchar(15) default null,
+  mac_id int(11) not null,
+  primary key (vou_no,stock_code,comp_code,dept_id,loc_code)
+) engine=innodb default charset=utf8mb3;
+
+create table process_his_detail (
+  vou_no varchar(15) not null,
+  stock_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  unique_id int(11) not null,
+  vou_date timestamp not null default current_timestamp() on update current_timestamp(),
+  qty float(20,3) not null,
+  unit varchar(15) not null,
+  price float(20,3) not null,
+  loc_code varchar(15) not null,
+  primary key (vou_no,stock_code,comp_code,dept_id,unique_id)
+) engine=innodb default charset=utf8mb3;
+
+create  view v_process_his as select p.vou_no as vou_no,p.stock_code as stock_code,p.comp_code as comp_code,p.dept_id as dept_id,p.loc_code as loc_code,p.vou_date as vou_date,p.end_date as end_date,p.qty as qty,p.unit as unit,ifnull(p.avg_qty,0) as avg_qty,p.price as price,ifnull(p.avg_price,0) as avg_price,p.remark as remark,p.process_no as process_no,p.pt_code as pt_code,p.finished as finished,p.deleted as deleted,p.created_by as created_by,p.updated_by as updated_by,p.mac_id as mac_id,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from (process_his p join stock s on(p.stock_code = s.stock_code and p.comp_code = s.comp_code and p.dept_id = s.dept_id));
+
+create  view v_process_his_detail as select pd.vou_no as vou_no,pd.stock_code as stock_code,pd.comp_code as comp_code,pd.dept_id as dept_id,pd.unique_id as unique_id,pd.vou_date as vou_date,pd.qty as qty,pd.unit as unit,pd.price as price,pd.loc_code as loc_code,p.deleted as deleted,p.pt_code as pt_code,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.calculate as calculate,s.rel_code as rel_code from ((process_his_detail pd join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code and pd.dept_id = s.dept_id)) join process_his p on(pd.vou_no = p.vou_no and pd.comp_code = p.comp_code and pd.dept_id = p.dept_id));

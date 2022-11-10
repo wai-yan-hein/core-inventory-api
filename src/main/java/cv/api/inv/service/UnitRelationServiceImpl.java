@@ -7,10 +7,7 @@ package cv.api.inv.service;
 
 import cv.api.common.Util1;
 import cv.api.inv.dao.UnitRelationDao;
-import cv.api.inv.entity.RelationKey;
-import cv.api.inv.entity.UnitRelation;
-import cv.api.inv.entity.UnitRelationDetail;
-import cv.api.inv.entity.UnitRelationDetailKey;
+import cv.api.inv.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +81,11 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     @Override
     public List<UnitRelation> findRelation( String compCode, Integer deptId) {
         return dao.findRelation(compCode,deptId);
+    }
+
+    @Override
+    public List<StockUnit> getRelation(String relCode, String compCode, Integer deptId) {
+        return null;
     }
 
     @Override

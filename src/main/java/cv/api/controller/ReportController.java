@@ -115,15 +115,15 @@ public class ReportController {
                         Util1.writeJsonFile(saleByCustomer, exportPath);
                     }
                     case "SaleByCustomerSummary" -> {
-                        List<VSale> saleByCustomer = reportService.getSaleByCustomerSummary(fromDate, toDate, curCode, traderCode, compCode, macId);
-                        Util1.writeJsonFile(saleByCustomer, exportPath);
+                        List<VSale> list = reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId);
+                        Util1.writeJsonFile(list, exportPath);
                     }
                     case "SaleBySaleManDetail" -> {
                         List<VSale> saleByCustomer = reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(saleByCustomer, exportPath);
                     }
                     case "SaleBySaleManSummary" -> {
-                        List<VSale> saleByCustomer = reportService.getSaleBySaleManSummary(fromDate, toDate, curCode, smCode, compCode, macId);
+                        List<VSale> saleByCustomer = reportService.getSaleBySaleManSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, smCode, compCode, deptId);
                         Util1.writeJsonFile(saleByCustomer, exportPath);
                     }
                     case "SaleByStockSummary" -> {
@@ -139,7 +139,7 @@ public class ReportController {
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
                     }
                     case "PurchaseBySupplierSummary" -> {
-                        List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierSummary(fromDate, toDate, curCode, traderCode, compCode, macId);
+                        List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
                     }
                     case "PurchaseByStockSummary", "PurchaseByStockDetail" -> {
@@ -181,18 +181,18 @@ public class ReportController {
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummary(opDate, fromDate, toDate,
-                                typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetail" -> {
                         reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode,
-                                stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockValue" -> {
                         List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode,
-                                brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
@@ -209,6 +209,22 @@ public class ReportController {
                     }
                     case "PurchasePriceCalender" -> {
                         List<VPurchase> values = reportService.getPurchasePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "ProductionOutputDetail" -> {
+                        List<VStockIO> values = reportService.getProcessOutputDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "ProductionOutputSummary" -> {
+                        List<VStockIO> values = reportService.getProcessOutputSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "ProductionUsageSummary" -> {
+                        List<VStockIO> values = reportService.getProcessUsageSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "ProductionUsageDetail" -> {
+                        List<VStockIO> values = reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");
@@ -263,8 +279,30 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-purchase-recent-price")
-    public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
-        return ResponseEntity.ok(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode));
+    public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode,
+                                                          @RequestParam String vouDate,
+                                                          @RequestParam String unit,
+                                                          @RequestParam String compCode,
+                                                          @RequestParam Integer deptId) {
+        return ResponseEntity.ok(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    }
+
+    @GetMapping(path = "/get-production-recent-price")
+    public ResponseEntity<General> getProductionRecentPrice(@RequestParam String stockCode,
+                                                            @RequestParam String vouDate,
+                                                            @RequestParam String unit,
+                                                            @RequestParam String compCode,
+                                                            @RequestParam Integer deptId) {
+        return ResponseEntity.ok(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    }
+
+    @GetMapping(path = "/get-purchase-avg-price")
+    public ResponseEntity<General> getPurAvgPrice(@RequestParam String stockCode,
+                                                  @RequestParam String vouDate,
+                                                  @RequestParam String unit,
+                                                  @RequestParam String compCode,
+                                                  @RequestParam Integer deptId) {
+        return ResponseEntity.ok(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-sale-recent-price")

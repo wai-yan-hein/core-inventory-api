@@ -34,15 +34,21 @@ public interface ReportService {
 
     List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String curCode, String traderCode, String compCode, Integer macId) throws Exception;
 
     List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String curCode, String smCode, String compCode, Integer macId) throws Exception;
+    List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) throws Exception;
+
+    List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode,
+                                        String catCode, String brandCode,
+                                        String stockCode, String smCode, String compCode, Integer deptId) throws Exception;
 
     List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String curCode, String traderCode, String compCode, Integer macId) throws Exception;
+    List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate,
+                                                 String typCode, String brandCode, String catCode,
+                                                 String stockCode,
+                                                 String traderCode, String compCode, Integer deptId) throws Exception;
 
     List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception;
 
@@ -52,14 +58,18 @@ public interface ReportService {
 
     General getPurchaseAvgPrice(String stockCode) throws Exception;
 
-    General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode);
+    General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
+
+    General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
+
+    General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
 
     General getSaleRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
     General getStockIORecentPrice(String stockCode, String purDate, String unit);
 
     List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
-                                        boolean calSale, boolean calPur,boolean calRI,boolean calRO,
+                                        boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                         String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
@@ -79,15 +89,15 @@ public interface ReportService {
     List<ClosingBalance> getClosingStockDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
-                                              String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
+                                              String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
-    void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode,
+    void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus,
                                    boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode,
-                                   String brandCode, String stockCode,
+                                   String brandCode, String stockCode, String vouStatus,
                                    boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                    String compCode, Integer deptId, Integer macId) throws Exception;
 
@@ -101,7 +111,7 @@ public interface ReportService {
 
     List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo,
                                      String remark, String desp, String userCode, String stockCode,
-                                     String locCode, String compCode,Integer deptId, String deleted) throws Exception;
+                                     String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
@@ -111,12 +121,12 @@ public interface ReportService {
                                        String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
     List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
-                                         String userCode, String stockCode, String locCode, String compCode,Integer deptId, String deleted) throws Exception;
+                                         String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
-    List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode,Integer deptId) throws Exception;
+    List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId) throws Exception;
 
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
-                                       String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode,Integer deptId, String deleted) throws Exception;
+                                       String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode, Integer deptId, String deleted) throws Exception;
 
     List<VSale> getSalePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
@@ -132,4 +142,11 @@ public interface ReportService {
 
     List<VReturnOut> getReturnOutVoucher(String vouNo, String compCode);
 
+    List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
+
+    List<VStockIO> getProcessOutputSummary(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
+
+    List<VStockIO> getProcessUsageSummary(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
+
+    List<VStockIO> getProcessUsageDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
 }

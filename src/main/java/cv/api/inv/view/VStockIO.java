@@ -25,4 +25,9 @@ public class VStockIO {
     private Float outAmt;
     private String createdBy;
     private boolean deleted;
+    private String unit;
+    private Float price;
+    private Float qty;
+    private String stockCode;
+    private String processNo;
 }

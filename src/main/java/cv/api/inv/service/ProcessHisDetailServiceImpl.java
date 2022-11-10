@@ -26,8 +26,8 @@ public class ProcessHisDetailServiceImpl implements ProcessHisDetailService {
     }
 
     @Override
-    public List<ProcessHisDetail> search(String vouNo, String stockCode, String compCode, Integer deptId) {
-        return dao.search(vouNo, stockCode, compCode, deptId);
+    public List<ProcessHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo, compCode, deptId);
     }
 
     @Override

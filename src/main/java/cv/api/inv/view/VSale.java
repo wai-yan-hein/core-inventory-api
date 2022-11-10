@@ -68,4 +68,6 @@ public class VSale {
     private String refNo;
     private float lastBalance;
     private String compCode;
+    private String relName;
+    private String qtyStr;
 }

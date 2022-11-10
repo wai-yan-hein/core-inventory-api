@@ -20,8 +20,6 @@ public class ProcessHisDetail {
     private String unit;
     @Column(name = "price")
     private Float price;
-    @Column(name = "amount")
-    private Float amount;
     @Transient
     private String locName;
     @Transient

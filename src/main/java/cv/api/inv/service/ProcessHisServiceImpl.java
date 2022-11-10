@@ -44,6 +44,11 @@ public class ProcessHisServiceImpl implements ProcessHisService {
         dao.delete(key);
     }
 
+    @Override
+    public void restore(ProcessHisKey key) {
+        dao.restore(key);
+    }
+
     private String getVoucherNo(Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "PROCESS", period, compCode);

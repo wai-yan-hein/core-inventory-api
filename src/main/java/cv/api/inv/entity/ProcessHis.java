@@ -25,10 +25,14 @@ public class ProcessHis {
     private String processNo;
     @Column(name = "qty")
     private Float qty;
+    @Column(name = "avg_qty")
+    private Float avgQty;
     @Column(name = "unit")
     private String unit;
     @Column(name = "price")
     private Float price;
+    @Column(name = "avg_price")
+    private Float avgPrice;
     @Column(name = "finished")
     private boolean finished;
     @Column(name = "deleted")
@@ -45,5 +49,7 @@ public class ProcessHis {
     private String stockName;
     @Transient
     private String ptName;
+    @Transient
+    private String locName;
 
 }

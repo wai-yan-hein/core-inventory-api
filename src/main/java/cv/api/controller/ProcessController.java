@@ -1,6 +1,7 @@
 package cv.api.controller;
 
 import cv.api.common.FilterObject;
+import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.ProcessHis;
 import cv.api.inv.entity.ProcessHisDetail;
@@ -22,6 +23,7 @@ public class ProcessController {
     private ProcessHisService processHisService;
     @Autowired
     private ProcessHisDetailService processHisDetailService;
+    private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-process")
     public ResponseEntity<?> saveProcess(@RequestBody ProcessHis p) {
@@ -31,7 +33,15 @@ public class ProcessController {
     @PostMapping(path = "/delete-process")
     public ResponseEntity<?> deleteProcess(@RequestBody ProcessHisKey p) {
         processHisService.delete(p);
-        return ResponseEntity.ok(ResponseEntity.accepted());
+        ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
+    @PostMapping(path = "/restore-process")
+    public ResponseEntity<?> restoreProcess(@RequestBody ProcessHisKey p) {
+        processHisService.restore(p);
+        ro.setMessage("Restored.");
+        return ResponseEntity.ok(ro);
     }
 
     @PostMapping(path = "/get-process")
@@ -45,8 +55,8 @@ public class ProcessController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         boolean deleted = filter.isDeleted();
-        boolean finished = filter.isDeleted();
-        String processNo = filter.getProcessNo();
+        boolean finished = filter.isFinished();
+        String processNo = Util1.isNull(filter.getProcessNo(), "-");
         String pt = filter.getVouStatus();
         return ResponseEntity.ok(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode, finished, deleted, compCode, deptId));
     }
@@ -59,15 +69,14 @@ public class ProcessController {
     @PostMapping(path = "/delete-process-detail")
     public ResponseEntity<?> deleteProcessDetail(@RequestBody ProcessHisDetailKey p) {
         processHisDetailService.delete(p);
-        return ResponseEntity.ok(ResponseEntity.accepted());
+        ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
     }
 
-    @PostMapping(path = "/get-process-detail")
-    public ResponseEntity<?> getProcessDetail(@RequestBody FilterObject f) {
-        String compCode = f.getCompCode();
-        Integer depId = f.getDeptId();
-        String vouNo = f.getVouNo();
-        String stockCode = f.getStockCode();
-        return ResponseEntity.ok(processHisDetailService.search(vouNo, stockCode, compCode, depId));
+    @GetMapping(path = "/get-process-detail")
+    public ResponseEntity<?> getProcessDetail(@RequestParam String vouNo,
+                                              @RequestParam String compCode,
+                                              @RequestParam Integer deptId) {
+        return ResponseEntity.ok(processHisDetailService.search(vouNo, compCode, deptId));
     }
 }

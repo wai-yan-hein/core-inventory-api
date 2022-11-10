@@ -65,27 +65,27 @@ public class AccountRepo {
     }
 
     private void updateSale(String vouNo, String compCode, String status) {
-        String sql = "update sale_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and '" + compCode + "'";
+        String sql = "update sale_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.error(String.format("updateSale: %s", vouNo));
+            log.info(String.format("updateSale: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateSale: %s", e.getMessage()));
         }
     }
 
     private void updatePurchase(String vouNo, String compCode, String status) {
-        String sql = "update pur_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and '" + compCode + "'";
+        String sql = "update pur_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.error(String.format("updatePurchase: %s", vouNo));
+            log.info(String.format("updatePurchase: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updatePurchase: %s", e.getMessage()));
         }
     }
 
     private void updateReturnIn(String vouNo, String compCode, String status) {
-        String sql = "update ret_in_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and '" + compCode + "'";
+        String sql = "update ret_in_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateReturnIn: %s", vouNo));
@@ -95,7 +95,7 @@ public class AccountRepo {
     }
 
     private void updateReturnOut(String vouNo, String compCode, String status) {
-        String sql = "update ret_out_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and '" + compCode + "'";
+        String sql = "update ret_out_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateReturnOut: %s", vouNo));
@@ -105,7 +105,7 @@ public class AccountRepo {
     }
 
     private void updateTrader(String traderCode, String account, String compCode) {
-        String sql = "update trader set intg_upd_status = '" + "ACK" + "',account = '" + account + "' where code ='" + traderCode + "' and '" + compCode + "'";
+        String sql = "update trader set intg_upd_status = '" + "ACK" + "',account = '" + account + "' where code ='" + traderCode + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateTrader: %s", traderCode));
@@ -189,11 +189,11 @@ public class AccountRepo {
                 double vouDis = Util1.getDouble(sh.getDiscount());
                 double vouPaid = Util1.getDouble(sh.getPaid());
                 double vouTax = Util1.getDouble(sh.getTaxAmt());
-                double vouTotal = Util1.getDouble(sh.getVouTotal());
                 double taxPercent = Util1.getDouble(sh.getTaxPercent());
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
+                k.setDeptId(sh.getKey().getDeptId());
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -208,7 +208,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(vouTotal);
+                    gl.setCrAmt(vouBal + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -259,7 +259,7 @@ public class AccountRepo {
                     gl.setDescription("Sale Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(srcAcc);
-                    gl.setDrAmt(vouTotal);
+                    gl.setDrAmt(vouPaid + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -322,7 +322,6 @@ public class AccountRepo {
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
                 boolean deleted = ph.getDeleted();
-                double vouTotal = Util1.getDouble(ph.getVouTotal());
                 double vouDis = Util1.getDouble(ph.getDiscount());
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
@@ -330,6 +329,7 @@ public class AccountRepo {
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
+                k.setDeptId(ph.getKey().getDeptId());
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -344,7 +344,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouTotal);
+                    gl.setDrAmt(vouBal + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -394,7 +394,7 @@ public class AccountRepo {
                     gl.setDescription("Purchase Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(srcAcc);
-                    gl.setCrAmt(vouTotal);
+                    gl.setCrAmt(vouPaid);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -432,10 +432,10 @@ public class AccountRepo {
                 double vouBal = Util1.getDouble(ri.getBalance());
                 double vouDis = Util1.getDouble(ri.getDiscount());
                 double vouPaid = Util1.getDouble(ri.getPaid());
-                double vouTotal = Util1.getDouble(ri.getVouTotal());
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
+                k.setDeptId(ri.getKey().getDeptId());
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -450,7 +450,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouTotal);
+                    gl.setDrAmt(vouBal + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -495,7 +495,7 @@ public class AccountRepo {
                     gl.setDescription("Return In Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
-                    gl.setCrAmt(vouPaid);
+                    gl.setCrAmt(vouPaid + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -514,7 +514,6 @@ public class AccountRepo {
 
     public void sendReturnOut(RetOutHis ro) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
-
             String tranSource = "RETURN_OUT";
             AccSetting setting = hmAccSetting.get(tranSource);
             if (ro != null) {
@@ -533,10 +532,10 @@ public class AccountRepo {
                 double vouBal = Util1.getDouble(ro.getBalance());
                 double vouDis = Util1.getDouble(ro.getDiscount());
                 double vouPaid = Util1.getDouble(ro.getPaid());
-                double vouTotal = Util1.getDouble(ro.getVouTotal());
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
+                k.setDeptId(ro.getKey().getDeptId());
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -551,7 +550,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(vouTotal);
+                    gl.setCrAmt(vouBal + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -596,7 +595,7 @@ public class AccountRepo {
                     gl.setDescription("Return Out Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
-                    gl.setDrAmt(vouPaid);
+                    gl.setDrAmt(vouPaid + vouDis);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);

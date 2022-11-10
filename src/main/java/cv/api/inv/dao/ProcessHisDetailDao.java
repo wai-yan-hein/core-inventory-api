@@ -10,7 +10,7 @@ public interface ProcessHisDetailDao {
 
     ProcessHisDetail findById(ProcessHisDetailKey key);
 
-    List<ProcessHisDetail> search(String vouNo, String stockCode, String compCode, Integer deptId);
+    List<ProcessHisDetail> search(String vouNo, String compCode, Integer deptId);
 
     void delete(ProcessHisDetailKey key);
 }

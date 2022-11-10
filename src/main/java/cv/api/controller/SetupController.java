@@ -375,8 +375,8 @@ public class SetupController {
         return ResponseEntity.ok(str.isEmpty() ? null : str);
     }
 
-    @GetMapping(path = "/find-stock")
-    public ResponseEntity<Stock> findStock(@RequestParam StockKey key) {
+    @PostMapping(path = "/find-stock")
+    public ResponseEntity<Stock> findStock(@RequestBody StockKey key) {
         Stock b = stockService.findById(key);
         return ResponseEntity.ok(b);
     }
@@ -513,6 +513,11 @@ public class SetupController {
         return ResponseEntity.ok(listB);
     }
 
+    @GetMapping(path = "/get-relation")
+    public ResponseEntity<List<?>> getRelation(@RequestParam String relCode, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(unitRelationService.getRelation(relCode, compCode, deptId));
+    }
+
     @GetMapping(path = "/get-unit-relation-detail")
     public ResponseEntity<List<UnitRelationDetail>> getUnitRelation(@RequestParam String code,
                                                                     @RequestParam String compCode,
@@ -549,6 +554,4 @@ public class SetupController {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
         return ResponseEntity.ok(g);
     }
-
-
-}
+    }

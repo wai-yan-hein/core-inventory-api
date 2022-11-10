@@ -1,9 +1,6 @@
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.RelationKey;
-import cv.api.inv.entity.UnitRelation;
-import cv.api.inv.entity.UnitRelationDetail;
-import cv.api.inv.entity.UnitRelationDetailKey;
+import cv.api.inv.entity.*;
 
 import java.util.List;
 
@@ -12,6 +9,8 @@ public interface UnitRelationDao {
     UnitRelation findByKey(RelationKey key);
 
     List<UnitRelation> findRelation( String compCode, Integer deptId);
+    List<StockUnit> getRelation(String relCode, String compCode, Integer deptId);
+
 
     UnitRelationDetail save(UnitRelationDetail unit);
 
