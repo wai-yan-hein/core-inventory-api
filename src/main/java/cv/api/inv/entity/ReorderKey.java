@@ -15,4 +15,6 @@ public class ReorderKey implements Serializable {
     private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "loc_code")
+    private String locCode;
 }

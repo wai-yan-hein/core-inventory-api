@@ -12,7 +12,6 @@ import cv.api.common.StockValue;
 import cv.api.inv.entity.ReorderLevel;
 import cv.api.inv.entity.VStockBalance;
 import cv.api.inv.view.*;
-import io.swagger.models.auth.In;
 
 import java.util.List;
 
@@ -70,13 +69,13 @@ public interface ReportService {
 
     List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
                                         boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                        String compCode, Integer deptId, Integer macId) throws Exception;
+                                        String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) throws Exception;
-
-    void generateReorder(String compCode, Integer deptId) throws Exception;
+    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode,
+                                       boolean calSale, boolean calPur, boolean calRI, boolean calRo,
+                                       String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<General> getStockListByGroup(String typeCode, String compCode, Integer macId) throws Exception;
 

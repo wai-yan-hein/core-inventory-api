@@ -44,7 +44,7 @@ public class ReportScheduler {
             if (!Objects.isNull(compCode)) {
                 List<VStockBalance> balanceList = reportService.getStockBalance(
                         "-", "-", "-",
-                        "-", true, true, true, true, "-", 1, 0);
+                        "-", true, true, true, true, "-", "-", 1, 0);
                 for (VStockBalance b : balanceList) {
                     StockBalanceKey key = new StockBalanceKey();
                     key.setStockCode(b.getStockCode());

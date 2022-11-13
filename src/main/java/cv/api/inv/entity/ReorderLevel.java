@@ -44,4 +44,9 @@ public class ReorderLevel implements java.io.Serializable {
     private String catName;
     @Transient
     private String relName;
+    @Transient
+    private String locName;
+    @Transient
+    private Integer position;
+
 }

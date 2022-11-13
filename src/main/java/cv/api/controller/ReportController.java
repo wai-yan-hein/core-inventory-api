@@ -200,7 +200,7 @@ public class ReportController {
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockInOutPriceCalender" -> {
-                        List<VStockIO> values = reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                        List<VStockIO> values = reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "SalePriceCalender" -> {
@@ -325,7 +325,7 @@ public class ReportController {
                                                                @RequestParam String compCode,
                                                                @RequestParam Integer deptId,
                                                                @RequestParam Integer macId) throws Exception {
-        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId));
+        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-",compCode, deptId, macId));
     }
 
     @PostMapping(path = "/get-reorder-level")
@@ -337,8 +337,12 @@ public class ReportController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         Integer deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
-        reportService.generateReorder(compCode, deptId);
-        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+        boolean calSale = filter.isCalSale();
+        boolean calPur = filter.isCalPur();
+        boolean calRI = filter.isCalRI();
+        boolean calRO = filter.isCalRO();
+        String locCode = Util1.isNull(filter.getLocCode(),"-");
+        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO,locCode, compCode, deptId, macId);
         return ResponseEntity.ok(reorderLevels);
     }
 

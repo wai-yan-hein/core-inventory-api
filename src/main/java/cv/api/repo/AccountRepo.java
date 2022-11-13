@@ -208,7 +208,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(vouBal + vouDis);
+                    gl.setCrAmt(vouBal + vouDis - vouTax);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -325,6 +325,7 @@ public class AccountRepo {
                 double vouDis = Util1.getDouble(ph.getDiscount());
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
+                double vouTax = Util1.getDouble(ph.getTaxAmt());
                 String vouNo = ph.getKey().getVouNo();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
@@ -344,7 +345,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouBal + vouDis);
+                    gl.setDrAmt(vouBal + vouDis-vouTax);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
