@@ -73,7 +73,14 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     @Override
     public List<Stock> getStock(String str, String compCode, Integer deptId) {
         List<Stock> listStock = new ArrayList<>();
-        String sql = "select s.*,rel.rel_name,st.stock_type_name,cat.cat_name,b.brand_name\n" + "from stock s\n" + "join unit_relation rel on s.rel_code= rel.rel_code\n" + "left join stock_type st on s.stock_type_code = st.stock_type_code\n" + "left join category cat  on s.category_code = cat.cat_code\n" + "left join stock_brand b on s.brand_code  = b.brand_code\n" + "where s.comp_code ='" + compCode + "'\n" + "and s.active =1\n" + "and s.dept_id =" + deptId + "\n" + "and (s.user_code like '" + str + "%' or s.stock_name like '%" + str + "%')\n" + "limit 20";
+        String sql = "select s.*,rel.rel_name,st.stock_type_name,cat.cat_name,b.brand_name\n" +
+                "from stock s\n" + "join unit_relation rel on s.rel_code= rel.rel_code\n" +
+                "left join stock_type st on s.stock_type_code = st.stock_type_code\n" +
+                "left join category cat  on s.category_code = cat.cat_code\n" +
+                "left join stock_brand b on s.brand_code  = b.brand_code\n" +
+                "where s.comp_code ='" + compCode + "'\n" +
+                "and s.active =1\n" + "and s.dept_id =" + deptId + "\n" +
+                "and (s.user_code like '" + str + "%' or s.stock_name like '%" + str + "%')\n" + "limit 20";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {
             try {

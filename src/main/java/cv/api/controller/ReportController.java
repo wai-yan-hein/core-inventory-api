@@ -341,8 +341,8 @@ public class ReportController {
         boolean calPur = filter.isCalPur();
         boolean calRI = filter.isCalRI();
         boolean calRO = filter.isCalRO();
-        String locCode = Util1.isNull(filter.getLocCode(),"-");
-        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO,locCode, compCode, deptId, macId);
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
+        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
         return ResponseEntity.ok(reorderLevels);
     }
 

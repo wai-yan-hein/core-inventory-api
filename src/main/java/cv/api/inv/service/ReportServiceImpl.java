@@ -940,10 +940,11 @@ public class ReportServiceImpl implements ReportService {
                                               String brandCode, String stockCode,
                                               boolean calSale, boolean calPur, boolean calRI, boolean calRo,
                                               String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+
         calStockBalanceByLocation(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRo, locCode, compCode, deptId, macId);
-        String sql1 = "select *,if(small_min_qty<small_bal_qty ,1,if(small_min_qty>small_bal_qty,2,3)) position\n\n" +
+        String sql1 = "select *,if(small_bal_qty<small_min_qty,1,if(small_bal_qty>small_min_qty,2,if(small_bal_qty<small_max_qty,3,if(small_bal_qty> small_max_qty,4,5)))) position\n\n\n" +
                 "from (\n" +
-                "select a.*,rel.rel_name,bal_qty*rel.smallest_qty small_bal_qty,min_qty*rel1.smallest_qty small_min_qty,max_qty*rel2.smallest_qty small_max_qty\n" +
+                "select a.*,rel.rel_name,bal_qty*rel.smallest_qty small_bal_qty,min_qty*ifnull(rel1.smallest_qty,0) small_min_qty,max_qty*ifnull(rel2.smallest_qty,0) small_max_qty\n" +
                 "from (\n" +
                 "select tmp.stock_code,tmp.loc_code,tmp.smallest_qty bal_qty, tmp.unit bal_unit,ifnull(min_qty,0) min_qty,min_unit,\n" +
                 "ifnull(max_qty,0) max_qty,max_unit,tmp.comp_code,tmp.dept_id,s.rel_code,s.user_code,s.stock_name,l.loc_name\n" +
