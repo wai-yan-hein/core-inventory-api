@@ -771,7 +771,8 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand (loc_code_from = '" + locCode + "' or '-' ='" + locCode + "')\n"
                 + "\t\tand calculate =1\n"
                 + "\t\tgroup by stock_code, unit , loc_code_from\n"
-                + "\t\t\tunion all\n" + "\t\tselect stock_code,sum(qty),unit,loc_code_to\n"
+                + "\t\t\tunion all\n" +
+                "\t\tselect stock_code,sum(qty),unit,loc_code_to\n"
                 + "\t\tfrom v_transfer \n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"

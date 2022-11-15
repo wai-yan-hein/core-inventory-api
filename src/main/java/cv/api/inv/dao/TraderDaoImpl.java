@@ -7,13 +7,17 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.Trader;
 import cv.api.inv.entity.TraderKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author WSwe
  */
+@Slf4j
 @Repository
 public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements TraderDao {
     @Override
@@ -23,21 +27,37 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode='" + compCode + "' and o.key.deptId =" + deptId + "\n" +
-                "and o.active =1\n";
+        String filter = "where active =1\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and dept_id =" + deptId + "\n" +
+                "and (user_code like '" + str + "%' or trader_name like '" + str + "%') \n";
         if (!type.equals("-")) {
-            hsql += "and (o.multi =1 or o.type ='" + type + "')\n";
+            filter += "and (multi =1 or type ='" + type + "')";
         }
-        String filter = "and o.userCode like '" + str + "%'\n";
-        int limit = 5;
-        List<Trader> list = findHSQL(hsql + filter, limit);
-        if (list.isEmpty()) {
-            filter = "and o.traderName like '" + str + "%'\n";
-            list = findHSQL(hsql + filter, limit);
-            if (list.isEmpty()) {
-                filter = "and o.traderName like '%" + str + "%'\n";
-                list = findHSQL(hsql + filter, limit);
+        String sql = "select code,user_code,trader_name,price_type,type\n" +
+                "from trader\n" +
+                "" + filter + "\n" +
+                "limit 20\n";
+        ResultSet rs = getResultSet(sql);
+        List<Trader> list = new ArrayList<>();
+        try {
+            if (rs != null) {
+                while (rs.next()) {
+                    Trader t = new Trader();
+                    TraderKey key = new TraderKey();
+                    key.setCompCode(compCode);
+                    key.setCode(rs.getString("code"));
+                    key.setDeptId(deptId);
+                    t.setKey(key);
+                    t.setUserCode(rs.getString("user_code"));
+                    t.setTraderName(rs.getString("trader_name"));
+                    t.setPriceType(rs.getString("price_type"));
+                    t.setType(rs.getString("type"));
+                    list.add(t);
+                }
             }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
         return list;
     }
