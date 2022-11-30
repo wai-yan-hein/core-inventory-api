@@ -11,6 +11,7 @@ import cv.api.common.ReportFilter;
 import cv.api.common.StockValue;
 import cv.api.inv.entity.ReorderLevel;
 import cv.api.inv.entity.VStockBalance;
+import cv.api.inv.entity.WeightLossHis;
 import cv.api.inv.view.*;
 
 import java.util.List;
@@ -55,9 +56,9 @@ public interface ReportService {
 
     List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    General getPurchaseAvgPrice(String stockCode) throws Exception;
-
     General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
+
+    General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode, Integer deptId);
 
     General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
 
@@ -127,11 +128,13 @@ public interface ReportService {
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
                                        String userCode, String stockCode, String locCodeFrom, String locCodeTo, String compCode, Integer deptId, String deleted) throws Exception;
 
+    List<WeightLossHis> getWeightLossHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String stockCode, String locCode, String compCode, Integer deptId, String deleted);
+
     List<VSale> getSalePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<VPurchase> getPurchasePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    Float getSmallestQty(String stockCode, String unit);
+    Float getSmallestQty(String stockCode, String unit, String compCode, Integer deptId);
 
     List<String> isStockExist(String stockCode, String compCode);
 

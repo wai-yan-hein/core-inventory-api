@@ -36,7 +36,10 @@ public class ProcessController {
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
-
+    @PostMapping(path = "/find-process")
+    public ResponseEntity<?> findProcess(@RequestBody ProcessHisKey p) {
+        return ResponseEntity.ok(processHisService.findById(p));
+    }
     @PostMapping(path = "/restore-process")
     public ResponseEntity<?> restoreProcess(@RequestBody ProcessHisKey p) {
         processHisService.restore(p);

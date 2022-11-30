@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -14,6 +15,8 @@ public class ProcessHis {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
+    @Column(name = "loc_code")
+    private String locCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "end_date")
     private Date endDate;
@@ -25,14 +28,10 @@ public class ProcessHis {
     private String processNo;
     @Column(name = "qty")
     private Float qty;
-    @Column(name = "avg_qty")
-    private Float avgQty;
     @Column(name = "unit")
     private String unit;
     @Column(name = "price")
     private Float price;
-    @Column(name = "avg_price")
-    private Float avgPrice;
     @Column(name = "finished")
     private boolean finished;
     @Column(name = "deleted")
@@ -43,6 +42,8 @@ public class ProcessHis {
     private String updatedBy;
     @Column(name = "mac_id")
     private Integer macId;
+    @Transient
+    private List<ProcessHisDetail> listDetail;
     @Transient
     private String stockUsrCode;
     @Transient

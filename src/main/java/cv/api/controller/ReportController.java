@@ -267,16 +267,7 @@ public class ReportController {
         return status;
     }
 
-    @GetMapping(path = "/get-purchase-price")
-    public ResponseEntity<General> getPurchaseAvgPrice(@RequestParam String stockCode, HttpServletRequest request) {
-        General g = new General();
-        try {
-            g = reportService.getPurchaseAvgPrice(stockCode);
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-        }
-        return ResponseEntity.ok(g);
-    }
+
 
     @GetMapping(path = "/get-purchase-recent-price")
     public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode,
@@ -285,6 +276,15 @@ public class ReportController {
                                                           @RequestParam String compCode,
                                                           @RequestParam Integer deptId) {
         return ResponseEntity.ok(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    }
+
+    @GetMapping(path = "/get-weight-loss-recent-price")
+    public ResponseEntity<General> getWeightLossRecentPrice(@RequestParam String stockCode,
+                                                            @RequestParam String vouDate,
+                                                            @RequestParam String unit,
+                                                            @RequestParam String compCode,
+                                                            @RequestParam Integer deptId) {
+        return ResponseEntity.ok(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-production-recent-price")
@@ -347,7 +347,7 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-smallest_qty")
-    public ResponseEntity<Float> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit) {
-        return ResponseEntity.ok(reportService.getSmallestQty(stockCode, unit));
+    public ResponseEntity<Float> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
     }
 }

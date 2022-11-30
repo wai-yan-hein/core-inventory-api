@@ -14,8 +14,8 @@ public class PriceOptionDaoImpl extends AbstractDao<String, PriceOption> impleme
     }
 
     @Override
-    public List<PriceOption> getPriceOption(String compCode) {
-        String hsql = "select o from PriceOption o where o.compCode = '" + compCode + "' order by o.uniqueId";
+    public List<PriceOption> getPriceOption(String option, String compCode, Integer deptId) {
+        String hsql = "select o from PriceOption o where (o.tranOption ='" + option + "' or '-' = '" + option + "') and o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + " order by o.uniqueId";
         return findHSQL(hsql);
     }
 }

@@ -20,7 +20,7 @@ public class PriceOptionServiceImpl implements PriceOptionService {
     }
 
     @Override
-    public List<PriceOption> getPriceOption(String compCode) {
-        return dao.getPriceOption(compCode);
+    public List<PriceOption> getPriceOption(String option, String compCode, Integer deptId) {
+        return dao.getPriceOption(option, compCode, deptId);
     }
 }

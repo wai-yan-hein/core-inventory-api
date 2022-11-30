@@ -483,16 +483,6 @@ public class ReportServiceImpl implements ReportService {
         return purchaseList;
     }
 
-    @Override
-    public General getPurchaseAvgPrice(String stockCode) throws Exception {
-        General general = new General();
-        String sql = "select avg_pur_price from v_avg_pur_price where stock_code = '" + stockCode + "'";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (rs.next()) {
-            general.setAmount(rs.getFloat("avg_pur_price"));
-        }
-        return general;
-    }
 
     @Override
     public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
@@ -500,7 +490,7 @@ public class ReportServiceImpl implements ReportService {
         general.setAmount(0.0f);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n"
                 + "from (\n"
-                + "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code\n"
+                + "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n"
                 + "from v_purchase pd\n"
                 + "join v_relation rel on pd.rel_code = rel.rel_code\n"
                 + "and pd.pur_unit =  rel.unit\n"
@@ -514,7 +504,10 @@ public class ReportServiceImpl implements ReportService {
                 + "and pd.stock_code = '" + stockCode + "'\n" + "group by ph.vou_no\n"
                 + "order by ph.vou_date desc\n" + "limit 1\n" + "))a\n"
                 + "join v_relation rel\n"
-                + "on a.rel_code =rel.rel_code\n" + "and rel.unit = '" + unit + "'";
+                + "on a.rel_code =rel.rel_code\n"
+                + "and a.comp_code = rel.comp_code\n"
+                + "and a.dept_id = rel.dept_id\n"
+                + "and rel.unit = '" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -522,6 +515,48 @@ public class ReportServiceImpl implements ReportService {
             }
         } catch (Exception e) {
             log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
+        }
+        return general;
+    }
+
+    @Override
+    public General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode, Integer deptId) {
+        General general = new General();
+        general.setAmount(0.0f);
+        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
+                "from (\n" +
+                "select v.loss_price/rel.smallest_qty smallest_price,v.rel_code,v.comp_code,v.dept_id\n" +
+                "from v_weight_loss v\n" +
+                "join v_relation rel\n" +
+                "on v.rel_code = rel.rel_code\n" +
+                "and v.loss_unit = rel.unit\n" +
+                "and v.comp_code = rel.comp_code\n" +
+                "and v.dept_id = rel.dept_id\n" +
+                "and v.stock_code ='" + stockCode + "'\n" +
+                "where vou_no =(\n" +
+                "select ph.vou_no\n" +
+                "from weight_loss_his ph, weight_loss_his_detail pd\n" +
+                "where date(ph.vou_date)<= '" + vouDate + "' \n" +
+                "and deleted = 0\n" +
+                "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
+                "and ph.dept_id = 1\n" +
+                "and pd.stock_code = '" + stockCode + "'\n" +
+                "group by ph.vou_no\n" +
+                "order by ph.vou_date desc\n" +
+                "limit 1)\n" +
+                ")a\n" +
+                "join v_relation rel\n" +
+                "on a.rel_code = rel.rel_code\n" +
+                "and a.comp_code = rel.comp_code\n" +
+                "and a.dept_id = rel.dept_id\n" +
+                "and rel.unit ='" + unit + "'";
+        try {
+            ResultSet rs = reportDao.executeSql(sql);
+            if (rs.next()) {
+                general.setAmount(rs.getFloat("price"));
+            }
+        } catch (Exception e) {
+            log.error(String.format("getWeightLossRecentPrice: %s", e.getMessage()));
         }
         return general;
     }
@@ -570,7 +605,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
         General g = new General();
-        String sql = "select stock_code,format(avg(avg_price)*rel.smallest_qty,2) price\n" +
+        String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" +
                 "from (\n" +
                 "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price,pur.rel_code,pur.comp_code,pur.dept_id\n" +
                 "from v_purchase pur\n" +
@@ -580,7 +615,7 @@ public class ReportServiceImpl implements ReportService {
                 "where deleted = 0 \n" +
                 "and pur.comp_code ='" + compCode + "'\n" +
                 "and pur.stock_code ='" + stockCode + "'\n" +
-                "and date(pur.vou_date) <= " + purDate + "'\n" +
+                "and date(pur.vou_date) <= '" + purDate + "'\n" +
                 "group by pur.stock_code\n" +
                 "\tunion all\n" +
                 "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price,op.rel_code,op.comp_code,op.dept_id\n" +
@@ -618,7 +653,7 @@ public class ReportServiceImpl implements ReportService {
         General general = new General();
         general.setAmount(0.0f);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
-                "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code\n" +
+                "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
                 "from v_sale pd\n" +
                 "join v_relation rel on pd.rel_code = rel.rel_code\n" + "and pd.sale_unit =  rel.unit\n" +
                 "and pd.stock_code = '" + stockCode + "'\n" +
@@ -627,7 +662,10 @@ public class ReportServiceImpl implements ReportService {
                 "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
                 "and pd.stock_code = '" + stockCode + "'\n" +
                 "order by ph.vou_date desc limit 1" + "))a\n" +
-                "join v_relation rel\n" + "on a.rel_code =rel.rel_code\n" +
+                "join v_relation rel\n" +
+                "on a.rel_code =rel.rel_code\n" +
+                "and a.comp_code = rel.comp_code\n" +
+                "and a.dept_id = rel.dept_id\n" +
                 "and rel.unit = '" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
@@ -664,9 +702,9 @@ public class ReportServiceImpl implements ReportService {
         String sql = "insert into tmp_stock_balance(stock_code, qty, unit, loc_code,smallest_qty, mac_id,comp_code,dept_id)\n"
                 + "select stock_code,qty,unit,loc_code,sum(smallest_qty) smallest_qty," + macId + ",'" + compCode + "'," + deptId + "\n"
                 + "from (\n"
-                + "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty\n"
+                + "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty,a.comp_code,a.dept_id\n"
                 + "\tfrom(\n"
-                + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code\n"
+                + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom v_opening\n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -679,7 +717,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand calculate =1\n"
                 + "\t\tgroup by stock_code, unit , loc_code \n"
                 + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code\n"
+                + "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom v_sale \n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -692,7 +730,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand (calculate =1 and 0 = " + calSale + ")\n"
                 + "\t\tgroup by stock_code ,sale_unit ,loc_code \n"
                 + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) as qty,pur_unit,loc_code\n"
+                + "\t\tselect stock_code,sum(qty) as qty,pur_unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom\n"
                 + "\t\tv_purchase \n" + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -705,7 +743,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand (calculate =1 and 0 = " + calPur + ")\n"
                 + "\t\tgroup by stock_code , pur_unit , loc_code \n"
                 + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code\n"
+                + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom v_return_in\n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -718,7 +756,8 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand (calculate =1 and 0 = " + calRI + ")\n"
                 + "\t\tgroup by stock_code,unit ,loc_code \n"
                 + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) * - 1 as qty,unit,loc_code\n" + "\t\tfrom\n" + "\t\tv_return_out\n"
+                + "\t\tselect stock_code,sum(qty) * - 1 as qty,unit,loc_code,comp_code,dept_id\n"
+                + "\t\tfrom\n" + "\t\tv_return_out\n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
                 + "\t\tand dept_id = " + deptId + "\n"
@@ -729,7 +768,8 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
                 + "\t\tand (calculate =1 and 0 = " + calRO + ")\n"
                 + "\t\tgroup by stock_code  , unit , loc_code \n"
-                + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(in_qty),in_unit,loc_code\n"
+                + "\t\t\tunion all \n"
+                + "\t\tselect stock_code,sum(in_qty),in_unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom\n"
                 + "\t\tv_stock_io\n"
                 + "\t\twhere in_qty is not null\n"
@@ -743,7 +783,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
                 + "\t\tand calculate =1\n" + "\t\tgroup by stock_code ,in_unit ,loc_code \n"
                 + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(out_qty) * - 1,out_unit,loc_code\n"
+                + "\t\tselect stock_code,sum(out_qty) * - 1,out_unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom\n"
                 + "\t\tv_stock_io\n"
                 + "\t\twhere out_qty is not null\n"
@@ -759,7 +799,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand calculate =1\n"
                 + "\t\tgroup by stock_code , out_unit , loc_code\n"
                 + "\t\t\tunion all\n"
-                + "\t\tselect stock_code,sum(qty) * - 1,unit,loc_code_from\n"
+                + "\t\tselect stock_code,sum(qty) * - 1,unit,loc_code_from,comp_code,dept_id\n"
                 + "\t\tfrom v_transfer \n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -772,7 +812,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand calculate =1\n"
                 + "\t\tgroup by stock_code, unit , loc_code_from\n"
                 + "\t\t\tunion all\n" +
-                "\t\tselect stock_code,sum(qty),unit,loc_code_to\n"
+                "\t\tselect stock_code,sum(qty),unit,loc_code_to,comp_code,dept_id\n"
                 + "\t\tfrom v_transfer \n"
                 + "\t\twhere deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -785,7 +825,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand calculate =1\n"
                 + "\t\tgroup by stock_code , unit , loc_code_to\n"
                 + "\t\t\tunion all\n"
-                + "\t\tselect stock_code,sum(if(avg_qty=0,qty,avg_qty)),unit,loc_code\n"
+                + "\t\tselect stock_code,sum(qty),unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom v_process_his\n"
                 + "\t\twhere  deleted = 0\n"
                 + "\t\tand finished =1\n"
@@ -799,7 +839,7 @@ public class ReportServiceImpl implements ReportService {
                 + "\t\tand calculate =1\n"
                 + "\t\tgroup by stock_code , unit , loc_code\n"
                 + "\t\t\tunion all\n"
-                + "\t\tselect stock_code,sum(qty)*-1,unit,loc_code\n"
+                + "\t\tselect stock_code,sum(qty)*-1,unit,loc_code,comp_code,dept_id\n"
                 + "\t\tfrom v_process_his_detail\n"
                 + "\t\twhere  deleted = 0\n"
                 + "\t\tand comp_code = '" + compCode + "'\n"
@@ -814,8 +854,12 @@ public class ReportServiceImpl implements ReportService {
                 + ") a\n"
                 + "join stock s\n"
                 + "on a.stock_code = s.stock_code\n"
+                + "and a.comp_code = s.comp_code\n"
+                + "and a.dept_id = s.dept_id\n"
                 + "join v_relation rel on s.rel_code = rel.rel_code \n"
                 + "and a.unit = rel.unit\n"
+                + "and a.comp_code = rel.comp_code\n"
+                + "and a.dept_id = rel.dept_id\n"
                 + "group by a.stock_code,a.unit,a.loc_code) b\n"
                 + "group by b.stock_code,b.loc_code";
         try {
@@ -1716,6 +1760,47 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<WeightLossHis> getWeightLossHistory(String fromDate, String toDate, String refNo, String vouNo,
+                                                    String remark, String stockCode,
+                                                    String locCode, String compCode,
+                                                    Integer deptId, String deleted) {
+        List<WeightLossHis> list = new ArrayList<>();
+        String sql = "select vou_no,date(vou_date) vou_date,remark,ref_no,created_by,deleted\n" +
+                "from v_weight_loss\n" +
+                "where deleted =" + deleted + "\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and dept_id =" + deptId + "\n" +
+                "and (vou_no ='" + vouNo + "' or '-' ='" + vouNo + "')\n" +
+                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
+                "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
+                "and (remark like '" + remark + "%' or '-%'='" + remark + "%')\n" +
+                "and (ref_no like '" + refNo + "%' or '-%'='" + refNo + "%')\n" +
+                "group by vou_no\n";
+        try {
+            ResultSet rs = reportDao.executeSql(sql);
+            while (rs.next()) {
+                WeightLossHis his = new WeightLossHis();
+                WeightLossHisKey key = new WeightLossHisKey();
+                key.setCompCode(compCode);
+                key.setDeptId(deptId);
+                key.setVouNo(rs.getString("vou_no"));
+                his.setKey(key);
+                his.setVouDate(rs.getDate("vou_date"));
+                his.setRemark(rs.getString("remark"));
+                his.setRefNo(rs.getString("ref_no"));
+                his.setCreatedBy(rs.getString("created_by"));
+                his.setDeleted(rs.getBoolean("deleted"));
+                list.add(his);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
     public List<VSale> getSalePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
         String sql = "select s.s_user_code,s.vou_date,s.vou_no,s.stock_code,\n" + "s.stock_name,s.sale_unit,s.sale_price,s.remark,t.trader_name,s.cur_code \n" + "from v_sale s join trader t\n" + "on s.trader_code = t.code\n" + "where s.comp_code = '" + compCode + "'\n" + "and s.deleted = 0\n" + "and date(s.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (s.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (s.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (s.cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (s.brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "group by s.stock_code,s.sale_price,s.sale_unit\n" + "order by s.s_user_code,s.vou_date,s.sale_unit\n";
         ResultSet rs = reportDao.executeSql(sql);
@@ -1762,9 +1847,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Float getSmallestQty(String stockCode, String unit) {
+    public Float getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
         float qty = 1.0f;
-        String sql = "select ud.smallest_qty\n" + "from stock s join unit_relation_detail ud\n" + "on s.rel_code = ud.rel_code\n" + "where s.stock_code ='" + stockCode + "'\n" + "and ud.unit ='" + unit + "'";
+        String sql = "select ud.smallest_qty\n" +
+                "from stock s join unit_relation_detail ud\n" +
+                "on s.rel_code = ud.rel_code\n" +
+                "and s.comp_code =ud.comp_code\n" +
+                "and s.dept_id =ud.dept_id\n" +
+                "where s.stock_code ='" + stockCode + "'\n" +
+                "and s.comp_code ='" + compCode + "'\n" +
+                "and s.dept_id =" + deptId + "\n" +
+                "and ud.unit ='" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             while (rs.next()) {
@@ -1900,7 +1993,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode,
                                                  String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
         List<VStockIO> list = new ArrayList<>();
-        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(end_date) end_date,if(qty=0,avg_qty,qty) qty,unit,if(avg_price=0,price,avg_price) price,remark,process_no,vs.description,l.loc_name\n" +
+        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(end_date) end_date, qty,unit,price,remark,process_no,vs.description,l.loc_name\n" +
                 "from v_process_his v\n" +
                 "join vou_status vs\n" +
                 "on v.pt_code =vs.code\n" +
@@ -1920,7 +2013,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" +
                 "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" +
                 "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "order by vs.description,v.end_date,v.unique_id\n";
+                "order by vs.description,v.end_date\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             //stock_code, stock_name, end_date, qty, unit, price, remark, process_no, description
@@ -1953,7 +2046,7 @@ public class ReportServiceImpl implements ReportService {
         List<VStockIO> list = new ArrayList<>();
         String sql = "select a.*,l.loc_name,vs.description\n" +
                 "from (\n" +
-                "select ifnull(user_code,stock_code) stock_code,stock_name,sum(if(qty=0,avg_qty,qty)) qty,unit,avg(if(avg_price=0,price,avg_price)) avg_price,loc_code,pt_code,comp_code,dept_id\n" +
+                "select ifnull(user_code,stock_code) stock_code,stock_name,sum(qty) qty,unit,avg(price) avg_price,loc_code,pt_code,comp_code,dept_id\n" +
                 "from v_process_his \n" +
                 "where comp_code ='"+compCode+"'\n" +
                 "and dept_id =1\n" +
@@ -2340,7 +2433,7 @@ public class ReportServiceImpl implements ReportService {
         String pIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from (\n" +
-                "select date(end_date) end_date,vou_no,pt_code,stock_code,sum(if(avg_qty=0,qty,avg_qty)) qty,loc_code, unit,rel_code,comp_code,dept_id\n" +
+                "select date(end_date) end_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" +
                 "from v_process_his\n" +
                 "where date(end_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = 0 \n" +
@@ -2542,7 +2635,7 @@ public class ReportServiceImpl implements ReportService {
                 + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
                 + "group by stock_code,unit\n"
                 + "\tunion all\n"
-                + "select stock_code,sum(if(avg_qty=0,qty,avg_qty)) qty,loc_code, unit\n"
+                + "select stock_code,sum(qty) qty,loc_code, unit\n"
                 + "from v_process_his\n"
                 + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
                 + "and deleted =0\n"

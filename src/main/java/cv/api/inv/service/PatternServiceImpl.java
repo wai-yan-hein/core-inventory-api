@@ -2,6 +2,7 @@ package cv.api.inv.service;
 
 import cv.api.inv.dao.PatternDao;
 import cv.api.inv.entity.Pattern;
+import cv.api.inv.entity.PatternKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +17,8 @@ public class PatternServiceImpl implements PatternService {
 
 
     @Override
-    public Pattern findByCode(String code) {
-        return dao.findByCode(code);
+    public Pattern findByCode(PatternKey key) {
+        return dao.findByCode(key);
     }
 
     @Override

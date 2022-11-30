@@ -358,7 +358,7 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (vouDis > 0) {
+               /* if (vouDis > 0) {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
@@ -384,7 +384,7 @@ public class AccountRepo {
                     gl.setDeleted(deleted);
                     gl.setMacId(macId);
                     listGl.add(gl);
-                }
+                }*/
                 //payment
                 if (vouPaid > 0) {
                     Gl gl = new Gl();
@@ -451,7 +451,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouBal + vouDis);
+                    gl.setDrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -464,28 +464,6 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (vouDis > 0) {
-                    Gl gl = new Gl();
-                    GlKey key = new GlKey();
-                    key.setCompCode(compCode);
-                    gl.setKey(key);
-                    gl.setGlDate(vouDate);
-                    gl.setDescription("Return In Voucher Discount : " + traderName);
-                    gl.setSrcAccCode(disAcc);
-                    gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouDis);
-                    gl.setCurCode(curCode);
-                    gl.setReference(remark);
-                    gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
-                    gl.setCreatedBy(appName);
-                    gl.setTranSource(tranSource);
-                    gl.setRefNo(vouNo);
-                    gl.setDeleted(deleted);
-                    gl.setMacId(macId);
-                    listGl.add(gl);
-                }
                 //payment
                 if (vouPaid > 0) {
                     Gl gl = new Gl();
@@ -496,7 +474,7 @@ public class AccountRepo {
                     gl.setDescription("Return In Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
-                    gl.setCrAmt(vouPaid + vouDis);
+                    gl.setCrAmt(vouPaid);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -551,7 +529,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setCrAmt(vouBal + vouDis);
+                    gl.setCrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -564,28 +542,6 @@ public class AccountRepo {
                     listGl.add(gl);
                 }
                 //discount
-                if (vouDis > 0) {
-                    Gl gl = new Gl();
-                    GlKey key = new GlKey();
-                    key.setCompCode(compCode);
-                    gl.setKey(key);
-                    gl.setGlDate(vouDate);
-                    gl.setDescription("Return Out Voucher Discount : " + traderName);
-                    gl.setSrcAccCode(disAcc);
-                    gl.setAccCode(balAcc);
-                    gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouDis);
-                    gl.setCurCode(curCode);
-                    gl.setReference(remark);
-                    gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
-                    gl.setCreatedBy(appName);
-                    gl.setTranSource(tranSource);
-                    gl.setRefNo(vouNo);
-                    gl.setDeleted(deleted);
-                    gl.setMacId(macId);
-                    listGl.add(gl);
-                }
                 //payment
                 if (vouPaid > 0) {
                     Gl gl = new Gl();
@@ -596,7 +552,7 @@ public class AccountRepo {
                     gl.setDescription("Return Out Voucher Paid : " + traderName);
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(balAcc);
-                    gl.setDrAmt(vouPaid + vouDis);
+                    gl.setDrAmt(vouPaid);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);

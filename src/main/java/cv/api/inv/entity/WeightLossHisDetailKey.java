@@ -6,16 +6,15 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
-@Embeddable
 @Data
-public class ProcessHisKey implements Serializable {
+@Embeddable
+public class WeightLossHisDetailKey implements Serializable {
     @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "stock_code")
-    private String stockCode;
     @Column(name = "comp_code")
     private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
-
+    @Column(name = "unique_id")
+    private Integer uniqueId;
 }

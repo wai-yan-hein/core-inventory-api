@@ -1,45 +1,22 @@
 package cv.api.inv.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
+import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Objects;
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+
+@Data
 @Entity
 @Table(name = "price_option")
-public class PriceOption implements java.io.Serializable {
-    @Id
-    @Column(name = "type")
-    private String priceType;
+public class PriceOption {
+    @EmbeddedId
+    private PriceOptionKey key;
     @Column(name = "desp")
     private String description;
-    @Column(name = "comp_code")
-    private String compCode;
     @Column(name = "unique_id")
     private Integer uniqueId;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        PriceOption that = (PriceOption) o;
-        return priceType != null && Objects.equals(priceType, that.priceType);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+    @Column(name = "tran_option")
+    private String tranOption;
 }

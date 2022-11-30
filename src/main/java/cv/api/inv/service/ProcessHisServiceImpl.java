@@ -2,8 +2,10 @@ package cv.api.inv.service;
 
 import cv.api.common.Util1;
 import cv.api.inv.dao.ProcessHisDao;
+import cv.api.inv.dao.ProcessHisDetailDao;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.entity.ProcessHis;
+import cv.api.inv.entity.ProcessHisDetail;
 import cv.api.inv.entity.ProcessHisKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ public class ProcessHisServiceImpl implements ProcessHisService {
     @Autowired
     private ProcessHisDao dao;
     @Autowired
+    private ProcessHisDetailDao phDao;
+    @Autowired
     private SeqTableDao seqDao;
 
     @Override
@@ -24,6 +28,22 @@ public class ProcessHisServiceImpl implements ProcessHisService {
         ph.setVouDate(Util1.toDateTime(ph.getVouDate()));
         if (Util1.isNullOrEmpty(ph.getKey().getVouNo())) {
             ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getKey().getCompCode()));
+        }
+        List<ProcessHisDetail> list = ph.getListDetail();
+        for (int i = 0; i < list.size(); i++) {
+            ProcessHisDetail cSd = list.get(i);
+            if (cSd.getKey().getStockCode() != null) {
+                if (cSd.getKey().getUniqueId() == null) {
+                    if (i == 0) {
+                        cSd.getKey().setUniqueId(1);
+                    } else {
+                        ProcessHisDetail pSd = list.get(i - 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                    }
+                }
+                cSd.getKey().setVouNo(ph.getKey().getVouNo());
+                phDao.save(cSd);
+            }
         }
         return dao.save(ph);
     }

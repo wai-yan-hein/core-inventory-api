@@ -11,11 +11,11 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class PatternDaoImpl extends AbstractDao<String, Pattern> implements PatternDao {
+public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements PatternDao {
 
     @Override
-    public Pattern findByCode(String code) {
-        return getByKey(code);
+    public Pattern findByCode(PatternKey key) {
+        return getByKey(key);
     }
 
     @Override
@@ -37,10 +37,17 @@ public class PatternDaoImpl extends AbstractDao<String, Pattern> implements Patt
     @Override
     public List<Pattern> search(String stockCode, String compCode, Integer deptId) {
         List<Pattern> listP = new ArrayList<>();
-        String sql = "select p.*,s.user_code,s.stock_name,l.loc_name\n" +
+        String sql = "select p.*,s.user_code,s.stock_name,l.loc_name,po.desp,p.price_type\n" +
                 "from pattern p join stock s\n" +
                 "on p.stock_code = s.stock_code\n" +
+                "and p.comp_code = s.comp_code\n" +
+                "and p.dept_id = s.dept_id\n" +
                 "join location l on p.loc_code = l.loc_code\n" +
+                "and p.comp_code = s.comp_code\n" +
+                "and p.dept_id = s.dept_id\n" +
+                "left join price_option po on p.price_type = po.type\n" +
+                "and p.comp_code = po.comp_code\n" +
+                "and p.dept_id = po.dept_id\n" +
                 "where p.f_stock_code = '" + stockCode + "'\n" +
                 "and p.dept_id =" + deptId + "\n" +
                 "and p.comp_code ='" + compCode + "'\n" +
@@ -64,6 +71,8 @@ public class PatternDaoImpl extends AbstractDao<String, Pattern> implements Patt
                     p.setQty(rs.getFloat("qty"));
                     p.setPrice(rs.getFloat("price"));
                     p.setUnitCode(rs.getString("unit"));
+                    p.setPriceTypeCode(rs.getString("price_type"));
+                    p.setPriceTypeName(rs.getString("desp"));
                     listP.add(p);
                 }
             } catch (Exception e) {

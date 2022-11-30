@@ -7,5 +7,5 @@ import java.util.List;
 public interface PriceOptionService {
     PriceOption save(PriceOption p);
 
-    List<PriceOption> getPriceOption(String compCode);
+    List<PriceOption> getPriceOption(String option,String compCode,Integer deptId);
 }

@@ -1,11 +1,12 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.Pattern;
+import cv.api.inv.entity.PatternKey;
 
 import java.util.List;
 
 public interface PatternService {
-    Pattern findByCode(String code);
+    Pattern findByCode(PatternKey key);
 
     Pattern save(Pattern pattern);
     List<Pattern> search(String stockCode,String compCode,Integer deptId);

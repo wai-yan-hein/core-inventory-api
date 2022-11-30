@@ -473,6 +473,11 @@ public class SetupController {
         return ResponseEntity.ok(ro);
     }
 
+    @PostMapping(path = "/find-pattern")
+    public ResponseEntity<?> findPattern(@RequestBody PatternKey p) {
+        return ResponseEntity.ok(patternService.findByCode(p));
+    }
+
     @GetMapping(path = "/get-pattern")
     public ResponseEntity<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(patternService.search(stockCode, compCode, deptId));
@@ -484,27 +489,15 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-price-option")
-    public ResponseEntity<ReturnObject> savePriceOption(@RequestBody PriceOption po) {
-        try {
-            if (Util1.isNullOrEmpty(po.getPriceType())) {
-                ro.setMessage("Invalid type.");
-            } else if (Util1.isNullOrEmpty(po.getCompCode())) {
-                ro.setMessage("Invalid Company Id.");
-            } else {
-                optionService.save(po);
-                ro.setMessage("Save Price Option.");
-                ro.setData(po);
-            }
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-            log.error(String.format("savePriceOption %s", e.getMessage()));
-        }
-        return ResponseEntity.ok(ro);
+    public ResponseEntity<?> savePriceOption(@RequestBody PriceOption po) {
+        return ResponseEntity.ok(optionService.save(po));
     }
 
     @GetMapping(path = "/get-price-option")
-    public ResponseEntity<List<PriceOption>> getPriceOption(@RequestParam String compCode) {
-        return ResponseEntity.ok(optionService.getPriceOption(compCode));
+    public ResponseEntity<List<PriceOption>> getPriceOption(@RequestParam String option,
+                                                            @RequestParam String compCode,
+                                                            @RequestParam Integer deptId) {
+        return ResponseEntity.ok(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
     }
 
     @GetMapping(path = "/get-unit-relation")
