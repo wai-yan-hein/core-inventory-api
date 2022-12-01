@@ -136,64 +136,43 @@ public class CloudMQSender {
     private void uploadSale() {
         log.info("upload sale.");
         List<SaleHis> list = saleHisService.unUpload();
-        list.forEach(o -> {
-            sendMessage("SALE", gson.toJson(o));
-        });
+        list.forEach(o -> sendMessage("SALE", gson.toJson(o)));
     }
 
     private void uploadPurchase() {
         log.info("upload purchase.");
         List<PurHis> list = purHisService.unUpload();
-        list.forEach(o -> {
-            sendMessage("PURCHASE", gson.toJson(o));
-        });
+        list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o)));
     }
 
     private void uploadReturnIn() {
         log.info("upload return in.");
         List<RetInHis> list = retInService.unUpload();
-        list.forEach(o -> {
-            sendMessage("RETURN_IN", gson.toJson(o));
-        });
+        list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o)));
     }
 
     private void uploadReturnOut() {
         log.info("upload return out.");
         List<RetOutHis> list = retOutService.unUpload();
-        list.forEach(o -> {
-            sendMessage("RETURN_OUT", gson.toJson(o));
-        });
-
+        list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o)));
     }
 
     private void uploadStockInOut() {
         log.info("upload stock in out.");
         List<StockInOut> list = inOutService.unUpload();
-        list.forEach(o -> {
-            sendMessage("STOCK_IO", gson.toJson(o));
-        });
-
+        list.forEach(o -> sendMessage("STOCK_IO", gson.toJson(o)));
     }
 
     private void uploadTransfer() {
         log.info("upload transfer.");
         List<TransferHis> list = transferHisService.unUpload();
-        list.forEach(o -> {
-            sendMessage("TRANSFER", gson.toJson(o));
-        });
-        //sendMessage("TRANSFER", "-", null);
-
+        list.forEach(o -> sendMessage("TRANSFER", gson.toJson(o)));
     }
 
     private void uploadOpening() {
         log.info("upload opening.");
         List<OPHis> list = opHisService.unUpload();
-        list.forEach(o -> {
-            sendMessage("OPENING", gson.toJson(o));
-        });
-        //sendMessage("OPENING", "-", null);
-
-
+        list.forEach(o -> sendMessage("OPENING", gson.toJson(o)));
     }
 
     private void uploadStock() {
@@ -212,8 +191,6 @@ public class CloudMQSender {
         log.info("upload vou status.");
         List<VouStatus> list = vouStatusService.unUpload();
         list.forEach((e) -> sendMessage("VOU_STATUS", gson.toJson(e)));
-
-
     }
 
     private void uploadUnitRelation() {
@@ -250,8 +227,6 @@ public class CloudMQSender {
         log.info("upload stock brand.");
         List<StockBrand> list = brandService.unUpload();
         list.forEach((o) -> sendMessage("STOCK_BRAND", gson.toJson(o)));
-
-
     }
 
     private void uploadSaleMan() {
@@ -271,7 +246,6 @@ public class CloudMQSender {
         log.info("upload location.");
         List<Location> list = locationService.unUpload();
         list.forEach(o -> sendMessage("LOCATION", gson.toJson(o)));
-
     }
 
     private void info(String message) {
