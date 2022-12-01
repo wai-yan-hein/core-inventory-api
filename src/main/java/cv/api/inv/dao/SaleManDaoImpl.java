@@ -5,16 +5,21 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.SaleMan;
 import cv.api.inv.entity.SaleManKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements SaleManDao {
 
     @Override
@@ -44,6 +49,29 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
     public List<SaleMan> unUpload() {
         String hsql = "select o from SaleMan o where o.intgUpdStatus is null";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<SaleMan> getSaleMan(String updatedDate) {
+        String hsql = "select o from SaleMan o where o.updatedDate > '" + updatedDate + "'";
+        return findHSQL(hsql);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from sale_man";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 
 }

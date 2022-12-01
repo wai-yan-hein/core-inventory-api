@@ -26,4 +26,5 @@ import java.util.List;
     List<StockType> unUpload();
     Date getMaxDate();
 
+    List<StockType> getStockType(String updatedDate);
 }

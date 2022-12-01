@@ -8,6 +8,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.SaleMan;
 import cv.api.inv.entity.SaleManKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,5 +24,7 @@ import java.util.List;
 
      SaleMan findByCode(SaleManKey key);
     List<SaleMan> unUpload();
+    List<SaleMan> getSaleMan(String updatedDate);
+    Date getMaxDate();
 
 }

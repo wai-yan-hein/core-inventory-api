@@ -26,4 +26,6 @@ import java.util.List;
      List<StockBrand> unUpload();
 
     Date getMaxDate();
+
+    List<StockBrand> getBrand(String updatedDate);
 }

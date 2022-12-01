@@ -65,6 +65,11 @@ public class LocationServiceImpl implements LocationService {
         return dao.getMaxDate();
     }
 
+    @Override
+    public List<Location> getLocation(String updatedDate) {
+        return dao.getLocation(updatedDate);
+    }
+
     private String getLocationCode(Integer macId, String compCode) {
 
         int seqNo = seqService.getSequence(macId, "Location", "-", compCode);

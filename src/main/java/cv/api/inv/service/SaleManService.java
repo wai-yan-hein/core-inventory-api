@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.SaleMan;
 import cv.api.inv.entity.SaleManKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,4 +24,8 @@ public interface SaleManService {
 
     SaleMan findByCode(SaleManKey key);
     List<SaleMan> unUpload();
+
+    List<SaleMan> getSaleMan(String updatedDate);
+
+    Date getMaxDate();
 }

@@ -66,6 +66,11 @@ public class CategoryServiceImpl implements CategoryService {
         return dao.getMaxDate();
     }
 
+    @Override
+    public List<Category> getCategory(String updatedDate) {
+        return dao.getCategory(updatedDate);
+    }
+
     private String getCatCode(Integer macId, String compCode) {
         int seqNo = seqService.getSequence(macId, "Category", "-", compCode);
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);

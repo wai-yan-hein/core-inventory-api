@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,6 +53,16 @@ public class SaleManServiceImpl implements SaleManService {
     @Override
     public List<SaleMan> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public List<SaleMan> getSaleMan(String updatedDate) {
+        return dao.getSaleMan(updatedDate);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return dao.getMaxDate();
     }
 
     private String getSaleManCode(Integer macId, String compCode) {

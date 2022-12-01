@@ -153,4 +153,10 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         }
         return Util1.getOldDate();
     }
+
+    @Override
+    public List<Stock> getStock(String updatedDate) {
+        String hsql = "select o from Stock o where o.updatedDate > '" + updatedDate + "'";
+        return findHSQL(hsql);
+    }
 }

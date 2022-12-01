@@ -97,7 +97,11 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Date getMaxDate() {
-        return  dao.getMaxDate();
+        return dao.getMaxDate();
     }
 
+    @Override
+    public List<Stock> getStock(String updatedDate) {
+        return dao.getStock(updatedDate);
+    }
 }

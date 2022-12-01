@@ -59,6 +59,11 @@ public class StockTypeServiceImpl implements StockTypeService {
     }
 
     @Override
+    public List<StockType> getStockType(String updatedDate) {
+        return dao.getStockType(updatedDate);
+    }
+
+    @Override
     public StockType findByCode(StockTypeKey key) {
         return dao.findByCode(key);
     }

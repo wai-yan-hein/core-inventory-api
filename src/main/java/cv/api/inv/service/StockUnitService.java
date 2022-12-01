@@ -28,4 +28,5 @@ public interface StockUnitService {
 
     Date getMaxDate();
 
+    List<StockUnit> getUnit(String updatedDate);
 }

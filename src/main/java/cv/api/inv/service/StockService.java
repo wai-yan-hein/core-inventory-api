@@ -33,4 +33,6 @@ public interface StockService {
     List<Stock> unUpload();
 
     Date getMaxDate();
+
+    List<Stock> getStock(String updatedDate);
 }

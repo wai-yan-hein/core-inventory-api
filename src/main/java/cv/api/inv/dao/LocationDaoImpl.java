@@ -60,12 +60,20 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
         ResultSet rs = getResultSet(sql);
         try {
             if (rs.next()) {
-                return rs.getTimestamp("date");
-            }
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         return Util1.getOldDate();
+    }
+
+    @Override
+    public List<Location> getLocation(String updatedDate) {
+        String hsql = "select o from Location o where o.updatedDate > '" + updatedDate + "'";
+        return findHSQL(hsql);
     }
 
     @Override

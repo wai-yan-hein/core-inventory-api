@@ -27,6 +27,7 @@ public interface StockBrandDao {
     List<StockBrand> unUpload();
 
     Date getMaxDate();
+    List<StockBrand> getBrand(String updatedDate);
 
 
 }

@@ -28,4 +28,6 @@ import java.util.List;
      List<Location> unUpload();
 
     Date getMaxDate();
+
+    List<Location> getLocation(String updatedDate);
 }

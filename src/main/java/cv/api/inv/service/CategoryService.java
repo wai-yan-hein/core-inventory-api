@@ -6,6 +6,7 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.Category;
+import cv.api.inv.entity.StockBrand;
 
 import java.util.Date;
 import java.util.List;
@@ -28,4 +29,6 @@ import java.util.List;
     List<Category> unUpload();
 
     Date getMaxDate();
+
+    List<Category> getCategory(String updatedDate);
 }

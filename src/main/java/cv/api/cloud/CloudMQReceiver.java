@@ -62,11 +62,24 @@ public class CloudMQReceiver {
     @Autowired
     private JmsTemplate cloudMQTemplate;
     private final String SENT = "SENT";
-    private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
             .create();
+
+    private void responseSetup(String entity, String distQ, String data) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "RESPONSE-SETUP");
+            mm.setString("DATA", data);
+            return mm;
+        };
+        if (distQ != null) {
+            cloudMQTemplate.send(distQ, mc);
+            log.info("responseSetup : " + entity);
+        }
+    }
 
     @JmsListener(destination = "${cloud.activemq.client.queue}")
     public void receivedMessage(final MapMessage message) throws JMSException {
@@ -76,7 +89,9 @@ public class CloudMQReceiver {
         String senderQ = message.getString("SENDER_QUEUE");
         if (data != null) {
             try {
+                log.info(String.format("receivedMessage : %s",entity));
                 String REC = "REC";
+                String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 switch (entity) {
                     case "VOU_STATUS" -> {
                         VouStatus vou = gson.fromJson(data, VouStatus.class);
@@ -86,12 +101,13 @@ public class CloudMQReceiver {
                                 vouStatusService.save(vou);
                             }
                             case "RECEIVE" -> updateVouStatus(vou);
-                            case "REQUEST" -> {
+                            case "REQUEST-SETUP" -> {
                                 List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(vou.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
-                                    log.info("data exists.");
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
+                            case "RESPONSE-SETUP" -> vouStatusService.save(vou);
                         }
                     }
                     case "RELATION" -> {
@@ -102,23 +118,13 @@ public class CloudMQReceiver {
                                 relationService.save(rel);
                             }
                             case "RECEIVE" -> updateUnitRelation(rel);
-                            case "REQUEST" -> {
-                                log.info(String.format("%s request received.", entity));
+                            case "REQUEST-SETUP" -> {
                                 List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(rel.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
-                                    log.info("data exists.");
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                        }
-                    }
-                    case "TRADER_GROUP" -> {
-                        TraderGroup obj = gson.fromJson(data, TraderGroup.class);
-                        switch (option) {
-                            case "SENT" -> {
-                                obj.setIntgUpdStatus(REC);
-                                traderGroupService.save(obj);
-                            }
-                            case "RECEIVE" -> updateTraderGroup(obj);
+                            case "RESPONSE-SETUP" -> relationService.save(rel);
                         }
                     }
                     case "TRADER" -> {
@@ -129,13 +135,13 @@ public class CloudMQReceiver {
                                 traderService.saveTrader(obj);
                             }
                             case "RECEIVE" -> updateTrader(obj);
-                            case "REQUEST" -> {
-                                log.info(String.format("%s request received.", entity));
+                            case "REQUEST-SETUP" -> {
                                 List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
-                                    log.info("data exists.");
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
+                            case "RESPONSE-SETUP" -> traderService.saveTrader(obj);
                         }
                     }
                     case "UNIT" -> {
@@ -146,6 +152,13 @@ public class CloudMQReceiver {
                                 unitService.save(obj);
                             }
                             case "RECEIVE" -> updateUnit(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<StockUnit> list = unitService.getUnit(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> unitService.save(obj);
                         }
                     }
                     case "STOCK_TYPE" -> {
@@ -156,6 +169,13 @@ public class CloudMQReceiver {
                                 typeService.save(obj);
                             }
                             case "RECEIVE" -> updateStockType(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<StockType> list = typeService.getStockType(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> typeService.save(obj);
                         }
                     }
                     case "STOCK_BRAND" -> {
@@ -166,6 +186,13 @@ public class CloudMQReceiver {
                                 brandService.save(obj);
                             }
                             case "RECEIVE" -> updateBrand(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<StockBrand> list = brandService.getBrand(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> brandService.save(obj);
                         }
                     }
                     case "STOCK_CATEGORY" -> {
@@ -176,6 +203,13 @@ public class CloudMQReceiver {
                                 categoryService.save(obj);
                             }
                             case "RECEIVE" -> updateCategory(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<Category> list = categoryService.getCategory(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> categoryService.save(obj);
                         }
                     }
                     case "SALEMAN" -> {
@@ -186,6 +220,13 @@ public class CloudMQReceiver {
                                 saleManService.save(obj);
                             }
                             case "RECEIVE" -> updateSaleMan(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<SaleMan> list = saleManService.getSaleMan(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> saleManService.save(obj);
                         }
                     }
                     case "LOCATION" -> {
@@ -196,6 +237,13 @@ public class CloudMQReceiver {
                                 locationService.save(obj);
                             }
                             case "RECEIVE" -> updateLocation(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<Location> list = locationService.getLocation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> locationService.save(obj);
                         }
                     }
                     case "STOCK" -> {
@@ -206,6 +254,13 @@ public class CloudMQReceiver {
                                 stockService.save(obj);
                             }
                             case "RECEIVE" -> updateStock(obj);
+                            case "REQUEST-SETUP" -> {
+                                List<Stock> list = stockService.getStock(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
+                                }
+                            }
+                            case "RESPONSE-SETUP" -> stockService.save(obj);
                         }
                     }
                     case "SALE" -> {
@@ -284,7 +339,7 @@ public class CloudMQReceiver {
                 }
 
             } catch (Exception e) {
-                log.error(e.getMessage());
+                log.error(String.format("%s : %s",entity,e.getMessage()));
             }
         }
     }

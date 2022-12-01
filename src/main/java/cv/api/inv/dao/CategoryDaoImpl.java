@@ -7,6 +7,7 @@ package cv.api.inv.dao;
 
 import cv.api.common.Util1;
 import cv.api.inv.entity.Category;
+import cv.api.inv.entity.StockBrand;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -78,11 +79,20 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
         ResultSet rs = getResultSet(sql);
         try {
             if (rs.next()) {
-                return rs.getTimestamp("date");
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         return Util1.getOldDate();
+    }
+
+    @Override
+    public List<Category> getCategory(String updatedDate) {
+        String hsql = "select o from Category o where o.updatedDate > '" + updatedDate + "'";
+        return findHSQL(hsql);
     }
 }

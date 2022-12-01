@@ -33,7 +33,7 @@ public class StockBrandServiceImpl implements StockBrandService {
         if (sb.getKey().getBrandCode() == null) {
             Integer macId = sb.getMacId();
             String compCode = sb.getKey().getCompCode();
-            String code = getStockBrandCode(macId, "StockBrand", "-", compCode);
+            String code = getStockBrandCode(macId, compCode);
             sb.getKey().setBrandCode(code);
         }
         sb.setIntgUpdStatus(null);
@@ -50,9 +50,9 @@ public class StockBrandServiceImpl implements StockBrandService {
         return dao.delete(id);
     }
 
-    private String getStockBrandCode(Integer macId, String option, String period, String compCode) {
+    private String getStockBrandCode(Integer macId, String compCode) {
 
-        int seqNo = seqService.getSequence(macId, option, period, compCode);
+        int seqNo = seqService.getSequence(macId, "StockBrand", "-", compCode);
 
         return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);
     }
@@ -70,5 +70,10 @@ public class StockBrandServiceImpl implements StockBrandService {
     @Override
     public Date getMaxDate() {
         return dao.getMaxDate();
+    }
+
+    @Override
+    public List<StockBrand> getBrand(String updatedDate) {
+        return dao.getBrand(updatedDate);
     }
 }

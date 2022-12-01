@@ -52,6 +52,11 @@ public class StockUnitServiceImpl implements StockUnitService {
     }
 
     @Override
+    public List<StockUnit> getUnit(String updatedDate) {
+        return dao.getUnit(updatedDate);
+    }
+
+    @Override
     public StockUnit findByCode(StockUnitKey code) {
         return dao.findByCode(code);
     }

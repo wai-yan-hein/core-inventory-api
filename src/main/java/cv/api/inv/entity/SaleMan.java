@@ -46,4 +46,10 @@ public class SaleMan implements Serializable {
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
 
+    public SaleMan(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public SaleMan() {
+    }
 }

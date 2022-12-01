@@ -25,5 +25,7 @@ import java.util.List;
      StockUnit findByCode(StockUnitKey code);
     List<StockUnit> unUpload();
     Date getMaxDate();
+    List<StockUnit> getUnit(String updatedDate);
+
 
 }
