@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,4 +27,5 @@ public interface StockInOutService {
     void restore(StockIOKey key) throws Exception;
 
     List<StockInOut> unUpload();
+    Date getMaxDate();
 }

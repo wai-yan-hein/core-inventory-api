@@ -8,6 +8,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,5 +28,6 @@ public interface SaleHisDao {
 
     List<SaleHis> unUploadVoucher(String syncDate);
     List<SaleHis> unUpload();
+    Date getMaxDate();
 
 }

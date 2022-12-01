@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -118,6 +119,11 @@ public class PurHisServiceImpl implements PurHisService {
     @Override
     public List<PurHis> unUpload() {
         return phDao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return phDao.getMaxDate();
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,6 +51,11 @@ public class StockTypeServiceImpl implements StockTypeService {
     @Override
     public List<StockType> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return dao.getMaxDate();
     }
 
     @Override

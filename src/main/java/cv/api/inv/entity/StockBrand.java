@@ -42,4 +42,11 @@ public class StockBrand {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+
+    public StockBrand() {
+    }
+
+    public StockBrand(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

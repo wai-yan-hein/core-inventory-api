@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -117,6 +118,11 @@ public class RetOutServiceImpl implements RetOutService {
     @Override
     public List<RetOutHis> unUpload() {
         return rDao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return rDao.getMaxDate();
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

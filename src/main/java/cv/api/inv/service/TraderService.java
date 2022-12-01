@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.Trader;
 import cv.api.inv.entity.TraderKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,4 +34,7 @@ public interface TraderService {
     List<String> delete(TraderKey key);
 
     List<Trader> unUploadTrader();
+    Date getMaxDate();
+    List<Trader> getTrader(String updatedDate);
+
 }

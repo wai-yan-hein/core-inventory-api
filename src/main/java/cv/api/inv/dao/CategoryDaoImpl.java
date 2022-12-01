@@ -5,18 +5,23 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.Category;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class CategoryDaoImpl extends AbstractDao<String, Category> implements CategoryDao {
     @Autowired
     private SessionFactory sessionFactory;
@@ -67,5 +72,17 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     public Category findByCode(String code) {
         return getByKey(code);
     }
-
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from category";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
+    }
 }

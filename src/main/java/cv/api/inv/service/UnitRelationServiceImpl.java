@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -106,6 +107,16 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     @Override
     public List<UnitRelation> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return dao.getMaxDate();
+    }
+
+    @Override
+    public List<UnitRelation> getRelation(String updatedDate) {
+        return dao.getRelation(updatedDate);
     }
 
     private String getUnitCode() {

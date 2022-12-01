@@ -9,6 +9,7 @@ import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,5 +30,6 @@ public interface RetOutDao {
     List<VReturnOut> search(String vouNo);
     List<RetOutHis> unUploadVoucher(String syncDate);
     List<RetOutHis> unUpload();
+    Date getMaxDate();
 
 }

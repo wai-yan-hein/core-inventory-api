@@ -3,6 +3,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisKey;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TransferHisService {
@@ -14,6 +15,7 @@ public interface TransferHisService {
 
     void delete(TransferHisKey key);
     void restore(TransferHisKey key);
+    Date getMaxDate();
 
 
 }

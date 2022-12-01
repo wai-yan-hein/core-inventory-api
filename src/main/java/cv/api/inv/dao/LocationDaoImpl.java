@@ -5,16 +5,21 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.Location;
 import cv.api.inv.entity.LocationKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implements LocationDao {
 
 
@@ -45,8 +50,22 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
 
     @Override
     public List<Location> unUpload() {
-        String hsql ="select o from Location o where o.intgUpdStatus is null";
+        String hsql = "select o from Location o where o.intgUpdStatus is null";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from location";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 
     @Override

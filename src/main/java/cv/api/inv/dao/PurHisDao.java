@@ -9,6 +9,7 @@ import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.view.VPurchase;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,7 +29,9 @@ public interface PurHisDao {
 
     List<VPurchase> search(String vouNo);
     List<PurHis> unUploadVoucher(String syncDate);
+
     List<PurHis> unUpload();
 
+    Date getMaxDate();
 
 }

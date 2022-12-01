@@ -5,6 +5,7 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.Trader;
 import cv.api.inv.entity.TraderKey;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -108,6 +110,26 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     @Override
     public List<Trader> unUploadTrader() {
         String hsql = "select o from Trader o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from trader";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
+    }
+
+    @Override
+    public List<Trader> getTrader(String updatedDate) {
+        String hsql = "select o from Trader o where o.updatedDate > '" + updatedDate + "'";
         return findHSQL(hsql);
     }
 }

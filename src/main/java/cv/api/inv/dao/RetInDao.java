@@ -9,6 +9,7 @@ import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.view.VReturnIn;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,5 +31,5 @@ public interface RetInDao {
 
     List<RetInHis> unUploadVoucher(String syncDate);
     List<RetInHis> unUpload();
-
+    Date getMaxDate();
 }

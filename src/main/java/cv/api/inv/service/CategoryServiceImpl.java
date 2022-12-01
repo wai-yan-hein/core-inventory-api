@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,6 +59,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return dao.getMaxDate();
     }
 
     private String getCatCode(Integer macId, String compCode) {

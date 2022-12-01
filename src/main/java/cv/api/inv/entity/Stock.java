@@ -100,4 +100,8 @@ public class Stock implements java.io.Serializable {
 
     public Stock() {
     }
+
+    public Stock(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

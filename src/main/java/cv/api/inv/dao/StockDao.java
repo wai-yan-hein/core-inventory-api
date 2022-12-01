@@ -8,6 +8,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.Stock;
 import cv.api.inv.entity.StockKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,5 +32,5 @@ public interface StockDao {
 
     List<Stock> unUpload();
 
-
+    Date getMaxDate();
 }

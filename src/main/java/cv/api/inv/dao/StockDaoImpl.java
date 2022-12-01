@@ -5,6 +5,7 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.Stock;
 import cv.api.inv.entity.StockKey;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -136,5 +138,19 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     public List<Stock> unUpload() {
         String hsql = "select o from Stock o where o.intgUpdStatus is null";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from location";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 }

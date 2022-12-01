@@ -80,8 +80,9 @@ public class CloudMQSender {
         if (sync) {
             if (!progress) {
                 progress = true;
-                uploadSetup();
-                uploadTransaction();
+                //uploadSetup();
+                //uploadTransaction();
+                downloadSetup();
                 progress = false;
             }
         }
@@ -102,11 +103,26 @@ public class CloudMQSender {
         }
     }
 
+    private void sendRequest(String entity, String date) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("SENDER_QUEUE", listenQ);
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "REQUEST");
+            mm.setString("DATA", date);
+            return mm;
+        };
+        String serverQ = environment.getProperty("cloud.activemq.server.queue");
+        if (serverQ != null) {
+            cloudMQTemplate.send(serverQ, mc);
+            log.info("Request : " + entity);
+        }
+    }
+
     private void uploadSetup() {
         log.info("upload setup start.");
         uploadVouStatus();
         uploadUnitRelation();
-        uploadTraderGroup();
         uploadTrader();
         uploadStockUnit();
         uploadStockType();
@@ -119,6 +135,27 @@ public class CloudMQSender {
         log.info("upload setup end.");
         uploadStock();
         info("upload setup end.");
+    }
+
+    private void downloadSetup() {
+        sendRequest("VOU_STATUS", gson.toJson(new VouStatus(vouStatusService.getMaxDate())));
+        sendRequest("RELATION", gson.toJson(new UnitRelation(relationService.getMaxDate())));
+        sendRequest("TRADER", gson.toJson(new Trader(traderService.getMaxDate())));
+        sendRequest("UNIT", gson.toJson(new StockUnit(unitService.getMaxDate())));
+        sendRequest("STOCK_TYPE", gson.toJson(new StockType(stockTypeService.getMaxDate())));
+        sendRequest("STOCK_BRAND", gson.toJson(new StockBrand(brandService.getMaxDate())));
+        sendRequest("STOCK_CATEGORY", gson.toJson(new Category(categoryService.getMaxDate())));
+        sendRequest("LOCATION", gson.toJson(new Location(locationService.getMaxDate())));
+        sendRequest("STOCK", gson.toJson(new Stock(stockService.getMaxDate())));
+    }
+
+
+    private void downloadTransaction() {
+        sendRequest("SALE", gson.toJson(new Stock(stockService.getMaxDate())));
+        sendRequest("PURCHASE", gson.toJson(new Stock(stockService.getMaxDate())));
+        sendRequest("RETURN_IN", gson.toJson(new Stock(stockService.getMaxDate())));
+        sendRequest("RETURN_OUT", gson.toJson(new Stock(stockService.getMaxDate())));
+        sendRequest("STOCK_IO", gson.toJson(new Stock(stockService.getMaxDate())));
     }
 
     private void uploadTransaction() {

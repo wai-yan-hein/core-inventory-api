@@ -7,6 +7,7 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.Category;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,5 +25,7 @@ import java.util.List;
 
     List<Category> unUpload();
 
-     int delete(String id);
+    int delete(String id);
+
+    Date getMaxDate();
 }

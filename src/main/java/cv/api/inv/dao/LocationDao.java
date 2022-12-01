@@ -8,6 +8,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.Location;
 import cv.api.inv.entity.LocationKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,4 +27,5 @@ import java.util.List;
      List<Location> search(String parent);
     List<Location> unUpload();
 
+    Date getMaxDate();
 }

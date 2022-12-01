@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,6 +63,16 @@ public class VouStatusServiceImpl implements VouStatusService {
     @Override
     public List<VouStatus> unUpload() {
         return vouDao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return vouDao.getMaxDate();
+    }
+
+    @Override
+    public List<VouStatus> getVouStatus(String updatedDate) {
+        return vouDao.getVouStatus(updatedDate);
     }
 
     private String getVouStatusCode(Integer macId, String compCode) {

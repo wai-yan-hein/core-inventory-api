@@ -52,6 +52,9 @@ public class StockUnit implements java.io.Serializable {
     public StockUnit(String unit) {
         this.key = new StockUnitKey();
         this.key.setUnitCode(unit);
-        this.unitName = unitName;
+    }
+
+    public StockUnit(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

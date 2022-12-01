@@ -5,19 +5,24 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.view.VPurchase;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements PurHisDao {
 
     @Autowired
@@ -127,5 +132,18 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
             o.setListPD(dao.search(vouNo, compCode, depId));
         });
         return list;
+    }
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from pur_his";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 }

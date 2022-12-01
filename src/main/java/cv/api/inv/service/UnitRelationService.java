@@ -2,6 +2,7 @@ package cv.api.inv.service;
 
 import cv.api.inv.entity.*;
 
+import java.util.Date;
 import java.util.List;
 
 public interface UnitRelationService {
@@ -10,6 +11,7 @@ public interface UnitRelationService {
     UnitRelation findByKey(RelationKey key);
 
     List<UnitRelation> findRelation(String compCode, Integer deptId);
+
     List<StockUnit> getRelation(String relCode, String compCode, Integer deptId);
 
     UnitRelationDetail save(UnitRelationDetail unit);
@@ -19,6 +21,11 @@ public interface UnitRelationService {
     UnitRelationDetail findByKey(UnitRelationDetailKey key);
 
     List<UnitRelation> unUpload();
+
+    Date getMaxDate();
+
+    List<UnitRelation> getRelation(String updatedDate);
+
 
 }
 

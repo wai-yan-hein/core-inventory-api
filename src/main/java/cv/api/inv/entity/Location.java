@@ -43,4 +43,11 @@ public class Location implements java.io.Serializable {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+
+    public Location() {
+    }
+
+    public Location(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

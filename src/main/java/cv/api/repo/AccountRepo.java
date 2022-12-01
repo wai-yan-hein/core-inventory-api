@@ -313,7 +313,6 @@ public class AccountRepo {
             if (ph != null) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
-                String disAcc = setting.getDiscountAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ph.getVouDate();
@@ -322,10 +321,8 @@ public class AccountRepo {
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
                 boolean deleted = ph.getDeleted();
-                double vouDis = Util1.getDouble(ph.getDiscount());
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
-                double vouTax = Util1.getDouble(ph.getTaxAmt());
                 String vouNo = ph.getKey().getVouNo();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
@@ -345,7 +342,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouBal + vouDis-vouTax);
+                    gl.setDrAmt(vouBal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);

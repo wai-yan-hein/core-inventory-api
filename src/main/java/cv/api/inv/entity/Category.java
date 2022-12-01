@@ -46,7 +46,11 @@ public class Category implements java.io.Serializable {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+
     public Category() {
     }
 
+    public Category(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

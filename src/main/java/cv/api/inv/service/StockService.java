@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.Stock;
 import cv.api.inv.entity.StockKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,4 +32,5 @@ public interface StockService {
 
     List<Stock> unUpload();
 
+    Date getMaxDate();
 }

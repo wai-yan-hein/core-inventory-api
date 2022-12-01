@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.StockBrand;
 import cv.api.inv.entity.StockBrandKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,4 +25,5 @@ import java.util.List;
      StockBrand findByCode(StockBrandKey code);
      List<StockBrand> unUpload();
 
+    Date getMaxDate();
 }

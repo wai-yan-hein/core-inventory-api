@@ -109,6 +109,10 @@ public class Util1 {
         return Calendar.getInstance().getTime();
     }
 
+    public static Date getOldDate() {
+        return Util1.toDate("1998-10-07");
+    }
+
     public static String isNull(String strValue, String value) {
         if (strValue == null) {
             return value;

@@ -7,6 +7,7 @@ package cv.api.inv.service;
 
 import cv.api.inv.entity.Category;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,7 @@ import java.util.List;
 
      List<Category> search(String catName);
 
-     List<Category> unUpload();
+    List<Category> unUpload();
 
+    Date getMaxDate();
 }

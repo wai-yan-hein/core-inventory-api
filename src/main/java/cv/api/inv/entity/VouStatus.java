@@ -46,4 +46,8 @@ public class VouStatus implements java.io.Serializable {
 
     public VouStatus() {
     }
+
+    public VouStatus(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

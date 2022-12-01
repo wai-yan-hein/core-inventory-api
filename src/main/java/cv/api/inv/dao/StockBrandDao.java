@@ -8,20 +8,25 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.StockBrand;
 import cv.api.inv.entity.StockBrandKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
- public interface StockBrandDao {
+public interface StockBrandDao {
 
-     StockBrand save(StockBrand brand) throws Exception;
+    StockBrand save(StockBrand brand) throws Exception;
 
-     List<StockBrand> findAll(String compCode, Integer deptId);
+    List<StockBrand> findAll(String compCode, Integer deptId);
 
-     StockBrand findByCode(StockBrandKey code);
+    StockBrand findByCode(StockBrandKey code);
 
-     int delete(String id);
+    int delete(String id);
+
     List<StockBrand> unUpload();
+
+    Date getMaxDate();
+
 
 }

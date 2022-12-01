@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -116,5 +117,10 @@ public class SaleHisServiceImpl implements SaleHisService {
     @Override
     public List<SaleHis> unUpload() {
         return shDao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return shDao.getMaxDate();
     }
 }

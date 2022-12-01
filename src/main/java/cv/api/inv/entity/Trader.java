@@ -73,4 +73,11 @@ public class Trader implements java.io.Serializable {
     private String groupCode;
     @Column(name = "account")
     private String account;
+
+    public Trader() {
+    }
+
+    public Trader(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

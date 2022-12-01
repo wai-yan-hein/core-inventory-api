@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,4 +33,5 @@ public interface SaleHisService {
     List<SaleHis> unUploadVoucher(String syncDate);
 
     List<SaleHis> unUpload();
+    Date getMaxDate();
 }

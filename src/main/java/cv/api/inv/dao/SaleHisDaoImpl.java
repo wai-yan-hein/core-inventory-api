@@ -5,17 +5,22 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements SaleHisDao {
 
     @Autowired
@@ -117,5 +122,19 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
             o.setListSH(dao.search(vouNo, compCode, deptId));
         });
         return list;
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from sale_his";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 }

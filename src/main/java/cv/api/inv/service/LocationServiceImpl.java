@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,6 +58,11 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public List<Location> unUpload() {
         return dao.unUpload();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return dao.getMaxDate();
     }
 
     private String getLocationCode(Integer macId, String compCode) {

@@ -5,16 +5,21 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.StockBrand;
 import cv.api.inv.entity.StockBrandKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> implements StockBrandDao {
 
     @Override
@@ -39,6 +44,20 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
     public List<StockBrand> unUpload() {
         String hsql ="select o from StockBrand o where o.intgUpdStatus is null";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from stock_brand";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 
     @Override
