@@ -8,19 +8,24 @@ package cv.api.inv.service;
 import cv.api.inv.entity.StockUnit;
 import cv.api.inv.entity.StockUnitKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
- public interface StockUnitService {
+public interface StockUnitService {
 
-     StockUnit findByCode(StockUnitKey code);
+    StockUnit findByCode(StockUnitKey code);
 
-     StockUnit save(StockUnit unit) throws Exception;
+    StockUnit save(StockUnit unit) throws Exception;
 
-     List<StockUnit> findAll(String compCode,Integer deptId);
-     List<StockUnit> unUpload();
+    List<StockUnit> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    List<StockUnit> unUpload();
+
+    int delete(String id);
+
+    Date getMaxDate();
+
 }

@@ -7,7 +7,9 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.Trader;
 import cv.api.inv.entity.TraderKey;
+import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,5 +35,7 @@ import java.util.List;
     List<Trader> findSupplier(String compCode,Integer deptId);
 
     List<Trader> unUploadTrader();
+    Date getMaxDate();
+    List<Trader> getTrader(String updatedDate);
 
 }

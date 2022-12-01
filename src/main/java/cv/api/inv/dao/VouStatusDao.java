@@ -8,22 +8,29 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.VouStatus;
 import cv.api.inv.entity.VouStatusKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
- public interface VouStatusDao {
+public interface VouStatusDao {
 
-     VouStatus save(VouStatus vouStatus);
+    VouStatus save(VouStatus vouStatus);
 
-     List<VouStatus> findAll(String compCode,Integer deptId);
+    List<VouStatus> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     VouStatus findById(VouStatusKey id);
-     List<VouStatus> search(String des);
+    VouStatus findById(VouStatusKey id);
+
+    List<VouStatus> search(String des);
+
     List<VouStatus> unUpload();
+
+    Date getMaxDate();
+
+    List<VouStatus> getVouStatus(String updatedDate);
 
 
 }

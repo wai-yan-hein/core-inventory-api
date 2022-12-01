@@ -5,16 +5,21 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
 import cv.api.inv.entity.VouStatus;
 import cv.api.inv.entity.VouStatusKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> implements VouStatusDao {
 
     @Override
@@ -60,6 +65,26 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
     @Override
     public List<VouStatus> unUpload() {
         String hsql = "select o from VouStatus o where o.intgUpdStatus is null";
+        return findHSQL(hsql);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from vou_status";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
+    }
+
+    @Override
+    public List<VouStatus> getVouStatus(String updatedDate) {
+        String hsql = "select o from VouStatus o where o.updatedDate > '" + updatedDate + "'";
         return findHSQL(hsql);
     }
 }

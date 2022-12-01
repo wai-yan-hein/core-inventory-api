@@ -80,8 +80,9 @@ public class CloudMQSender {
         if (sync) {
             if (!progress) {
                 progress = true;
-                uploadSetup();
-                uploadTransaction();
+                //uploadSetup();
+                //uploadTransaction();
+                downloadSetup();
                 progress = false;
             }
         }
@@ -102,11 +103,26 @@ public class CloudMQSender {
         }
     }
 
+    private void sendRequest(String entity, String date) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("SENDER_QUEUE", listenQ);
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "REQUEST");
+            mm.setString("DATA", date);
+            return mm;
+        };
+        String serverQ = environment.getProperty("cloud.activemq.server.queue");
+        if (serverQ != null) {
+            cloudMQTemplate.send(serverQ, mc);
+            log.info("Request : " + entity);
+        }
+    }
+
     private void uploadSetup() {
         log.info("upload setup start.");
         uploadVouStatus();
         uploadUnitRelation();
-        uploadTraderGroup();
         uploadTrader();
         uploadStockUnit();
         uploadStockType();
@@ -119,6 +135,19 @@ public class CloudMQSender {
         log.info("upload setup end.");
         uploadStock();
         info("upload setup end.");
+    }
+
+    private void downloadSetup() {
+        sendRequest("VOU_STATUS", gson.toJson(new VouStatus(vouStatusService.getMaxDate())));
+        sendRequest("RELATION", gson.toJson(new UnitRelation(relationService.getMaxDate())));
+        sendRequest("TRADER", gson.toJson(new Trader(traderService.getMaxDate())));
+        sendRequest("UNIT", gson.toJson(new StockUnit(unitService.getMaxDate())));
+        sendRequest("STOCK_TYPE", gson.toJson(new StockType(stockTypeService.getMaxDate())));
+    }
+
+
+    private void downloadTransaction() {
+
     }
 
     private void uploadTransaction() {
@@ -191,9 +220,6 @@ public class CloudMQSender {
         list.forEach(o -> {
             sendMessage("OPENING", gson.toJson(o));
         });
-        //sendMessage("OPENING", "-", null);
-
-
     }
 
     private void uploadStock() {

@@ -2,6 +2,7 @@ package cv.api.cloud;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Session;
 import java.text.DateFormat;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -60,6 +62,7 @@ public class CloudMQReceiver {
     @Autowired
     private JmsTemplate cloudMQTemplate;
     private final String SENT = "SENT";
+    private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
@@ -83,6 +86,12 @@ public class CloudMQReceiver {
                                 vouStatusService.save(vou);
                             }
                             case "RECEIVE" -> updateVouStatus(vou);
+                            case "REQUEST" -> {
+                                List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(vou.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    log.info("data exists.");
+                                }
+                            }
                         }
                     }
                     case "RELATION" -> {
@@ -93,6 +102,13 @@ public class CloudMQReceiver {
                                 relationService.save(rel);
                             }
                             case "RECEIVE" -> updateUnitRelation(rel);
+                            case "REQUEST" -> {
+                                log.info(String.format("%s request received.", entity));
+                                List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(rel.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    log.info("data exists.");
+                                }
+                            }
                         }
                     }
                     case "TRADER_GROUP" -> {
@@ -113,6 +129,13 @@ public class CloudMQReceiver {
                                 traderService.saveTrader(obj);
                             }
                             case "RECEIVE" -> updateTrader(obj);
+                            case "REQUEST" -> {
+                                log.info(String.format("%s request received.", entity));
+                                List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    log.info("data exists.");
+                                }
+                            }
                         }
                     }
                     case "UNIT" -> {

@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.VouStatus;
 import cv.api.inv.entity.VouStatusKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,11 @@ public interface VouStatusService {
     VouStatus findById(VouStatusKey id);
 
     List<VouStatus> search(String description);
+
     List<VouStatus> unUpload();
+
+    Date getMaxDate();
+    List<VouStatus> getVouStatus(String updatedDate);
+
 
 }

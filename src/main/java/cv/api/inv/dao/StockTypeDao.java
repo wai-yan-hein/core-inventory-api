@@ -8,6 +8,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.StockType;
 import cv.api.inv.entity.StockTypeKey;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,5 +24,7 @@ import java.util.List;
 
     StockType findByCode(StockTypeKey key);
     List<StockType> unUpload();
+    Date getMaxDate();
+
 
 }

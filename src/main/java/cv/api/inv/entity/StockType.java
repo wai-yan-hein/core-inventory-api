@@ -43,4 +43,10 @@ public class StockType implements java.io.Serializable {
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
 
+    public StockType() {
+    }
+
+    public StockType(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }
