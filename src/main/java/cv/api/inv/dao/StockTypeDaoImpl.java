@@ -30,7 +30,7 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
 
     @Override
     public List<StockType> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from StockType o where o.key.compCode = '" + compCode + "' and o.key.deptId=" + deptId + "";
+        String hsql = "select o from StockType o where o.key.compCode = '" + compCode + "' and (o.key.deptId=" + deptId + " or 0 =" + deptId + ")";
         return findHSQL(hsql);
     }
 

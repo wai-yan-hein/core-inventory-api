@@ -36,7 +36,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
+        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")";
         return findHSQL(hsql);
     }
 
@@ -49,14 +49,14 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> findActiveStock(String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
+        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")";
         return findHSQL(hsql);
 
     }
 
     @Override
     public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.active = 1 and o.key.compCode ='" + compCode + "' and o.key.deptId =" + deptId + "\n";
+        String hsql = "select o from Stock o where o.active = 1 and o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")\n";
         if (!stockCode.equals("-")) {
             hsql += " and o.key.stockCode ='" + stockCode + "'\n";
         }
@@ -89,7 +89,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                 "left join category cat  on s.category_code = cat.cat_code\n" +
                 "left join stock_brand b on s.brand_code  = b.brand_code\n" +
                 "where s.comp_code ='" + compCode + "'\n" +
-                "and s.active =1\n" + "and s.dept_id =" + deptId + "\n" +
+                "and s.active =1\n" + "and (s.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and " + filter + "\n" + "limit 100";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {

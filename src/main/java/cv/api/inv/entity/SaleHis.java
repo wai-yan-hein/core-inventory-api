@@ -89,5 +89,7 @@ public class SaleHis {
     private List<String> listDel;
     @Transient
     private boolean backup;
+    @Transient
+    private List<Location> listLocation;
 
 }

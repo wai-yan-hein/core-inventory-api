@@ -3,3 +3,6 @@ change column updated_date updated_date timestamp not null default current_times
 
 ALTER TABLE `unit_relation` 
 ADD COLUMN `updated_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+ALTER TABLE `stock_type` 
+CHANGE COLUMN `updated_date` `updated_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ;

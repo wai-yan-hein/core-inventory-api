@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
 
     @Override
     public List<Location> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Location o where o.key.compCode ='" + compCode + "' and o.key.deptId = " + deptId + "";
+        String hsql = "select o from Location o where o.key.compCode ='" + compCode + "' and (o.key.deptId = " + deptId + " or 0 = " + deptId + ")";
         return findHSQL(hsql);
     }
 
@@ -74,6 +75,17 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     public List<Location> getLocation(String updatedDate) {
         String hsql = "select o from Location o where o.updatedDate > '" + updatedDate + "'";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<LocationKey> getLocation(Integer deptId) {
+        List<LocationKey> keys = new ArrayList<>();
+        String hsql = "select o from Location o where o.key.deptId =" + deptId + "";
+        List<Location> list = findHSQL(hsql);
+        list.forEach(l -> {
+            keys.add(l.getKey());
+        });
+        return keys;
     }
 
     @Override

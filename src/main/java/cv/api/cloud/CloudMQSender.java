@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.model.RequestModel;
+import cv.api.repo.UserRepo;
 import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +70,8 @@ public class CloudMQSender {
     private TransferHisService transferHisService;
     @Autowired
     private OPHisService opHisService;
+    @Autowired
+    private UserRepo userRepo;
     private boolean progress = false;
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -83,6 +87,7 @@ public class CloudMQSender {
                 //uploadSetup();
                 //uploadTransaction();
                 downloadSetup();
+                downloadTransaction();
                 progress = false;
             }
         }
@@ -151,11 +156,14 @@ public class CloudMQSender {
 
 
     private void downloadTransaction() {
-        requestSetup("SALE", gson.toJson(new Stock(stockService.getMaxDate())));
-        requestSetup("PURCHASE", gson.toJson(new Stock(stockService.getMaxDate())));
-        requestSetup("RETURN_IN", gson.toJson(new Stock(stockService.getMaxDate())));
-        requestSetup("RETURN_OUT", gson.toJson(new Stock(stockService.getMaxDate())));
-        requestSetup("STOCK_IO", gson.toJson(new Stock(stockService.getMaxDate())));
+        List<LocationKey> keys = userRepo.getLocation();
+        requestSetup("SALE", gson.toJson(new RequestModel(keys, saleHisService.getMaxDate())));
+        requestSetup("PURCHASE", gson.toJson(new RequestModel(keys, purHisService.getMaxDate())));
+        requestSetup("RETURN_IN", gson.toJson(new RequestModel(keys, retInService.getMaxDate())));
+        requestSetup("RETURN_OUT", gson.toJson(new RequestModel(keys, retOutService.getMaxDate())));
+        requestSetup("STOCK_IO", gson.toJson(new RequestModel(keys, inOutService.getMaxDate())));
+        requestSetup("TRANSFER", gson.toJson(new RequestModel(keys, transferHisService.getMaxDate())));
+
     }
 
     private void uploadTransaction() {

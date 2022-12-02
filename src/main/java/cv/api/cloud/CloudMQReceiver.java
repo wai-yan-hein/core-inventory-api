@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.model.RequestModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -264,13 +265,22 @@ public class CloudMQReceiver {
                         }
                     }
                     case "SALE" -> {
-                        SaleHis obj = gson.fromJson(data, SaleHis.class);
                         switch (option) {
                             case "SENT" -> {
+                                SaleHis obj = gson.fromJson(data, SaleHis.class);
                                 obj.setIntgUpdStatus(REC);
                                 saleHisService.save(obj);
                             }
-                            case "RECEIVE" -> updateSale(obj);
+                            case "RECEIVE" -> {
+                                SaleHis obj = gson.fromJson(data, SaleHis.class);
+                                updateSale(obj);
+                            }
+                            case "REQUEST_TRAN" -> {
+                                RequestModel m = gson.fromJson(data,RequestModel.class);
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                     case "OPENING" -> {
@@ -281,6 +291,12 @@ public class CloudMQReceiver {
                                 opHisService.save(obj);
                             }
                             case "RECEIVE" -> updateOpening(obj);
+                            case "REQUEST_TRAN" -> {
+
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                     case "PURCHASE" -> {
@@ -291,6 +307,12 @@ public class CloudMQReceiver {
                                 purHisService.save(obj);
                             }
                             case "RECEIVE" -> updatePurchase(obj);
+                            case "REQUEST_TRAN" -> {
+
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                     case "RETURN_IN" -> {
@@ -301,6 +323,12 @@ public class CloudMQReceiver {
                                 retInService.save(obj);
                             }
                             case "RECEIVE" -> updateReturnIn(obj);
+                            case "REQUEST_TRAN" -> {
+
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                     case "RETURN_OUT" -> {
@@ -311,6 +339,12 @@ public class CloudMQReceiver {
                                 retOutService.save(obj);
                             }
                             case "RECEIVE" -> updateReturnOut(obj);
+                            case "REQUEST_TRAN" -> {
+
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                     case "TRANSFER" -> {
@@ -321,6 +355,12 @@ public class CloudMQReceiver {
                                 transferHisService.save(obj);
                             }
                             case "RECEIVE" -> updateTransfer(obj);
+                            case "REQUEST_TRAN" -> {
+
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                     case "STOCK_IO" -> {
@@ -331,6 +371,12 @@ public class CloudMQReceiver {
                                 inOutService.save(obj);
                             }
                             case "RECEIVE" -> updateStockIO(obj);
+                            case "REQUEST_TRAN" -> {
+
+                            }
+                            case "RESPONSE_TRAN" -> {
+
+                            }
                         }
                     }
                 }

@@ -1490,7 +1490,6 @@ public class ReportServiceImpl implements ReportService {
                 + "group by vou_no\n" + ")a\n"
                 + "join vou_status v on a.vou_status = v.code\n"
                 + "and a.comp_code = v.comp_code\n"
-                + "and a.dept_id = v.dept_id\n"
                 + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VStockIO> ioList = new ArrayList<>();
@@ -1504,6 +1503,7 @@ public class ReportServiceImpl implements ReportService {
                 io.setVouTypeName(rs.getString("vou_status_name"));
                 io.setCreatedBy(rs.getString("created_by"));
                 io.setDeleted(rs.getBoolean("deleted"));
+                io.setDeptId(rs.getInt("dept_id"));
                 ioList.add(io);
             }
         }
@@ -1519,7 +1519,7 @@ public class ReportServiceImpl implements ReportService {
                 + "select  vou_no,date(vou_date) vou_date,remark,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
                 + "from v_sale s \n"
                 + "where comp_code = '" + compCode + "'\n"
-                + "and dept_id = " + deptId + "\n"
+                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and deleted = " + deleted + "\n"
                 + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
                 + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
@@ -1533,7 +1533,6 @@ public class ReportServiceImpl implements ReportService {
                 + "group by vou_no\n" + ")a\n"
                 + "join trader t on a.trader_code = t.code\n"
                 + "and a.comp_code = t.comp_code\n"
-                + "and a.dept_id = t.dept_id\n"
                 + "order by date(vou_date) desc,vou_no desc";
         ResultSet rs = reportDao.executeSql(sql);
         List<VSale> saleList = new ArrayList<>();
@@ -1548,6 +1547,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setPaid(rs.getFloat("paid"));
                 s.setVouTotal(rs.getFloat("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
+                s.setDeptId(rs.getInt("dept_id"));
                 saleList.add(s);
             }
         }
@@ -1563,7 +1563,7 @@ public class ReportServiceImpl implements ReportService {
                 + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id\n"
                 + "from v_purchase p \n"
                 + "where comp_code = '" + compCode + "'\n"
-                + "and dept_id =" + deptId + "\n"
+                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and deleted =" + deleted + "\n"
                 + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
                 + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
@@ -1576,7 +1576,6 @@ public class ReportServiceImpl implements ReportService {
                 + "group by vou_no)a\n"
                 + "join trader t on a.trader_code = t.code\n"
                 + "and a.comp_code = t.comp_code\n"
-                + "and a.dept_id = t.dept_id\n"
                 + "order by date(vou_date),vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VPurchase> purchaseList = new ArrayList<>();
@@ -1591,6 +1590,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setPaid(rs.getFloat("paid"));
                 s.setVouTotal(rs.getFloat("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
+                s.setDeptId(rs.getInt("dept_id"));
                 purchaseList.add(s);
             }
         }
@@ -1607,7 +1607,7 @@ public class ReportServiceImpl implements ReportService {
                 + "from v_return_in \n"
                 + "where comp_code = '" + compCode + "'\n"
                 + "and deleted = " + deleted + "\n"
-                + "and dept_id = " + deptId + "\n"
+                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
                 + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
                 + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
@@ -1618,7 +1618,6 @@ public class ReportServiceImpl implements ReportService {
                 + "group by vou_no\n" + ")a\n"
                 + "join trader t on a.trader_code = t.code\n"
                 + "and a.comp_code = t.comp_code\n"
-                + "and a.dept_id = t.dept_id\n"
                 + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VReturnIn> returnInList = new ArrayList<>();
@@ -1633,6 +1632,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setPaid(rs.getFloat("paid"));
                 s.setVouTotal(rs.getFloat("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
+                s.setDeptId(rs.getInt("dept_id"));
                 returnInList.add(s);
             }
         }
@@ -1650,7 +1650,7 @@ public class ReportServiceImpl implements ReportService {
                 + "from v_return_out \n"
                 + "where comp_code = '" + compCode + "'\n"
                 + "and deleted = " + deleted + "\n"
-                + "and dept_id = " + deptId + "\n"
+                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
                 + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
                 + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
@@ -1661,7 +1661,6 @@ public class ReportServiceImpl implements ReportService {
                 + "group by vou_no\n" + ")a\n"
                 + "join trader t on a.trader_code = t.code\n"
                 + "and a.comp_code= t.comp_code\n"
-                + "and a.dept_id= t.dept_id\n"
                 + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VReturnOut> returnInList = new ArrayList<>();
@@ -1676,6 +1675,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setPaid(rs.getFloat("paid"));
                 s.setVouTotal(rs.getFloat("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
+                s.setDeptId(rs.getInt("dept_id"));
                 returnInList.add(s);
             }
         }
@@ -1685,10 +1685,10 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode,
                                             String stockCode, String locCode, String compCode, Integer deptId) throws Exception {
-        String sql = "select v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name \n"
+        String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name \n"
                 + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n"
                 + "where v.comp_code = '" + compCode + "'\n"
-                + "and v.dept_id =" + deptId + "\n"
+                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n"
                 + "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
                 + "and (v.remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
@@ -1702,12 +1702,14 @@ public class ReportServiceImpl implements ReportService {
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 VOpening s = new VOpening();
+                s.setAmount(rs.getFloat("amount"));
                 s.setVouDate(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setRemark(rs.getString("remark"));
                 s.setCreatedBy(rs.getString("created_by"));
                 s.setDeleted(rs.getBoolean("deleted"));
                 s.setLocationName(rs.getString("loc_name"));
+                s.setDeptId(deptId);
                 openingList.add(s);
             }
         }
@@ -1719,14 +1721,12 @@ public class ReportServiceImpl implements ReportService {
                                               String userCode, String stockCode, String locCodeFrom,
                                               String locCodeTo, String compCode, Integer deptId, String deleted) throws Exception {
 
-        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,l.loc_name from_loc_name,ll.loc_name to_loc_name\n"
+        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n"
                 + "from v_transfer v join location l\n"
                 + "on v.loc_code_from = l.loc_code\n"
                 + "and v.comp_code = l.comp_code\n"
-                + "and v.dept_id = l.dept_id\n"
                 + "join location ll on v.loc_code_to = ll.loc_code\n"
                 + "and v.comp_code = ll.comp_code\n"
-                + "and v.dept_id = ll.dept_id\n"
                 + "where v.comp_code = '" + compCode + "'\n"
                 + "and v.deleted = " + deleted + "\n"
                 + "and v.dept_id = " + deptId + "\n"
@@ -1753,6 +1753,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setDeleted(rs.getBoolean("deleted"));
                 s.setFromLocationName(rs.getString("from_loc_name"));
                 s.setToLocationName(rs.getString("to_loc_name"));
+                s.setDeptId(rs.getInt("dept_id"));
                 openingList.add(s);
             }
         }
@@ -1770,7 +1771,7 @@ public class ReportServiceImpl implements ReportService {
                 "where deleted =" + deleted + "\n" +
                 "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
                 "and (vou_no ='" + vouNo + "' or '-' ='" + vouNo + "')\n" +
                 "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
                 "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
@@ -2048,8 +2049,8 @@ public class ReportServiceImpl implements ReportService {
                 "from (\n" +
                 "select ifnull(user_code,stock_code) stock_code,stock_name,sum(qty) qty,unit,avg(price) avg_price,loc_code,pt_code,comp_code,dept_id\n" +
                 "from v_process_his \n" +
-                "where comp_code ='"+compCode+"'\n" +
-                "and dept_id =1\n" +
+                "where comp_code ='" + compCode + "'\n" +
+                "and dept_id =" + deptId + "\n" +
                 "and calculate=1\n" +
                 "and finished =1\n" +
                 "and deleted =0\n" +
