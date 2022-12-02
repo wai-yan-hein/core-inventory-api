@@ -70,4 +70,5 @@ public class VSale {
     private String compCode;
     private String relName;
     private String qtyStr;
+    private Integer deptId;
 }

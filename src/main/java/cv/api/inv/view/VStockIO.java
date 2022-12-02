@@ -30,4 +30,5 @@ public class VStockIO {
     private Float qty;
     private String stockCode;
     private String processNo;
+    private Integer deptId;
 }

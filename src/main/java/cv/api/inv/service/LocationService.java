@@ -30,4 +30,5 @@ import java.util.List;
     Date getMaxDate();
 
     List<Location> getLocation(String updatedDate);
+    List<LocationKey> getLocation(Integer deptId);
 }

@@ -64,10 +64,8 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                 "and a.dept_id = s.dept_id\n" +
                 "join location l on a.loc_code = l.loc_code\n" +
                 "and a.comp_code = l.comp_code\n" +
-                "and a.dept_id = l.dept_id\n" +
                 "join vou_status v on a.pt_code = v.code\n" +
-                "and a.comp_code = v.comp_code\n" +
-                "and a.dept_id = v.dept_id";
+                "and a.comp_code = v.comp_code\n";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {
             try {

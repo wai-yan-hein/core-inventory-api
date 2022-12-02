@@ -48,4 +48,5 @@ public class VReturnOut implements Serializable {
     private String traderName;
     private String stockName;
     private String locationName;
+    private Integer deptId;
 }

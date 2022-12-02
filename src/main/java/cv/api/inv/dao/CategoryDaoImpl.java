@@ -7,7 +7,6 @@ package cv.api.inv.dao;
 
 import cv.api.common.Util1;
 import cv.api.inv.entity.Category;
-import cv.api.inv.entity.StockBrand;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -35,7 +34,7 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
 
     @Override
     public List<Category> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Category o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "";
+        String hsql = "select o from Category o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 = " + deptId + ")";
         Query<Category> query = sessionFactory.getCurrentSession().createQuery(hsql, Category.class);
         return query.list();
     }

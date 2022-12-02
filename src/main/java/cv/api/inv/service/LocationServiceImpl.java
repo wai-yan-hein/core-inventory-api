@@ -70,6 +70,11 @@ public class LocationServiceImpl implements LocationService {
         return dao.getLocation(updatedDate);
     }
 
+    @Override
+    public List<LocationKey> getLocation(Integer deptId) {
+        return dao.getLocation(deptId);
+    }
+
     private String getLocationCode(Integer macId, String compCode) {
 
         int seqNo = seqService.getSequence(macId, "Location", "-", compCode);

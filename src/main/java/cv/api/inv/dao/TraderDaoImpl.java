@@ -31,7 +31,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
         String filter = "where active =1\n" +
                 "and comp_code ='" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
+                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and (user_code like '" + str + "%' or trader_name like '" + str + "%') \n";
         if (!type.equals("-")) {
             filter += "and (multi =1 or type ='" + type + "')";
@@ -97,13 +97,13 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public List<Trader> findCustomer(String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + " and o.type = 'CUS' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 ="+deptId+") and o.type = 'CUS' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 
     @Override
     public List<Trader> findSupplier(String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and o.key.deptId =" + deptId + "  and o.type = 'SUP' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 ="+deptId+")  and o.type = 'SUP' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 
