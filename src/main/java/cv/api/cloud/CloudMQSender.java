@@ -74,7 +74,7 @@ public class CloudMQSender {
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
             .create();
 
-    @Scheduled(fixedRate = 1000000)
+    @Scheduled(fixedRate = 10000000)
     private void uploadToServer() {
         boolean sync = Util1.getBoolean(environment.getProperty("cloud.upload.server"));
         if (sync) {
