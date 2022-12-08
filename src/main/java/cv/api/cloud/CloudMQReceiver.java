@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
-import cv.api.model.RequestModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -277,25 +276,22 @@ public class CloudMQReceiver {
                         }
                     }
                     case "SALE" -> {
+                        SaleHis obj = gson.fromJson(data, SaleHis.class);
                         switch (option) {
                             case "SENT" -> {
-                                SaleHis obj = gson.fromJson(data, SaleHis.class);
                                 obj.setIntgUpdStatus(REC);
                                 saleHisService.save(obj);
                             }
                             case "RECEIVE" -> {
-                                SaleHis obj = gson.fromJson(data, SaleHis.class);
                                 updateSale(obj);
                             }
                             case "REQUEST_TRAN" -> {
-                                RequestModel m = gson.fromJson(data, RequestModel.class);
-                                List<SaleHis> list = saleHisService.search(Util1.toDateStr(m.getUpdatedDate(), dateTimeFormat), m.getKeys());
+                                List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                                 }
                             }
                             case "RESPONSE_TRAN" -> {
-                                SaleHis obj = gson.fromJson(data, SaleHis.class);
                                 saleHisService.save(obj);
                             }
                         }
