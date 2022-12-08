@@ -86,7 +86,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return Util1.getOldDate();
+        return Util1.getSyncDate();
     }
 
 }

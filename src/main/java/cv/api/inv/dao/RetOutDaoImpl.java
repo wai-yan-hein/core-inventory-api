@@ -142,12 +142,14 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
         ResultSet rs = getResultSet(sql);
         try {
             if (rs.next()) {
-                return rs.getTimestamp("date");
-            }
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return Util1.getOldDate();
+        return Util1.getSyncDate();
     }
 
     @Override

@@ -126,7 +126,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return Util1.getOldDate();
+        return Util1.getSyncDate();
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.util.Date;
 @Slf4j
 public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.##";
+    public static String SYNC_DATE;
     private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     public static <T> Object cast(Object from, Class<T> to) {
@@ -109,8 +110,8 @@ public class Util1 {
         return Calendar.getInstance().getTime();
     }
 
-    public static Date getOldDate() {
-        return Util1.toDate("1998-10-07");
+    public static Date getSyncDate() {
+        return Util1.toDate(SYNC_DATE);
     }
 
     public static String isNull(String strValue, String value) {
@@ -171,5 +172,9 @@ public class Util1 {
             Gson gson = new Gson();
             gson.toJson(data, writer);
         }
+    }
+
+    public static Date getOldDate() {
+        return Util1.toDate("1998-10-07");
     }
 }
