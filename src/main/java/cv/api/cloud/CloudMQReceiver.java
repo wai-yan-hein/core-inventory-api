@@ -276,8 +276,8 @@ public class CloudMQReceiver {
                         }
                     }
                     case "SALE" -> {
-                        log.info(option);
                         SaleHis obj = gson.fromJson(data, SaleHis.class);
+                        log.info(obj.getUpdatedDate().toString());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
