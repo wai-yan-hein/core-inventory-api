@@ -114,7 +114,7 @@ public class CloudMQSender {
             MapMessage mm = session.createMapMessage();
             mm.setString("SENDER_QUEUE", listenQ);
             mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "REQUEST-SETUP");
+            mm.setString("OPTION", "REQUEST_SETUP");
             mm.setString("DATA", date);
             return mm;
         };

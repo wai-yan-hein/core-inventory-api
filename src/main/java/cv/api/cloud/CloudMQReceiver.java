@@ -69,7 +69,7 @@ public class CloudMQReceiver {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
             mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "RESPONSE-SETUP");
+            mm.setString("OPTION", "RESPONSE_SETUP");
             mm.setString("DATA", data);
             return mm;
         };
@@ -83,7 +83,7 @@ public class CloudMQReceiver {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
             mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "RESPONSE-TRAN");
+            mm.setString("OPTION", "RESPONSE_TRAN");
             mm.setString("DATA", data);
             return mm;
         };
@@ -113,13 +113,13 @@ public class CloudMQReceiver {
                                 vouStatusService.save(vou);
                             }
                             case "RECEIVE" -> updateVouStatus(vou);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(vou.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> vouStatusService.save(vou);
+                            case "RESPONSE_SETUP" -> vouStatusService.save(vou);
                         }
                     }
                     case "RELATION" -> {
@@ -130,13 +130,13 @@ public class CloudMQReceiver {
                                 relationService.save(rel);
                             }
                             case "RECEIVE" -> updateUnitRelation(rel);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(rel.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> relationService.save(rel);
+                            case "RESPONSE_SETUP" -> relationService.save(rel);
                         }
                     }
                     case "TRADER" -> {
@@ -147,13 +147,13 @@ public class CloudMQReceiver {
                                 traderService.saveTrader(obj);
                             }
                             case "RECEIVE" -> updateTrader(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> traderService.saveTrader(obj);
+                            case "RESPONSE_SETUP" -> traderService.saveTrader(obj);
                         }
                     }
                     case "UNIT" -> {
@@ -164,13 +164,13 @@ public class CloudMQReceiver {
                                 unitService.save(obj);
                             }
                             case "RECEIVE" -> updateUnit(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<StockUnit> list = unitService.getUnit(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> unitService.save(obj);
+                            case "RESPONSE_SETUP" -> unitService.save(obj);
                         }
                     }
                     case "STOCK_TYPE" -> {
@@ -181,13 +181,13 @@ public class CloudMQReceiver {
                                 typeService.save(obj);
                             }
                             case "RECEIVE" -> updateStockType(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<StockType> list = typeService.getStockType(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> typeService.save(obj);
+                            case "RESPONSE_SETUP" -> typeService.save(obj);
                         }
                     }
                     case "STOCK_BRAND" -> {
@@ -198,13 +198,13 @@ public class CloudMQReceiver {
                                 brandService.save(obj);
                             }
                             case "RECEIVE" -> updateBrand(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<StockBrand> list = brandService.getBrand(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> brandService.save(obj);
+                            case "RESPONSE_SETUP" -> brandService.save(obj);
                         }
                     }
                     case "STOCK_CATEGORY" -> {
@@ -215,13 +215,13 @@ public class CloudMQReceiver {
                                 categoryService.save(obj);
                             }
                             case "RECEIVE" -> updateCategory(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<Category> list = categoryService.getCategory(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> categoryService.save(obj);
+                            case "RESPONSE_SETUP" -> categoryService.save(obj);
                         }
                     }
                     case "SALEMAN" -> {
@@ -232,13 +232,13 @@ public class CloudMQReceiver {
                                 saleManService.save(obj);
                             }
                             case "RECEIVE" -> updateSaleMan(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<SaleMan> list = saleManService.getSaleMan(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> saleManService.save(obj);
+                            case "RESPONSE_SETUP" -> saleManService.save(obj);
                         }
                     }
                     case "LOCATION" -> {
@@ -249,13 +249,13 @@ public class CloudMQReceiver {
                                 locationService.save(obj);
                             }
                             case "RECEIVE" -> updateLocation(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<Location> list = locationService.getLocation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> locationService.save(obj);
+                            case "RESPONSE_SETUP" -> locationService.save(obj);
                         }
                     }
                     case "STOCK" -> {
@@ -266,13 +266,13 @@ public class CloudMQReceiver {
                                 stockService.save(obj);
                             }
                             case "RECEIVE" -> updateStock(obj);
-                            case "REQUEST-SETUP" -> {
+                            case "REQUEST_SETUP" -> {
                                 List<Stock> list = stockService.getStock(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE-SETUP" -> stockService.save(obj);
+                            case "RESPONSE_SETUP" -> stockService.save(obj);
                         }
                     }
                     case "SALE" -> {
