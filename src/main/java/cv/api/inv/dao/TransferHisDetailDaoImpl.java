@@ -62,4 +62,33 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
         }
         return list;
     }
+
+    @Override
+    public List<TransferHisDetail> searchDetail(String vouNo, String compCode, Integer deptId) {
+        List<TransferHisDetail> list = new ArrayList<>();
+        String sql="select * from transfer_his_detail where vou_no ='"+vouNo+"' and comp_code ='"+compCode+"' and dept_id ="+deptId+" order by unique_id";
+        ResultSet rs = getResultSet(sql);
+        if (rs != null) {
+            try {
+                while (rs.next()) {
+                    //td_code, vou_no, stock_code, qty, unit, unique_id, comp_code, dept_id
+                    TransferHisDetail td = new TransferHisDetail();
+                    THDetailKey key = new THDetailKey();
+                    key.setDeptId(rs.getInt("dept_id"));
+                    key.setVouNo(rs.getString("vou_no"));
+                    key.setTdCode(rs.getString("td_code"));
+                    td.setKey(key);
+                    td.setStockCode(rs.getString("stock_code"));
+                    td.setCompCode(rs.getString("comp_code"));
+                    td.setQty(rs.getFloat("qty"));
+                    td.setUnitCode(rs.getString("unit"));
+                    td.setUniqueId(rs.getInt("unique_id"));
+                    list.add(td);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+        return list;
+    }
 }

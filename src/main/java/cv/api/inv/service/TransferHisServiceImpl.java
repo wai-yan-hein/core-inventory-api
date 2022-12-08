@@ -103,7 +103,7 @@ public class TransferHisServiceImpl implements TransferHisService {
     }
 
     @Override
-    public List<TransferHis> search(String updatedDate, List<LocationKey> keys) {
-        return dao.search(updatedDate, keys);
+    public List<TransferHis> search(String updatedDate, List<String> location) {
+        return dao.search(updatedDate, location);
     }
 }

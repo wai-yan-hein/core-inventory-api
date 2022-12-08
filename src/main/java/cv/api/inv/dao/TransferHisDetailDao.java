@@ -10,5 +10,7 @@ public interface TransferHisDetailDao {
     int delete(String code, String compCode, Integer deptId);
 
     List<TransferHisDetail> search(String vouNo, String compCode, Integer deptId);
+    List<TransferHisDetail> searchDetail(String vouNo, String compCode, Integer deptId);
+
 
 }

@@ -287,7 +287,7 @@ public class CloudMQReceiver {
                                 updateSale(obj);
                             }
                             case "REQUEST_TRAN" -> {
-                                List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
                                 log.info(list.size()+"");
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
@@ -377,7 +377,7 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateTransfer(obj);
                             case "REQUEST_TRAN" -> {
-                                List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                                 }

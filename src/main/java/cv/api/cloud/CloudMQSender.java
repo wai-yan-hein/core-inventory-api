@@ -169,14 +169,15 @@ public class CloudMQSender {
 
     private void downloadTransaction() {
         log.info("downloadTransaction start.");
-        List<LocationKey> keys = userRepo.getLocation();
-        requestTran("OPENING", gson.toJson(new OPHis(opHisService.getMaxDate(), keys)));
-        requestTran("SALE", gson.toJson(new SaleHis(saleHisService.getMaxDate(), keys)));
+        List<String> location = userRepo.getLocation();
+        //requestTran("OPENING", gson.toJson(new OPHis(opHisService.getMaxDate(), keys)));
+        log.info(saleHisService.getMaxDate().toString());
+        requestTran("SALE", gson.toJson(new SaleHis(saleHisService.getMaxDate(), location)));
         //requestTran("PURCHASE", gson.toJson(new PurHis(purHisService.getMaxDate(), keys)));
         //requestTran("RETURN_IN", gson.toJson(new RetInHis(retInService.getMaxDate(), keys)));
         //requestTran("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), keys)));
         //requestTran("STOCK_IO", gson.toJson(new StockInOut(inOutService.getMaxDate(), keys)));
-        //requestTran("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), keys)));
+        requestTran("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), location)));
         log.info("downloadTransaction end.");
     }
 

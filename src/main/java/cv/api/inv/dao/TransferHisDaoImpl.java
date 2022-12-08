@@ -79,19 +79,48 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
     }
 
     @Override
-    public List<TransferHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<TransferHis> search(String updatedDate, List<String> location) {
         List<TransferHis> list = new ArrayList<>();
-        if (keys != null) {
-            for (LocationKey key : keys) {
-                String hql = "select o from TransferHis o where (o.locCodeFrom='" + key.getLocCode() + "' or o.locCodeTo='" + key.getLocCode() + "') and updatedDate > '" + updatedDate + "'";
-                list.addAll(findHSQL(hql));
+        if (location != null) {
+            for (String locCode : location) {
+                //vou_no, created_by, created_date, deleted, vou_date, ref_no, remark, updated_by,
+                // updated_date, loc_code_from, loc_code_to, mac_id, comp_code, dept_id, intg_upd_status
+                String sql = "select * from transfer_his where (loc_code_from ='" + locCode + "' or o.loc_code_to ='" + locCode + "') and updated_date >'" + updatedDate + "'";
+                try {
+                    ResultSet rs = getResultSet(sql);
+                    if (rs != null) {
+                        while (rs.next()) {
+                            TransferHis th = new TransferHis();
+                            TransferHisKey key = new TransferHisKey();
+                            key.setVouNo(rs.getString("vou_no"));
+                            key.setDeptId(rs.getInt("dept_id"));
+                            key.setCompCode(rs.getString("comp_code"));
+                            th.setKey(key);
+                            th.setCreatedBy(rs.getString("crated_by"));
+                            th.setCreatedDate(rs.getDate("created_date"));
+                            th.setDeleted(rs.getBoolean("deleted"));
+                            th.setVouDate(rs.getDate("vou_date"));
+                            th.setRefNo(rs.getString("ref_no"));
+                            th.setRemark(rs.getString("remark"));
+                            th.setUpdatedBy(rs.getString("updated_by"));
+                            th.setUpdatedDate(rs.getDate("updated_date"));
+                            th.setLocCodeFrom(rs.getString("loc_code_from"));
+                            th.setLocCodeTo(rs.getString("loc_code_to"));
+                            th.setMacId(rs.getInt("mac_id"));
+                            th.setIntgUpdStatus(rs.getString("intg_upd_status"));
+                            list.add(th);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
             }
         }
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
             Integer deptId = o.getKey().getDeptId();
-            o.setListTD(dao.search(vouNo, compCode, deptId));
+            o.setListTD(dao.searchDetail(vouNo, compCode, deptId));
         });
         return list;
     }

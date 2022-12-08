@@ -71,7 +71,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public List<LocationKey> getLocation(Integer deptId) {
+    public List<String> getLocation(Integer deptId) {
         return dao.getLocation(deptId);
     }
 

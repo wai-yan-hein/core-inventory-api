@@ -21,7 +21,7 @@ public interface TransferHisService {
 
     Date getMaxDate();
 
-    List<TransferHis> search(String updatedDate, List<LocationKey> keys);
+    List<TransferHis> search(String updatedDate, List<String> keys);
 
 
 }

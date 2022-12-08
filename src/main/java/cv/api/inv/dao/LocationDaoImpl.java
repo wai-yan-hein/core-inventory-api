@@ -64,7 +64,8 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }            }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -78,14 +79,14 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     }
 
     @Override
-    public List<LocationKey> getLocation(Integer deptId) {
-        List<LocationKey> keys = new ArrayList<>();
+    public List<String> getLocation(Integer deptId) {
+        List<String> location = new ArrayList<>();
         String hsql = "select o from Location o where o.key.deptId =" + deptId + "";
         List<Location> list = findHSQL(hsql);
         list.forEach(l -> {
-            keys.add(l.getKey());
+            location.add(l.getKey().getLocCode());
         });
-        return keys;
+        return location;
     }
 
     @Override
