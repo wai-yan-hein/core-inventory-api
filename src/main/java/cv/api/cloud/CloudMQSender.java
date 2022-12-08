@@ -168,7 +168,9 @@ public class CloudMQSender {
         requestSetup("LOCATION", gson.toJson(new Location(locationService.getMaxDate())));
         requestSetup("STOCK", gson.toJson(new Stock(stockService.getMaxDate())));
     }
+
     private void downloadTransaction() {
+        log.info("downloadTransaction start.");
         List<LocationKey> keys = userRepo.getLocation();
         requestTran("OPENING", gson.toJson(new OPHis(opHisService.getMaxDate(), keys)));
         requestTran("SALE", gson.toJson(new SaleHis(saleHisService.getMaxDate(), keys)));
@@ -177,6 +179,7 @@ public class CloudMQSender {
         //requestTran("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), keys)));
         //requestTran("STOCK_IO", gson.toJson(new StockInOut(inOutService.getMaxDate(), keys)));
         //requestTran("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), keys)));
+        log.info("downloadTransaction end.");
     }
 
     private void uploadTransaction() {
