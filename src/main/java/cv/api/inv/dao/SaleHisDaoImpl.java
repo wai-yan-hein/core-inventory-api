@@ -148,7 +148,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         List<SaleHis> list = new ArrayList<>();
         if (location != null) {
             for (String locCode : location) {
-                log.info("start.");
+                log.info("start."+updatedDate);
                 String sql = "select * from sale_his o where o.loc_code='" + locCode + "' and o.updated_date > '" + updatedDate + "'";
                 ResultSet rs = getResultSet(sql);
                 if (rs != null) {
@@ -177,13 +177,13 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                             sh.setDiscP(rs.getFloat("disc_p"));
                             sh.setTaxAmt(rs.getFloat("tax_amt"));
                             sh.setTaxPercent(rs.getFloat("tax_p"));
-                            sh.setCreatedDate(rs.getDate("created_date"));
+                            sh.setCreatedDate(rs.getTimestamp("created_date"));
                             sh.setCreatedBy(rs.getString("created_by"));
                             sh.setDeleted(rs.getBoolean("deleted"));
                             sh.setPaid(rs.getFloat("paid"));
                             sh.setBalance(rs.getFloat("vou_balance"));
                             sh.setUpdatedBy(rs.getString("updated_by"));
-                            sh.setUpdatedDate(rs.getDate("updated_date"));
+                            sh.setUpdatedDate(rs.getTimestamp("updated_date"));
                             sh.setAddress(rs.getString("address"));
                             sh.setOrderCode(rs.getString("order_code"));
                             sh.setLocCode(rs.getString("loc_code"));

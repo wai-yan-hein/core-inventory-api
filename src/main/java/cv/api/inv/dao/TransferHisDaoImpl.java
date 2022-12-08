@@ -85,7 +85,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
             for (String locCode : location) {
                 //vou_no, created_by, created_date, deleted, vou_date, ref_no, remark, updated_by,
                 // updated_date, loc_code_from, loc_code_to, mac_id, comp_code, dept_id, intg_upd_status
-                String sql = "select * from transfer_his where (loc_code_from ='" + locCode + "' or o.loc_code_to ='" + locCode + "') and updated_date >'" + updatedDate + "'";
+                String sql = "select * from transfer_his where (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "') and updated_date >'" + updatedDate + "'";
                 try {
                     ResultSet rs = getResultSet(sql);
                     if (rs != null) {
@@ -96,14 +96,14 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
                             key.setDeptId(rs.getInt("dept_id"));
                             key.setCompCode(rs.getString("comp_code"));
                             th.setKey(key);
-                            th.setCreatedBy(rs.getString("crated_by"));
-                            th.setCreatedDate(rs.getDate("created_date"));
+                            th.setCreatedBy(rs.getString("created_by"));
+                            th.setCreatedDate(rs.getTimestamp("created_date"));
                             th.setDeleted(rs.getBoolean("deleted"));
                             th.setVouDate(rs.getDate("vou_date"));
                             th.setRefNo(rs.getString("ref_no"));
                             th.setRemark(rs.getString("remark"));
                             th.setUpdatedBy(rs.getString("updated_by"));
-                            th.setUpdatedDate(rs.getDate("updated_date"));
+                            th.setUpdatedDate(rs.getTimestamp("updated_date"));
                             th.setLocCodeFrom(rs.getString("loc_code_from"));
                             th.setLocCodeTo(rs.getString("loc_code_to"));
                             th.setMacId(rs.getInt("mac_id"));
