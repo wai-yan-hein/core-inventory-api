@@ -32,12 +32,6 @@ public class TransferHisServiceImpl implements TransferHisService {
         List<TransferHisDetail> listTD = th.getListTD();
         List<String> listDel = th.getDelList();
         String vouNo = th.getKey().getVouNo();
-        if (th.getStatus().equals("NEW")) {
-            TransferHis valid = dao.findById(th.getKey());
-            if (valid != null) {
-                throw new IllegalStateException("Duplicate Transfer Voucher");
-            }
-        }
         if (listDel != null) {
             listDel.forEach(detailId -> {
                 if (detailId != null) {

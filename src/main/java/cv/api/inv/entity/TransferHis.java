@@ -45,7 +45,7 @@ public class TransferHis {
     @Transient
     private List<String> delList;
     @Transient
-    private String status;
+    private String status = "STATUS";
     @Transient
     private List<String> location;
 
