@@ -276,6 +276,7 @@ public class CloudMQReceiver {
                         }
                     }
                     case "SALE" -> {
+                        log.info(option);
                         SaleHis obj = gson.fromJson(data, SaleHis.class);
                         switch (option) {
                             case "SENT" -> {
@@ -287,6 +288,7 @@ public class CloudMQReceiver {
                             }
                             case "REQUEST_TRAN" -> {
                                 List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                log.info(list.size()+"");
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                                 }

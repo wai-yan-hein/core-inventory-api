@@ -93,10 +93,10 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         Session sees = getSession();
         sees.doWork(work);
     }
-    public ResultSet getResultSet(final String strSql) {
+    public ResultSet getResultSet(final String sql) {
         Work work = (Connection con) -> {
             try {
-                PreparedStatement stmt = con.prepareStatement(strSql);
+                PreparedStatement stmt = con.prepareStatement(sql);
                 rs = null;
                 rs = stmt.executeQuery();
             } catch (SQLException ex) {
