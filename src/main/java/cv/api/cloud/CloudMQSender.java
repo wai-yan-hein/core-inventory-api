@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.MapMessage;
 import javax.jms.Session;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -86,7 +87,7 @@ public class CloudMQSender {
                 progress = true;
                 //uploadSetup();
                 //uploadTransaction();
-                downloadSetup();
+                //downloadSetup();
                 downloadTransaction();
                 progress = false;
             }
@@ -128,7 +129,7 @@ public class CloudMQSender {
             MapMessage mm = session.createMapMessage();
             mm.setString("SENDER_QUEUE", listenQ);
             mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "REQUEST-TRAN");
+            mm.setString("OPTION", "REQUEST_TRAN");
             mm.setString("DATA", date);
             return mm;
         };
@@ -171,11 +172,11 @@ public class CloudMQSender {
         List<LocationKey> keys = userRepo.getLocation();
         requestTran("OPENING", gson.toJson(new OPHis(opHisService.getMaxDate(), keys)));
         requestTran("SALE", gson.toJson(new SaleHis(saleHisService.getMaxDate(), keys)));
-        requestTran("PURCHASE", gson.toJson(new PurHis(purHisService.getMaxDate(), keys)));
-        requestTran("RETURN_IN", gson.toJson(new RetInHis(retInService.getMaxDate(), keys)));
-        requestTran("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), keys)));
-        requestTran("STOCK_IO", gson.toJson(new StockInOut(inOutService.getMaxDate(), keys)));
-        requestTran("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), keys)));
+        //requestTran("PURCHASE", gson.toJson(new PurHis(purHisService.getMaxDate(), keys)));
+        //requestTran("RETURN_IN", gson.toJson(new RetInHis(retInService.getMaxDate(), keys)));
+        //requestTran("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), keys)));
+        //requestTran("STOCK_IO", gson.toJson(new StockInOut(inOutService.getMaxDate(), keys)));
+        //requestTran("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), keys)));
     }
 
     private void uploadTransaction() {

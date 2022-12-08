@@ -132,7 +132,10 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         ResultSet rs = getResultSet(sql);
         try {
             if (rs.next()) {
-                return rs.getTimestamp("date");
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());
