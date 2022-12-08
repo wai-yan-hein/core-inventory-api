@@ -50,5 +50,14 @@ public class OPHis implements java.io.Serializable {
     private List<String> listDel;
     @Transient
     private String status = "STATUS";
+    @Transient
+    private List<LocationKey> keys;
 
+    public OPHis() {
+    }
+
+    public OPHis(Date updatedDate, List<LocationKey> keys) {
+        this.updatedDate = updatedDate;
+        this.keys = keys;
+    }
 }

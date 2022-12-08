@@ -9,10 +9,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.dao.StockInOutDao;
 import cv.api.inv.dao.StockInOutDetailDao;
-import cv.api.inv.entity.StockIOKey;
-import cv.api.inv.entity.StockInOut;
-import cv.api.inv.entity.StockInOutDetail;
-import cv.api.inv.entity.StockInOutKey;
+import cv.api.inv.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +46,7 @@ public class StockInOutServiceImpl implements StockInOutService {
         if (listDel != null) {
             listDel.forEach(detailId -> {
                 if (detailId != null) {
-                    iodDao.delete(detailId,io.getKey().getCompCode(),io.getKey().getDeptId());
+                    iodDao.delete(detailId, io.getKey().getCompCode(), io.getKey().getDeptId());
                 }
             });
         }
@@ -104,6 +101,11 @@ public class StockInOutServiceImpl implements StockInOutService {
     @Override
     public Date getMaxDate() {
         return ioDao.getMaxDate();
+    }
+
+    @Override
+    public List<StockInOut> search(String updatedDate, List<LocationKey> keys) {
+        return ioDao.search(updatedDate, keys);
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

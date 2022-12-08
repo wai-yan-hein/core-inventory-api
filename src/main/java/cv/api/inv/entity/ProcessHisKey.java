@@ -11,8 +11,6 @@ import java.io.Serializable;
 public class ProcessHisKey implements Serializable {
     @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "stock_code")
-    private String stockCode;
     @Column(name = "comp_code")
     private String compCode;
     @Column(name = "dept_id")

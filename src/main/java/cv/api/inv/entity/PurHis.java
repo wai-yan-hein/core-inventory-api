@@ -76,8 +76,14 @@ public class PurHis implements java.io.Serializable {
     private List<PurHisDetail> listPD;
     @Transient
     private List<String> listDel;
+    @Transient
+    private List<LocationKey> keys;
 
     public PurHis() {
     }
 
+    public PurHis(Date updatedDate, List<LocationKey> keys) {
+        this.updatedDate = updatedDate;
+        this.keys = keys;
+    }
 }

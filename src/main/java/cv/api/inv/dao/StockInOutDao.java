@@ -5,8 +5,10 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
+import cv.api.inv.entity.TransferHis;
 
 import java.util.Date;
 import java.util.List;
@@ -14,19 +16,23 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockInOutDao {
+public interface StockInOutDao {
 
     StockInOut save(StockInOut saleHis) throws Exception;
 
     List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
-                            String vouNo, String userCode,String vouStatus);
+                            String vouNo, String userCode, String vouStatus);
 
     StockInOut findById(StockIOKey id);
 
     void delete(StockIOKey key) throws Exception;
-   void restore(StockIOKey key) throws Exception;
 
-   List<StockInOut> unUpload();
+    void restore(StockIOKey key) throws Exception;
+
+    List<StockInOut> unUpload();
 
     Date getMaxDate();
+
+    List<StockInOut> search(String updatedDate, List<LocationKey> keys);
+
 }

@@ -27,6 +27,9 @@ public class TransferHis {
     private String refNo;
     @Column(name = "remark")
     private String remark;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
     @Column(name = "loc_code_from")
@@ -43,4 +46,14 @@ public class TransferHis {
     private List<String> delList;
     @Transient
     private String status;
+    @Transient
+    private List<LocationKey> keys;
+
+    public TransferHis() {
+    }
+
+    public TransferHis(Date updatedDate, List<LocationKey> keys) {
+        this.updatedDate = updatedDate;
+        this.keys = keys;
+    }
 }

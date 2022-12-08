@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -68,5 +67,14 @@ public class RetInHis implements java.io.Serializable {
     private List<RetInHisDetail> listRD;
     @Transient
     private List<String> listDel;
+    @Transient
+    private List<LocationKey> keys;
 
+    public RetInHis() {
+    }
+
+    public RetInHis(Date updatedDate, List<LocationKey> keys) {
+        this.updatedDate = updatedDate;
+        this.keys = keys;
+    }
 }

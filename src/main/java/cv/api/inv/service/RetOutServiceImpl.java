@@ -9,10 +9,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.RetOutDao;
 import cv.api.inv.dao.RetOutDetailDao;
 import cv.api.inv.dao.SeqTableDao;
-import cv.api.inv.entity.RetOutHis;
-import cv.api.inv.entity.RetOutHisDetail;
-import cv.api.inv.entity.RetOutHisKey;
-import cv.api.inv.entity.RetOutKey;
+import cv.api.inv.entity.*;
 import cv.api.inv.view.VReturnOut;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +120,11 @@ public class RetOutServiceImpl implements RetOutService {
     @Override
     public Date getMaxDate() {
         return rDao.getMaxDate();
+    }
+
+    @Override
+    public List<RetOutHis> search(String updatedDate, List<LocationKey> keys) {
+        return rDao.search(updatedDate, keys);
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

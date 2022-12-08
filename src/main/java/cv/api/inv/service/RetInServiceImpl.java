@@ -9,10 +9,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.RetInDao;
 import cv.api.inv.dao.RetInDetailDao;
 import cv.api.inv.dao.SeqTableDao;
-import cv.api.inv.entity.RetInHis;
-import cv.api.inv.entity.RetInHisDetail;
-import cv.api.inv.entity.RetInHisKey;
-import cv.api.inv.entity.RetInKey;
+import cv.api.inv.entity.*;
 import cv.api.inv.view.VReturnIn;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +129,11 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public Date getMaxDate() {
         return rDao.getMaxDate();
+    }
+
+    @Override
+    public List<RetInHis> search(String updatedDate, List<LocationKey> keys) {
+        return rDao.search(updatedDate,keys);
     }
 
 

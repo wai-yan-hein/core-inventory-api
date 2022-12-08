@@ -8,10 +8,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.PurHisDao;
 import cv.api.inv.dao.SeqTableDao;
-import cv.api.inv.entity.PurDetailKey;
-import cv.api.inv.entity.PurHis;
-import cv.api.inv.entity.PurHisDetail;
-import cv.api.inv.entity.PurHisKey;
+import cv.api.inv.entity.*;
 import cv.api.inv.view.VPurchase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +121,11 @@ public class PurHisServiceImpl implements PurHisService {
     @Override
     public Date getMaxDate() {
         return phDao.getMaxDate();
+    }
+
+    @Override
+    public List<PurHis> search(String updatedDate, List<LocationKey> keys) {
+        return phDao.search(updatedDate,keys);
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

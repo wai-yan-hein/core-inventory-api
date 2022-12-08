@@ -6,6 +6,8 @@
 package cv.api.inv.dao;
 
 import cv.api.common.Util1;
+import cv.api.inv.entity.LocationKey;
+import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -145,5 +148,23 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
             log.error(e.getMessage());
         }
         return Util1.getOldDate();
+    }
+
+    @Override
+    public List<RetOutHis> search(String updatedDate, List<LocationKey> keys) {
+        List<RetOutHis> list = new ArrayList<>();
+        if (keys != null) {
+            for (LocationKey key : keys) {
+                String hql = "select o from RetOutHis o where o.locCode='" + key.getLocCode() + "' and updatedDate > '" + updatedDate + "'";
+                list.addAll(findHSQL(hql));
+            }
+        }
+        list.forEach(o -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setListRD(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 }

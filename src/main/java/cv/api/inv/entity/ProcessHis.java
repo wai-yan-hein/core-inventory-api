@@ -12,6 +12,8 @@ import java.util.List;
 public class ProcessHis {
     @EmbeddedId
     private ProcessHisKey key;
+    @Column(name = "stock_code")
+    private String stockCode;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;

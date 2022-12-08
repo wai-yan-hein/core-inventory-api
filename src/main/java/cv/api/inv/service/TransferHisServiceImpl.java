@@ -4,10 +4,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.SeqTableDao;
 import cv.api.inv.dao.TransferHisDao;
 import cv.api.inv.dao.TransferHisDetailDao;
-import cv.api.inv.entity.THDetailKey;
-import cv.api.inv.entity.TransferHis;
-import cv.api.inv.entity.TransferHisDetail;
-import cv.api.inv.entity.TransferHisKey;
+import cv.api.inv.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,5 +100,10 @@ public class TransferHisServiceImpl implements TransferHisService {
     @Override
     public Date getMaxDate() {
         return dao.getMaxDate();
+    }
+
+    @Override
+    public List<TransferHis> search(String updatedDate, List<LocationKey> keys) {
+        return dao.search(updatedDate, keys);
     }
 }

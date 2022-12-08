@@ -5,8 +5,10 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisKey;
+import cv.api.inv.entity.SaleHis;
 import cv.api.inv.view.VPurchase;
 
 import java.util.Date;
@@ -25,13 +27,17 @@ public interface PurHisDao {
     PurHis findById(PurHisKey id);
 
     void delete(PurHisKey key) throws Exception;
+
     void restore(PurHisKey key) throws Exception;
 
     List<VPurchase> search(String vouNo);
+
     List<PurHis> unUploadVoucher(String syncDate);
 
     List<PurHis> unUpload();
 
     Date getMaxDate();
+
+    List<PurHis> search(String updatedDate, List<LocationKey> keys);
 
 }

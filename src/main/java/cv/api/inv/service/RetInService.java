@@ -5,6 +5,8 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.LocationKey;
+import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.view.VReturnIn;
@@ -27,6 +29,7 @@ public interface RetInService {
     RetInHis findById(RetInHisKey id);
 
     void delete(RetInHisKey key) throws Exception;
+
     void restore(RetInHisKey key) throws Exception;
 
     List<VReturnIn> search(String vouNo);
@@ -34,5 +37,9 @@ public interface RetInService {
     List<RetInHis> unUploadVoucher(String syncDate);
 
     List<RetInHis> unUpload();
+
     Date getMaxDate();
+
+    List<RetInHis> search(String updatedDate, List<LocationKey> keys);
+
 }

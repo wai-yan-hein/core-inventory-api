@@ -123,6 +123,21 @@ public class CloudMQSender {
         }
     }
 
+    private void requestTran(String entity, String date) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("SENDER_QUEUE", listenQ);
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "REQUEST-TRAN");
+            mm.setString("DATA", date);
+            return mm;
+        };
+        String serverQ = environment.getProperty("cloud.activemq.server.queue");
+        if (serverQ != null) {
+            cloudMQTemplate.send(serverQ, mc);
+        }
+    }
+
     private void uploadSetup() {
         log.info("upload setup start.");
         uploadVouStatus();
@@ -134,7 +149,6 @@ public class CloudMQSender {
         uploadSaleMan();
         uploadCategory();
         uploadLocation();
-        //uploadPattern();
         uploadStock();
         log.info("upload setup end.");
         uploadStock();
@@ -153,17 +167,15 @@ public class CloudMQSender {
         requestSetup("LOCATION", gson.toJson(new Location(locationService.getMaxDate())));
         requestSetup("STOCK", gson.toJson(new Stock(stockService.getMaxDate())));
     }
-
-
     private void downloadTransaction() {
         List<LocationKey> keys = userRepo.getLocation();
-        requestSetup("SALE", gson.toJson(new RequestModel(keys, saleHisService.getMaxDate())));
-        requestSetup("PURCHASE", gson.toJson(new RequestModel(keys, purHisService.getMaxDate())));
-        requestSetup("RETURN_IN", gson.toJson(new RequestModel(keys, retInService.getMaxDate())));
-        requestSetup("RETURN_OUT", gson.toJson(new RequestModel(keys, retOutService.getMaxDate())));
-        requestSetup("STOCK_IO", gson.toJson(new RequestModel(keys, inOutService.getMaxDate())));
-        requestSetup("TRANSFER", gson.toJson(new RequestModel(keys, transferHisService.getMaxDate())));
-
+        requestTran("OPENING", gson.toJson(new OPHis(opHisService.getMaxDate(), keys)));
+        requestTran("SALE", gson.toJson(new SaleHis(saleHisService.getMaxDate(), keys)));
+        requestTran("PURCHASE", gson.toJson(new PurHis(purHisService.getMaxDate(), keys)));
+        requestTran("RETURN_IN", gson.toJson(new RetInHis(retInService.getMaxDate(), keys)));
+        requestTran("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), keys)));
+        requestTran("STOCK_IO", gson.toJson(new StockInOut(inOutService.getMaxDate(), keys)));
+        requestTran("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), keys)));
     }
 
     private void uploadTransaction() {
@@ -229,7 +241,7 @@ public class CloudMQSender {
     private void uploadPattern() {
         log.info("upload pattern.");
         List<Pattern> list = patternService.unUpload();
-        list.forEach(p -> sendMessage( "PATTERN", gson.toJson(p)));
+        list.forEach(p -> sendMessage("PATTERN", gson.toJson(p)));
     }
 
     private void uploadVouStatus() {

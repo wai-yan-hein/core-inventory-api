@@ -1,12 +1,18 @@
 package cv.api.inv.dao;
 
+import cv.api.common.Util1;
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.OPHisKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
+@Slf4j
 @Repository
 public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisDao {
     @Autowired
@@ -49,6 +55,38 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         Integer deptId = key.getDeptId();
         String sql = "update op_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(sql);
+    }
+
+    @Override
+    public List<OPHis> search(String updatedDate, List<LocationKey> keys) {
+        List<OPHis> list = new ArrayList<>();
+        if (keys != null) {
+            for (LocationKey key : keys) {
+                String hql = "select o from OPHis o where o.locCode='" + key.getLocCode() + "' and updatedDate > '" + updatedDate + "'";
+                list.addAll(findHSQL(hql));
+            }
+        }
+        list.forEach(o -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setDetailList(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from op_his";
+        ResultSet rs = getResultSet(sql);
+        try {
+            if (rs.next()) {
+                return rs.getTimestamp("date");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 
 }

@@ -27,8 +27,6 @@ public class CloudMQReceiver {
     @Autowired
     private UnitRelationService relationService;
     @Autowired
-    private TraderGroupService traderGroupService;
-    @Autowired
     private TraderService traderService;
     @Autowired
     private StockUnitService unitService;
@@ -82,6 +80,20 @@ public class CloudMQReceiver {
         }
     }
 
+    private void responseTran(String entity, String distQ, String data) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "RESPONSE-TRAN");
+            mm.setString("DATA", data);
+            return mm;
+        };
+        if (distQ != null) {
+            cloudMQTemplate.send(distQ, mc);
+            log.info("responseTran : " + entity);
+        }
+    }
+
     @JmsListener(destination = "${cloud.activemq.client.queue}")
     public void receivedMessage(final MapMessage message) throws JMSException {
         String entity = message.getString("ENTITY");
@@ -90,7 +102,7 @@ public class CloudMQReceiver {
         String senderQ = message.getString("SENDER_QUEUE");
         if (data != null) {
             try {
-                log.info(String.format("receivedMessage : %s",entity));
+                log.info(String.format("receivedMessage : %s", entity));
                 String REC = "REC";
                 String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 switch (entity) {
@@ -276,10 +288,15 @@ public class CloudMQReceiver {
                                 updateSale(obj);
                             }
                             case "REQUEST_TRAN" -> {
-                                RequestModel m = gson.fromJson(data,RequestModel.class);
+                                RequestModel m = gson.fromJson(data, RequestModel.class);
+                                List<SaleHis> list = saleHisService.search(Util1.toDateStr(m.getUpdatedDate(), dateTimeFormat), m.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
                             case "RESPONSE_TRAN" -> {
-
+                                SaleHis obj = gson.fromJson(data, SaleHis.class);
+                                saleHisService.save(obj);
                             }
                         }
                     }
@@ -292,10 +309,13 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateOpening(obj);
                             case "REQUEST_TRAN" -> {
-
+                                List<OPHis> list = opHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
                             case "RESPONSE_TRAN" -> {
-
+                                opHisService.save(obj);
                             }
                         }
                     }
@@ -308,11 +328,12 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updatePurchase(obj);
                             case "REQUEST_TRAN" -> {
-
+                                List<PurHis> list = purHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
-                            case "RESPONSE_TRAN" -> {
-
-                            }
+                            case "RESPONSE_TRAN" -> purHisService.save(obj);
                         }
                     }
                     case "RETURN_IN" -> {
@@ -324,11 +345,12 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateReturnIn(obj);
                             case "REQUEST_TRAN" -> {
-
+                                List<RetInHis> list = retInService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
-                            case "RESPONSE_TRAN" -> {
-
-                            }
+                            case "RESPONSE_TRAN" -> retInService.save(obj);
                         }
                     }
                     case "RETURN_OUT" -> {
@@ -340,11 +362,12 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateReturnOut(obj);
                             case "REQUEST_TRAN" -> {
-
+                                List<RetOutHis> list = retOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
-                            case "RESPONSE_TRAN" -> {
-
-                            }
+                            case "RESPONSE_TRAN" -> retOutService.save(obj);
                         }
                     }
                     case "TRANSFER" -> {
@@ -356,11 +379,13 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateTransfer(obj);
                             case "REQUEST_TRAN" -> {
-
+                                List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
-                            case "RESPONSE_TRAN" -> {
+                            case "RESPONSE_TRAN" -> transferHisService.save(obj);
 
-                            }
                         }
                     }
                     case "STOCK_IO" -> {
@@ -372,11 +397,14 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateStockIO(obj);
                             case "REQUEST_TRAN" -> {
-
+                                List<StockInOut> list = inOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                                if (!list.isEmpty()) {
+                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                                }
                             }
-                            case "RESPONSE_TRAN" -> {
+                            case "RESPONSE_TRAN" -> inOutService.save(obj);
 
-                            }
+
                         }
                     }
                 }
@@ -385,7 +413,7 @@ public class CloudMQReceiver {
                 }
 
             } catch (Exception e) {
-                log.error(String.format("%s : %s",entity,e.getMessage()));
+                log.error(String.format("%s : %s", entity, e.getMessage()));
             }
         }
     }
@@ -497,6 +525,7 @@ public class CloudMQReceiver {
         service.executeSql(sql);
         log.info("update opening.");
     }
+
     private void updateSale(SaleHis obj) throws Exception {
         SaleHisKey key = obj.getKey();
         String sql = "update sale_his set intg_upd_status ='" + SENT + "'\n"
@@ -504,6 +533,7 @@ public class CloudMQReceiver {
         service.executeSql(sql);
         log.info("update sale.");
     }
+
     private void updatePurchase(PurHis obj) throws Exception {
         PurHisKey key = obj.getKey();
         String sql = "update pur_his set intg_upd_status ='" + SENT + "'\n"

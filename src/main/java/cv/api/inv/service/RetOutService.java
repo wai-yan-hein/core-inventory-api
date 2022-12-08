@@ -5,6 +5,8 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.LocationKey;
+import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
@@ -27,11 +29,17 @@ public interface RetOutService {
     RetOutHis findById(RetOutHisKey id);
 
     void delete(RetOutHisKey key) throws Exception;
+
     void restore(RetOutHisKey key) throws Exception;
 
     List<VReturnOut> search(String vouNo);
 
     List<RetOutHis> unUploadVoucher(String syncDate);
+
     List<RetOutHis> unUpload();
+
     Date getMaxDate();
+
+    List<RetOutHis> search(String updatedDate, List<LocationKey> keys);
+
 }

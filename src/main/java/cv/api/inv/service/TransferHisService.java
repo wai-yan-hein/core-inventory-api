@@ -1,5 +1,7 @@
 package cv.api.inv.service;
 
+import cv.api.inv.entity.LocationKey;
+import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisKey;
 
@@ -14,8 +16,12 @@ public interface TransferHisService {
     List<TransferHis> unUpload();
 
     void delete(TransferHisKey key);
+
     void restore(TransferHisKey key);
+
     Date getMaxDate();
+
+    List<TransferHis> search(String updatedDate, List<LocationKey> keys);
 
 
 }

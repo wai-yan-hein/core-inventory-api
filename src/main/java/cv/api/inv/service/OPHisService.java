@@ -1,8 +1,10 @@
 package cv.api.inv.service;
 
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.OPHisKey;
 
+import java.util.Date;
 import java.util.List;
 
 public interface OPHisService {
@@ -16,4 +18,7 @@ public interface OPHisService {
 
     void delete(OPHisKey key);
 
+    List<OPHis> search(String updatedDate, List<LocationKey> keys);
+
+    Date getMaxDate();
 }

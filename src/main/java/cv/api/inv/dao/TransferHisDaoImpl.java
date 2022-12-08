@@ -1,6 +1,8 @@
 package cv.api.inv.dao;
 
 import cv.api.common.Util1;
+import cv.api.inv.entity.LocationKey;
+import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -71,5 +74,23 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
             log.error(e.getMessage());
         }
         return Util1.getOldDate();
+    }
+
+    @Override
+    public List<TransferHis> search(String updatedDate, List<LocationKey> keys) {
+        List<TransferHis> list = new ArrayList<>();
+        if (keys != null) {
+            for (LocationKey key : keys) {
+                String hql = "select o from TransferHis o where (o.locCodeFrom='" + key.getLocCode() + "' or o.locCodeTo='" + key.getLocCode() + "') and updatedDate > '" + updatedDate + "'";
+                list.addAll(findHSQL(hql));
+            }
+        }
+        list.forEach(o -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setListTD(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 }

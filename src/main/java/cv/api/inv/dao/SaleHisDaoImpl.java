@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.common.Util1;
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -136,5 +138,23 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
             log.error(e.getMessage());
         }
         return Util1.getOldDate();
+    }
+
+    @Override
+    public List<SaleHis> search(String updatedDate, List<LocationKey> keys) {
+        List<SaleHis> list = new ArrayList<>();
+        if (keys != null) {
+            for (LocationKey key : keys) {
+                String hql = "select o from SaleHis o where o.locCode='" + key.getLocCode() + "' and updatedDate > '" + updatedDate + "'";
+                list.addAll(findHSQL(hql));
+            }
+        }
+        list.forEach(o -> {
+            String vouNo = o.getKey().getVouNo();
+            String compCode = o.getKey().getCompCode();
+            Integer deptId = o.getKey().getDeptId();
+            o.setListSH(dao.search(vouNo, compCode, deptId));
+        });
+        return list;
     }
 }

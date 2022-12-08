@@ -5,6 +5,7 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
 
@@ -24,8 +25,13 @@ public interface StockInOutService {
     StockInOut findById(StockIOKey id);
 
     void delete(StockIOKey key) throws Exception;
+
     void restore(StockIOKey key) throws Exception;
 
     List<StockInOut> unUpload();
+
     Date getMaxDate();
+
+    List<StockInOut> search(String updatedDate, List<LocationKey> keys);
+
 }

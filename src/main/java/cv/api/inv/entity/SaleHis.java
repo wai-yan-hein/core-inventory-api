@@ -91,5 +91,14 @@ public class SaleHis {
     private boolean backup;
     @Transient
     private List<Location> listLocation;
+    @Transient
+    private List<LocationKey> keys;
 
+    public SaleHis() {
+    }
+
+    public SaleHis(Date updatedDate, List<LocationKey> keys) {
+        this.updatedDate = updatedDate;
+        this.keys = keys;
+    }
 }

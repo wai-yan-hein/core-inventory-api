@@ -5,6 +5,8 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.inv.entity.LocationKey;
+import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.view.VReturnIn;
@@ -25,11 +27,17 @@ public interface RetInDao {
     RetInHis findById(RetInHisKey id);
 
     void delete(RetInHisKey key) throws Exception;
+
     void restore(RetInHisKey key) throws Exception;
 
     List<VReturnIn> search(String vouNo);
 
     List<RetInHis> unUploadVoucher(String syncDate);
+
     List<RetInHis> unUpload();
+
     Date getMaxDate();
+
+    List<RetInHis> search(String updatedDate, List<LocationKey> keys);
+
 }

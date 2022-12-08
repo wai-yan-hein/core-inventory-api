@@ -5,6 +5,7 @@
  */
 package cv.api.inv.service;
 
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 
@@ -33,5 +34,8 @@ public interface SaleHisService {
     List<SaleHis> unUploadVoucher(String syncDate);
 
     List<SaleHis> unUpload();
+
     Date getMaxDate();
+
+    List<SaleHis> search(String updatedDate, List<LocationKey> keys);
 }

@@ -9,10 +9,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.SaleHisDao;
 import cv.api.inv.dao.SaleHisDetailDao;
 import cv.api.inv.dao.SeqTableDao;
-import cv.api.inv.entity.SaleDetailKey;
-import cv.api.inv.entity.SaleHis;
-import cv.api.inv.entity.SaleHisDetail;
-import cv.api.inv.entity.SaleHisKey;
+import cv.api.inv.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -122,5 +119,10 @@ public class SaleHisServiceImpl implements SaleHisService {
     @Override
     public Date getMaxDate() {
         return shDao.getMaxDate();
+    }
+
+    @Override
+    public List<SaleHis> search(String updatedDate, List<LocationKey> keys) {
+        return shDao.search(updatedDate, keys);
     }
 }

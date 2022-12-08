@@ -4,6 +4,7 @@ import cv.api.common.Util1;
 import cv.api.inv.dao.OPHisDao;
 import cv.api.inv.dao.OPHisDetailDao;
 import cv.api.inv.dao.SeqTableDao;
+import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.OPHisDetail;
 import cv.api.inv.entity.OPHisKey;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -86,6 +88,16 @@ public class OPHisServiceImpl implements OPHisService {
     @Override
     public void delete(OPHisKey key) {
         opHisDao.delete(key);
+    }
+
+    @Override
+    public List<OPHis> search(String updatedDate, List<LocationKey> keys) {
+        return opHisDao.search(updatedDate, keys);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return opHisDao.getMaxDate();
     }
 
 }
