@@ -47,13 +47,13 @@ public class TransferHis {
     @Transient
     private String status;
     @Transient
-    private List<LocationKey> keys;
+    private List<String> location;
 
     public TransferHis() {
     }
 
-    public TransferHis(Date updatedDate, List<LocationKey> keys) {
+    public TransferHis(Date updatedDate, List<String> location) {
         this.updatedDate = updatedDate;
-        this.keys = keys;
+        this.location = location;
     }
 }

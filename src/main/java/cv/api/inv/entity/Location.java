@@ -43,6 +43,8 @@ public class Location implements java.io.Serializable {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "map_dept_id")
+    private Integer mapDeptId;
 
     public Location() {
     }

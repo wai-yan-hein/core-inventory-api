@@ -34,6 +34,6 @@ public interface SaleHisDao {
 
     Date getMaxDate();
 
-    List<SaleHis> search(String updatedDate, List<LocationKey> keys);
+    List<SaleHis> search(String updatedDate, List<String> location);
 
 }

@@ -23,7 +23,7 @@ public class UserRepo {
     @Autowired
     private WebClient userApi;
     private List<Department> listDept;
-    private List<LocationKey> locKeys;
+    private List<String> location;
     @Autowired
     private LocationService locationService;
     int min = 1;
@@ -51,8 +51,8 @@ public class UserRepo {
         return listDept;
     }
 
-    public List<LocationKey> getLocation() {
-        if (locKeys == null) {
+    public List<String> getLocation() {
+        if (location == null) {
             List<Department> list = getDepartment();
             if (list != null) {
                 Integer deptId = list.get(0).getDeptId();
@@ -60,6 +60,6 @@ public class UserRepo {
 
             }
         }
-        return locKeys;
+        return location;
     }
 }

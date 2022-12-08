@@ -144,12 +144,12 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     }
 
     @Override
-    public List<SaleHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<SaleHis> search(String updatedDate, List<String> location) {
         List<SaleHis> list = new ArrayList<>();
-        if (keys != null) {
-            for (LocationKey key : keys) {
+        if (location != null) {
+            for (String locCode : location) {
                 log.info("start.");
-                String sql = "select * from sale_his o where o.loc_code='" + key.getLocCode() + "' and o.updated_date > '" + updatedDate + "' limit 200";
+                String sql = "select * from sale_his o where o.loc_code='" + locCode + "' and o.updated_date > '" + updatedDate + "' limit 200";
                 ResultSet rs = getResultSet(sql);
                 if (rs != null) {
                     try {

@@ -14,19 +14,23 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface LocationService {
+public interface LocationService {
 
-     Location findByCode(LocationKey code);
+    Location findByCode(LocationKey code);
 
-     Location save(Location loc) throws Exception;
+    Location save(Location loc) throws Exception;
 
-     List<Location> findAll(String compCode, Integer deptId);
+    List<Location> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     List<Location> search(String parent);
-     List<Location> unUpload();
+    List<Location> search(String parent);
+
+    List<Location> unUpload();
+
     Date getMaxDate();
+
     List<Location> getLocation(String updatedDate);
-    List<LocationKey> getLocation(Integer deptId);
+
+    List<String> getLocation(Integer deptId);
 }

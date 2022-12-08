@@ -122,7 +122,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public List<SaleHis> search(String updatedDate, List<LocationKey> keys) {
-        return shDao.search(updatedDate, keys);
+    public List<SaleHis> search(String updatedDate, List<String> location) {
+        return shDao.search(updatedDate, location);
     }
 }
