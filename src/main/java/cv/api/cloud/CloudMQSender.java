@@ -221,8 +221,7 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("SALE", gson.toJson(o), serverQ));
     }
 
-    public void sendSale(SaleHisKey key) {
-        SaleHis sh = saleHisService.findById(key);
+    public void sendSale(SaleHis sh) {
         if (sh != null) {
             String queue = client ? serverQ : hmQueue.get(sh.getLocCode());
             sendMessage("SALE", gson.toJson(sh), queue);

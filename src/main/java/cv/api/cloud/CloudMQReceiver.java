@@ -314,10 +314,10 @@ public class CloudMQReceiver {
                     }
                     case "SALE" -> {
                         SaleHis obj = gson.fromJson(data, SaleHis.class);
-                        log.info(obj.getUpdatedDate().toString());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
+                                obj.getKey().setDeptId(userRepo.getDeptId());
                                 saleHisService.save(obj);
                             }
                             case "RECEIVE" -> {
@@ -331,6 +331,7 @@ public class CloudMQReceiver {
                                 }
                             }
                             case "RESPONSE_TRAN" -> {
+                                obj.getKey().setDeptId(userRepo.getDeptId());
                                 saleHisService.save(obj);
                             }
                         }
@@ -419,7 +420,10 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_TRAN" -> transferHisService.save(obj);
+                            case "RESPONSE_TRAN" -> {
+                                obj.getKey().setDeptId(userRepo.getDeptId());
+                                transferHisService.save(obj);
+                            }
 
                         }
                     }
@@ -438,8 +442,6 @@ public class CloudMQReceiver {
                                 }
                             }
                             case "RESPONSE_TRAN" -> inOutService.save(obj);
-
-
                         }
                     }
                 }
