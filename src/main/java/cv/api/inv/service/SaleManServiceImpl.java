@@ -36,7 +36,6 @@ public class SaleManServiceImpl implements SaleManService {
             String code = getSaleManCode(macId, compCode);
             sm.getKey().setSaleManCode(code);
         }
-        sm.setIntgUpdStatus(null);
         return dao.save(sm);
     }
 

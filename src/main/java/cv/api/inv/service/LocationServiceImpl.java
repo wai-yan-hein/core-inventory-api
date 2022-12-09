@@ -36,7 +36,6 @@ public class LocationServiceImpl implements LocationService {
             String locCode = getLocationCode(macId, compCode);
             loc.getKey().setLocCode(locCode);
         }
-        loc.setIntgUpdStatus(null);
         return dao.save(loc);
     }
 

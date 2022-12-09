@@ -199,16 +199,13 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                 }
 
             }
-            log.info("end.");
         }
-        log.info("start detail.");
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
             Integer deptId = o.getKey().getDeptId();
             o.setListSH(dao.searchDetail(vouNo, compCode, deptId));
         });
-        log.info("end detail.");
         return list;
     }
 }

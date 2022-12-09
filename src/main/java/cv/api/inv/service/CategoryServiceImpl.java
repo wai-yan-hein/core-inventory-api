@@ -37,7 +37,6 @@ public class CategoryServiceImpl implements CategoryService {
             cat.getKey().setCatCode(catCode);
 
         }
-        cat.setIntgUpdStatus(null);
         return dao.save(cat);
     }
 

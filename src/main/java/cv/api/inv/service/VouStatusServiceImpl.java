@@ -36,7 +36,6 @@ public class VouStatusServiceImpl implements VouStatusService {
             String compCode = vs.getKey().getCompCode();
             vs.getKey().setCode(getVouStatusCode(macId, compCode));
         }
-        vs.setIntgUpdStatus(null);
         return vouDao.save(vs);
     }
 

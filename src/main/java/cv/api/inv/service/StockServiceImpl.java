@@ -44,7 +44,6 @@ public class StockServiceImpl implements StockService {
                 throw new IllegalStateException("Duplicate Stock Code");
             }
         }
-        stock.setIntgUpdStatus(null);
         return dao.save(stock);
     }
 

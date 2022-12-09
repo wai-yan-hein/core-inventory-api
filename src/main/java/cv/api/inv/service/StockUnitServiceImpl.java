@@ -27,7 +27,6 @@ public class StockUnitServiceImpl implements StockUnitService {
 
     @Override
     public StockUnit save(StockUnit unit) throws Exception {
-        unit.setIntgUpdStatus(null);
         return dao.save(unit);
     }
 
