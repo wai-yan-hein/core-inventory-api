@@ -148,7 +148,6 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         List<SaleHis> list = new ArrayList<>();
         if (location != null) {
             for (String locCode : location) {
-                log.info("start."+updatedDate);
                 String sql = "select * from sale_his o where o.loc_code='" + locCode + "' and o.updated_date > '" + updatedDate + "'";
                 ResultSet rs = getResultSet(sql);
                 if (rs != null) {
