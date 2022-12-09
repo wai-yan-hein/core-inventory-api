@@ -5,6 +5,7 @@
  */
 package cv.api.controller;
 
+import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -36,10 +37,13 @@ public class TransferController {
     private ReportService reportService;
     @Autowired
     private TransferHisDetailService detailService;
+    @Autowired
+    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-transfer")
     public ResponseEntity<TransferHis> saveTransfer(@RequestBody TransferHis transferHis) {
         transferHis = thService.save(transferHis);
+        cloudMQSender.sendTransfer(transferHis);
         return ResponseEntity.ok(transferHis);
     }
 

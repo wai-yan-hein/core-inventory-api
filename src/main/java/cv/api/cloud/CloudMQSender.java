@@ -91,7 +91,7 @@ public class CloudMQSender {
             if (!progress) {
                 progress = true;
                 //uploadSetup();
-                //uploadTransaction();
+                uploadTransaction();
                 downloadSetup();
                 //downloadTransaction();
                 progress = false;
@@ -256,6 +256,14 @@ public class CloudMQSender {
         log.info("upload transfer.");
         List<TransferHis> list = transferHisService.unUpload();
         list.forEach(o -> sendMessage("TRANSFER", gson.toJson(o), serverQ));
+    }
+
+    public void sendTransfer(TransferHis th) {
+        String q1 = hmQueue.get(th.getLocCodeTo());
+        String q2 = hmQueue.get(th.getLocCodeFrom());
+        String mig = Util1.isNull(q1, q2);
+        String queue = client ? serverQ : mig;
+        sendMessage("TRANSFER", gson.toJson(th), queue);
     }
 
 
