@@ -142,7 +142,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public Date getMaxDate() {
-        String sql = "select max(updated_date) date from location";
+        String sql = "select max(updated_date) date from stock";
         ResultSet rs = getResultSet(sql);
         try {
             if (rs.next()) {
