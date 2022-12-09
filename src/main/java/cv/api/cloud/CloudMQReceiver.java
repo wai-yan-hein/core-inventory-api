@@ -331,6 +331,7 @@ public class CloudMQReceiver {
                                 }
                             }
                             case "RESPONSE_TRAN" -> {
+                                obj.getKey().setDeptId(userRepo.getDeptId());
                                 saleHisService.save(obj);
                             }
                         }
