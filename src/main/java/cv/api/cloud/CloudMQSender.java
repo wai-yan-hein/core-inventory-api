@@ -92,8 +92,8 @@ public class CloudMQSender {
                 progress = true;
                 //uploadSetup();
                 //uploadTransaction();
-                //downloadSetup();
-                downloadTransaction();
+                downloadSetup();
+                //downloadTransaction();
                 progress = false;
             }
         }
