@@ -410,6 +410,7 @@ public class CloudMQReceiver {
                         TransferHis obj = gson.fromJson(data, TransferHis.class);
                         switch (option) {
                             case "SENT" -> {
+                                obj.getKey().setDeptId(userRepo.getDeptId());
                                 obj.setIntgUpdStatus(REC);
                                 transferHisService.save(obj);
                             }
