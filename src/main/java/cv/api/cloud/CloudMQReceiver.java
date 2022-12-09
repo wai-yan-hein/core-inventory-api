@@ -288,7 +288,7 @@ public class CloudMQReceiver {
                             }
                             case "REQUEST_TRAN" -> {
                                 List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
-                                log.info(list.size()+"");
+                                log.info(list.size() + "");
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                                 }

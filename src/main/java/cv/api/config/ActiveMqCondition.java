@@ -17,7 +17,7 @@ public class ActiveMqCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext cc, AnnotatedTypeMetadata atm) {
-        String useActiveMq = cc.getEnvironment().getProperty("use.activemq");
+        String useActiveMq = cc.getEnvironment().getProperty("cloud.use.activemq");
         return Util1.getBoolean(useActiveMq);
     }
 }

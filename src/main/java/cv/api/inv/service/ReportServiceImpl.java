@@ -872,8 +872,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
                                                boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                               String locCode,String compCode, Integer deptId, Integer macId) throws Exception {
-        calStockBalanceByLocation(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode,compCode, deptId, macId);
+                                               String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+        calStockBalanceByLocation(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
         List<VStockBalance> balances = new ArrayList<>();
         String sql = "select tmp.stock_code,tmp.loc_code,l.loc_name,tmp.unit,tmp.qty,tmp.smallest_qty,s.user_code,s.rel_code,s.stock_name\n" +
                 "from tmp_stock_balance tmp join location l\n" +
@@ -1729,7 +1729,7 @@ public class ReportServiceImpl implements ReportService {
                 + "and v.comp_code = ll.comp_code\n"
                 + "where v.comp_code = '" + compCode + "'\n"
                 + "and v.deleted = " + deleted + "\n"
-                + "and v.dept_id = " + deptId + "\n"
+                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
                 + "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
                 + "and (v.ref_no like '" + refNo + "%' or '-%'= '" + refNo + "%')\n"

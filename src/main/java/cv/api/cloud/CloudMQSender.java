@@ -10,6 +10,7 @@ import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.MapMessage;
 import javax.jms.Session;
 import java.text.DateFormat;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -71,6 +73,9 @@ public class CloudMQSender {
     private OPHisService opHisService;
     @Autowired
     private UserRepo userRepo;
+    private HashMap<String, String> hmQueue = new HashMap<>();
+    private boolean client;
+    private String serverQ;
     private boolean progress = false;
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -79,8 +84,10 @@ public class CloudMQSender {
 
     @Scheduled(fixedRate = 10000000)
     private void uploadToServer() {
-        boolean sync = Util1.getBoolean(environment.getProperty("cloud.upload.server"));
-        if (sync) {
+        client = Util1.getBoolean(userRepo.getProperty("cloud.upload.server"));
+        serverQ = userRepo.getProperty("cloud.activemq.server.queue");
+        if (client) {
+            log.info("ActiveMQ Server Q : " + serverQ);
             if (!progress) {
                 progress = true;
                 //uploadSetup();
@@ -92,7 +99,7 @@ public class CloudMQSender {
         }
     }
 
-    private void sendMessage(String entity, String data) {
+    private void sendMessage(String entity, String data, String queue) {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
             mm.setString("SENDER_QUEUE", listenQ);
@@ -101,9 +108,8 @@ public class CloudMQSender {
             mm.setString("DATA", data);
             return mm;
         };
-        String serverQ = environment.getProperty("cloud.activemq.server.queue");
-        if (serverQ != null) {
-            cloudMQTemplate.send(serverQ, mc);
+        if (queue != null) {
+            cloudMQTemplate.send(queue, mc);
         }
     }
 
@@ -116,7 +122,6 @@ public class CloudMQSender {
             mm.setString("DATA", date);
             return mm;
         };
-        String serverQ = environment.getProperty("cloud.activemq.server.queue");
         if (serverQ != null) {
             cloudMQTemplate.send(serverQ, mc);
         }
@@ -131,7 +136,6 @@ public class CloudMQSender {
             mm.setString("DATA", date);
             return mm;
         };
-        String serverQ = environment.getProperty("cloud.activemq.server.queue");
         if (serverQ != null) {
             cloudMQTemplate.send(serverQ, mc);
         }
@@ -196,116 +200,125 @@ public class CloudMQSender {
     private void uploadSale() {
         log.info("upload sale.");
         List<SaleHis> list = saleHisService.unUpload();
-        list.forEach(o -> sendMessage("SALE", gson.toJson(o)));
+        list.forEach(o -> sendMessage("SALE", gson.toJson(o), serverQ));
+    }
+
+    public void sendSale(SaleHisKey key) {
+        SaleHis sh = saleHisService.findById(key);
+        if (sh != null) {
+            String queue = client ? serverQ : hmQueue.get(sh.getLocCode());
+            sendMessage("SALE", gson.toJson(sh), queue);
+        }
     }
 
     private void uploadPurchase() {
         log.info("upload purchase.");
         List<PurHis> list = purHisService.unUpload();
-        list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o)));
+        list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o), serverQ));
     }
 
     private void uploadReturnIn() {
         log.info("upload return in.");
         List<RetInHis> list = retInService.unUpload();
-        list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o)));
+        list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o), serverQ));
     }
 
     private void uploadReturnOut() {
         log.info("upload return out.");
         List<RetOutHis> list = retOutService.unUpload();
-        list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o)));
+        list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o), serverQ));
     }
 
     private void uploadStockInOut() {
         log.info("upload stock in out.");
         List<StockInOut> list = inOutService.unUpload();
-        list.forEach(o -> sendMessage("STOCK_IO", gson.toJson(o)));
+        list.forEach(o -> sendMessage("STOCK_IO", gson.toJson(o), serverQ));
     }
 
     private void uploadTransfer() {
         log.info("upload transfer.");
         List<TransferHis> list = transferHisService.unUpload();
-        list.forEach(o -> sendMessage("TRANSFER", gson.toJson(o)));
+        list.forEach(o -> sendMessage("TRANSFER", gson.toJson(o), serverQ));
     }
+
 
     private void uploadOpening() {
         log.info("upload opening.");
         List<OPHis> list = opHisService.unUpload();
-        list.forEach(o -> sendMessage("OPENING", gson.toJson(o)));
+        list.forEach(o -> sendMessage("OPENING", gson.toJson(o), serverQ));
     }
 
     private void uploadStock() {
         log.info("upload stock.");
         List<Stock> list = stockService.unUpload();
-        list.forEach(o -> sendMessage("STOCK", gson.toJson(o)));
+        list.forEach(o -> sendMessage("STOCK", gson.toJson(o), serverQ));
     }
 
     private void uploadPattern() {
         log.info("upload pattern.");
         List<Pattern> list = patternService.unUpload();
-        list.forEach(p -> sendMessage("PATTERN", gson.toJson(p)));
+        list.forEach(p -> sendMessage("PATTERN", gson.toJson(p), serverQ));
     }
 
     private void uploadVouStatus() {
         log.info("upload vou status.");
         List<VouStatus> list = vouStatusService.unUpload();
-        list.forEach((e) -> sendMessage("VOU_STATUS", gson.toJson(e)));
+        list.forEach((e) -> sendMessage("VOU_STATUS", gson.toJson(e), serverQ));
     }
 
     private void uploadUnitRelation() {
         log.info("upload unit relation.");
         List<UnitRelation> list = relationService.unUpload();
-        list.forEach(o -> sendMessage("RELATION", gson.toJson(o)));
+        list.forEach(o -> sendMessage("RELATION", gson.toJson(o), serverQ));
     }
 
     private void uploadTraderGroup() {
         log.info("upload trader group.");
         List<TraderGroup> list = traderGroupService.unUpload();
-        list.forEach((o) -> sendMessage("TRADER_GROUP", gson.toJson(o)));
+        list.forEach((o) -> sendMessage("TRADER_GROUP", gson.toJson(o), serverQ));
     }
 
     private void uploadTrader() {
         log.info("upload trader.");
         List<Trader> list = traderService.unUploadTrader();
-        list.forEach((o) -> sendMessage("TRADER", gson.toJson(o)));
+        list.forEach((o) -> sendMessage("TRADER", gson.toJson(o), serverQ));
     }
 
     private void uploadStockUnit() {
         log.info("upload stock unit.");
         List<StockUnit> list = unitService.unUpload();
-        list.forEach((o) -> sendMessage("UNIT", gson.toJson(o)));
+        list.forEach((o) -> sendMessage("UNIT", gson.toJson(o), serverQ));
     }
 
     private void uploadStockType() {
         log.info("upload stock type.");
         List<StockType> list = stockTypeService.unUpload();
-        list.forEach((o) -> sendMessage("STOCK_TYPE", gson.toJson(o)));
+        list.forEach((o) -> sendMessage("STOCK_TYPE", gson.toJson(o), serverQ));
     }
 
     private void uploadStockBrand() {
         log.info("upload stock brand.");
         List<StockBrand> list = brandService.unUpload();
-        list.forEach((o) -> sendMessage("STOCK_BRAND", gson.toJson(o)));
+        list.forEach((o) -> sendMessage("STOCK_BRAND", gson.toJson(o), serverQ));
     }
 
     private void uploadSaleMan() {
         log.info("upload sale man.");
         List<SaleMan> list = saleManService.unUpload();
-        list.forEach(o -> sendMessage("SALEMAN", gson.toJson(o)));
+        list.forEach(o -> sendMessage("SALEMAN", gson.toJson(o), serverQ));
 
     }
 
     private void uploadCategory() {
         log.info("upload category.");
         List<Category> list = categoryService.unUpload();
-        list.forEach(o -> sendMessage("STOCK_CATEGORY", gson.toJson(o)));
+        list.forEach(o -> sendMessage("STOCK_CATEGORY", gson.toJson(o), serverQ));
     }
 
     private void uploadLocation() {
         log.info("upload location.");
         List<Location> list = locationService.unUpload();
-        list.forEach(o -> sendMessage("LOCATION", gson.toJson(o)));
+        list.forEach(o -> sendMessage("LOCATION", gson.toJson(o), serverQ));
     }
 
     private void info(String message) {

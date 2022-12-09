@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ public class UserRepo {
     private WebClient userApi;
     private List<Department> listDept;
     private List<String> location;
+    private final HashMap<String, String> hmKey = new HashMap<>();
     @Autowired
     private LocationService locationService;
     int min = 1;
@@ -38,6 +40,26 @@ public class UserRepo {
                 .retrieve()
                 .bodyToMono(SystemProperty.class);
         return result.block(Duration.ofMinutes(min));
+    }
+
+    public String getProperty(String key) {
+        if (hmKey.isEmpty()) {
+            Mono<ResponseEntity<List<SystemProperty>>> result = userApi.get()
+                    .uri(builder -> builder.path("/user/get-system-property")
+                            .queryParam("compCode", "-")
+                            .build())
+                    .retrieve().toEntityList(SystemProperty.class);
+            ResponseEntity<List<SystemProperty>> block = result.block();
+            if (block != null) {
+                List<SystemProperty> list = block.getBody();
+                if (list != null) {
+                    for (SystemProperty s : list) {
+                        hmKey.put(s.getKey().getPropKey(), s.getPropValue());
+                    }
+                }
+            }
+        }
+        return hmKey.get(key);
     }
 
     public List<Department> getDepartment() {

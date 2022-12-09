@@ -81,7 +81,7 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     @Override
     public List<String> getLocation(Integer deptId) {
         List<String> location = new ArrayList<>();
-        String hsql = "select o from Location o where o.key.deptId =" + deptId + "";
+        String hsql = "select o from Location o where o.mapDeptId =" + deptId + "";
         List<Location> list = findHSQL(hsql);
         list.forEach(l -> {
             location.add(l.getKey().getLocCode());

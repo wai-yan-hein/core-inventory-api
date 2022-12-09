@@ -5,9 +5,13 @@
  */
 package cv.api.config;
 
+import cv.api.common.Util1;
+import cv.api.model.Department;
+import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -31,7 +35,8 @@ import java.util.List;
 @EnableJms
 public class ActiveMQConfig {
     @Autowired
-    Environment environment;
+    private UserRepo userRepo;
+
 
     public ActiveMQConnectionFactory connectionFactory(String url) {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
@@ -45,26 +50,20 @@ public class ActiveMQConfig {
         return new ActiveMQTopic("INV_MSG");
     }
 
-    //@Bean(name = "topicSender")
+    @Bean(name = "topicSender")
     public JmsTemplate topicSender() {
         JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(connectionFactory(localUrl()));
+        String url = userRepo.getProperty("cloud.activemq.url");
+        template.setConnectionFactory(connectionFactory(url));
         template.setDefaultDestination(topic());
         template.setPubSubDomain(true);
-        return template;
-    }
-
-    //@Bean(name = "queueSender")
-    public JmsTemplate queueSender() {
-        JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(connectionFactory(localUrl()));
         return template;
     }
 
     @Bean(name = "cloudMQTemplate")
     public JmsTemplate cloudMQTemplate() {
         JmsTemplate template = new JmsTemplate();
-        String url = environment.getProperty("cloud.activemq.url");
+        String url = userRepo.getProperty("cloud.activemq.url");
         template.setConnectionFactory(connectionFactory(url));
         return template;
     }
@@ -72,14 +71,11 @@ public class ActiveMQConfig {
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        String url = environment.getProperty("cloud.activemq.url");
+        String url = userRepo.getProperty("cloud.activemq.url");
         factory.setConnectionFactory(connectionFactory(url));
         factory.setConcurrency("1-1");
-        log.info("active mq configured.");
+        log.info("ActiveMQ connection configured at " + url);
         return factory;
     }
 
-    public String localUrl() {
-      return environment.getRequiredProperty("activemq.url");
-    }
 }

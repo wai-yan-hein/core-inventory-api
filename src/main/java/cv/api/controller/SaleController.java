@@ -5,6 +5,7 @@
  */
 package cv.api.controller;
 
+import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -43,6 +44,8 @@ public class SaleController {
     private final ReturnObject ro = new ReturnObject();
     @Autowired
     private AccountRepo accountRepo;
+    @Autowired
+    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-sale")
     public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale) throws Exception {
@@ -50,7 +53,10 @@ public class SaleController {
             backupService.backup(sale);
             sale = shService.save(sale);
         }
+        //for account
         accountRepo.sendSale(sale);
+        //for cloud
+        cloudMQSender.sendSale(sale.getKey());
         return ResponseEntity.ok(sale);
     }
 
@@ -100,7 +106,7 @@ public class SaleController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode,deptId,deleted);
+        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode, deptId, deleted);
         return ResponseEntity.ok(saleList);
     }
 
