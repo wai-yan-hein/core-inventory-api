@@ -37,6 +37,11 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     }
 
     @Override
+    public List<Location> findAll() {
+        return findHSQL("select o from Location o");
+    }
+
+    @Override
     public int delete(String id) {
         String hsql = "delete from Location o where o.locationCode='" + id + "'";
         return execUpdateOrDelete(hsql);

@@ -22,6 +22,8 @@ public interface LocationService {
 
     List<Location> findAll(String compCode, Integer deptId);
 
+    List<Location> findAll();
+
     int delete(String id);
 
     List<Location> search(String parent);

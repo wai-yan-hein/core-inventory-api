@@ -46,6 +46,11 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
+    public List<Location> findAll() {
+        return dao.findAll();
+    }
+
+    @Override
     public int delete(String id) {
         return dao.delete(id);
     }

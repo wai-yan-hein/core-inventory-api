@@ -93,7 +93,7 @@ public class CloudMQReceiver {
         }
     }
 
-    @JmsListener(destination = "${cloud.activemq.client.queue}")
+    @JmsListener(destination = "${cloud.activemq.listen.queue}")
     public void receivedMessage(final MapMessage message) throws JMSException {
         String entity = message.getString("ENTITY");
         String option = message.getString("OPTION");

@@ -14,20 +14,24 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface LocationDao {
+public interface LocationDao {
 
-     Location save(Location loc);
+    Location save(Location loc);
 
-     List<Location> findAll(String compCode, Integer deptId);
+    List<Location> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    List<Location> findAll();
 
-     Location findByCode(LocationKey code);
+    int delete(String id);
 
-     List<Location> search(String parent);
+    Location findByCode(LocationKey code);
+
+    List<Location> search(String parent);
+
     List<Location> unUpload();
 
     Date getMaxDate();
+
     List<Location> getLocation(String updatedDate);
 
     List<String> getLocation(Integer deptId);

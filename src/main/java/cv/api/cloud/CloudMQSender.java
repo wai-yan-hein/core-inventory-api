@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.model.Department;
 import cv.api.repo.UserRepo;
 import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +27,10 @@ import java.util.List;
 @Slf4j
 @Component
 public class CloudMQSender {
-    @Value("${cloud.activemq.client.queue}")
+    @Value("${cloud.activemq.listen.queue}")
     private String listenQ;
     @Autowired
     private JmsTemplate cloudMQTemplate;
-    @Autowired
-    private Environment environment;
     //service
     @Autowired
     private PatternService patternService;
@@ -84,6 +83,7 @@ public class CloudMQSender {
 
     @Scheduled(fixedRate = 10000000)
     private void uploadToServer() {
+        initQueue();
         client = Util1.getBoolean(userRepo.getProperty("cloud.upload.server"));
         serverQ = userRepo.getProperty("cloud.activemq.server.queue");
         if (client) {
@@ -95,6 +95,24 @@ public class CloudMQSender {
                 //downloadSetup();
                 downloadTransaction();
                 progress = false;
+            }
+        }
+    }
+
+    private void initQueue() {
+        if (hmQueue.isEmpty()) {
+            List<Department> listDep = userRepo.getDepartment();
+            HashMap<Integer, String> hmDep = new HashMap<>();
+            listDep.forEach(d -> {
+                hmDep.put(d.getDeptId(), d.getQueueName());
+            });
+            List<Location> list = locationService.findAll();
+            if (!list.isEmpty()) {
+                for (Location l : list) {
+                    String locCode = l.getKey().getLocCode();
+                    Integer deptId = l.getMapDeptId();
+                    hmQueue.put(locCode, hmDep.get(deptId));
+                }
             }
         }
     }
