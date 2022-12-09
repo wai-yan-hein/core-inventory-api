@@ -8,6 +8,7 @@ import cv.api.inv.service.*;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -22,6 +23,8 @@ import java.util.List;
 @Slf4j
 @Component
 public class CloudMQReceiver {
+    @Value("${cloud.activemq.listen.queue}")
+    private String listenQ;
     @Autowired
     private VouStatusService vouStatusService;
     @Autowired
@@ -72,6 +75,7 @@ public class CloudMQReceiver {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
             mm.setString("ENTITY", entity);
+            mm.setString("SENDER_QUEUE", listenQ);
             mm.setString("OPTION", "RESPONSE_SETUP");
             mm.setString("DATA", data);
             return mm;
