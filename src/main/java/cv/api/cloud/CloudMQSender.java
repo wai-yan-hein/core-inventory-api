@@ -90,10 +90,10 @@ public class CloudMQSender {
             log.info("ActiveMQ Server Q : " + serverQ);
             if (!progress) {
                 progress = true;
-                //uploadSetup();
+                uploadSetup();
                 uploadTransaction();
                 downloadSetup();
-                //downloadTransaction();
+                downloadTransaction();
                 progress = false;
             }
         }

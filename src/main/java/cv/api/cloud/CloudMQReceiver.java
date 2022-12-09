@@ -128,6 +128,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 vouStatusService.save(obj);
                             }
                         }
@@ -148,6 +149,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 relationService.save(obj);
                             }
                         }
@@ -168,6 +170,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 traderService.saveTrader(obj);
                             }
                         }
@@ -188,6 +191,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 unitService.save(obj);
                             }
                         }
@@ -208,6 +212,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 typeService.save(obj);
                             }
                         }
@@ -228,6 +233,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 brandService.save(obj);
                             }
                         }
@@ -248,6 +254,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 categoryService.save(obj);
                             }
                         }
@@ -268,6 +275,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 saleManService.save(obj);
                             }
                         }
@@ -288,6 +296,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 locationService.save(obj);
                             }
                         }
@@ -308,6 +317,7 @@ public class CloudMQReceiver {
                             }
                             case "RESPONSE_SETUP" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
+                                obj.setIntgUpdStatus(REC);
                                 stockService.save(obj);
                             }
                         }
