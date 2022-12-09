@@ -104,7 +104,7 @@ public class CloudMQReceiver {
         String senderQ = message.getString("SENDER_QUEUE");
         if (data != null) {
             try {
-                log.info(String.format("receivedMessage : %s", entity));
+                log.info(String.format("receivedMessage : %s - %s - %s", entity, option, senderQ));
                 String REC = "REC";
                 String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 switch (entity) {
@@ -170,7 +170,6 @@ public class CloudMQReceiver {
                     }
                     case "UNIT" -> {
                         StockUnit obj = gson.fromJson(data, StockUnit.class);
-                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
