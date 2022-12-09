@@ -9,3 +9,6 @@ CHANGE COLUMN `updated_date` `updated_date` TIMESTAMP NOT NULL DEFAULT CURRENT_T
 
 ALTER TABLE `location` 
 ADD COLUMN `map_dept_id` INT NULL;
+
+ALTER TABLE `stock` 
+CHANGE COLUMN `updated_date` `updated_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ;
