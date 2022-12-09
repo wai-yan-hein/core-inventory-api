@@ -84,4 +84,9 @@ public class UserRepo {
         }
         return location;
     }
+
+    public Integer getDeptId() {
+        List<Department> list = getDepartment();
+        return list.isEmpty() ? 0 : list.get(0).getDeptId();
+    }
 }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -59,6 +60,8 @@ public class CloudMQReceiver {
     private ReportService service;
     @Autowired
     private JmsTemplate cloudMQTemplate;
+    @Autowired
+    private UserRepo userRepo;
     private final String SENT = "SENT";
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -107,6 +110,7 @@ public class CloudMQReceiver {
                 switch (entity) {
                     case "VOU_STATUS" -> {
                         VouStatus vou = gson.fromJson(data, VouStatus.class);
+                        vou.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 vou.setIntgUpdStatus(REC);
@@ -124,6 +128,7 @@ public class CloudMQReceiver {
                     }
                     case "RELATION" -> {
                         UnitRelation rel = gson.fromJson(data, UnitRelation.class);
+                        rel.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 rel.setIntgUpdStatus(REC);
@@ -141,6 +146,7 @@ public class CloudMQReceiver {
                     }
                     case "TRADER" -> {
                         Trader obj = gson.fromJson(data, Trader.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -158,6 +164,7 @@ public class CloudMQReceiver {
                     }
                     case "UNIT" -> {
                         StockUnit obj = gson.fromJson(data, StockUnit.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -175,6 +182,7 @@ public class CloudMQReceiver {
                     }
                     case "STOCK_TYPE" -> {
                         StockType obj = gson.fromJson(data, StockType.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -192,6 +200,7 @@ public class CloudMQReceiver {
                     }
                     case "STOCK_BRAND" -> {
                         StockBrand obj = gson.fromJson(data, StockBrand.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -209,6 +218,7 @@ public class CloudMQReceiver {
                     }
                     case "STOCK_CATEGORY" -> {
                         Category obj = gson.fromJson(data, Category.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -226,6 +236,7 @@ public class CloudMQReceiver {
                     }
                     case "SALEMAN" -> {
                         SaleMan obj = gson.fromJson(data, SaleMan.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -243,6 +254,7 @@ public class CloudMQReceiver {
                     }
                     case "LOCATION" -> {
                         Location obj = gson.fromJson(data, Location.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
@@ -260,6 +272,7 @@ public class CloudMQReceiver {
                     }
                     case "STOCK" -> {
                         Stock obj = gson.fromJson(data, Stock.class);
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                         switch (option) {
                             case "SENT" -> {
                                 obj.setIntgUpdStatus(REC);
