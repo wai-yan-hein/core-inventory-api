@@ -115,7 +115,7 @@ public class CloudMQReceiver {
                     case "VOU_STATUS" -> {
                         VouStatus obj = gson.fromJson(data, VouStatus.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 vouStatusService.save(obj);
                             }
@@ -126,17 +126,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                vouStatusService.save(obj);
-                            }
                         }
                     }
                     case "RELATION" -> {
                         UnitRelation obj = gson.fromJson(data, UnitRelation.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 relationService.save(obj);
                             }
@@ -147,17 +142,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                relationService.save(obj);
-                            }
                         }
                     }
                     case "TRADER" -> {
                         Trader obj = gson.fromJson(data, Trader.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 traderService.saveTrader(obj);
                             }
@@ -168,17 +158,13 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                traderService.saveTrader(obj);
-                            }
+
                         }
                     }
                     case "UNIT" -> {
                         StockUnit obj = gson.fromJson(data, StockUnit.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 unitService.save(obj);
                             }
@@ -189,17 +175,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                unitService.save(obj);
-                            }
                         }
                     }
                     case "STOCK_TYPE" -> {
                         StockType obj = gson.fromJson(data, StockType.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 typeService.save(obj);
                             }
@@ -210,17 +191,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                typeService.save(obj);
-                            }
                         }
                     }
                     case "STOCK_BRAND" -> {
                         StockBrand obj = gson.fromJson(data, StockBrand.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 brandService.save(obj);
                             }
@@ -231,17 +207,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                brandService.save(obj);
-                            }
                         }
                     }
                     case "STOCK_CATEGORY" -> {
                         Category obj = gson.fromJson(data, Category.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 categoryService.save(obj);
                             }
@@ -252,17 +223,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                categoryService.save(obj);
-                            }
                         }
                     }
                     case "SALEMAN" -> {
                         SaleMan obj = gson.fromJson(data, SaleMan.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
                                 obj.setIntgUpdStatus(REC);
                                 saleManService.save(obj);
                             }
@@ -273,17 +239,13 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                saleManService.save(obj);
-                            }
                         }
                     }
                     case "LOCATION" -> {
                         Location obj = gson.fromJson(data, Location.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
+                                obj.getKey().setDeptId(userRepo.getDeptId());
                                 obj.setIntgUpdStatus(REC);
                                 locationService.save(obj);
                             }
@@ -294,17 +256,13 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                locationService.save(obj);
-                            }
                         }
                     }
                     case "STOCK" -> {
                         Stock obj = gson.fromJson(data, Stock.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SENT", "RESPONSE_SETUP" -> {
+                                obj.getKey().setDeptId(userRepo.getDeptId());
                                 obj.setIntgUpdStatus(REC);
                                 stockService.save(obj);
                             }
@@ -314,11 +272,6 @@ public class CloudMQReceiver {
                                 if (!list.isEmpty()) {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
-                            }
-                            case "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                stockService.save(obj);
                             }
                         }
                     }
