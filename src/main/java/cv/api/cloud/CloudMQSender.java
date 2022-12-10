@@ -11,8 +11,6 @@ import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +29,8 @@ public class CloudMQSender {
     private String listenQ;
     @Autowired
     private JmsTemplate cloudMQTemplate;
+    @Autowired
+    private JmsTemplate topicSender;
     //service
     @Autowired
     private PatternService patternService;
@@ -128,6 +128,20 @@ public class CloudMQSender {
         };
         if (queue != null) {
             cloudMQTemplate.send(queue, mc);
+        }
+    }
+
+    private void sendTopicMessage(String entity, String data) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("SENDER_QUEUE", listenQ);
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "SENT");
+            mm.setString("DATA", data);
+            return mm;
+        };
+        if (topicSender != null) {
+            topicSender.send(mc);
         }
     }
 
@@ -277,6 +291,10 @@ public class CloudMQSender {
         log.info("upload stock.");
         List<Stock> list = stockService.unUpload();
         list.forEach(o -> sendMessage("STOCK", gson.toJson(o), serverQ));
+    }
+
+    public void sendStock(Stock s) {
+        sendTopicMessage("STOCK", gson.toJson(s));
     }
 
     private void uploadPattern() {

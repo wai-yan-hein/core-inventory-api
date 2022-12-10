@@ -5,6 +5,7 @@
  */
 package cv.api.controller;
 
+import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
@@ -75,6 +76,8 @@ public class SetupController {
 
     @Autowired
     private AccountRepo accountRepo;
+    @Autowired
+    private CloudMQSender cloudMQSender;
     private final ReturnObject ro = new ReturnObject();
 
 
@@ -344,6 +347,8 @@ public class SetupController {
     @PostMapping(path = "/save-stock")
     public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) throws Exception {
         Stock b = stockService.save(stock);
+        //for cloud
+        cloudMQSender.sendStock(b);
         return ResponseEntity.ok(b);
     }
 
