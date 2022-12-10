@@ -5,9 +5,11 @@
  */
 package cv.api.controller;
 
+import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
+import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisDetail;
 import cv.api.inv.entity.RetInHisKey;
@@ -18,6 +20,7 @@ import cv.api.inv.view.VReturnIn;
 import cv.api.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +34,7 @@ import java.util.List;
 @Slf4j
 public class RetInController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private RetInService riService;
     @Autowired
@@ -39,13 +43,16 @@ public class RetInController {
     private ReportService reportService;
     @Autowired
     private AccountRepo accountRepo;
-    private final ReturnObject ro = new ReturnObject();
+    @Autowired(required = false)
+    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-retin")
     public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin) throws Exception {
         retin = riService.save(retin);
         //send message to service
         accountRepo.sendReturnIn(retin);
+        //send to cloud
+        cloudMQSender.sendReturnIn(retin);
         return ResponseEntity.ok(retin);
     }
 

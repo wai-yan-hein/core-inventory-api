@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface RetInDetailService {
+public interface RetInDetailService {
 
-     RetInHisDetail save(RetInHisDetail pd);
+    RetInHisDetail save(RetInHisDetail pd);
 
-     List<RetInHisDetail> search(String vouNo, String compCode, Integer deptId);
+    List<RetInHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-     int delete(String id, String compCode, Integer deptId) throws Exception;
+    int delete(String id, String compCode, Integer deptId) throws Exception;
 }

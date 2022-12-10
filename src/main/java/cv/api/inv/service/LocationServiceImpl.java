@@ -29,7 +29,7 @@ public class LocationServiceImpl implements LocationService {
     private SeqTableService seqService;
 
     @Override
-    public Location save(Location loc) throws Exception {
+    public Location save(Location loc) {
         if (loc.getKey().getLocCode() == null) {
             Integer macId = loc.getMacId();
             String compCode = loc.getKey().getCompCode();

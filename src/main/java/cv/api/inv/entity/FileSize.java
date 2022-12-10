@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
- *
  * @author SAI
  */
 @Entity
@@ -46,5 +45,5 @@ public class FileSize implements Serializable {
         this.fileSize = fileSize;
     }
 
-   
+
 }

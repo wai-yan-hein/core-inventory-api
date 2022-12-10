@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockInOutDetailService {
+public interface StockInOutDetailService {
 
     StockInOutDetail save(StockInOutDetail stock);
 
-    List<StockInOutDetail> search(String vouNo,String compCode,Integer deptId);
+    List<StockInOutDetail> search(String vouNo, String compCode, Integer deptId);
 
     int delete(String code, String compCode, Integer deptId);
 }

@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     private SeqTableService seqService;
 
     @Override
-    public Category save(Category cat) throws Exception {
+    public Category save(Category cat) {
         if (Util1.isNull(cat.getKey().getCatCode())) {
             Integer macId = cat.getMacId();
             String compCode = cat.getKey().getCompCode();

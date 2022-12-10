@@ -47,7 +47,7 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
 
     @Override
     public List<StockType> unUpload() {
-        String hsql ="select o from StockType o where o.intgUpdStatus is null";
+        String hsql = "select o from StockType o where o.intgUpdStatus is null";
         return findHSQL(hsql);
     }
 

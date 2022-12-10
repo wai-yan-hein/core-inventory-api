@@ -30,6 +30,9 @@ import java.util.*;
 @Transactional
 @Slf4j
 public class ReportServiceImpl implements ReportService {
+    private final DecimalFormat formatter = new DecimalFormat("###.##");
+    private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
+    private final HashMap<String, String> hmUser = new HashMap<>();
     @Autowired
     private ReportDao reportDao;
     @Autowired
@@ -38,9 +41,6 @@ public class ReportServiceImpl implements ReportService {
     private SessionFactory sessionFactory;
     @Autowired
     private WebClient userApi;
-    private final DecimalFormat formatter = new DecimalFormat("###.##");
-    private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
-    private final HashMap<String, String> hmUser = new HashMap<>();
 
     public String getAppUser(String userCode) {
         String userShort;

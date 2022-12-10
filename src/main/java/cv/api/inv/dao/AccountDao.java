@@ -11,26 +11,25 @@ import javax.naming.AuthenticationException;
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
 public interface AccountDao {
 
-     AppUser saveAccount(AppUser au);
+    AppUser saveAccount(AppUser au);
 
-     AppUser findUserById(Integer id);
+    AppUser findUserById(Integer id);
 
-     AppUser findUserByShort(String userShort);
+    AppUser findUserByShort(String userShort);
 
-     AppUser findUserByEmail(String email);
+    AppUser findUserByEmail(String email);
 
-     List<AppUser> search(String id, String userShort, String email, String owner);
+    List<AppUser> search(String id, String userShort, String email, String owner);
 
-     AppUser login(String user, String password) throws AuthenticationException;
+    AppUser login(String user, String password) throws AuthenticationException;
 
-     int delete(String userCode);
+    int delete(String userCode);
 
-     AppUser findById(String id);
+    AppUser findById(String id);
 
-     List<AppUser> findAll(String compCode);
+    List<AppUser> findAll(String compCode);
 }

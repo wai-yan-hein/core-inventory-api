@@ -16,13 +16,14 @@ import java.util.List;
  */
 public interface SaleManService {
 
-    SaleMan save(SaleMan saleMan) throws Exception;
+    SaleMan save(SaleMan saleMan);
 
     List<SaleMan> findAll(String compCode, Integer deptId);
 
     int delete(String id);
 
     SaleMan findByCode(SaleManKey key);
+
     List<SaleMan> unUpload();
 
     List<SaleMan> getSaleMan(String updatedDate);

@@ -31,7 +31,7 @@ public class StockServiceImpl implements StockService {
     private ReportService reportService;
 
     @Override
-    public Stock save(Stock stock) throws Exception {
+    public Stock save(Stock stock) {
         if (Util1.isNull(stock.getKey().getStockCode())) {
             Integer macId = stock.getMacId();
             String compCode = stock.getKey().getCompCode();

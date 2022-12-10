@@ -3,28 +3,38 @@ package cv.api.cloud;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
+import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
 import cv.api.model.Department;
 import cv.api.repo.UserRepo;
 import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.jms.MapMessage;
-import javax.jms.Session;
+import javax.jms.*;
+import javax.sql.PooledConnection;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
+@Conditional(ActiveMqCondition.class)
 public class CloudMQSender {
+    private final Gson gson = new GsonBuilder()
+            .serializeNulls()
+            .setDateFormat(DateFormat.FULL, DateFormat.FULL)
+            .create();
     @Value("${cloud.activemq.listen.queue}")
     private String listenQ;
     @Autowired
@@ -76,10 +86,6 @@ public class CloudMQSender {
     private boolean client;
     private String serverQ;
     private boolean progress = false;
-    private final Gson gson = new GsonBuilder()
-            .serializeNulls()
-            .setDateFormat(DateFormat.FULL, DateFormat.FULL)
-            .create();
 
     @Scheduled(fixedRate = 10000000)
     private void uploadToServer() {
@@ -90,6 +96,7 @@ public class CloudMQSender {
             log.info("ActiveMQ Server Q : " + serverQ);
             if (!progress) {
                 progress = true;
+                destroyQ(serverQ);
                 uploadSetup();
                 uploadTransaction();
                 downloadSetup();
@@ -128,6 +135,24 @@ public class CloudMQSender {
         };
         if (queue != null) {
             cloudMQTemplate.send(queue, mc);
+        }
+    }
+
+    private void destroyQ(String queue) {
+        try {
+            if (cloudMQTemplate != null) {
+                ConnectionFactory factory =cloudMQTemplate.getConnectionFactory();
+
+                if(factory!=null){
+                    Connection connection = factory.createConnection();
+                    if(connection instanceof ActiveMQConnection con){
+                        con.destroyDestination(new ActiveMQQueue(queue));
+                    }
+
+                }
+            }
+        } catch (JMSException e) {
+            log.error("destroyQ : " + e.getMessage());
         }
     }
 
@@ -248,16 +273,37 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o), serverQ));
     }
 
+    public void sendPurchase(PurHis sh) {
+        if (sh != null) {
+            String queue = client ? serverQ : hmQueue.get(sh.getLocCode());
+            sendMessage("PURCHASE", gson.toJson(sh), queue);
+        }
+    }
+
     private void uploadReturnIn() {
         log.info("upload return in.");
         List<RetInHis> list = retInService.unUpload();
         list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o), serverQ));
     }
 
-    private void uploadReturnOut() {
+    public void sendReturnIn(RetInHis rin) {
+        if (rin != null) {
+            String queue = client ? serverQ : hmQueue.get(rin.getLocCode());
+            sendMessage("RETURN_IN", gson.toJson(rin), queue);
+        }
+    }
+
+    public void uploadReturnOut() {
         log.info("upload return out.");
         List<RetOutHis> list = retOutService.unUpload();
         list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o), serverQ));
+    }
+
+    public void sendReturnOut(RetOutHis obj) {
+        if (obj != null) {
+            String queue = client ? serverQ : hmQueue.get(obj.getLocCode());
+            sendMessage("RETURN_OUT", gson.toJson(obj), queue);
+        }
     }
 
     private void uploadStockInOut() {
@@ -265,6 +311,7 @@ public class CloudMQSender {
         List<StockInOut> list = inOutService.unUpload();
         list.forEach(o -> sendMessage("STOCK_IO", gson.toJson(o), serverQ));
     }
+
 
     private void uploadTransfer() {
         log.info("upload transfer.");

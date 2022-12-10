@@ -23,7 +23,7 @@ import java.util.List;
 public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> implements StockBrandDao {
 
     @Override
-    public StockBrand save(StockBrand item) throws Exception {
+    public StockBrand save(StockBrand item)  {
         persist(item);
         return item;
     }
@@ -42,7 +42,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
 
     @Override
     public List<StockBrand> unUpload() {
-        String hsql ="select o from StockBrand o where o.intgUpdStatus is null";
+        String hsql = "select o from StockBrand o where o.intgUpdStatus is null";
         return findHSQL(hsql);
     }
 
@@ -55,7 +55,8 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }            }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }

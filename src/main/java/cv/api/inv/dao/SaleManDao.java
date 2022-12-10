@@ -14,17 +14,20 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface SaleManDao {
+public interface SaleManDao {
 
-     SaleMan save(SaleMan saleMan);
+    SaleMan save(SaleMan saleMan);
 
-     List<SaleMan> findAll(String compCode,Integer deptId);
+    List<SaleMan> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     SaleMan findByCode(SaleManKey key);
+    SaleMan findByCode(SaleManKey key);
+
     List<SaleMan> unUpload();
+
     List<SaleMan> getSaleMan(String updatedDate);
+
     Date getMaxDate();
 
 }

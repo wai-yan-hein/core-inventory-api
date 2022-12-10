@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface AccSettingService {
+public interface AccSettingService {
 
-     List<AccSetting> findAll();
+    List<AccSetting> findAll();
 
-     AccSetting save(AccSetting setting);
+    AccSetting save(AccSetting setting);
 
-     AccSetting findByCode(String code);
+    AccSetting findByCode(String code);
 
 }

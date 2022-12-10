@@ -26,13 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class VoucherController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private SeqTableService seqService;
-    private final ReturnObject ro = new ReturnObject();
 
     @GetMapping(path = "/get-vou-no")
     public ResponseEntity<ReturnObject> getVouNo(@RequestParam String macId,
-            @RequestParam String option, @RequestParam String compCode) {
+                                                 @RequestParam String option, @RequestParam String compCode) {
         log.info("/get-vou-no");
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         SeqKey key = new SeqKey();

@@ -11,14 +11,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- *
  * @author wai yan
  */
 @Entity
 @Table(name = "seq_table")
 public class SeqTable implements java.io.Serializable {
 
-    
+
     private Integer seqNo;
     private SeqKey key;
 
@@ -30,9 +29,8 @@ public class SeqTable implements java.io.Serializable {
     public void setKey(SeqKey key) {
         this.key = key;
     }
-  
 
-   
+
     @Column(name = "seq_no")
     public Integer getSeqNo() {
         return seqNo;
@@ -42,5 +40,5 @@ public class SeqTable implements java.io.Serializable {
         this.seqNo = seqNo;
     }
 
-   
+
 }

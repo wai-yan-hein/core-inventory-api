@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- *
  * @author wai yan
  */
 @Repository
@@ -70,7 +69,7 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
         key.setSeqOption(option);
         SeqTable st = findById(key);
         if (st == null) {
-            st=new SeqTable();
+            st = new SeqTable();
             st.setKey(key);
             st.setSeqNo(1);
         } else {

@@ -6,7 +6,6 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Category;
-import cv.api.inv.entity.StockBrand;
 
 import java.util.Date;
 import java.util.List;
@@ -14,21 +13,22 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface CategoryDao {
+public interface CategoryDao {
 
-     Category findByCode(String code);
+    Category findByCode(String code);
 
-     Category save(Category item);
+    Category save(Category item);
 
-     List<Category> findAll(String compCode, Integer deptId);
+    List<Category> findAll(String compCode, Integer deptId);
 
-     List<Category> search(String catName);
+    List<Category> search(String catName);
 
     List<Category> unUpload();
 
     int delete(String id);
 
     Date getMaxDate();
+
     List<Category> getCategory(String updatedDate);
 
 }

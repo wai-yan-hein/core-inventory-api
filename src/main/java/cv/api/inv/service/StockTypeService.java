@@ -14,16 +14,18 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockTypeService {
+public interface StockTypeService {
 
-     StockType findByCode(StockTypeKey key);
+    StockType findByCode(StockTypeKey key);
 
-     StockType save(StockType item) throws Exception;
+    StockType save(StockType item);
 
-     List<StockType> findAll(String compCode, Integer deptId);
+    List<StockType> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
+
     List<StockType> unUpload();
+
     Date getMaxDate();
 
     List<StockType> getStockType(String updatedDate);

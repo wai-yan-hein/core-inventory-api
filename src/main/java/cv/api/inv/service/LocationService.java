@@ -18,7 +18,7 @@ public interface LocationService {
 
     Location findByCode(LocationKey code);
 
-    Location save(Location loc) throws Exception;
+    Location save(Location loc);
 
     List<Location> findAll(String compCode, Integer deptId);
 

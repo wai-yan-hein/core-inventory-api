@@ -15,7 +15,7 @@ public class FilterObject {
 
     private String fromDate;
     private String toDate;
-    private String cusCode; 
+    private String cusCode;
     private String vouNo;
     private String userCode;
     private String description;

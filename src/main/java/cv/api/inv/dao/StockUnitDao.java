@@ -14,17 +14,20 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockUnitDao {
+public interface StockUnitDao {
 
-     StockUnit save(StockUnit unit);
+    StockUnit save(StockUnit unit);
 
-     List<StockUnit> findAll(String compCode,Integer deptId);
+    List<StockUnit> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     StockUnit findByCode(StockUnitKey code);
+    StockUnit findByCode(StockUnitKey code);
+
     List<StockUnit> unUpload();
+
     Date getMaxDate();
+
     List<StockUnit> getUnit(String updatedDate);
 
 

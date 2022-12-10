@@ -105,7 +105,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 }
             }
         } catch (Exception e) {
-            log.error("searchDetail : "+e.getMessage());
+            log.error("searchDetail : " + e.getMessage());
         }
         return list;
     }

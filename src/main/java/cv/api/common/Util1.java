@@ -25,8 +25,8 @@ import java.util.Date;
 @Slf4j
 public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.##";
-    public static String SYNC_DATE;
     private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+    public static String SYNC_DATE;
 
     public static <T> Object cast(Object from, Class<T> to) {
         return gson.fromJson(gson.toJson(from), to);

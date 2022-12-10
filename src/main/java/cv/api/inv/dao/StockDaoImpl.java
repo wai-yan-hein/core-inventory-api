@@ -149,7 +149,8 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }             }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }

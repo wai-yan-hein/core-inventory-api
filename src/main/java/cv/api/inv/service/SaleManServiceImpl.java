@@ -29,7 +29,7 @@ public class SaleManServiceImpl implements SaleManService {
     private SeqTableService seqService;
 
     @Override
-    public SaleMan save(SaleMan sm) throws Exception {
+    public SaleMan save(SaleMan sm) {
         if (Util1.isNull(sm.getKey().getSaleManCode())) {
             Integer macId = sm.getMacId();
             String compCode = sm.getKey().getCompCode();

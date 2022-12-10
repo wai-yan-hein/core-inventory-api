@@ -5,6 +5,7 @@
  */
 package cv.api.controller;
 
+import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -32,6 +32,7 @@ import java.util.List;
 @Slf4j
 public class PurchaseController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private PurHisService phService;
     @Autowired
@@ -40,13 +41,15 @@ public class PurchaseController {
     private ReportService reportService;
     @Autowired
     private AccountRepo accountRepo;
-    private final ReturnObject ro = new ReturnObject();
-
+    @Autowired(required = false)
+    private CloudMQSender cloudMQSender;
     @PostMapping(path = "/save-pur")
     public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur) throws Exception {
         pur = phService.save(pur);
         //send message to service
         accountRepo.sendPurchase(pur);
+        //send to cloud
+        cloudMQSender.sendPurchase(pur);
         return ResponseEntity.ok(pur);
     }
 
@@ -74,6 +77,7 @@ public class PurchaseController {
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
+
     @PostMapping(path = "/restore-pur")
     public ResponseEntity<?> restorePur(@RequestBody PurHisKey key) throws Exception {
         phService.restore(key);

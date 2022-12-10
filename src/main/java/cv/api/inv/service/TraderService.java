@@ -23,7 +23,7 @@ public interface TraderService {
     List<Trader> search(String regionCode, String coaCode);
 
 
-    Trader saveTrader(Trader trader) throws Exception;
+    Trader saveTrader(Trader trader);
 
     List<Trader> findAll(String compCode);
 
@@ -34,7 +34,9 @@ public interface TraderService {
     List<String> delete(TraderKey key);
 
     List<Trader> unUploadTrader();
+
     Date getMaxDate();
+
     List<Trader> getTrader(String updatedDate);
 
 }

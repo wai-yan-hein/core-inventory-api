@@ -10,9 +10,12 @@ import java.util.Objects;
 public class AppTray {
 
     private static TrayIcon trayIcon;
-    private SystemTray tray;
     private final Font menuFont = new Font("Arial", Font.BOLD, 12);
+    private SystemTray tray;
 
+    public static void showMessage(String message) {
+        trayIcon.displayMessage("Core Cloud Service.", message, TrayIcon.MessageType.INFO);
+    }
 
     public void startup() {
         if (SystemTray.isSupported()) {
@@ -36,10 +39,5 @@ public class AppTray {
                 log.error(String.format("startup: %s", e.getMessage()));
             }
         }
-    }
-
-
-    public static void showMessage(String message) {
-        trayIcon.displayMessage("Core Cloud Service.", message, TrayIcon.MessageType.INFO);
     }
 }

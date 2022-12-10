@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface AccSettingDao {
+public interface AccSettingDao {
 
     List<AccSetting> findAll();
 

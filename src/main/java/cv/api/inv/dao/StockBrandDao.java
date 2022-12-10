@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface StockBrandDao {
 
-    StockBrand save(StockBrand brand) throws Exception;
+    StockBrand save(StockBrand brand);
 
     List<StockBrand> findAll(String compCode, Integer deptId);
 
@@ -27,6 +27,7 @@ public interface StockBrandDao {
     List<StockBrand> unUpload();
 
     Date getMaxDate();
+
     List<StockBrand> getBrand(String updatedDate);
 
 

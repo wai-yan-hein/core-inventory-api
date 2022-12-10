@@ -7,9 +7,11 @@ import java.util.List;
 
 public interface UnitRelationDao {
     UnitRelation save(UnitRelation ur);
+
     UnitRelation findByKey(RelationKey key);
 
-    List<UnitRelation> findRelation( String compCode, Integer deptId);
+    List<UnitRelation> findRelation(String compCode, Integer deptId);
+
     List<StockUnit> getRelation(String relCode, String compCode, Integer deptId);
 
 
@@ -18,8 +20,11 @@ public interface UnitRelationDao {
     List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId);
 
     UnitRelationDetail findByKey(UnitRelationDetailKey key);
+
     List<UnitRelation> unUpload();
+
     Date getMaxDate();
+
     List<UnitRelation> getRelation(String updatedDate);
 
 

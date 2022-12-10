@@ -14,16 +14,18 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockTypeDao {
+public interface StockTypeDao {
 
-     StockType save(StockType item);
+    StockType save(StockType item);
 
-     List<StockType> findAll(String compCode, Integer deptId);
+    List<StockType> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
     StockType findByCode(StockTypeKey key);
+
     List<StockType> unUpload();
+
     Date getMaxDate();
 
     List<StockType> getStockType(String updatedDate);

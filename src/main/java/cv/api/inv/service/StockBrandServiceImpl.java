@@ -29,7 +29,7 @@ public class StockBrandServiceImpl implements StockBrandService {
     private SeqTableService seqService;
 
     @Override
-    public StockBrand save(StockBrand sb) throws Exception {
+    public StockBrand save(StockBrand sb)  {
         if (sb.getKey().getBrandCode() == null) {
             Integer macId = sb.getMacId();
             String compCode = sb.getKey().getCompCode();

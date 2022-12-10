@@ -9,8 +9,11 @@ public interface PatternService {
     Pattern findByCode(PatternKey key);
 
     Pattern save(Pattern pattern);
-    List<Pattern> search(String stockCode,String compCode,Integer deptId);
+
+    List<Pattern> search(String stockCode, String compCode, Integer deptId);
+
     void delete(Pattern pattern);
+
     List<Pattern> unUpload();
 
 }

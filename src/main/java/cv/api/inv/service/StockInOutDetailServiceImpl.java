@@ -30,12 +30,12 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
 
     @Override
     public int delete(String code, String compCode, Integer deptId) {
-        return dao.delete(code,compCode,deptId);
+        return dao.delete(code, compCode, deptId);
     }
 
     @Override
-    public List<StockInOutDetail> search(String vouNo,String compCode,Integer deptId) {
-        return dao.search(vouNo,compCode,deptId);
+    public List<StockInOutDetail> search(String vouNo, String compCode, Integer deptId) {
+        return dao.search(vouNo, compCode, deptId);
     }
 
 }

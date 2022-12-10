@@ -30,10 +30,9 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 public class ReportController {
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private ReportService reportService;
-    private final ReturnObject ro = new ReturnObject();
-
 
     @PostMapping(path = "/save-filter")
     public ResponseEntity<ReturnObject> saveOpening(@RequestBody ReportFilter filter, HttpServletRequest request) {
@@ -48,7 +47,8 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-sale-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody
+    byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VSale> listVSale = reportService.getSaleVoucher(vouNo);
@@ -57,7 +57,8 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-purchase-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getPurchaseReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody
+    byte[] getPurchaseReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "PurchaseVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo);
@@ -66,7 +67,8 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-return-in-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody
+    byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnInVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VReturnIn> listRI = reportService.getReturnInVoucher(vouNo, compCode);
@@ -75,7 +77,8 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-return-out-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody
+    byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnOutVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VReturnOut> listRO = reportService.getReturnOutVoucher(vouNo, compCode);
@@ -84,7 +87,8 @@ public class ReportController {
     }
 
     @PostMapping(value = "/get-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ReturnObject getReport(@RequestBody ReportFilter filter) {
+    public @ResponseBody
+    ReturnObject getReport(@RequestBody ReportFilter filter) {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
@@ -268,7 +272,6 @@ public class ReportController {
     }
 
 
-
     @GetMapping(path = "/get-purchase-recent-price")
     public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode,
                                                           @RequestParam String vouDate,
@@ -325,7 +328,7 @@ public class ReportController {
                                                                @RequestParam String compCode,
                                                                @RequestParam Integer deptId,
                                                                @RequestParam Integer macId) throws Exception {
-        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-",compCode, deptId, macId));
+        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId));
     }
 
     @PostMapping(path = "/get-reorder-level")

@@ -5,6 +5,7 @@
  */
 package cv.api.controller;
 
+import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -31,6 +32,7 @@ import java.util.List;
 @Slf4j
 public class RetOutController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private RetOutService roService;
     @Autowired
@@ -39,12 +41,15 @@ public class RetOutController {
     private ReportService reportService;
     @Autowired
     private AccountRepo accountRepo;
-    private final ReturnObject ro = new ReturnObject();
+    @Autowired(required = false)
+    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-retout")
     public ResponseEntity<?> saveReturnOut(@RequestBody RetOutHis retout) throws Exception {
         retout = roService.save(retout);
         accountRepo.sendReturnOut(retout);
+        //send to cloud
+        cloudMQSender.sendReturnOut(retout);
         return ResponseEntity.ok(retout);
     }
 
@@ -61,7 +66,7 @@ public class RetOutController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode,deptId,deleted);
+        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted);
         return ResponseEntity.ok(listRO);
     }
 
@@ -71,6 +76,7 @@ public class RetOutController {
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
+
     @PostMapping(path = "/restore-retout")
     public ResponseEntity<ReturnObject> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
         roService.restore(key);

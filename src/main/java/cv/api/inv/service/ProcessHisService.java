@@ -15,5 +15,6 @@ public interface ProcessHisService {
                             String locCode, boolean finish, boolean deleted, String compCode, Integer deptId);
 
     void delete(ProcessHisKey key);
+
     void restore(ProcessHisKey key);
 }

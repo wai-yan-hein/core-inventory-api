@@ -31,12 +31,12 @@ public class RetOutDetailServiceImpl implements RetOutDetailService {
 
     @Override
     public List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId) {
-        return dao.search(vouNo,compCode,deptId);
+        return dao.search(vouNo, compCode, deptId);
     }
 
     @Override
-    public int delete(String id, String compCode, Integer deptId) throws Exception{
-        return dao.delete(id,compCode,deptId);
+    public int delete(String id, String compCode, Integer deptId) throws Exception {
+        return dao.delete(id, compCode, deptId);
     }
 
 }

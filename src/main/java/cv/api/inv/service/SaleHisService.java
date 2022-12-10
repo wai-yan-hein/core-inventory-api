@@ -5,7 +5,6 @@
  */
 package cv.api.inv.service;
 
-import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 

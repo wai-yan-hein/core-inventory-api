@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface RetOutDetailService {
+public interface RetOutDetailService {
 
-     RetOutHisDetail save(RetOutHisDetail pd);
+    RetOutHisDetail save(RetOutHisDetail pd);
 
-     List<RetOutHisDetail> search(String vouNo, String compCode,Integer deptId);
+    List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-     int delete(String id, String compCode, Integer deptId) throws Exception;
+    int delete(String id, String compCode, Integer deptId) throws Exception;
 
 }

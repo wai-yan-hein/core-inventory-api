@@ -77,7 +77,8 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }            }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }

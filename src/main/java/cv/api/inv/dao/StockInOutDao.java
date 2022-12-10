@@ -8,7 +8,6 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
-import cv.api.inv.entity.TransferHis;
 
 import java.util.Date;
 import java.util.List;
