@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 @Conditional(ActiveMqCondition.class)
 public class CloudMQReceiver {
-    private final String SENT = "SENT";
+    private final String SAVE = "SAVE";
     private final String REC = "REC";
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -245,7 +245,7 @@ public class CloudMQReceiver {
                     case "VOU_STATUS" -> {
                         VouStatus obj = gson.fromJson(data, VouStatus.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateVouStatus(obj);
                             case "REQUEST_SETUP" -> {
                                 List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -258,7 +258,7 @@ public class CloudMQReceiver {
                     case "RELATION" -> {
                         UnitRelation obj = gson.fromJson(data, UnitRelation.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateUnitRelation(obj);
                             case "REQUEST_SETUP" -> {
                                 List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -271,7 +271,7 @@ public class CloudMQReceiver {
                     case "TRADER" -> {
                         Trader obj = gson.fromJson(data, Trader.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateTrader(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -284,7 +284,7 @@ public class CloudMQReceiver {
                     case "UNIT" -> {
                         StockUnit obj = gson.fromJson(data, StockUnit.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateUnit(obj);
                             case "REQUEST_SETUP" -> {
                                 List<StockUnit> list = unitService.getUnit(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -297,7 +297,7 @@ public class CloudMQReceiver {
                     case "STOCK_TYPE" -> {
                         StockType obj = gson.fromJson(data, StockType.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateStockType(obj);
                             case "REQUEST_SETUP" -> {
                                 List<StockType> list = typeService.getStockType(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -310,7 +310,7 @@ public class CloudMQReceiver {
                     case "STOCK_BRAND" -> {
                         StockBrand obj = gson.fromJson(data, StockBrand.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateBrand(obj);
                             case "REQUEST_SETUP" -> {
                                 List<StockBrand> list = brandService.getBrand(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -323,7 +323,7 @@ public class CloudMQReceiver {
                     case "STOCK_CATEGORY" -> {
                         Category obj = gson.fromJson(data, Category.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateCategory(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Category> list = categoryService.getCategory(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -336,7 +336,7 @@ public class CloudMQReceiver {
                     case "SALEMAN" -> {
                         SaleMan obj = gson.fromJson(data, SaleMan.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> saleManService.save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> saleManService.save(obj);
                             case "RECEIVE" -> updateSaleMan(obj);
                             case "REQUEST_SETUP" -> {
                                 List<SaleMan> list = saleManService.getSaleMan(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -349,7 +349,7 @@ public class CloudMQReceiver {
                     case "LOCATION" -> {
                         Location obj = gson.fromJson(data, Location.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateLocation(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Location> list = locationService.getLocation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -362,7 +362,7 @@ public class CloudMQReceiver {
                     case "STOCK" -> {
                         Stock obj = gson.fromJson(data, Stock.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> save(obj);
+                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateStock(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Stock> list = stockService.getStock(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -375,14 +375,14 @@ public class CloudMQReceiver {
                     case "SALE" -> {
                         SaleHis obj = gson.fromJson(data, SaleHis.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.setIntgUpdStatus(REC);
                                 obj.getKey().setDeptId(userRepo.getDeptId());
                                 saleHisService.save(obj);
                             }
-                            case "RECEIVE" -> {
-                                updateSale(obj);
-                            }
+                            case "RECEIVE" -> updateSale(obj);
+                            case "DELETE" -> saleHisService.delete(obj.getKey());
+                            case "RESTORE" -> saleHisService.restore(obj.getKey());
                             case "REQUEST_TRAN" -> {
                                 List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
                                 if (!list.isEmpty()) {
@@ -398,7 +398,7 @@ public class CloudMQReceiver {
                     case "OPENING" -> {
                         OPHis obj = gson.fromJson(data, OPHis.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.setIntgUpdStatus(REC);
                                 opHisService.save(obj);
                             }
@@ -417,7 +417,7 @@ public class CloudMQReceiver {
                     case "PURCHASE" -> {
                         PurHis obj = gson.fromJson(data, PurHis.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.setIntgUpdStatus(REC);
                                 purHisService.save(obj);
                             }
@@ -434,7 +434,7 @@ public class CloudMQReceiver {
                     case "RETURN_IN" -> {
                         RetInHis obj = gson.fromJson(data, RetInHis.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.setIntgUpdStatus(REC);
                                 retInService.save(obj);
                             }
@@ -451,7 +451,7 @@ public class CloudMQReceiver {
                     case "RETURN_OUT" -> {
                         RetOutHis obj = gson.fromJson(data, RetOutHis.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.setIntgUpdStatus(REC);
                                 retOutService.save(obj);
                             }
@@ -468,7 +468,7 @@ public class CloudMQReceiver {
                     case "TRANSFER" -> {
                         TransferHis obj = gson.fromJson(data, TransferHis.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.getKey().setDeptId(userRepo.getDeptId());
                                 obj.setIntgUpdStatus(REC);
                                 transferHisService.save(obj);
@@ -490,7 +490,7 @@ public class CloudMQReceiver {
                     case "STOCK_IO" -> {
                         StockInOut obj = gson.fromJson(data, StockInOut.class);
                         switch (option) {
-                            case "SENT" -> {
+                            case "SAVE" -> {
                                 obj.setIntgUpdStatus(REC);
                                 inOutService.save(obj);
                             }
@@ -505,7 +505,7 @@ public class CloudMQReceiver {
                         }
                     }
                 }
-                if (option.equals("SENT")) {
+                if (option.equals("SAVE")) {
                     sendMessage(senderQ, entity, data);
                 }
 
@@ -530,7 +530,7 @@ public class CloudMQReceiver {
 
     private void updateVouStatus(VouStatus vou) throws Exception {
         VouStatusKey key = vou.getKey();
-        String sql = "update vou_status set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update vou_status set intg_upd_status ='" + SAVE + "'\n"
                 + "where code ='" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update vou status.");
@@ -538,7 +538,7 @@ public class CloudMQReceiver {
 
     private void updateUnitRelation(UnitRelation rel) throws Exception {
         RelationKey key = rel.getKey();
-        String sql = "update unit_relation set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update unit_relation set intg_upd_status ='" + SAVE + "'\n"
                 + "where rel_code ='" + key.getRelCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update unit.");
@@ -546,7 +546,7 @@ public class CloudMQReceiver {
 
     private void updateTraderGroup(TraderGroup obj) throws Exception {
         TraderGroupKey key = obj.getKey();
-        String sql = "update trader_group set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update trader_group set intg_upd_status ='" + SAVE + "'\n"
                 + "where group_code ='" + key.getGroupCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update trader group.");
@@ -554,7 +554,7 @@ public class CloudMQReceiver {
 
     private void updateTrader(Trader obj) throws Exception {
         TraderKey key = obj.getKey();
-        String sql = "update trader set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update trader set intg_upd_status ='" + SAVE + "'\n"
                 + "where code ='" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update trader.");
@@ -562,7 +562,7 @@ public class CloudMQReceiver {
 
     private void updateUnit(StockUnit obj) throws Exception {
         StockUnitKey key = obj.getKey();
-        String sql = "update stock_unit set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update stock_unit set intg_upd_status ='" + SAVE + "'\n"
                 + "where unit_code ='" + key.getUnitCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update stock unit.");
@@ -570,7 +570,7 @@ public class CloudMQReceiver {
 
     private void updateStockType(StockType obj) throws Exception {
         StockTypeKey key = obj.getKey();
-        String sql = "update stock_type set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update stock_type set intg_upd_status ='" + SAVE + "'\n"
                 + "where stock_type_code ='" + key.getStockTypeCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update stock type.");
@@ -578,7 +578,7 @@ public class CloudMQReceiver {
 
     private void updateBrand(StockBrand obj) throws Exception {
         StockBrandKey key = obj.getKey();
-        String sql = "update stock_brand set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update stock_brand set intg_upd_status ='" + SAVE + "'\n"
                 + "where brand_code ='" + key.getBrandCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update brand");
@@ -586,7 +586,7 @@ public class CloudMQReceiver {
 
     private void updateCategory(Category obj) throws Exception {
         CategoryKey key = obj.getKey();
-        String sql = "update category set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update category set intg_upd_status ='" + SAVE + "'\n"
                 + "where cat_code ='" + key.getCatCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update category");
@@ -594,7 +594,7 @@ public class CloudMQReceiver {
 
     private void updateLocation(Location obj) throws Exception {
         LocationKey key = obj.getKey();
-        String sql = "update location set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update location set intg_upd_status ='" + SAVE + "'\n"
                 + "where loc_code ='" + key.getLocCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update location.");
@@ -602,7 +602,7 @@ public class CloudMQReceiver {
 
     private void updateSaleMan(SaleMan obj) throws Exception {
         SaleManKey key = obj.getKey();
-        String sql = "update sale_man set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update sale_man set intg_upd_status ='" + SAVE + "'\n"
                 + "where saleman_code ='" + key.getSaleManCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update saleman.");
@@ -610,7 +610,7 @@ public class CloudMQReceiver {
 
     private void updateStock(Stock obj) throws Exception {
         StockKey key = obj.getKey();
-        String sql = "update stock set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update stock set intg_upd_status ='" + SAVE + "'\n"
                 + "where stock_code ='" + key.getStockCode() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update stock.");
@@ -618,7 +618,7 @@ public class CloudMQReceiver {
 
     private void updateOpening(OPHis obj) throws Exception {
         OPHisKey key = obj.getKey();
-        String sql = "update op_his set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update op_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update opening.");
@@ -626,7 +626,7 @@ public class CloudMQReceiver {
 
     private void updateSale(SaleHis obj) throws Exception {
         SaleHisKey key = obj.getKey();
-        String sql = "update sale_his set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update sale_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update sale.");
@@ -634,7 +634,7 @@ public class CloudMQReceiver {
 
     private void updatePurchase(PurHis obj) throws Exception {
         PurHisKey key = obj.getKey();
-        String sql = "update pur_his set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update pur_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update purchase.");
@@ -642,7 +642,7 @@ public class CloudMQReceiver {
 
     private void updateReturnIn(RetInHis obj) throws Exception {
         RetInHisKey key = obj.getKey();
-        String sql = "update ret_in_his set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update ret_in_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update return in.");
@@ -650,7 +650,7 @@ public class CloudMQReceiver {
 
     private void updateReturnOut(RetOutHis obj) throws Exception {
         RetOutHisKey key = obj.getKey();
-        String sql = "update ret_out_his set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update ret_out_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update return out.");
@@ -658,7 +658,7 @@ public class CloudMQReceiver {
 
     private void updateTransfer(TransferHis obj) throws Exception {
         TransferHisKey key = obj.getKey();
-        String sql = "update transfer_his set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update transfer_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update transfer.");
@@ -666,7 +666,7 @@ public class CloudMQReceiver {
 
     private void updateStockIO(StockInOut obj) throws Exception {
         StockIOKey key = obj.getKey();
-        String sql = "update stock_in_out set intg_upd_status ='" + SENT + "'\n"
+        String sql = "update stock_in_out set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
         log.info("update stock io.");
