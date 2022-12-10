@@ -28,7 +28,7 @@ public interface StockInOutDao {
 
     void restore(StockIOKey key) throws Exception;
 
-    List<StockInOut> unUpload();
+    List<StockInOut> unUpload(String syncDate);
 
     Date getMaxDate();
 

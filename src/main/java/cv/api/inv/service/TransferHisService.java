@@ -11,7 +11,7 @@ public interface TransferHisService {
 
     TransferHis findById(TransferHisKey key);
 
-    List<TransferHis> unUpload();
+    List<TransferHis> unUpload(String syncDate);
 
     void delete(TransferHisKey key);
 

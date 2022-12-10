@@ -123,8 +123,8 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
     }
 
     @Override
-    public List<RetOutHis> unUpload() {
-        String hsql = "select o from RetOutHis o where o.intgUpdStatus ='ACK'";
+    public List<RetOutHis> unUpload(String syncDate) {
+        String hsql = "select o from RetOutHis o where o.intgUpdStatus ='ACK' and date(o.vouDate) >= '" + syncDate + "'";
         List<RetOutHis> list = findHSQL(hsql);
         list.forEach((o) -> {
             String vouNo = o.getKey().getVouNo();

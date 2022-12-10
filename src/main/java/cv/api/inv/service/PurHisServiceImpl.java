@@ -114,8 +114,8 @@ public class PurHisServiceImpl implements PurHisService {
     }
 
     @Override
-    public List<PurHis> unUpload() {
-        return phDao.unUpload();
+    public List<PurHis> unUpload(String syncDate) {
+        return phDao.unUpload(syncDate);
     }
 
     @Override

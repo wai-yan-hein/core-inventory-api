@@ -35,7 +35,7 @@ public interface RetOutService {
 
     List<RetOutHis> unUploadVoucher(String syncDate);
 
-    List<RetOutHis> unUpload();
+    List<RetOutHis> unUpload(String syncDate);
 
     Date getMaxDate();
 

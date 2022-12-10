@@ -29,7 +29,7 @@ public interface SaleHisDao {
 
     List<SaleHis> unUploadVoucher(String syncDate);
 
-    List<SaleHis> unUpload();
+    List<SaleHis> unUpload(String syncDate);
 
     Date getMaxDate();
 

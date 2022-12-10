@@ -33,7 +33,7 @@ public interface PurHisDao {
 
     List<PurHis> unUploadVoucher(String syncDate);
 
-    List<PurHis> unUpload();
+    List<PurHis> unUpload(String syncDate);
 
     Date getMaxDate();
 

@@ -94,8 +94,8 @@ public class StockInOutServiceImpl implements StockInOutService {
     }
 
     @Override
-    public List<StockInOut> unUpload() {
-        return ioDao.unUpload();
+    public List<StockInOut> unUpload(String syncDate) {
+        return ioDao.unUpload(syncDate);
     }
 
     @Override

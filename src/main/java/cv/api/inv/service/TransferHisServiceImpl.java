@@ -79,8 +79,8 @@ public class TransferHisServiceImpl implements TransferHisService {
     }
 
     @Override
-    public List<TransferHis> unUpload() {
-        return dao.unUpload();
+    public List<TransferHis> unUpload(String syncDate) {
+        return dao.unUpload(syncDate);
     }
 
     @Override
