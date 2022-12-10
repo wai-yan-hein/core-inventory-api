@@ -505,9 +505,9 @@ public class CloudMQReceiver {
                         }
                     }
                 }
-                /*if (option.equals("SAVE")) {
-                    sendMessage(senderQ, entity, data);
-                }*/
+                if (option.equals("SAVE")) {
+                    sendReceiveMessage(senderQ, entity, data);
+                }
 
             } catch (Exception e) {
                 log.error(String.format("%s : %s", entity, e.getMessage()));
@@ -515,7 +515,7 @@ public class CloudMQReceiver {
         }
     }
 
-    private void sendMessage(String senderQ, String entity, String data) {
+    private void sendReceiveMessage(String senderQ, String entity, String data) {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
             mm.setString("ENTITY", entity);

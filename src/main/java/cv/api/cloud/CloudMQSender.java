@@ -253,8 +253,8 @@ public class CloudMQSender {
     }
 
     private void uploadSale() {
-        log.info("upload sale.");
         List<SaleHis> list = saleHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) log.info("upload sale : " + list.size());
         list.forEach(o -> sendMessage("SALE", gson.toJson(o), serverQ));
     }
 
@@ -266,8 +266,8 @@ public class CloudMQSender {
     }
 
     private void uploadPurchase() {
-        log.info("upload purchase.");
         List<PurHis> list = purHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) log.info("upload purchase : " + list.size());
         list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o), serverQ));
     }
 
@@ -279,8 +279,8 @@ public class CloudMQSender {
     }
 
     private void uploadReturnIn() {
-        log.info("upload return in.");
         List<RetInHis> list = retInService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) log.info("upload return in : " + list.size());
         list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o), serverQ));
     }
 
@@ -292,8 +292,8 @@ public class CloudMQSender {
     }
 
     public void uploadReturnOut() {
-        log.info("upload return out.");
         List<RetOutHis> list = retOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) log.info("upload return out : " + list.size());
         list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o), serverQ));
     }
 
@@ -305,15 +305,15 @@ public class CloudMQSender {
     }
 
     private void uploadStockInOut() {
-        log.info("upload stock in out.");
         List<StockInOut> list = inOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) log.info("upload stock io : " + list.size());
         list.forEach(o -> sendMessage("STOCK_IO", gson.toJson(o), serverQ));
     }
 
 
     private void uploadTransfer() {
-        log.info("upload transfer.");
         List<TransferHis> list = transferHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) log.info("upload transfer : " + list.size());
         list.forEach(o -> sendMessage("TRANSFER", gson.toJson(o), serverQ));
     }
 
@@ -327,14 +327,14 @@ public class CloudMQSender {
 
 
     private void uploadOpening() {
-        log.info("upload opening.");
         List<OPHis> list = opHisService.unUpload();
+        if (!list.isEmpty()) log.info("upload opening : " + list.size());
         list.forEach(o -> sendMessage("OPENING", gson.toJson(o), serverQ));
     }
 
     private void uploadStock() {
-        log.info("upload stock.");
         List<Stock> list = stockService.unUpload();
+        if (!list.isEmpty()) log.info("upload stock : " + list.size());
         list.forEach(o -> sendMessage("STOCK", gson.toJson(o), serverQ));
     }
 
@@ -349,18 +349,21 @@ public class CloudMQSender {
     }
 
     private void uploadVouStatus() {
-        log.info("upload vou status.");
         List<VouStatus> list = vouStatusService.unUpload();
+        if (!list.isEmpty()) log.info("upload vou status : " + list.size());
         list.forEach((e) -> sendMessage("VOU_STATUS", gson.toJson(e), serverQ));
     }
+
     public void send(VouStatus s) {
         sendTopicMessage("VOU_STATUS", gson.toJson(s));
     }
+
     private void uploadUnitRelation() {
-        log.info("upload unit relation.");
         List<UnitRelation> list = relationService.unUpload();
+        if (!list.isEmpty()) log.info("upload relation : " + list.size());
         list.forEach(o -> sendMessage("RELATION", gson.toJson(o), serverQ));
     }
+
     public void send(UnitRelation s) {
         sendTopicMessage("RELATION", gson.toJson(s));
     }
@@ -372,8 +375,8 @@ public class CloudMQSender {
     }
 
     private void uploadTrader() {
-        log.info("upload trader.");
         List<Trader> list = traderService.unUploadTrader();
+        if (!list.isEmpty()) log.info("upload trader : " + list.size());
         list.forEach((o) -> sendMessage("TRADER", gson.toJson(o), serverQ));
     }
 
@@ -382,8 +385,8 @@ public class CloudMQSender {
     }
 
     private void uploadStockUnit() {
-        log.info("upload stock unit.");
         List<StockUnit> list = unitService.unUpload();
+        if (!list.isEmpty()) log.info("upload stock unit : " + list.size());
         list.forEach((o) -> sendMessage("UNIT", gson.toJson(o), serverQ));
     }
 
@@ -392,8 +395,8 @@ public class CloudMQSender {
     }
 
     private void uploadStockType() {
-        log.info("upload stock type.");
         List<StockType> list = stockTypeService.unUpload();
+        if (!list.isEmpty()) log.info("upload stock type : " + list.size());
         list.forEach((o) -> sendMessage("STOCK_TYPE", gson.toJson(o), serverQ));
     }
 
@@ -402,8 +405,8 @@ public class CloudMQSender {
     }
 
     private void uploadStockBrand() {
-        log.info("upload stock brand.");
         List<StockBrand> list = brandService.unUpload();
+        if (!list.isEmpty()) log.info("upload stock brand : " + list.size());
         list.forEach((o) -> sendMessage("STOCK_BRAND", gson.toJson(o), serverQ));
     }
 
@@ -413,8 +416,8 @@ public class CloudMQSender {
 
 
     private void uploadSaleMan() {
-        log.info("upload sale man.");
         List<SaleMan> list = saleManService.unUpload();
+        if (!list.isEmpty()) log.info("upload sale man : " + list.size());
         list.forEach(o -> sendMessage("SALEMAN", gson.toJson(o), serverQ));
 
     }
@@ -425,8 +428,8 @@ public class CloudMQSender {
 
 
     private void uploadCategory() {
-        log.info("upload category.");
         List<Category> list = categoryService.unUpload();
+        if (!list.isEmpty()) log.info("upload category : " + list.size());
         list.forEach(o -> sendMessage("STOCK_CATEGORY", gson.toJson(o), serverQ));
     }
 
@@ -436,8 +439,8 @@ public class CloudMQSender {
 
 
     private void uploadLocation() {
-        log.info("upload location.");
         List<Location> list = locationService.unUpload();
+        if (!list.isEmpty()) log.info("upload location : " + list.size());
         list.forEach(o -> sendMessage("LOCATION", gson.toJson(o), serverQ));
     }
 
