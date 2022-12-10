@@ -33,7 +33,7 @@ public interface RetInDao {
 
     List<RetInHis> unUploadVoucher(String syncDate);
 
-    List<RetInHis> unUpload();
+    List<RetInHis> unUpload(String syncDate);
 
     Date getMaxDate();
 

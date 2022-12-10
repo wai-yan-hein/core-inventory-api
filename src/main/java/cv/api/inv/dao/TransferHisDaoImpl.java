@@ -30,8 +30,8 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
     }
 
     @Override
-    public List<TransferHis> unUpload() {
-        String hsql = "select o from TransferHis o where o.intgUpdStatus is null";
+    public List<TransferHis> unUpload(String syncDate) {
+        String hsql = "select o from TransferHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
         List<TransferHis> list = findHSQL(hsql);
         list.forEach((o) -> {
             String vouNo = o.getKey().getVouNo();

@@ -122,8 +122,8 @@ public class RetInServiceImpl implements RetInService {
     }
 
     @Override
-    public List<RetInHis> unUpload() {
-        return rDao.unUpload();
+    public List<RetInHis> unUpload(String syncDate) {
+        return rDao.unUpload(syncDate);
     }
 
     @Override

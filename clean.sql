@@ -9,7 +9,7 @@ truncate stock_unit;
 truncate vou_status;
 truncate unit_relation;
 truncate unit_relation_detail;
-truncate seq_table;
+#truncate seq_table;
 truncate trader;
 #transaction
 truncate op_his;

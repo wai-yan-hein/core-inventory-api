@@ -36,7 +36,7 @@ public interface PurHisService {
 
     List<PurHis> unUploadVoucher(String syncDate);
 
-    List<PurHis> unUpload();
+    List<PurHis> unUpload(String syncDate);
 
     Date getMaxDate();
 

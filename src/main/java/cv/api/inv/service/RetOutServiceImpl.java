@@ -113,8 +113,8 @@ public class RetOutServiceImpl implements RetOutService {
     }
 
     @Override
-    public List<RetOutHis> unUpload() {
-        return rDao.unUpload();
+    public List<RetOutHis> unUpload(String syncDate) {
+        return rDao.unUpload(syncDate);
     }
 
     @Override

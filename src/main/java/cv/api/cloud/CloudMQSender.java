@@ -21,11 +21,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.jms.*;
-import javax.sql.PooledConnection;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -141,11 +139,11 @@ public class CloudMQSender {
     private void destroyQ(String queue) {
         try {
             if (cloudMQTemplate != null) {
-                ConnectionFactory factory =cloudMQTemplate.getConnectionFactory();
+                ConnectionFactory factory = cloudMQTemplate.getConnectionFactory();
 
-                if(factory!=null){
+                if (factory != null) {
                     Connection connection = factory.createConnection();
-                    if(connection instanceof ActiveMQConnection con){
+                    if (connection instanceof ActiveMQConnection con) {
                         con.destroyDestination(new ActiveMQQueue(queue));
                     }
 
@@ -256,7 +254,7 @@ public class CloudMQSender {
 
     private void uploadSale() {
         log.info("upload sale.");
-        List<SaleHis> list = saleHisService.unUpload();
+        List<SaleHis> list = saleHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         list.forEach(o -> sendMessage("SALE", gson.toJson(o), serverQ));
     }
 
@@ -269,7 +267,7 @@ public class CloudMQSender {
 
     private void uploadPurchase() {
         log.info("upload purchase.");
-        List<PurHis> list = purHisService.unUpload();
+        List<PurHis> list = purHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o), serverQ));
     }
 
@@ -282,7 +280,7 @@ public class CloudMQSender {
 
     private void uploadReturnIn() {
         log.info("upload return in.");
-        List<RetInHis> list = retInService.unUpload();
+        List<RetInHis> list = retInService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o), serverQ));
     }
 
@@ -295,7 +293,7 @@ public class CloudMQSender {
 
     public void uploadReturnOut() {
         log.info("upload return out.");
-        List<RetOutHis> list = retOutService.unUpload();
+        List<RetOutHis> list = retOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o), serverQ));
     }
 
@@ -308,14 +306,14 @@ public class CloudMQSender {
 
     private void uploadStockInOut() {
         log.info("upload stock in out.");
-        List<StockInOut> list = inOutService.unUpload();
+        List<StockInOut> list = inOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         list.forEach(o -> sendMessage("STOCK_IO", gson.toJson(o), serverQ));
     }
 
 
     private void uploadTransfer() {
         log.info("upload transfer.");
-        List<TransferHis> list = transferHisService.unUpload();
+        List<TransferHis> list = transferHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         list.forEach(o -> sendMessage("TRANSFER", gson.toJson(o), serverQ));
     }
 
@@ -378,7 +376,8 @@ public class CloudMQSender {
         List<Trader> list = traderService.unUploadTrader();
         list.forEach((o) -> sendMessage("TRADER", gson.toJson(o), serverQ));
     }
-    public void send(Trader t){
+
+    public void send(Trader t) {
         sendTopicMessage("TRADER", gson.toJson(t));
     }
 
@@ -387,7 +386,8 @@ public class CloudMQSender {
         List<StockUnit> list = unitService.unUpload();
         list.forEach((o) -> sendMessage("UNIT", gson.toJson(o), serverQ));
     }
-    public void send(StockUnit t){
+
+    public void send(StockUnit t) {
         sendTopicMessage("UNIT", gson.toJson(t));
     }
 
@@ -396,7 +396,8 @@ public class CloudMQSender {
         List<StockType> list = stockTypeService.unUpload();
         list.forEach((o) -> sendMessage("STOCK_TYPE", gson.toJson(o), serverQ));
     }
-    public void send(StockType t){
+
+    public void send(StockType t) {
         sendTopicMessage("STOCK_TYPE", gson.toJson(t));
     }
 
@@ -405,7 +406,8 @@ public class CloudMQSender {
         List<StockBrand> list = brandService.unUpload();
         list.forEach((o) -> sendMessage("STOCK_BRAND", gson.toJson(o), serverQ));
     }
-    public void send(StockBrand t){
+
+    public void send(StockBrand t) {
         sendTopicMessage("STOCK_BRAND", gson.toJson(t));
     }
 
@@ -416,7 +418,8 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("SALEMAN", gson.toJson(o), serverQ));
 
     }
-    public void send(SaleMan t){
+
+    public void send(SaleMan t) {
         sendTopicMessage("SALEMAN", gson.toJson(t));
     }
 
@@ -426,7 +429,8 @@ public class CloudMQSender {
         List<Category> list = categoryService.unUpload();
         list.forEach(o -> sendMessage("STOCK_CATEGORY", gson.toJson(o), serverQ));
     }
-    public void send(Category t){
+
+    public void send(Category t) {
         sendTopicMessage("STOCK_CATEGORY", gson.toJson(t));
     }
 
@@ -436,7 +440,8 @@ public class CloudMQSender {
         List<Location> list = locationService.unUpload();
         list.forEach(o -> sendMessage("LOCATION", gson.toJson(o), serverQ));
     }
-    public void send(Location t){
+
+    public void send(Location t) {
         sendTopicMessage("LOCATION", gson.toJson(t));
     }
 
