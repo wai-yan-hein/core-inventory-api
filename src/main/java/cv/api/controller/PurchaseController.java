@@ -49,7 +49,7 @@ public class PurchaseController {
         //send message to service
         accountRepo.sendPurchase(pur);
         //send to cloud
-        cloudMQSender.sendPurchase(pur);
+        cloudMQSender.send(pur);
         return ResponseEntity.ok(pur);
     }
 

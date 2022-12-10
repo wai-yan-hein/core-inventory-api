@@ -260,7 +260,7 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("SALE", gson.toJson(o), serverQ));
     }
 
-    public void sendSale(SaleHis sh) {
+    public void send(SaleHis sh) {
         if (sh != null) {
             String queue = client ? serverQ : hmQueue.get(sh.getLocCode());
             sendMessage("SALE", gson.toJson(sh), queue);
@@ -273,7 +273,7 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("PURCHASE", gson.toJson(o), serverQ));
     }
 
-    public void sendPurchase(PurHis sh) {
+    public void send(PurHis sh) {
         if (sh != null) {
             String queue = client ? serverQ : hmQueue.get(sh.getLocCode());
             sendMessage("PURCHASE", gson.toJson(sh), queue);
@@ -286,7 +286,7 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("RETURN_IN", gson.toJson(o), serverQ));
     }
 
-    public void sendReturnIn(RetInHis rin) {
+    public void send(RetInHis rin) {
         if (rin != null) {
             String queue = client ? serverQ : hmQueue.get(rin.getLocCode());
             sendMessage("RETURN_IN", gson.toJson(rin), queue);
@@ -299,7 +299,7 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("RETURN_OUT", gson.toJson(o), serverQ));
     }
 
-    public void sendReturnOut(RetOutHis obj) {
+    public void send(RetOutHis obj) {
         if (obj != null) {
             String queue = client ? serverQ : hmQueue.get(obj.getLocCode());
             sendMessage("RETURN_OUT", gson.toJson(obj), queue);
@@ -340,7 +340,7 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("STOCK", gson.toJson(o), serverQ));
     }
 
-    public void sendStock(Stock s) {
+    public void send(Stock s) {
         sendTopicMessage("STOCK", gson.toJson(s));
     }
 
@@ -373,11 +373,17 @@ public class CloudMQSender {
         List<Trader> list = traderService.unUploadTrader();
         list.forEach((o) -> sendMessage("TRADER", gson.toJson(o), serverQ));
     }
+    public void send(Trader t){
+        sendTopicMessage("TRADER", gson.toJson(t));
+    }
 
     private void uploadStockUnit() {
         log.info("upload stock unit.");
         List<StockUnit> list = unitService.unUpload();
         list.forEach((o) -> sendMessage("UNIT", gson.toJson(o), serverQ));
+    }
+    public void send(StockUnit t){
+        sendTopicMessage("UNIT", gson.toJson(t));
     }
 
     private void uploadStockType() {
@@ -385,12 +391,19 @@ public class CloudMQSender {
         List<StockType> list = stockTypeService.unUpload();
         list.forEach((o) -> sendMessage("STOCK_TYPE", gson.toJson(o), serverQ));
     }
+    public void send(StockType t){
+        sendTopicMessage("STOCK_TYPE", gson.toJson(t));
+    }
 
     private void uploadStockBrand() {
         log.info("upload stock brand.");
         List<StockBrand> list = brandService.unUpload();
         list.forEach((o) -> sendMessage("STOCK_BRAND", gson.toJson(o), serverQ));
     }
+    public void send(StockBrand t){
+        sendTopicMessage("STOCK_BRAND", gson.toJson(t));
+    }
+
 
     private void uploadSaleMan() {
         log.info("upload sale man.");
@@ -398,17 +411,28 @@ public class CloudMQSender {
         list.forEach(o -> sendMessage("SALEMAN", gson.toJson(o), serverQ));
 
     }
+    public void send(SaleMan t){
+        sendTopicMessage("SALEMAN", gson.toJson(t));
+    }
+
 
     private void uploadCategory() {
         log.info("upload category.");
         List<Category> list = categoryService.unUpload();
         list.forEach(o -> sendMessage("STOCK_CATEGORY", gson.toJson(o), serverQ));
     }
+    public void send(Category t){
+        sendTopicMessage("STOCK_CATEGORY", gson.toJson(t));
+    }
+
 
     private void uploadLocation() {
         log.info("upload location.");
         List<Location> list = locationService.unUpload();
         list.forEach(o -> sendMessage("LOCATION", gson.toJson(o), serverQ));
+    }
+    public void send(Location t){
+        sendTopicMessage("LOCATION", gson.toJson(t));
     }
 
     private void info(String message) {

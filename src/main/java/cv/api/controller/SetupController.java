@@ -100,6 +100,8 @@ public class SetupController {
     @PostMapping(path = "/save-category")
     public ResponseEntity<Category> saveCategory(@RequestBody Category cat) throws Exception {
         Category category = categoryService.save(cat);
+        //sent to cloud
+        cloudMQSender.send(cat);
         return ResponseEntity.ok(category);
     }
 
@@ -123,8 +125,10 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-location")
-    public ResponseEntity<Location> saveLocation(@RequestBody Location location) throws Exception {
+    public ResponseEntity<Location> saveLocation(@RequestBody Location location) {
         Location loc = locationService.save(location);
+        //sent to cloud
+        cloudMQSender.send(loc);
         return ResponseEntity.ok(loc);
     }
 
@@ -148,6 +152,8 @@ public class SetupController {
     @PostMapping(path = "/save-saleman")
     public ResponseEntity<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) throws Exception {
         SaleMan sm = saleManService.save(saleMan);
+        //sent to cloud
+        cloudMQSender.send(saleMan);
         return ResponseEntity.ok(sm);
     }
 
@@ -173,6 +179,8 @@ public class SetupController {
     @PostMapping(path = "/save-brand")
     public ResponseEntity<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) throws Exception {
         StockBrand b = brandService.save(brand);
+        //send to cloud
+        cloudMQSender.send(brand);
         return ResponseEntity.ok(b);
     }
 
@@ -203,6 +211,8 @@ public class SetupController {
     @PostMapping(path = "/save-type")
     public ResponseEntity<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) throws Exception {
         StockType b = typeService.save(type);
+        //send to cloud
+        cloudMQSender.send(type);
         return ResponseEntity.ok(b);
     }
 
@@ -229,6 +239,8 @@ public class SetupController {
     @PostMapping(path = "/save-unit")
     public ResponseEntity<StockUnit> saveUnit(@RequestBody StockUnit unit, HttpServletRequest request) {
         StockUnit b = unitService.save(unit);
+        //send to cloud
+        cloudMQSender.send(unit);
         return ResponseEntity.ok(b);
     }
 
@@ -293,6 +305,7 @@ public class SetupController {
     public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) throws Exception {
         trader = traderService.saveTrader(trader);
         accountRepo.sendTrader(trader);
+        cloudMQSender.send(trader);
         return ResponseEntity.ok(trader);
     }
 
@@ -346,7 +359,7 @@ public class SetupController {
     public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) throws Exception {
         Stock b = stockService.save(stock);
         //for cloud
-        cloudMQSender.sendStock(b);
+        cloudMQSender.send(b);
         return ResponseEntity.ok(b);
     }
 
