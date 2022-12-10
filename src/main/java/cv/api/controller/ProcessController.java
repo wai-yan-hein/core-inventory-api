@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/process")
 @Slf4j
 public class ProcessController {
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private ProcessHisService processHisService;
     @Autowired
     private ProcessHisDetailService processHisDetailService;
-    private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-process")
     public ResponseEntity<?> saveProcess(@RequestBody ProcessHis p) {
@@ -36,10 +36,12 @@ public class ProcessController {
         ro.setMessage("Deleted.");
         return ResponseEntity.ok(ro);
     }
+
     @PostMapping(path = "/find-process")
     public ResponseEntity<?> findProcess(@RequestBody ProcessHisKey p) {
         return ResponseEntity.ok(processHisService.findById(p));
     }
+
     @PostMapping(path = "/restore-process")
     public ResponseEntity<?> restoreProcess(@RequestBody ProcessHisKey p) {
         processHisService.restore(p);

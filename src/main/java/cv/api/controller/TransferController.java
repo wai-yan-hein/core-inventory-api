@@ -37,7 +37,7 @@ public class TransferController {
     private ReportService reportService;
     @Autowired
     private TransferHisDetailService detailService;
-    @Autowired
+    @Autowired(required = false)
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-transfer")

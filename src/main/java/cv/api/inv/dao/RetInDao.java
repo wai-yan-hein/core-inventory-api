@@ -6,7 +6,6 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.LocationKey;
-import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
 import cv.api.inv.view.VReturnIn;

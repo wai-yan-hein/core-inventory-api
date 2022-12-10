@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class VPurchase implements Serializable {

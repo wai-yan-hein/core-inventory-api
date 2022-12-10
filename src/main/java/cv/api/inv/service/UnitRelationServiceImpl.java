@@ -23,12 +23,11 @@ import java.util.Objects;
 @Service
 @Transactional
 public class UnitRelationServiceImpl implements UnitRelationService {
+    private final DecimalFormat formatter = new DecimalFormat(Util1.DECIMAL_FORMAT);
     @Autowired
     private SeqTableService seqService;
     @Autowired
     private UnitRelationDao dao;
-    private final DecimalFormat formatter = new DecimalFormat(Util1.DECIMAL_FORMAT);
-
 
     @Override
     public UnitRelation save(UnitRelation ur) {
@@ -79,8 +78,8 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     }
 
     @Override
-    public List<UnitRelation> findRelation( String compCode, Integer deptId) {
-        return dao.findRelation(compCode,deptId);
+    public List<UnitRelation> findRelation(String compCode, Integer deptId) {
+        return dao.findRelation(compCode, deptId);
     }
 
     @Override

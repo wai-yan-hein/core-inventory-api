@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface PurHisDetailDao {
+public interface PurHisDetailDao {
 
     PurHisDetail save(PurHisDetail pd);
 

@@ -29,7 +29,7 @@ public class StockTypeServiceImpl implements StockTypeService {
     private SeqTableService seqService;
 
     @Override
-    public StockType save(StockType s) throws Exception {
+    public StockType save(StockType s) {
         if (Util1.isNull(s.getKey().getStockTypeCode())) {
             String code = getCode(s.getMacId(), s.getKey().getCompCode());
             s.getKey().setStockTypeCode(code);

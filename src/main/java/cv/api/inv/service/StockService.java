@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface StockService {
 
-    Stock save(Stock stock) throws Exception;
+    Stock save(Stock stock);
 
     Stock findById(StockKey key);
 

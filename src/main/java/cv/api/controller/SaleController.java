@@ -33,6 +33,7 @@ import java.util.List;
 @Slf4j
 public class SaleController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private SaleHisService shService;
     @Autowired
@@ -41,10 +42,9 @@ public class SaleController {
     private ReportService reportService;
     @Autowired
     private BackupService backupService;
-    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private AccountRepo accountRepo;
-    @Autowired
+    @Autowired(required = false)
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-sale")

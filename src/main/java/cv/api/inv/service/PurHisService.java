@@ -6,7 +6,6 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.LocationKey;
-import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisKey;
 import cv.api.inv.view.VPurchase;

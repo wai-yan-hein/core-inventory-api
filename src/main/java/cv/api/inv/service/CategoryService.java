@@ -6,7 +6,6 @@
 package cv.api.inv.service;
 
 import cv.api.inv.entity.Category;
-import cv.api.inv.entity.StockBrand;
 
 import java.util.Date;
 import java.util.List;
@@ -14,17 +13,17 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface CategoryService {
+public interface CategoryService {
 
-     Category findByCode(String code);
+    Category findByCode(String code);
 
-     Category save(Category category) throws Exception;
+    Category save(Category category);
 
-     List<Category> findAll(String compCode, Integer deptId);
+    List<Category> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     List<Category> search(String catName);
+    List<Category> search(String catName);
 
     List<Category> unUpload();
 

@@ -11,7 +11,6 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 /**
- *
  * @author Lenevo
  */
 @Data

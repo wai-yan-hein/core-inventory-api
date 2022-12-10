@@ -80,7 +80,7 @@ public class BKSaleHis implements java.io.Serializable {
     @Column(name = "order_code")
     private String orderCode;
     @Column(name = "reg_code")
-    private String  regCode;
+    private String regCode;
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "mac_id")

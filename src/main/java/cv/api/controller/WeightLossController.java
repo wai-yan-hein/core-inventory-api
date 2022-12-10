@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/weight")
 @Slf4j
 public class WeightLossController {
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private WeightLossService weightLossService;
     @Autowired
     private ReportService reportService;
     @Autowired
     private WeightLossDetailService weightLossDetailService;
-    private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-weight-loss")
     public ResponseEntity<?> saveStockIO(@RequestBody WeightLossHis w) {

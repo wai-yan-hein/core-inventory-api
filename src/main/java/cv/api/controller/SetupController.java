@@ -33,6 +33,7 @@ import java.util.List;
 @Slf4j
 public class SetupController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private CurrencyService currencyService;
     @Autowired
@@ -73,13 +74,10 @@ public class SetupController {
     private FontService fontService;
     @Autowired
     private TraderGroupService traderGroupService;
-
     @Autowired
     private AccountRepo accountRepo;
-    @Autowired
+    @Autowired(required = false)
     private CloudMQSender cloudMQSender;
-    private final ReturnObject ro = new ReturnObject();
-
 
     @PostMapping(path = "/save-currency")
     public ResponseEntity<Currency> saveCurrency(@RequestBody Currency machine, HttpServletRequest request) {
@@ -552,4 +550,4 @@ public class SetupController {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
         return ResponseEntity.ok(g);
     }
-    }
+}

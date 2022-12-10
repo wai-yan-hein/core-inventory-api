@@ -9,7 +9,6 @@ import cv.api.common.Util1;
 import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.PurHisKey;
-import cv.api.inv.entity.SaleHis;
 import cv.api.inv.view.VPurchase;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
@@ -136,6 +135,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         });
         return list;
     }
+
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from pur_his";

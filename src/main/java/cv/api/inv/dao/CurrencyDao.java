@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author WSwe
  */
- public interface CurrencyDao {
+public interface CurrencyDao {
 
     Currency save(Currency cur);
 

@@ -7,7 +7,6 @@ package cv.api.inv.dao;
 
 import cv.api.common.Util1;
 import cv.api.inv.entity.LocationKey;
-import cv.api.inv.entity.PurHis;
 import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
@@ -145,7 +144,8 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }            }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }

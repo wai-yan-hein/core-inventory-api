@@ -21,14 +21,13 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     private static final Logger log = LoggerFactory.getLogger(AbstractDao.class);
     private Class<T> persistentClass;
     private ResultSet rs = null;
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @SuppressWarnings("unchecked")
     public AbstractDao() {
         this.persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
-
-    @Autowired
-    private SessionFactory sessionFactory;
 
     public AbstractDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -93,6 +92,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         Session sees = getSession();
         sees.doWork(work);
     }
+
     public ResultSet getResultSet(final String sql) {
         Work work = (Connection con) -> {
             try {

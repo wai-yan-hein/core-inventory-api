@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 @Slf4j
 @Repository
 public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisDao {

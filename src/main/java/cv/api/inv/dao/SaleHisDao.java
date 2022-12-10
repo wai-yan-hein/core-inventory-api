@@ -5,7 +5,6 @@
  */
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 

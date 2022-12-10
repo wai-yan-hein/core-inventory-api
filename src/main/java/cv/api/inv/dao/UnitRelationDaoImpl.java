@@ -61,9 +61,9 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
     public List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId) {
         String hsql;
         if (code.equals("-")) {
-            hsql = "select o from UnitRelationDetail o where o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 ="+deptId+")";
+            hsql = "select o from UnitRelationDetail o where o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ")";
         } else {
-            hsql = "select o from UnitRelationDetail o where o.key.relCode = '" + code + "' and o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 ="+deptId+")";
+            hsql = "select o from UnitRelationDetail o where o.key.relCode = '" + code + "' and o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ")";
         }
         return getSession().createQuery(hsql, UnitRelationDetail.class).list();
     }
@@ -95,7 +95,8 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }            }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }

@@ -4,8 +4,8 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
 import java.io.Serializable;
+
 @Data
 @Embeddable
 public class ReorderKey implements Serializable {

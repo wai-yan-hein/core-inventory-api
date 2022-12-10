@@ -12,6 +12,7 @@ import java.sql.ResultSet;
  */
 public interface ReportDao {
     void executeSql(String... sql) throws Exception;
+
     ResultSet executeSql(String sql) throws Exception;
 
 

@@ -7,5 +7,5 @@ import java.util.List;
 public interface PriceOptionDao {
     PriceOption save(PriceOption p);
 
-    List<PriceOption> getPriceOption(String option,String compCode,Integer deptId);
+    List<PriceOption> getPriceOption(String option, String compCode, Integer deptId);
 }

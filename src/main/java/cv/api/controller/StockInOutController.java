@@ -31,13 +31,13 @@ import java.util.List;
 @Slf4j
 public class StockInOutController {
 
+    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private StockInOutService ioService;
     @Autowired
     private StockInOutDetailService iodService;
     @Autowired
     private ReportService reportService;
-    private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-stockio")
     public ResponseEntity<StockInOut> saveStockIO(@RequestBody StockInOut stockio, HttpServletRequest request) throws Exception {

@@ -9,7 +9,6 @@ import cv.api.common.Util1;
 import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.StockIOKey;
 import cv.api.inv.entity.StockInOut;
-import cv.api.inv.entity.TransferHis;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -135,7 +134,8 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
                 Date date = rs.getTimestamp("date");
                 if (date != null) {
                     return date;
-                }            }
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }

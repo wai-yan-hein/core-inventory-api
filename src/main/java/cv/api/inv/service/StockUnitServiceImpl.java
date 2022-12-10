@@ -26,13 +26,13 @@ public class StockUnitServiceImpl implements StockUnitService {
     private StockUnitDao dao;
 
     @Override
-    public StockUnit save(StockUnit unit) throws Exception {
+    public StockUnit save(StockUnit unit) {
         return dao.save(unit);
     }
 
     @Override
-    public List<StockUnit> findAll(String compCode,Integer deptId) {
-        return dao.findAll(compCode,deptId);
+    public List<StockUnit> findAll(String compCode, Integer deptId) {
+        return dao.findAll(compCode, deptId);
     }
 
     @Override

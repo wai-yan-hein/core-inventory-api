@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
  * @author SAI
  */
 @Embeddable
@@ -91,6 +90,6 @@ public class SeqKey implements Serializable {
         }
         return Objects.equals(this.macId, other.macId);
     }
-    
+
 
 }

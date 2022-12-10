@@ -3,12 +3,14 @@ package cv.api.cloud;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import cv.api.common.Util1;
+import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -22,7 +24,14 @@ import java.util.List;
 
 @Slf4j
 @Component
+@Conditional(ActiveMqCondition.class)
 public class CloudMQReceiver {
+    private final String SENT = "SENT";
+    private final String REC = "REC";
+    private final Gson gson = new GsonBuilder()
+            .serializeNulls()
+            .setDateFormat(DateFormat.FULL, DateFormat.FULL)
+            .create();
     @Value("${cloud.activemq.listen.queue}")
     private String listenQ;
     @Autowired
@@ -65,11 +74,6 @@ public class CloudMQReceiver {
     private JmsTemplate cloudMQTemplate;
     @Autowired
     private UserRepo userRepo;
-    private final String SENT = "SENT";
-    private final Gson gson = new GsonBuilder()
-            .serializeNulls()
-            .setDateFormat(DateFormat.FULL, DateFormat.FULL)
-            .create();
 
     private void responseSetup(String entity, String distQ, String data) {
         MessageCreator mc = (Session session) -> {
@@ -100,7 +104,133 @@ public class CloudMQReceiver {
         }
     }
 
-    @JmsListener(destination = "${cloud.activemq.listen.queue}")
+    private void save(VouStatus obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        vouStatusService.save(obj);
+    }
+
+    private void save(UnitRelation obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        relationService.save(obj);
+    }
+
+    private void save(Trader obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        traderService.saveTrader(obj);
+    }
+
+    private void save(StockUnit obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        unitService.save(obj);
+    }
+
+    private void save(StockType obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        typeService.save(obj);
+    }
+
+    private void save(StockBrand obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        brandService.save(obj);
+    }
+
+    private void save(Category obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        categoryService.save(obj);
+    }
+
+    private void save(SaleMan obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        saleManService.save(obj);
+    }
+
+    private void save(Location obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        locationService.save(obj);
+    }
+
+    private void save(Stock obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        stockService.save(obj);
+    }
+
+    @JmsListener(destination = "INV_MSG", containerFactory = "topicContainerFactory")
+    public void receivedTopicMessage(final MapMessage message) throws JMSException {
+        String entity = message.getString("ENTITY");
+        String option = message.getString("OPTION");
+        String data = message.getString("DATA");
+        String senderQ = message.getString("SENDER_QUEUE");
+        String serverQ = userRepo.getProperty("cloud.activemq.server.queue");
+        if (senderQ.equals(serverQ)) {
+            if (data != null) {
+                try {
+                    log.info(String.format("receivedMessage : %s - %s - %s", entity, option, senderQ));
+                    switch (option) {
+                        case "SETUP":
+                            switch (entity) {
+                                case "VOU_STATUS" -> {
+                                    VouStatus obj = gson.fromJson(data, VouStatus.class);
+                                    save(obj);
+                                }
+                                case "RELATION" -> {
+                                    UnitRelation obj = gson.fromJson(data, UnitRelation.class);
+                                    save(obj);
+                                }
+                                case "TRADER" -> {
+                                    Trader obj = gson.fromJson(data, Trader.class);
+                                    save(obj);
+                                }
+                                case "UNIT" -> {
+                                    StockUnit obj = gson.fromJson(data, StockUnit.class);
+                                    save(obj);
+                                }
+                                case "STOCK_TYPE" -> {
+                                    StockType obj = gson.fromJson(data, StockType.class);
+                                    save(obj);
+                                }
+                                case "STOCK_BRAND" -> {
+                                    StockBrand obj = gson.fromJson(data, StockBrand.class);
+                                    save(obj);
+                                }
+                                case "STOCK_CATEGORY" -> {
+                                    Category obj = gson.fromJson(data, Category.class);
+                                    save(obj);
+                                }
+                                case "SALEMAN" -> {
+                                    SaleMan obj = gson.fromJson(data, SaleMan.class);
+                                    save(obj);
+                                }
+                                case "LOCATION" -> {
+                                    Location obj = gson.fromJson(data, Location.class);
+                                    save(obj);
+                                }
+                                case "STOCK" -> {
+                                    Stock obj = gson.fromJson(data, Stock.class);
+                                    save(obj);
+                                }
+                            }
+                        case "NOTIFICATION":
+                            log.info("test");
+                    }
+                } catch (Exception e) {
+                    log.error(String.format("%s : %s", entity, e.getMessage()));
+                }
+            }
+        }
+
+    }
+
+    @JmsListener(destination = "${cloud.activemq.listen.queue}", containerFactory = "queueContainerFactory")
     public void receivedMessage(final MapMessage message) throws JMSException {
         String entity = message.getString("ENTITY");
         String option = message.getString("OPTION");
@@ -115,10 +245,7 @@ public class CloudMQReceiver {
                     case "VOU_STATUS" -> {
                         VouStatus obj = gson.fromJson(data, VouStatus.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                vouStatusService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateVouStatus(obj);
                             case "REQUEST_SETUP" -> {
                                 List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -131,10 +258,7 @@ public class CloudMQReceiver {
                     case "RELATION" -> {
                         UnitRelation obj = gson.fromJson(data, UnitRelation.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                relationService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateUnitRelation(obj);
                             case "REQUEST_SETUP" -> {
                                 List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -147,10 +271,7 @@ public class CloudMQReceiver {
                     case "TRADER" -> {
                         Trader obj = gson.fromJson(data, Trader.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                traderService.saveTrader(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateTrader(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -158,16 +279,12 @@ public class CloudMQReceiver {
                                     list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
                                 }
                             }
-
                         }
                     }
                     case "UNIT" -> {
                         StockUnit obj = gson.fromJson(data, StockUnit.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                unitService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateUnit(obj);
                             case "REQUEST_SETUP" -> {
                                 List<StockUnit> list = unitService.getUnit(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -180,10 +297,7 @@ public class CloudMQReceiver {
                     case "STOCK_TYPE" -> {
                         StockType obj = gson.fromJson(data, StockType.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                typeService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateStockType(obj);
                             case "REQUEST_SETUP" -> {
                                 List<StockType> list = typeService.getStockType(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -196,10 +310,7 @@ public class CloudMQReceiver {
                     case "STOCK_BRAND" -> {
                         StockBrand obj = gson.fromJson(data, StockBrand.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                brandService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateBrand(obj);
                             case "REQUEST_SETUP" -> {
                                 List<StockBrand> list = brandService.getBrand(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -212,10 +323,7 @@ public class CloudMQReceiver {
                     case "STOCK_CATEGORY" -> {
                         Category obj = gson.fromJson(data, Category.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                categoryService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateCategory(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Category> list = categoryService.getCategory(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -228,10 +336,7 @@ public class CloudMQReceiver {
                     case "SALEMAN" -> {
                         SaleMan obj = gson.fromJson(data, SaleMan.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.setIntgUpdStatus(REC);
-                                saleManService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> saleManService.save(obj);
                             case "RECEIVE" -> updateSaleMan(obj);
                             case "REQUEST_SETUP" -> {
                                 List<SaleMan> list = saleManService.getSaleMan(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -244,11 +349,7 @@ public class CloudMQReceiver {
                     case "LOCATION" -> {
                         Location obj = gson.fromJson(data, Location.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                locationService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateLocation(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Location> list = locationService.getLocation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
@@ -261,11 +362,7 @@ public class CloudMQReceiver {
                     case "STOCK" -> {
                         Stock obj = gson.fromJson(data, Stock.class);
                         switch (option) {
-                            case "SENT", "RESPONSE_SETUP" -> {
-                                obj.getKey().setDeptId(userRepo.getDeptId());
-                                obj.setIntgUpdStatus(REC);
-                                stockService.save(obj);
-                            }
+                            case "SENT", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateStock(obj);
                             case "REQUEST_SETUP" -> {
                                 List<Stock> list = stockService.getStock(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));

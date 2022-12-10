@@ -11,18 +11,17 @@ import cv.api.inv.entity.RegionKey;
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
- public interface RegionService {
+public interface RegionService {
 
-     Region save(Region region) throws Exception;
+    Region save(Region region) throws Exception;
 
-     Region findByCode(RegionKey id);
+    Region findByCode(RegionKey id);
 
-     List<Region> search(String code, String name, String compCode, String parentCode);
+    List<Region> search(String code, String name, String compCode, String parentCode);
 
-     int delete(String code);
+    int delete(String code);
 
-     List<Region> findAll(String compCode);
+    List<Region> findAll(String compCode);
 }

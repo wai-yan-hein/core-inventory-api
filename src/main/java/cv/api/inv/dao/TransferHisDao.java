@@ -1,7 +1,5 @@
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.LocationKey;
-import cv.api.inv.entity.OPHis;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisKey;
 

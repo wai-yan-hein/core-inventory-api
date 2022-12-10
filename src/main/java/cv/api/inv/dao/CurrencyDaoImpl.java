@@ -5,16 +5,12 @@
  */
 package cv.api.inv.dao;
 
-import cv.api.common.Util1;
 import cv.api.inv.entity.Currency;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.util.Date;
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
 @Repository

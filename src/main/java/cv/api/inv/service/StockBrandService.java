@@ -14,16 +14,17 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface StockBrandService {
+public interface StockBrandService {
 
-     StockBrand save(StockBrand brand)throws Exception;
+    StockBrand save(StockBrand brand);
 
-     List<StockBrand> findAll(String compCode, Integer deptId);
+    List<StockBrand> findAll(String compCode, Integer deptId);
 
-     int delete(String id);
+    int delete(String id);
 
-     StockBrand findByCode(StockBrandKey code);
-     List<StockBrand> unUpload();
+    StockBrand findByCode(StockBrandKey code);
+
+    List<StockBrand> unUpload();
 
     Date getMaxDate();
 

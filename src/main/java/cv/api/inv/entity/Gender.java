@@ -10,14 +10,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 /**
- *
  * @author Thandar
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name="gender")
-public class Gender implements java.io.Serializable{
+@Table(name = "gender")
+public class Gender implements java.io.Serializable {
     private String genderId;
     private String description;
 
@@ -31,8 +31,8 @@ public class Gender implements java.io.Serializable{
         this.genderId = genderId;
     }
 
-    @Column(name="description", unique=true, nullable=false,
-            length=10)
+    @Column(name = "description", unique = true, nullable = false,
+            length = 10)
     public String getDescription() {
         return description;
     }
@@ -40,9 +40,9 @@ public class Gender implements java.io.Serializable{
     public void setDescription(String Description) {
         this.description = Description;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return description;
     }
 }

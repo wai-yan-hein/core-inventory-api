@@ -15,7 +15,7 @@ public class BackupDaoImpl extends AbstractDao<String, Object> implements Backup
     @Override
     public BKSaleHis save(BKSaleHis bk) {
         persist(bk);
-        return  bk;
+        return bk;
     }
 
     @Override

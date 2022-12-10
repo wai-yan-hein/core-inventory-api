@@ -125,7 +125,7 @@ public class PurHisServiceImpl implements PurHisService {
 
     @Override
     public List<PurHis> search(String updatedDate, List<LocationKey> keys) {
-        return phDao.search(updatedDate,keys);
+        return phDao.search(updatedDate, keys);
     }
 
     private String getVoucherNo(Integer macId, String compCode) {

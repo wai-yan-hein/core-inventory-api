@@ -19,6 +19,7 @@ public interface OPHisDao {
     void delete(OPHisKey key);
 
     List<OPHis> search(String updatedDate, List<LocationKey> keys);
+
     Date getMaxDate();
 
 

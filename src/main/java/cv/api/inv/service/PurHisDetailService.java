@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * @author wai yan
  */
- public interface PurHisDetailService {
+public interface PurHisDetailService {
 
-     PurHisDetail save(PurHisDetail pd);
-    
-     List<PurHisDetail> search(String vouNo, String compCode, Integer deptId);
+    PurHisDetail save(PurHisDetail pd);
 
-     int delete(String code, String compCode, Integer deptId) throws Exception;
+    List<PurHisDetail> search(String vouNo, String compCode, Integer deptId);
+
+    int delete(String code, String compCode, Integer deptId) throws Exception;
 
 }

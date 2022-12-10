@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @RequiredArgsConstructor

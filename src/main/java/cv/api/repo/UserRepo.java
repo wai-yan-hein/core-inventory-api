@@ -1,7 +1,5 @@
 package cv.api.repo;
 
-import cv.api.inv.entity.Location;
-import cv.api.inv.entity.LocationKey;
 import cv.api.inv.service.LocationService;
 import cv.api.model.Department;
 import cv.api.model.PropertyKey;
@@ -21,14 +19,14 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class UserRepo {
+    private final HashMap<String, String> hmKey = new HashMap<>();
+    int min = 1;
     @Autowired
     private WebClient userApi;
     private List<Department> listDept;
     private List<String> location;
-    private final HashMap<String, String> hmKey = new HashMap<>();
     @Autowired
     private LocationService locationService;
-    int min = 1;
 
     public SystemProperty findProperty(String key, String compCode) {
         PropertyKey p = new PropertyKey();

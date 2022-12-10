@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- *
  * @author WSwe
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)

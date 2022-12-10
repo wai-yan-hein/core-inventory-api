@@ -72,6 +72,7 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     public Category findByCode(String code) {
         return getByKey(code);
     }
+
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from category";

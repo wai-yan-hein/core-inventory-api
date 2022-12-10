@@ -1,7 +1,6 @@
 package cv.api.inv.dao;
 
 import cv.api.common.Util1;
-import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.TransferHis;
 import cv.api.inv.entity.TransferHisKey;
 import lombok.extern.slf4j.Slf4j;

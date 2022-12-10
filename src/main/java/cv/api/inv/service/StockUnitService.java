@@ -18,7 +18,7 @@ public interface StockUnitService {
 
     StockUnit findByCode(StockUnitKey code);
 
-    StockUnit save(StockUnit unit) throws Exception;
+    StockUnit save(StockUnit unit);
 
     List<StockUnit> findAll(String compCode, Integer deptId);
 

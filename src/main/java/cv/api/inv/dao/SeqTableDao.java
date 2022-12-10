@@ -11,22 +11,21 @@ import cv.api.inv.entity.SeqTable;
 import java.util.List;
 
 /**
- *
  * @author wai yan
  */
- public interface SeqTableDao {
+public interface SeqTableDao {
 
-     SeqTable save(SeqTable st);
+    SeqTable save(SeqTable st);
 
-     SeqTable findById(SeqKey id);
+    SeqTable findById(SeqKey id);
 
-     List<SeqTable> search(String option, String period, String compCode);
+    List<SeqTable> search(String option, String period, String compCode);
 
-     SeqTable getSeqTable(String option, String period, String compCode);
+    SeqTable getSeqTable(String option, String period, String compCode);
 
-     int delete(Integer id);
+    int delete(Integer id);
 
-     int getSequence(Integer macId,String option, String period, String compCode);
+    int getSequence(Integer macId, String option, String period, String compCode);
 
-     List<SeqTable> findAll();
+    List<SeqTable> findAll();
 }

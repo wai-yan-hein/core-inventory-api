@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 @Service
 @Transactional
-public class TmpServiceImpl implements TmpService{
+public class TmpServiceImpl implements TmpService {
     @Autowired
     private TmpDao dao;
+
     @Override
     public TmpStockIO save(TmpStockIO io) {
         return dao.save(io);
@@ -19,6 +21,6 @@ public class TmpServiceImpl implements TmpService{
 
     @Override
     public List<TmpStockIO> getStockIO(String stockCode, String compCode, Integer deptId, Integer macId) {
-        return dao.getStockIO(stockCode,compCode,deptId,macId);
+        return dao.getStockIO(stockCode, compCode, deptId, macId);
     }
 }

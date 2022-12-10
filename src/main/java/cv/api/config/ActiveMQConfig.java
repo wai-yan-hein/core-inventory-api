@@ -5,23 +5,20 @@
  */
 package cv.api.config;
 
-import cv.api.common.Util1;
-import cv.api.model.Department;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;
-import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
 
+import javax.jms.DeliveryMode;
 import javax.jms.Topic;
 import java.util.List;
 
@@ -65,16 +62,28 @@ public class ActiveMQConfig {
         JmsTemplate template = new JmsTemplate();
         String url = userRepo.getProperty("cloud.activemq.url");
         template.setConnectionFactory(connectionFactory(url));
+        template.setDeliveryMode(DeliveryMode.PERSISTENT);
+        template.setMessageIdEnabled(true);
         return template;
     }
 
     @Bean
-    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
+    public DefaultJmsListenerContainerFactory queueContainerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         String url = userRepo.getProperty("cloud.activemq.url");
         factory.setConnectionFactory(connectionFactory(url));
         factory.setConcurrency("1-1");
         log.info("ActiveMQ connection configured at " + url);
+        return factory;
+    }
+
+    @Bean
+    public DefaultJmsListenerContainerFactory topicContainerFactory() {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        String url = userRepo.getProperty("cloud.activemq.url");
+        factory.setConnectionFactory(connectionFactory(url));
+        factory.setConcurrency("1-1");
+        factory.setPubSubDomain(true);
         return factory;
     }
 

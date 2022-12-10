@@ -66,7 +66,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
     @Override
     public List<TransferHisDetail> searchDetail(String vouNo, String compCode, Integer deptId) {
         List<TransferHisDetail> list = new ArrayList<>();
-        String sql="select * from transfer_his_detail where vou_no ='"+vouNo+"' and comp_code ='"+compCode+"' and dept_id ="+deptId+" order by unique_id";
+        String sql = "select * from transfer_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + " order by unique_id";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {
             try {

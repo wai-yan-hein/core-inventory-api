@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class VReturnIn  {
+public class VReturnIn {
 
     private String rdCode;
     private String vouNo;

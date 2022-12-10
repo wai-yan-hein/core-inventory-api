@@ -10,16 +10,15 @@ import cv.api.inv.entity.Currency;
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
- public interface CurrencyService {
+public interface CurrencyService {
 
-     Currency save(Currency cur);
+    Currency save(Currency cur);
 
-     Currency findById(String id);
+    Currency findById(String id);
 
-     List<Currency> search(String code, String name);
+    List<Currency> search(String code, String name);
 
-     int delete(String code, String compCode);
+    int delete(String code, String compCode);
 }

@@ -7,22 +7,20 @@ package cv.api.inv.dao;
 
 import cv.api.inv.entity.Trader;
 import cv.api.inv.entity.TraderKey;
-import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 /**
- *
  * @author WSwe
  */
- public interface TraderDao {
+public interface TraderDao {
 
     Trader findById(TraderKey key);
 
-    List<Trader> searchTrader(String str,String type, String compCode,Integer deptId);
+    List<Trader> searchTrader(String str, String type, String compCode, Integer deptId);
 
-     Trader saveTrader(Trader trader);
+    Trader saveTrader(Trader trader);
 
     List<Trader> search(String regionCode, String coaCode);
 
@@ -30,12 +28,14 @@ import java.util.List;
 
     int delete(TraderKey code);
 
-    List<Trader> findCustomer(String compCode,Integer deptId);
+    List<Trader> findCustomer(String compCode, Integer deptId);
 
-    List<Trader> findSupplier(String compCode,Integer deptId);
+    List<Trader> findSupplier(String compCode, Integer deptId);
 
     List<Trader> unUploadTrader();
+
     Date getMaxDate();
+
     List<Trader> getTrader(String updatedDate);
 
 }

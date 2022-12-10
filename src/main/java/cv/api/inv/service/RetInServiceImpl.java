@@ -133,7 +133,7 @@ public class RetInServiceImpl implements RetInService {
 
     @Override
     public List<RetInHis> search(String updatedDate, List<LocationKey> keys) {
-        return rDao.search(updatedDate,keys);
+        return rDao.search(updatedDate, keys);
     }
 
 
