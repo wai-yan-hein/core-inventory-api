@@ -12,3 +12,7 @@ ADD COLUMN `map_dept_id` INT NULL;
 
 ALTER TABLE `stock` 
 CHANGE COLUMN `updated_date` `updated_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ;
+
+ALTER TABLE `sale_his_detail` 
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`sd_code`, `vou_no`, `dept_id`, `unique_id`);

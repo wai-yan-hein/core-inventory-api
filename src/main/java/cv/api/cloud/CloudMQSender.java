@@ -355,11 +355,16 @@ public class CloudMQSender {
         List<VouStatus> list = vouStatusService.unUpload();
         list.forEach((e) -> sendMessage("VOU_STATUS", gson.toJson(e), serverQ));
     }
-
+    public void send(VouStatus s) {
+        sendTopicMessage("VOU_STATUS", gson.toJson(s));
+    }
     private void uploadUnitRelation() {
         log.info("upload unit relation.");
         List<UnitRelation> list = relationService.unUpload();
         list.forEach(o -> sendMessage("RELATION", gson.toJson(o), serverQ));
+    }
+    public void send(UnitRelation s) {
+        sendTopicMessage("RELATION", gson.toJson(s));
     }
 
     private void uploadTraderGroup() {

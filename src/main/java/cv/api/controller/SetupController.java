@@ -401,6 +401,8 @@ public class SetupController {
     @PostMapping(path = "/save-voucher-status")
     public ResponseEntity<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus, HttpServletRequest request) {
         VouStatus b = vouStatusService.save(vouStatus);
+        //sent to cloud
+        cloudMQSender.send(b);
         return ResponseEntity.ok(b);
     }
 
@@ -538,6 +540,8 @@ public class SetupController {
     @PostMapping(path = "/save-unit-relation")
     public ResponseEntity<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
+        //sent to cloud
+        cloudMQSender.send(relation);
         return ResponseEntity.ok(b);
     }
 
