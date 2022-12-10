@@ -74,6 +74,7 @@ public class RetOutController {
     public ResponseEntity<ReturnObject> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
         roService.delete(key);
         ro.setMessage("Deleted.");
+        cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -81,6 +82,7 @@ public class RetOutController {
     public ResponseEntity<ReturnObject> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
         roService.restore(key);
         ro.setMessage("Restored.");
+        cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 

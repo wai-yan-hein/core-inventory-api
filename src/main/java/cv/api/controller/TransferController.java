@@ -43,7 +43,7 @@ public class TransferController {
     @PostMapping(path = "/save-transfer")
     public ResponseEntity<TransferHis> saveTransfer(@RequestBody TransferHis transferHis) {
         transferHis = thService.save(transferHis);
-        cloudMQSender.sendTransfer(transferHis);
+        cloudMQSender.send(transferHis);
         return ResponseEntity.ok(transferHis);
     }
 
@@ -84,6 +84,7 @@ public class TransferController {
         thService.delete(key);
         ReturnObject ro = new ReturnObject();
         ro.setMessage("Deleted.");
+        cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -92,6 +93,7 @@ public class TransferController {
         thService.restore(key);
         ReturnObject ro = new ReturnObject();
         ro.setMessage("Restored.");
+        cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 }

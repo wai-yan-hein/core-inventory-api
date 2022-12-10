@@ -9,7 +9,6 @@ import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
-import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisDetail;
 import cv.api.inv.entity.RetInHisKey;
@@ -20,7 +19,6 @@ import cv.api.inv.view.VReturnIn;
 import cv.api.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,6 +75,7 @@ public class RetInController {
     public ResponseEntity<ReturnObject> deleteRI(@RequestBody RetInHisKey key) throws Exception {
         riService.delete(key);
         ro.setMessage("Deleted.");
+        cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -84,6 +83,7 @@ public class RetInController {
     public ResponseEntity<ReturnObject> restoreRI(@RequestBody RetInHisKey key) throws Exception {
         riService.restore(key);
         ro.setMessage("Restored.");
+        cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 

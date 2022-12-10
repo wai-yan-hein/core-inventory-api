@@ -114,6 +114,7 @@ public class SaleController {
     public ResponseEntity<ReturnObject> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
         ro.setMessage("Deleted.");
+        cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -121,6 +122,7 @@ public class SaleController {
     public ResponseEntity<ReturnObject> restoreSale(@RequestBody SaleHisKey key) throws Exception {
         shService.restore(key);
         ro.setMessage("Restored.");
+        cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 
