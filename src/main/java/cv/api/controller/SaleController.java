@@ -56,7 +56,7 @@ public class SaleController {
         //for account
         accountRepo.sendSale(sale);
         //for cloud
-        cloudMQSender.sendSale(sale);
+        cloudMQSender.send(sale);
         return ResponseEntity.ok(sale);
     }
 

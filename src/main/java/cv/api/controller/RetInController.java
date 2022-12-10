@@ -52,7 +52,7 @@ public class RetInController {
         //send message to service
         accountRepo.sendReturnIn(retin);
         //send to cloud
-        cloudMQSender.sendReturnIn(retin);
+        cloudMQSender.send(retin);
         return ResponseEntity.ok(retin);
     }
 
