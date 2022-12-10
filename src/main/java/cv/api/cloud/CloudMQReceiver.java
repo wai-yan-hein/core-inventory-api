@@ -505,9 +505,9 @@ public class CloudMQReceiver {
                         }
                     }
                 }
-                if (option.equals("SAVE")) {
+                /*if (option.equals("SAVE")) {
                     sendMessage(senderQ, entity, data);
-                }
+                }*/
 
             } catch (Exception e) {
                 log.error(String.format("%s : %s", entity, e.getMessage()));
