@@ -41,10 +41,14 @@ public class TransferController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-transfer")
-    public ResponseEntity<TransferHis> saveTransfer(@RequestBody TransferHis transferHis) {
-        transferHis = thService.save(transferHis);
-        cloudMQSender.send(transferHis);
-        return ResponseEntity.ok(transferHis);
+    public ResponseEntity<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
+        //if change location
+        cloudMQSender.checkLocationAndTruncate(obj);
+        //save to local
+        obj = thService.save(obj);
+        //send to cloud
+        cloudMQSender.send(obj);
+        return ResponseEntity.ok(obj);
     }
 
     @PostMapping(path = "/get-transfer")

@@ -48,7 +48,9 @@ public class SaleController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-sale")
-    public ResponseEntity<SaleHis> saveSale(@RequestBody SaleHis sale) throws Exception {
+    public ResponseEntity<?> saveSale(@RequestBody SaleHis sale) throws Exception {
+        //if change location
+        cloudMQSender.checkLocationAndTruncate(sale);
         if (isValidSale(sale, ro)) {
             backupService.backup(sale);
             sale = shService.save(sale);

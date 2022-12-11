@@ -30,7 +30,6 @@ import java.util.List;
 @Conditional(ActiveMqCondition.class)
 public class CloudMQSender {
     private final Gson gson = new GsonBuilder()
-            .serializeNulls()
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)
             .create();
     @Value("${cloud.activemq.listen.queue}")
@@ -142,6 +141,20 @@ public class CloudMQSender {
             mm.setString("SENDER_QUEUE", listenQ);
             mm.setString("ENTITY", entity);
             mm.setString("OPTION", "DELETE");
+            mm.setString("DATA", data);
+            return mm;
+        };
+        if (queue != null) {
+            cloudMQTemplate.send(queue, mc);
+        }
+    }
+
+    private void truncateMessage(String entity, String data, String queue) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("SENDER_QUEUE", listenQ);
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "TRUNCATE");
             mm.setString("DATA", data);
             return mm;
         };
@@ -285,6 +298,13 @@ public class CloudMQSender {
         }
     }
 
+    public void checkLocationAndTruncate(SaleHis sh) {
+        SaleHis old = saleHisService.findById(sh.getKey());
+        if (!sh.getLocCode().equals(old.getLocCode())) {
+            truncateMessage("SALE", gson.toJson(old), getQueue(old));
+        }
+    }
+
     public void delete(SaleHisKey key) {
         SaleHis obj = new SaleHis();
         obj.setKey(key);
@@ -405,6 +425,13 @@ public class CloudMQSender {
         TransferHis obj = new TransferHis();
         obj.setKey(key);
         deleteMessage("TRANSFER", gson.toJson(obj), getQueue(transferHisService.findById(key)));
+    }
+
+    public void checkLocationAndTruncate(TransferHis obj) {
+        TransferHis old = transferHisService.findById(obj.getKey());
+        if (!obj.getLocCodeFrom().equals(old.getLocCodeFrom()) || !obj.getLocCodeTo().equals(old.getLocCodeTo())){
+            truncateMessage("TRANSFER", gson.toJson(old), getQueue(old));
+        }
     }
 
     public void restore(TransferHisKey key) {

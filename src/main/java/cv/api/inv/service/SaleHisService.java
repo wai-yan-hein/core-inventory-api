@@ -37,4 +37,6 @@ public interface SaleHisService {
     Date getMaxDate();
 
     List<SaleHis> search(String updatedDate, List<String> keys);
+
+    void truncate(SaleHisKey key);
 }

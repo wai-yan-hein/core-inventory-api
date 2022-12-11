@@ -128,4 +128,9 @@ public class SaleHisServiceImpl implements SaleHisService {
     public List<SaleHis> search(String updatedDate, List<String> location) {
         return shDao.search(updatedDate, location);
     }
+
+    @Override
+    public void truncate(SaleHisKey key) {
+        shDao.truncate(key);
+    }
 }
