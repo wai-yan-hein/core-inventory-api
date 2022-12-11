@@ -300,8 +300,10 @@ public class CloudMQSender {
 
     public void checkLocationAndTruncate(SaleHis sh) {
         SaleHis old = saleHisService.findById(sh.getKey());
-        if (!sh.getLocCode().equals(old.getLocCode())) {
-            truncateMessage("SALE", gson.toJson(old), getQueue(old));
+        if (old != null) {
+            if (!sh.getLocCode().equals(old.getLocCode())) {
+                truncateMessage("SALE", gson.toJson(old), getQueue(old));
+            }
         }
     }
 
@@ -429,8 +431,10 @@ public class CloudMQSender {
 
     public void checkLocationAndTruncate(TransferHis obj) {
         TransferHis old = transferHisService.findById(obj.getKey());
-        if (!obj.getLocCodeFrom().equals(old.getLocCodeFrom()) || !obj.getLocCodeTo().equals(old.getLocCodeTo())){
-            truncateMessage("TRANSFER", gson.toJson(old), getQueue(old));
+        if (old != null) {
+            if (!obj.getLocCodeFrom().equals(old.getLocCodeFrom()) || !obj.getLocCodeTo().equals(old.getLocCodeTo())) {
+                truncateMessage("TRANSFER", gson.toJson(old), getQueue(old));
+            }
         }
     }
 

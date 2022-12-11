@@ -488,6 +488,7 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateTransfer(obj);
                             case "DELETE" -> transferHisService.delete(obj.getKey());
+                            case "TRUNCATE"->transferHisService.truncate(obj.getKey());
                             case "RESTORE" -> transferHisService.restore(obj.getKey());
                             case "REQUEST_TRAN" -> {
                                 List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());

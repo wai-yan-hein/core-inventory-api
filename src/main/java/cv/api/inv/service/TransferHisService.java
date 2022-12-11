@@ -22,4 +22,5 @@ public interface TransferHisService {
     List<TransferHis> search(String updatedDate, List<String> keys);
 
 
+    void truncate(TransferHisKey key);
 }

@@ -123,4 +123,13 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         });
         return list;
     }
+
+    @Override
+    public void truncate(TransferHisKey key) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql1 = "delete from transfer_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
+        String sql2 = "delete from transfer_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
+        execSQL(sql1, sql2);    }
 }

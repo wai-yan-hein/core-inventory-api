@@ -20,6 +20,7 @@ public interface TransferHisDao {
     Date getMaxDate();
 
     List<TransferHis> search(String updatedDate, List<String> location);
+    void truncate(TransferHisKey key);
 
 
 }

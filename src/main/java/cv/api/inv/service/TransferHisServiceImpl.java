@@ -102,4 +102,9 @@ public class TransferHisServiceImpl implements TransferHisService {
     public List<TransferHis> search(String updatedDate, List<String> location) {
         return dao.search(updatedDate, location);
     }
+
+    @Override
+    public void truncate(TransferHisKey key) {
+        dao.truncate(key);
+    }
 }
