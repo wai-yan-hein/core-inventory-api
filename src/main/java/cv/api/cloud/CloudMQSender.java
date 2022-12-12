@@ -108,7 +108,7 @@ public class CloudMQSender {
             List<Department> listDep = userRepo.getDepartment();
             HashMap<Integer, String> hmDep = new HashMap<>();
             listDep.forEach(d -> {
-                hmDep.put(d.getDeptId(), d.getQueueName());
+                hmDep.put(d.getDeptId(), d.getInventoryQ());
             });
             List<Location> list = locationService.findAll();
             if (!list.isEmpty()) {
