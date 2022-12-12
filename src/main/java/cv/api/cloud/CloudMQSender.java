@@ -79,7 +79,7 @@ public class CloudMQSender {
     private OPHisService opHisService;
     @Autowired
     private UserRepo userRepo;
-    private HashMap<String, String> hmQueue = new HashMap<>();
+    private final HashMap<String, String> hmQueue = new HashMap<>();
     private boolean client;
     private String serverQ;
     private boolean progress = false;
@@ -88,7 +88,7 @@ public class CloudMQSender {
     private void uploadToServer() {
         initQueue();
         client = Util1.getBoolean(userRepo.getProperty("cloud.upload.server"));
-        serverQ = userRepo.getProperty("cloud.activemq.server.queue");
+        serverQ = userRepo.getProperty("cloud.activemq.inventory.server.queue");
         if (client) {
             log.info("ActiveMQ Server Q : " + serverQ);
             if (!progress) {
