@@ -8,6 +8,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +29,7 @@ public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.##";
     private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     public static String SYNC_DATE;
+    private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
 
     public static <T> Object cast(Object from, Class<T> to) {
         return gson.fromJson(gson.toJson(from), to);
@@ -178,6 +182,9 @@ public class Util1 {
                 stream.write(zipData);
             }
             try (ZipFile zf = new ZipFile(exportPath.concat(".zip"))) {
+                if (zf.isEncrypted()) {
+                    zf.setPassword(password);
+                }
                 zf.extractAll("temp");
             }
         } catch (IOException ex) {
@@ -188,14 +195,23 @@ public class Util1 {
     public static byte[] zipJsonFile(String exportPath) throws IOException {
         String zipPath = exportPath.replace(".json", ".zip");
         File file = new File(exportPath);
-        try (ZipFile fr = new ZipFile(zipPath)) {
-            fr.addFile(file);
+        try (ZipFile fr = new ZipFile(zipPath, password)) {
+            fr.addFile(file, zipParameters());
         }
         FileInputStream stream = new FileInputStream(zipPath);
         byte[] data = stream.readAllBytes();
         stream.close();
         return data;
     }
+
+    public static ZipParameters zipParameters() {
+        ZipParameters p = new ZipParameters();
+        p.setEncryptFiles(true);
+        p.setCompressionLevel(CompressionLevel.HIGHER);
+        p.setEncryptionMethod(EncryptionMethod.AES);
+        return p;
+    }
+
     public static Date getOldDate() {
         return Util1.toDate("1998-10-07");
     }
