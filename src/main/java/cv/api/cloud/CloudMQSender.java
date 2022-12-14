@@ -95,7 +95,7 @@ public class CloudMQSender {
                 progress = true;
                 destroyQ(serverQ);
                 //uploadSetup();
-                uploadTransaction();
+               // uploadTransaction();
                 downloadSetup();
                 downloadTransaction();
                 progress = false;
