@@ -37,6 +37,6 @@ public interface PurHisDao {
 
     Date getMaxDate();
 
-    List<PurHis> search(String updatedDate, List<LocationKey> keys);
+    List<PurHis> search(String updatedDate, List<String> keys);
 
 }

@@ -37,7 +37,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     private SeqTableDao seqDao;
 
     @Override
-    public SaleHis save(SaleHis saleHis) throws Exception {
+    public SaleHis save(SaleHis saleHis) {
         saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
             saleHis.getKey().setVouNo(getVoucherNo(saleHis.getMacId(), saleHis.getKey().getCompCode()));

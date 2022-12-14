@@ -68,13 +68,12 @@ public class RetInHis implements java.io.Serializable {
     @Transient
     private List<String> listDel;
     @Transient
-    private List<LocationKey> keys;
-
+    private List<String> location;
     public RetInHis() {
     }
 
-    public RetInHis(Date updatedDate, List<LocationKey> keys) {
+    public RetInHis(Date updatedDate, List<String> location) {
         this.updatedDate = updatedDate;
-        this.keys = keys;
+        this.location = location;
     }
 }

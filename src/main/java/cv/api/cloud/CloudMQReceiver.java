@@ -193,6 +193,36 @@ public class CloudMQReceiver {
         stockService.save(obj);
     }
 
+    private void save(SaleHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        saleHisService.save(obj);
+    }
+
+    private void save(TransferHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        transferHisService.save(obj);
+    }
+
+    private void save(RetInHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        retInService.save(obj);
+    }
+
+    private void save(RetOutHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        retOutService.save(obj);
+    }
+
+    private void save(PurHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        purHisService.save(obj);
+    }
+
     @JmsListener(destination = "INV_MSG", containerFactory = "topicContainerFactory")
     public void receivedTopicMessage(final MapMessage message) throws JMSException {
         String entity = message.getString("ENTITY");
@@ -286,15 +316,6 @@ public class CloudMQReceiver {
                         case "DELETE" -> saleHisService.delete(obj.getKey());
                         case "TRUNCATE" -> saleHisService.truncate(obj.getKey());
                         case "RESTORE" -> saleHisService.restore(obj.getKey());
-                        case "REQUEST_TRAN" -> {
-                            List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
-                            if (!list.isEmpty()) {
-                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                            }
-                        }
-                        case "RESPONSE_TRAN" -> {
-                            saleHisService.save(obj);
-                        }
                     }
                 }
                 case "OPENING" -> {
@@ -330,13 +351,6 @@ public class CloudMQReceiver {
                             purHisService.save(obj);
                         }
                         case "RECEIVE" -> updatePurchase(obj);
-                        case "REQUEST_TRAN" -> {
-                            List<PurHis> list = purHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                            if (!list.isEmpty()) {
-                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                            }
-                        }
-                        case "RESPONSE_TRAN" -> purHisService.save(obj);
                     }
                 }
                 case "RETURN_IN" -> {
@@ -347,13 +361,6 @@ public class CloudMQReceiver {
                             retInService.save(obj);
                         }
                         case "RECEIVE" -> updateReturnIn(obj);
-                        case "REQUEST_TRAN" -> {
-                            List<RetInHis> list = retInService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                            if (!list.isEmpty()) {
-                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                            }
-                        }
-                        case "RESPONSE_TRAN" -> retInService.save(obj);
                     }
                 }
                 case "RETURN_OUT" -> {
@@ -367,13 +374,6 @@ public class CloudMQReceiver {
                             retOutService.save(obj);
                         }
                         case "RECEIVE" -> updateReturnOut(obj);
-                        case "REQUEST_TRAN" -> {
-                            List<RetOutHis> list = retOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                            if (!list.isEmpty()) {
-                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                            }
-                        }
-                        case "RESPONSE_TRAN" -> retOutService.save(obj);
                     }
                 }
                 case "TRANSFER" -> {
@@ -390,16 +390,6 @@ public class CloudMQReceiver {
                         case "DELETE" -> transferHisService.delete(obj.getKey());
                         case "TRUNCATE" -> transferHisService.truncate(obj.getKey());
                         case "RESTORE" -> transferHisService.restore(obj.getKey());
-                        case "REQUEST_TRAN" -> {
-                            List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
-                            if (!list.isEmpty()) {
-                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                            }
-                        }
-                        case "RESPONSE_TRAN" -> {
-                            transferHisService.save(obj);
-                        }
-
                     }
                 }
                 case "STOCK_IO" -> {
@@ -614,6 +604,101 @@ public class CloudMQReceiver {
                                     save(obj);
                                 }
                                 log.info("stock done.");
+                            }
+                        }
+                        case "SALE_REQUEST" -> {
+                            SaleHis obj = gson.fromJson(data, SaleHis.class);
+                            List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                responseFile("SALE_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "SALE_RESPONSE" -> {
+                            assert reader != null;
+                            List<SaleHis> list = gson.fromJson(reader, new TypeToken<ArrayList<SaleHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("sale list size : " + list.size());
+                                for (SaleHis obj : list) {
+                                    save(obj);
+                                }
+                                log.info("sale done.");
+                            }
+                        }
+                        case "PURCHASE_REQUEST" -> {
+                            PurHis obj = gson.fromJson(data, PurHis.class);
+                            List<PurHis> list = purHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                responseFile("PURCHASE_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "PURCHASE_RESPONSE" -> {
+                            assert reader != null;
+                            List<PurHis> list = gson.fromJson(reader, new TypeToken<ArrayList<PurHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("purhcase list size : " + list.size());
+                                for (PurHis obj : list) {
+                                    save(obj);
+                                }
+                                log.info("purchase done.");
+                            }
+                        }
+                        case "TRANSFER_REQUEST" -> {
+                            TransferHis obj = gson.fromJson(data, TransferHis.class);
+                            List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                responseFile("TRANSFER_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "TRANSFER_RESPONSE" -> {
+                            assert reader != null;
+                            List<TransferHis> list = gson.fromJson(reader, new TypeToken<ArrayList<TransferHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("transfer list size : " + list.size());
+                                for (TransferHis obj : list) {
+                                    save(obj);
+                                }
+                                log.info("transfer done.");
+                            }
+                        }
+                        case "RETURN_IN_REQUEST" -> {
+                            RetInHis obj = gson.fromJson(data, RetInHis.class);
+                            List<RetInHis> list = retInService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                responseFile("RETURN_IN_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "RETURN_IN_RESPONSE" -> {
+                            assert reader != null;
+                            List<RetInHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetInHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("return in list size : " + list.size());
+                                for (RetInHis obj : list) {
+                                    save(obj);
+                                }
+                                log.info("return in  done.");
+                            }
+                        }
+                        case "RETURN_OUT_REQUEST" -> {
+                            RetOutHis obj = gson.fromJson(data, RetOutHis.class);
+                            List<RetOutHis> list = retOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                responseFile("RETURN_OUT_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "RETURN_OUT_RESPONSE" -> {
+                            assert reader != null;
+                            List<RetOutHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetInHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("return out list size : " + list.size());
+                                for (RetOutHis obj : list) {
+                                    save(obj);
+                                }
+                                log.info("return out  done.");
                             }
                         }
                     }

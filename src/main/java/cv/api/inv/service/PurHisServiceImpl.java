@@ -35,7 +35,7 @@ public class PurHisServiceImpl implements PurHisService {
 
 
     @Override
-    public PurHis save(PurHis ph) throws Exception {
+    public PurHis save(PurHis ph) {
         ph.setVouDate(Util1.toDateTime(ph.getVouDate()));
         if (Util1.isNullOrEmpty(ph.getKey().getVouNo())) {
             ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getKey().getCompCode()));
@@ -124,7 +124,7 @@ public class PurHisServiceImpl implements PurHisService {
     }
 
     @Override
-    public List<PurHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<PurHis> search(String updatedDate, List<String> keys) {
         return phDao.search(updatedDate, keys);
     }
 

@@ -36,7 +36,7 @@ public class RetInServiceImpl implements RetInService {
 
 
     @Override
-    public RetInHis save(RetInHis rin) throws Exception {
+    public RetInHis save(RetInHis rin) {
         rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
         if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
             rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getCompCode()));
@@ -132,7 +132,7 @@ public class RetInServiceImpl implements RetInService {
     }
 
     @Override
-    public List<RetInHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<RetInHis> search(String updatedDate, List<String> keys) {
         return rDao.search(updatedDate, keys);
     }
 

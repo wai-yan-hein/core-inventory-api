@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface RetInService {
 
-    RetInHis save(RetInHis ri) throws Exception;
+    RetInHis save(RetInHis ri);
 
     RetInHis update(RetInHis ri);
 
@@ -39,6 +39,6 @@ public interface RetInService {
 
     Date getMaxDate();
 
-    List<RetInHis> search(String updatedDate, List<LocationKey> keys);
+    List<RetInHis> search(String updatedDate, List<String> keys);
 
 }

@@ -35,7 +35,7 @@ public class RetOutServiceImpl implements RetOutService {
     private SeqTableDao seqDao;
 
     @Override
-    public RetOutHis save(RetOutHis rin) throws Exception {
+    public RetOutHis save(RetOutHis rin) {
         rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
         if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
             rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getCompCode()));
@@ -123,7 +123,7 @@ public class RetOutServiceImpl implements RetOutService {
     }
 
     @Override
-    public List<RetOutHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<RetOutHis> search(String updatedDate, List<String> keys) {
         return rDao.search(updatedDate, keys);
     }
 

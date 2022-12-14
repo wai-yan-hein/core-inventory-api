@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface SaleHisService {
 
-    SaleHis save(SaleHis saleHis) throws Exception;
+    SaleHis save(SaleHis saleHis);
 
     SaleHis update(SaleHis saleHis);
 
