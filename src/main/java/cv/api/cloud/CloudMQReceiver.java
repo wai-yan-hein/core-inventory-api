@@ -2,10 +2,12 @@ package cv.api.cloud;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import cv.api.common.Util1;
 import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.model.Gl;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,13 @@ import org.springframework.stereotype.Component;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Session;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -74,6 +82,27 @@ public class CloudMQReceiver {
     private JmsTemplate cloudMQTemplate;
     @Autowired
     private UserRepo userRepo;
+
+    private void responseFile(String option, Object data, String queue) {
+        String path = String.format("temp%s%s", File.separator, option + ".json");
+        try {
+            Util1.writeJsonFile(data, path);
+            byte[] file = Util1.zipJsonFile(path);
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", "FILE");
+                mm.setString("OPTION", option);
+                mm.setBytes("DATA_FILE", file);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (IOException e) {
+            log.error("File Message : " + e.getMessage());
+        }
+    }
 
     private void responseSetup(String entity, String distQ, String data) {
         MessageCreator mc = (Session session) -> {
@@ -236,6 +265,8 @@ public class CloudMQReceiver {
         String option = message.getString("OPTION");
         String data = message.getString("DATA");
         String senderQ = message.getString("SENDER_QUEUE");
+        byte[] file = message.getBytes("DATA_FILE");
+        String path = "temp" + File.separator;
         if (data != null) {
             try {
                 log.info(String.format("receivedMessage : %s - %s - %s", entity, option, senderQ));
@@ -247,12 +278,6 @@ public class CloudMQReceiver {
                         switch (option) {
                             case "SAVE", "RESPONSE_SETUP" -> save(obj);
                             case "RECEIVE" -> updateVouStatus(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
                         }
                     }
                     case "RELATION" -> {
@@ -384,7 +409,7 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateSale(obj);
                             case "DELETE" -> saleHisService.delete(obj.getKey());
-                            case "TRUNCATE"->saleHisService.truncate(obj.getKey());
+                            case "TRUNCATE" -> saleHisService.truncate(obj.getKey());
                             case "RESTORE" -> saleHisService.restore(obj.getKey());
                             case "REQUEST_TRAN" -> {
                                 List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
@@ -488,7 +513,7 @@ public class CloudMQReceiver {
                             }
                             case "RECEIVE" -> updateTransfer(obj);
                             case "DELETE" -> transferHisService.delete(obj.getKey());
-                            case "TRUNCATE"->transferHisService.truncate(obj.getKey());
+                            case "TRUNCATE" -> transferHisService.truncate(obj.getKey());
                             case "RESTORE" -> transferHisService.restore(obj.getKey());
                             case "REQUEST_TRAN" -> {
                                 List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
@@ -519,7 +544,34 @@ public class CloudMQReceiver {
                             case "RESPONSE_TRAN" -> inOutService.save(obj);
                         }
                     }
+                    case "FILE" -> {
+                        Reader reader = null;
+                        if (file != null) {
+                            Util1.extractZipToJson(file, path + option);
+                            reader = Files.newBufferedReader(Paths.get(path.concat(".json")));
+                        }
+                        switch (option) {
+                            case "VOU_STATUS_REQUEST" -> {
+                                VouStatus obj = gson.fromJson(data, VouStatus.class);
+                                List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                                if (!list.isEmpty()) {
+                                    responseFile("VOU_STATUS_RESPONSE", list, senderQ);
+                                }
+                            }
+                            case "VOU_STATUS_RESPONSE" -> {
+                                assert reader != null;
+                                List<VouStatus> list = gson.fromJson(reader, new TypeToken<ArrayList<VouStatus>>() {
+                                }.getType());
+                                if (!list.isEmpty()) {
+                                    for (VouStatus obj : list) {
+                                        save(obj);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+
                 if (option.equals("SAVE")) {
                     sendReceiveMessage(senderQ, entity, data);
                 }
