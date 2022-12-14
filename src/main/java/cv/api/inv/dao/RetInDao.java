@@ -37,6 +37,6 @@ public interface RetInDao {
 
     Date getMaxDate();
 
-    List<RetInHis> search(String updatedDate, List<LocationKey> keys);
+    List<RetInHis> search(String updatedDate, List<String> keys);
 
 }

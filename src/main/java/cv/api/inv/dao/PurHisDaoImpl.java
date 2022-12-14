@@ -142,20 +142,23 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         ResultSet rs = getResultSet(sql);
         try {
             if (rs.next()) {
-                return rs.getTimestamp("date");
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return Util1.getOldDate();
+        return Util1.getSyncDate();
     }
 
     @Override
-    public List<PurHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<PurHis> search(String updatedDate, List<String> keys) {
         List<PurHis> list = new ArrayList<>();
         if (keys != null) {
-            for (LocationKey key : keys) {
-                String hql = "select o from PurHis o where o.locCode='" + key.getLocCode() + "' and updatedDate > '" + updatedDate + "'";
+            for (String locCode : keys) {
+                String hql = "select o from PurHis o where o.locCode='" + locCode + "' and updatedDate > '" + updatedDate + "'";
                 list.addAll(findHSQL(hql));
             }
         }

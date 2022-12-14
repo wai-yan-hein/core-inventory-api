@@ -68,13 +68,13 @@ public class RetOutHis implements java.io.Serializable {
     @Transient
     private List<String> listDel;
     @Transient
-    private List<LocationKey> keys;
+    private List<String> location;
 
     public RetOutHis() {
     }
 
-    public RetOutHis(Date updatedDate, List<LocationKey> keys) {
+    public RetOutHis(Date updatedDate, List<String> location) {
         this.updatedDate = updatedDate;
-        this.keys = keys;
+        this.location = location;
     }
 }

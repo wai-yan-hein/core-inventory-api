@@ -153,11 +153,11 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
     }
 
     @Override
-    public List<RetOutHis> search(String updatedDate, List<LocationKey> keys) {
+    public List<RetOutHis> search(String updatedDate, List<String> keys) {
         List<RetOutHis> list = new ArrayList<>();
         if (keys != null) {
-            for (LocationKey key : keys) {
-                String hql = "select o from RetOutHis o where o.locCode='" + key.getLocCode() + "' and updatedDate > '" + updatedDate + "'";
+            for (String locCode : keys) {
+                String hql = "select o from RetOutHis o where o.locCode='" + locCode + "' and updatedDate > '" + updatedDate + "'";
                 list.addAll(findHSQL(hql));
             }
         }

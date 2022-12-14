@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface RetOutService {
 
-    RetOutHis save(RetOutHis saleHis) throws Exception;
+    RetOutHis save(RetOutHis saleHis);
 
     RetOutHis update(RetOutHis ro);
 
@@ -39,6 +39,6 @@ public interface RetOutService {
 
     Date getMaxDate();
 
-    List<RetOutHis> search(String updatedDate, List<LocationKey> keys);
+    List<RetOutHis> search(String updatedDate, List<String> keys);
 
 }

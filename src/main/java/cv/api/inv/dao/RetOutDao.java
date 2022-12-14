@@ -5,7 +5,6 @@
  */
 package cv.api.inv.dao;
 
-import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.RetOutHis;
 import cv.api.inv.entity.RetOutHisKey;
 import cv.api.inv.view.VReturnOut;
@@ -37,7 +36,5 @@ public interface RetOutDao {
 
     Date getMaxDate();
 
-    List<RetOutHis> search(String updatedDate, List<LocationKey> keys);
-
-
+    List<RetOutHis> search(String updatedDate, List<String> keys);
 }

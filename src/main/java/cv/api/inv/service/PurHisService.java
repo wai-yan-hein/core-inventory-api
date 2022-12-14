@@ -19,7 +19,7 @@ import java.util.List;
 public interface PurHisService {
 
 
-    PurHis save(PurHis ph) throws Exception;
+    PurHis save(PurHis ph);
 
     PurHis update(PurHis ph);
 
@@ -40,7 +40,7 @@ public interface PurHisService {
 
     Date getMaxDate();
 
-    List<PurHis> search(String updatedDate, List<LocationKey> keys);
+    List<PurHis> search(String updatedDate, List<String> keys);
 
 
 }
