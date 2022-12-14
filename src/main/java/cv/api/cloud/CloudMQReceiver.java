@@ -267,319 +267,362 @@ public class CloudMQReceiver {
         String senderQ = message.getString("SENDER_QUEUE");
         byte[] file = message.getBytes("DATA_FILE");
         String path = "temp" + File.separator;
-        if (data != null) {
-            try {
-                log.info(String.format("receivedMessage : %s - %s - %s", entity, option, senderQ));
-                String REC = "REC";
-                String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                switch (entity) {
-                    case "VOU_STATUS" -> {
-                        VouStatus obj = gson.fromJson(data, VouStatus.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateVouStatus(obj);
+        try {
+            log.info(String.format("receivedMessage : %s - %s - %s", entity, option, senderQ));
+            String REC = "REC";
+            String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            switch (entity) {
+                case "SALE" -> {
+                    SaleHis obj = gson.fromJson(data, SaleHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
+                    }
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            saleHisService.save(obj);
+                        }
+                        case "RECEIVE" -> updateSale(obj);
+                        case "DELETE" -> saleHisService.delete(obj.getKey());
+                        case "TRUNCATE" -> saleHisService.truncate(obj.getKey());
+                        case "RESTORE" -> saleHisService.restore(obj.getKey());
+                        case "REQUEST_TRAN" -> {
+                            List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                            }
+                        }
+                        case "RESPONSE_TRAN" -> {
+                            saleHisService.save(obj);
                         }
                     }
-                    case "RELATION" -> {
-                        UnitRelation obj = gson.fromJson(data, UnitRelation.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateUnitRelation(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
+                }
+                case "OPENING" -> {
+                    OPHis obj = gson.fromJson(data, OPHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
+                    }
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            opHisService.save(obj);
+                        }
+                        case "RECEIVE" -> updateOpening(obj);
+                        case "REQUEST_TRAN" -> {
+                            List<OPHis> list = opHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                             }
+                        }
+                        case "RESPONSE_TRAN" -> {
+                            opHisService.save(obj);
                         }
                     }
-                    case "TRADER" -> {
-                        Trader obj = gson.fromJson(data, Trader.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateTrader(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                        }
+                }
+                case "PURCHASE" -> {
+                    PurHis obj = gson.fromJson(data, PurHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                     }
-                    case "UNIT" -> {
-                        StockUnit obj = gson.fromJson(data, StockUnit.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateUnit(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<StockUnit> list = unitService.getUnit(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            purHisService.save(obj);
+                        }
+                        case "RECEIVE" -> updatePurchase(obj);
+                        case "REQUEST_TRAN" -> {
+                            List<PurHis> list = purHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                             }
                         }
+                        case "RESPONSE_TRAN" -> purHisService.save(obj);
                     }
-                    case "STOCK_TYPE" -> {
-                        StockType obj = gson.fromJson(data, StockType.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateStockType(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<StockType> list = typeService.getStockType(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
+                }
+                case "RETURN_IN" -> {
+                    RetInHis obj = gson.fromJson(data, RetInHis.class);
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            retInService.save(obj);
+                        }
+                        case "RECEIVE" -> updateReturnIn(obj);
+                        case "REQUEST_TRAN" -> {
+                            List<RetInHis> list = retInService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                             }
                         }
+                        case "RESPONSE_TRAN" -> retInService.save(obj);
                     }
-                    case "STOCK_BRAND" -> {
-                        StockBrand obj = gson.fromJson(data, StockBrand.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateBrand(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<StockBrand> list = brandService.getBrand(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                        }
+                }
+                case "RETURN_OUT" -> {
+                    RetOutHis obj = gson.fromJson(data, RetOutHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                     }
-                    case "STOCK_CATEGORY" -> {
-                        Category obj = gson.fromJson(data, Category.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateCategory(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<Category> list = categoryService.getCategory(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            retOutService.save(obj);
+                        }
+                        case "RECEIVE" -> updateReturnOut(obj);
+                        case "REQUEST_TRAN" -> {
+                            List<RetOutHis> list = retOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                             }
                         }
+                        case "RESPONSE_TRAN" -> retOutService.save(obj);
                     }
-                    case "SALEMAN" -> {
-                        SaleMan obj = gson.fromJson(data, SaleMan.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> saleManService.save(obj);
-                            case "RECEIVE" -> updateSaleMan(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<SaleMan> list = saleManService.getSaleMan(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                        }
+                }
+                case "TRANSFER" -> {
+                    TransferHis obj = gson.fromJson(data, TransferHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
                     }
-                    case "LOCATION" -> {
-                        Location obj = gson.fromJson(data, Location.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateLocation(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<Location> list = locationService.getLocation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            transferHisService.save(obj);
+                        }
+                        case "RECEIVE" -> updateTransfer(obj);
+                        case "DELETE" -> transferHisService.delete(obj.getKey());
+                        case "TRUNCATE" -> transferHisService.truncate(obj.getKey());
+                        case "RESTORE" -> transferHisService.restore(obj.getKey());
+                        case "REQUEST_TRAN" -> {
+                            List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
                             }
                         }
-                    }
-                    case "STOCK" -> {
-                        Stock obj = gson.fromJson(data, Stock.class);
-                        switch (option) {
-                            case "SAVE", "RESPONSE_SETUP" -> save(obj);
-                            case "RECEIVE" -> updateStock(obj);
-                            case "REQUEST_SETUP" -> {
-                                List<Stock> list = stockService.getStock(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseSetup(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
+                        case "RESPONSE_TRAN" -> {
+                            transferHisService.save(obj);
                         }
-                    }
-                    case "SALE" -> {
-                        SaleHis obj = gson.fromJson(data, SaleHis.class);
-                        if (obj.getKey() != null) {
-                            obj.getKey().setDeptId(userRepo.getDeptId());
-                        }
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                saleHisService.save(obj);
-                            }
-                            case "RECEIVE" -> updateSale(obj);
-                            case "DELETE" -> saleHisService.delete(obj.getKey());
-                            case "TRUNCATE" -> saleHisService.truncate(obj.getKey());
-                            case "RESTORE" -> saleHisService.restore(obj.getKey());
-                            case "REQUEST_TRAN" -> {
-                                List<SaleHis> list = saleHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> {
-                                saleHisService.save(obj);
-                            }
-                        }
-                    }
-                    case "OPENING" -> {
-                        OPHis obj = gson.fromJson(data, OPHis.class);
-                        if (obj.getKey() != null) {
-                            obj.getKey().setDeptId(userRepo.getDeptId());
-                        }
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                opHisService.save(obj);
-                            }
-                            case "RECEIVE" -> updateOpening(obj);
-                            case "REQUEST_TRAN" -> {
-                                List<OPHis> list = opHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> {
-                                opHisService.save(obj);
-                            }
-                        }
-                    }
-                    case "PURCHASE" -> {
-                        PurHis obj = gson.fromJson(data, PurHis.class);
-                        if (obj.getKey() != null) {
-                            obj.getKey().setDeptId(userRepo.getDeptId());
-                        }
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                purHisService.save(obj);
-                            }
-                            case "RECEIVE" -> updatePurchase(obj);
-                            case "REQUEST_TRAN" -> {
-                                List<PurHis> list = purHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> purHisService.save(obj);
-                        }
-                    }
-                    case "RETURN_IN" -> {
-                        RetInHis obj = gson.fromJson(data, RetInHis.class);
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                retInService.save(obj);
-                            }
-                            case "RECEIVE" -> updateReturnIn(obj);
-                            case "REQUEST_TRAN" -> {
-                                List<RetInHis> list = retInService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> retInService.save(obj);
-                        }
-                    }
-                    case "RETURN_OUT" -> {
-                        RetOutHis obj = gson.fromJson(data, RetOutHis.class);
-                        if (obj.getKey() != null) {
-                            obj.getKey().setDeptId(userRepo.getDeptId());
-                        }
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                retOutService.save(obj);
-                            }
-                            case "RECEIVE" -> updateReturnOut(obj);
-                            case "REQUEST_TRAN" -> {
-                                List<RetOutHis> list = retOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> retOutService.save(obj);
-                        }
-                    }
-                    case "TRANSFER" -> {
-                        TransferHis obj = gson.fromJson(data, TransferHis.class);
-                        if (obj.getKey() != null) {
-                            obj.getKey().setDeptId(userRepo.getDeptId());
-                        }
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                transferHisService.save(obj);
-                            }
-                            case "RECEIVE" -> updateTransfer(obj);
-                            case "DELETE" -> transferHisService.delete(obj.getKey());
-                            case "TRUNCATE" -> transferHisService.truncate(obj.getKey());
-                            case "RESTORE" -> transferHisService.restore(obj.getKey());
-                            case "REQUEST_TRAN" -> {
-                                List<TransferHis> list = transferHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> {
-                                transferHisService.save(obj);
-                            }
 
-                        }
                     }
-                    case "STOCK_IO" -> {
-                        StockInOut obj = gson.fromJson(data, StockInOut.class);
-                        switch (option) {
-                            case "SAVE" -> {
-                                obj.setIntgUpdStatus(REC);
-                                inOutService.save(obj);
-                            }
-                            case "RECEIVE" -> updateStockIO(obj);
-                            case "REQUEST_TRAN" -> {
-                                List<StockInOut> list = inOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                                if (!list.isEmpty()) {
-                                    list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                                }
-                            }
-                            case "RESPONSE_TRAN" -> inOutService.save(obj);
+                }
+                case "STOCK_IO" -> {
+                    StockInOut obj = gson.fromJson(data, StockInOut.class);
+                    switch (option) {
+                        case "SAVE" -> {
+                            obj.setIntgUpdStatus(REC);
+                            inOutService.save(obj);
                         }
+                        case "RECEIVE" -> updateStockIO(obj);
+                        case "REQUEST_TRAN" -> {
+                            List<StockInOut> list = inOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
+                            if (!list.isEmpty()) {
+                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
+                            }
+                        }
+                        case "RESPONSE_TRAN" -> inOutService.save(obj);
                     }
-                    case "FILE" -> {
-                        Reader reader = null;
-                        if (file != null) {
-                            Util1.extractZipToJson(file, path + option);
-                            reader = Files.newBufferedReader(Paths.get(path.concat(".json")));
-                        }
-                        switch (option) {
-                            case "VOU_STATUS_REQUEST" -> {
-                                VouStatus obj = gson.fromJson(data, VouStatus.class);
-                                List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
-                                if (!list.isEmpty()) {
-                                    responseFile("VOU_STATUS_RESPONSE", list, senderQ);
-                                }
+                }
+                case "FILE" -> {
+                    Reader reader = null;
+                    if (file != null) {
+                        Util1.extractZipToJson(file, path + option);
+                        reader = Files.newBufferedReader(Paths.get(path + option.concat(".json")));
+                    }
+                    switch (option) {
+                        case "VOU_STATUS_REQUEST" -> {
+                            VouStatus obj = gson.fromJson(data, VouStatus.class);
+                            List<VouStatus> list = vouStatusService.getVouStatus(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("VOU_STATUS_RESPONSE", list, senderQ);
                             }
-                            case "VOU_STATUS_RESPONSE" -> {
-                                assert reader != null;
-                                List<VouStatus> list = gson.fromJson(reader, new TypeToken<ArrayList<VouStatus>>() {
-                                }.getType());
-                                if (!list.isEmpty()) {
-                                    for (VouStatus obj : list) {
-                                        save(obj);
-                                    }
+                        }
+                        case "VOU_STATUS_RESPONSE" -> {
+                            assert reader != null;
+                            List<VouStatus> list = gson.fromJson(reader, new TypeToken<ArrayList<VouStatus>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("vou status list size : " + list.size());
+                                for (VouStatus obj : list) {
+                                    save(obj);
                                 }
+                                log.info("vou status done.");
+                            }
+                        }
+                        case "RELATION_REQUEST" -> {
+                            UnitRelation obj = gson.fromJson(data, UnitRelation.class);
+                            List<UnitRelation> list = relationService.getRelation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("RELATION_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "RELATION_RESPONSE" -> {
+                            assert reader != null;
+                            List<UnitRelation> list = gson.fromJson(reader, new TypeToken<ArrayList<UnitRelation>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("relation list size : " + list.size());
+                                for (UnitRelation obj : list) {
+                                    save(obj);
+                                }
+                                log.info("relation done.");
+                            }
+                        }
+                        case "TRADER_REQUEST" -> {
+                            Trader obj = gson.fromJson(data, Trader.class);
+                            List<Trader> list = traderService.getTrader(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("TRADER_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "TRADER_RESPONSE" -> {
+                            assert reader != null;
+                            List<Trader> list = gson.fromJson(reader, new TypeToken<ArrayList<Trader>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("trader list size : " + list.size());
+                                for (Trader obj : list) {
+                                    save(obj);
+                                }
+                                log.info("trader done.");
+                            }
+                        }
+                        case "UNIT_REQUEST" -> {
+                            StockUnit obj = gson.fromJson(data, StockUnit.class);
+                            List<StockUnit> list = unitService.getUnit(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("UNIT_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "UNIT_RESPONSE" -> {
+                            assert reader != null;
+                            List<StockUnit> list = gson.fromJson(reader, new TypeToken<ArrayList<StockUnit>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("unit list size : " + list.size());
+                                for (StockUnit obj : list) {
+                                    save(obj);
+                                }
+                                log.info("unit done.");
+                            }
+                        }
+                        case "STOCK_TYPE_REQUEST" -> {
+                            StockType obj = gson.fromJson(data, StockType.class);
+                            List<StockType> list = typeService.getStockType(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("STOCK_TYPE_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "STOCK_TYPE_RESPONSE" -> {
+                            assert reader != null;
+                            List<StockType> list = gson.fromJson(reader, new TypeToken<ArrayList<StockType>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("stock type list size : " + list.size());
+                                for (StockType obj : list) {
+                                    save(obj);
+                                }
+                                log.info("stock type done.");
+                            }
+                        }
+                        case "STOCK_CATEGORY_REQUEST" -> {
+                            Category obj = gson.fromJson(data, Category.class);
+                            List<Category> list = categoryService.getCategory(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("STOCK_CATEGORY_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "STOCK_CATEGORY_RESPONSE" -> {
+                            assert reader != null;
+                            List<Category> list = gson.fromJson(reader, new TypeToken<ArrayList<Category>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("stock category list size : " + list.size());
+                                for (Category obj : list) {
+                                    save(obj);
+                                }
+                                log.info("stock category done.");
+                            }
+                        }
+                        case "STOCK_BRAND_REQUEST" -> {
+                            StockBrand obj = gson.fromJson(data, StockBrand.class);
+                            List<StockBrand> list = brandService.getBrand(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("STOCK_BRAND_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "STOCK_BRAND_RESPONSE" -> {
+                            assert reader != null;
+                            List<StockBrand> list = gson.fromJson(reader, new TypeToken<ArrayList<StockBrand>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("stock brand list size : " + list.size());
+                                for (StockBrand obj : list) {
+                                    save(obj);
+                                }
+                                log.info("stock brand done.");
+                            }
+                        }
+                        case "SALEMAN_REQUEST" -> {
+                            SaleMan obj = gson.fromJson(data, SaleMan.class);
+                            List<SaleMan> list = saleManService.getSaleMan(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("SALEMAN_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "SALEMAN_RESPONSE" -> {
+                            assert reader != null;
+                            List<SaleMan> list = gson.fromJson(reader, new TypeToken<ArrayList<SaleMan>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("sale man list size : " + list.size());
+                                for (SaleMan obj : list) {
+                                    save(obj);
+                                }
+                                log.info("sale man done.");
+                            }
+                        }
+                        case "LOCATION_REQUEST" -> {
+                            Location obj = gson.fromJson(data, Location.class);
+                            List<Location> list = locationService.getLocation(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("LOCATION_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "LOCATION_RESPONSE" -> {
+                            assert reader != null;
+                            List<Location> list = gson.fromJson(reader, new TypeToken<ArrayList<Location>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("location list size : " + list.size());
+                                for (Location obj : list) {
+                                    save(obj);
+                                }
+                                log.info("location done.");
+                            }
+                        }
+                        case "STOCK_REQUEST" -> {
+                            Stock obj = gson.fromJson(data, Stock.class);
+                            List<Stock> list = stockService.getStock(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat));
+                            if (!list.isEmpty()) {
+                                responseFile("STOCK_RESPONSE", list, senderQ);
+                            }
+                        }
+                        case "STOCK_RESPONSE" -> {
+                            assert reader != null;
+                            List<Stock> list = gson.fromJson(reader, new TypeToken<ArrayList<Stock>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("stock list size : " + list.size());
+                                for (Stock obj : list) {
+                                    save(obj);
+                                }
+                                log.info("stock done.");
                             }
                         }
                     }
                 }
-
-                if (option.equals("SAVE")) {
-                    sendReceiveMessage(senderQ, entity, data);
-                }
-
-            } catch (Exception e) {
-                log.error(String.format("%s : %s", entity, e.getMessage()));
             }
+        } catch (Exception e) {
+            log.error(String.format("%s : %s", entity, e.getMessage()));
         }
+
     }
 
     private void sendReceiveMessage(String senderQ, String entity, String data) {
