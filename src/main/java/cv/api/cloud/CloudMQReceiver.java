@@ -702,6 +702,9 @@ public class CloudMQReceiver {
                             }
                         }
                     }
+                    if (option.equals("SAVE")) {
+                        sendReceiveMessage(senderQ, entity, data);
+                    }
                 }
             }
         } catch (Exception e) {
