@@ -50,7 +50,7 @@ public class PurchaseController {
         //send message to service
         accountRepo.sendPurchase(pur);
         //send to cloud
-        cloudMQSender.send(pur);
+        if (cloudMQSender != null)cloudMQSender.send(pur);
         return ResponseEntity.ok(pur);
     }
 
@@ -76,7 +76,7 @@ public class PurchaseController {
     public ResponseEntity<ReturnObject> deletePur(@RequestBody PurHisKey key) throws Exception {
         phService.delete(key);
         ro.setMessage("Deleted.");
-        cloudMQSender.delete(key);
+        if (cloudMQSender != null)cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -84,7 +84,7 @@ public class PurchaseController {
     public ResponseEntity<?> restorePur(@RequestBody PurHisKey key) throws Exception {
         phService.restore(key);
         ro.setMessage("Restored.");
-        cloudMQSender.restore(key);
+        if (cloudMQSender != null)cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 

@@ -50,7 +50,7 @@ public class SaleController {
     @PostMapping(path = "/save-sale")
     public ResponseEntity<?> saveSale(@RequestBody SaleHis sale) throws Exception {
         //if change location
-        cloudMQSender.checkLocationAndTruncate(sale);
+        if (cloudMQSender != null) cloudMQSender.checkLocationAndTruncate(sale);
         if (isValidSale(sale, ro)) {
             backupService.backup(sale);
             sale = shService.save(sale);
@@ -58,7 +58,7 @@ public class SaleController {
         //for account
         accountRepo.sendSale(sale);
         //for cloud
-        cloudMQSender.send(sale);
+        if (cloudMQSender != null) cloudMQSender.send(sale);
         return ResponseEntity.ok(sale);
     }
 
@@ -116,7 +116,7 @@ public class SaleController {
     public ResponseEntity<ReturnObject> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
         ro.setMessage("Deleted.");
-        cloudMQSender.delete(key);
+        if (cloudMQSender != null) cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -124,7 +124,7 @@ public class SaleController {
     public ResponseEntity<ReturnObject> restoreSale(@RequestBody SaleHisKey key) throws Exception {
         shService.restore(key);
         ro.setMessage("Restored.");
-        cloudMQSender.restore(key);
+        if (cloudMQSender != null) cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 
