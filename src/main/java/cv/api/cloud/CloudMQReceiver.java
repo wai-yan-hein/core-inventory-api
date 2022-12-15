@@ -624,6 +624,31 @@ public class CloudMQReceiver {
                                 log.info("sale done.");
                             }
                         }
+                        case "SALE_UPLOAD" -> {
+                            assert reader != null;
+                            List<SaleHis> objList = new ArrayList<>();
+                            List<SaleHis> list = gson.fromJson(reader, new TypeToken<ArrayList<SaleHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("sale upload list size : " + list.size() + " from " + senderQ);
+                                for (SaleHis obj : list) {
+                                    save(obj);
+                                    SaleHis sh = new SaleHis();
+                                    sh.setKey(obj.getKey());
+                                    objList.add(sh);
+                                }
+                                log.info("sale upload done from " + senderQ);
+                                responseFile("SALE_RECEIVED", objList, senderQ);
+                            }
+                        }
+                        case "SALE_RECEIVED" -> {
+                            assert reader != null;
+                            List<SaleHis> list = gson.fromJson(reader, new TypeToken<ArrayList<SaleHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                list.forEach(this::updateSale);
+                            }
+                        }
                         case "PURCHASE_REQUEST" -> {
                             PurHis obj = gson.fromJson(data, PurHis.class);
                             List<PurHis> list = purHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
@@ -636,11 +661,36 @@ public class CloudMQReceiver {
                             List<PurHis> list = gson.fromJson(reader, new TypeToken<ArrayList<PurHis>>() {
                             }.getType());
                             if (!list.isEmpty()) {
-                                log.info("purhcase list size : " + list.size());
+                                log.info("purchase list size : " + list.size());
                                 for (PurHis obj : list) {
                                     save(obj);
                                 }
                                 log.info("purchase done.");
+                            }
+                        }
+                        case "PURCHASE_UPLOAD" -> {
+                            assert reader != null;
+                            List<PurHis> objList = new ArrayList<>();
+                            List<PurHis> list = gson.fromJson(reader, new TypeToken<ArrayList<PurHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("purchase upload list size : " + list.size() + " from " + senderQ);
+                                for (PurHis obj : list) {
+                                    save(obj);
+                                    PurHis sh = new PurHis();
+                                    sh.setKey(obj.getKey());
+                                    objList.add(sh);
+                                }
+                                log.info("purchase upload done from " + senderQ);
+                                responseFile("PURCHASE_RECEIVED", objList, senderQ);
+                            }
+                        }
+                        case "PURCHASE_RECEIVED" -> {
+                            assert reader != null;
+                            List<PurHis> list = gson.fromJson(reader, new TypeToken<ArrayList<PurHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                list.forEach(this::updatePurchase);
                             }
                         }
                         case "TRANSFER_REQUEST" -> {
@@ -662,6 +712,31 @@ public class CloudMQReceiver {
                                 log.info("transfer done.");
                             }
                         }
+                        case "TRANSFER_UPLOAD" -> {
+                            assert reader != null;
+                            List<TransferHis> objList = new ArrayList<>();
+                            List<TransferHis> list = gson.fromJson(reader, new TypeToken<ArrayList<TransferHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("transfer upload list size : " + list.size() + " from " + senderQ);
+                                for (TransferHis obj : list) {
+                                    save(obj);
+                                    TransferHis sh = new TransferHis();
+                                    sh.setKey(obj.getKey());
+                                    objList.add(sh);
+                                }
+                                log.info("transfer upload done from " + senderQ);
+                                responseFile("TRANSFER_RECEIVED", objList, senderQ);
+                            }
+                        }
+                        case "TRANSFER_RECEIVED" -> {
+                            assert reader != null;
+                            List<TransferHis> list = gson.fromJson(reader, new TypeToken<ArrayList<TransferHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                list.forEach(this::updateTransfer);
+                            }
+                        }
                         case "RETURN_IN_REQUEST" -> {
                             RetInHis obj = gson.fromJson(data, RetInHis.class);
                             List<RetInHis> list = retInService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
@@ -681,6 +756,31 @@ public class CloudMQReceiver {
                                 log.info("return in  done.");
                             }
                         }
+                        case "RETURN_IN_UPLOAD" -> {
+                            assert reader != null;
+                            List<RetInHis> objList = new ArrayList<>();
+                            List<RetInHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetInHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("return in upload list size : " + list.size() + " from " + senderQ);
+                                for (RetInHis obj : list) {
+                                    save(obj);
+                                    RetInHis sh = new RetInHis();
+                                    sh.setKey(obj.getKey());
+                                    objList.add(sh);
+                                }
+                                log.info("return in upload done from " + senderQ);
+                                responseFile("RETURN_IN_RECEIVED", objList, senderQ);
+                            }
+                        }
+                        case "RETURN_IN_RECEIVED" -> {
+                            assert reader != null;
+                            List<RetInHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetInHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                list.forEach(this::updateReturnIn);
+                            }
+                        }
                         case "RETURN_OUT_REQUEST" -> {
                             RetOutHis obj = gson.fromJson(data, RetOutHis.class);
                             List<RetOutHis> list = retOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getLocation());
@@ -698,6 +798,31 @@ public class CloudMQReceiver {
                                     save(obj);
                                 }
                                 log.info("return out  done.");
+                            }
+                        }
+                        case "RETURN_OUT_UPLOAD" -> {
+                            assert reader != null;
+                            List<RetOutHis> objList = new ArrayList<>();
+                            List<RetOutHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetOutHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("return out upload list size : " + list.size() + " from " + senderQ);
+                                for (RetOutHis obj : list) {
+                                    save(obj);
+                                    RetOutHis sh = new RetOutHis();
+                                    sh.setKey(obj.getKey());
+                                    objList.add(sh);
+                                }
+                                log.info("return out upload done from " + senderQ);
+                                responseFile("RETURN_OUT_RECEIVED", objList, senderQ);
+                            }
+                        }
+                        case "RETURN_OUT_RECEIVED" -> {
+                            assert reader != null;
+                            List<RetOutHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetOutHis>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                list.forEach(this::updateReturnOut);
                             }
                         }
                     }
@@ -822,43 +947,63 @@ public class CloudMQReceiver {
         log.info("update opening.");
     }
 
-    private void updateSale(SaleHis obj) throws Exception {
+    private void updateSale(SaleHis obj) {
         SaleHisKey key = obj.getKey();
         String sql = "update sale_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        service.executeSql(sql);
+        try {
+            service.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updateSale : " + e.getMessage());
+        }
         log.info("update sale.");
     }
 
-    private void updatePurchase(PurHis obj) throws Exception {
+    private void updatePurchase(PurHis obj) {
         PurHisKey key = obj.getKey();
         String sql = "update pur_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        service.executeSql(sql);
+        try {
+            service.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updatePurchase : " + e.getMessage());
+        }
         log.info("update purchase.");
     }
 
-    private void updateReturnIn(RetInHis obj) throws Exception {
+    private void updateReturnIn(RetInHis obj) {
         RetInHisKey key = obj.getKey();
         String sql = "update ret_in_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        service.executeSql(sql);
+        try {
+            service.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updateReturnIn : " + e.getMessage());
+        }
         log.info("update return in.");
     }
 
-    private void updateReturnOut(RetOutHis obj) throws Exception {
+    private void updateReturnOut(RetOutHis obj) {
         RetOutHisKey key = obj.getKey();
         String sql = "update ret_out_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        service.executeSql(sql);
+        try {
+            service.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updateReturnOut : " + e.getMessage());
+        }
         log.info("update return out.");
     }
 
-    private void updateTransfer(TransferHis obj) throws Exception {
+    private void updateTransfer(TransferHis obj) {
         TransferHisKey key = obj.getKey();
         String sql = "update transfer_his set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        service.executeSql(sql);
+        try {
+            service.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updateTransfer : " + e.getMessage());
+        }
         log.info("update transfer.");
     }
 

@@ -21,6 +21,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.jms.*;
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -135,6 +137,27 @@ public class CloudMQSender {
         }
     }
 
+    private void uploadFile(String option, Object data, String queue) {
+        String path = String.format("temp%s%s", File.separator, option + ".json");
+        try {
+            Util1.writeJsonFile(data, path);
+            byte[] file = Util1.zipJsonFile(path);
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", "FILE");
+                mm.setString("OPTION", option + "_UPLOAD");
+                mm.setBytes("DATA_FILE", file);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (IOException e) {
+            log.error("File Message : " + e.getMessage());
+        }
+    }
+
     private void deleteMessage(String entity, String data, String queue) {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
@@ -181,7 +204,6 @@ public class CloudMQSender {
         try {
             if (cloudMQTemplate != null) {
                 ConnectionFactory factory = cloudMQTemplate.getConnectionFactory();
-
                 if (factory != null) {
                     Connection connection = factory.createConnection();
                     if (connection instanceof ActiveMQConnection con) {
@@ -276,20 +298,22 @@ public class CloudMQSender {
 
     private void uploadTransaction() {
         info("upload transaction start.");
-        uploadOpening();
+        //uploadOpening();
         uploadSale();
         uploadPurchase();
         uploadReturnIn();
         uploadReturnOut();
-        uploadStockInOut();
+        //uploadStockInOut();
         uploadTransfer();
         info("upload transaction end.");
     }
 
     private void uploadSale() {
         List<SaleHis> list = saleHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
-        if (!list.isEmpty()) log.info("upload sale : " + list.size());
-        list.forEach(o -> saveMessage("SALE", gson.toJson(o), serverQ));
+        if (!list.isEmpty()) {
+            log.info("upload sale : " + list.size());
+            uploadFile("SALE", list, serverQ);
+        }
     }
 
     public void send(SaleHis sh) {
@@ -325,8 +349,10 @@ public class CloudMQSender {
 
     private void uploadPurchase() {
         List<PurHis> list = purHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
-        if (!list.isEmpty()) log.info("upload purchase : " + list.size());
-        list.forEach(o -> saveMessage("PURCHASE", gson.toJson(o), serverQ));
+        if (!list.isEmpty()) {
+            log.info("upload purchase : " + list.size());
+            uploadFile("PURCHASE", list, serverQ);
+        }
     }
 
     public void send(PurHis sh) {
@@ -354,8 +380,10 @@ public class CloudMQSender {
 
     private void uploadReturnIn() {
         List<RetInHis> list = retInService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
-        if (!list.isEmpty()) log.info("upload return in : " + list.size());
-        list.forEach(o -> saveMessage("RETURN_IN", gson.toJson(o), serverQ));
+        if (!list.isEmpty()) {
+            log.info("upload return in : " + list.size());
+            uploadFile("RETURN_IN", list, serverQ);
+        }
     }
 
     public void send(RetInHis rin) {
@@ -380,8 +408,10 @@ public class CloudMQSender {
 
     public void uploadReturnOut() {
         List<RetOutHis> list = retOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
-        if (!list.isEmpty()) log.info("upload return out : " + list.size());
-        list.forEach(o -> saveMessage("RETURN_OUT", gson.toJson(o), serverQ));
+        if (!list.isEmpty()) {
+            log.info("upload return out : " + list.size());
+            uploadFile("RETURN_OUT", list, serverQ);
+        }
     }
 
     public void send(RetOutHis obj) {
@@ -415,8 +445,10 @@ public class CloudMQSender {
 
     private void uploadTransfer() {
         List<TransferHis> list = transferHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
-        if (!list.isEmpty()) log.info("upload transfer : " + list.size());
-        list.forEach(o -> saveMessage("TRANSFER", gson.toJson(o), serverQ));
+        if (!list.isEmpty()) {
+            log.info("upload transfer : " + list.size());
+            uploadFile("TRANSFER", list, serverQ);
+        }
     }
 
     public void send(TransferHis th) {
