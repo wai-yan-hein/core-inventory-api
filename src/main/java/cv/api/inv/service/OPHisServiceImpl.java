@@ -28,7 +28,7 @@ public class OPHisServiceImpl implements OPHisService {
     @Override
     public OPHis save(OPHis op) {
         if (Util1.isNullOrEmpty(op.getKey().getVouNo())) {
-            op.getKey().setVouNo(getVoucherNo(op.getMacId(), op.getKey().getCompCode()));
+            op.getKey().setVouNo(getVoucherNo(op.getKey().getDeptId(), op.getMacId(), op.getKey().getCompCode()));
         }
         List<OPHisDetail> listSD = op.getDetailList();
         List<String> listDel = op.getListDel();
@@ -69,10 +69,11 @@ public class OPHisServiceImpl implements OPHisService {
         return opHisDao.findByCode(key);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "OPENING", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
     @Override

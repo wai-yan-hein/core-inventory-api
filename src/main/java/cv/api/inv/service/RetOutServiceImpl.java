@@ -38,7 +38,7 @@ public class RetOutServiceImpl implements RetOutService {
     public RetOutHis save(RetOutHis rin) {
         rin.setVouDate(Util1.toDateTime(rin.getVouDate()));
         if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
-            rin.getKey().setVouNo(getVoucherNo(rin.getMacId(), rin.getKey().getCompCode()));
+            rin.getKey().setVouNo(getVoucherNo(rin.getKey().getDeptId(),rin.getMacId(), rin.getKey().getCompCode()));
         }
         List<RetOutHisDetail> listSD = rin.getListRD();
         List<String> listDel = rin.getListDel();
@@ -127,10 +127,11 @@ public class RetOutServiceImpl implements RetOutService {
         return rDao.search(updatedDate, keys);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "RETURN_OUT", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
 }

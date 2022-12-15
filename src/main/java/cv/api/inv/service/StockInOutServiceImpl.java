@@ -37,7 +37,7 @@ public class StockInOutServiceImpl implements StockInOutService {
     public StockInOut save(StockInOut io) throws Exception {
         io.setVouDate(Util1.toDateTime(io.getVouDate()));
         if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
-            io.getKey().setVouNo(getVoucherNo(io.getMacId(), io.getKey().getCompCode()));
+            io.getKey().setVouNo(getVoucherNo(io.getKey().getDeptId(), io.getMacId(), io.getKey().getCompCode()));
         }
 
         List<StockInOutDetail> listSD = io.getListSH();
@@ -108,10 +108,11 @@ public class StockInOutServiceImpl implements StockInOutService {
         return ioDao.search(updatedDate, keys);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "STOCKIO", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
 }

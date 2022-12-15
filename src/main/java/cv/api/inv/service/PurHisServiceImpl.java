@@ -38,7 +38,7 @@ public class PurHisServiceImpl implements PurHisService {
     public PurHis save(PurHis ph) {
         ph.setVouDate(Util1.toDateTime(ph.getVouDate()));
         if (Util1.isNullOrEmpty(ph.getKey().getVouNo())) {
-            ph.getKey().setVouNo(getVoucherNo(ph.getMacId(), ph.getKey().getCompCode()));
+            ph.getKey().setVouNo(getVoucherNo(ph.getKey().getDeptId(),ph.getMacId(), ph.getKey().getCompCode()));
         }
         List<PurHisDetail> listSD = ph.getListPD();
         List<String> listDel = ph.getListDel();
@@ -128,10 +128,11 @@ public class PurHisServiceImpl implements PurHisService {
         return phDao.search(updatedDate, keys);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId,Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "PURCHASE", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
 }

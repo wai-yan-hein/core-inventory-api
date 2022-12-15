@@ -28,7 +28,7 @@ public class WeightLossServiceImpl implements WeightLossService {
     public WeightLossHis save(WeightLossHis l) {
         l.setVouDate(Util1.toDateTime(l.getVouDate()));
         if (Util1.isNullOrEmpty(l.getKey().getVouNo())) {
-            l.getKey().setVouNo(getVoucherNo(l.getMacId(), l.getKey().getCompCode()));
+            l.getKey().setVouNo(getVoucherNo(l.getKey().getDeptId(),l.getMacId(), l.getKey().getCompCode()));
         }
         String vouNo = l.getKey().getVouNo();
         List<WeightLossHisDetailKey> delKeys = l.getDelKeys();
@@ -74,9 +74,10 @@ public class WeightLossServiceImpl implements WeightLossService {
         return dao.search(fromDate, toDate, locCode, compCode, deptId);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "WEIGHT", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 }

@@ -29,7 +29,7 @@ public class TransferHisServiceImpl implements TransferHisService {
     public TransferHis save(TransferHis th) {
         th.setVouDate(Util1.toDateTime(th.getVouDate()));
         if (Util1.isNullOrEmpty(th.getKey().getVouNo())) {
-            th.getKey().setVouNo(getVoucherNo(th.getMacId(), th.getKey().getCompCode()));
+            th.getKey().setVouNo(getVoucherNo(th.getKey().getDeptId(), th.getMacId(), th.getKey().getCompCode()));
         }
 
         List<TransferHisDetail> listTD = th.getListTD();
@@ -67,10 +67,11 @@ public class TransferHisServiceImpl implements TransferHisService {
         return dao.save(th);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "TRANSFER", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
     @Override

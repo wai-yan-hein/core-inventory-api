@@ -40,7 +40,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     public SaleHis save(SaleHis saleHis) {
         saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
-            saleHis.getKey().setVouNo(getVoucherNo(saleHis.getMacId(), saleHis.getKey().getCompCode()));
+            saleHis.getKey().setVouNo(getVoucherNo(saleHis.getKey().getDeptId(), saleHis.getMacId(), saleHis.getKey().getCompCode()));
         }
         List<SaleHisDetail> listSD = saleHis.getListSH();
         List<String> listDel = saleHis.getListDel();
@@ -102,10 +102,11 @@ public class SaleHisServiceImpl implements SaleHisService {
         shDao.restore(key);
     }
 
-    private String getVoucherNo(Integer macId, String compCode) {
+    private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqDao.getSequence(macId, "SALE", period, compCode);
-        return String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
+        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 
 
