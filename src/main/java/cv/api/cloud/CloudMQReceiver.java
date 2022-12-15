@@ -311,7 +311,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             saleHisService.save(obj);
                         }
-                        case "RECEIVE" -> updateSale(obj);
+                        case "RECEIVE" -> {
+                            updateSale(obj);
+                            log.info("sale voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                         case "DELETE" -> saleHisService.delete(obj.getKey());
                         case "TRUNCATE" -> saleHisService.truncate(obj.getKey());
                         case "RESTORE" -> saleHisService.restore(obj.getKey());
@@ -327,7 +330,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             opHisService.save(obj);
                         }
-                        case "RECEIVE" -> updateOpening(obj);
+                        case "RECEIVE" -> {
+                            updateOpening(obj);
+                            log.info("opening voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                         case "REQUEST_TRAN" -> {
                             List<OPHis> list = opHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
                             if (!list.isEmpty()) {
@@ -349,7 +355,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             purHisService.save(obj);
                         }
-                        case "RECEIVE" -> updatePurchase(obj);
+                        case "RECEIVE" -> {
+                            updatePurchase(obj);
+                            log.info("purchase voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                     }
                 }
                 case "RETURN_IN" -> {
@@ -359,7 +368,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             retInService.save(obj);
                         }
-                        case "RECEIVE" -> updateReturnIn(obj);
+                        case "RECEIVE" -> {
+                            updateReturnIn(obj);
+                            log.info("return in voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                     }
                 }
                 case "RETURN_OUT" -> {
@@ -372,7 +384,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             retOutService.save(obj);
                         }
-                        case "RECEIVE" -> updateReturnOut(obj);
+                        case "RECEIVE" -> {
+                            updateReturnOut(obj);
+                            log.info("return out voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                     }
                 }
                 case "TRANSFER" -> {
@@ -385,7 +400,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             transferHisService.save(obj);
                         }
-                        case "RECEIVE" -> updateTransfer(obj);
+                        case "RECEIVE" -> {
+                            updateTransfer(obj);
+                            log.info("transfer voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                         case "DELETE" -> transferHisService.delete(obj.getKey());
                         case "TRUNCATE" -> transferHisService.truncate(obj.getKey());
                         case "RESTORE" -> transferHisService.restore(obj.getKey());
@@ -398,7 +416,10 @@ public class CloudMQReceiver {
                             obj.setIntgUpdStatus(REC);
                             inOutService.save(obj);
                         }
-                        case "RECEIVE" -> updateStockIO(obj);
+                        case "RECEIVE" -> {
+                            updateStockIO(obj);
+                            log.info("stock io voucher successfully delivered to server : " + obj.getKey().getVouNo());
+                        }
                         case "REQUEST_TRAN" -> {
                             List<StockInOut> list = inOutService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
                             if (!list.isEmpty()) {
@@ -647,6 +668,7 @@ public class CloudMQReceiver {
                             }.getType());
                             if (!list.isEmpty()) {
                                 list.forEach(this::updateSale);
+                                log.info("sale voucher successfully delivered to server : " + list.size());
                             }
                         }
                         case "PURCHASE_REQUEST" -> {
@@ -691,6 +713,7 @@ public class CloudMQReceiver {
                             }.getType());
                             if (!list.isEmpty()) {
                                 list.forEach(this::updatePurchase);
+                                log.info("purchase voucher successfully delivered to server : " + list.size());
                             }
                         }
                         case "TRANSFER_REQUEST" -> {
@@ -735,6 +758,8 @@ public class CloudMQReceiver {
                             }.getType());
                             if (!list.isEmpty()) {
                                 list.forEach(this::updateTransfer);
+                                log.info("transfer out voucher successfully delivered to server : " + list.size());
+
                             }
                         }
                         case "RETURN_IN_REQUEST" -> {
@@ -779,6 +804,7 @@ public class CloudMQReceiver {
                             }.getType());
                             if (!list.isEmpty()) {
                                 list.forEach(this::updateReturnIn);
+                                log.info("return in voucher successfully delivered to server : " + list.size());
                             }
                         }
                         case "RETURN_OUT_REQUEST" -> {
@@ -823,6 +849,8 @@ public class CloudMQReceiver {
                             }.getType());
                             if (!list.isEmpty()) {
                                 list.forEach(this::updateReturnOut);
+                                log.info("return out voucher successfully delivered to server : " + list.size());
+
                             }
                         }
                     }
@@ -956,7 +984,6 @@ public class CloudMQReceiver {
         } catch (Exception e) {
             log.error("updateSale : " + e.getMessage());
         }
-        log.info("update sale.");
     }
 
     private void updatePurchase(PurHis obj) {
@@ -968,7 +995,6 @@ public class CloudMQReceiver {
         } catch (Exception e) {
             log.error("updatePurchase : " + e.getMessage());
         }
-        log.info("update purchase.");
     }
 
     private void updateReturnIn(RetInHis obj) {
@@ -980,7 +1006,6 @@ public class CloudMQReceiver {
         } catch (Exception e) {
             log.error("updateReturnIn : " + e.getMessage());
         }
-        log.info("update return in.");
     }
 
     private void updateReturnOut(RetOutHis obj) {
@@ -992,7 +1017,6 @@ public class CloudMQReceiver {
         } catch (Exception e) {
             log.error("updateReturnOut : " + e.getMessage());
         }
-        log.info("update return out.");
     }
 
     private void updateTransfer(TransferHis obj) {
@@ -1004,7 +1028,6 @@ public class CloudMQReceiver {
         } catch (Exception e) {
             log.error("updateTransfer : " + e.getMessage());
         }
-        log.info("update transfer.");
     }
 
     private void updateStockIO(StockInOut obj) throws Exception {
@@ -1012,6 +1035,5 @@ public class CloudMQReceiver {
         String sql = "update stock_in_out set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         service.executeSql(sql);
-        log.info("update stock io.");
     }
 }

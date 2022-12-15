@@ -42,13 +42,9 @@ public class CloudMQSender {
     private JmsTemplate topicSender;
     //service
     @Autowired
-    private PatternService patternService;
-    @Autowired
     private VouStatusService vouStatusService;
     @Autowired
     private UnitRelationService relationService;
-    @Autowired
-    private TraderGroupService traderGroupService;
     @Autowired
     private TraderService traderService;
     @Autowired
@@ -74,11 +70,7 @@ public class CloudMQSender {
     @Autowired
     private RetOutService retOutService;
     @Autowired
-    private StockInOutService inOutService;
-    @Autowired
     private TransferHisService transferHisService;
-    @Autowired
-    private OPHisService opHisService;
     @Autowired
     private UserRepo userRepo;
     private final HashMap<String, String> hmQueue = new HashMap<>();
@@ -109,9 +101,9 @@ public class CloudMQSender {
         if (hmQueue.isEmpty()) {
             List<Department> listDep = userRepo.getDepartment();
             HashMap<Integer, String> hmDep = new HashMap<>();
-            listDep.forEach(d -> {
+            for (Department d : listDep) {
                 hmDep.put(d.getDeptId(), d.getInventoryQ());
-            });
+            }
             List<Location> list = locationService.findAll();
             if (!list.isEmpty()) {
                 for (Location l : list) {
@@ -146,7 +138,7 @@ public class CloudMQSender {
                 MapMessage mm = session.createMapMessage();
                 mm.setString("SENDER_QUEUE", listenQ);
                 mm.setString("ENTITY", "FILE");
-                mm.setString("OPTION", option + "_UPLOAD");
+                mm.setString("OPTION", option );
                 mm.setBytes("DATA_FILE", file);
                 return mm;
             };
@@ -245,19 +237,6 @@ public class CloudMQSender {
         }
     }
 
-    private void requestTran(String entity, String date) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "REQUEST_TRAN");
-            mm.setString("DATA", date);
-            return mm;
-        };
-        if (serverQ != null) {
-            cloudMQTemplate.send(serverQ, mc);
-        }
-    }
 
     private void uploadSetup() {
         uploadVouStatus();
@@ -289,9 +268,9 @@ public class CloudMQSender {
         List<String> location = userRepo.getLocation();
         //requestTran("OPENING", gson.toJson(new OPHis(opHisService.getMaxDate(), keys)));
         requestFile("SALE", gson.toJson(new SaleHis(saleHisService.getMaxDate(), location)));
-        requestTran("PURCHASE", gson.toJson(new PurHis(purHisService.getMaxDate(), location)));
-        requestTran("RETURN_IN", gson.toJson(new RetInHis(retInService.getMaxDate(), location)));
-        requestTran("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), location)));
+        requestFile("PURCHASE", gson.toJson(new PurHis(purHisService.getMaxDate(), location)));
+        requestFile("RETURN_IN", gson.toJson(new RetInHis(retInService.getMaxDate(), location)));
+        requestFile("RETURN_OUT", gson.toJson(new RetOutHis(retOutService.getMaxDate(), location)));
         //requestTran("STOCK_IO", gson.toJson(new StockInOut(inOutService.getMaxDate(), keys)));
         requestFile("TRANSFER", gson.toJson(new TransferHis(transferHisService.getMaxDate(), location)));
     }
@@ -312,7 +291,7 @@ public class CloudMQSender {
         List<SaleHis> list = saleHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         if (!list.isEmpty()) {
             log.info("upload sale : " + list.size());
-            uploadFile("SALE", list, serverQ);
+            uploadFile("SALE_UPLOAD", list, serverQ);
         }
     }
 
@@ -351,7 +330,7 @@ public class CloudMQSender {
         List<PurHis> list = purHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         if (!list.isEmpty()) {
             log.info("upload purchase : " + list.size());
-            uploadFile("PURCHASE", list, serverQ);
+            uploadFile("PURCHASE_UPLOAD", list, serverQ);
         }
     }
 
@@ -382,7 +361,7 @@ public class CloudMQSender {
         List<RetInHis> list = retInService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         if (!list.isEmpty()) {
             log.info("upload return in : " + list.size());
-            uploadFile("RETURN_IN", list, serverQ);
+            uploadFile("RETURN_IN_UPLOAD", list, serverQ);
         }
     }
 
@@ -410,7 +389,7 @@ public class CloudMQSender {
         List<RetOutHis> list = retOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         if (!list.isEmpty()) {
             log.info("upload return out : " + list.size());
-            uploadFile("RETURN_OUT", list, serverQ);
+            uploadFile("RETURN_OUT_UPLOAD", list, serverQ);
         }
     }
 
@@ -436,18 +415,13 @@ public class CloudMQSender {
         return client ? serverQ : hmQueue.get(sh.getLocCode());
     }
 
-    private void uploadStockInOut() {
-        List<StockInOut> list = inOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
-        if (!list.isEmpty()) log.info("upload stock io : " + list.size());
-        list.forEach(o -> saveMessage("STOCK_IO", gson.toJson(o), serverQ));
-    }
 
 
     private void uploadTransfer() {
         List<TransferHis> list = transferHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         if (!list.isEmpty()) {
             log.info("upload transfer : " + list.size());
-            uploadFile("TRANSFER", list, serverQ);
+            uploadFile("TRANSFER_UPLOAD", list, serverQ);
         }
     }
 
@@ -483,13 +457,6 @@ public class CloudMQSender {
         return client ? serverQ : mig;
     }
 
-
-    private void uploadOpening() {
-        List<OPHis> list = opHisService.unUpload();
-        if (!list.isEmpty()) log.info("upload opening : " + list.size());
-        list.forEach(o -> saveMessage("OPENING", gson.toJson(o), serverQ));
-    }
-
     private void uploadStock() {
         List<Stock> list = stockService.unUpload();
         if (!list.isEmpty()) log.info("upload stock : " + list.size());
@@ -500,11 +467,6 @@ public class CloudMQSender {
         sendTopicMessage("STOCK", gson.toJson(s));
     }
 
-    private void uploadPattern() {
-        log.info("upload pattern.");
-        List<Pattern> list = patternService.unUpload();
-        list.forEach(p -> saveMessage("PATTERN", gson.toJson(p), serverQ));
-    }
 
     private void uploadVouStatus() {
         List<VouStatus> list = vouStatusService.unUpload();
@@ -526,11 +488,7 @@ public class CloudMQSender {
         sendTopicMessage("RELATION", gson.toJson(s));
     }
 
-    private void uploadTraderGroup() {
-        log.info("upload trader group.");
-        List<TraderGroup> list = traderGroupService.unUpload();
-        list.forEach((o) -> saveMessage("TRADER_GROUP", gson.toJson(o), serverQ));
-    }
+
 
     private void uploadTrader() {
         List<Trader> list = traderService.unUploadTrader();
