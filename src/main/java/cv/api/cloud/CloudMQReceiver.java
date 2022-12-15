@@ -7,7 +7,6 @@ import cv.api.common.Util1;
 import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
-import cv.api.model.Gl;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -702,10 +701,11 @@ public class CloudMQReceiver {
                             }
                         }
                     }
-                    if (option.equals("SAVE")) {
-                        sendReceiveMessage(senderQ, entity, data);
-                    }
+
                 }
+            }
+            if (option.equals("SAVE")) {
+                sendReceiveMessage(senderQ, entity, data);
             }
         } catch (Exception e) {
             log.error(String.format("%s : %s", entity, e.getMessage()));
