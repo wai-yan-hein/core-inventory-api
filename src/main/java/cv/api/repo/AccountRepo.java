@@ -190,10 +190,11 @@ public class AccountRepo {
                 double vouPaid = Util1.getDouble(sh.getPaid());
                 double vouTax = Util1.getDouble(sh.getTaxAmt());
                 double taxPercent = Util1.getDouble(sh.getTaxPercent());
+                Integer deptId = sh.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(sh.getKey().getDeptId());
+                k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -202,6 +203,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Sale Voucher Balance");
@@ -225,6 +227,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     if (vouPaid > 0) {
                         gl.setSrcAccCode(payAcc);
@@ -254,6 +257,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Sale Voucher Paid : " + traderName);
@@ -276,6 +280,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     if (vouPaid > 0) {
                         gl.setSrcAccCode(payAcc);
@@ -324,10 +329,11 @@ public class AccountRepo {
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
                 String vouNo = ph.getKey().getVouNo();
+                Integer deptId =ph.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(ph.getKey().getDeptId());
+                k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -336,6 +342,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Purchase Voucher Balance");
@@ -387,6 +394,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Purchase Voucher Paid : " + traderName);
@@ -417,7 +425,6 @@ public class AccountRepo {
             if (ri != null) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
-                String disAcc = setting.getDiscountAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ri.getVouDate();
@@ -428,12 +435,12 @@ public class AccountRepo {
                 boolean deleted = ri.getDeleted();
                 String vouNo = ri.getKey().getVouNo();
                 double vouBal = Util1.getDouble(ri.getBalance());
-                double vouDis = Util1.getDouble(ri.getDiscount());
                 double vouPaid = Util1.getDouble(ri.getPaid());
+                Integer deptId = ri.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(ri.getKey().getDeptId());
+                k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 List<Gl> listGl = new ArrayList<>();
@@ -442,6 +449,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return In Voucher Balance");
@@ -466,6 +474,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return In Voucher Paid : " + traderName);
@@ -495,7 +504,6 @@ public class AccountRepo {
             if (ro != null) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
-                String disAcc = setting.getDiscountAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ro.getVouDate();
@@ -506,8 +514,8 @@ public class AccountRepo {
                 boolean deleted = ro.getDeleted();
                 String vouNo = ro.getKey().getVouNo();
                 double vouBal = Util1.getDouble(ro.getBalance());
-                double vouDis = Util1.getDouble(ro.getDiscount());
                 double vouPaid = Util1.getDouble(ro.getPaid());
+                Integer deptId =ro.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
@@ -520,6 +528,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return Out Voucher Balance");
@@ -544,6 +553,7 @@ public class AccountRepo {
                     Gl gl = new Gl();
                     GlKey key = new GlKey();
                     key.setCompCode(compCode);
+                    key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
                     gl.setDescription("Return Out Voucher Paid : " + traderName);

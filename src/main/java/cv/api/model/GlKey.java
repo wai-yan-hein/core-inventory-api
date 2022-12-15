@@ -6,4 +6,5 @@ import lombok.Data;
 public class GlKey {
     private String glCode;
     private String compCode;
+    private Integer deptId;
 }
