@@ -78,7 +78,7 @@ public class CloudMQSender {
     private String serverQ;
     private boolean progress = false;
 
-    @Scheduled(fixedRate = 10000000)
+    @Scheduled(fixedRate = 5 * 60 * 1000)
     private void uploadToServer() {
         initQueue();
         client = Util1.getBoolean(userRepo.getProperty("cloud.upload.server"));
@@ -138,7 +138,7 @@ public class CloudMQSender {
                 MapMessage mm = session.createMapMessage();
                 mm.setString("SENDER_QUEUE", listenQ);
                 mm.setString("ENTITY", "FILE");
-                mm.setString("OPTION", option );
+                mm.setString("OPTION", option);
                 mm.setBytes("DATA_FILE", file);
                 return mm;
             };
@@ -416,7 +416,6 @@ public class CloudMQSender {
     }
 
 
-
     private void uploadTransfer() {
         List<TransferHis> list = transferHisService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
         if (!list.isEmpty()) {
@@ -487,7 +486,6 @@ public class CloudMQSender {
     public void send(UnitRelation s) {
         sendTopicMessage("RELATION", gson.toJson(s));
     }
-
 
 
     private void uploadTrader() {

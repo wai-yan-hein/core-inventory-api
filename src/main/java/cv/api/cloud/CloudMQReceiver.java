@@ -977,8 +977,9 @@ public class CloudMQReceiver {
 
     private void updateSale(SaleHis obj) {
         SaleHisKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
         String sql = "update sale_his set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         try {
             service.executeSql(sql);
         } catch (Exception e) {
@@ -988,8 +989,9 @@ public class CloudMQReceiver {
 
     private void updatePurchase(PurHis obj) {
         PurHisKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
         String sql = "update pur_his set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         try {
             service.executeSql(sql);
         } catch (Exception e) {
@@ -999,8 +1001,9 @@ public class CloudMQReceiver {
 
     private void updateReturnIn(RetInHis obj) {
         RetInHisKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
         String sql = "update ret_in_his set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         try {
             service.executeSql(sql);
         } catch (Exception e) {
@@ -1010,8 +1013,9 @@ public class CloudMQReceiver {
 
     private void updateReturnOut(RetOutHis obj) {
         RetOutHisKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
         String sql = "update ret_out_his set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         try {
             service.executeSql(sql);
         } catch (Exception e) {
@@ -1021,8 +1025,9 @@ public class CloudMQReceiver {
 
     private void updateTransfer(TransferHis obj) {
         TransferHisKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
         String sql = "update transfer_his set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         try {
             service.executeSql(sql);
         } catch (Exception e) {
@@ -1032,8 +1037,9 @@ public class CloudMQReceiver {
 
     private void updateStockIO(StockInOut obj) throws Exception {
         StockIOKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
         String sql = "update stock_in_out set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         service.executeSql(sql);
     }
 }
