@@ -189,7 +189,6 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                             sh.setIntgUpdStatus(rs.getString("intg_upd_status"));
                             sh.setReference(rs.getString("reference"));
                             list.add(sh);
-
                         }
                     } catch (Exception e) {
                         log.error(e.getMessage());

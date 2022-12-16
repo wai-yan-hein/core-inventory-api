@@ -71,7 +71,6 @@ public class RetOutServiceImpl implements RetOutService {
                 rd.save(cSd);
             }
         }
-        rin.setIntgUpdStatus(null);
         rDao.save(rin);
         rin.setListRD(listSD);
         return rin;
