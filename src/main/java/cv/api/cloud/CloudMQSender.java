@@ -87,7 +87,7 @@ public class CloudMQSender {
             log.info("ActiveMQ Server Q : " + serverQ);
             if (!progress) {
                 progress = true;
-                destroyQ(serverQ);
+                //destroyQ(serverQ);
                 //uploadSetup();
                 uploadTransaction();
                 downloadSetup();
