@@ -24,6 +24,8 @@ ALTER TABLE `transfer_his`
 CHANGE COLUMN `vou_no` `vou_no` VARCHAR(20) NOT NULL ;
 ALTER TABLE `transfer_his_detail` 
 CHANGE COLUMN `td_code` `td_code` VARCHAR(25) NOT NULL ;
+
+
 update sale_his
 set vou_no =concat('02-',vou_no);
 update sale_his_detail
