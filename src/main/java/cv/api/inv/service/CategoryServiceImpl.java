@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.common.Util1;
 import cv.api.inv.dao.CategoryDao;
 import cv.api.inv.entity.Category;
+import cv.api.inv.entity.CategoryKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,8 +77,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category findByCode(String code) {
-        return dao.findByCode(code);
+    public Category findByCode(CategoryKey key) {
+        return dao.findByCode(key);
     }
 
 }

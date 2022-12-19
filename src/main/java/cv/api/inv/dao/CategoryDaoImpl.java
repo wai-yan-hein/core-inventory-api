@@ -7,6 +7,7 @@ package cv.api.inv.dao;
 
 import cv.api.common.Util1;
 import cv.api.inv.entity.Category;
+import cv.api.inv.entity.CategoryKey;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @Repository
 @Slf4j
-public class CategoryDaoImpl extends AbstractDao<String, Category> implements CategoryDao {
+public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implements CategoryDao {
     @Autowired
     private SessionFactory sessionFactory;
 
@@ -69,8 +70,8 @@ public class CategoryDaoImpl extends AbstractDao<String, Category> implements Ca
     }
 
     @Override
-    public Category findByCode(String code) {
-        return getByKey(code);
+    public Category findByCode(CategoryKey key) {
+        return getByKey(key);
     }
 
     @Override

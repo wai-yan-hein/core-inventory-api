@@ -6,6 +6,7 @@
 package cv.api.inv.dao;
 
 import cv.api.inv.entity.Category;
+import cv.api.inv.entity.CategoryKey;
 
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface CategoryDao {
 
-    Category findByCode(String code);
+    Category findByCode(CategoryKey key);
 
     Category save(Category item);
 
