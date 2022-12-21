@@ -42,10 +42,10 @@ public class AccountRepo {
                     String vouNo = response.getVouNo();
                     String compCode = response.getCompCode();
                     switch (response.getTranSource()) {
-                        case "SALE" -> updateSale(vouNo, compCode, ACK);
-                        case "PURCHASE" -> updatePurchase(vouNo, compCode, ACK);
-                        case "RETURN_IN" -> updateReturnIn(vouNo, compCode, ACK);
-                        case "RETURN_OUT" -> updateReturnOut(vouNo, compCode, ACK);
+                        case "SALE" -> updateSale(vouNo, compCode);
+                        case "PURCHASE" -> updatePurchase(vouNo, compCode);
+                        case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
+                        case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
                     }
                 }
             }, (e) -> {
@@ -54,18 +54,18 @@ public class AccountRepo {
                 String compCode = gl.getKey().getCompCode();
                 String tranSource = gl.getTranSource();
                 switch (tranSource) {
-                    case "SALE" -> updateSale(vouNo, compCode, null);
-                    case "PURCHASE" -> updatePurchase(vouNo, compCode, null);
-                    case "RETURN_IN" -> updateReturnIn(vouNo, compCode, null);
-                    case "RETURN_OUT" -> updateReturnOut(vouNo, compCode, null);
+                    case "SALE" -> updateSaleNull(vouNo, compCode);
+                    case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
+                    case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
+                    case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
                 }
                 throw new IllegalStateException(e.getMessage());
             });
         }
     }
 
-    private void updateSale(String vouNo, String compCode, String status) {
-        String sql = "update sale_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+    private void updateSale(String vouNo, String compCode) {
+        String sql = "update sale_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateSale: %s", vouNo));
@@ -74,8 +74,18 @@ public class AccountRepo {
         }
     }
 
-    private void updatePurchase(String vouNo, String compCode, String status) {
-        String sql = "update pur_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+    private void updateSaleNull(String vouNo, String compCode) {
+        String sql = "update sale_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        try {
+            reportService.executeSql(sql);
+            log.info(String.format("updateSale: %s", vouNo));
+        } catch (Exception e) {
+            log.error(String.format("updateSale: %s", e.getMessage()));
+        }
+    }
+
+    private void updatePurchase(String vouNo, String compCode) {
+        String sql = "update pur_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updatePurchase: %s", vouNo));
@@ -84,8 +94,18 @@ public class AccountRepo {
         }
     }
 
-    private void updateReturnIn(String vouNo, String compCode, String status) {
-        String sql = "update ret_in_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
+    private void updatePurchaseNull(String vouNo, String compCode) {
+        String sql = "update pur_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        try {
+            reportService.executeSql(sql);
+            log.info(String.format("updatePurchase: %s", vouNo));
+        } catch (Exception e) {
+            log.error(String.format("updatePurchase: %s", e.getMessage()));
+        }
+    }
+
+    private void updateReturnInNull(String vouNo, String compCode) {
+        String sql = "update ret_in_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateReturnIn: %s", vouNo));
@@ -94,8 +114,28 @@ public class AccountRepo {
         }
     }
 
-    private void updateReturnOut(String vouNo, String compCode, String status) {
-        String sql = "update ret_out_his set intg_upd_status = '" + status + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+    private void updateReturnIn(String vouNo, String compCode) {
+        String sql = "update ret_in_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
+        try {
+            reportService.executeSql(sql);
+            log.info(String.format("updateReturnIn: %s", vouNo));
+        } catch (Exception e) {
+            log.error(String.format("updateReturnIn: %s", e.getMessage()));
+        }
+    }
+
+    private void updateReturnOutNull(String vouNo, String compCode) {
+        String sql = "update ret_out_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        try {
+            reportService.executeSql(sql);
+            log.info(String.format("updateReturnOut: %s", vouNo));
+        } catch (Exception e) {
+            log.error(String.format("updateReturnOut: %s", e.getMessage()));
+        }
+    }
+
+    private void updateReturnOut(String vouNo, String compCode) {
+        String sql = "update ret_out_his set intg_upd_status = '" + ACK+ "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateReturnOut: %s", vouNo));
@@ -105,7 +145,7 @@ public class AccountRepo {
     }
 
     private void updateTrader(String traderCode, String account, String compCode) {
-        String sql = "update trader set intg_upd_status = '" + "ACK" + "',account = '" + account + "' where code ='" + traderCode + "' and comp_code='" + compCode + "'";
+        String sql = "update trader set intg_upd_status = '" + ACK + "',account = '" + account + "' where code ='" + traderCode + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateTrader: %s", traderCode));

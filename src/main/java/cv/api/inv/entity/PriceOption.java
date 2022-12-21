@@ -17,6 +17,6 @@ public class PriceOption {
     private String description;
     @Column(name = "unique_id")
     private Integer uniqueId;
-    @Column(name = "tran_option")
+    @Column(name = "tran_type")
     private String tranOption;
 }
