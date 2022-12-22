@@ -40,6 +40,8 @@ public class TransferHis {
     private Integer macId;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "vou_lock")
+    private boolean vouLock;
     @Transient
     private List<TransferHisDetail> listTD;
     @Transient

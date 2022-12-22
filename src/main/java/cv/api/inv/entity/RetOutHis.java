@@ -63,6 +63,8 @@ public class RetOutHis implements java.io.Serializable {
     private Integer macId;
     @Transient
     private String status = "STATUS";
+    @Column(name = "vou_lock")
+    private boolean vouLock;
     @Transient
     private List<RetOutHisDetail> listRD;
     @Transient

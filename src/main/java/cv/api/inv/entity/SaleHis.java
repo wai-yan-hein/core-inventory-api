@@ -81,6 +81,8 @@ public class SaleHis {
     private Integer macId;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "vou_lock")
+    private boolean vouLock;
     @Transient
     private String status = "STATUS";
     @Transient

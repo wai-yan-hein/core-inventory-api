@@ -70,6 +70,8 @@ public class PurHis implements java.io.Serializable {
     private String intgUpdStatus;
     @Column(name = "mac_id")
     private Integer macId;
+    @Column(name = "vou_lock")
+    private boolean vouLock;
     @Transient
     private String status = "STATUS";
     @Transient

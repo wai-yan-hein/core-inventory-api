@@ -195,30 +195,35 @@ public class CloudMQReceiver {
     private void save(SaleHis obj) {
         obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
         saleHisService.save(obj);
     }
 
     private void save(TransferHis obj) {
         obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
         transferHisService.save(obj);
     }
 
     private void save(RetInHis obj) {
         obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
         retInService.save(obj);
     }
 
     private void save(RetOutHis obj) {
         obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
         retOutService.save(obj);
     }
 
     private void save(PurHis obj) {
         obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
         purHisService.save(obj);
     }
 
