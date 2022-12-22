@@ -26,6 +26,30 @@ ALTER TABLE `transfer_his_detail`
 CHANGE COLUMN `td_code` `td_code` VARCHAR(25) NOT NULL ;
 
 
+
+
+
+ALTER TABLE `sale_his` 
+ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
+
+ALTER TABLE `pur_his` 
+ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
+
+ALTER TABLE `ret_in_his` 
+ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
+
+ALTER TABLE `ret_out_his` 
+ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
+
+ALTER TABLE `transfer_his` 
+ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
+
+
+
+
+
+
+
 update sale_his
 set vou_no =concat('02-',vou_no);
 update sale_his_detail
