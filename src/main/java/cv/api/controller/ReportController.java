@@ -87,8 +87,7 @@ public class ReportController {
     }
 
     @PostMapping(value = "/get-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    ReturnObject getReport(@RequestBody ReportFilter filter) {
+    public @ResponseBody ReturnObject getReport(@RequestBody ReportFilter filter) {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
