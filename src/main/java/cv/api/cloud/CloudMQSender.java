@@ -116,16 +116,20 @@ public class CloudMQSender {
     }
 
     private void saveMessage(String entity, String data, String queue) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "SAVE");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (queue != null) {
-            cloudMQTemplate.send(queue, mc);
+        try {
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", entity);
+                mm.setString("OPTION", "SAVE");
+                mm.setString("DATA", data);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (Exception e) {
+            log.error(String.format("saveMessage : %s : %s", entity, e.getMessage()));
         }
     }
 
@@ -146,49 +150,62 @@ public class CloudMQSender {
                 cloudMQTemplate.send(queue, mc);
             }
         } catch (IOException e) {
-            log.error("File Message : " + e.getMessage());
+            log.error(String.format("uploadFile : %s : %s", option, e.getMessage()));
         }
     }
 
     private void deleteMessage(String entity, String data, String queue) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "DELETE");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (queue != null) {
-            cloudMQTemplate.send(queue, mc);
+        try {
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", entity);
+                mm.setString("OPTION", "DELETE");
+                mm.setString("DATA", data);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (Exception e) {
+            log.error(String.format("deleteMessage : %s : %s", entity, e.getMessage()));
         }
     }
 
     private void truncateMessage(String entity, String data, String queue) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "TRUNCATE");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (queue != null) {
-            cloudMQTemplate.send(queue, mc);
+        try {
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", entity);
+                mm.setString("OPTION", "TRUNCATE");
+                mm.setString("DATA", data);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (Exception e) {
+            log.error(String.format("truncateMessage : %s : %s", entity, e.getMessage()));
+
         }
     }
 
     private void restoreMessage(String entity, String data, String queue) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "RESTORE");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (queue != null) {
-            cloudMQTemplate.send(queue, mc);
+        try {
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", entity);
+                mm.setString("OPTION", "RESTORE");
+                mm.setString("DATA", data);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (Exception e) {
+            log.error(String.format("restoreMessage : %s : %s", entity, e.getMessage()));
         }
     }
 
@@ -210,30 +227,38 @@ public class CloudMQSender {
     }
 
     private void sendTopicMessage(String entity, String data) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "SETUP");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (topicSender != null) {
-            topicSender.send(mc);
+        try {
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", entity);
+                mm.setString("OPTION", "SETUP");
+                mm.setString("DATA", data);
+                return mm;
+            };
+            if (topicSender != null) {
+                topicSender.send(mc);
+            }
+        } catch (Exception e) {
+            log.error(String.format("requestFile : %s : %s", entity, e.getMessage()));
         }
     }
 
     private void requestFile(String option, String date) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("ENTITY", "FILE");
-            mm.setString("OPTION", option + "_REQUEST");
-            mm.setString("DATA", date);
-            return mm;
-        };
-        if (serverQ != null) {
-            cloudMQTemplate.send(serverQ, mc);
+        try {
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", "FILE");
+                mm.setString("OPTION", option + "_REQUEST");
+                mm.setString("DATA", date);
+                return mm;
+            };
+            if (serverQ != null) {
+                cloudMQTemplate.send(serverQ, mc);
+            }
+        } catch (Exception e) {
+            log.error(String.format("requestFile : %s : %s", option, e.getMessage()));
         }
     }
 

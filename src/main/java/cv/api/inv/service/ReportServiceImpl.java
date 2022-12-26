@@ -62,7 +62,10 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public String getOpeningDate(String compCode, Integer deptId) {
         String opDate = null;
-        String sql = "select max(op_date) op_date from op_his where deleted =0 and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "select max(op_date) op_date\n" +
+                "from op_his \n" +
+                "where deleted =0 and comp_code ='" + compCode + "'\n" +
+                "and (dept_id =" + deptId + " or 0 =" + deptId + ")";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
