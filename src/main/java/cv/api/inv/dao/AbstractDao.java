@@ -96,7 +96,10 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     public ResultSet getResultSet(final String sql) {
         Work work = (Connection con) -> {
             try {
-                PreparedStatement stmt = con.prepareStatement(sql);
+                PreparedStatement stmt = con.prepareStatement(
+                        sql,
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 rs = null;
                 rs = stmt.executeQuery();
             } catch (SQLException ex) {

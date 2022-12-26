@@ -14,6 +14,7 @@ import cv.api.inv.entity.VStockBalance;
 import cv.api.inv.entity.WeightLossHis;
 import cv.api.inv.view.*;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 /**
@@ -24,6 +25,7 @@ public interface ReportService {
     void insertTmp(List<String> listStr, Integer macId, String taleName);
 
     void executeSql(String... sql) throws Exception;
+    ResultSet executeSql(String sql) throws Exception;
 
     String getOpeningDate(String compCode, Integer deptIdF);
 

@@ -75,6 +75,8 @@ public class SetupController {
     @Autowired
     private TraderGroupService traderGroupService;
     @Autowired
+    private ConverterService converterService;
+    @Autowired
     private AccountRepo accountRepo;
     @Autowired(required = false)
     private CloudMQSender cloudMQSender;
@@ -101,7 +103,7 @@ public class SetupController {
     public ResponseEntity<Category> saveCategory(@RequestBody Category cat) throws Exception {
         Category category = categoryService.save(cat);
         //sent to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(cat);
+        if (cloudMQSender != null) cloudMQSender.send(cat);
         return ResponseEntity.ok(category);
     }
 
@@ -128,7 +130,7 @@ public class SetupController {
     public ResponseEntity<Location> saveLocation(@RequestBody Location location) {
         Location loc = locationService.save(location);
         //sent to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(loc);
+        if (cloudMQSender != null) cloudMQSender.send(loc);
         return ResponseEntity.ok(loc);
     }
 
@@ -153,7 +155,7 @@ public class SetupController {
     public ResponseEntity<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) throws Exception {
         SaleMan sm = saleManService.save(saleMan);
         //sent to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(saleMan);
+        if (cloudMQSender != null) cloudMQSender.send(saleMan);
         return ResponseEntity.ok(sm);
     }
 
@@ -180,7 +182,7 @@ public class SetupController {
     public ResponseEntity<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) throws Exception {
         StockBrand b = brandService.save(brand);
         //send to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(brand);
+        if (cloudMQSender != null) cloudMQSender.send(brand);
         return ResponseEntity.ok(b);
     }
 
@@ -212,7 +214,7 @@ public class SetupController {
     public ResponseEntity<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) throws Exception {
         StockType b = typeService.save(type);
         //send to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(type);
+        if (cloudMQSender != null) cloudMQSender.send(type);
         return ResponseEntity.ok(b);
     }
 
@@ -240,7 +242,7 @@ public class SetupController {
     public ResponseEntity<StockUnit> saveUnit(@RequestBody StockUnit unit, HttpServletRequest request) {
         StockUnit b = unitService.save(unit);
         //send to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(unit);
+        if (cloudMQSender != null) cloudMQSender.send(unit);
         return ResponseEntity.ok(b);
     }
 
@@ -305,7 +307,7 @@ public class SetupController {
     public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) throws Exception {
         trader = traderService.saveTrader(trader);
         accountRepo.sendTrader(trader);
-        if(cloudMQSender!=null)cloudMQSender.send(trader);
+        if (cloudMQSender != null) cloudMQSender.send(trader);
         return ResponseEntity.ok(trader);
     }
 
@@ -359,7 +361,7 @@ public class SetupController {
     public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) throws Exception {
         Stock b = stockService.save(stock);
         //for cloud
-        if(cloudMQSender!=null)cloudMQSender.send(b);
+        if (cloudMQSender != null) cloudMQSender.send(b);
         return ResponseEntity.ok(b);
     }
 
@@ -402,7 +404,7 @@ public class SetupController {
     public ResponseEntity<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus, HttpServletRequest request) {
         VouStatus b = vouStatusService.save(vouStatus);
         //sent to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(b);
+        if (cloudMQSender != null) cloudMQSender.send(b);
         return ResponseEntity.ok(b);
     }
 
@@ -541,7 +543,7 @@ public class SetupController {
     public ResponseEntity<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
         //sent to cloud
-        if(cloudMQSender!=null)cloudMQSender.send(relation);
+        if (cloudMQSender != null) cloudMQSender.send(relation);
         return ResponseEntity.ok(b);
     }
 
@@ -566,5 +568,11 @@ public class SetupController {
     public ResponseEntity<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
         return ResponseEntity.ok(g);
+    }
+
+    @GetMapping(path = "/convert-to-unicode")
+    public ResponseEntity<?> convertToUniCode() {
+        converterService.convertToUnicode();
+        return ResponseEntity.ok("converted.");
     }
 }

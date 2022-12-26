@@ -60,6 +60,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public ResultSet executeSql(String sql) throws Exception {
+        return reportDao.executeSql(sql);
+    }
+
+    @Override
     public String getOpeningDate(String compCode, Integer deptId) {
         String opDate = null;
         String sql = "select max(op_date) op_date\n" +

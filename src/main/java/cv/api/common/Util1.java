@@ -221,13 +221,14 @@ public class Util1 {
         return Util1.toDate("1998-10-07");
     }
 
-    public static String convertToUniCode(String str) {
+    public static boolean isZGText(String str) {
         ZawgyiDetector zd = new ZawgyiDetector();
         Double score = zd.getZawgyiProbability(str);
-        if (getBoolean(df0.format(score))) {
-            TransliterateZ2U z2U = new TransliterateZ2U("Zawgyi to Unicode");
-            return z2U.convert(str);
-        }
-        return str;
+        return getBoolean(df0.format(score));
+    }
+
+    public static String convertToUniCode(String str) {
+        TransliterateZ2U z2U = new TransliterateZ2U("Zawgyi to Unicode");
+        return z2U.convert(str);
     }
 }
