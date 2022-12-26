@@ -20,6 +20,7 @@ import java.util.List;
  * @author wai yan
  */
 public interface ReportService {
+
     void insertTmp(List<String> listStr, Integer macId, String taleName);
 
     void executeSql(String... sql) throws Exception;
