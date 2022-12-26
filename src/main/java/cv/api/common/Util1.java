@@ -6,6 +6,8 @@ package cv.api.common;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.myanmartools.TransliterateZ2U;
+import com.google.myanmartools.ZawgyiDetector;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -15,6 +17,7 @@ import net.lingala.zip4j.model.enums.EncryptionMethod;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -27,6 +30,8 @@ import java.util.Date;
 @Slf4j
 public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.##";
+    private static final DecimalFormat df0 = new DecimalFormat("0");
+
     private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     public static String SYNC_DATE;
     private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
@@ -214,5 +219,15 @@ public class Util1 {
 
     public static Date getOldDate() {
         return Util1.toDate("1998-10-07");
+    }
+
+    public static String convertToUniCode(String str) {
+        ZawgyiDetector zd = new ZawgyiDetector();
+        Double score = zd.getZawgyiProbability(str);
+        if (getBoolean(df0.format(score))) {
+            TransliterateZ2U z2U = new TransliterateZ2U("Zawgyi to Unicode");
+            return z2U.convert(str);
+        }
+        return str;
     }
 }

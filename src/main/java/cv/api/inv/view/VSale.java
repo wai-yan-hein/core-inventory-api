@@ -6,6 +6,7 @@
 package cv.api.inv.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cv.api.common.Util1;
 import lombok.Data;
 
 /**
@@ -71,4 +72,6 @@ public class VSale {
     private String relName;
     private String qtyStr;
     private Integer deptId;
+
+
 }

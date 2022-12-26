@@ -2662,6 +2662,7 @@ public class ReportServiceImpl implements ReportService {
         log.info("calculate opening.");
     }
 
+
     @Override
     public void insertTmp(List<String> listStr, Integer macId, String taleName) {
         try {

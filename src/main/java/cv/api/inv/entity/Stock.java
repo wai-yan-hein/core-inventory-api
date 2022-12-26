@@ -6,6 +6,7 @@
 package cv.api.inv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cv.api.common.Util1;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -14,7 +15,6 @@ import java.util.Date;
 /**
  * @author wai yan
  */
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Data
@@ -94,14 +94,12 @@ public class Stock implements java.io.Serializable {
     private String catName;
 
 
-    public Stock(StockKey key) {
-        this.key = key;
-    }
-
     public Stock() {
     }
 
     public Stock(Date updatedDate) {
         this.updatedDate = updatedDate;
     }
+
+
 }

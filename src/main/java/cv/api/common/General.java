@@ -1,6 +1,7 @@
 package cv.api.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jdk.jshell.execution.Util;
 import lombok.Data;
 
 @Data
@@ -19,4 +20,7 @@ public class General {
     private String saleManName;
     private String saleManCode;
     private String qtyRel;
+
+
 }
+
