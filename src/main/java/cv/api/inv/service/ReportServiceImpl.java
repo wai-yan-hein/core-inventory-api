@@ -60,7 +60,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public ResultSet executeSql(String sql) throws Exception {
+    public ResultSet getResult(String sql) throws Exception {
         return reportDao.executeSql(sql);
     }
 

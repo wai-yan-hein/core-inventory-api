@@ -25,7 +25,7 @@ public interface ReportService {
     void insertTmp(List<String> listStr, Integer macId, String taleName);
 
     void executeSql(String... sql) throws Exception;
-    ResultSet executeSql(String sql) throws Exception;
+    ResultSet getResult(String sql) throws Exception;
 
     String getOpeningDate(String compCode, Integer deptIdF);
 

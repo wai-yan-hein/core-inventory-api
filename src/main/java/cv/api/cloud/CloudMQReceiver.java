@@ -308,14 +308,8 @@ public class CloudMQReceiver {
             switch (entity) {
                 case "SALE" -> {
                     SaleHis obj = gson.fromJson(data, SaleHis.class);
-                    if (obj.getKey() != null) {
-                        obj.getKey().setDeptId(userRepo.getDeptId());
-                    }
                     switch (option) {
-                        case "SAVE" -> {
-                            obj.setIntgUpdStatus(REC);
-                            saleHisService.save(obj);
-                        }
+                        case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
                             updateSale(obj);
                             log.info("sale voucher successfully delivered to server : " + obj.getKey().getVouNo());
@@ -356,10 +350,7 @@ public class CloudMQReceiver {
                         obj.getKey().setDeptId(userRepo.getDeptId());
                     }
                     switch (option) {
-                        case "SAVE" -> {
-                            obj.setIntgUpdStatus(REC);
-                            purHisService.save(obj);
-                        }
+                        case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
                             updatePurchase(obj);
                             log.info("purchase voucher successfully delivered to server : " + obj.getKey().getVouNo());
@@ -369,10 +360,7 @@ public class CloudMQReceiver {
                 case "RETURN_IN" -> {
                     RetInHis obj = gson.fromJson(data, RetInHis.class);
                     switch (option) {
-                        case "SAVE" -> {
-                            obj.setIntgUpdStatus(REC);
-                            retInService.save(obj);
-                        }
+                        case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
                             updateReturnIn(obj);
                             log.info("return in voucher successfully delivered to server : " + obj.getKey().getVouNo());
@@ -385,10 +373,7 @@ public class CloudMQReceiver {
                         obj.getKey().setDeptId(userRepo.getDeptId());
                     }
                     switch (option) {
-                        case "SAVE" -> {
-                            obj.setIntgUpdStatus(REC);
-                            retOutService.save(obj);
-                        }
+                        case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
                             updateReturnOut(obj);
                             log.info("return out voucher successfully delivered to server : " + obj.getKey().getVouNo());
@@ -402,8 +387,7 @@ public class CloudMQReceiver {
                     }
                     switch (option) {
                         case "SAVE" -> {
-                            obj.setIntgUpdStatus(REC);
-                            transferHisService.save(obj);
+                            save(obj);
                         }
                         case "RECEIVE" -> {
                             updateTransfer(obj);
