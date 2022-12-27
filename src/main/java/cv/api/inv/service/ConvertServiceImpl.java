@@ -33,7 +33,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from vou_status\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String description = rs.getString("description");
@@ -53,7 +53,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from stock\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String stockName = rs.getString("stock_name");
@@ -73,7 +73,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from stock_type\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String typeName = rs.getString("stock_type_name");
@@ -93,7 +93,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from trader\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String typeName = rs.getString("trader_name");
@@ -113,7 +113,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from sale_his\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String remark = rs.getString("remark");
@@ -133,7 +133,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from pur_his\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String remark = rs.getString("remark");
@@ -153,7 +153,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from ret_in_his\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String remark = rs.getString("remark");
@@ -173,7 +173,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from ret_out_his\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String remark = rs.getString("remark");
@@ -193,7 +193,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from stock_in_out\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String remark = rs.getString("remark");
@@ -218,7 +218,7 @@ public class ConvertServiceImpl implements ConverterService {
         String sql = "select *\n" +
                 "from transfer_his\n";
         try {
-            ResultSet rs = reportService.executeSql(sql);
+            ResultSet rs = reportService.getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     String remark = rs.getString("remark");
