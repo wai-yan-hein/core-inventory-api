@@ -48,7 +48,8 @@ public class SaleController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-sale")
-    public ResponseEntity<?> saveSale(@RequestBody SaleHis sale) throws Exception {
+    public ResponseEntity<?> saveSale(@RequestBody SaleHis sale) {
+        sale.setUpdatedDate(Util1.getTodayDate());
         //if change location
         if (cloudMQSender != null) cloudMQSender.checkLocationAndTruncate(sale);
         if (isValidSale(sale, ro)) {

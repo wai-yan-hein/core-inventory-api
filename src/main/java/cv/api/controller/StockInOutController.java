@@ -41,6 +41,7 @@ public class StockInOutController {
 
     @PostMapping(path = "/save-stockio")
     public ResponseEntity<StockInOut> saveStockIO(@RequestBody StockInOut stockio, HttpServletRequest request) throws Exception {
+        stockio.setUpdatedDate(Util1.getTodayDate());
         stockio = ioService.save(stockio);
         return ResponseEntity.ok(stockio);
     }

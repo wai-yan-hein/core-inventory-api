@@ -100,7 +100,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-category")
-    public ResponseEntity<Category> saveCategory(@RequestBody Category cat) throws Exception {
+    public ResponseEntity<Category> saveCategory(@RequestBody Category cat) {
+        cat.setUpdatedDate(Util1.getTodayDate());
         Category category = categoryService.save(cat);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(cat);
@@ -128,6 +129,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-location")
     public ResponseEntity<Location> saveLocation(@RequestBody Location location) {
+        location.setUpdatedDate(Util1.getTodayDate());
         Location loc = locationService.save(location);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(loc);
@@ -152,7 +154,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-saleman")
-    public ResponseEntity<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) throws Exception {
+    public ResponseEntity<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) {
+        saleMan.setUpdatedDate(Util1.getTodayDate());
         SaleMan sm = saleManService.save(saleMan);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(saleMan);
@@ -179,7 +182,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-brand")
-    public ResponseEntity<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) throws Exception {
+    public ResponseEntity<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) {
+        brand.setUpdatedDate(Util1.getTodayDate());
         StockBrand b = brandService.save(brand);
         //send to cloud
         if (cloudMQSender != null) cloudMQSender.send(brand);
@@ -211,7 +215,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-type")
-    public ResponseEntity<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) throws Exception {
+    public ResponseEntity<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) {
+        type.setUpdatedDate(Util1.getTodayDate());
         StockType b = typeService.save(type);
         //send to cloud
         if (cloudMQSender != null) cloudMQSender.send(type);
@@ -240,6 +245,7 @@ public class SetupController {
     @SneakyThrows
     @PostMapping(path = "/save-unit")
     public ResponseEntity<StockUnit> saveUnit(@RequestBody StockUnit unit, HttpServletRequest request) {
+        unit.setUpdatedDate(Util1.getTodayDate());
         StockUnit b = unitService.save(unit);
         //send to cloud
         if (cloudMQSender != null) cloudMQSender.send(unit);
@@ -266,6 +272,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-region")
     public ResponseEntity<Region> saveRegion(@RequestBody Region region, HttpServletRequest request) throws Exception {
+        region.setUpdatedDate(Util1.getTodayDate());
         Region b = regionService.save(region);
         return ResponseEntity.ok(b);
     }
@@ -295,7 +302,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-customer")
-    public ResponseEntity<Trader> saveCustomer(@RequestBody Trader trader) throws Exception {
+    public ResponseEntity<Trader> saveCustomer(@RequestBody Trader trader) {
+        trader.setUpdatedDate(Util1.getTodayDate());
         trader.setType("CUS");
         trader.setMacId(0);
         Trader b = traderService.saveTrader(trader);
@@ -304,7 +312,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-trader")
-    public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) throws Exception {
+    public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) {
+        trader.setUpdatedDate(Util1.getTodayDate());
         trader = traderService.saveTrader(trader);
         accountRepo.sendTrader(trader);
         if (cloudMQSender != null) cloudMQSender.send(trader);
@@ -358,7 +367,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-stock")
-    public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) throws Exception {
+    public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) {
+        stock.setUpdatedDate(Util1.getTodayDate());
         Stock b = stockService.save(stock);
         //for cloud
         if (cloudMQSender != null) cloudMQSender.send(b);
@@ -402,6 +412,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-voucher-status")
     public ResponseEntity<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus, HttpServletRequest request) {
+        vouStatus.setUpdatedDate(Util1.getTodayDate());
         VouStatus b = vouStatusService.save(vouStatus);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(b);
@@ -433,6 +444,7 @@ public class SetupController {
             detailList.forEach(op -> op.setLocCode(opHis.getLocCode()));
             opHis.setDetailList(detailList);
             try {
+                opHis.setUpdatedDate(Util1.getTodayDate());
                 opHisService.save(opHis);
                 ro.setMessage("Saved Opening.");
             } catch (Exception e) {

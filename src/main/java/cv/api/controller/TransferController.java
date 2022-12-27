@@ -42,8 +42,9 @@ public class TransferController {
 
     @PostMapping(path = "/save-transfer")
     public ResponseEntity<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
+        obj.setUpdatedDate(Util1.getTodayDate());
         //if change location
-        if (cloudMQSender != null)cloudMQSender.checkLocationAndTruncate(obj);
+        if (cloudMQSender != null) cloudMQSender.checkLocationAndTruncate(obj);
         //save to local
         obj = thService.save(obj);
         //send to cloud
