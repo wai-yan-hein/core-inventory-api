@@ -45,7 +45,8 @@ public class RetInController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-retin")
-    public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin) throws Exception {
+    public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin) {
+        retin.setUpdatedDate(Util1.getTodayDate());
         retin = riService.save(retin);
         //send message to service
         accountRepo.sendReturnIn(retin);

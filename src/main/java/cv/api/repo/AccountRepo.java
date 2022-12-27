@@ -59,7 +59,7 @@ public class AccountRepo {
                     case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
                     case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
                 }
-                throw new IllegalStateException(e.getMessage());
+                log.error(e.getMessage());
             });
         }
     }

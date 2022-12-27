@@ -45,11 +45,12 @@ public class RetOutController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-retout")
-    public ResponseEntity<?> saveReturnOut(@RequestBody RetOutHis retout) throws Exception {
+    public ResponseEntity<?> saveReturnOut(@RequestBody RetOutHis retout) {
+        retout.setUpdatedDate(Util1.getTodayDate());
         retout = roService.save(retout);
         accountRepo.sendReturnOut(retout);
         //send to cloud
-        if (cloudMQSender != null)cloudMQSender.send(retout);
+        if (cloudMQSender != null) cloudMQSender.send(retout);
         return ResponseEntity.ok(retout);
     }
 
@@ -74,7 +75,7 @@ public class RetOutController {
     public ResponseEntity<ReturnObject> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
         roService.delete(key);
         ro.setMessage("Deleted.");
-        if (cloudMQSender != null)cloudMQSender.delete(key);
+        if (cloudMQSender != null) cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -82,7 +83,7 @@ public class RetOutController {
     public ResponseEntity<ReturnObject> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
         roService.restore(key);
         ro.setMessage("Restored.");
-        if (cloudMQSender != null)cloudMQSender.restore(key);
+        if (cloudMQSender != null) cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 

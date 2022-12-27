@@ -45,12 +45,13 @@ public class PurchaseController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-pur")
-    public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur) throws Exception {
+    public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur) {
+        pur.setUpdatedDate(Util1.getTodayDate());
         pur = phService.save(pur);
         //send message to service
         accountRepo.sendPurchase(pur);
         //send to cloud
-        if (cloudMQSender != null)cloudMQSender.send(pur);
+        if (cloudMQSender != null) cloudMQSender.send(pur);
         return ResponseEntity.ok(pur);
     }
 
@@ -76,7 +77,7 @@ public class PurchaseController {
     public ResponseEntity<ReturnObject> deletePur(@RequestBody PurHisKey key) throws Exception {
         phService.delete(key);
         ro.setMessage("Deleted.");
-        if (cloudMQSender != null)cloudMQSender.delete(key);
+        if (cloudMQSender != null) cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -84,7 +85,7 @@ public class PurchaseController {
     public ResponseEntity<?> restorePur(@RequestBody PurHisKey key) throws Exception {
         phService.restore(key);
         ro.setMessage("Restored.");
-        if (cloudMQSender != null)cloudMQSender.restore(key);
+        if (cloudMQSender != null) cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 
