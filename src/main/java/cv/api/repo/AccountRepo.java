@@ -135,7 +135,7 @@ public class AccountRepo {
     }
 
     private void updateReturnOut(String vouNo, String compCode) {
-        String sql = "update ret_out_his set intg_upd_status = '" + ACK+ "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        String sql = "update ret_out_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
             log.info(String.format("updateReturnOut: %s", vouNo));
@@ -180,11 +180,18 @@ public class AccountRepo {
                     }
                     default -> accTrader.setTraderType("D");
                 }
-                Mono<AccTrader> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).doOnError((e) -> log.error(e.getMessage()));
-                AccTrader trader = result.block();
-                assert trader != null;
-                updateTrader(trader.getKey().getCode(), trader.getAccCode(), trader.getKey().getCompCode());
-
+                try {
+                    Mono<AccTrader> result = accountApi.post()
+                            .uri("/account/save-trader")
+                            .body(Mono.just(accTrader), AccTrader.class)
+                            .retrieve().bodyToMono(AccTrader.class)
+                            .doOnError((e) -> log.error(e.getMessage()));
+                    AccTrader trader = result.block();
+                    assert trader != null;
+                    updateTrader(trader.getKey().getCode(), trader.getAccCode(), trader.getKey().getCompCode());
+                } catch (Exception e) {
+                    log.error("sendTrader : " + e.getMessage());
+                }
             }
         }
     }
@@ -369,7 +376,7 @@ public class AccountRepo {
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
                 String vouNo = ph.getKey().getVouNo();
-                Integer deptId =ph.getKey().getDeptId();
+                Integer deptId = ph.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
@@ -555,7 +562,7 @@ public class AccountRepo {
                 String vouNo = ro.getKey().getVouNo();
                 double vouBal = Util1.getDouble(ro.getBalance());
                 double vouPaid = Util1.getDouble(ro.getPaid());
-                Integer deptId =ro.getKey().getDeptId();
+                Integer deptId = ro.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);

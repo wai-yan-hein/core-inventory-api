@@ -7,6 +7,7 @@ import cv.api.common.Util1;
 import cv.api.config.ActiveMqCondition;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
+import cv.api.repo.AccountRepo;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,8 @@ public class CloudMQReceiver {
     private JmsTemplate cloudMQTemplate;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private AccountRepo accountRepo;
 
     private void responseFile(String option, Object data, String queue) {
         String path = String.format("temp%s%s", File.separator, option + ".json");
@@ -146,8 +149,8 @@ public class CloudMQReceiver {
 
     private void save(Trader obj) {
         obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
         traderService.saveTrader(obj);
+        accountRepo.sendTrader(obj);
     }
 
     private void save(StockUnit obj) {
