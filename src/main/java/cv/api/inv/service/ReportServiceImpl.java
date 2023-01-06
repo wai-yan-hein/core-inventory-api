@@ -420,23 +420,42 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception {
+    public List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode,
+                                             String typeCode, String brandCode,
+                                             String catCode, String locCode,
+                                             String compCode,Integer deptId, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.s_user_code,v.stock_name,v.remark,v.trader_code,t.trader_name,v.qty,v.sale_unit,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" + "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "order by v.s_user_code,v.vou_date,v.vou_no";
+        String sql="select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code,dept_id\n" +
+                "from v_sale\n" +
+                "where date(vou_date) between '"+fromDate+"' and '"+toDate+"'\n" +
+                "and comp_code = '"+compCode+"'\n" +
+                "and dept_id ="+deptId+"\n" +
+                "and deleted = 0\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,sale_unit\n" +
+                ")a\n" +
+                "join v_relation rel \n" +
+                "on a.rel_code = rel.rel_code\n" +
+                "and a.sale_unit = rel.unit\n" +
+                "and a.comp_code =rel.comp_code\n" +
+                "and a.dept_id =rel.dept_id\n" +
+                "order by s_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 VSale sale = new VSale();
-                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                sale.setVouNo(rs.getString("vou_no"));
-                sale.setTraderCode(rs.getString("trader_code"));
-                sale.setTraderName(rs.getString("trader_name"));
-                sale.setStockUserCode(rs.getString("s_user_code"));
+                String relCode = rs.getString("rel_code");
+                float smallQty = rs.getFloat("smallest_qty");
+                sale.setStockCode(rs.getString("s_user_code"));
                 sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getFloat("qty"));
-                sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSaleAmount(rs.getFloat("sale_amt"));
-                sale.setRemark(rs.getString("remark"));
+                sale.setRelName(rs.getString("rel_name"));
+                sale.setSaleAmount(rs.getFloat("ttl_amt"));
+                sale.setQtyStr(getRelStr(relCode, compCode, deptId, smallQty));
                 saleList.add(sale);
             }
         }
