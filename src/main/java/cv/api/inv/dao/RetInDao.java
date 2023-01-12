@@ -8,6 +8,7 @@ package cv.api.inv.dao;
 import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
+import cv.api.inv.entity.TransferHisKey;
 import cv.api.inv.view.VReturnIn;
 
 import java.util.Date;
@@ -38,5 +39,6 @@ public interface RetInDao {
     Date getMaxDate();
 
     List<RetInHis> search(String updatedDate, List<String> keys);
+    void truncate(RetInHisKey key);
 
 }

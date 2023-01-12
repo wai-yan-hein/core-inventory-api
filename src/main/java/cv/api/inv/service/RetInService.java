@@ -8,6 +8,7 @@ package cv.api.inv.service;
 import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
+import cv.api.inv.entity.TransferHisKey;
 import cv.api.inv.view.VReturnIn;
 
 import java.util.Date;
@@ -41,4 +42,5 @@ public interface RetInService {
 
     List<RetInHis> search(String updatedDate, List<String> keys);
 
+    void truncate(RetInHisKey key);
 }

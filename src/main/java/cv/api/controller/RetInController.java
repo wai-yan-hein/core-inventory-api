@@ -76,7 +76,7 @@ public class RetInController {
     public ResponseEntity<ReturnObject> deleteRI(@RequestBody RetInHisKey key) throws Exception {
         riService.delete(key);
         ro.setMessage("Deleted.");
-        if (cloudMQSender != null)cloudMQSender.delete(key);
+        if (cloudMQSender != null) cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
 
@@ -84,7 +84,7 @@ public class RetInController {
     public ResponseEntity<ReturnObject> restoreRI(@RequestBody RetInHisKey key) throws Exception {
         riService.restore(key);
         ro.setMessage("Restored.");
-        if (cloudMQSender != null)cloudMQSender.restore(key);
+        if (cloudMQSender != null) cloudMQSender.restore(key);
         return ResponseEntity.ok(ro);
     }
 

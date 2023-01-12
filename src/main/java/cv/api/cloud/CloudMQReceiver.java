@@ -106,21 +106,6 @@ public class CloudMQReceiver {
         }
     }
 
-    private void responseSetup(String entity, String distQ, String data) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("ENTITY", entity);
-            mm.setString("SENDER_QUEUE", listenQ);
-            mm.setString("OPTION", "RESPONSE_SETUP");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (distQ != null) {
-            cloudMQTemplate.send(distQ, mc);
-            log.info("responseSetup : " + entity);
-        }
-    }
-
     private void responseTran(String entity, String distQ, String data) {
         MessageCreator mc = (Session session) -> {
             MapMessage mm = session.createMapMessage();
@@ -358,6 +343,7 @@ public class CloudMQReceiver {
                             updatePurchase(obj);
                             log.info("purchase voucher successfully delivered to server : " + obj.getKey().getVouNo());
                         }
+                        case "DELETE" -> purHisService.delete(obj.getKey());
                     }
                 }
                 case "RETURN_IN" -> {
@@ -368,6 +354,9 @@ public class CloudMQReceiver {
                             updateReturnIn(obj);
                             log.info("return in voucher successfully delivered to server : " + obj.getKey().getVouNo());
                         }
+                        case "DELETE" -> retInService.delete(obj.getKey());
+                        case "TRUNCATE" -> retInService.truncate(obj.getKey());
+                        case "RESTORE" -> retInService.restore(obj.getKey());
                     }
                 }
                 case "RETURN_OUT" -> {
@@ -381,6 +370,8 @@ public class CloudMQReceiver {
                             updateReturnOut(obj);
                             log.info("return out voucher successfully delivered to server : " + obj.getKey().getVouNo());
                         }
+                        case "DELETE" -> retOutService.delete(obj.getKey());
+
                     }
                 }
                 case "TRANSFER" -> {

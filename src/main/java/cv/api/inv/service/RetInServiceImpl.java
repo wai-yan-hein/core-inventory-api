@@ -58,20 +58,18 @@ public class RetInServiceImpl implements RetInService {
         for (int i = 0; i < listSD.size(); i++) {
             RetInHisDetail cSd = listSD.get(i);
             if (cSd.getStockCode() != null) {
-                if (cSd.getStockCode() != null) {
-                    if (cSd.getUniqueId() == null) {
-                        if (i == 0) {
-                            cSd.setUniqueId(1);
-                        } else {
-                            RetInHisDetail pSd = listSD.get(i - 1);
-                            cSd.setUniqueId(pSd.getUniqueId() + 1);
-                        }
+                if (cSd.getUniqueId() == null) {
+                    if (i == 0) {
+                        cSd.setUniqueId(1);
+                    } else {
+                        RetInHisDetail pSd = listSD.get(i - 1);
+                        cSd.setUniqueId(pSd.getUniqueId() + 1);
                     }
-                    String sdCode = vouNo + "-" + cSd.getUniqueId();
-                    cSd.setRiKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
-                    cSd.setCompCode(rin.getKey().getCompCode());
-                    sdDao.save(cSd);
                 }
+                String sdCode = vouNo + "-" + cSd.getUniqueId();
+                cSd.setRiKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
+                cSd.setCompCode(rin.getKey().getCompCode());
+                sdDao.save(cSd);
             }
             rDao.save(rin);
             rin.setListRD(listSD);
@@ -134,6 +132,11 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public List<RetInHis> search(String updatedDate, List<String> keys) {
         return rDao.search(updatedDate, keys);
+    }
+
+    @Override
+    public void truncate(RetInHisKey key) {
+        rDao.truncate(key);
     }
 
 

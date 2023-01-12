@@ -9,6 +9,7 @@ import cv.api.common.Util1;
 import cv.api.inv.entity.LocationKey;
 import cv.api.inv.entity.RetInHis;
 import cv.api.inv.entity.RetInHisKey;
+import cv.api.inv.entity.TransferHisKey;
 import cv.api.inv.view.VReturnIn;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
@@ -168,5 +169,15 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
             o.setListRD(dao.search(vouNo, compCode, deptId));
         });
         return list;
+    }
+
+    @Override
+    public void truncate(RetInHisKey key) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        Integer deptId = key.getDeptId();
+        String sql1 = "delete from ret_in_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
+        String sql2 = "delete from ret_in_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
+        execSQL(sql1, sql2);
     }
 }
