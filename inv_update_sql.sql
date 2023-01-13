@@ -403,3 +403,12 @@ create view v_process_his as select p.vou_no as vou_no,p.stock_code as stock_cod
 
 drop view if exists v_process_his_detail;
 create  view v_process_his_detail as select pd.vou_no as vou_no,pd.stock_code as stock_code,pd.comp_code as comp_code,pd.dept_id as dept_id,pd.unique_id as unique_id,pd.vou_date as vou_date,pd.qty as qty,pd.unit as unit,pd.price as price,pd.loc_code as loc_code,p.deleted as deleted,p.pt_code as pt_code,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.calculate as calculate,s.rel_code as rel_code from ((process_his_detail pd join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code and pd.dept_id = s.dept_id)) join process_his p on(pd.vou_no = p.vou_no and pd.comp_code = p.comp_code and pd.dept_id = p.dept_id));
+
+#2023-01-12
+ALTER TABLE `trader`
+DROP COLUMN `app_trader_code`,
+DROP COLUMN `app_short_name`,
+DROP COLUMN `parent`,
+ADD COLUMN `rfid` VARCHAR(50) NULL AFTER `account`;
+ADD COLUMN `nrc` VARCHAR(255) NULL AFTER `rfid`;
+
