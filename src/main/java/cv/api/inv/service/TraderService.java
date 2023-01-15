@@ -18,6 +18,8 @@ public interface TraderService {
 
     Trader findById(TraderKey key);
 
+    Trader findByRFID(String rfId, String compCode, Integer deptId);
+
     List<Trader> searchTrader(String str, String type, String compCode, Integer deptId);
 
     List<Trader> search(String regionCode, String coaCode);

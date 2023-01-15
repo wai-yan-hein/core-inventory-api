@@ -90,6 +90,11 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    public List<Stock> getService(String compCode, Integer deptId) {
+        return dao.getService(compCode,deptId);
+    }
+
+    @Override
     public List<Stock> unUpload() {
         return dao.unUpload();
     }

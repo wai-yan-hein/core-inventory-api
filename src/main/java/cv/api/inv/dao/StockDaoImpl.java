@@ -81,6 +81,44 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         return list;
     }
 
+    @Override
+    public List<Stock> getService(String compCode, Integer deptId) {
+        List<Stock> list = new ArrayList<>();
+        String sql = "select * from stock where calculate =0 and  comp_code ='" + compCode + "' and (dept_id =" + deptId + " or 0=" + deptId + ")";
+        ResultSet rs = getResultSet(sql);
+        if (rs != null) {
+            try {
+                while (rs.next()) {
+                    //stock_code, active, brand_code, stock_name, category_code, stock_type_code, created_by,
+                    // created_date, updated_by, updated_date, barcode, short_name, pur_price, pur_unit, licence_exp_date,
+                    // sale_unit, remark, sale_price_n, sale_price_a, sale_price_b, sale_price_c,
+                    // sale_price_d, sale_price_e, sale_wt, pur_wt, mig_code, comp_code, user_code, mac_id,
+                    // rel_code, calculate, dept_id, rel_name, stock_type_name, cat_name, brand_name
+                    Stock s = new Stock();
+                    StockKey key = new StockKey();
+                    key.setStockCode(rs.getString("stock_code"));
+                    key.setCompCode(rs.getString("comp_code"));
+                    key.setDeptId(rs.getInt("dept_id"));
+                    s.setKey(key);
+                    s.setSaleUnitCode(rs.getString("sale_unit"));
+                    s.setSalePriceN(rs.getFloat("sale_price_n"));
+                    s.setSalePriceA(rs.getFloat("sale_price_a"));
+                    s.setSalePriceB(rs.getFloat("sale_price_b"));
+                    s.setSalePriceC(rs.getFloat("sale_price_c"));
+                    s.setSalePriceD(rs.getFloat("sale_price_d"));
+                    s.setSalePriceE(rs.getFloat("sale_price_e"));
+                    s.setStockName(rs.getString("stock_name"));
+                    s.setUserCode(rs.getString("user_code"));
+                    list.add(s);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+        return list;
+    }
+
+
     private List<Stock> getStockList(String filter, String compCode, Integer deptId) {
         List<Stock> listStock = new ArrayList<>();
         String sql = "select s.*,rel.rel_name,st.stock_type_name,cat.cat_name,b.brand_name\n" +

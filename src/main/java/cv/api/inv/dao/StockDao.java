@@ -29,6 +29,7 @@ public interface StockDao {
     List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId);
 
     List<Stock> getStock(String str, String compCode, Integer deptId);
+    List<Stock> getService(String compCode, Integer deptId);
 
     List<Stock> unUpload();
 

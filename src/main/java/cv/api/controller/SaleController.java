@@ -55,6 +55,8 @@ public class SaleController {
         if (isValidSale(sale, ro)) {
             backupService.backup(sale);
             sale = shService.save(sale);
+        } else {
+            return ResponseEntity.ok(ro);
         }
         //for account
         accountRepo.sendSale(sale);
@@ -87,9 +89,6 @@ public class SaleController {
         } else if (Util1.isNullOrEmpty(sale.getCreatedDate())) {
             status = false;
             ro.setMessage("Invalid Created Date.");
-        } else if (listSH.size() <= 1) {
-            status = false;
-            ro.setMessage("Invalid Voucher Records.");
         }
         return status;
     }

@@ -39,6 +39,11 @@ public class TraderServiceImpl implements TraderService {
     }
 
     @Override
+    public Trader findByRFID(String rfId, String compCode, Integer deptId) {
+        return dao.findByRFID(rfId, compCode, deptId);
+    }
+
+    @Override
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
         return dao.searchTrader(str, type, compCode, deptId);
     }

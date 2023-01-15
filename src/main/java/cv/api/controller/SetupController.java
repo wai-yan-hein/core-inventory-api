@@ -366,6 +366,11 @@ public class SetupController {
         return ResponseEntity.ok(b);
     }
 
+    @GetMapping(path = "/find-trader-rfid")
+    public ResponseEntity<?> findTraderRfId(@RequestParam String rfId, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(traderService.findByRFID(rfId, compCode, deptId));
+    }
+
     @PostMapping(path = "/save-stock")
     public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) {
         stock.setUpdatedDate(Util1.getTodayDate());
@@ -380,7 +385,10 @@ public class SetupController {
         List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
         return ResponseEntity.ok(listB);
     }
-
+    @GetMapping(path = "/get-service")
+    public ResponseEntity<List<Stock>> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(stockService.getService(compCode,deptId));
+    }
     @PostMapping(path = "/search-stock")
     public ResponseEntity<?> searchStock(@RequestBody ReportFilter filter) {
         String stockCode = filter.getStockCode();

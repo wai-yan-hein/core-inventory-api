@@ -32,7 +32,7 @@ public class Trader implements java.io.Serializable {
     @Column(name = "remark")
     private String remark;
     @Column(name = "rfid")
-    private String rfid;
+    private String rfId;
     @Column(name = "nrc")
     private String nrc;
     @Column(name = "mig_code")

@@ -30,6 +30,8 @@ public interface StockService {
 
     List<Stock> getStock(String str, String compCode, Integer deptId);
 
+    List<Stock> getService(String compCode, Integer deptId);
+
     List<Stock> unUpload();
 
     Date getMaxDate();

@@ -28,6 +28,35 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     }
 
     @Override
+    public Trader findByRFID(String rfId, String compCode, Integer deptId) {
+        String sql = "select code,user_code,trader_name,price_type,type\n" +
+                "from trader\n" +
+                "where comp_code='" + compCode + "'\n" +
+                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
+                "and rfid='" + rfId + "'\n" +
+                "limit 1\n";
+        try {
+            ResultSet rs = getResultSet(sql);
+            if (rs.next()) {
+                Trader t = new Trader();
+                TraderKey key = new TraderKey();
+                key.setCompCode(compCode);
+                key.setCode(rs.getString("code"));
+                key.setDeptId(deptId);
+                t.setKey(key);
+                t.setUserCode(rs.getString("user_code"));
+                t.setTraderName(rs.getString("trader_name"));
+                t.setPriceType(rs.getString("price_type"));
+                t.setType(rs.getString("type"));
+                return t;
+            }
+        } catch (Exception e) {
+            log.error("findByRFID : " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
         String filter = "where active =1\n" +
                 "and comp_code ='" + compCode + "'\n" +

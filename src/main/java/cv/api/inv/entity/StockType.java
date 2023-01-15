@@ -25,7 +25,7 @@ public class StockType implements java.io.Serializable {
     @Column(name = "stock_type_name")
     private String stockTypeName;
     @Column(name = "account_id")
-    private String accountId;
+    private String account;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -43,8 +43,7 @@ public class StockType implements java.io.Serializable {
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
 
-    public StockType() {
-    }
+
 
     public StockType(Date updatedDate) {
         this.updatedDate = updatedDate;

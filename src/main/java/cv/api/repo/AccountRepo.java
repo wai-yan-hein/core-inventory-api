@@ -4,6 +4,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.ReportService;
+import cv.api.inv.service.TraderGroupService;
 import cv.api.inv.service.TraderService;
 import cv.api.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,8 @@ public class AccountRepo {
     private UserRepo userRepo;
     @Autowired
     private TraderService traderService;
+    @Autowired
+    private TraderGroupService groupService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -243,7 +246,19 @@ public class AccountRepo {
                 k.setCompCode(compCode);
                 k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
-                String traderName = t == null ? "" : t.getTraderName();
+                String traderName = "";
+                if (t != null) {
+                    traderName = t.getTraderName();
+                    //income by trader group
+                    String groupCode = t.getGroupCode();
+                    TraderGroupKey key = new TraderGroupKey();
+                    key.setGroupCode(groupCode);
+                    key.setCompCode(compCode);
+                    key.setDeptId(deptId);
+                    TraderGroup g = groupService.findById(key);
+                    srcAcc = g == null ? null : g.getAccount();
+                    balAcc = t.getAccount();
+                }
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {

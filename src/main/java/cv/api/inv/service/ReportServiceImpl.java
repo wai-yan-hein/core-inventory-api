@@ -116,23 +116,34 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleVoucher(String vouNo) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select t.trader_name,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" + "v.qty,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" + "t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "join location l on v.loc_code = l.loc_code\n" + "left join category c on v.cat_code = c.cat_code\n" + "where v.vou_no ='" + vouNo + "'";
+        String sql = "select t.trader_name,t.rfid,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
+                "v.qty,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
+                "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" +
+                "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" +
+                "join location l on v.loc_code = l.loc_code\n" +
+                "left join category c on v.cat_code = c.cat_code\n" +
+                "where v.vou_no ='" + vouNo + "'";
         ResultSet rs = reportDao.executeSql(sql);
         while (rs.next()) {
             VSale sale = new VSale();
             String remark = rs.getString("remark");
             String refNo = "-";
-            if (remark.contains("/")) {
-                try {
-                    String[] split = remark.split("/");
-                    remark = split[0];
-                    refNo = split[1];
-                } catch (Exception ignored) {
+
+            if (remark != null) {
+                if (remark.contains("/")) {
+                    try {
+                        String[] split = remark.split("/");
+                        remark = split[0];
+                        refNo = split[1];
+                    } catch (Exception ignored) {
+                    }
                 }
             }
+            sale.setTraderCode(rs.getString("t_user_code"));
             sale.setTraderName(rs.getString("trader_name"));
             sale.setRemark(remark);
             sale.setRefNo(refNo);
+            sale.setRfId(rs.getString("rfid"));
             sale.setVouNo(rs.getString("vou_no"));
             sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
             sale.setStockName(rs.getString("stock_name"));

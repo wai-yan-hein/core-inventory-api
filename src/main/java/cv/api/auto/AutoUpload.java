@@ -60,7 +60,6 @@ public class AutoUpload {
         if (!traders.isEmpty()) {
             log.info(String.format("uploadTrader: %s", traders.size()));
             traders.forEach(vou -> accountRepo.sendTrader(vou));
-
         }
     }
 

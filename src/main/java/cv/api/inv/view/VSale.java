@@ -19,6 +19,7 @@ public class VSale {
     private String sdCode;
     private String vouNo;
     private String traderCode;
+    private String rfId;
     private String saleManCode;
     private String vouDate;
     private String creditTerm;
