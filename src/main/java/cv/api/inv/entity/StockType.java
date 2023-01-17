@@ -44,6 +44,8 @@ public class StockType implements java.io.Serializable {
     private String intgUpdStatus;
 
 
+    public StockType() {
+    }
 
     public StockType(Date updatedDate) {
         this.updatedDate = updatedDate;

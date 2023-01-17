@@ -181,35 +181,30 @@ public class CloudMQReceiver {
     }
 
     private void save(SaleHis obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         saleHisService.save(obj);
     }
 
     private void save(TransferHis obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         transferHisService.save(obj);
     }
 
     private void save(RetInHis obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         retInService.save(obj);
     }
 
     private void save(RetOutHis obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         retOutService.save(obj);
     }
 
     private void save(PurHis obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         purHisService.save(obj);
@@ -221,8 +216,8 @@ public class CloudMQReceiver {
         String option = message.getString("OPTION");
         String data = message.getString("DATA");
         String senderQ = message.getString("SENDER_QUEUE");
-        String serverQ = userRepo.getProperty("cloud.activemq.server.queue");
-        if (senderQ.equals(serverQ)) {
+        String serverQ = userRepo.getProperty("cloud.activemq.inventory.server.queue");
+        if (serverQ.equals(listenQ)) {
             if (data != null) {
                 try {
                     log.info(String.format("receivedMessage : %s - %s - %s", entity, option, senderQ));
@@ -296,6 +291,9 @@ public class CloudMQReceiver {
             switch (entity) {
                 case "SALE" -> {
                     SaleHis obj = gson.fromJson(data, SaleHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
+                    }
                     switch (option) {
                         case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
@@ -305,31 +303,6 @@ public class CloudMQReceiver {
                         case "DELETE" -> saleHisService.delete(obj.getKey());
                         case "TRUNCATE" -> saleHisService.truncate(obj.getKey());
                         case "RESTORE" -> saleHisService.restore(obj.getKey());
-                    }
-                }
-                case "OPENING" -> {
-                    OPHis obj = gson.fromJson(data, OPHis.class);
-                    if (obj.getKey() != null) {
-                        obj.getKey().setDeptId(userRepo.getDeptId());
-                    }
-                    switch (option) {
-                        case "SAVE" -> {
-                            obj.setIntgUpdStatus(REC);
-                            opHisService.save(obj);
-                        }
-                        case "RECEIVE" -> {
-                            updateOpening(obj);
-                            log.info("opening voucher successfully delivered to server : " + obj.getKey().getVouNo());
-                        }
-                        case "REQUEST_TRAN" -> {
-                            List<OPHis> list = opHisService.search(Util1.toDateStr(obj.getUpdatedDate(), dateTimeFormat), obj.getKeys());
-                            if (!list.isEmpty()) {
-                                list.forEach(v -> responseTran(entity, senderQ, gson.toJson(v)));
-                            }
-                        }
-                        case "RESPONSE_TRAN" -> {
-                            opHisService.save(obj);
-                        }
                     }
                 }
                 case "PURCHASE" -> {
@@ -348,6 +321,9 @@ public class CloudMQReceiver {
                 }
                 case "RETURN_IN" -> {
                     RetInHis obj = gson.fromJson(data, RetInHis.class);
+                    if (obj.getKey() != null) {
+                        obj.getKey().setDeptId(userRepo.getDeptId());
+                    }
                     switch (option) {
                         case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
