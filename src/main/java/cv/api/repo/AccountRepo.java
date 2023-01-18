@@ -256,7 +256,11 @@ public class AccountRepo {
                     key.setCompCode(compCode);
                     key.setDeptId(deptId);
                     TraderGroup g = groupService.findById(key);
-                    srcAcc = g == null ? null : g.getAccount();
+                    if (g != null) {
+                        if (!Util1.isNullOrEmpty(g.getAccount())) {
+                            srcAcc = g.getAccount();
+                        }
+                    }
                     balAcc = t.getAccount();
                 }
                 List<Gl> listGl = new ArrayList<>();

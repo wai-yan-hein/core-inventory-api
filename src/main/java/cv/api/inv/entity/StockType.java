@@ -42,7 +42,6 @@ public class StockType implements java.io.Serializable {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
-
     public StockType() {
     }
 

@@ -44,21 +44,3 @@ ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
 ALTER TABLE `transfer_his` 
 ADD COLUMN `vou_lock` BIT(1) NOT NULL DEFAULT 0;
 
-
-
-
-
-
-
-update sale_his
-set vou_no =concat('02-',vou_no);
-update sale_his_detail
-set vou_no =concat('02-',vou_no);
-update ret_in_his
-set vou_no =concat('02-',vou_no);
-update ret_in_his_detail
-set vou_no =concat('02-',vou_no);
-update transfer_his
-set vou_no =concat('02-',vou_no);
-update transfer_his_detail
-set vou_no =concat('02-',vou_no);
