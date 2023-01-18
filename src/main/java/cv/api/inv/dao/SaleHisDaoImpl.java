@@ -92,7 +92,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update sale_his set deleted =1,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update sale_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSQL(sql);
     }
 
