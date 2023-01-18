@@ -75,7 +75,9 @@ public class RetInController {
     @PostMapping(path = "/delete-retin")
     public ResponseEntity<ReturnObject> deleteRI(@RequestBody RetInHisKey key) throws Exception {
         riService.delete(key);
-        ro.setMessage("Deleted.");
+        //delete in account
+        accountRepo.deleteInvVoucher(key);
+        //delete in cloud
         if (cloudMQSender != null) cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }
