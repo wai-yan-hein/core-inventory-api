@@ -115,6 +115,9 @@ public class SaleController {
     @PostMapping(path = "/delete-sale")
     public ResponseEntity<ReturnObject> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
+        //delete in account
+        accountRepo.deleteInvVoucher(key);
+        //delete in cloud
         if (cloudMQSender != null) cloudMQSender.delete(key);
         return ResponseEntity.ok(ro);
     }

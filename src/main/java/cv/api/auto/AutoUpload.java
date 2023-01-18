@@ -67,7 +67,13 @@ public class AutoUpload {
         List<SaleHis> vouchers = saleHisService.unUploadVoucher(syncDate);
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadSaleVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> accountRepo.sendSale(vou));
+            vouchers.forEach(vou -> {
+                if (vou.isDeleted()) {
+                    accountRepo.deleteInvVoucher(vou.getKey());
+                } else {
+                    accountRepo.sendSale(vou);
+                }
+            });
         }
     }
 
@@ -75,7 +81,13 @@ public class AutoUpload {
         List<PurHis> vouchers = purHisService.unUploadVoucher(syncDate);
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadPurchaseVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> accountRepo.sendPurchase(vou));
+            vouchers.forEach(vou -> {
+                if (vou.isDeleted()) {
+                    accountRepo.deleteInvVoucher(vou.getKey());
+                } else {
+                    accountRepo.sendPurchase(vou);
+                }
+            });
         }
     }
 
@@ -83,7 +95,13 @@ public class AutoUpload {
         List<RetInHis> vouchers = retInService.unUploadVoucher(syncDate);
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadReturnInVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> accountRepo.sendReturnIn(vou));
+            vouchers.forEach(vou -> {
+                if (vou.isDeleted()) {
+                    accountRepo.deleteInvVoucher(vou.getKey());
+                } else {
+                    accountRepo.sendReturnIn(vou);
+                }
+            });
         }
     }
 
@@ -91,7 +109,13 @@ public class AutoUpload {
         List<RetOutHis> vouchers = retOutService.unUploadVoucher(syncDate);
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadReturnOutVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> accountRepo.sendReturnOut(vou));
+            vouchers.forEach(vou -> {
+                if (vou.isDeleted()) {
+                    accountRepo.deleteInvVoucher(vou.getKey());
+                } else {
+                    accountRepo.sendReturnOut(vou);
+                }
+            });
         }
     }
 }

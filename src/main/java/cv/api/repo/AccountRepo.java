@@ -390,7 +390,7 @@ public class AccountRepo {
                 String compCode = ph.getKey().getCompCode();
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
-                boolean deleted = ph.getDeleted();
+                boolean deleted = ph.isDeleted();
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
                 String vouNo = ph.getKey().getVouNo();
@@ -497,7 +497,7 @@ public class AccountRepo {
                 String compCode = ri.getKey().getCompCode();
                 String curCode = ri.getCurCode();
                 String remark = ri.getRemark();
-                boolean deleted = ri.getDeleted();
+                boolean deleted = ri.isDeleted();
                 String vouNo = ri.getKey().getVouNo();
                 double vouBal = Util1.getDouble(ri.getBalance());
                 double vouPaid = Util1.getDouble(ri.getPaid());
@@ -576,7 +576,7 @@ public class AccountRepo {
                 String compCode = ro.getKey().getCompCode();
                 String curCode = ro.getCurCode();
                 String remark = ro.getRemark();
-                boolean deleted = ro.getDeleted();
+                boolean deleted = ro.isDeleted();
                 String vouNo = ro.getKey().getVouNo();
                 double vouBal = Util1.getDouble(ro.getBalance());
                 double vouPaid = Util1.getDouble(ro.getPaid());
@@ -638,6 +638,74 @@ public class AccountRepo {
                 }
                 sendAccount(listGl);
             }
+        }
+    }
+
+    public void deleteInvVoucher(SaleHisKey key) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(key.getCompCode());
+        gl.setKey(glKey);
+        gl.setTranSource("SALE");
+        gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+    public void deleteInvVoucher(PurHisKey key) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(key.getCompCode());
+        gl.setKey(glKey);
+        gl.setTranSource("PURCHASE");
+        gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+    public void deleteInvVoucher(RetInHisKey key) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(key.getCompCode());
+        gl.setKey(glKey);
+        gl.setTranSource("RETURN_IN");
+        gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+    public void deleteInvVoucher(RetOutHisKey key) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(key.getCompCode());
+        gl.setKey(glKey);
+        gl.setTranSource("RETURN_OUT");
+        gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+    public void deleteGlByVoucher(Gl gl) {
+        try {
+            Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher")
+                    .body(Mono.just(gl), Gl.class)
+                    .retrieve().bodyToMono(String.class);
+            result.block();
+            String vouNo = gl.getRefNo();
+            String compCode = gl.getKey().getCompCode();
+            switch (gl.getTranSource()) {
+                case "SALE" -> updateSale(vouNo, compCode);
+                case "PURCHASE" -> updatePurchase(vouNo, compCode);
+                case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
+                case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+            }
+        } catch (Exception e) {
+            String vouNo = gl.getRefNo();
+            String compCode = gl.getKey().getCompCode();
+            String tranSource = gl.getTranSource();
+            switch (tranSource) {
+                case "SALE" -> updateSaleNull(vouNo, compCode);
+                case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
+                case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
+                case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+            }
+            log.error("deleteGlByVoucher : " + e.getMessage());
         }
     }
 }

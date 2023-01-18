@@ -30,7 +30,7 @@ public class RetInHis implements java.io.Serializable {
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "deleted")
-    private Boolean deleted;
+    private boolean deleted;
     @Column(name = "vou_total")
     private Float vouTotal;
     @Column(name = "paid")
