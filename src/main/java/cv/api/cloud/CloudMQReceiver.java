@@ -85,130 +85,6 @@ public class CloudMQReceiver {
     @Autowired
     private AccountRepo accountRepo;
 
-    private void responseFile(String option, Object data, String queue) {
-        String path = String.format("temp%s%s", File.separator, option + ".json");
-        try {
-            Util1.writeJsonFile(data, path);
-            byte[] file = Util1.zipJsonFile(path);
-            MessageCreator mc = (Session session) -> {
-                MapMessage mm = session.createMapMessage();
-                mm.setString("SENDER_QUEUE", listenQ);
-                mm.setString("ENTITY", "FILE");
-                mm.setString("OPTION", option);
-                mm.setBytes("DATA_FILE", file);
-                return mm;
-            };
-            if (queue != null) {
-                cloudMQTemplate.send(queue, mc);
-            }
-        } catch (IOException e) {
-            log.error("File Message : " + e.getMessage());
-        }
-    }
-
-    private void responseTran(String entity, String distQ, String data) {
-        MessageCreator mc = (Session session) -> {
-            MapMessage mm = session.createMapMessage();
-            mm.setString("ENTITY", entity);
-            mm.setString("OPTION", "RESPONSE_TRAN");
-            mm.setString("DATA", data);
-            return mm;
-        };
-        if (distQ != null) {
-            cloudMQTemplate.send(distQ, mc);
-            log.info("responseTran : " + entity);
-        }
-    }
-
-    private void save(VouStatus obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        vouStatusService.save(obj);
-    }
-
-    private void save(UnitRelation obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        relationService.save(obj);
-    }
-
-    private void save(Trader obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        traderService.saveTrader(obj);
-        accountRepo.sendTrader(obj);
-    }
-
-    private void save(StockUnit obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        unitService.save(obj);
-    }
-
-    private void save(StockType obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        typeService.save(obj);
-    }
-
-    private void save(StockBrand obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        brandService.save(obj);
-    }
-
-    private void save(Category obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        categoryService.save(obj);
-    }
-
-    private void save(SaleMan obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        saleManService.save(obj);
-    }
-
-    private void save(Location obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        locationService.save(obj);
-    }
-
-    private void save(Stock obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
-        obj.setIntgUpdStatus(REC);
-        stockService.save(obj);
-    }
-
-    private void save(SaleHis obj) {
-        obj.setIntgUpdStatus(REC);
-        obj.setVouLock(true);
-        saleHisService.save(obj);
-    }
-
-    private void save(TransferHis obj) {
-        obj.setIntgUpdStatus(REC);
-        obj.setVouLock(true);
-        transferHisService.save(obj);
-    }
-
-    private void save(RetInHis obj) {
-        obj.setIntgUpdStatus(REC);
-        obj.setVouLock(true);
-        retInService.save(obj);
-    }
-
-    private void save(RetOutHis obj) {
-        obj.setIntgUpdStatus(REC);
-        obj.setVouLock(true);
-        retOutService.save(obj);
-    }
-
-    private void save(PurHis obj) {
-        obj.setIntgUpdStatus(REC);
-        obj.setVouLock(true);
-        purHisService.save(obj);
-    }
 
     @JmsListener(destination = "INV_MSG", containerFactory = "topicContainerFactory")
     public void receivedTopicMessage(final MapMessage message) throws JMSException {
@@ -1000,5 +876,132 @@ public class CloudMQReceiver {
         String sql = "update stock_in_out set intg_upd_status ='" + SAVE + "'\n"
                 + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
         service.executeSql(sql);
+    }
+
+    private void responseFile(String option, Object data, String queue) {
+        String path = String.format("temp%s%s", File.separator, option + ".json");
+        try {
+            Util1.writeJsonFile(data, path);
+            byte[] file = Util1.zipJsonFile(path);
+            MessageCreator mc = (Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                mm.setString("SENDER_QUEUE", listenQ);
+                mm.setString("ENTITY", "FILE");
+                mm.setString("OPTION", option);
+                mm.setBytes("DATA_FILE", file);
+                return mm;
+            };
+            if (queue != null) {
+                cloudMQTemplate.send(queue, mc);
+            }
+        } catch (IOException e) {
+            log.error("File Message : " + e.getMessage());
+        }
+    }
+
+    private void responseTran(String entity, String distQ, String data) {
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("ENTITY", entity);
+            mm.setString("OPTION", "RESPONSE_TRAN");
+            mm.setString("DATA", data);
+            return mm;
+        };
+        if (distQ != null) {
+            cloudMQTemplate.send(distQ, mc);
+            log.info("responseTran : " + entity);
+        }
+    }
+
+    private void save(VouStatus obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        vouStatusService.save(obj);
+    }
+
+    private void save(UnitRelation obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        relationService.save(obj);
+    }
+
+    private void save(Trader obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        traderService.saveTrader(obj);
+        accountRepo.sendTrader(obj);
+    }
+
+    private void save(StockUnit obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        unitService.save(obj);
+    }
+
+    private void save(StockType obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        typeService.save(obj);
+    }
+
+    private void save(StockBrand obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        brandService.save(obj);
+    }
+
+    private void save(Category obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        categoryService.save(obj);
+    }
+
+    private void save(SaleMan obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        saleManService.save(obj);
+    }
+
+    private void save(Location obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        locationService.save(obj);
+    }
+
+    private void save(Stock obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        stockService.save(obj);
+    }
+
+    private void save(SaleHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
+        saleHisService.save(obj);
+    }
+
+    private void save(TransferHis obj) {
+        obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
+        transferHisService.save(obj);
+    }
+
+    private void save(RetInHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
+        retInService.save(obj);
+    }
+
+    private void save(RetOutHis obj) {
+        obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
+        retOutService.save(obj);
+    }
+
+    private void save(PurHis obj) {
+        obj.setIntgUpdStatus(REC);
+        obj.setVouLock(true);
+        purHisService.save(obj);
     }
 }
