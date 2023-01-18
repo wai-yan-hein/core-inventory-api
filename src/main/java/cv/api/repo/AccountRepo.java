@@ -81,7 +81,6 @@ public class AccountRepo {
         String sql = "update sale_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateSale: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateSale: %s", e.getMessage()));
         }

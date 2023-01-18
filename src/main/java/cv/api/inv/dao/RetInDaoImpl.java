@@ -125,7 +125,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
 
     @Override
     public List<RetInHis> unUpload(String syncDate) {
-        String hsql = "select o from RetInHis o where o.intgUpdStatus ='ACK' and date(o.vouDate) >= '" + syncDate + "'";
+        String hsql = "select o from RetInHis o where (o.intgUpdStatus ='ACK' or o.intgUpdStatus is null) and date(o.vouDate) >= '" + syncDate + "'";
         List<RetInHis> list = findHSQL(hsql);
         list.forEach((o) -> {
             String vouNo = o.getKey().getVouNo();

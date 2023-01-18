@@ -775,7 +775,7 @@ public class CloudMQReceiver {
                         }
                         case "RETURN_OUT_RESPONSE" -> {
                             assert reader != null;
-                            List<RetOutHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetInHis>>() {
+                            List<RetOutHis> list = gson.fromJson(reader, new TypeToken<ArrayList<RetOutHis>>() {
                             }.getType());
                             if (!list.isEmpty()) {
                                 log.info("return out list size : " + list.size());
