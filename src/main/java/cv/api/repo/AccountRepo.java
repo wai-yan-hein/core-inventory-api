@@ -71,7 +71,7 @@ public class AccountRepo {
         String sql = "update sale_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateSale: %s", vouNo));
+            //log.info(String.format("updateSale: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateSale: %s", e.getMessage()));
         }
@@ -90,7 +90,7 @@ public class AccountRepo {
         String sql = "update pur_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updatePurchase: %s", vouNo));
+            //log.info(String.format("updatePurchase: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updatePurchase: %s", e.getMessage()));
         }
@@ -100,7 +100,7 @@ public class AccountRepo {
         String sql = "update pur_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updatePurchase: %s", vouNo));
+            //log.info(String.format("updatePurchase: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updatePurchase: %s", e.getMessage()));
         }
@@ -110,7 +110,7 @@ public class AccountRepo {
         String sql = "update ret_in_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateReturnIn: %s", vouNo));
+            //log.info(String.format("updateReturnIn: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateReturnIn: %s", e.getMessage()));
         }
@@ -120,7 +120,7 @@ public class AccountRepo {
         String sql = "update ret_in_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateReturnIn: %s", vouNo));
+            //log.info(String.format("updateReturnIn: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateReturnIn: %s", e.getMessage()));
         }
@@ -130,7 +130,7 @@ public class AccountRepo {
         String sql = "update ret_out_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateReturnOut: %s", vouNo));
+            //log.info(String.format("updateReturnOut: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateReturnOut: %s", e.getMessage()));
         }
@@ -140,7 +140,7 @@ public class AccountRepo {
         String sql = "update ret_out_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateReturnOut: %s", vouNo));
+            //log.info(String.format("updateReturnOut: %s", vouNo));
         } catch (Exception e) {
             log.error(String.format("updateReturnOut: %s", e.getMessage()));
         }
@@ -150,7 +150,7 @@ public class AccountRepo {
         String sql = "update trader set intg_upd_status = '" + ACK + "',account = '" + account + "' where code ='" + traderCode + "' and comp_code='" + compCode + "'";
         try {
             reportService.executeSql(sql);
-            log.info(String.format("updateTrader: %s", traderCode));
+            //log.info(String.format("updateTrader: %s", traderCode));
         } catch (Exception e) {
             log.error(String.format("updateTrader: %s", e.getMessage()));
         }
