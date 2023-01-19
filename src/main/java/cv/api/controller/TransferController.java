@@ -62,13 +62,12 @@ public class TransferController {
         String refNo = Util1.isNull(filter.getRefNo(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String locCodeTo = Util1.isNull(filter.getLocCodeTo(), "-");
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         List<VTransfer> listStockIO = reportService.getTransferHistory(fromDate, toDate, refNo,
                 vouNo, remark, userCode,
-                stockCode, locCode, locCodeTo, compCode, deptId, deleted);
+                stockCode, locCode, compCode, deptId, deleted);
         return ResponseEntity.ok(listStockIO);
     }
 
