@@ -503,7 +503,7 @@ public class CloudMQReceiver {
                             }.getType());
                             if (!list.isEmpty()) {
                                 list.forEach(this::updateSale);
-                                log.info("sale voucher successfully delivered to server : " + list.size());
+                                log.info("sale voucher successfully sent to " + senderQ + " : " + list.size());
                             }
                         }
                         case "PURCHASE_REQUEST" -> {

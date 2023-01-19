@@ -31,10 +31,14 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
         String sql = "select td.*,s.stock_name,rel.rel_name\n" +
                 "from transfer_his_detail td \n" +
                 "join stock s on td.stock_code = s.stock_code\n" +
+                "and td.comp_code = s.comp_code\n" +
+                "and td.dept_id = s.dept_id\n" +
                 "join unit_relation rel on s.rel_code = rel.rel_code\n" +
-                "where td.vou_no ='" + vouNo + "'\n" +
-                "and td.comp_code ='" + compCode + "'\n" +
-                "and td.dept_id = " + deptId + "\n" +
+                "and td.comp_code = rel.comp_code\n" +
+                "and td.dept_id = rel.dept_id\n" +
+                "where td.vou_no ='"+vouNo+"'\n" +
+                "and td.comp_code ='"+compCode+"'\n" +
+                "and td.dept_id = "+deptId+"\n" +
                 "order by td.unique_id";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {
