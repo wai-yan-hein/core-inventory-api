@@ -143,4 +143,11 @@ public class SaleController {
         List<SaleHisDetail> listSD = sdService.search(vouNo, compCode, deptId);
         return ResponseEntity.ok(listSD);
     }
+
+    @GetMapping(path = "/get-sale-voucher-info")
+    public ResponseEntity<?> getSaleVoucherCount(@RequestParam String vouDate,
+                                                 @RequestParam String compCode,
+                                                 @RequestParam Integer deptId) {
+        return ResponseEntity.ok(shService.getVoucherInfo(vouDate, compCode, deptId));
+    }
 }

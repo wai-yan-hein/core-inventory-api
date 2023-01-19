@@ -5,6 +5,7 @@
  */
 package cv.api.inv.service;
 
+import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.inv.dao.SaleHisDao;
 import cv.api.inv.dao.SaleHisDetailDao;
@@ -132,5 +133,10 @@ public class SaleHisServiceImpl implements SaleHisService {
     @Override
     public void truncate(SaleHisKey key) {
         shDao.truncate(key);
+    }
+
+    @Override
+    public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
+        return shDao.getVoucherInfo(vouDate, compCode, depId);
     }
 }

@@ -5,6 +5,7 @@
  */
 package cv.api.inv.service;
 
+import cv.api.common.General;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
 
@@ -39,4 +40,6 @@ public interface SaleHisService {
     List<SaleHis> search(String updatedDate, List<String> keys);
 
     void truncate(SaleHisKey key);
+
+    General getVoucherInfo(String vouDate, String compCode, Integer depId);
 }

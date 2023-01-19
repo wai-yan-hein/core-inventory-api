@@ -5,6 +5,7 @@
  */
 package cv.api.inv.dao;
 
+import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.inv.entity.SaleHis;
 import cv.api.inv.entity.SaleHisKey;
@@ -214,5 +215,26 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String sql1 = "delete from sale_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
         String sql2 = "delete from sale_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
         execSQL(sql1, sql2);
+    }
+
+    @Override
+    public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
+        General g = new General();
+        String sql = "select count(*) vou_count,sum(paid) paid\n" +
+                "from sale_his\n" +
+                "where deleted =0\n" +
+                "and date(vou_date)='" + vouDate + "'\n" +
+                "and comp_code='" + compCode + "'\n" +
+                "and dept_id ='" + depId + "'";
+        try {
+            ResultSet rs = getResultSet(sql);
+            if (rs.next()) {
+                g.setQty(rs.getInt("vou_count"));
+                g.setAmount(rs.getFloat("paid"));
+            }
+        } catch (Exception e) {
+            log.error("getVoucherCount : " + e.getMessage());
+        }
+        return g;
     }
 }

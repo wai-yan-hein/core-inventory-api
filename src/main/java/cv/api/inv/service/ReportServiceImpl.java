@@ -1592,7 +1592,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode,
                                       String vouNo, String remark, String reference, String userCode, String stockCode,
                                       String locCode, String compCode, Integer deptId, String deleted) throws Exception {
-        String sql = "select a.*,t.trader_name\n"
+        String sql = "select a.*,t.trader_name,t.user_code\n"
                 + "from (\n"
                 + "select  vou_no,date(vou_date) vou_date,remark,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
                 + "from v_sale s \n"
@@ -1619,6 +1619,7 @@ public class ReportServiceImpl implements ReportService {
                 VSale s = new VSale();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
+                s.setTraderCode(rs.getString("user_code"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setRemark(rs.getString("remark"));
                 s.setCreatedBy(rs.getString("created_by"));
