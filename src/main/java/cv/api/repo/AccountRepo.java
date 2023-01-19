@@ -174,10 +174,10 @@ public class AccountRepo {
                 switch (traderType) {
                     case "CUS" -> {
                         accTrader.setTraderType("C");
-                        accTrader.setAccCode(Util1.isNull(t.getAccount(), getCustomerAcc(key.getCompCode())));
+                        accTrader.setAccount(Util1.isNull(t.getAccount(), getCustomerAcc(key.getCompCode())));
                     }
                     case "SUP" -> {
-                        accTrader.setAccCode(Util1.isNull(t.getAccount(), getSupplierAcc(key.getCompCode())));
+                        accTrader.setAccount(Util1.isNull(t.getAccount(), getSupplierAcc(key.getCompCode())));
                         accTrader.setTraderType("S");
                     }
                     default -> accTrader.setTraderType("D");
@@ -190,7 +190,7 @@ public class AccountRepo {
                             .doOnError((e) -> log.error(e.getMessage()));
                     AccTrader trader = result.block();
                     assert trader != null;
-                    updateTrader(trader.getKey().getCode(), trader.getAccCode(), trader.getKey().getCompCode());
+                    updateTrader(trader.getKey().getCode(), trader.getAccount(), trader.getKey().getCompCode());
                 } catch (Exception e) {
                     log.error("sendTrader : " + e.getMessage());
                 }
@@ -260,7 +260,9 @@ public class AccountRepo {
                             srcAcc = g.getAccount();
                         }
                     }
-                    balAcc = t.getAccount();
+                    if (!Util1.isNullOrEmpty(t.getAccount())) {
+                        balAcc = t.getAccount();
+                    }
                 }
                 List<Gl> listGl = new ArrayList<>();
                 //income
