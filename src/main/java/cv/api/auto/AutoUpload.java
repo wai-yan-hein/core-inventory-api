@@ -38,7 +38,7 @@ public class AutoUpload {
     @Autowired
     private Environment environment;
 
-    @Scheduled(fixedRate = 1000000)
+    @Scheduled(fixedRate = 5 * 60 * 1000)
     private void autoUpload() {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             if (!syncing) {
@@ -74,6 +74,7 @@ public class AutoUpload {
                     accountRepo.sendSale(vou);
                 }
             });
+            log.info(String.format("uploadSaleVoucher: %s", "done"));
         }
     }
 
