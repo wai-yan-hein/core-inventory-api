@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -53,6 +54,10 @@ public class OPHis implements java.io.Serializable {
     private String status = "STATUS";
     @Transient
     private List<LocationKey> keys;
+    @Transient
+    private String locName;
+    @Transient
+    private String vouDateStr;
 
     public OPHis() {
     }

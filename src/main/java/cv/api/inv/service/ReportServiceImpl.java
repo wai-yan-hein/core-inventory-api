@@ -1430,34 +1430,55 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode) throws Exception {
-        List<VOpening> openings = new ArrayList<>();
-        String sql = "select v.op_date,v.vou_no,v.remark,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n" + "v.unit,v.qty,v.price,v.amount\n" + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n" + "where v.deleted = 0\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and v.loc_code in (select f_code from f_location where mac_id = " + macId + ")\n" + "and v.comp_code ='" + compCode + "' order by l.loc_name,v.stock_user_code\n";
+    public List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode,
+                                               String stockCode, Integer macId, String compCode, Integer deptId) throws Exception {
+        List<VOpening> list = new ArrayList<>();
+        String sql = "select v.op_date,v.vou_no,v.remark,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n"
+                + "v.unit,v.qty,v.price,v.amount,v.comp_code,v.dept_id\n"
+                + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n"
+                + "where v.deleted = 0\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
+                + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
+                + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
+                + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
+                + "and v.loc_code in (select f_code from f_location where mac_id = " + macId + ")\n"
+                + "and v.comp_code ='" + compCode + "'\n"
+                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
+                + "order by l.loc_name,v.stock_user_code\n";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VOpening opening = new VOpening();
-                opening.setVouDate(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
-                opening.setVouNo(rs.getString("vou_no"));
-                opening.setRemark(rs.getString("remark"));
-                opening.setStockCode(rs.getString("stock_code"));
-                opening.setUnit(rs.getString("unit"));
-                opening.setStockUserCode(rs.getString("stock_user_code"));
-                opening.setStockName(rs.getString("stock_name"));
-                opening.setLocationName(rs.getString("loc_name"));
-                opening.setQty(rs.getFloat("qty"));
-                opening.setPrice(rs.getFloat("price"));
-                opening.setAmount(rs.getFloat("amount"));
-                openings.add(opening);
+                VOpening op = new VOpening();
+                op.setVouDate(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
+                op.setRemark(rs.getString("remark"));
+                op.setStockCode(rs.getString("stock_code"));
+                op.setUnit(rs.getString("unit"));
+                op.setStockUserCode(rs.getString("stock_user_code"));
+                op.setStockName(rs.getString("stock_name"));
+                op.setLocationName(rs.getString("loc_name"));
+                op.setQty(rs.getFloat("qty"));
+                op.setPrice(rs.getFloat("price"));
+                op.setAmount(rs.getFloat("amount"));
+                list.add(op);
             }
         }
-        return openings;
+        return list;
     }
 
     @Override
-    public List<VOpening> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode) throws Exception {
+    public List<VOpening> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode, Integer deptId) throws Exception {
         List<VOpening> openings = new ArrayList<>();
-        String sql = "select a.*,t.stock_type_name\n" + "from (select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n" + "unit,qty,price,amount \n" + "from v_opening v join location l \n" + "on v.loc_code = l.loc_code\n" + "where v.deleted = 0 \n" + "and v.comp_code = '" + compCode + "'\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n" + "join stock_type t on a.stock_type_code = t.stock_type_code\n" + "order by t.stock_type_name,a.stock_user_code";
+        String sql = "select a.*,t.stock_type_name\n"
+                + "from (select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n"
+                + "unit,qty,price,amount \n" + "from v_opening v join location l \n"
+                + "on v.loc_code = l.loc_code\n" + "where v.deleted = 0 \n"
+                + "and v.comp_code = '" + compCode + "'\n"
+                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
+                + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
+                + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
+                + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
+                + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n"
+                + "join stock_type t on a.stock_type_code = t.stock_type_code\n"
+                + "order by t.stock_type_name,a.stock_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1762,9 +1783,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOpening> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode,
-                                            String stockCode, String locCode, String compCode, Integer deptId) throws Exception {
-        String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name \n"
+    public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode,
+                                         String stockCode, String locCode, String compCode, Integer deptId) throws Exception {
+        String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n"
                 + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n"
                 + "where v.comp_code = '" + compCode + "'\n"
                 + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
@@ -1777,22 +1798,25 @@ public class ReportServiceImpl implements ReportService {
                 + "group by v.vou_no\n"
                 + "order by v.op_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
-        List<VOpening> openingList = new ArrayList<>();
+        List<OPHis> list = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VOpening s = new VOpening();
-                s.setAmount(rs.getFloat("amount"));
-                s.setVouDate(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
+                OPHis s = new OPHis();
+                OPHisKey key = new OPHisKey();
+                key.setCompCode(rs.getString("comp_code"));
+                key.setVouNo(rs.getString("vou_no"));
+                key.setDeptId(rs.getInt("dept_id"));
+                s.setKey(key);
+                s.setOpAmt(rs.getFloat("amount"));
+                s.setVouDateStr(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
                 s.setRemark(rs.getString("remark"));
                 s.setCreatedBy(rs.getString("created_by"));
                 s.setDeleted(rs.getBoolean("deleted"));
-                s.setLocationName(rs.getString("loc_name"));
-                s.setDeptId(deptId);
-                openingList.add(s);
+                s.setLocName(rs.getString("loc_name"));
+                list.add(s);
             }
         }
-        return openingList;
+        return list;
     }
 
     @Override

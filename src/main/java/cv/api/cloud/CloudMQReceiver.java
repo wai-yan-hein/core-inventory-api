@@ -688,6 +688,33 @@ public class CloudMQReceiver {
 
                             }
                         }
+                        case "STOCK_IO_UPLOAD" -> {
+                            assert reader != null;
+                            List<StockInOut> objList = new ArrayList<>();
+                            List<StockInOut> list = gson.fromJson(reader, new TypeToken<ArrayList<StockInOut>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                log.info("stock in out upload list size : " + list.size() + " from " + senderQ);
+                                for (StockInOut obj : list) {
+                                    save(obj);
+                                    StockInOut sh = new StockInOut();
+                                    sh.setKey(obj.getKey());
+                                    objList.add(sh);
+                                }
+                                log.info("stock in out upload done from " + senderQ);
+                                responseFile("STOCK_IO_RECEIVED", objList, senderQ);
+                            }
+                        }
+                        case "STOCK_IO_RECEIVED" -> {
+                            assert reader != null;
+                            List<StockInOut> list = gson.fromJson(reader, new TypeToken<ArrayList<StockInOut>>() {
+                            }.getType());
+                            if (!list.isEmpty()) {
+                                list.forEach(this::updateStockIO);
+                                log.info("stock in out voucher successfully delivered to server : " + list.size());
+
+                            }
+                        }
                     }
 
                 }
@@ -858,6 +885,18 @@ public class CloudMQReceiver {
         }
     }
 
+    private void updateStockIO(StockInOut obj) {
+        StockIOKey key = obj.getKey();
+        Integer deptId = userRepo.getDeptId();
+        String sql = "update stock_in_out set intg_upd_status ='" + SAVE + "'\n"
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
+        try {
+            service.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updateStockIO : " + e.getMessage());
+        }
+    }
+
     private void updateTransfer(TransferHis obj) {
         TransferHisKey key = obj.getKey();
         Integer deptId = userRepo.getDeptId();
@@ -868,14 +907,6 @@ public class CloudMQReceiver {
         } catch (Exception e) {
             log.error("updateTransfer : " + e.getMessage());
         }
-    }
-
-    private void updateStockIO(StockInOut obj) throws Exception {
-        StockIOKey key = obj.getKey();
-        Integer deptId = userRepo.getDeptId();
-        String sql = "update stock_in_out set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
-        service.executeSql(sql);
     }
 
     private void responseFile(String option, Object data, String queue) {
@@ -1003,5 +1034,11 @@ public class CloudMQReceiver {
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         purHisService.save(obj);
+    }
+
+    private void save(StockInOut obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
+        obj.setIntgUpdStatus(REC);
+        inOutService.save(obj);
     }
 }

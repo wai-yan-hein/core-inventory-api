@@ -12,7 +12,6 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
-import cv.api.inv.view.VOpening;
 import cv.api.model.AccTraderKey;
 import cv.api.repo.AccountRepo;
 import lombok.SneakyThrows;
@@ -463,7 +462,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/get-opening")
-    public ResponseEntity<List<VOpening>> getOpening(@RequestBody FilterObject filter) throws Exception {
+    public ResponseEntity<?> getOpening(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -473,7 +472,7 @@ public class SetupController {
         String remark = Util1.isNull(filter.getRemark(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
-        List<VOpening> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode, deptId);
+        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode, deptId);
         return ResponseEntity.ok(opHisList);
     }
 

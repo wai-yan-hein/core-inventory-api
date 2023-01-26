@@ -72,6 +72,8 @@ public class CloudMQSender {
     @Autowired
     private TransferHisService transferHisService;
     @Autowired
+    private StockInOutService inOutService;
+    @Autowired
     private UserRepo userRepo;
     private final HashMap<String, String> hmQueue = new HashMap<>();
     private boolean client;
@@ -307,8 +309,8 @@ public class CloudMQSender {
         uploadPurchase();
         uploadReturnIn();
         uploadReturnOut();
-        //uploadStockInOut();
         uploadTransfer();
+        uploadStockInOut();
         info("upload transaction end.");
     }
 
@@ -472,6 +474,14 @@ public class CloudMQSender {
         TransferHis obj = new TransferHis();
         obj.setKey(key);
         restoreMessage("TRANSFER", gson.toJson(obj), getQueue(transferHisService.findById(key)));
+    }
+
+    private void uploadStockInOut() {
+        List<StockInOut> list = inOutService.unUpload(Util1.toDateStr(Util1.getSyncDate(), "yyyy-MM-dd"));
+        if (!list.isEmpty()) {
+            log.info("upload stock in out : " + list.size());
+            uploadFile("STOCK_IO_UPLOAD", list, serverQ);
+        }
     }
 
     public String getQueue(TransferHis th) {
