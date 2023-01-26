@@ -34,7 +34,7 @@ public class StockInOutServiceImpl implements StockInOutService {
     private SeqTableDao seqDao;
 
     @Override
-    public StockInOut save(StockInOut io) throws Exception {
+    public StockInOut save(StockInOut io) {
         io.setVouDate(Util1.toDateTime(io.getVouDate()));
         if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
             io.getKey().setVouNo(getVoucherNo(io.getKey().getDeptId(), io.getMacId(), io.getKey().getCompCode()));

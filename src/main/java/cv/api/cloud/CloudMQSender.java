@@ -303,19 +303,12 @@ public class CloudMQSender {
     }
 
     private void uploadTransaction() {
-        //info("upload transaction start.");
-        //uploadOpening();
         uploadSale();
         uploadPurchase();
         uploadReturnIn();
         uploadReturnOut();
         uploadTransfer();
-<<<<<<< HEAD
-        //info("upload transaction end.");
-=======
         uploadStockInOut();
-        info("upload transaction end.");
->>>>>>> d5decbec1dada4df3496e693a087beacb944af01
     }
 
     private void uploadSale() {
