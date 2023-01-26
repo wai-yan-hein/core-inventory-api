@@ -84,7 +84,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
             for (String locCode : location) {
                 //vou_no, created_by, created_date, deleted, vou_date, ref_no, remark, updated_by,
                 // updated_date, loc_code_from, loc_code_to, mac_id, comp_code, dept_id, intg_upd_status
-                String sql = "select * from transfer_his where (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "') and updated_date >'" + updatedDate + "'";
+                String sql = "select * from transfer_his where (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "') and intg_upd_status is null";
                 try {
                     ResultSet rs = getResultSet(sql);
                     if (rs != null) {

@@ -981,6 +981,7 @@ public class CloudMQReceiver {
     }
 
     private void save(TransferHis obj) {
+        obj.getKey().setDeptId(userRepo.getDeptId());
         obj.setIntgUpdStatus(REC);
         obj.setVouLock(true);
         transferHisService.save(obj);

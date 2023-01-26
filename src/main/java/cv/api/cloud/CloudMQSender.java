@@ -301,7 +301,7 @@ public class CloudMQSender {
     }
 
     private void uploadTransaction() {
-        info("upload transaction start.");
+        //info("upload transaction start.");
         //uploadOpening();
         uploadSale();
         uploadPurchase();
@@ -309,7 +309,7 @@ public class CloudMQSender {
         uploadReturnOut();
         //uploadStockInOut();
         uploadTransfer();
-        info("upload transaction end.");
+        //info("upload transaction end.");
     }
 
     private void uploadSale() {

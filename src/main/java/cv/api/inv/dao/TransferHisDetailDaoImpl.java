@@ -28,7 +28,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
     @Override
     public List<TransferHisDetail> search(String vouNo, String compCode, Integer deptId) {
         List<TransferHisDetail> list = new ArrayList<>();
-        String sql = "select td.*,s.stock_name,rel.rel_name\n" +
+        String sql = "select td.*,s.user_code,s.stock_name,rel.rel_name\n" +
                 "from transfer_his_detail td \n" +
                 "join stock s on td.stock_code = s.stock_code\n" +
                 "and td.comp_code = s.comp_code\n" +
@@ -51,6 +51,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
                     key.setVouNo(rs.getString("vou_no"));
                     key.setTdCode(rs.getString("td_code"));
                     td.setKey(key);
+                    td.setUserCode(rs.getString("user_code"));
                     td.setStockCode(rs.getString("stock_code"));
                     td.setStockName(rs.getString("stock_name"));
                     td.setCompCode(rs.getString("comp_code"));
