@@ -72,12 +72,19 @@ public class AutoUpload {
                     accountRepo.deleteInvVoucher(vou.getKey());
                 } else {
                     accountRepo.sendSale(vou);
-                }
+                    sleep();
+                                    }
             });
             log.info(String.format("uploadSaleVoucher: %s", "done"));
         }
     }
-
+    private void sleep() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+    }
     private void uploadPurchaseVoucher() {
         List<PurHis> vouchers = purHisService.unUploadVoucher(syncDate);
         if (!vouchers.isEmpty()) {
