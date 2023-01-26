@@ -179,11 +179,11 @@ public class ReportController {
                         Util1.writeJsonFile(general, exportPath);
                     }
                     case "OpeningByLocation" -> {
-                        List<VOpening> opening = reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode);
+                        List<VOpening> opening = reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode, deptId);
                         Util1.writeJsonFile(opening, exportPath);
                     }
                     case "OpeningByGroup" -> {
-                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode);
+                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode,deptId);
                         Util1.writeJsonFile(opGroup, exportPath);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {

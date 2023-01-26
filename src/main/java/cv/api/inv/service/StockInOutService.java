@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface StockInOutService {
 
-    StockInOut save(StockInOut io) throws Exception;
+    StockInOut save(StockInOut io);
 
     List<StockInOut> search(String fromDate, String toDate, String remark, String desp,
                             String vouNo, String userCode, String vouStatus);
