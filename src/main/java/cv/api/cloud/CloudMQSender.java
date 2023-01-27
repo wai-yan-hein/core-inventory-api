@@ -303,12 +303,12 @@ public class CloudMQSender {
     }
 
     private void uploadTransaction() {
+        uploadStockInOut();
         uploadSale();
         uploadPurchase();
         uploadReturnIn();
         uploadReturnOut();
         uploadTransfer();
-        uploadStockInOut();
     }
 
     private void uploadSale() {
