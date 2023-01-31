@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cv.api.controller;
 
 import cv.api.cloud.CloudMQSender;
@@ -14,7 +10,6 @@ import cv.api.inv.entity.*;
 import cv.api.inv.service.*;
 import cv.api.model.AccTraderKey;
 import cv.api.repo.AccountRepo;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -73,6 +68,8 @@ public class SetupController {
     private FontService fontService;
     @Autowired
     private TraderGroupService traderGroupService;
+    @Autowired
+    private GRNService batchService;
     @Autowired
     private ConverterService converterService;
     @Autowired
@@ -241,9 +238,8 @@ public class SetupController {
         return ResponseEntity.ok(b);
     }
 
-    @SneakyThrows
     @PostMapping(path = "/save-unit")
-    public ResponseEntity<StockUnit> saveUnit(@RequestBody StockUnit unit, HttpServletRequest request) {
+    public ResponseEntity<StockUnit> saveUnit(@RequestBody StockUnit unit) {
         unit.setUpdatedDate(Util1.getTodayDate());
         StockUnit b = unitService.save(unit);
         //send to cloud
@@ -593,5 +589,22 @@ public class SetupController {
     public ResponseEntity<?> convertToUniCode() {
         converterService.convertToUnicode();
         return ResponseEntity.ok("converted.");
+    }
+
+    @PostMapping(path = "/save-batch")
+    public ResponseEntity<?> saveBatch(@RequestBody GRN b) {
+        return ResponseEntity.ok(batchService.save(b));
+    }
+
+    @PostMapping(path = "/delete-batch")
+    public ResponseEntity<ReturnObject> deleteBatch(@RequestBody GRNKey key) {
+        batchService.delete(key);
+        ro.setMessage("Deleted.");
+        return ResponseEntity.ok(ro);
+    }
+
+    @GetMapping(path = "/get-batch")
+    public ResponseEntity<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return ResponseEntity.ok(batchService.findAll(compCode, deptId));
     }
 }

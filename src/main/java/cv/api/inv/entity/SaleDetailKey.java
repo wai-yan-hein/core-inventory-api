@@ -18,18 +18,16 @@ import java.io.Serializable;
 @Embeddable
 public class SaleDetailKey implements Serializable {
 
-    @Column(name = "vou_no")
-    private String vouNo;
+
     @Column(name = "sd_code")
     private String sdCode;
+    @Column(name = "comp_code")
+    private String compCode;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "unique_id")
+    private Integer uniqueId;
 
-    public SaleDetailKey(String vouNo, String sdCode, Integer deptId) {
-        this.vouNo = vouNo;
-        this.sdCode = sdCode;
-        this.deptId = deptId;
-    }
 
     public SaleDetailKey() {
     }
