@@ -61,10 +61,12 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 while (rs.next()) {
                     SaleHisDetail op = new SaleHisDetail();
                     SaleDetailKey key = new SaleDetailKey();
-                    key.setVouNo(rs.getString("vou_no"));
+                    key.setCompCode(rs.getString("comp_code"));
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setSdCode(rs.getString("sd_code"));
-                    op.setSdKey(key);
+                    key.setUniqueId(rs.getInt("unique_id"));
+                    op.setKey(key);
+                    op.setVouNo(rs.getString("vou_no"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setPrice(rs.getFloat("sale_price"));
@@ -72,14 +74,12 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("sale_unit"));
-                    op.setCompCode(rs.getString("comp_code"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
                     op.setCatName(rs.getString("cat_name"));
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
-                    op.setUniqueId(rs.getInt("unique_id"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
@@ -101,9 +101,11 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     SaleHisDetail sh = new SaleHisDetail();
                     SaleDetailKey key = new SaleDetailKey();
                     key.setSdCode(rs.getString("sd_code"));
-                    key.setVouNo(rs.getString("vou_no"));
                     key.setDeptId(rs.getInt("dept_id"));
-                    sh.setSdKey(key);
+                    key.setCompCode(rs.getString("comp_code"));
+                    key.setUniqueId(rs.getInt("unique_id"));
+                    sh.setKey(key);
+                    sh.setVouNo(rs.getString("vou_no"));
                     sh.setStockCode(rs.getString("stock_code"));
                     sh.setExpDate(rs.getDate("expire_date"));
                     sh.setQty(rs.getFloat("qty"));
@@ -111,8 +113,6 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     sh.setPrice(rs.getFloat("sale_price"));
                     sh.setAmount(rs.getFloat("sale_amt"));
                     sh.setLocCode(rs.getString("loc_code"));
-                    sh.setUniqueId(rs.getInt("unique_id"));
-                    sh.setCompCode(rs.getString("comp_code"));
                     list.add(sh);
                 }
             }

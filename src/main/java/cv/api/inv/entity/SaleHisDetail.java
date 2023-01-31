@@ -27,7 +27,7 @@ import java.util.Date;
 public class SaleHisDetail implements java.io.Serializable {
 
     @EmbeddedId
-    private SaleDetailKey sdKey;
+    private SaleDetailKey key;
     @Column(name = "stock_code")
     private String stockCode;
     @Temporal(TemporalType.DATE)
@@ -43,10 +43,10 @@ public class SaleHisDetail implements java.io.Serializable {
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
+    @Column(name = "vou_no")
+    private String vouNo;
+    @Column(name = "batch_code")
+    private String batchCode;
     @Transient
     private String userCode;
     @Transient

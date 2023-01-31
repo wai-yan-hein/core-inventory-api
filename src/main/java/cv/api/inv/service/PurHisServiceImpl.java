@@ -66,7 +66,7 @@ public class PurHisServiceImpl implements PurHisService {
                     }
                 }
                 String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setPdKey(new PurDetailKey(vouNo, sdCode, ph.getKey().getDeptId()));
+                cSd.setKey(new PurDetailKey(vouNo, sdCode, ph.getKey().getDeptId()));
                 cSd.setCompCode(ph.getKey().getCompCode());
                 pdDao.save(cSd);
 

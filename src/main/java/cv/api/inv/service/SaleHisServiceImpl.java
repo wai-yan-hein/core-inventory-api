@@ -57,17 +57,21 @@ public class SaleHisServiceImpl implements SaleHisService {
         for (int i = 0; i < listSD.size(); i++) {
             SaleHisDetail cSd = listSD.get(i);
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                SaleDetailKey key = new SaleDetailKey();
+                key.setDeptId(saleHis.getKey().getDeptId());
+                key.setCompCode(saleHis.getKey().getCompCode());
+                cSd.setKey(key);
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         SaleHisDetail pSd = listSD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setSdKey(new SaleDetailKey(vouNo, sdCode, saleHis.getKey().getDeptId()));
-                cSd.setCompCode(saleHis.getKey().getCompCode());
+                String sdCode = vouNo + "-" + cSd.getKey().getUniqueId();
+                cSd.getKey().setSdCode(sdCode);
+                cSd.setVouNo(vouNo);
                 sdDao.save(cSd);
 
             }

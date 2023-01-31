@@ -21,7 +21,7 @@ import java.io.Serializable;
 public class PurHisDetail implements Serializable {
 
     @EmbeddedId
-    private PurDetailKey pdKey;
+    private PurDetailKey key;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty", nullable = false)
