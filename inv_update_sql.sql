@@ -412,3 +412,5 @@ DROP COLUMN `parent`,
 ADD COLUMN `rfid` VARCHAR(50) NULL AFTER `account`;
 ADD COLUMN `nrc` VARCHAR(255) NULL AFTER `rfid`;
 
+ALTER TABLE `pur_his_detail`
+ADD COLUMN `avg_price` FLOAT(20,3) NULL AFTER `avg_qty`;
