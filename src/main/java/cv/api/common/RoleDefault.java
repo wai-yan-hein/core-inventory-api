@@ -5,10 +5,10 @@
  */
 package cv.api.common;
 
-import cv.api.inv.entity.Currency;
-import cv.api.inv.entity.Location;
-import cv.api.inv.entity.SaleMan;
-import cv.api.inv.entity.Trader;
+import cv.api.entity.Currency;
+import cv.api.entity.Location;
+import cv.api.entity.SaleMan;
+import cv.api.entity.Trader;
 import lombok.Data;
 
 /**

@@ -1,10 +1,10 @@
 package cv.api.auto;
 
-import cv.api.inv.entity.VStockBalance;
-import cv.api.inv.service.ReportService;
+import cv.api.entity.VStockBalance;
 import cv.api.model.Response;
 import cv.api.model.StockBalance;
 import cv.api.model.StockBalanceKey;
+import cv.api.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;

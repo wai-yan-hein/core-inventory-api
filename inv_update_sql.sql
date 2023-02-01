@@ -414,3 +414,7 @@ ADD COLUMN `nrc` VARCHAR(255) NULL AFTER `rfid`;
 
 ALTER TABLE `pur_his_detail`
 ADD COLUMN `avg_price` FLOAT(20,3) NULL AFTER `avg_qty`;
+
+alter table sale_his_detail
+add column batch_no varchar(15) null after dept_id,
+add column owner_code varchar(15) null after batch_no;

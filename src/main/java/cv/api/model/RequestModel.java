@@ -1,6 +1,6 @@
 package cv.api.model;
 
-import cv.api.inv.entity.LocationKey;
+import cv.api.entity.LocationKey;
 import lombok.Data;
 
 import java.util.Date;

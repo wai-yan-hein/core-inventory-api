@@ -6,10 +6,10 @@
 package cv.api.controller;
 
 import cv.api.common.*;
-import cv.api.inv.entity.ReorderLevel;
-import cv.api.inv.entity.VStockBalance;
-import cv.api.inv.service.ReportService;
-import cv.api.inv.view.*;
+import cv.api.entity.ReorderLevel;
+import cv.api.entity.VStockBalance;
+import cv.api.model.*;
+import cv.api.service.ReportService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

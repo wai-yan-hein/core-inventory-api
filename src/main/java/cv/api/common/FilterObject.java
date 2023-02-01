@@ -29,8 +29,10 @@ public class FilterObject {
     private String locCodeTo;
     private String refNo;
     private boolean deleted;
+    private boolean close;
     private Integer deptId;
     private String processNo;
     private boolean finished;
+    private String traderCode;
 
 }

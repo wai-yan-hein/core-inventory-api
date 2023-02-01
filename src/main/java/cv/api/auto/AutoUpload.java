@@ -1,9 +1,9 @@
 package cv.api.auto;
 
 import cv.api.common.Util1;
-import cv.api.inv.entity.*;
-import cv.api.inv.service.*;
+import cv.api.entity.*;
 import cv.api.repo.AccountRepo;
+import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

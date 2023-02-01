@@ -1,9 +1,9 @@
 package cv.api.repo;
 
-import cv.api.inv.service.LocationService;
 import cv.api.model.Department;
 import cv.api.model.PropertyKey;
 import cv.api.model.SystemProperty;
+import cv.api.service.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

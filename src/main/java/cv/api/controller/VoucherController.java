@@ -7,9 +7,9 @@ package cv.api.controller;
 
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
-import cv.api.inv.entity.SeqKey;
-import cv.api.inv.entity.SeqTable;
-import cv.api.inv.service.SeqTableService;
+import cv.api.entity.SeqKey;
+import cv.api.entity.SeqTable;
+import cv.api.service.SeqTableService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

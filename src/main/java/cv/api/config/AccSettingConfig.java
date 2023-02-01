@@ -1,8 +1,8 @@
 package cv.api.config;
 
 import cv.api.common.Util1;
-import cv.api.inv.entity.AccSetting;
-import cv.api.inv.service.AccSettingService;
+import cv.api.entity.AccSetting;
+import cv.api.service.AccSettingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
