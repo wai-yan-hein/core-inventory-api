@@ -14,5 +14,5 @@ public interface GRNDao {
 
     boolean delete(GRNKey key);
 
-    List<GRN> search(String str, String compCode, Integer deptId);
+    List<GRN> search(String batchNo, String compCode, Integer deptId);
 }

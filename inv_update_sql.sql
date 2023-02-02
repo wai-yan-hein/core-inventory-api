@@ -417,4 +417,34 @@ ADD COLUMN `avg_price` FLOAT(20,3) NULL AFTER `avg_qty`;
 
 alter table sale_his_detail
 add column batch_no varchar(15) null after dept_id,
-add column owner_code varchar(15) null after batch_no;
+
+create table grn (
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  vou_date datetime not null,
+  trader_code varchar(15) default null,
+  closed bit(1) not null default b'0',
+  created_date timestamp not null default current_timestamp() on update current_timestamp(),
+  created_by varchar(15) not null,
+  updated_date timestamp not null default current_timestamp() on update current_timestamp(),
+  updated_by varchar(15) default null,
+  deleted bit(1) not null default b'0',
+  batch_no varchar(15) default null,
+  remark varchar(255) default null,
+  mac_id int(11) not null,
+  primary key (vou_no,comp_code,dept_id)
+) engine=innodb default charset=utf8mb3;
+
+create table grn_detail (
+  vou_no varchar(15) not null,
+  unique_id int(11) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  stock_code varchar(15) default null,
+  loc_code varchar(15) not null,
+  qty float(20,3) not null,
+  unit varchar(15) not null,
+  primary key (vou_no,unique_id,comp_code,dept_id)
+) engine=innodb default charset=utf8mb3;
+create view v_sale as select sh.vou_no as vou_no,sh.trader_code as trader_code,sh.saleman_code as saleman_code,sh.vou_date as vou_date,sh.credit_term as credit_term,sh.cur_code as cur_code,sh.remark as remark,sh.vou_total as vou_total,sh.grand_total as grand_total,sh.discount as discount,sh.disc_p as disc_p,sh.tax_amt as tax_amt,sh.tax_p as tax_p,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.paid as paid,sh.vou_balance as vou_balance,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.address as address,sh.order_code as order_code,sh.mac_id as mac_id,sh.session_id as session_id,sh.reference as reference,sh.dept_id as dept_id,sd.sd_code as sd_code,sd.stock_code as stock_code,sd.expire_date as expire_date,sd.qty as qty,sd.sale_unit as sale_unit,sd.sale_price as sale_price,sd.sale_amt as sale_amt,sd.loc_code as loc_code,sd.batch_no as batch_no,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((sale_his sh join sale_his_detail sd on(sh.vou_no = sd.vou_no)) join stock s on(sd.stock_code = s.stock_code));

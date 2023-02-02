@@ -1612,8 +1612,36 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode,
                                       String vouNo, String remark, String reference, String userCode, String stockCode,
-                                      String locCode, String compCode, Integer deptId, String deleted) {
+                                      String locCode, String compCode, Integer deptId, String deleted, String nullBatch) {
         List<VSale> saleList = new ArrayList<>();
+        String filter = "";
+        if (!vouNo.equals("-")) {
+            filter += "and vou_no = '" + vouNo + "'\n";
+        }
+        if (!remark.equals("-")) {
+            filter += "and remark like '" + remark + "%'\n";
+        }
+        if (!reference.equals("-")) {
+            filter += "and reference like '" + reference + "%'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
+        }
+        if (!userCode.equals("-")) {
+            filter += "and created_by = '" + userCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code = '" + stockCode + "'\n";
+        }
+        if (!saleManCode.equals("-")) {
+            filter += "and saleman_code = '" + saleManCode + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and loc_code = '" + locCode + "'\n";
+        }
+        if (nullBatch.equals("true")) {
+            filter += "and (batch_no is null or batch_no ='') \n";
+        }
         String sql = "select a.*,t.trader_name,t.user_code\n"
                 + "from (\n"
                 + "select  vou_no,date(vou_date) vou_date,remark,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
@@ -1622,14 +1650,7 @@ public class ReportServiceImpl implements ReportService {
                 + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and deleted = " + deleted + "\n"
                 + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
-                + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
-                + "and (reference like '" + reference + "%' or '-%'= '" + reference + "%')\n"
-                + "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n"
-                + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
-                + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "and (saleman_code ='" + saleManCode + "' or '-' ='" + saleManCode + "')\n"
-                + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
+                + "" + filter + "\n"
                 + "group by vou_no\n" + ")a\n"
                 + "join trader t on a.trader_code = t.code\n"
                 + "and a.comp_code = t.comp_code\n"

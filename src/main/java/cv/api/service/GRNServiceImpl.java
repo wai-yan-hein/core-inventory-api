@@ -75,10 +75,9 @@ public class GRNServiceImpl implements GRNService {
     }
 
     @Override
-    public GRN findByBatch(String batchNo, String compCode, Integer deptId) {
-        return null;
+    public List<GRN> search(String batchNo, String compCode, Integer deptId) {
+        return dao.search(batchNo,compCode,deptId);
     }
-
     @Override
     public boolean delete(GRNKey key) {
         return dao.delete(key);

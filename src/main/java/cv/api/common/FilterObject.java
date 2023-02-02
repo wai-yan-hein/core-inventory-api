@@ -34,5 +34,7 @@ public class FilterObject {
     private String processNo;
     private boolean finished;
     private String traderCode;
+    private boolean nullBatch;
+
 
 }

@@ -108,7 +108,8 @@ public class SaleController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode, deptId, deleted);
+        String nullBatch =String.valueOf(filter.isNullBatch());
+        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode, deptId, deleted,nullBatch);
         return ResponseEntity.ok(saleList);
     }
 
