@@ -33,8 +33,8 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     }
 
     @Override
-    public GRN findByBatch(String batchNo, String compCode, Integer deptId) {
-        String sql="";
+    public List<GRN> search(String str, String compCode, Integer deptId) {
         return null;
     }
+
 }

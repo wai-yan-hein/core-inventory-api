@@ -11,7 +11,8 @@ public interface GRNService {
     GRN save(GRN b);
 
     List<GRN> findAll(String compCode, Integer deptId);
-    GRN findByBatch(String batchNo,String compCode,Integer deptId);
+
+    List<GRN> search(String str, String compCode, Integer deptId);
 
     boolean delete(GRNKey key);
 }

@@ -13,5 +13,6 @@ public interface GRNDao {
     List<GRN> findAll(String compCode, Integer deptId);
 
     boolean delete(GRNKey key);
-    GRN findByBatch(String batchNo,String compCode,Integer deptId);
+
+    List<GRN> search(String str, String compCode, Integer deptId);
 }

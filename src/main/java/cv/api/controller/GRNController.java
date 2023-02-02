@@ -65,10 +65,10 @@ public class GRNController {
         return ResponseEntity.ok(ro);
     }
 
-    @GetMapping(path = "/find-by-batch")
-    public ResponseEntity<?> findByBatch(@RequestParam String batchNo,
+    @GetMapping(path = "/search-grn")
+    public ResponseEntity<?> findByBatch(@RequestParam String str,
                                          @RequestParam String compCode,
                                          @RequestParam Integer deptId) {
-        return ResponseEntity.ok(grnService.findByBatch(batchNo, compCode, deptId));
+        return ResponseEntity.ok(grnService.search(str, compCode, deptId));
     }
 }
