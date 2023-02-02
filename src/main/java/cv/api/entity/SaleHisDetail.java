@@ -47,8 +47,6 @@ public class SaleHisDetail implements java.io.Serializable {
     private String vouNo;
     @Column(name = "batch_no")
     private String batchNo;
-    @Column(name = "owner_code")
-    private String ownerCode;
     @Transient
     private String userCode;
     @Transient
