@@ -11,6 +11,7 @@ import cv.api.service.*;
 import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.ActiveMQQueueReceiver;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -75,6 +77,8 @@ public class CloudMQSender {
     private StockInOutService inOutService;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private CloudMQReceiver receiver;
     private final HashMap<String, String> hmQueue = new HashMap<>();
     private boolean client;
     private String serverQ;
@@ -87,15 +91,39 @@ public class CloudMQSender {
         serverQ = userRepo.getProperty("cloud.activemq.inventory.server.queue");
         if (client) {
             log.info("ActiveMQ Server Q : " + serverQ);
-            if (!progress) {
-                progress = true;
-                //destroyQ(serverQ);
-                //uploadSetup();
-                uploadTransaction();
-                downloadSetup();
-                downloadTransaction();
-                progress = false;
+            checkOnline();
+            if (receiver.isOnline()) {
+                if (!progress) {
+                    progress = true;
+                    uploadTransaction();
+                    downloadSetup();
+                    downloadTransaction();
+                    progress = false;
+                }
+            } else {
+                log.info("server is offline.");
             }
+        }
+    }
+
+    private void checkOnline() {
+        receiver.setOnline(false);
+        MessageCreator mc = (Session session) -> {
+            MapMessage mm = session.createMapMessage();
+            mm.setString("SENDER_QUEUE", listenQ);
+            mm.setString("ENTITY", "CONNECTION");
+            mm.setString("OPTION", "CONNECTION");
+            return mm;
+        };
+        cloudMQTemplate.send(serverQ, mc);
+        sleep();
+    }
+
+    private void sleep() {
+        try {
+            TimeUnit.MILLISECONDS.sleep(2000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
         }
     }
 

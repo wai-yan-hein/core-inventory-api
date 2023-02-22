@@ -84,7 +84,15 @@ public class CloudMQReceiver {
     private UserRepo userRepo;
     @Autowired
     private AccountRepo accountRepo;
+    private boolean online;
 
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 
     @JmsListener(destination = "INV_MSG", containerFactory = "topicContainerFactory")
     public void receivedTopicMessage(final MapMessage message) throws JMSException {
@@ -264,6 +272,19 @@ public class CloudMQReceiver {
                         case "RESPONSE_TRAN" -> inOutService.save(obj);
                     }
                 }
+                case "CONNECTION" -> {
+                    MessageCreator mc = (Session session) -> {
+                        MapMessage mm = session.createMapMessage();
+                        mm.setString("SENDER_QUEUE", listenQ);
+                        mm.setString("ENTITY", "ONLINE");
+                        mm.setString("OPTION", "CONNECTION");
+                        return mm;
+                    };
+                    if (senderQ != null) {
+                        cloudMQTemplate.send(senderQ, mc);
+                    }
+                }
+                case "ONLINE" -> setOnline(true);
                 case "FILE" -> {
                     Reader reader = null;
                     if (file != null) {

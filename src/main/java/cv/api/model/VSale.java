@@ -72,6 +72,9 @@ public class VSale {
     private String relName;
     private String qtyStr;
     private Integer deptId;
+    private String batchNo;
+    private String reference;
+    private String supplierName;
 
 
 }

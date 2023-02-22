@@ -23,6 +23,7 @@ public interface ReportService {
     void insertTmp(List<String> listStr, Integer macId, String taleName);
 
     void executeSql(String... sql) throws Exception;
+
     ResultSet getResult(String sql) throws Exception;
 
     String getOpeningDate(String compCode, Integer deptIdF);
@@ -53,10 +54,15 @@ public interface ReportService {
 
     List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception;
 
-    List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode,Integer deptId, Integer macId) throws Exception;
+    List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
+
+    List<VSale> getSaleByVoucherDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
+
+    List<VSale> getSaleByBatchDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
-    List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode,Integer deptId, Integer macId) throws Exception;
+
+    List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
 
@@ -105,7 +111,7 @@ public interface ReportService {
 
     List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode, Integer deptId) throws Exception;
 
-    List<VOpening> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode,Integer deptId) throws Exception;
+    List<VOpening> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode, Integer deptId) throws Exception;
 
     List<VStockIO> getStockIODetailByVoucherType(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
@@ -117,7 +123,7 @@ public interface ReportService {
 
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
-                               String compCode, Integer deptId, String deleted,String nullBatch);
+                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo);
 
     List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
@@ -155,5 +161,8 @@ public interface ReportService {
     List<VStockIO> getProcessUsageSummary(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
 
     List<VStockIO> getProcessUsageDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
-    List<GRN> getGRNHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted,String close);
+
+    List<GRN> getGRNHistory(String fromDate, String toDate, String traderCode, String vouNo,
+                            String remark, String userCode, String stockCode, String locCode,
+                            String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
 }

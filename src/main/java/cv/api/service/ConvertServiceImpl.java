@@ -20,6 +20,7 @@ public class ConvertServiceImpl implements ConverterService {
         convertVouStatus();
         convertStock();
         convertStockType();
+        convertStockCategory();
         convertTrader();
         convertSale();
         convertPurchase();
@@ -83,6 +84,25 @@ public class ConvertServiceImpl implements ConverterService {
                     }
                 }
                 log.info("converted stock type.");
+            }
+        } catch (Exception e) {
+            log.error("convertStockType : " + e.getMessage());
+        }
+    }
+    private void convertStockCategory() {
+        String sql = "select *\n" +
+                "from category\n";
+        try {
+            ResultSet rs = reportService.getResult(sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    String typeName = rs.getString("cat_name");
+                    if (Util1.isZGText(typeName)) {
+                        rs.updateString("cat_name", Util1.convertToUniCode(typeName));
+                        rs.updateRow();
+                    }
+                }
+                log.info("converted stock category.");
             }
         } catch (Exception e) {
             log.error("convertStockType : " + e.getMessage());

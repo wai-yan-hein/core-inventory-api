@@ -41,4 +41,9 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     public int delete(String code, String compCode, Integer deptId) {
         return dao.delete(code, compCode, deptId);
     }
+
+    @Override
+    public List<SaleHisDetail> getSaleByBatch(String batchNo, String compCode, Integer depId) {
+        return dao.getSaleByBatch(batchNo, compCode, depId);
+    }
 }

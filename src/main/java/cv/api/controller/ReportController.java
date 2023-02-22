@@ -87,7 +87,8 @@ public class ReportController {
     }
 
     @PostMapping(value = "/get-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ReturnObject getReport(@RequestBody ReportFilter filter) {
+    public @ResponseBody
+    ReturnObject getReport(@RequestBody ReportFilter filter) {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
@@ -106,6 +107,7 @@ public class ReportController {
                 String vouTypeCode = Util1.isNull(filter.getVouTypeCode(), "-");
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
+                String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -136,6 +138,14 @@ public class ReportController {
                     case "SaleByStockDetail" -> {
                         List<VSale> saleByStock = reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);
+                    }
+                    case "SaleByVoucherDetail" -> {
+                        List<VSale> list = reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "SaleByBatchDetail" -> {
+                        List<VSale> list = reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
                     }
                     case "PurchaseBySupplierDetail" -> {
                         List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
@@ -183,7 +193,7 @@ public class ReportController {
                         Util1.writeJsonFile(opening, exportPath);
                     }
                     case "OpeningByGroup" -> {
-                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode,deptId);
+                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
                         Util1.writeJsonFile(opGroup, exportPath);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {

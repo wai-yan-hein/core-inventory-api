@@ -47,7 +47,8 @@ public class GRNController {
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         String close = String.valueOf(filter.isClose());
-        List<GRN> list = reportService.getGRNHistory(fromDate, toDate, traderCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, close);
+        boolean orderByBatch = filter.isOrderByBatch();
+        List<GRN> list = reportService.getGRNHistory(fromDate, toDate, traderCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, close, orderByBatch);
         return ResponseEntity.ok(list);
     }
 

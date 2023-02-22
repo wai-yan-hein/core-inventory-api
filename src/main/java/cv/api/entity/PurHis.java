@@ -72,6 +72,8 @@ public class PurHis implements java.io.Serializable {
     private Integer macId;
     @Column(name = "vou_lock")
     private boolean vouLock;
+    @Column(name = "batch_no")
+    private String batchNo;
     @Transient
     private String status = "STATUS";
     @Transient

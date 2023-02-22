@@ -35,6 +35,8 @@ public class FilterObject {
     private boolean finished;
     private String traderCode;
     private boolean nullBatch;
+    private String batchNo;
+    private boolean orderByBatch;
 
 
 }

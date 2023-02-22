@@ -29,6 +29,7 @@ public class Gl {
     private String refNo;
     private boolean deleted;
     private boolean cash = false;
+    private String batchNo;
 
     public Gl() {
     }

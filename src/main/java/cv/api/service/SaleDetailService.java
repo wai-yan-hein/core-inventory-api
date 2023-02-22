@@ -19,4 +19,6 @@ public interface SaleDetailService {
     List<SaleHisDetail> search(String vouNo, String compCode, Integer deptId);
 
     int delete(String code, String compCode, Integer deptId);
+    List<SaleHisDetail> getSaleByBatch(String batchNo, String compCode, Integer depId);
+
 }

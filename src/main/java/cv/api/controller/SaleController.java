@@ -108,8 +108,10 @@ public class SaleController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        String nullBatch =String.valueOf(filter.isNullBatch());
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark, reference, userCode, stockCode, locCode, compCode, deptId, deleted,nullBatch);
+        String nullBatch = String.valueOf(filter.isNullBatch());
+        String batchNo = Util1.isNull(filter.getBatchNo(), "-");
+        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
+                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo);
         return ResponseEntity.ok(saleList);
     }
 
@@ -150,5 +152,11 @@ public class SaleController {
                                                  @RequestParam String compCode,
                                                  @RequestParam Integer deptId) {
         return ResponseEntity.ok(shService.getVoucherInfo(vouDate, compCode, deptId));
+    }
+    @GetMapping(path = "/get-sale-by-batch")
+    public ResponseEntity<?> getSaleByBatch(@RequestParam String batchNo,
+                                                 @RequestParam String compCode,
+                                                 @RequestParam Integer deptId) {
+        return ResponseEntity.ok(sdService.getSaleByBatch(batchNo, compCode, deptId));
     }
 }

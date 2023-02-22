@@ -396,6 +396,7 @@ public class AccountRepo {
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
                 String vouNo = ph.getKey().getVouNo();
+                String batchNo = ph.getBatchNo();
                 Integer deptId = ph.getKey().getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
@@ -426,36 +427,9 @@ public class AccountRepo {
                     gl.setRefNo(vouNo);
                     gl.setDeleted(deleted);
                     gl.setMacId(macId);
+                    gl.setBatchNo(batchNo);
                     listGl.add(gl);
                 }
-                //discount
-               /* if (vouDis > 0) {
-                    Gl gl = new Gl();
-                    GlKey key = new GlKey();
-                    key.setCompCode(compCode);
-                    gl.setKey(key);
-                    if (vouPaid > 0) {
-                        gl.setSrcAccCode(payAcc);
-                        gl.setCash(true);
-                    } else {
-                        gl.setSrcAccCode(balAcc);
-                        gl.setTraderCode(traderCode);
-                    }
-                    gl.setAccCode(disAcc);
-                    gl.setDrAmt(vouDis);
-                    gl.setGlDate(vouDate);
-                    gl.setDescription("Purchase Voucher Discount : " + traderName);
-                    gl.setCurCode(curCode);
-                    gl.setReference(remark);
-                    gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
-                    gl.setCreatedBy(appName);
-                    gl.setTranSource(tranSource);
-                    gl.setRefNo(vouNo);
-                    gl.setDeleted(deleted);
-                    gl.setMacId(macId);
-                    listGl.add(gl);
-                }*/
                 //payment
                 if (vouPaid > 0) {
                     Gl gl = new Gl();
@@ -477,6 +451,7 @@ public class AccountRepo {
                     gl.setRefNo(vouNo);
                     gl.setDeleted(deleted);
                     gl.setMacId(macId);
+                    gl.setBatchNo(batchNo);
                     listGl.add(gl);
                 }
                 sendAccount(listGl);

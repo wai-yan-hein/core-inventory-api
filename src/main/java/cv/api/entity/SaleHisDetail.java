@@ -62,5 +62,5 @@ public class SaleHisDetail implements java.io.Serializable {
     @Transient
     private String locName;
     @Transient
-    private String ownerName;
+    private String traderName;
 }

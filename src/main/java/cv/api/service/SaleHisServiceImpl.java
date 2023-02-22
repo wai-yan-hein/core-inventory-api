@@ -143,4 +143,6 @@ public class SaleHisServiceImpl implements SaleHisService {
     public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
         return shDao.getVoucherInfo(vouDate, compCode, depId);
     }
+
+
 }
