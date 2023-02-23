@@ -453,3 +453,10 @@ create view v_sale as select sh.vou_no as vou_no,sh.trader_code as trader_code,s
 
 alter table pur_his
 add column batch_no varchar(15) null after vou_lock;
+alter table pur_his
+add column comm_p float(20,3) null after vou_lock,
+add column comm_amt float(20,3) null after comm_p;
+alter table acc_setting
+add column comm_acc varchar(15) null after bal_acc;
+
+

@@ -32,6 +32,8 @@ public class AccSetting implements Serializable {
     private String balanceAcc;
     @Column(name = "tax_acc")
     private String taxAcc;
+    @Column(name = "comm_acc")
+    private String commAcc;
     @Column(name = "dep_code")
     private String deptCode;
 }

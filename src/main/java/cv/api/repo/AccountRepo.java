@@ -386,6 +386,7 @@ public class AccountRepo {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
+                String commAcc = setting.getCommAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ph.getVouDate();
                 String traderCode = ph.getTraderCode();
@@ -395,6 +396,8 @@ public class AccountRepo {
                 boolean deleted = ph.isDeleted();
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
+                double vouComm = Util1.getDouble(ph.getCommAmt());
+                double vouCommP = Util1.getDouble(ph.getCommP());
                 String vouNo = ph.getKey().getVouNo();
                 String batchNo = ph.getBatchNo();
                 Integer deptId = ph.getKey().getDeptId();
@@ -442,6 +445,32 @@ public class AccountRepo {
                     gl.setSrcAccCode(payAcc);
                     gl.setAccCode(srcAcc);
                     gl.setCrAmt(vouPaid);
+                    gl.setCurCode(curCode);
+                    gl.setReference(remark);
+                    gl.setDeptCode(deptCode);
+                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedBy(appName);
+                    gl.setTranSource(tranSource);
+                    gl.setRefNo(vouNo);
+                    gl.setDeleted(deleted);
+                    gl.setMacId(macId);
+                    gl.setBatchNo(batchNo);
+                    listGl.add(gl);
+                }
+                //comm
+                if (vouComm > 0) {
+                    String des = "Purchase Voucher Commission";
+                    Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    key.setDeptId(deptId);
+                    gl.setKey(key);
+                    gl.setGlDate(vouDate);
+                    gl.setDescription(vouCommP > 0 ? des + " : " + vouCommP + "%" : des);
+                    gl.setSrcAccCode(commAcc);
+                    gl.setAccCode(balAcc);
+                    gl.setTraderCode(traderCode);
+                    gl.setCrAmt(vouComm);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);

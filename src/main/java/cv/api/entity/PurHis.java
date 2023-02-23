@@ -74,6 +74,10 @@ public class PurHis implements java.io.Serializable {
     private boolean vouLock;
     @Column(name = "batch_no")
     private String batchNo;
+    @Column(name = "comm_p")
+    private Float commP;
+    @Column(name = "comm_amt")
+    private Float commAmt;
     @Transient
     private String status = "STATUS";
     @Transient
