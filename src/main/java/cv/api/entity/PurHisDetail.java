@@ -30,6 +30,8 @@ public class PurHisDetail implements Serializable {
     private Float avgQty;
     @Column(name = "pur_unit")
     private String unitCode;
+    @Column(name = "org_price")
+    private Float orgPrice;
     @Column(name = "pur_price", nullable = false)
     private Float price;
     @Column(name = "pur_amt", nullable = false)

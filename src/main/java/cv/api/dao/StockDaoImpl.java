@@ -128,7 +128,9 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                 "left join stock_brand b on s.brand_code  = b.brand_code\n" +
                 "where s.comp_code ='" + compCode + "'\n" +
                 "and s.active =1\n" + "and (s.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and " + filter + "\n" + "limit 100";
+                "and " + filter + "\n" +
+                "order by s.user_code\n" +
+                "limit 100";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {
             try {
@@ -150,6 +152,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                     s.setPurPrice(rs.getFloat("pur_price"));
                     s.setPurUnitCode(rs.getString("pur_unit"));
                     s.setSaleUnitCode(rs.getString("sale_unit"));
+                    s.setLossUnit(rs.getString("loss_unit"));
                     s.setSalePriceN(rs.getFloat("sale_price_n"));
                     s.setSalePriceA(rs.getFloat("sale_price_a"));
                     s.setSalePriceB(rs.getFloat("sale_price_b"));

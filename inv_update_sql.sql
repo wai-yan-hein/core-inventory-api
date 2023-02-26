@@ -412,8 +412,6 @@ DROP COLUMN `parent`,
 ADD COLUMN `rfid` VARCHAR(50) NULL AFTER `account`,
 ADD COLUMN `nrc` VARCHAR(255) NULL AFTER `rfid`;
 
-ALTER TABLE `pur_his_detail`
-ADD COLUMN `avg_price` FLOAT(20,3) NULL AFTER `avg_qty`;
 
 alter table sale_his_detail
 add column batch_no varchar(15) null after dept_id;
@@ -458,5 +456,9 @@ add column comm_p float(20,3) null after vou_lock,
 add column comm_amt float(20,3) null after comm_p;
 alter table acc_setting
 add column comm_acc varchar(15) null after bal_acc;
+alter table pur_his_detail
+add column org_price float(20,3) null after dept_id;
+alter table stock
+add column loss_unit varchar(15) null after intg_upd_status;
 
 

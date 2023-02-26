@@ -363,7 +363,7 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-smallest_qty")
-    public ResponseEntity<Float> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public ResponseEntity<?> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
     }
 }

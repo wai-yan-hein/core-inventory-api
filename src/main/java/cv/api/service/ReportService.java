@@ -144,7 +144,7 @@ public interface ReportService {
 
     List<VPurchase> getPurchasePriceCalender(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    Float getSmallestQty(String stockCode, String unit, String compCode, Integer deptId);
+    General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId);
 
     List<String> isStockExist(String stockCode, String compCode);
 

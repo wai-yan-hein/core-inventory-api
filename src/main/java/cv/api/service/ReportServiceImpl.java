@@ -11,8 +11,6 @@ import cv.api.dao.UnitRelationDao;
 import cv.api.entity.*;
 import cv.api.model.*;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,8 +35,6 @@ public class ReportServiceImpl implements ReportService {
     private ReportDao reportDao;
     @Autowired
     private UnitRelationDao relationDao;
-    @Autowired
-    private SessionFactory sessionFactory;
     @Autowired
     private WebClient userApi;
 
@@ -2121,9 +2117,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Float getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
-        float qty = 1.0f;
-        String sql = "select ud.smallest_qty\n" +
+    public General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
+        General g = new General();
+        String sql = "select ud.qty,ud.smallest_qty\n" +
                 "from stock s join unit_relation_detail ud\n" +
                 "on s.rel_code = ud.rel_code\n" +
                 "and s.comp_code =ud.comp_code\n" +
@@ -2134,13 +2130,14 @@ public class ReportServiceImpl implements ReportService {
                 "and ud.unit ='" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
-            while (rs.next()) {
-                qty = rs.getFloat("smallest_qty");
+            if (rs.next()) {
+                g.setQty(rs.getFloat("qty"));
+                g.setSmallQty(rs.getFloat("smallest_qty"));
             }
         } catch (Exception e) {
             log.error(String.format("getSmallestQty: %s", e.getMessage()));
         }
-        return qty;
+        return g;
     }
 
     @Override

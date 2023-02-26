@@ -229,7 +229,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         try {
             ResultSet rs = getResultSet(sql);
             if (rs.next()) {
-                g.setQty(rs.getInt("vou_count"));
+                g.setQty(rs.getFloat("vou_count"));
                 g.setAmount(rs.getFloat("paid"));
             }
         } catch (Exception e) {

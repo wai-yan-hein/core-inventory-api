@@ -69,7 +69,8 @@ public class PurHisDetailDaoImpl extends AbstractDao<String, PurHisDetail> imple
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     float avgQty = rs.getFloat("avg_qty");
-                    op.setAvgQty(avgQty == 0 ? op.getQty() : avgQty);
+                    op.setAvgQty(avgQty);
+                    op.setOrgPrice(rs.getFloat("org_price"));
                     op.setPrice(rs.getFloat("pur_price"));
                     op.setAmount(rs.getFloat("pur_amt"));
                     op.setLocCode(rs.getString("loc_code"));
