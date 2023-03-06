@@ -158,9 +158,14 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseVoucher(String vouNo) throws Exception {
+    public List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
-        String sql = "select t.trader_name,p.remark,p.vou_no,\n" + "p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" + "from v_purchase p join trader t\n" + "on p.trader_code = t.code\n" + "where p.vou_no ='" + vouNo + "'";
+        String sql = "select t.trader_name,p.remark,p.vou_no,\n" +
+                "p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" +
+                "from v_purchase p join trader t\n" +
+                "on p.trader_code = t.code\n" +
+                "where p.vou_no ='" + vouNo + "'\n" +
+                "and p.comp_code ='" + compCode + "'";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {

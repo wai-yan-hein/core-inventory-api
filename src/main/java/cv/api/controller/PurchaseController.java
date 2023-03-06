@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -98,8 +99,10 @@ public class PurchaseController {
     }
 
     @GetMapping(path = "/get-pur-detail")
-    public ResponseEntity<List<PurHisDetail>> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<PurHisDetail> getPurDetail(@RequestParam String vouNo,
+                                           @RequestParam String compCode,
+                                           @RequestParam Integer deptId) {
         List<PurHisDetail> listSD = pdService.search(vouNo, compCode, deptId);
-        return ResponseEntity.ok(listSD);
+        return Flux.fromIterable(listSD);
     }
 }

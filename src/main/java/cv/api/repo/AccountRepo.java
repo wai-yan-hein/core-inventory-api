@@ -4,9 +4,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.*;
 import cv.api.model.*;
-import cv.api.service.ReportService;
-import cv.api.service.TraderGroupService;
-import cv.api.service.TraderService;
+import cv.api.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -36,6 +34,10 @@ public class AccountRepo {
     private TraderService traderService;
     @Autowired
     private TraderGroupService groupService;
+    @Autowired
+    private PurExpenseService purExpenseService;
+    @Autowired
+    private ExpenseService expenseService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -387,6 +389,7 @@ public class AccountRepo {
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
                 String commAcc = setting.getCommAcc();
+                String disAcc = setting.getDiscountAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ph.getVouDate();
                 String traderCode = ph.getTraderCode();
@@ -394,10 +397,12 @@ public class AccountRepo {
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
                 boolean deleted = ph.isDeleted();
+                double vouTotal = Util1.getDouble(ph.getVouTotal());
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouBal = Util1.getDouble(ph.getBalance());
                 double vouComm = Util1.getDouble(ph.getCommAmt());
                 double vouCommP = Util1.getDouble(ph.getCommP());
+                double vouDis = Util1.getDouble(ph.getDiscount());
                 String vouNo = ph.getKey().getVouNo();
                 String batchNo = ph.getBatchNo();
                 Integer deptId = ph.getKey().getDeptId();
@@ -420,7 +425,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouBal);
+                    gl.setDrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
@@ -457,6 +462,33 @@ public class AccountRepo {
                     gl.setBatchNo(batchNo);
                     listGl.add(gl);
                 }
+                //discount
+                if (vouDis > 0) {
+                    if (vouBal > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Purchase Discount Received : " + traderName);
+                        gl.setSrcAccCode(disAcc);
+                        gl.setAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setCrAmt(vouDis);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(Util1.getTodayDate());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setBatchNo(batchNo);
+                        listGl.add(gl);
+                    }
+                }
                 //comm
                 if (vouComm > 0) {
                     String des = "Purchase Voucher Commission";
@@ -482,6 +514,45 @@ public class AccountRepo {
                     gl.setMacId(macId);
                     gl.setBatchNo(batchNo);
                     listGl.add(gl);
+                }
+                List<PurExpense> listExp = purExpenseService.search(vouNo, compCode);
+                for (PurExpense e : listExp) {
+                    String expCode = e.getKey().getExpenseCode();
+                    ExpenseKey ek = new ExpenseKey();
+                    ek.setExpenseCode(expCode);
+                    ek.setCompCode(compCode);
+                    Expense expense = expenseService.findById(ek);
+                    if (expense != null) {
+                        String account = expense.getAccountCode();
+                        double amt = Util1.getDouble(e.getAmount());
+                        if (!Util1.isNullOrEmpty(account)) {
+                            if (vouBal > 0) {
+                                Gl gl = new Gl();
+                                GlKey key = new GlKey();
+                                key.setCompCode(compCode);
+                                key.setDeptId(deptId);
+                                gl.setKey(key);
+                                gl.setGlDate(vouDate);
+                                //gl.setDescription("Purchase Voucher Paid : " + traderName);
+                                gl.setSrcAccCode(account);
+                                gl.setAccCode(balAcc);
+                                gl.setCrAmt(amt);
+                                gl.setTraderCode(traderCode);
+                                gl.setCurCode(curCode);
+                                gl.setReference(remark);
+                                gl.setDeptCode(deptCode);
+                                gl.setCreatedDate(Util1.getTodayDate());
+                                gl.setCreatedBy(appName);
+                                gl.setTranSource(tranSource);
+                                gl.setRefNo(vouNo);
+                                gl.setDeleted(deleted);
+                                gl.setMacId(macId);
+                                gl.setBatchNo(batchNo);
+                                listGl.add(gl);
+                            }
+
+                        }
+                    }
                 }
                 sendAccount(listGl);
             }

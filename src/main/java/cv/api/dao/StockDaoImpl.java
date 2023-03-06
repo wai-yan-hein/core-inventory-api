@@ -129,7 +129,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                 "where s.comp_code ='" + compCode + "'\n" +
                 "and s.active =1\n" + "and (s.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and " + filter + "\n" +
-                "order by s.user_code\n" +
+                "order by s.user_code,s.stock_name\n" +
                 "limit 100";
         ResultSet rs = getResultSet(sql);
         if (rs != null) {

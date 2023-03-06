@@ -24,17 +24,17 @@ public class PurHisDetail implements Serializable {
     private PurDetailKey key;
     @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "qty", nullable = false)
+    @Column(name = "qty")
     private Float qty;
-    @Column(name = "avg_qty", nullable = false)
+    @Column(name = "avg_qty")
     private Float avgQty;
     @Column(name = "pur_unit")
     private String unitCode;
     @Column(name = "org_price")
     private Float orgPrice;
-    @Column(name = "pur_price", nullable = false)
+    @Column(name = "pur_price")
     private Float price;
-    @Column(name = "pur_amt", nullable = false)
+    @Column(name = "pur_amt")
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
@@ -42,6 +42,12 @@ public class PurHisDetail implements Serializable {
     private Integer uniqueId;
     @Column(name = "comp_code")
     private String compCode;
+    @Column(name = "weight")
+    private Float weight;
+    @Column(name = "std_qty")
+    private Float stdQty;
+    @Column(name = "avg_unit")
+    private String avgUnit;
     @Transient
     private String userCode;
     @Transient

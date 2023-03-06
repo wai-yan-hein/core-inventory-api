@@ -6,12 +6,11 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
+import cv.api.dao.ExpenseDao;
+import cv.api.dao.PurExpenseDao;
 import cv.api.dao.PurHisDao;
 import cv.api.dao.SeqTableDao;
-import cv.api.entity.PurDetailKey;
-import cv.api.entity.PurHis;
-import cv.api.entity.PurHisDetail;
-import cv.api.entity.PurHisKey;
+import cv.api.entity.*;
 import cv.api.model.VPurchase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +34,8 @@ public class PurHisServiceImpl implements PurHisService {
     private PurHisDetailService pdDao;
     @Autowired
     private SeqTableDao seqDao;
+    @Autowired
+    private PurExpenseDao purExpenseDao;
 
 
     @Override
@@ -56,6 +57,22 @@ public class PurHisServiceImpl implements PurHisService {
                     }
                 }
             });
+        }
+        List<PurExpense> listExp = ph.getListExpense();
+        if (listExp != null) {
+            for (int i = 0; i < listExp.size(); i++) {
+                PurExpense e = listExp.get(i);
+                if (e.getKey().getUniqueId() == null) {
+                    if (i == 0) {
+                        e.getKey().setUniqueId(1);
+                    } else {
+                        PurExpense pe = listExp.get(i - 1);
+                        e.getKey().setUniqueId(pe.getKey().getUniqueId() + 1);
+                    }
+                }
+                e.getKey().setVouNo(vouNo);
+                purExpenseDao.save(e);
+            }
         }
         for (int i = 0; i < listSD.size(); i++) {
             PurHisDetail cSd = listSD.get(i);

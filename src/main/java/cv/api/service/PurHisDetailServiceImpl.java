@@ -38,6 +38,5 @@ public class PurHisDetailServiceImpl implements PurHisDetailService {
     @Override
     public int delete(String code, String compCode, Integer deptId) throws Exception {
         return dao.delete(code, compCode, deptId);
-
     }
 }
