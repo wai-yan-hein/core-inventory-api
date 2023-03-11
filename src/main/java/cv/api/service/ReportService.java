@@ -165,4 +165,6 @@ public interface ReportService {
     List<GRN> getGRNHistory(String fromDate, String toDate, String traderCode, String vouNo,
                             String remark, String userCode, String stockCode, String locCode,
                             String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
+
+    List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
 }

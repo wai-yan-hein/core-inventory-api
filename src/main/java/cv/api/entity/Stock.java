@@ -83,8 +83,10 @@ public class Stock implements java.io.Serializable {
     private String intgUpdStatus;
     @Column(name = "explode")
     private boolean explode;
-    @Column(name = "loss_unit")
-    private String lossUnit;
+    @Column(name = "weight_unit")
+    private String weightUnit;
+    @Column(name = "weight")
+    private Float weight;
     @Transient
     private String relName;
     @Transient

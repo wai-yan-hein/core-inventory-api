@@ -75,6 +75,8 @@ public class VSale {
     private String batchNo;
     private String reference;
     private String supplierName;
+    private Float weight;
+    private String weightUnit;
 
 
 }

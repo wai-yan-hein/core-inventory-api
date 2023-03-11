@@ -44,10 +44,11 @@ public class PurHisDetail implements Serializable {
     private String compCode;
     @Column(name = "weight")
     private Float weight;
-    @Column(name = "std_qty")
-    private Float stdQty;
-    @Column(name = "avg_unit")
-    private String avgUnit;
+    @Column(name = "weight_unit")
+    private String weightUnit;
+    @Column(name = "std_weight")
+    private Float stdWeight;
+
     @Transient
     private String userCode;
     @Transient

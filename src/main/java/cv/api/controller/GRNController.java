@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -53,10 +54,10 @@ public class GRNController {
     }
 
     @GetMapping(path = "/get-grn-detail")
-    public ResponseEntity<?> getGRNDetail(@RequestParam String vouNo,
-                                          @RequestParam String compCode,
-                                          @RequestParam Integer deptId) {
-        return ResponseEntity.ok(grnDetailService.search(vouNo, compCode, deptId));
+    public Flux<?> getGRNDetail(@RequestParam String vouNo,
+                                @RequestParam String compCode,
+                                @RequestParam Integer deptId) {
+        return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId));
     }
 
     @PostMapping(path = "/delete-grn")
@@ -70,6 +71,6 @@ public class GRNController {
     public ResponseEntity<?> findByBatch(@RequestParam String batchNo,
                                          @RequestParam String compCode,
                                          @RequestParam Integer deptId) {
-        return ResponseEntity.ok(grnService.search(batchNo, compCode, deptId));
+        return ResponseEntity.ok(grnService.search(Util1.cleanStr(batchNo), compCode, deptId));
     }
 }

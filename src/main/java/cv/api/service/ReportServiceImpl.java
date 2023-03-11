@@ -109,7 +109,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VSale> getSaleVoucher(String vouNo) throws Exception {
         List<VSale> saleList = new ArrayList<>();
         String sql = "select t.trader_name,t.rfid,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
-                "v.qty,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
+                "v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
                 "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" +
                 "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" +
                 "join location l on v.loc_code = l.loc_code\n" +
@@ -152,6 +152,8 @@ public class ReportServiceImpl implements ReportService {
             sale.setCreatedBy(getAppUser(rs.getString("created_by")));
             sale.setCompCode(rs.getString("comp_code"));
             sale.setCategoryName(rs.getString("cat_name"));
+            sale.setWeight(rs.getFloat("weight"));
+            sale.setWeightUnit(rs.getString("weight_unit"));
             saleList.add(sale);
         }
         return saleList;
@@ -2543,6 +2545,45 @@ public class ReportServiceImpl implements ReportService {
             }
         } catch (Exception e) {
             log.error("getGRNHistory : " + e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
+    public List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode) {
+        List<VPurchase> list = new ArrayList<>();
+        String sql = "select 'I' group_name,user_code,stock_name,qty,unit,weight,weight_unit,0 price,0 amount,qty*weight ttl_qty,qty*weight ttl\n" +
+                "from v_grn\n" +
+                "where batch_no ='" + batchNo + "'\n" +
+                "and stock_code in (select stock_code from pur_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "')\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "\tunion all\n" +
+                "select 'R',s_user_code,stock_name,qty,pur_unit,weight,weight_unit,pur_price,pur_amt,qty*weight ttl_qty,(qty*weight)*-1 ttl\n" +
+                "from v_purchase\n" +
+                "where vou_no ='" + vouNo + "'\n" +
+                "and comp_code ='" + compCode + "'\n";
+
+        try {
+            ResultSet rs = getResult(sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    VPurchase p = new VPurchase();
+                    p.setGroupName(rs.getString("group_name"));
+                    p.setStockUserCode(rs.getString("user_code"));
+                    p.setStockName(rs.getString("stock_name"));
+                    p.setQty(Util1.toNull(rs.getFloat("qty")));
+                    p.setPurUnit(rs.getString("unit"));
+                    p.setWeight(Util1.toNull(rs.getFloat("weight")));
+                    p.setWeightUnit(rs.getString("weight_unit"));
+                    p.setPurAmount(Util1.toNull(rs.getFloat("amount")));
+                    p.setTotalQty(Util1.toNull(rs.getFloat("ttl_qty")));
+                    p.setPurPrice(Util1.toNull(rs.getFloat("price")));
+                    p.setTotal(Util1.toNull(rs.getFloat("ttl")));
+                    list.add(p);
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
         return list;
     }

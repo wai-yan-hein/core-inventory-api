@@ -462,7 +462,63 @@ alter table stock
 add column loss_unit varchar(15) null after intg_upd_status;
 
 drop view if exists v_purchase;
-create view v_purchase as select ph.vou_date as vou_date,ph.balance as balance,ph.deleted as deleted,ph.discount as discount,ph.due_date as due_date,ph.paid as paid,ph.remark as remark,ph.ref_no as ref_no,ph.updated_by as updated_by,ph.updated_date as updated_date,ph.created_by as created_by,ph.created_date as created_date,ph.vou_total as vou_total,ph.cur_code as cur_code,ph.trader_code as trader_code,ph.disc_p as disc_p,ph.tax_p as tax_p,ph.tax_amt as tax_amt,ph.dept_id as dept_id,ph.intg_upd_status as intg_upd_status,ph.comp_code as comp_code,ph.reference as reference,pd.pd_code as pd_code,pd.vou_no as vou_no,pd.stock_code as stock_code,pd.exp_date as exp_date,pd.avg_qty as avg_qty,pd.qty as qty,pd.pur_unit as pur_unit,pd.pur_price as pur_price,pd.pur_amt as pur_amt,pd.loc_code as loc_code,pd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((pur_his ph join pur_his_detail pd on(ph.vou_no = pd.vou_no)) join stock s on(pd.stock_code = s.stock_code));
+create  view v_purchase as select ph.vou_date as vou_date,ph.balance as balance,ph.deleted as deleted,ph.discount as discount,ph.due_date as due_date,ph.paid as paid,ph.remark as remark,ph.ref_no as ref_no,ph.updated_by as updated_by,ph.updated_date as updated_date,ph.created_by as created_by,ph.created_date as created_date,ph.vou_total as vou_total,ph.cur_code as cur_code,ph.trader_code as trader_code,ph.disc_p as disc_p,ph.tax_p as tax_p,ph.tax_amt as tax_amt,ph.dept_id as dept_id,ph.intg_upd_status as intg_upd_status,ph.comp_code as comp_code,ph.reference as reference,pd.pd_code as pd_code,pd.vou_no as vou_no,pd.stock_code as stock_code,pd.exp_date as exp_date,pd.avg_qty as avg_qty,pd.qty as qty,pd.weight as weight,pd.weight_unit as weight_unit,pd.std_weight as std_weight,pd.pur_unit as pur_unit,pd.pur_price as pur_price,pd.pur_amt as pur_amt,pd.loc_code as loc_code,pd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((pur_his ph join pur_his_detail pd on(ph.vou_no = pd.vou_no)) join stock s on(pd.stock_code = s.stock_code));
 
+alter table grn_detail
+add column weight float(20,3) null after unit,
+add column weight_unit varchar(15) null after weight;
+
+alter table stock
+change column loss_unit weight_unit varchar(15) null default null ;
+ALTER TABLE `stock`
+ADD COLUMN `std_wt` FLOAT NULL AFTER `explode`;
+
+ALTER TABLE `pur_his_detail`
+ADD COLUMN `std_weight` FLOAT NULL,
+ADD COLUMN `weight` FLOAT NULL,
+ADD COLUMN `weight_unit` FLOAT NULL;
+
+
+
+CREATE TABLE `expense` (
+  `expense_code` varchar(15) NOT NULL,
+  `comp_code` varchar(15) NOT NULL,
+  `expense_name` varchar(255) NOT NULL,
+  `account_code` varchar(15) NOT NULL,
+  `deleted` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`expense_code`,`comp_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+CREATE TABLE `pur_expense` (
+  `expense_code` varchar(15) NOT NULL,
+  `vou_no` varchar(15) NOT NULL,
+  `comp_code` varchar(15) NOT NULL,
+  `unique_id` int(11) NOT NULL,
+  `amount` float NOT NULL,
+  PRIMARY KEY (`expense_code`,`comp_code`,`vou_no`,`unique_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+alter table pur_his
+add column expense float(20,3) not null after batch_no;
+create view v_grn as
+select g.*,gd.stock_code,gd.loc_code,gd.qty,gd.unit,gd.weight,gd.weight_unit,
+s.user_code,s.stock_name,s.stock_type_code,s.category_code,s.brand_code,s.rel_code,s.calculate
+from grn g join grn_detail gd
+on g.vou_no = gd.vou_no
+and g.comp_code =gd.comp_code
+join stock s on gd.stock_code = s.stock_code
+and gd.comp_code = s.comp_code
+
+drop view if exists v_purchase;
+create  view v_purchase as select ph.vou_date as vou_date,ph.balance as balance,ph.deleted as deleted,ph.discount as discount,ph.due_date as due_date,ph.paid as paid,ph.remark as remark,ph.ref_no as ref_no,ph.updated_by as updated_by,ph.updated_date as updated_date,ph.created_by as created_by,ph.created_date as created_date,ph.vou_total as vou_total,ph.cur_code as cur_code,ph.trader_code as trader_code,ph.disc_p as disc_p,ph.tax_p as tax_p,ph.tax_amt as tax_amt,ph.dept_id as dept_id,ph.intg_upd_status as intg_upd_status,ph.comp_code as comp_code,ph.reference as reference,pd.pd_code as pd_code,pd.vou_no as vou_no,pd.stock_code as stock_code,pd.exp_date as exp_date,pd.avg_qty as avg_qty,pd.qty as qty,pd.weight as weight,pd.weight_unit as weight_unit,pd.std_weight as std_weight,pd.pur_unit as pur_unit,pd.pur_price as pur_price,pd.pur_amt as pur_amt,pd.loc_code as loc_code,pd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((pur_his ph join pur_his_detail pd on(ph.vou_no = pd.vou_no)) join stock s on(pd.stock_code = s.stock_code));
+
+alter table sale_his_detail
+add column weight float(20,3) null after batch_no,
+add column weight_unit varchar(15) null after weight,
+add column std_weight float(20,3);
+
+
+drop view if exists v_sale;
+create  view v_sale as select sh.vou_no as vou_no,sh.trader_code as trader_code,sh.saleman_code as saleman_code,sh.vou_date as vou_date,sh.credit_term as credit_term,sh.cur_code as cur_code,sh.remark as remark,sh.vou_total as vou_total,sh.grand_total as grand_total,sh.discount as discount,sh.disc_p as disc_p,sh.tax_amt as tax_amt,sh.tax_p as tax_p,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.paid as paid,sh.vou_balance as vou_balance,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.address as address,sh.order_code as order_code,sh.mac_id as mac_id,sh.session_id as session_id,sh.reference as reference,sh.dept_id as dept_id,sd.sd_code as sd_code,sd.stock_code as stock_code,sd.expire_date as expire_date,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.sale_unit as sale_unit,sd.sale_price as sale_price,sd.sale_amt as sale_amt,sd.loc_code as loc_code,sd.batch_no as batch_no,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((sale_his sh join sale_his_detail sd on(sh.vou_no = sd.vou_no)) join stock s on(sd.stock_code = s.stock_code));
 
 

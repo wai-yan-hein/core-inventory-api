@@ -47,6 +47,12 @@ public class SaleHisDetail implements java.io.Serializable {
     private String vouNo;
     @Column(name = "batch_no")
     private String batchNo;
+    @Column(name = "weight")
+    private Float weight;
+    @Column(name = "weight_unit")
+    private String weightUnit;
+    @Column(name = "std_weight")
+    private Float stdWeight;
     @Transient
     private String userCode;
     @Transient

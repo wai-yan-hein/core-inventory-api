@@ -74,6 +74,9 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     op.setKey(key);
                     op.setVouNo(rs.getString("vou_no"));
                     op.setStockCode(rs.getString("stock_code"));
+                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeightUnit(rs.getString("weight_unit"));
+                    op.setStdWeight(rs.getFloat("std_weight"));
                     op.setQty(rs.getFloat("qty"));
                     op.setPrice(rs.getFloat("sale_price"));
                     op.setAmount(rs.getFloat("sale_amt"));
@@ -149,9 +152,9 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "from (\n" +
                 "select stock_code,sum(qty) qty,sale_unit,sale_price,loc_code,comp_code,dept_id\n" +
                 "from sale_his_detail\n" +
-                "where batch_no ='"+batchNo+"'\n" +
-                "and comp_code ='"+compCode+"'\n" +
-                "and dept_id = "+deptId+"\n" +
+                "where batch_no ='" + batchNo + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and dept_id = " + deptId + "\n" +
                 "group by stock_code,sale_unit,sale_price,loc_code\n" +
                 ")a\n" +
                 "join stock s on a.stock_code = s.stock_code\n" +

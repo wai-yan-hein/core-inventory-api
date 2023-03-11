@@ -231,4 +231,11 @@ public class Util1 {
         TransliterateZ2U z2U = new TransliterateZ2U("Zawgyi to Unicode");
         return z2U.convert(str);
     }
+    public static Float toNull(float value) {
+        return value == 0 ? null : value;
+    }
+    public static String cleanStr(String str) {
+        return str.trim().replaceAll("[^a-zA-Z0-9\\s.,?!:;\"'()-]", "");
+    }
+
 }

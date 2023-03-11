@@ -152,7 +152,8 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                     s.setPurPrice(rs.getFloat("pur_price"));
                     s.setPurUnitCode(rs.getString("pur_unit"));
                     s.setSaleUnitCode(rs.getString("sale_unit"));
-                    s.setLossUnit(rs.getString("loss_unit"));
+                    s.setWeightUnit(rs.getString("weight_unit"));
+                    s.setWeight(rs.getFloat("weight"));
                     s.setSalePriceN(rs.getFloat("sale_price_n"));
                     s.setSalePriceA(rs.getFloat("sale_price_a"));
                     s.setSalePriceB(rs.getFloat("sale_price_b"));

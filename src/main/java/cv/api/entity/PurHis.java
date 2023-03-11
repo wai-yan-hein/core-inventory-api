@@ -78,6 +78,8 @@ public class PurHis implements java.io.Serializable {
     private Float commP;
     @Column(name = "comm_amt")
     private Float commAmt;
+    @Column(name = "expense")
+    private Float expense;
     @Transient
     private String status = "STATUS";
     @Transient

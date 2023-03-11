@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -94,7 +95,7 @@ public class SaleController {
     }
 
     @PostMapping(path = "/get-sale")
-    public ResponseEntity<List<VSale>> getSale(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getSale(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -112,7 +113,7 @@ public class SaleController {
         String batchNo = Util1.isNull(filter.getBatchNo(), "-");
         List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
                 reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo);
-        return ResponseEntity.ok(saleList);
+        return Flux.fromIterable(saleList);
     }
 
     @PostMapping(path = "/delete-sale")
@@ -153,10 +154,11 @@ public class SaleController {
                                                  @RequestParam Integer deptId) {
         return ResponseEntity.ok(shService.getVoucherInfo(vouDate, compCode, deptId));
     }
+
     @GetMapping(path = "/get-sale-by-batch")
     public ResponseEntity<?> getSaleByBatch(@RequestParam String batchNo,
-                                                 @RequestParam String compCode,
-                                                 @RequestParam Integer deptId) {
+                                            @RequestParam String compCode,
+                                            @RequestParam Integer deptId) {
         return ResponseEntity.ok(sdService.getSaleByBatch(batchNo, compCode, deptId));
     }
 }

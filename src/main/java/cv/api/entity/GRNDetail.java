@@ -18,6 +18,10 @@ public class GRNDetail {
     private String unit;
     @Column(name = "loc_code")
     private String locCode;
+    @Column(name = "weight")
+    private Float weight;
+    @Column(name = "weight_unit")
+    private String weightUnit;
     @Transient
     private String userCode;
     @Transient
@@ -26,4 +30,6 @@ public class GRNDetail {
     private String relName;
     @Transient
     private String locName;
+    @Transient
+    private Float stdWeight;
 }

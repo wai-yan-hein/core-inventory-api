@@ -57,7 +57,7 @@ public class PurchaseController {
     }
 
     @PostMapping(path = "/get-pur")
-    public ResponseEntity<List<VPurchase>> getPur(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getPur(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -71,7 +71,7 @@ public class PurchaseController {
         String deleted = String.valueOf(filter.isDeleted());
         Integer deptId = filter.getDeptId();
         List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode, stockCode, locCode, compCode, deptId, deleted);
-        return ResponseEntity.ok(listPur);
+        return Flux.fromIterable(listPur);
     }
 
     @PostMapping(path = "/delete-pur")

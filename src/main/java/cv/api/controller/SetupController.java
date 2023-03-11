@@ -332,7 +332,7 @@ public class SetupController {
                                                         @RequestParam String type,
                                                         @RequestParam String compCode,
                                                         @RequestParam Integer deptId) {
-        return ResponseEntity.ok(traderService.searchTrader(text, type, compCode, deptId));
+        return ResponseEntity.ok(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
     }
 
     @GetMapping(path = "/get-supplier")
@@ -397,7 +397,7 @@ public class SetupController {
 
     @GetMapping(path = "/get-stock-list")
     public ResponseEntity<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(stockService.getStock(text, compCode, deptId));
+        return ResponseEntity.ok(stockService.getStock(Util1.cleanStr(text), compCode, deptId));
     }
 
     @PostMapping(path = "/delete-stock")

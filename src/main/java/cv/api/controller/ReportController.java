@@ -6,9 +6,11 @@
 package cv.api.controller;
 
 import cv.api.common.*;
+import cv.api.entity.PurExpense;
 import cv.api.entity.ReorderLevel;
 import cv.api.entity.VStockBalance;
 import cv.api.model.*;
+import cv.api.service.PurExpenseService;
 import cv.api.service.ReportService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -64,6 +68,14 @@ public class ReportController {
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo, compCode);
         Util1.writeJsonFile(listPur, exportPath);
         return new FileInputStream(exportPath).readAllBytes();
+    }
+
+    @GetMapping(value = "/get-purchase-weight-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<?> getPurWeightReport(@RequestParam String vouNo,
+                                      @RequestParam String compCode,
+                                      @RequestParam String batchNo) throws IOException {
+        List<VPurchase> list = reportService.getPurchaseByWeightVoucher(vouNo, Util1.isNull(batchNo, "-"), compCode);
+        return Flux.fromIterable(list);
     }
 
     @GetMapping(value = "/get-return-in-report", produces = MediaType.APPLICATION_JSON_VALUE)
