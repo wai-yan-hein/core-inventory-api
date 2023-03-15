@@ -163,7 +163,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select t.trader_name,p.remark,p.vou_no,\n" +
-                "p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" +
+                "p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" +
                 "from v_purchase p join trader t\n" +
                 "on p.trader_code = t.code\n" +
                 "where p.vou_no ='" + vouNo + "'\n" +
@@ -185,6 +185,7 @@ public class ReportServiceImpl implements ReportService {
                 purchase.setDiscount(rs.getFloat("discount"));
                 purchase.setPaid(rs.getFloat("paid"));
                 purchase.setBalance(rs.getFloat("balance"));
+                purchase.setBatchNo(rs.getString("batch_no"));
                 purchaseList.add(purchase);
             }
         }
@@ -473,8 +474,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByVoucherDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode,
-                                              String brandCode, String catCode, String locCode, String batchNo, String compCode,
+    public List<VSale> getSaleByVoucherDetail(String fromDate, String toDate,
+                                              String curCode, String stockCode, String typeCode,
+                                              String brandCode, String catCode, String locCode,
+                                              String batchNo, String compCode,
                                               Integer deptId, Integer macId) throws Exception {
         String filter = "";
         if (!typeCode.equals("-")) {
@@ -491,6 +494,9 @@ public class ReportServiceImpl implements ReportService {
         }
         if (!batchNo.equals("-")) {
             filter += "and batch_no='" + batchNo + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and loc_code='" + locCode + "'\n";
         }
         List<VSale> list = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
@@ -532,6 +538,57 @@ public class ReportServiceImpl implements ReportService {
                 s.setSaleAmount(rs.getFloat("sale_amt"));
                 s.setVouTotal(rs.getFloat("vou_total"));
                 s.setPaid(rs.getFloat("paid"));
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<VSale> getSaleByVoucherSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
+        String filter = "";
+        if (!typeCode.equals("-")) {
+            filter += "and stock_type_code='" + typeCode + "'\n";
+        }
+        if (!brandCode.equals("-")) {
+            filter += "and brand_code='" + brandCode + "'\n";
+        }
+        if (!catCode.equals("-")) {
+            filter += "and cat_code='" + catCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code='" + stockCode + "'\n";
+        }
+        if (!batchNo.equals("-")) {
+            filter += "and batch_no='" + batchNo + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and loc_code='" + locCode + "'\n";
+        }
+        List<VSale> list = new ArrayList<>();
+        String sql = "select a.*,t.trader_name\n" +
+                "from (\n" +
+                "select vou_no,vou_date,trader_code,vou_total,comp_code\n" +
+                "from sale_his\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted =0\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and cur_code ='" + curCode + "'\n" +
+                "" + filter + "\n" +
+                ")a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "order by vou_date,vou_no";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
+                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
+                VSale s = new VSale();
+                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setVouNo(rs.getString("vou_no"));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setVouTotal(rs.getFloat("vou_total"));
                 list.add(s);
             }
         }
@@ -1780,7 +1837,7 @@ public class ReportServiceImpl implements ReportService {
         }
         String sql = "select a.*,t.trader_name,t.user_code\n"
                 + "from (\n"
-                + "select  vou_no,date(vou_date) vou_date,remark,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
+                + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
                 + "from v_sale s \n"
                 + "where comp_code = '" + compCode + "'\n"
                 + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
@@ -1801,6 +1858,7 @@ public class ReportServiceImpl implements ReportService {
                     s.setTraderCode(rs.getString("user_code"));
                     s.setTraderName(rs.getString("trader_name"));
                     s.setRemark(rs.getString("remark"));
+                    s.setReference(rs.getString("reference"));
                     s.setCreatedBy(rs.getString("created_by"));
                     s.setPaid(rs.getFloat("paid"));
                     s.setVouTotal(rs.getFloat("vou_total"));
@@ -2472,7 +2530,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<GRN> getGRNHistory(String fromDate, String toDate, String traderCode, String vouNo,
+    public List<GRN> getGRNHistory(String fromDate, String toDate, String batchNo, String traderCode, String vouNo,
                                    String remark, String userCode, String stockCode, String locCode,
                                    String compCode, Integer deptId, String deleted, String close, boolean orderByBatch) {
         List<GRN> list = new ArrayList<>();
@@ -2483,6 +2541,9 @@ public class ReportServiceImpl implements ReportService {
         String filter = "";
         if (!fromDate.equals("-") && !toDate.equals("-")) {
             filter += "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n";
+        }
+        if (!batchNo.equals("-")) {
+            filter += "and g.batch_no = '" + batchNo + "'\n";
         }
         if (!vouNo.equals("-")) {
             filter += "and g.vou_no = '" + vouNo + "'\n";

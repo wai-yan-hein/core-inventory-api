@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class RetInController {
     }
 
     @PostMapping(path = "/get-retin")
-    public ResponseEntity<List<VReturnIn>> getRI(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getRI(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -69,7 +70,7 @@ public class RetInController {
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted);
-        return ResponseEntity.ok(listRI);
+        return Flux.fromIterable(listRI);
     }
 
     @PostMapping(path = "/delete-retin")

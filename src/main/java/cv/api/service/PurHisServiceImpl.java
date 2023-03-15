@@ -62,17 +62,19 @@ public class PurHisServiceImpl implements PurHisService {
         if (listExp != null) {
             for (int i = 0; i < listExp.size(); i++) {
                 PurExpense e = listExp.get(i);
-                if (e.getKey().getExpenseCode() != null) {
-                    if (e.getKey().getUniqueId() == null) {
-                        if (i == 0) {
-                            e.getKey().setUniqueId(1);
-                        } else {
-                            PurExpense pe = listExp.get(i - 1);
-                            e.getKey().setUniqueId(pe.getKey().getUniqueId() + 1);
+                if (Util1.getFloat(e.getAmount()) > 0) {
+                    if (e.getKey().getExpenseCode() != null) {
+                        if (e.getKey().getUniqueId() == null) {
+                            if (i == 0) {
+                                e.getKey().setUniqueId(1);
+                            } else {
+                                PurExpense pe = listExp.get(i - 1);
+                                e.getKey().setUniqueId(pe.getKey().getUniqueId() + 1);
+                            }
                         }
+                        e.getKey().setVouNo(vouNo);
+                        purExpenseDao.save(e);
                     }
-                    e.getKey().setVouNo(vouNo);
-                    purExpenseDao.save(e);
                 }
             }
         }

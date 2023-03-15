@@ -61,13 +61,9 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-purchase-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    byte[] getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
-        String reportName = "PurchaseVoucher";
-        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
+    public Flux<?> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo, compCode);
-        Util1.writeJsonFile(listPur, exportPath);
-        return new FileInputStream(exportPath).readAllBytes();
+        return Flux.fromIterable(listPur);
     }
 
     @GetMapping(value = "/get-purchase-weight-report", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -153,6 +149,10 @@ public class ReportController {
                     }
                     case "SaleByVoucherDetail" -> {
                         List<VSale> list = reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "SaleByVoucherSummary" -> {
+                        List<VSale> list = reportService.getSaleByVoucherSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "SaleByBatchDetail" -> {

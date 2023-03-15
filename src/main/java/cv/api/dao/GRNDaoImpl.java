@@ -39,15 +39,17 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     @Override
     public List<GRN> search(String batchNo, String compCode, Integer deptId) {
         List<GRN> list = new ArrayList<>();
-        String sql = "select a.batch_no,t.trader_name\n" +
+        String sql = "select a.batch_no,t.trader_name,a.vou_no\n" +
                 "from (\n" +
-                "select batch_no,trader_code,comp_code,dept_id\n" +
+                "select batch_no,trader_code,comp_code,dept_id,vou_no\n" +
                 "from grn\n" +
                 "where comp_code='" + compCode + "'\n" +
                 "and (dept_id =" + deptId + " or 0=" + deptId + ")\n" +
                 "and deleted =0\n" +
                 "and closed =0\n" +
                 "and batch_no like '" + batchNo + "%'\n" +
+                "order by batch_no\n" +
+                "limit 20\n" +
                 ")a\n" +
                 "join trader t on\n" +
                 "a.trader_code = t.code\n" +
@@ -58,6 +60,9 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
             if (rs != null) {
                 while (rs.next()) {
                     GRN g = new GRN();
+                    GRNKey key = new GRNKey();
+                    key.setVouNo(rs.getString("vou_no"));
+                    g.setKey(key);
                     g.setBatchNo(rs.getString("batch_no"));
                     g.setTraderName(rs.getString("trader_name"));
                     list.add(g);

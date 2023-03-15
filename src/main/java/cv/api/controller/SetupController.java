@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -322,9 +323,9 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-customer")
-    public ResponseEntity<List<Trader>> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<Trader> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<Trader> listB = traderService.findCustomer(compCode, deptId);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
 
     @GetMapping(path = "/get-trader-list")
@@ -336,9 +337,9 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-supplier")
-    public ResponseEntity<List<Trader>> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<Trader> listB = traderService.findSupplier(compCode, deptId);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
 
 
@@ -376,14 +377,16 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-stock")
-    public ResponseEntity<List<Stock>> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
+    public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
         List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
+
     @GetMapping(path = "/get-service")
     public ResponseEntity<List<Stock>> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(stockService.getService(compCode,deptId));
+        return ResponseEntity.ok(stockService.getService(compCode, deptId));
     }
+
     @PostMapping(path = "/search-stock")
     public ResponseEntity<?> searchStock(@RequestBody ReportFilter filter) {
         String stockCode = filter.getStockCode();
