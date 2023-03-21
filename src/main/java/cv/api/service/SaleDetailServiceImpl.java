@@ -24,9 +24,6 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     @Autowired
     private SaleHisDetailDao dao;
 
-    @Autowired
-    private SaleHisDao hisDao;
-
     @Override
     public SaleHisDetail save(SaleHisDetail sdh) {
         return dao.save(sdh);
@@ -45,5 +42,10 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     @Override
     public List<SaleHisDetail> getSaleByBatch(String batchNo, String compCode, Integer depId) {
         return dao.getSaleByBatch(batchNo, compCode, depId);
+    }
+
+    @Override
+    public List<SaleHisDetail> getSaleByBatchDetail(String batchNo, String compCode, Integer depId) {
+        return dao.getSaleByBatchDetail(batchNo,compCode,depId);
     }
 }

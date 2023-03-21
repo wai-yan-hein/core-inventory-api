@@ -158,7 +158,11 @@ public class SaleController {
     @GetMapping(path = "/get-sale-by-batch")
     public ResponseEntity<?> getSaleByBatch(@RequestParam String batchNo,
                                             @RequestParam String compCode,
-                                            @RequestParam Integer deptId) {
+                                            @RequestParam Integer deptId,
+                                            @RequestParam boolean detail) {
+        if (detail) {
+            return ResponseEntity.ok(sdService.getSaleByBatchDetail(batchNo, compCode, deptId));
+        }
         return ResponseEntity.ok(sdService.getSaleByBatch(batchNo, compCode, deptId));
     }
 }

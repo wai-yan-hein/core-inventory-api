@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -47,7 +48,7 @@ public class StockInOutController {
     }
 
     @PostMapping(path = "/get-stockio")
-    public ResponseEntity<List<VStockIO>> getStockIO(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getStockIO(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -61,7 +62,7 @@ public class StockInOutController {
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, locCode, compCode, deptId, deleted);
-        return ResponseEntity.ok(listStockIO);
+        return Flux.fromIterable(listStockIO);
     }
 
     @PostMapping(path = "/delete-stockio")
@@ -85,8 +86,8 @@ public class StockInOutController {
     }
 
     @GetMapping(path = "/get-stockio-detail")
-    public ResponseEntity<List<StockInOutDetail>> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<StockInOutDetail> listSD = iodService.search(vouNo, compCode, deptId);
-        return ResponseEntity.ok(listSD);
+        return Flux.fromIterable(listSD);
     }
 }
