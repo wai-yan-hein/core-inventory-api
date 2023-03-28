@@ -412,6 +412,9 @@ public class AccountRepo {
                 k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
+                if (t != null) {
+                    balAcc = Util1.isNull(t.getAccount(), balAcc);
+                }
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -561,7 +564,6 @@ public class AccountRepo {
 
     public void sendReturnIn(RetInHis ri) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
-
             String tranSource = "RETURN_IN";
             AccSetting setting = hmAccSetting.get(tranSource);
             if (ri != null) {
@@ -585,6 +587,9 @@ public class AccountRepo {
                 k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
+                if (t != null) {
+                    balAcc = Util1.isNull(t.getAccount(), balAcc);
+                }
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {
@@ -664,6 +669,9 @@ public class AccountRepo {
                 k.setDeptId(ro.getKey().getDeptId());
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
+                if (t != null) {
+                    balAcc = Util1.isNull(t.getAccount(), balAcc);
+                }
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouBal > 0) {

@@ -43,13 +43,11 @@ public class AutoUpload {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             if (!syncing) {
                 syncing = true;
-                log.info("autoUpload: Start");
                 uploadTrader();
                 uploadSaleVoucher();
                 uploadPurchaseVoucher();
                 uploadReturnInVoucher();
                 uploadReturnOutVoucher();
-                log.info("autoUpload: End");
                 syncing = false;
             }
         }
@@ -73,11 +71,12 @@ public class AutoUpload {
                 } else {
                     accountRepo.sendSale(vou);
                     sleep();
-                                    }
+                }
             });
             log.info(String.format("uploadSaleVoucher: %s", "done"));
         }
     }
+
     private void sleep() {
         try {
             Thread.sleep(50);
@@ -85,6 +84,7 @@ public class AutoUpload {
             Thread.currentThread().interrupt();
         }
     }
+
     private void uploadPurchaseVoucher() {
         List<PurHis> vouchers = purHisService.unUploadVoucher(syncDate);
         if (!vouchers.isEmpty()) {

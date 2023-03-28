@@ -37,6 +37,8 @@ public class GRN {
     private Integer macId;
     @Column(name = "remark")
     private String remark;
+    @Column(name = "loc_code")
+    private String locCode;
     @Transient
     private List<GRNDetail> listDetail;
     @Transient

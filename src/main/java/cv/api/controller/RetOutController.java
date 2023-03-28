@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class RetOutController {
     }
 
     @PostMapping(path = "/get-retout")
-    public ResponseEntity<List<VReturnOut>> getRO(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getRO(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -67,8 +68,8 @@ public class RetOutController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        List<VReturnOut> listRO = reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted);
-        return ResponseEntity.ok(listRO);
+        return Flux.fromIterable(reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode,
+                stockCode, locCode, compCode, deptId, deleted));
     }
 
     @PostMapping(path = "/delete-retout")
