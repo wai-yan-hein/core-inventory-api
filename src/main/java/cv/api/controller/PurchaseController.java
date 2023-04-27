@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -75,21 +76,20 @@ public class PurchaseController {
     }
 
     @PostMapping(path = "/delete-pur")
-    public ResponseEntity<ReturnObject> deletePur(@RequestBody PurHisKey key) throws Exception {
+    public Mono<?> deletePur(@RequestBody PurHisKey key) throws Exception {
         phService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
         if (cloudMQSender != null) cloudMQSender.delete(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-pur")
-    public ResponseEntity<?> restorePur(@RequestBody PurHisKey key) throws Exception {
+    public Mono<?> restorePur(@RequestBody PurHisKey key) throws Exception {
         phService.restore(key);
-        ro.setMessage("Restored.");
         if (cloudMQSender != null) cloudMQSender.restore(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-pur")

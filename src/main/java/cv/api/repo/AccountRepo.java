@@ -23,8 +23,6 @@ public class AccountRepo {
     @Autowired
     private WebClient accountApi;
     @Autowired
-    private HashMap<String, AccSetting> hmAccSetting;
-    @Autowired
     private ReportService reportService;
     @Autowired
     private Environment environment;
@@ -38,6 +36,8 @@ public class AccountRepo {
     private PurExpenseService purExpenseService;
     @Autowired
     private ExpenseService expenseService;
+    @Autowired
+    private AccSettingService settingService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -221,8 +221,9 @@ public class AccountRepo {
     public void sendSale(SaleHis sh) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             String tranSource = "SALE";
-            AccSetting setting = hmAccSetting.get(tranSource);
-            if (!Objects.isNull(sh)) {
+            String compCode = sh.getKey().getCompCode();
+            AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
+            if (!Objects.isNull(setting)) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
                 String disAcc = setting.getDiscountAcc();
@@ -235,7 +236,6 @@ public class AccountRepo {
                 String remark = sh.getRemark();
                 boolean deleted = sh.isDeleted();
                 String vouNo = sh.getKey().getVouNo();
-                String compCode = sh.getKey().getCompCode();
                 double vouBal = Util1.getDouble(sh.getBalance());
                 double vouDis = Util1.getDouble(sh.getDiscount());
                 double vouPaid = Util1.getDouble(sh.getPaid());
@@ -383,8 +383,9 @@ public class AccountRepo {
     public void sendPurchase(PurHis ph) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             String tranSource = "PURCHASE";
-            AccSetting setting = hmAccSetting.get(tranSource);
-            if (ph != null) {
+            String compCode = ph.getKey().getCompCode();
+            AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
+            if (setting != null) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
@@ -393,7 +394,6 @@ public class AccountRepo {
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ph.getVouDate();
                 String traderCode = ph.getTraderCode();
-                String compCode = ph.getKey().getCompCode();
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
                 boolean deleted = ph.isDeleted();
@@ -565,15 +565,15 @@ public class AccountRepo {
     public void sendReturnIn(RetInHis ri) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             String tranSource = "RETURN_IN";
-            AccSetting setting = hmAccSetting.get(tranSource);
-            if (ri != null) {
+            String compCode = ri.getKey().getCompCode();
+            AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
+            if (setting != null) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ri.getVouDate();
                 String traderCode = ri.getTraderCode();
-                String compCode = ri.getKey().getCompCode();
                 String curCode = ri.getCurCode();
                 String remark = ri.getRemark();
                 boolean deleted = ri.isDeleted();
@@ -647,15 +647,15 @@ public class AccountRepo {
     public void sendReturnOut(RetOutHis ro) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             String tranSource = "RETURN_OUT";
-            AccSetting setting = hmAccSetting.get(tranSource);
-            if (ro != null) {
+            String compCode = ro.getKey().getCompCode();
+            AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
+            if (setting != null) {
                 String srcAcc = setting.getSourceAcc();
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
                 Date vouDate = ro.getVouDate();
                 String traderCode = ro.getTraderCode();
-                String compCode = ro.getKey().getCompCode();
                 String curCode = ro.getCurCode();
                 String remark = ro.getRemark();
                 boolean deleted = ro.isDeleted();

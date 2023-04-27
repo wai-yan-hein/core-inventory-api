@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -117,21 +118,20 @@ public class SaleController {
     }
 
     @PostMapping(path = "/delete-sale")
-    public ResponseEntity<ReturnObject> deleteSale(@RequestBody SaleHisKey key) throws Exception {
+    public Mono<?> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
         if (cloudMQSender != null) cloudMQSender.delete(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-sale")
-    public ResponseEntity<ReturnObject> restoreSale(@RequestBody SaleHisKey key) throws Exception {
+    public Mono<?> restoreSale(@RequestBody SaleHisKey key) throws Exception {
         shService.restore(key);
-        ro.setMessage("Restored.");
         if (cloudMQSender != null) cloudMQSender.restore(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-sale")

@@ -108,7 +108,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleVoucher(String vouNo) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select t.trader_name,t.rfid,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
+        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
                 "v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
                 "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" +
                 "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" +
@@ -135,6 +135,8 @@ public class ReportServiceImpl implements ReportService {
             sale.setTraderName(rs.getString("trader_name"));
             sale.setRemark(remark);
             sale.setRefNo(refNo);
+            sale.setPhoneNo(rs.getString("phone"));
+            sale.setAddress(rs.getString("address"));
             sale.setRfId(rs.getString("rfid"));
             sale.setVouNo(rs.getString("vou_no"));
             sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
@@ -444,6 +446,7 @@ public class ReportServiceImpl implements ReportService {
                 "and comp_code = '" + compCode + "'\n" +
                 "and dept_id =" + deptId + "\n" +
                 "and deleted = 0\n" +
+                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
@@ -666,7 +669,18 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" + "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "order by v.s_user_code,v.vou_no";
+        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
+                "from v_sale v join trader t\n" +
+                "on v.trader_code = t.code\n" +
+                "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
+                "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
+                "and v.cur_code = '" + curCode + "'\n" +
+                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "order by v.s_user_code,v.vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {

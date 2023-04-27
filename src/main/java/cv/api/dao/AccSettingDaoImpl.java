@@ -5,6 +5,7 @@
  */
 package cv.api.dao;
 
+import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
 import org.springframework.stereotype.Repository;
 
@@ -14,11 +15,11 @@ import java.util.List;
  * @author wai yan
  */
 @Repository
-public class AccSettingDaoImpl extends AbstractDao<String, AccSetting> implements AccSettingDao {
+public class AccSettingDaoImpl extends AbstractDao<AccKey, AccSetting> implements AccSettingDao {
 
     @Override
-    public List<AccSetting> findAll() {
-        String hsql = "select o from AccSetting o";
+    public List<AccSetting> findAll(String compCode) {
+        String hsql = "select o from AccSetting o where o.key.compCode ='" + compCode + "'";
         return findHSQL(hsql);
     }
 
@@ -30,8 +31,8 @@ public class AccSettingDaoImpl extends AbstractDao<String, AccSetting> implement
     }
 
     @Override
-    public AccSetting findByCode(String code) {
-        return getByKey(code);
+    public AccSetting findByCode(AccKey key) {
+        return getByKey(key);
     }
 
 }

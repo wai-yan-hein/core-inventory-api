@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -74,21 +75,21 @@ public class RetInController {
     }
 
     @PostMapping(path = "/delete-retin")
-    public ResponseEntity<ReturnObject> deleteRI(@RequestBody RetInHisKey key) throws Exception {
+    public Mono<?> deleteRI(@RequestBody RetInHisKey key) throws Exception {
         riService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
         if (cloudMQSender != null) cloudMQSender.delete(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-retin")
-    public ResponseEntity<ReturnObject> restoreRI(@RequestBody RetInHisKey key) throws Exception {
+    public Mono<?> restoreRI(@RequestBody RetInHisKey key) throws Exception {
         riService.restore(key);
         ro.setMessage("Restored.");
         if (cloudMQSender != null) cloudMQSender.restore(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-retin")

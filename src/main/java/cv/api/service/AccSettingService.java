@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
 
 import java.util.List;
@@ -14,10 +15,10 @@ import java.util.List;
  */
 public interface AccSettingService {
 
-    List<AccSetting> findAll();
+    List<AccSetting> findAll(String compCode);
 
     AccSetting save(AccSetting setting);
 
-    AccSetting findByCode(String code);
+    AccSetting findByCode(AccKey key);
 
 }

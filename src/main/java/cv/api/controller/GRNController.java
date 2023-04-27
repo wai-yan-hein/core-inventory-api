@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +79,9 @@ public class GRNController {
     }
 
     @PostMapping(path = "/delete-grn")
-    public ResponseEntity<?> deleteGRN(@RequestBody GRNKey key) {
+    public Mono<?> deleteGRN(@RequestBody GRNKey key) {
         grnService.delete(key);
-        ro.setMessage("deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @GetMapping(path = "/get-batch-list")

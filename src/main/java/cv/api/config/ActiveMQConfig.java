@@ -5,6 +5,7 @@
  */
 package cv.api.config;
 
+import cv.api.common.Util1;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
@@ -33,7 +35,8 @@ import java.util.List;
 public class ActiveMQConfig {
     @Autowired
     private UserRepo userRepo;
-
+    @Autowired
+    private Environment environment;
 
     public ActiveMQConnectionFactory connectionFactory(String url) {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
@@ -86,5 +89,4 @@ public class ActiveMQConfig {
         factory.setPubSubDomain(true);
         return factory;
     }
-
 }

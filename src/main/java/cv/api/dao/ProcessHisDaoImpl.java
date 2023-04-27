@@ -29,7 +29,7 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                                    String stockCode, String pt, String locCode, boolean finish, boolean deleted, String compCode, Integer deptId) {
         List<ProcessHis> list = new ArrayList<>();
         String filter = "where comp_code ='" + compCode + "'\n"
-                + "and dept_id =" + deptId + "\n"
+                + "and (dept_id =" + deptId + " or 0=" + deptId + ")\n"
                 + "and finished =" + finish + "\n"
                 + "and deleted =" + deleted + "\n"
                 + "and date(vou_date)>='" + fromDate + "'\n"
@@ -56,8 +56,7 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
         String sql = "select a.*,s.user_code,s.stock_name,l.loc_name,v.description\n" +
                 "from (\n" +
                 "select *\n" +
-                "from process_his\n" +
-                "" + filter + "\n" +
+                "from process_his\n" + filter + "\n" +
                 ")a\n" +
                 "join stock s on a.stock_code = s.stock_code\n" +
                 "and a.comp_code = s.comp_code\n" +

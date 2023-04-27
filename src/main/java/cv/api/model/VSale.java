@@ -77,6 +77,8 @@ public class VSale {
     private String supplierName;
     private Float weight;
     private String weightUnit;
+    private String phoneNo;
+    private String address;
 
 
 }

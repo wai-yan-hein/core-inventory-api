@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -75,6 +76,8 @@ public class SetupController {
     private ConverterService converterService;
     @Autowired
     private AccountRepo accountRepo;
+    @Autowired
+    private AccSettingService accSettingService;
     @Autowired(required = false)
     private CloudMQSender cloudMQSender;
 
@@ -322,6 +325,7 @@ public class SetupController {
         return ResponseEntity.ok(listB);
     }
 
+
     @GetMapping(path = "/get-customer")
     public Flux<Trader> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<Trader> listB = traderService.findCustomer(compCode, deptId);
@@ -438,7 +442,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-opening")
-    public ResponseEntity<ReturnObject> saveOpening(@RequestBody OPHis opHis, HttpServletRequest request) {
+    public Mono<?> saveOpening(@RequestBody OPHis opHis, HttpServletRequest request) {
         if (Util1.isNullOrEmpty(opHis.getVouDate())) {
             ro.setMessage("Invalid Opening Date.");
         } else if (Util1.isNullOrEmpty(opHis.getLocCode())) {
@@ -451,13 +455,12 @@ public class SetupController {
             opHis.setDetailList(detailList);
             try {
                 opHis.setUpdatedDate(Util1.getTodayDate());
-                opHisService.save(opHis);
-                ro.setMessage("Saved Opening.");
+                return Mono.just(opHisService.save(opHis));
             } catch (Exception e) {
                 log.error(String.format("saveOpening : %s", e.getMessage()));
             }
         }
-        return ResponseEntity.ok(ro);
+        return Mono.just(ro);
     }
 
     @PostMapping(path = "/get-opening")
@@ -481,10 +484,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/delete-opening")
-    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody OPHisKey key) {
+    public Mono<?> deleteStockIO(@RequestBody OPHisKey key) {
         opHisService.delete(key);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/save-opening-detail")
@@ -505,10 +507,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/delete-pattern")
-    public ResponseEntity<?> deletePattern(@RequestBody Pattern p) {
+    public Mono<?> deletePattern(@RequestBody Pattern p) {
         patternService.delete(p);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-pattern")
@@ -532,10 +533,10 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-price-option")
-    public ResponseEntity<List<PriceOption>> getPriceOption(@RequestParam String option,
-                                                            @RequestParam String compCode,
-                                                            @RequestParam Integer deptId) {
-        return ResponseEntity.ok(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
+    public Flux<?> getPriceOption(@RequestParam String option,
+                                  @RequestParam String compCode,
+                                  @RequestParam Integer deptId) {
+        return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
     }
 
     @GetMapping(path = "/get-unit-relation")
@@ -609,5 +610,15 @@ public class SetupController {
     @GetMapping(path = "/get-batch")
     public ResponseEntity<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(batchService.findAll(compCode, deptId));
+    }
+
+    @GetMapping(path = "/getAccSetting")
+    public Flux<?> getAccSetting(@RequestParam String compCode) {
+        return Flux.just(accSettingService.findAll(compCode));
+    }
+
+    @PostMapping(path = "/saveAccSetting")
+    public Mono<?> saveAccSetting(@RequestBody AccSetting setting) {
+        return Mono.just(accSettingService.save(setting));
     }
 }

@@ -40,6 +40,7 @@ public class AutoUpload {
 
     @Scheduled(fixedRate = 5 * 60 * 1000)
     private void autoUpload() {
+        Util1.SYNC_DATE = environment.getProperty("sync.date");
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             if (!syncing) {
                 syncing = true;

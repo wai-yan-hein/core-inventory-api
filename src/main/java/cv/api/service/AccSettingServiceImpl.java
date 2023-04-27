@@ -6,6 +6,7 @@
 package cv.api.service;
 
 import cv.api.dao.AccSettingDao;
+import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class AccSettingServiceImpl implements AccSettingService {
     private AccSettingDao dao;
 
     @Override
-    public List<AccSetting> findAll() {
-        return dao.findAll();
+    public List<AccSetting> findAll(String compCode) {
+        return dao.findAll(compCode);
     }
 
     @Override
@@ -34,8 +35,8 @@ public class AccSettingServiceImpl implements AccSettingService {
     }
 
     @Override
-    public AccSetting findByCode(String code) {
-        return dao.findByCode(code);
+    public AccSetting findByCode(AccKey key) {
+        return dao.findByCode(key);
     }
 
 }

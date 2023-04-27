@@ -6,20 +6,8 @@ drop table if exists sys_prop;
 alter table reorder_level 
 change column bal_unit bal_unit varchar(15) null ;
 
-create table department (
-  dept_id int(11) not null,
-  user_code varchar(15) not null,
-  dept_name varchar(255) not null,
-  queue_name varchar(50) default null,
-  primary key (dept_id)
-) engine=innodb default charset=utf8mb3;
-
-insert into department (dept_id, user_code, dept_name) values ('1', 'H', 'Head Office');
-
 alter table region 
 add column dept_id int not null default 1 ;
-
-
 
 alter table vou_status 
 add column dept_id int not null default 1,
@@ -50,8 +38,6 @@ add primary key (unit_code, dept_id,comp_code);
 alter table stock_unit 
 drop index item_unit_name_UNIQUE ,
 drop index item_unit_code ;
-;
-
 
 alter table stock_type 
 add column dept_id int not null default 1,
@@ -356,18 +342,17 @@ create table tmp_stock_balance (
   primary key (stock_code,mac_id,loc_code,unit,dept_id,comp_code)
 ) engine=innodb default charset=utf8mb3;
 
-ALTER TABLE `reorder_level` 
-ADD COLUMN `loc_code` VARCHAR(15) NOT NULL AFTER `dept_id`,
-CHANGE COLUMN `min_qty` `min_qty` FLOAT NULL DEFAULT 0 ,
-CHANGE COLUMN `min_unit` `min_unit` VARCHAR(15) NULL ,
-CHANGE COLUMN `max_qty` `max_qty` VARCHAR(15) NULL DEFAULT '0' ,
-CHANGE COLUMN `max_unit` `max_unit` VARCHAR(15) NULL ,
-CHANGE COLUMN `bal_qty` `bal_qty` VARCHAR(15) NULL DEFAULT '0' ,
+ALTER TABLE reorder_level
+ADD COLUMN loc_code VARCHAR(15) NOT NULL AFTER dept_id,
+CHANGE COLUMN min_qty min_qty FLOAT NULL DEFAULT 0 ,
+CHANGE COLUMN min_unit min_unit VARCHAR(15) NULL ,
+CHANGE COLUMN max_qty max_qty VARCHAR(15) NULL DEFAULT '0' ,
+CHANGE COLUMN max_unit max_unit VARCHAR(15) NULL ,
+CHANGE COLUMN bal_qty bal_qty VARCHAR(15) NULL DEFAULT '0' ,
 DROP PRIMARY KEY,
-ADD PRIMARY KEY (`stock_code`, `dept_id`, `comp_code`, `loc_code`);
-;
-ALTER TABLE `pattern` 
-ADD COLUMN `price_type` VARCHAR(15) NULL AFTER `intg_upd_status`;
+ADD PRIMARY KEY (stock_code, dept_id, comp_code, loc_code);
+ALTER TABLE pattern
+ADD COLUMN price_type VARCHAR(15) NULL AFTER intg_upd_status;
 
 
 #view
@@ -405,12 +390,12 @@ drop view if exists v_process_his_detail;
 create  view v_process_his_detail as select pd.vou_no as vou_no,pd.stock_code as stock_code,pd.comp_code as comp_code,pd.dept_id as dept_id,pd.unique_id as unique_id,pd.vou_date as vou_date,pd.qty as qty,pd.unit as unit,pd.price as price,pd.loc_code as loc_code,p.deleted as deleted,p.pt_code as pt_code,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.calculate as calculate,s.rel_code as rel_code from ((process_his_detail pd join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code and pd.dept_id = s.dept_id)) join process_his p on(pd.vou_no = p.vou_no and pd.comp_code = p.comp_code and pd.dept_id = p.dept_id));
 
 #2023-01-12
-ALTER TABLE `trader`
-DROP COLUMN `app_trader_code`,
-DROP COLUMN `app_short_name`,
-DROP COLUMN `parent`,
-ADD COLUMN `rfid` VARCHAR(50) NULL AFTER `account`,
-ADD COLUMN `nrc` VARCHAR(255) NULL AFTER `rfid`;
+ALTER TABLE trader
+DROP COLUMN app_trader_code,
+DROP COLUMN app_short_name,
+DROP COLUMN parent,
+ADD COLUMN rfid VARCHAR(50) NULL AFTER account,
+ADD COLUMN nrc VARCHAR(255) NULL AFTER rfid;
 
 
 alter table sale_his_detail
@@ -462,31 +447,32 @@ add column weight_unit varchar(15) null after weight;
 
 alter table stock
 add column weight_unit varchar(15) null default null ;
-ALTER TABLE `stock`
-ADD COLUMN `weight`;
+alter table stock
+add column weight float null;
 
-ALTER TABLE `pur_his_detail`
-ADD COLUMN `std_weight` FLOAT NULL,
-ADD COLUMN `weight_unit` FLOAT NULL;
+alter table pur_his_detail
+add column weight float null,
+add column std_weight float null,
+add column weight_unit float null;
 
 
-CREATE TABLE `expense` (
-  `expense_code` varchar(15) NOT NULL,
-  `comp_code` varchar(15) NOT NULL,
-  `expense_name` varchar(255) NOT NULL,
-  `account_code` varchar(15) NOT NULL,
-  `deleted` bit(1) NOT NULL DEFAULT b'0',
-  PRIMARY KEY (`expense_code`,`comp_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+create table expense (
+  expense_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  expense_name varchar(255) not null,
+  account_code varchar(15) not null,
+  deleted bit(1) not null default b'0',
+  primary key (expense_code,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
-CREATE TABLE `pur_expense` (
-  `expense_code` varchar(15) NOT NULL,
-  `vou_no` varchar(15) NOT NULL,
-  `comp_code` varchar(15) NOT NULL,
-  `unique_id` int(11) NOT NULL,
-  `amount` float NOT NULL,
-  PRIMARY KEY (`expense_code`,`comp_code`,`vou_no`,`unique_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+create table pur_expense (
+  expense_code varchar(15) not null,
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  unique_id int(11) not null,
+  amount float not null,
+  primary key (expense_code,comp_code,vou_no,unique_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
 alter table pur_his
 add column expense float(20,3) not null after batch_no;
@@ -511,4 +497,14 @@ add column std_weight float(20,3);
 drop view if exists v_sale;
 create  view v_sale as select sh.vou_no as vou_no,sh.trader_code as trader_code,sh.saleman_code as saleman_code,sh.vou_date as vou_date,sh.credit_term as credit_term,sh.cur_code as cur_code,sh.remark as remark,sh.vou_total as vou_total,sh.grand_total as grand_total,sh.discount as discount,sh.disc_p as disc_p,sh.tax_amt as tax_amt,sh.tax_p as tax_p,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.paid as paid,sh.vou_balance as vou_balance,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.address as address,sh.order_code as order_code,sh.mac_id as mac_id,sh.session_id as session_id,sh.reference as reference,sh.dept_id as dept_id,sd.sd_code as sd_code,sd.stock_code as stock_code,sd.expire_date as expire_date,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.sale_unit as sale_unit,sd.sale_price as sale_price,sd.sale_amt as sale_amt,sd.loc_code as loc_code,sd.batch_no as batch_no,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((sale_his sh join sale_his_detail sd on(sh.vou_no = sd.vou_no)) join stock s on(sd.stock_code = s.stock_code));
 
+alter table grn
+add column loc_code varchar(15) null after mac_id;
 
+alter table acc_setting
+add column comp_code varchar(15) not null after type,
+drop primary key,
+add primary key (type, comp_code);
+
+set sql_safe_updates =0;
+update acc_setting
+set comp_code ='0010010';

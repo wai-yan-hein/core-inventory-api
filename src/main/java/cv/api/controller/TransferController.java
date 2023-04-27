@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -84,20 +85,16 @@ public class TransferController {
     }
 
     @PostMapping(path = "/delete-transfer")
-    public ResponseEntity<ReturnObject> deleteTransfer(@RequestBody TransferHisKey key) {
+    public Mono<?> deleteTransfer(@RequestBody TransferHisKey key) {
         thService.delete(key);
-        ReturnObject ro = new ReturnObject();
-        ro.setMessage("Deleted.");
         if (cloudMQSender != null) cloudMQSender.delete(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-transfer")
-    public ResponseEntity<ReturnObject> restoreTransfer(@RequestBody TransferHisKey key) {
+    public Mono<?> restoreTransfer(@RequestBody TransferHisKey key) {
         thService.restore(key);
-        ReturnObject ro = new ReturnObject();
-        ro.setMessage("Restored.");
         if (cloudMQSender != null) cloudMQSender.restore(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 }

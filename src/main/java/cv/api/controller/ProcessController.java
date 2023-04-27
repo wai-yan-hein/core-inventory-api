@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @CrossOrigin
 @RestController
@@ -27,14 +29,13 @@ public class ProcessController {
 
     @PostMapping(path = "/save-process")
     public ResponseEntity<?> saveProcess(@RequestBody ProcessHis p) {
-                return ResponseEntity.ok(processHisService.save(p));
+        return ResponseEntity.ok(processHisService.save(p));
     }
 
     @PostMapping(path = "/delete-process")
-    public ResponseEntity<?> deleteProcess(@RequestBody ProcessHisKey p) {
+    public Mono<?> deleteProcess(@RequestBody ProcessHisKey p) {
         processHisService.delete(p);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-process")
@@ -43,14 +44,13 @@ public class ProcessController {
     }
 
     @PostMapping(path = "/restore-process")
-    public ResponseEntity<?> restoreProcess(@RequestBody ProcessHisKey p) {
+    public Mono<?> restoreProcess(@RequestBody ProcessHisKey p) {
         processHisService.restore(p);
-        ro.setMessage("Restored.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/get-process")
-    public ResponseEntity<?> getProcess(@RequestBody FilterObject filter) {
+    public Flux<?> getProcess(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -63,7 +63,7 @@ public class ProcessController {
         boolean finished = filter.isFinished();
         String processNo = Util1.isNull(filter.getProcessNo(), "-");
         String pt = filter.getVouStatus();
-        return ResponseEntity.ok(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode, finished, deleted, compCode, deptId));
+        return Flux.fromIterable(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode, finished, deleted, compCode, deptId));
     }
 
     @PostMapping(path = "/save-process-detail")
@@ -72,10 +72,10 @@ public class ProcessController {
     }
 
     @PostMapping(path = "/delete-process-detail")
-    public ResponseEntity<?> deleteProcessDetail(@RequestBody ProcessHisDetailKey p) {
+    public Mono<?> deleteProcessDetail(@RequestBody ProcessHisDetailKey p) {
         processHisDetailService.delete(p);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @GetMapping(path = "/get-process-detail")

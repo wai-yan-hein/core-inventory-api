@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 /**
  * @author wai yan
@@ -54,17 +55,15 @@ public class WeightLossController {
     }
 
     @PostMapping(path = "/delete-weight-loss")
-    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody WeightLossHisKey key) {
+    public Mono<?> deleteStockIO(@RequestBody WeightLossHisKey key) {
         weightLossService.delete(key);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-weight-loss")
-    public ResponseEntity<ReturnObject> restoreStockIO(@RequestBody WeightLossHisKey key) {
+    public Mono<?> restoreStockIO(@RequestBody WeightLossHisKey key) {
         weightLossService.restore(key);
-        ro.setMessage("Restored.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-weight-loss")

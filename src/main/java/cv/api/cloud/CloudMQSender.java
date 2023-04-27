@@ -16,6 +16,7 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,6 +39,8 @@ public class CloudMQSender {
             .create();
     @Value("${cloud.activemq.listen.queue}")
     private String listenQ;
+    @Autowired
+    private Environment environment;
     @Autowired
     private JmsTemplate cloudMQTemplate;
     @Autowired

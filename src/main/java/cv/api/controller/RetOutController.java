@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -73,21 +74,20 @@ public class RetOutController {
     }
 
     @PostMapping(path = "/delete-retout")
-    public ResponseEntity<ReturnObject> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
+    public Mono<?> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
         roService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
         if (cloudMQSender != null) cloudMQSender.delete(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-retout")
-    public ResponseEntity<ReturnObject> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
+    public Mono<?> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
         roService.restore(key);
-        ro.setMessage("Restored.");
         if (cloudMQSender != null) cloudMQSender.restore(key);
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-retout")

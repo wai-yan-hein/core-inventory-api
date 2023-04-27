@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -66,17 +67,15 @@ public class StockInOutController {
     }
 
     @PostMapping(path = "/delete-stockio")
-    public ResponseEntity<ReturnObject> deleteStockIO(@RequestBody StockIOKey key) throws Exception {
+    public Mono<?> deleteStockIO(@RequestBody StockIOKey key) throws Exception {
         ioService.delete(key);
-        ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-stockio")
-    public ResponseEntity<ReturnObject> restoreStockIO(@RequestBody StockIOKey key) throws Exception {
+    public Mono<?> restoreStockIO(@RequestBody StockIOKey key) throws Exception {
         ioService.restore(key);
-        ro.setMessage("Restored.");
-        return ResponseEntity.ok(ro);
+        return Mono.just(true);
     }
 
     @PostMapping(path = "/find-stockio")

@@ -8,8 +8,8 @@ package cv.api.entity;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -20,8 +20,8 @@ import java.io.Serializable;
 @Entity
 @Table(name = "acc_setting")
 public class AccSetting implements Serializable {
-    @Id
-    private String type;
+    @EmbeddedId
+    private AccKey key;
     @Column(name = "source_acc")
     private String sourceAcc;
     @Column(name = "pay_acc")

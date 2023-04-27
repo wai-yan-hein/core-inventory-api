@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -1026,9 +1027,10 @@ public class CloudMQReceiver {
     }
 
     private void save(SaleHis obj) {
-        obj.getKey().setDeptId(userRepo.getDeptId());
+        Integer deptId = userRepo.getDeptId();
+        obj.setVouLock(!Objects.equals(deptId, obj.getKey().getDeptId()));
+        obj.getKey().setDeptId(deptId);
         obj.setIntgUpdStatus(REC);
-        obj.setVouLock(true);
         saleHisService.save(obj);
     }
 

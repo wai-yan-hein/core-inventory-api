@@ -53,6 +53,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "left join grn g on op.batch_no = g.batch_no\n" +
                 "and op.comp_code = g.comp_code\n" +
                 "and op.dept_id = g.dept_id\n" +
+                "and g.deleted = 0\n" +
                 "left join trader t on g.trader_code = t.code\n" +
                 "and g.comp_code = t.comp_code\n" +
                 "and g.dept_id = t.dept_id\n" +
