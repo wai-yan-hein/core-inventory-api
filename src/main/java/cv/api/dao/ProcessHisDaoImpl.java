@@ -74,8 +74,8 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                 while (rs.next()) {
                     ProcessHis p = new ProcessHis();
                     ProcessHisKey key = new ProcessHisKey();
-                    key.setCompCode(compCode);
-                    key.setDeptId(deptId);
+                    key.setCompCode(rs.getString("comp_code"));
+                    key.setDeptId(rs.getInt("dept_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     p.setKey(key);
                     p.setStockCode(rs.getString("stock_code"));

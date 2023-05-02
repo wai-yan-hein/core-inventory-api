@@ -141,11 +141,10 @@ public class SaleController {
     }
 
     @GetMapping(path = "/get-sale-detail")
-    public ResponseEntity<List<SaleHisDetail>> getSaleDetail(@RequestParam String vouNo,
-                                                             @RequestParam String compCode,
-                                                             @RequestParam Integer deptId) {
-        List<SaleHisDetail> listSD = sdService.search(vouNo, compCode, deptId);
-        return ResponseEntity.ok(listSD);
+    public Flux<?> getSaleDetail(@RequestParam String vouNo,
+                                 @RequestParam String compCode,
+                                 @RequestParam Integer deptId) {
+        return Flux.fromIterable(sdService.search(vouNo, compCode, deptId));
     }
 
     @GetMapping(path = "/get-sale-voucher-info")

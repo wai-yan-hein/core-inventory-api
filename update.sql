@@ -332,23 +332,6 @@ alter table unit_relation_detail
 add column comp_code varchar(15) not null default '0010010' after unique_id,
 add column dept_id int not null default 1 after comp_code;
 
-drop table if exists pattern;
-drop table if exists pattern_detail;
-create table pattern (
-  stock_code varchar(15) not null,
-  loc_code varchar(15) default null,
-  qty float(20,3) not null default 0.000,
-  unit varchar(15) not null,
-  price float(20,3) default null,
-  explode bit(1) not null default b'0',
-  f_stock_code varchar(15) not null,
-  unique_id int(11) not null,
-  comp_code varchar(15) not null,
-  dept_id int(11) not null default 1,
-  intg_upd_status varchar(15) default null,
-  primary key (stock_code,unique_id,comp_code,dept_id,f_stock_code)
-) engine=innodb default charset=utf8mb3;
-
 
 #intg_upd_status
 alter table stock

@@ -1,11 +1,7 @@
-
 package cv.api.controller;
 
 import cv.api.cloud.CloudMQSender;
-import cv.api.common.FilterObject;
-import cv.api.common.ReportFilter;
-import cv.api.common.ReturnObject;
-import cv.api.common.Util1;
+import cv.api.common.*;
 import cv.api.entity.*;
 import cv.api.model.AccTraderKey;
 import cv.api.repo.AccountRepo;
@@ -333,10 +329,7 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-trader-list")
-    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text,
-                                                        @RequestParam String type,
-                                                        @RequestParam String compCode,
-                                                        @RequestParam Integer deptId) {
+    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
     }
 
@@ -518,8 +511,29 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-pattern")
-    public ResponseEntity<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(patternService.search(stockCode, compCode, deptId));
+    public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam String vouDate) {
+        List<Pattern> list = patternService.search(stockCode, compCode, deptId);
+        if (!Util1.isNullOrEmpty(vouDate)) {
+            list.forEach(p -> {
+                String code = p.getKey().getStockCode();
+                String type = p.getPriceTypeCode();
+                if (type != null) {
+                    General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode, deptId);
+                    p.setPrice(g == null ? 0.0f : Util1.getFloat(g.getAmount()));
+                }
+            });
+        }
+        return Flux.fromIterable(list);
+    }
+
+    public General getPrice(String stockCode, String vouDate, String unit, String type, String compCode, Integer deptId) {
+        return switch (type) {
+            case "PUR-R" -> reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId);
+            case "PUR-A" -> reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId);
+            case "PRO-R" -> reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId);
+            case "WL-R" -> reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId);
+            default -> null;
+        };
     }
 
     @PostMapping(path = "/save-reorder")
@@ -533,9 +547,7 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-price-option")
-    public Flux<?> getPriceOption(@RequestParam String option,
-                                  @RequestParam String compCode,
-                                  @RequestParam Integer deptId) {
+    public Flux<?> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
     }
 
@@ -551,9 +563,7 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-unit-relation-detail")
-    public ResponseEntity<List<UnitRelationDetail>> getUnitRelation(@RequestParam String code,
-                                                                    @RequestParam String compCode,
-                                                                    @RequestParam Integer deptId) {
+    public ResponseEntity<List<UnitRelationDetail>> getUnitRelation(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode, deptId);
         return ResponseEntity.ok(listB);
     }
