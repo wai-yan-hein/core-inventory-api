@@ -52,8 +52,9 @@ public class OrderHisDetailDaoImpl extends AbstractDao<SaleDetailKey, OrderHisDe
                 "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
                 "and op.comp_code = sb.comp_code\n" +
                 "and op.dept_id = sb.dept_id\n" +
-                "left join grn g on op.batch_no = g.batch_no\n" +
-                "and op.comp_code = g.comp_code\n" +
+                "left join grn g on " +
+//                "op.batch_no = g.batch_no and\n" +
+                "op.comp_code = g.comp_code\n" +
                 "and op.dept_id = g.dept_id\n" +
                 "and g.deleted = 0\n" +
                 "left join trader t on g.trader_code = t.code\n" +
@@ -80,11 +81,11 @@ public class OrderHisDetailDaoImpl extends AbstractDao<SaleDetailKey, OrderHisDe
                     op.setWeightUnit(rs.getString("weight_unit"));
                     op.setStdWeight(rs.getFloat("std_weight"));
                     op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("sale_price"));
-                    op.setAmount(rs.getFloat("sale_amt"));
+                    op.setPrice(rs.getFloat("price"));
+                    op.setAmount(rs.getFloat("amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
-                    op.setUnitCode(rs.getString("sale_unit"));
+                    op.setUnitCode(rs.getString("unit"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
                     op.setCatName(rs.getString("cat_name"));
