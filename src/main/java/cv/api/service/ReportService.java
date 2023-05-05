@@ -125,6 +125,9 @@ public interface ReportService {
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
                                String compCode, Integer deptId, String deleted, String nullBatch, String batchNo);
+    List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
+                               String remark, String reference, String userCode, String stockCode, String locCode,
+                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo);
 
     List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
 
