@@ -6,6 +6,7 @@
 package cv.api.service;
 
 import cv.api.entity.StockInOutDetail;
+import cv.api.entity.StockInOutKey;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface StockInOutDetailService {
 
     List<StockInOutDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String code, String compCode, Integer deptId);
+    int delete(StockInOutKey key);
 }

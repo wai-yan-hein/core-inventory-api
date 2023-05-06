@@ -2,8 +2,6 @@ package cv.api.dao;
 
 import cv.api.entity.ProcessHisDetail;
 import cv.api.entity.ProcessHisDetailKey;
-import cv.api.entity.PurExpense;
-import cv.api.entity.PurExpenseKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 

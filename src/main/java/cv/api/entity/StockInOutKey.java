@@ -18,19 +18,12 @@ import java.io.Serializable;
 @Embeddable
 public class StockInOutKey implements Serializable {
 
-    @Column(name = "sd_code", unique = true, nullable = false)
-    private String sdCode;
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "dept_id")
     private Integer deptId;
-
-    public StockInOutKey(String sdCode, String vouNo, Integer deptId) {
-        this.sdCode = sdCode;
-        this.vouNo = vouNo;
-        this.deptId = deptId;
-    }
-
-    public StockInOutKey() {
-    }
+    @Column(name = "unique_id")
+    private Integer uniqueId;
+    @Column(name = "comp_code")
+    private String compCode;
 }

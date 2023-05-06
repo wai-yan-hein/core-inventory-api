@@ -1,8 +1,8 @@
 package cv.api.dao;
 
-import cv.api.entity.*;
+import cv.api.entity.UnitRelationDetail;
+import cv.api.entity.UnitRelationDetailKey;
 
-import java.util.Date;
 import java.util.List;
 
 public interface UnitRelationDetailDao {

@@ -5,8 +5,6 @@
  */
 package cv.api.dao;
 
-import cv.api.entity.AccKey;
-import cv.api.entity.AccSetting;
 import cv.api.entity.UnitRelationDetail;
 import cv.api.entity.UnitRelationDetailKey;
 import org.springframework.stereotype.Repository;

@@ -20,19 +20,12 @@ import java.io.Serializable;
 @Embeddable
 public class RetOutKey implements Serializable {
 
-    @Column(name = "rd_code", unique = true, nullable = false)
-    private String rdCode;
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "dept_id")
     private Integer deptId;
-
-    public RetOutKey(String rdCode, String vouNo, Integer deptId) {
-        this.rdCode = rdCode;
-        this.vouNo = vouNo;
-        this.deptId = deptId;
-    }
-
-    public RetOutKey() {
-    }
+    @Column(name = "unique_id")
+    private Integer uniqueId;
+    @Column(name = "comp_code")
+    private String compCode;
 }

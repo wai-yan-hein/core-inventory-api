@@ -45,7 +45,6 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
                     key.setVouNo(rs.getString("vou_no"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setDeptId(rs.getInt("dept_id"));
-                    key.setOpCode(rs.getString("op_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
@@ -70,9 +69,8 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
     }
 
     @Override
-    public int delete(String opCode, String compCode, Integer deptId) {
-        String delSql = "delete from op_his_detail where op_code = '" + opCode + "' and comp_code ='" + compCode + "' and dept_id=" + deptId + "";
-        execSql(delSql);
+    public int delete(OPHisDetailKey key) {
+        remove(key);
         return 1;
     }
 }

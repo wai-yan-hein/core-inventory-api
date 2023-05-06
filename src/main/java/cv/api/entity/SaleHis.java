@@ -88,7 +88,7 @@ public class SaleHis {
     @Transient
     private List<SaleHisDetail> listSH;
     @Transient
-    private List<String> listDel;
+    private List<SaleDetailKey> listDel;
     @Transient
     private boolean backup;
     @Transient

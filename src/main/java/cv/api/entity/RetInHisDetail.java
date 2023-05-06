@@ -5,10 +5,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import javax.persistence.*;
 
@@ -16,13 +13,10 @@ import javax.persistence.*;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "ret_in_his_detail")
-public class RetInHisDetail implements java.io.Serializable {
+public class RetInHisDetail {
 
     @EmbeddedId
     private RetInKey key;
@@ -40,10 +34,6 @@ public class RetInHisDetail implements java.io.Serializable {
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private String userCode;
     @Transient

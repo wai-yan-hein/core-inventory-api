@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.entity.PurDetailKey;
 import cv.api.entity.PurHisDetail;
 
 import java.util.List;
@@ -18,6 +19,6 @@ public interface PurHisDetailService {
 
     List<PurHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String code, String compCode, Integer deptId) throws Exception;
+    int delete(PurDetailKey key);
 
 }

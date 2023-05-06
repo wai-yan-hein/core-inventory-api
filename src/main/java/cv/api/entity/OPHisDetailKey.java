@@ -1,15 +1,13 @@
 package cv.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 @Data
 @Embeddable
 public class OPHisDetailKey implements java.io.Serializable {
-    @Column(name = "op_code")
-    private String opCode;
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "unique_id")

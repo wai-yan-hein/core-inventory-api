@@ -7,7 +7,6 @@ package cv.api.service;
 
 import cv.api.common.General;
 import cv.api.entity.SaleHis;
-import cv.api.entity.SaleHisDetail;
 import cv.api.entity.SaleHisKey;
 
 import java.util.Date;

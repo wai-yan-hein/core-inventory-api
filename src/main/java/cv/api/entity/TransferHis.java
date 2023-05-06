@@ -45,7 +45,7 @@ public class TransferHis {
     @Transient
     private List<TransferHisDetail> listTD;
     @Transient
-    private List<String> delList;
+    private List<THDetailKey> delList;
     @Transient
     private String status = "STATUS";
     @Transient

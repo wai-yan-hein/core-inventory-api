@@ -13,7 +13,6 @@ import cv.api.entity.RetInHis;
 import cv.api.entity.RetInHisDetail;
 import cv.api.entity.RetInHisKey;
 import cv.api.entity.RetInKey;
-import cv.api.model.VReturnIn;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,34 +43,31 @@ public class RetInServiceImpl implements RetInService {
         if (Util1.isNullOrEmpty(rin.getKey().getVouNo())) {
             rin.getKey().setVouNo(getVoucherNo(rin.getKey().getDeptId(), rin.getMacId(), rin.getKey().getCompCode()));
         }
-
         List<RetInHisDetail> listSD = rin.getListRD();
-        List<String> listDel = rin.getListDel();
+        List<RetInKey> listDel = rin.getListDel();
         String vouNo = rin.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    try {
-                        sdDao.delete(detailId, rin.getKey().getCompCode(), rin.getKey().getDeptId());
-                    } catch (Exception ignored) {
-                    }
-                }
-            });
+            listDel.forEach(key -> sdDao.delete(key));
         }
         for (int i = 0; i < listSD.size(); i++) {
             RetInHisDetail cSd = listSD.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                RetInKey key = new RetInKey();
+                key.setDeptId(rin.getKey().getDeptId());
+                key.setCompCode(rin.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
+                cSd.setKey(key);
+            }
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         RetInHisDetail pSd = listSD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
-                cSd.setCompCode(rin.getKey().getCompCode());
                 sdDao.save(cSd);
             }
             rDao.save(rin);

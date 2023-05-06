@@ -6,6 +6,7 @@
 package cv.api.service;
 
 import cv.api.entity.RetOutHisDetail;
+import cv.api.entity.RetOutKey;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface RetOutDetailService {
 
     List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String id, String compCode, Integer deptId) throws Exception;
+    int delete(RetOutKey key);
 
 }

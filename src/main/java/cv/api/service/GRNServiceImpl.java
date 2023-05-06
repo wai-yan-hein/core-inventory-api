@@ -38,20 +38,19 @@ public class GRNServiceImpl implements GRNService {
         List<GRNDetailKey> listDel = g.getListDel();
         //backup
         if (listDel != null) {
-            listDel.forEach(key -> {
-                if (key != null) {
-                    gdDao.delete(key);
-                }
-            });
+            listDel.forEach(key -> gdDao.delete(key));
         }
         for (int i = 0; i < listDetail.size(); i++) {
             GRNDetail cSd = listDetail.get(i);
-            if (cSd.getStockCode() != null) {
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
                 GRNDetailKey key = new GRNDetailKey();
                 key.setDeptId(g.getKey().getDeptId());
                 key.setCompCode(g.getKey().getCompCode());
                 key.setVouNo(g.getKey().getVouNo());
+                key.setUniqueId(null);
                 cSd.setKey(key);
+            }
+            if (cSd.getStockCode() != null) {
                 if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
@@ -64,8 +63,8 @@ public class GRNServiceImpl implements GRNService {
 
             }
         }
-        dao.save(g);
         g.setListDetail(listDetail);
+        dao.save(g);
         return g;
     }
 
@@ -76,8 +75,9 @@ public class GRNServiceImpl implements GRNService {
 
     @Override
     public List<GRN> search(String batchNo, String compCode, Integer deptId) {
-        return dao.search(batchNo,compCode,deptId);
+        return dao.search(batchNo, compCode, deptId);
     }
+
     @Override
     public boolean delete(GRNKey key) {
         return dao.delete(key);

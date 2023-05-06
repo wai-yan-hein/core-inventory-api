@@ -8,9 +8,7 @@ package cv.api.dao;
 import cv.api.common.Util1;
 import cv.api.entity.RetInHis;
 import cv.api.entity.RetInHisKey;
-import cv.api.model.VReturnIn;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

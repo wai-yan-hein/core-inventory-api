@@ -18,19 +18,12 @@ import java.io.Serializable;
 @Embeddable
 public class THDetailKey implements Serializable {
 
-    @Column(name = "td_code", unique = true, nullable = false)
-    private String tdCode;
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "dept_id")
     private Integer deptId;
-
-    public THDetailKey(String tdCode, String vouNo, Integer deptId) {
-        this.tdCode = tdCode;
-        this.vouNo = vouNo;
-        this.deptId = deptId;
-    }
-
-    public THDetailKey() {
-    }
+    @Column(name = "unique_id")
+    private Integer uniqueId;
+    @Column(name = "comp_code")
+    private String compCode;
 }

@@ -4,10 +4,7 @@ import cv.api.common.Util1;
 import cv.api.dao.OPHisDao;
 import cv.api.dao.OPHisDetailDao;
 import cv.api.dao.SeqTableDao;
-import cv.api.entity.LocationKey;
-import cv.api.entity.OPHis;
-import cv.api.entity.OPHisDetail;
-import cv.api.entity.OPHisKey;
+import cv.api.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,17 +28,21 @@ public class OPHisServiceImpl implements OPHisService {
             op.getKey().setVouNo(getVoucherNo(op.getKey().getDeptId(), op.getMacId(), op.getKey().getCompCode()));
         }
         List<OPHisDetail> listSD = op.getDetailList();
-        List<String> listDel = op.getListDel();
+        List<OPHisDetailKey> listDel = op.getListDel();
         String vouNo = op.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    opHisDetailDao.delete(detailId, op.getKey().getCompCode(), op.getKey().getDeptId());
-                }
-            });
+            listDel.forEach(key -> opHisDetailDao.delete(key));
         }
         for (int i = 0; i < listSD.size(); i++) {
             OPHisDetail cSd = listSD.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                OPHisDetailKey key = new OPHisDetailKey();
+                key.setDeptId(op.getKey().getDeptId());
+                key.setCompCode(op.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
+                cSd.setKey(key);
+            }
             if (cSd.getStockCode() != null) {
                 if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
@@ -51,11 +52,6 @@ public class OPHisServiceImpl implements OPHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String opCode = vouNo + "-" + cSd.getKey().getUniqueId();
-                cSd.getKey().setOpCode(opCode);
-                cSd.getKey().setVouNo(vouNo);
-                cSd.getKey().setCompCode(op.getKey().getCompCode());
-                cSd.getKey().setDeptId(op.getKey().getDeptId());
                 opHisDetailDao.save(cSd);
             }
         }

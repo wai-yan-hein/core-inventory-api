@@ -1,12 +1,6 @@
 package cv.api.dao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.jdbc.Work;
-import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +9,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +42,13 @@ public abstract class AbstractDao<PK extends Serializable, T> {
 
     }
 
+    public void remove(PK pk) {
+        T byKey = getByKey(pk);
+        if (byKey != null) {
+            entityManager.remove(byKey);
+        }
+    }
+
     public void update(T entity) {
         entityManager.merge(entity);
     }
@@ -62,13 +64,6 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         }
     }
 
-    public void persist(Object obj) {
-        entityManager.persist(obj);
-    }
-
-    public void merge(Object obj) {
-        entityManager.merge(obj);
-    }
 
     public List<Map<String, Object>> getList(String sql) {
         return jdbcTemplate.queryForList(sql);

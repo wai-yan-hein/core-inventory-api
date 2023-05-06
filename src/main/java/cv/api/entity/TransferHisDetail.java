@@ -18,10 +18,6 @@ public class TransferHisDetail {
     private Float qty;
     @Column(name = "unit")
     private String unitCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private String userCode;
     @Transient

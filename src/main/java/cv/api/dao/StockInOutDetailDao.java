@@ -6,6 +6,7 @@
 package cv.api.dao;
 
 import cv.api.entity.StockInOutDetail;
+import cv.api.entity.StockInOutKey;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface StockInOutDetailDao {
 
     List<StockInOutDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String id, String compCode, Integer deptId);
+    int delete(StockInOutKey key);
 
 }

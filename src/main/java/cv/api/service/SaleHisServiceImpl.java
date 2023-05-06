@@ -44,23 +44,23 @@ public class SaleHisServiceImpl implements SaleHisService {
             saleHis.getKey().setVouNo(getVoucherNo(saleHis.getKey().getDeptId(), saleHis.getMacId(), saleHis.getKey().getCompCode()));
         }
         List<SaleHisDetail> listSD = saleHis.getListSH();
-        List<String> listDel = saleHis.getListDel();
+        List<SaleDetailKey> listDel = saleHis.getListDel();
         String vouNo = saleHis.getKey().getVouNo();
         //backup
         if (listDel != null) {
-            listDel.forEach(code -> {
-                if (code != null) {
-                    sdDao.delete(code, saleHis.getKey().getCompCode(), saleHis.getKey().getDeptId());
-                }
-            });
+            listDel.forEach(key -> sdDao.delete(key));
         }
         for (int i = 0; i < listSD.size(); i++) {
             SaleHisDetail cSd = listSD.get(i);
-            if (cSd.getStockCode() != null) {
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
                 SaleDetailKey key = new SaleDetailKey();
                 key.setDeptId(saleHis.getKey().getDeptId());
                 key.setCompCode(saleHis.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
                 cSd.setKey(key);
+            }
+            if (cSd.getStockCode() != null) {
                 if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
@@ -69,11 +69,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getKey().getUniqueId();
-                cSd.getKey().setSdCode(sdCode);
-                cSd.getKey().setVouNo(vouNo);
                 sdDao.save(cSd);
-
             }
         }
         shDao.save(saleHis);

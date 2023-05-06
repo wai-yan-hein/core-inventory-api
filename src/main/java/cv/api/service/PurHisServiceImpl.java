@@ -6,12 +6,10 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.dao.ExpenseDao;
 import cv.api.dao.PurExpenseDao;
 import cv.api.dao.PurHisDao;
 import cv.api.dao.SeqTableDao;
 import cv.api.entity.*;
-import cv.api.model.VPurchase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,18 +43,10 @@ public class PurHisServiceImpl implements PurHisService {
             ph.getKey().setVouNo(getVoucherNo(ph.getKey().getDeptId(), ph.getMacId(), ph.getKey().getCompCode()));
         }
         List<PurHisDetail> listSD = ph.getListPD();
-        List<String> listDel = ph.getListDel();
+        List<PurDetailKey> listDel = ph.getListDel();
         String vouNo = ph.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    try {
-                        pdDao.delete(detailId, ph.getKey().getCompCode(), ph.getKey().getDeptId());
-                    } catch (Exception ex) {
-                        log.error("listDel : " + ex.getMessage());
-                    }
-                }
-            });
+            listDel.forEach(key -> pdDao.delete(key));
         }
         List<PurExpense> listExp = ph.getListExpense();
         if (listExp != null) {
@@ -80,18 +70,23 @@ public class PurHisServiceImpl implements PurHisService {
         }
         for (int i = 0; i < listSD.size(); i++) {
             PurHisDetail cSd = listSD.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                PurDetailKey key = new PurDetailKey();
+                key.setDeptId(ph.getKey().getDeptId());
+                key.setCompCode(ph.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
+                cSd.setKey(key);
+            }
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         PurHisDetail pSd = listSD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setKey(new PurDetailKey(vouNo, sdCode, ph.getKey().getDeptId()));
-                cSd.setCompCode(ph.getKey().getCompCode());
                 pdDao.save(cSd);
 
             }
@@ -124,11 +119,6 @@ public class PurHisServiceImpl implements PurHisService {
     @Override
     public void restore(PurHisKey key) throws Exception {
         phDao.restore(key);
-    }
-
-    @Override
-    public List<VPurchase> search(String vouNo) {
-        return phDao.search(vouNo);
     }
 
     @Override

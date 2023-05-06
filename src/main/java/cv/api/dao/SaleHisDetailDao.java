@@ -5,6 +5,7 @@
  */
 package cv.api.dao;
 
+import cv.api.entity.SaleDetailKey;
 import cv.api.entity.SaleHisDetail;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface SaleHisDetailDao {
 
     List<SaleHisDetail> searchDetail(String vouNo, String compCode, Integer deptId);
 
-    int delete(String code, String compCode, Integer deptId);
+    int delete(SaleDetailKey key);
 
     List<SaleHisDetail> getSaleByBatch(String batchNo, String compCode, Integer depId);
 

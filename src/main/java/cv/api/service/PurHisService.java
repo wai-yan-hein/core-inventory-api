@@ -7,7 +7,6 @@ package cv.api.service;
 
 import cv.api.entity.PurHis;
 import cv.api.entity.PurHisKey;
-import cv.api.model.VPurchase;
 
 import java.util.Date;
 import java.util.List;
@@ -31,7 +30,6 @@ public interface PurHisService {
 
     void restore(PurHisKey key) throws Exception;
 
-    List<VPurchase> search(String vouNo);
 
     List<PurHis> unUploadVoucher(String syncDate);
 

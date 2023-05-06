@@ -5,8 +5,8 @@
  */
 package cv.api.service;
 
-import cv.api.dao.SaleHisDao;
 import cv.api.dao.SaleHisDetailDao;
+import cv.api.entity.SaleDetailKey;
 import cv.api.entity.SaleHisDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +35,8 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     }
 
     @Override
-    public int delete(String code, String compCode, Integer deptId) {
-        return dao.delete(code, compCode, deptId);
+    public int delete(SaleDetailKey key) {
+        return dao.delete(key);
     }
 
     @Override

@@ -33,10 +33,6 @@ public class RetOutHisDetail implements java.io.Serializable {
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private String userCode;
     @Transient

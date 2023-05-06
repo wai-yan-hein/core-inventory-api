@@ -5,7 +5,6 @@
  */
 package cv.api.config;
 
-import cv.api.common.Util1;
 import cv.api.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;

@@ -20,8 +20,7 @@ public class WeightLossHisDetailDaoImpl extends AbstractDao<WeightLossHisDetailK
 
     @Override
     public void delete(WeightLossHisDetailKey key) {
-        String sql = "delete from weight_loss_his_detail where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id=" + key.getDeptId() + " and unique_id =" + key.getUniqueId() + "";
-        execSql(sql);
+       remove(key);
     }
 
     @Override

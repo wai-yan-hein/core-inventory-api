@@ -68,7 +68,7 @@ public class RetInHis implements java.io.Serializable {
     @Transient
     private List<RetInHisDetail> listRD;
     @Transient
-    private List<String> listDel;
+    private List<RetInKey> listDel;
     @Transient
     private List<String> location;
     public RetInHis() {

@@ -14,14 +14,13 @@ import java.util.List;
 public class GRNDetailDaoImpl extends AbstractDao<GRNDetailKey, GRNDetail> implements GRNDetailDao {
     @Override
     public GRNDetail save(GRNDetail b) {
-        saveOrUpdate(b,b.getKey());
+        saveOrUpdate(b, b.getKey());
         return b;
     }
 
     @Override
     public void delete(GRNDetailKey key) {
-        String sql = "delete from grn_detail where vou_no='" + key.getVouNo() + "' and '" + key.getCompCode() + "' and '" + key.getDeptId() + "' and '" + key.getUniqueId() + "'";
-        execSql(sql);
+        remove(key);
     }
 
     @Override

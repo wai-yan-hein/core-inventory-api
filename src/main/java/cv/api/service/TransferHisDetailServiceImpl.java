@@ -1,6 +1,7 @@
 package cv.api.service;
 
 import cv.api.dao.TransferHisDetailDao;
+import cv.api.entity.THDetailKey;
 import cv.api.entity.TransferHisDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ public class TransferHisDetailServiceImpl implements TransferHisDetailService {
     }
 
     @Override
-    public int delete(String code, String compCode, Integer deptId) {
-        return dao.delete(code, compCode, deptId);
+    public int delete(THDetailKey key) {
+        return dao.delete(key);
     }
 
     @Override

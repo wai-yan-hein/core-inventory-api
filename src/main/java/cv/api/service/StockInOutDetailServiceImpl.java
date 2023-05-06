@@ -7,6 +7,7 @@ package cv.api.service;
 
 import cv.api.dao.StockInOutDetailDao;
 import cv.api.entity.StockInOutDetail;
+import cv.api.entity.StockInOutKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,8 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
     }
 
     @Override
-    public int delete(String code, String compCode, Integer deptId) {
-        return dao.delete(code, compCode, deptId);
+    public int delete(StockInOutKey key) {
+        return dao.delete(key);
     }
 
     @Override

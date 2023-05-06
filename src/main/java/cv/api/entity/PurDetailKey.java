@@ -20,17 +20,12 @@ public class PurDetailKey implements Serializable {
 
     @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "pd_code")
-    private String pdCode;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "unique_id")
+    private Integer uniqueId;
+    @Column(name = "comp_code")
+    private String compCode;
 
-    public PurDetailKey(String vouNo, String pdCode, Integer deptId) {
-        this.vouNo = vouNo;
-        this.pdCode = pdCode;
-        this.deptId = deptId;
-    }
 
-    public PurDetailKey() {
-    }
 }

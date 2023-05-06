@@ -18,19 +18,13 @@ import java.io.Serializable;
 @Embeddable
 public class RetInKey implements Serializable {
 
-    @Column(name = "rd_code", unique = true, nullable = false)
-    private String rdCode;
+    @Column(name = "unique_id")
+    private Integer uniqueId;
+    @Column(name = "comp_code")
+    private String compCode;
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "dept_id")
     private Integer deptId;
 
-    public RetInKey(String rdCode, String vouNo, Integer deptId) {
-        this.rdCode = rdCode;
-        this.vouNo = vouNo;
-        this.deptId = deptId;
-    }
-
-    public RetInKey() {
-    }
 }

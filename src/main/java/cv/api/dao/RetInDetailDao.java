@@ -6,6 +6,7 @@
 package cv.api.dao;
 
 import cv.api.entity.RetInHisDetail;
+import cv.api.entity.RetInKey;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface RetInDetailDao {
 
     List<RetInHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String id, String compCode, Integer deptId) throws Exception;
+    int delete(RetInKey key);
 
 }

@@ -18,9 +18,6 @@ import java.io.Serializable;
 @Embeddable
 public class SaleDetailKey implements Serializable {
 
-
-    @Column(name = "sd_code")
-    private String sdCode;
     @Column(name = "comp_code")
     private String compCode;
     @Column(name = "dept_id")

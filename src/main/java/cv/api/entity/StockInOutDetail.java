@@ -6,10 +6,9 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.Data;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * @author wai yan
@@ -18,7 +17,7 @@ import java.io.Serializable;
 @Data
 @Entity
 @Table(name = "stock_in_out_detail")
-public class StockInOutDetail implements Serializable {
+public class StockInOutDetail {
 
     @EmbeddedId
     private StockInOutKey key;
@@ -34,12 +33,8 @@ public class StockInOutDetail implements Serializable {
     private Float outQty;
     @Column(name = "out_unit")
     private String outUnitCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
     @Column(name = "cost_price")
     private Float costPrice;
-    @Column(name = "comp_code")
-    private String compCode;
     @Transient
     private String userCode;
     @Transient

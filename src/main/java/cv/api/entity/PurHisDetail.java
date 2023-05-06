@@ -38,10 +38,6 @@ public class PurHisDetail implements Serializable {
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
     @Column(name = "weight")
     private Float weight;
     @Column(name = "weight_unit")

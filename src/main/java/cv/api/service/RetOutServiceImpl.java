@@ -13,7 +13,6 @@ import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisDetail;
 import cv.api.entity.RetOutHisKey;
 import cv.api.entity.RetOutKey;
-import cv.api.model.VReturnOut;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,33 +43,30 @@ public class RetOutServiceImpl implements RetOutService {
             rin.getKey().setVouNo(getVoucherNo(rin.getKey().getDeptId(),rin.getMacId(), rin.getKey().getCompCode()));
         }
         List<RetOutHisDetail> listSD = rin.getListRD();
-        List<String> listDel = rin.getListDel();
+        List<RetOutKey> listDel = rin.getListDel();
         String vouNo = rin.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    try {
-                        rd.delete(detailId, rin.getKey().getCompCode(), rin.getKey().getDeptId());
-                    } catch (Exception ex) {
-                        throw new IllegalStateException(String.format("Return Out Delete : %s", ex.getMessage()));
-                    }
-                }
-            });
+            listDel.forEach(key -> rd.delete(key));
         }
         for (int i = 0; i < listSD.size(); i++) {
             RetOutHisDetail cSd = listSD.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                RetOutKey key = new RetOutKey();
+                key.setDeptId(rin.getKey().getDeptId());
+                key.setCompCode(rin.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
+                cSd.setKey(key);
+            }
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         RetOutHisDetail pSd = listSD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setKey(new RetOutKey(sdCode, vouNo, rin.getKey().getDeptId()));
-                cSd.setCompCode(rin.getKey().getCompCode());
                 rd.save(cSd);
             }
         }

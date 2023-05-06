@@ -11,7 +11,6 @@ import cv.api.service.*;
 import cv.api.tray.AppTray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQQueueReceiver;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

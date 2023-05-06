@@ -6,6 +6,7 @@
 package cv.api.service;
 
 import cv.api.dao.PurHisDetailDao;
+import cv.api.entity.PurDetailKey;
 import cv.api.entity.PurHisDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class PurHisDetailServiceImpl implements PurHisDetailService {
     }
 
     @Override
-    public int delete(String code, String compCode, Integer deptId) throws Exception {
-        return dao.delete(code, compCode, deptId);
+    public int delete(PurDetailKey key) {
+        return dao.delete(key);
     }
 }

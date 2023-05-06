@@ -1889,6 +1889,74 @@ public class ReportServiceImpl implements ReportService {
         }
         return saleList;
     }
+    @Override
+    public List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode,
+                                      String vouNo, String remark, String reference, String userCode, String stockCode,
+                                      String locCode, String compCode, Integer deptId, String deleted, String nullBatch, String batchNo) {
+        List<VOrder> saleList = new ArrayList<>();
+        String filter = "";
+        if (!vouNo.equals("-")) {
+            filter += "and vou_no = '" + vouNo + "'\n";
+        }
+        if (!remark.equals("-")) {
+            filter += "and remark like '" + remark + "%'\n";
+        }
+        if (!reference.equals("-")) {
+            filter += "and reference like '" + reference + "%'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
+        }
+        if (!userCode.equals("-")) {
+            filter += "and created_by = '" + userCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code = '" + stockCode + "'\n";
+        }
+        if (!saleManCode.equals("-")) {
+            filter += "and saleman_code = '" + saleManCode + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and loc_code = '" + locCode + "'\n";
+        }
+        String sql = "select a.*,t.trader_name,t.user_code\n"
+                + "from (\n"
+                + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
+                + "from v_order s \n"
+                + "where comp_code = '" + compCode + "'\n"
+                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
+                + "and deleted = " + deleted + "\n"
+                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
+                + "" + filter + "\n"
+                + "group by vou_no\n" + ")a\n"
+                + "join trader t on a.trader_code = t.code\n"
+                + "and a.comp_code = t.comp_code\n"
+                + "and a.dept_id = t.dept_id\n"
+                + "order by date(vou_date) desc,vou_no desc";
+        try {
+            ResultSet rs = reportDao.executeSql(sql);
+            if (!Objects.isNull(rs)) {
+                while (rs.next()) {
+                    VOrder s = new VOrder();
+                    s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                    s.setVouNo(rs.getString("vou_no"));
+                    s.setTraderCode(rs.getString("user_code"));
+                    s.setTraderName(rs.getString("trader_name"));
+                    s.setRemark(rs.getString("remark"));
+                    s.setReference(rs.getString("reference"));
+                    s.setCreatedBy(rs.getString("created_by"));
+                    s.setPaid(rs.getFloat("paid"));
+                    s.setVouTotal(rs.getFloat("vou_total"));
+                    s.setDeleted(rs.getBoolean("deleted"));
+                    s.setDeptId(rs.getInt("dept_id"));
+                    saleList.add(s);
+                }
+            }
+        } catch (Exception e) {
+            log.error("getSaleHistory : " + e.getMessage());
+        }
+        return saleList;
+    }
 
     @Override
     public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo,
@@ -2582,7 +2650,7 @@ public class ReportServiceImpl implements ReportService {
         }
         String sql = "select a.*,t.user_code,t.trader_name\n" +
                 "from (\n" +
-                "select vou_date,g.vou_no,g.comp_code,g.dept_id,g.created_by,g.batch_no,remark,g.trader_code,g.deleted,g.closed\n" +
+                "select vou_date,g.vou_no,g.comp_code,g.dept_id,g.loc_code,g.created_by,g.batch_no,remark,g.trader_code,g.deleted,g.closed\n" +
                 "from grn g join grn_detail gd\n" +
                 "on g.vou_no = gd.vou_no\n" +
                 "and g.comp_code = gd.comp_code\n" +
@@ -2618,6 +2686,7 @@ public class ReportServiceImpl implements ReportService {
                     g.setDeleted(rs.getBoolean("deleted"));
                     g.setClosed(rs.getBoolean("closed"));
                     g.setCreatedBy(rs.getString("created_by"));
+                    g.setLocCode(rs.getString("loc_code"));
                     list.add(g);
                 }
             }

@@ -1,6 +1,7 @@
 package cv.api.dao;
 
 import cv.api.entity.OPHisDetail;
+import cv.api.entity.OPHisDetailKey;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public interface OPHisDetailDao {
 
     List<OPHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String opCode, String compCode, Integer deptId);
+    int delete(OPHisDetailKey key);
 
 
 }

@@ -85,7 +85,7 @@ public class PurHis implements java.io.Serializable {
     @Transient
     private List<PurHisDetail> listPD;
     @Transient
-    private List<String> listDel;
+    private List<PurDetailKey> listDel;
     @Transient
     private List<String> location;
     @Transient

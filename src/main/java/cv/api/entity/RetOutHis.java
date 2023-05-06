@@ -68,7 +68,7 @@ public class RetOutHis implements java.io.Serializable {
     @Transient
     private List<RetOutHisDetail> listRD;
     @Transient
-    private List<String> listDel;
+    private List<RetOutKey> listDel;
     @Transient
     private List<String> location;
 

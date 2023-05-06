@@ -9,9 +9,6 @@ import cv.api.common.Util1;
 import cv.api.entity.Category;
 import cv.api.entity.CategoryKey;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -24,8 +21,6 @@ import java.util.List;
 @Repository
 @Slf4j
 public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implements CategoryDao {
-    @Autowired
-    private SessionFactory sessionFactory;
 
     @Override
     public Category save(Category item) {
@@ -36,8 +31,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
     @Override
     public List<Category> findAll(String compCode, Integer deptId) {
         String hsql = "select o from Category o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 = " + deptId + ")";
-        Query<Category> query = sessionFactory.getCurrentSession().createQuery(hsql, Category.class);
-        return query.list();
+        return findHSQL(hsql);
     }
 
     @Override
@@ -58,8 +52,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
         } else {
             strFilter = "select o from Category o where " + strFilter;
         }
-        Query<Category> query = sessionFactory.getCurrentSession().createQuery(strFilter, Category.class);
-        return query.list();
+        return findHSQL(strFilter);
     }
 
     @Override

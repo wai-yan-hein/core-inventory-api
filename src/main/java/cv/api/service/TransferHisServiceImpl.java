@@ -33,33 +33,30 @@ public class TransferHisServiceImpl implements TransferHisService {
         }
 
         List<TransferHisDetail> listTD = th.getListTD();
-        List<String> listDel = th.getDelList();
+        List<THDetailKey> listDel = th.getDelList();
         String vouNo = th.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    detailDao.delete(detailId, th.getKey().getCompCode(), th.getKey().getDeptId());
-                }
-            });
+            listDel.forEach(key -> detailDao.delete(key));
         }
         for (int i = 0; i < listTD.size(); i++) {
             TransferHisDetail cSd = listTD.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                THDetailKey key = new THDetailKey();
+                key.setDeptId(th.getKey().getDeptId());
+                key.setCompCode(th.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
+                cSd.setKey(key);
+            }
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         TransferHisDetail pSd = listTD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getUniqueId();
-                THDetailKey key = new THDetailKey();
-                key.setVouNo(vouNo);
-                key.setTdCode(sdCode);
-                key.setDeptId(th.getKey().getDeptId());
-                cSd.setKey(key);
-                cSd.setCompCode(th.getKey().getCompCode());
                 detailDao.save(cSd);
             }
         }

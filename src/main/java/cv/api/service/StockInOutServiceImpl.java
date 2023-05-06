@@ -41,29 +41,30 @@ public class StockInOutServiceImpl implements StockInOutService {
         }
 
         List<StockInOutDetail> listSD = io.getListSH();
-        List<String> listDel = io.getListDel();
+        List<StockInOutKey> listDel = io.getListDel();
         String vouNo = io.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(detailId -> {
-                if (detailId != null) {
-                    iodDao.delete(detailId, io.getKey().getCompCode(), io.getKey().getDeptId());
-                }
-            });
+            listDel.forEach(key -> iodDao.delete(key));
         }
         for (int i = 0; i < listSD.size(); i++) {
             StockInOutDetail cSd = listSD.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                StockInOutKey key = new StockInOutKey();
+                key.setDeptId(io.getKey().getDeptId());
+                key.setCompCode(io.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(null);
+                cSd.setKey(key);
+            }
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         StockInOutDetail pSd = listSD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setKey(new StockInOutKey(sdCode, vouNo, io.getKey().getDeptId()));
-                cSd.setCompCode(io.getKey().getCompCode());
                 iodDao.save(cSd);
             }
         }

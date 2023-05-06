@@ -8,9 +8,7 @@ package cv.api.dao;
 import cv.api.common.Util1;
 import cv.api.entity.PurHis;
 import cv.api.entity.PurHisKey;
-import cv.api.model.VPurchase;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,8 +24,6 @@ import java.util.List;
 @Slf4j
 public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements PurHisDao {
 
-    @Autowired
-    private SessionFactory sessionFactory;
     @Autowired
     private PurHisDetailDao dao;
 
@@ -93,7 +89,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
     }
 
     @Override
-    public void delete(PurHisKey key) throws Exception {
+    public void delete(PurHisKey key) {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
@@ -110,11 +106,6 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         execSql(sql);
     }
 
-    @Override
-    public List<VPurchase> search(String vouNo) {
-        String hsql = "select o from VPurchase o where o.vouNo = '" + vouNo + "' order by o.uniqueId";
-        return sessionFactory.getCurrentSession().createQuery(hsql, VPurchase.class).list();
-    }
 
     @Override
     public List<PurHis> unUploadVoucher(String syncDate) {

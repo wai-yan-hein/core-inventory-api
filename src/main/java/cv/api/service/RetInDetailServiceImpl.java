@@ -7,6 +7,7 @@ package cv.api.service;
 
 import cv.api.dao.RetInDetailDao;
 import cv.api.entity.RetInHisDetail;
+import cv.api.entity.RetInKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +36,8 @@ public class RetInDetailServiceImpl implements RetInDetailService {
     }
 
     @Override
-    public int delete(String id, String compCode, Integer deptId) throws Exception {
-        return dao.delete(id, compCode, deptId);
+    public int delete(RetInKey key) {
+        return dao.delete(key);
     }
 
 }

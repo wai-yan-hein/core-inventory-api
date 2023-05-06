@@ -54,7 +54,7 @@ public class StockInOut implements Serializable {
     @Transient
     private List<StockInOutDetail> listSH;
     @Transient
-    private List<String> listDel;
+    private List<StockInOutKey> listDel;
     @Transient
     private List<LocationKey> keys;
 

@@ -48,7 +48,7 @@ public class OPHis implements java.io.Serializable {
     @Transient
     private List<OPHisDetail> detailList;
     @Transient
-    private List<String> listDel;
+    private List<OPHisDetailKey> listDel;
     @Transient
     private String status = "STATUS";
     @Transient

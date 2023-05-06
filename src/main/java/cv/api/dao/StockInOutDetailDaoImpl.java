@@ -23,14 +23,13 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
 
     @Override
     public StockInOutDetail save(StockInOutDetail stock) {
-        saveOrUpdate(stock,stock.getKey());
+        saveOrUpdate(stock, stock.getKey());
         return stock;
     }
 
     @Override
-    public int delete(String code, String compCode, Integer deptId) {
-        String delSql = "delete from stock_in_out_detail  where sd_code = '" + code + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
-        execSql(delSql);
+    public int delete(StockInOutKey key) {
+        remove(key);
         return 1;
     }
 
@@ -70,7 +69,8 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     StockInOutKey key = new StockInOutKey();
                     key.setVouNo(rs.getString("vou_no"));
                     key.setDeptId(rs.getInt("dept_id"));
-                    key.setSdCode(rs.getString("sd_code"));
+                    key.setUniqueId(rs.getInt("unique_id"));
+                    key.setCompCode(rs.getString("comp_code"));
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setInQty(rs.getFloat("in_qty"));
@@ -79,8 +79,6 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setOutUnitCode(rs.getString("out_unit"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
-                    op.setUniqueId(rs.getInt("unique_id"));
-                    op.setCompCode(rs.getString("comp_code"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
                     op.setCatName(rs.getString("cat_name"));
