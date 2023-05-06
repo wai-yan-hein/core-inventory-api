@@ -1,6 +1,7 @@
 package cv.api.dao;
 
 import cv.api.entity.OPHisDetail;
+import cv.api.entity.OPHisDetailKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -10,12 +11,12 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> implements OPHisDetailDao {
+public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail> implements OPHisDetailDao {
 
 
     @Override
     public OPHisDetail save(OPHisDetail op) {
-        persist(op);
+        saveOrUpdate(op,op.getKey());
         return op;
     }
 
@@ -33,30 +34,32 @@ public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> impleme
                 "and op.comp_code ='" + compCode + "'\n" +
                 "and op.dept_id = " + deptId + "\n" +
                 "order by unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //op_code, stock_code, qty, price, amount, loc_code, unit, vou_no, unique_id,
                 //comp_code, dept_id, user_code, stock_name, cat_name, stock_type_name, brand_name, rel_name
                 while (rs.next()) {
                     OPHisDetail op = new OPHisDetail();
-                    op.setOpCode(rs.getString("op_code"));
+                    OPHisDetailKey key = new OPHisDetailKey();
+                    key.setVouNo(rs.getString("vou_no"));
+                    key.setCompCode(rs.getString("comp_code"));
+                    key.setDeptId(rs.getInt("dept_id"));
+                    key.setOpCode(rs.getString("op_code"));
+                    key.setUniqueId(rs.getInt("unique_id"));
+                    op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setPrice(rs.getFloat("price"));
                     op.setAmount(rs.getFloat("amount"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setUnitCode(rs.getString("unit"));
-                    op.setVouNo(rs.getString("vou_no"));
-                    op.setCompCode(rs.getString("comp_code"));
-                    op.setDeptId(rs.getInt("dept_id"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
                     op.setCatName(rs.getString("cat_name"));
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
-                    op.setUniqueId(rs.getInt("unique_id"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
@@ -69,7 +72,7 @@ public class OPHisDetailDaoImpl extends AbstractDao<String, OPHisDetail> impleme
     @Override
     public int delete(String opCode, String compCode, Integer deptId) {
         String delSql = "delete from op_his_detail where op_code = '" + opCode + "' and comp_code ='" + compCode + "' and dept_id=" + deptId + "";
-        execSQL(delSql);
+        execSql(delSql);
         return 1;
     }
 }

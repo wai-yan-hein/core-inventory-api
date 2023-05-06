@@ -43,19 +43,19 @@ public class OPHisServiceImpl implements OPHisService {
         for (int i = 0; i < listSD.size(); i++) {
             OPHisDetail cSd = listSD.get(i);
             if (cSd.getStockCode() != null) {
-                if (cSd.getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
-                        cSd.setUniqueId(1);
+                        cSd.getKey().setUniqueId(1);
                     } else {
                         OPHisDetail pSd = listSD.get(i - 1);
-                        cSd.setUniqueId(pSd.getUniqueId() + 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                String opCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setOpCode(opCode);
-                cSd.setVouNo(vouNo);
-                cSd.setCompCode(op.getKey().getCompCode());
-                cSd.setDeptId(op.getKey().getDeptId());
+                String opCode = vouNo + "-" + cSd.getKey().getUniqueId();
+                cSd.getKey().setOpCode(opCode);
+                cSd.getKey().setVouNo(vouNo);
+                cSd.getKey().setCompCode(op.getKey().getCompCode());
+                cSd.getKey().setDeptId(op.getKey().getDeptId());
                 opHisDetailDao.save(cSd);
             }
         }

@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Repository
 @Slf4j
-public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> implements RetOutDetailDao {
+public class RetOutDetailDaoImpl extends AbstractDao<RetOutKey, RetOutHisDetail> implements RetOutDetailDao {
 
     @Override
     public List<RetOutHisDetail> search(String vouNo, String compCode, Integer deptId) {
@@ -48,7 +48,7 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> im
                 "and op.comp_code ='"+compCode+"'\n" +
                 "and op.dept_id = "+deptId+" \n" +
                 "order by unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -58,7 +58,7 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> im
                     key.setVouNo(rs.getString("vou_no"));
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setRdCode(rs.getString("rd_code"));
-                    op.setRoKey(key);
+                    op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setPrice(rs.getFloat("price"));
@@ -86,13 +86,13 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> im
     @Override
     public int delete(String id, String compCode, Integer deptId) throws Exception {
         String strSql = "delete from ret_out_detail_his where rd_code = '" + id + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(strSql);
+        execSql(strSql);
         return 1;
     }
 
     @Override
     public RetOutHisDetail save(RetOutHisDetail pd) {
-        persist(pd);
+        saveOrUpdate(pd,pd.getKey());
         return pd;
     }
 }

@@ -14,14 +14,14 @@ import java.util.List;
 public class WeightLossHisDetailDaoImpl extends AbstractDao<WeightLossHisDetailKey, WeightLossHisDetail> implements WeightLossHisDetailDao {
     @Override
     public WeightLossHisDetail save(WeightLossHisDetail wd) {
-        persist(wd);
+        saveOrUpdate(wd,wd.getKey());
         return wd;
     }
 
     @Override
     public void delete(WeightLossHisDetailKey key) {
         String sql = "delete from weight_loss_his_detail where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id=" + key.getDeptId() + " and unique_id =" + key.getUniqueId() + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class WeightLossHisDetailDaoImpl extends AbstractDao<WeightLossHisDetailK
                 "order by unique_id";
         try {
             //vou_no, comp_code, dept_id, unique_id, stock_code, qty, unit, price, loss_qty, loss_unit, loss_price, loc_code, user_code, stock_name
-            ResultSet rs = getResultSet(sql);
+            ResultSet rs = getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     WeightLossHisDetail h = new WeightLossHisDetail();

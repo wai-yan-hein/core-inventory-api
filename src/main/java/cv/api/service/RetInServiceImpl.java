@@ -70,7 +70,7 @@ public class RetInServiceImpl implements RetInService {
                     }
                 }
                 String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setRiKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
+                cSd.setKey(new RetInKey(sdCode, vouNo, rin.getKey().getDeptId()));
                 cSd.setCompCode(rin.getKey().getCompCode());
                 sdDao.save(cSd);
             }
@@ -110,11 +110,6 @@ public class RetInServiceImpl implements RetInService {
     @Override
     public void restore(RetInHisKey key) throws Exception {
         rDao.restore(key);
-    }
-
-    @Override
-    public List<VReturnIn> search(String vouNo) {
-        return rDao.search(vouNo);
     }
 
     @Override

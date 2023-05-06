@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.common.*;
 import cv.api.dao.ReportDao;
 import cv.api.dao.UnitRelationDao;
+import cv.api.dao.UnitRelationDetailDao;
 import cv.api.entity.*;
 import cv.api.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class ReportServiceImpl implements ReportService {
     private ReportDao reportDao;
     @Autowired
     private UnitRelationDao relationDao;
+    @Autowired
+    private UnitRelationDetailDao detailDao;
     @Autowired
     private WebClient userApi;
 
@@ -1186,7 +1189,7 @@ public class ReportServiceImpl implements ReportService {
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
             if (hmRelation.get(relCode) == null) {
-                hmRelation.put(relCode, relationDao.getRelationDetail(relCode, compCode, deptId));
+                hmRelation.put(relCode, detailDao.getRelationDetail(relCode, compCode, deptId));
             }
             List<UnitRelationDetail> detailList = hmRelation.get(relCode);
             if (detailList != null) {

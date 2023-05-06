@@ -3,6 +3,7 @@ package cv.api.dao;
 import cv.api.common.Util1;
 import cv.api.entity.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -13,9 +14,11 @@ import java.util.List;
 @Repository
 @Slf4j
 public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> implements UnitRelationDao {
+   @Autowired
+   private UnitRelationDetailDao dao;
     @Override
     public UnitRelation save(UnitRelation ur) {
-        persist(ur);
+        saveOrUpdate(ur,ur.getKey());
         return ur;
     }
 
@@ -34,7 +37,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
     public List<StockUnit> getRelation(String relCode, String compCode, Integer deptId) {
         List<StockUnit> list = new ArrayList<>();
         String sql = "select unit from unit_relation_detail where rel_code ='" + relCode + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             while (rs.next()) {
                 StockUnitKey key = new StockUnitKey();
@@ -51,27 +54,6 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
         return list;
     }
 
-    @Override
-    public UnitRelationDetail save(UnitRelationDetail unit) {
-        getSession().saveOrUpdate(unit);
-        return unit;
-    }
-
-    @Override
-    public List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId) {
-        String hsql;
-        if (code.equals("-")) {
-            hsql = "select o from UnitRelationDetail o where o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ")";
-        } else {
-            hsql = "select o from UnitRelationDetail o where o.key.relCode = '" + code + "' and o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ")";
-        }
-        return getSession().createQuery(hsql, UnitRelationDetail.class).list();
-    }
-
-    @Override
-    public UnitRelationDetail findByKey(UnitRelationDetailKey key) {
-        return getSession().get(UnitRelationDetail.class, key);
-    }
 
     @Override
     public List<UnitRelation> unUpload() {
@@ -81,7 +63,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();
             Integer deptId = o.getKey().getDeptId();
-            o.setDetailList(getRelationDetail(code, compCode, deptId));
+            o.setDetailList(dao.getRelationDetail(code, compCode, deptId));
         });
         return list;
     }
@@ -89,7 +71,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from unit_relation";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");
@@ -111,7 +93,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();
             Integer deptId = o.getKey().getDeptId();
-            o.setDetailList(getRelationDetail(code, compCode, deptId));
+            o.setDetailList(dao.getRelationDetail(code, compCode, deptId));
         });
         return list;
     }

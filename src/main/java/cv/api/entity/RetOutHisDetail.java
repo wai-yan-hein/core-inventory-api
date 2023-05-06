@@ -20,7 +20,7 @@ import javax.persistence.*;
 public class RetOutHisDetail implements java.io.Serializable {
 
     @EmbeddedId
-    private RetOutKey roKey;
+    private RetOutKey key;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty", nullable = false)

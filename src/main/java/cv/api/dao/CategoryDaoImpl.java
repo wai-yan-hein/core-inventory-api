@@ -29,7 +29,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
 
     @Override
     public Category save(Category item) {
-        persist(item);
+        saveOrUpdate(item,item.getKey());
         return item;
     }
 
@@ -42,8 +42,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from Category o where o.catCode ='" + id + "'";
-        return execUpdateOrDelete(hsql);
+      return 1;
     }
 
     @Override
@@ -77,7 +76,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from category";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

@@ -21,7 +21,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
 
     @Override
     public OPHis save(OPHis op) {
-        persist(op);
+        saveOrUpdate(op,op.getKey());
         return op;
     }
 
@@ -55,7 +55,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update op_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from op_his";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 return rs.getTimestamp("date");

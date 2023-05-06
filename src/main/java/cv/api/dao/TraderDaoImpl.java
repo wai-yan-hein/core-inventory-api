@@ -36,7 +36,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
                 "and rfid='" + rfId + "'\n" +
                 "limit 1\n";
         try {
-            ResultSet rs = getResultSet(sql);
+            ResultSet rs = getResult(sql);
             if (rs.next()) {
                 Trader t = new Trader();
                 TraderKey key = new TraderKey();
@@ -59,6 +59,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     @Override
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
         String filter = "where active =1\n" +
+                "and deleted = 0\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and (user_code like '" + str + "%' or trader_name like '" + str + "%') \n";
@@ -69,7 +70,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
                 "from trader\n" + filter + "\n" +
                 "order by user_code,trader_name\n" +
                 "limit 100\n";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         List<Trader> list = new ArrayList<>();
         try {
             if (rs != null) {
@@ -96,7 +97,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public Trader saveTrader(Trader trader) {
-        persist(trader);
+        saveOrUpdate(trader,trader.getKey());
         return trader;
     }
 
@@ -120,8 +121,8 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public int delete(TraderKey key) {
-        String sql = "delete from trader  where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
-        execSQL(sql);
+        String sql = "update trader deleted = 1 where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
+        execSql(sql);
         return 1;
     }
 
@@ -146,7 +147,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from trader";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

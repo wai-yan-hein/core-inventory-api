@@ -2,25 +2,26 @@ package cv.api.dao;
 
 import cv.api.entity.BKSaleHis;
 import cv.api.entity.BKSaleHisDetail;
+import cv.api.entity.BKSaleHisKey;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class BackupDaoImpl extends AbstractDao<String, Object> implements BackupDao {
+public class BackupDaoImpl extends AbstractDao<BKSaleHisKey, Object> implements BackupDao {
 
     @Override
     public void exeSql(String... str) {
-        execSQL(str);
+        execSql(str);
     }
 
     @Override
     public BKSaleHis save(BKSaleHis bk) {
-        persist(bk);
+        saveOrUpdate(bk,bk.getKey());
         return bk;
     }
 
     @Override
     public BKSaleHisDetail save(BKSaleHisDetail bkd) {
-        persist(bkd);
+        //saveOrUpdate(bkd,bkd.getSdKey());
         return bkd;
     }
 }

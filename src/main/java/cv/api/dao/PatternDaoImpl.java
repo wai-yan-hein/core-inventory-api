@@ -20,7 +20,7 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
 
     @Override
     public Pattern save(Pattern pattern) {
-        persist(pattern);
+        saveOrUpdate(pattern,pattern.getKey());
         return pattern;
     }
 
@@ -30,7 +30,7 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
         String sql = "delete from pattern where comp_code ='" + key.getCompCode() + "'\n"
                 + "and dept_id =" + key.getDeptId() + " and stock_code ='" + key.getStockCode() + "'\n"
                 + "and f_stock_code ='" + key.getMapStockCode() + "' and unique_id =" + key.getUniqueId() + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
 
@@ -52,7 +52,7 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
                 "and p.dept_id =" + deptId + "\n" +
                 "and p.comp_code ='" + compCode + "'\n" +
                 "order by p.unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 while (rs.next()) {

@@ -30,7 +30,6 @@ public interface RetInService {
 
     void restore(RetInHisKey key) throws Exception;
 
-    List<VReturnIn> search(String vouNo);
 
     List<RetInHis> unUploadVoucher(String syncDate);
 

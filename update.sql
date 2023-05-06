@@ -663,3 +663,5 @@ set comp_code ='0010010';
 
 alter table pur_his_detail
 change column avg_qty avg_qty float(20,3) null default 0.000 ;
+alter table trader
+add column deleted bit(1) not null default 0 after nrc;

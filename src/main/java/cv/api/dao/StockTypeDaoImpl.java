@@ -24,7 +24,7 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
 
     @Override
     public StockType save(StockType item) {
-        persist(item);
+        saveOrUpdate(item,item.getKey());
         return item;
     }
 
@@ -36,8 +36,7 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from StockType o where o.stockTypeCode ='" + id + "'";
-        return execUpdateOrDelete(hsql);
+     return 1;
     }
 
     @Override
@@ -54,7 +53,7 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from stock_type";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

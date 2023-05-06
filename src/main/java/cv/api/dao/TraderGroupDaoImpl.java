@@ -10,7 +10,7 @@ import java.util.List;
 public class TraderGroupDaoImpl extends AbstractDao<TraderGroupKey, TraderGroup> implements TraderGroupDao {
     @Override
     public TraderGroup save(TraderGroup group) {
-        persist(group);
+        saveOrUpdate(group,group.getKey());
         return group;
     }
 

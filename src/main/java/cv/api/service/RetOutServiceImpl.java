@@ -69,7 +69,7 @@ public class RetOutServiceImpl implements RetOutService {
                     }
                 }
                 String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setRoKey(new RetOutKey(sdCode, vouNo, rin.getKey().getDeptId()));
+                cSd.setKey(new RetOutKey(sdCode, vouNo, rin.getKey().getDeptId()));
                 cSd.setCompCode(rin.getKey().getCompCode());
                 rd.save(cSd);
             }
@@ -102,11 +102,6 @@ public class RetOutServiceImpl implements RetOutService {
     @Override
     public void restore(RetOutHisKey key) throws Exception {
         rDao.restore(key);
-    }
-
-    @Override
-    public List<VReturnOut> search(String vouNo) {
-        return rDao.search(vouNo);
     }
 
     @Override

@@ -6,10 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,16 +15,13 @@ import java.io.Serializable;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "stock_in_out_detail")
 public class StockInOutDetail implements Serializable {
 
     @EmbeddedId
-    private StockInOutKey ioKey;
+    private StockInOutKey key;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "loc_code")

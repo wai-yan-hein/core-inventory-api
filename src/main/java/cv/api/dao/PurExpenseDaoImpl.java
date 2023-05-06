@@ -14,7 +14,7 @@ import java.util.List;
 public class PurExpenseDaoImpl extends AbstractDao<PurExpenseKey, PurExpense> implements PurExpenseDao {
     @Override
     public PurExpense save(PurExpense p) {
-        persist(p);
+        saveOrUpdate(p,p.getKey());
         return p;
     }
 
@@ -31,7 +31,7 @@ public class PurExpenseDaoImpl extends AbstractDao<PurExpenseKey, PurExpense> im
                 "on a.expense_code = e.expense_code\n" +
                 "and a.comp_code = e.comp_code\n" +
                 "order by a.unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         List<PurExpense> list = new ArrayList<>();
         if (rs != null) {
             try {

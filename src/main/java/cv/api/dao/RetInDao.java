@@ -28,8 +28,6 @@ public interface RetInDao {
 
     void restore(RetInHisKey key) throws Exception;
 
-    List<VReturnIn> search(String vouNo);
-
     List<RetInHis> unUploadVoucher(String syncDate);
 
     List<RetInHis> unUpload(String syncDate);

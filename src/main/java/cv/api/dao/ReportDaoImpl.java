@@ -18,11 +18,11 @@ public class ReportDaoImpl extends AbstractDao<Serializable, Object> implements 
 
     @Override
     public void executeSql(String... sql) throws Exception {
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
     public ResultSet executeSql(String sql) throws Exception {
-        return getResultSet(sql);
+        return getResult(sql);
     }
 }

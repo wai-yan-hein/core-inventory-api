@@ -30,7 +30,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
 
     @Override
     public SaleHis save(SaleHis sh) {
-        persist(sh);
+        saveOrUpdate(sh,sh.getKey());
         return sh;
     }
 
@@ -94,7 +94,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update sale_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update sale_his set deleted =0,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
 
@@ -129,7 +129,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from sale_his";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");
@@ -149,7 +149,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         if (location != null) {
             for (String locCode : location) {
                 String sql = "select * from sale_his o where o.loc_code='" + locCode + "' and o.updated_date > '" + updatedDate + "'";
-                ResultSet rs = getResultSet(sql);
+                ResultSet rs = getResult(sql);
                 if (rs != null) {
                     try {
                         while (rs.next()) {
@@ -214,7 +214,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         Integer deptId = key.getDeptId();
         String sql1 = "delete from sale_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
         String sql2 = "delete from sale_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        execSQL(sql1, sql2);
+        execSql(sql1, sql2);
     }
 
     @Override
@@ -227,7 +227,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                 "and comp_code='" + compCode + "'\n" +
                 "and dept_id ='" + depId + "'";
         try {
-            ResultSet rs = getResultSet(sql);
+            ResultSet rs = getResult(sql);
             if (rs.next()) {
                 g.setQty(rs.getFloat("vou_count"));
                 g.setAmount(rs.getFloat("paid"));

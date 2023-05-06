@@ -25,7 +25,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public Stock save(Stock stock) {
-        persist(stock);
+        saveOrUpdate(stock,stock.getKey());
         return stock;
     }
 
@@ -43,7 +43,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     @Override
     public int delete(String id) {
         String sql = "delete from stock where stock_code = '" + id + "'";
-        execSQL(sql);
+        execSql(sql);
         return 1;
     }
 
@@ -85,7 +85,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     public List<Stock> getService(String compCode, Integer deptId) {
         List<Stock> list = new ArrayList<>();
         String sql = "select * from stock where calculate =0 and  comp_code ='" + compCode + "' and (dept_id =" + deptId + " or 0=" + deptId + ")";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 while (rs.next()) {
@@ -131,7 +131,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                 "and " + filter + "\n" +
                 "order by s.user_code,s.stock_name\n" +
                 "limit 100";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 while (rs.next()) {
@@ -185,7 +185,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from stock";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

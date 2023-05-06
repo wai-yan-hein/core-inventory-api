@@ -15,7 +15,7 @@ public class ExpenseDaoImpl extends AbstractDao<ExpenseKey, Expense> implements 
 
     @Override
     public Expense save(Expense exp) {
-        persist(exp);
+        saveOrUpdate(exp,exp.getKey());
         return exp;
     }
 
@@ -28,6 +28,6 @@ public class ExpenseDaoImpl extends AbstractDao<ExpenseKey, Expense> implements 
     @Override
     public void delete(ExpenseKey key) {
         String sql = "update expense set deleted = 1 where expense_code ='" + key.getExpenseCode() + "' and comp_code ='" + key.getCompCode() + "'";
-        execSQL(sql);
+        execSql(sql);
     }
 }

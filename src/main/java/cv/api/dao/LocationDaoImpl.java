@@ -26,7 +26,7 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
 
     @Override
     public Location save(Location ch) {
-        persist(ch);
+        saveOrUpdate(ch, ch.getKey());
         return ch;
     }
 
@@ -43,8 +43,9 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from Location o where o.locationCode='" + id + "'";
-        return execUpdateOrDelete(hsql);
+        String hsql = "delete from location where loc_code ='" + id + "'";
+        execSql(hsql);
+        return 1;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from location";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

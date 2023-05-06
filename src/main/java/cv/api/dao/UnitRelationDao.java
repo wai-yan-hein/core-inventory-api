@@ -14,13 +14,6 @@ public interface UnitRelationDao {
 
     List<StockUnit> getRelation(String relCode, String compCode, Integer deptId);
 
-
-    UnitRelationDetail save(UnitRelationDetail unit);
-
-    List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId);
-
-    UnitRelationDetail findByKey(UnitRelationDetailKey key);
-
     List<UnitRelation> unUpload();
 
     Date getMaxDate();

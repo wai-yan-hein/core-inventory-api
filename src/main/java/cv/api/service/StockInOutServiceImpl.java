@@ -62,7 +62,7 @@ public class StockInOutServiceImpl implements StockInOutService {
                     }
                 }
                 String sdCode = vouNo + "-" + cSd.getUniqueId();
-                cSd.setIoKey(new StockInOutKey(sdCode, vouNo, io.getKey().getDeptId()));
+                cSd.setKey(new StockInOutKey(sdCode, vouNo, io.getKey().getDeptId()));
                 cSd.setCompCode(io.getKey().getCompCode());
                 iodDao.save(cSd);
             }

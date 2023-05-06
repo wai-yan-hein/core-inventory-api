@@ -16,7 +16,7 @@ import java.util.List;
 public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, ProcessHisDetail> implements ProcessHisDetailDao {
     @Override
     public ProcessHisDetail save(ProcessHisDetail ph) {
-        persist(ph);
+        saveOrUpdate(ph,ph.getKey());
         return ph;
     }
 
@@ -43,7 +43,7 @@ public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, Pr
                 "and l.comp_code =a.comp_code\n" +
                 "and l.dept_id = a.dept_id\n" +
                 "order by a.unique_id\n";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             while (rs.next()) {
                 ProcessHisDetail p = new ProcessHisDetail();
@@ -74,6 +74,6 @@ public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, Pr
     public void delete(ProcessHisDetailKey key) {
         String sql = "delete from process_his_detail where vou_no='" + key.getVouNo() + "'\n"
                 + "and unique_id =" + key.getUniqueId() + " and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        execSQL(sql);
+        execSql(sql);
     }
 }

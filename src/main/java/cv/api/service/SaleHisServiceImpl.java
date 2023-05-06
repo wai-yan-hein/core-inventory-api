@@ -71,7 +71,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                 }
                 String sdCode = vouNo + "-" + cSd.getKey().getUniqueId();
                 cSd.getKey().setSdCode(sdCode);
-                cSd.setVouNo(vouNo);
+                cSd.getKey().setVouNo(vouNo);
                 sdDao.save(cSd);
 
             }

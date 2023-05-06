@@ -24,7 +24,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
 
     @Override
     public StockBrand save(StockBrand item)  {
-        persist(item);
+        saveOrUpdate(item,item.getKey());
         return item;
     }
 
@@ -36,8 +36,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from StockBrand o where o.brandCode='" + id + "'";
-        return execUpdateOrDelete(hsql);
+      return 1;
     }
 
     @Override
@@ -49,7 +48,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from stock_brand";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

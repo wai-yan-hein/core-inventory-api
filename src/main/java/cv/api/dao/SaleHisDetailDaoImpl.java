@@ -23,7 +23,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
 
     @Override
     public SaleHisDetail save(SaleHisDetail sdh) {
-        persist(sdh);
+        saveOrUpdate(sdh, sdh.getKey());
         return sdh;
     }
 
@@ -61,7 +61,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "and op.comp_code ='" + compCode + "'\n" +
                 "and op.dept_id = " + deptId + "\n" +
                 "order by unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -72,8 +72,8 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setSdCode(rs.getString("sd_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
+                    key.setVouNo(rs.getString("vou_no"));
                     op.setKey(key);
-                    op.setVouNo(rs.getString("vou_no"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setWeight(rs.getFloat("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
@@ -112,7 +112,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "and dept_id ='" + deptId + "'\n" +
                 "order by unique_id";
         try {
-            ResultSet rs = getResultSet(sql);
+            ResultSet rs = getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     SaleHisDetail sh = new SaleHisDetail();
@@ -121,8 +121,8 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
+                    key.setVouNo(rs.getString("vou_no"));
                     sh.setKey(key);
-                    sh.setVouNo(rs.getString("vou_no"));
                     sh.setStockCode(rs.getString("stock_code"));
                     sh.setExpDate(rs.getDate("expire_date"));
                     sh.setQty(rs.getFloat("qty"));
@@ -142,7 +142,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
     @Override
     public int delete(String code, String compCode, Integer deptId) {
         String strSql = "delete from sale_his_detail where sd_code = '" + code + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(strSql);
+        execSql(strSql);
         return 1;
     }
 
@@ -169,7 +169,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "and a.comp_code = l.comp_code\n" +
                 "and a.dept_id = l.dept_id\n" +
                 "order by s_user_code";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -220,7 +220,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "and a.comp_code = l.comp_code\n" +
                 "and a.dept_id = l.dept_id\n" +
                 "order by s_user_code";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id

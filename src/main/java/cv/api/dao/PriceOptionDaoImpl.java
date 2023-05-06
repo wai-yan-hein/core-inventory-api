@@ -11,10 +11,10 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class PriceOptionDaoImpl extends AbstractDao<String, PriceOption> implements PriceOptionDao {
+public class PriceOptionDaoImpl extends AbstractDao<PriceOptionKey, PriceOption> implements PriceOptionDao {
     @Override
     public PriceOption save(PriceOption p) {
-        persist(p);
+        saveOrUpdate(p,p.getKey());
         return p;
     }
 
@@ -27,7 +27,7 @@ public class PriceOptionDaoImpl extends AbstractDao<String, PriceOption> impleme
                 "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
                 "and tran_option='" + option + "'\n" +
                 "order by unique_id;";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 while (rs.next()) {

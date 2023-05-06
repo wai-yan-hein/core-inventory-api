@@ -14,14 +14,14 @@ import java.util.List;
 public class GRNDetailDaoImpl extends AbstractDao<GRNDetailKey, GRNDetail> implements GRNDetailDao {
     @Override
     public GRNDetail save(GRNDetail b) {
-        persist(b);
+        saveOrUpdate(b,b.getKey());
         return b;
     }
 
     @Override
     public void delete(GRNDetailKey key) {
         String sql = "delete from grn_detail where vou_no='" + key.getVouNo() + "' and '" + key.getCompCode() + "' and '" + key.getDeptId() + "' and '" + key.getUniqueId() + "'";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class GRNDetailDaoImpl extends AbstractDao<GRNDetailKey, GRNDetail> imple
                     "and g.comp_code ='" + compCode + "'\n" +
                     "and g.dept_id =" + deptId + "\n" +
                     "order by unique_id;";
-            ResultSet rs = getResultSet(sql);
+            ResultSet rs = getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     GRNDetail g = new GRNDetail();

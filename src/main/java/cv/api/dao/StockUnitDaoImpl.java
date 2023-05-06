@@ -24,7 +24,7 @@ public class StockUnitDaoImpl extends AbstractDao<StockUnitKey, StockUnit> imple
 
     @Override
     public StockUnit save(StockUnit item) {
-        persist(item);
+        saveOrUpdate(item, item.getKey());
         return item;
     }
 
@@ -36,8 +36,7 @@ public class StockUnitDaoImpl extends AbstractDao<StockUnitKey, StockUnit> imple
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from StockUnit o where o.itemUnitCode='" + id + "'";
-        return execUpdateOrDelete(hsql);
+        return 1;
     }
 
     @Override
@@ -54,7 +53,7 @@ public class StockUnitDaoImpl extends AbstractDao<StockUnitKey, StockUnit> imple
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from stock_unit";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

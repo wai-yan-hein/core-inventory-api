@@ -25,7 +25,7 @@ import javax.persistence.*;
 public class RetInHisDetail implements java.io.Serializable {
 
     @EmbeddedId
-    private RetInKey riKey;
+    private RetInKey key;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty", nullable = false)

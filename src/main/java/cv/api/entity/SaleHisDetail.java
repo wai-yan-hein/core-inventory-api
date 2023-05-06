@@ -43,8 +43,6 @@ public class SaleHisDetail implements java.io.Serializable {
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "vou_no")
-    private String vouNo;
     @Column(name = "batch_no")
     private String batchNo;
     @Column(name = "weight")

@@ -341,7 +341,7 @@ public class SetupController {
 
 
     @PostMapping(path = "/delete-trader")
-    public ResponseEntity<?> deleteTrader(@RequestBody TraderKey key) {
+    public Mono<?> deleteTrader(@RequestBody TraderKey key) {
         List<String> str = traderService.delete(key);
         if (str.isEmpty()) {
             AccTraderKey k = new AccTraderKey();
@@ -350,7 +350,7 @@ public class SetupController {
             accountRepo.deleteTrader(k);
             log.info("deleted trader.");
         }
-        return ResponseEntity.ok(str.isEmpty() ? null : str);
+        return Mono.justOrEmpty(str);
     }
 
     @PostMapping(path = "/find-trader")

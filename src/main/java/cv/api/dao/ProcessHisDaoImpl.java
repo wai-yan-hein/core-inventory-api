@@ -14,7 +14,7 @@ import java.util.List;
 public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> implements ProcessHisDao {
     @Override
     public ProcessHis save(ProcessHis ph) {
-        persist(ph);
+        saveOrUpdate(ph,ph.getKey());
         return ph;
     }
 
@@ -65,7 +65,7 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                 "and a.comp_code = l.comp_code\n" +
                 "join vou_status v on a.pt_code = v.code\n" +
                 "and a.comp_code = v.comp_code\n";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //vou_no, stock_code, comp_code, dept_id, loc_code, vou_date, end_date, qty,
@@ -108,12 +108,12 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
     @Override
     public void delete(ProcessHisKey key) {
         String sql = "update process_his set deleted =1 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
     public void restore(ProcessHisKey key) {
         String sql = "update process_his set deleted =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        execSQL(sql);
+        execSql(sql);
     }
 }

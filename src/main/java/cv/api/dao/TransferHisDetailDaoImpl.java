@@ -11,17 +11,17 @@ import java.util.List;
 
 @Slf4j
 @Repository
-public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDetail> implements TransferHisDetailDao {
+public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferHisDetail> implements TransferHisDetailDao {
     @Override
     public TransferHisDetail save(TransferHisDetail th) {
-        persist(th);
+        saveOrUpdate(th,th.getKey());
         return th;
     }
 
     @Override
     public int delete(String code, String compCode, Integer deptId) {
         String delSql = "delete from transfer_his_detail  where td_code = '" + code + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        execSQL(delSql);
+        execSql(delSql);
         return 1;
     }
 
@@ -40,7 +40,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
                 "and td.comp_code ='"+compCode+"'\n" +
                 "and td.dept_id = "+deptId+"\n" +
                 "order by td.unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 while (rs.next()) {
@@ -72,7 +72,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<String, TransferHisDet
     public List<TransferHisDetail> searchDetail(String vouNo, String compCode, Integer deptId) {
         List<TransferHisDetail> list = new ArrayList<>();
         String sql = "select * from transfer_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + " order by unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 while (rs.next()) {

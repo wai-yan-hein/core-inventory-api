@@ -19,12 +19,12 @@ import java.util.List;
  */
 @Repository
 @Slf4j
-public class PurHisDetailDaoImpl extends AbstractDao<String, PurHisDetail> implements PurHisDetailDao {
+public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail> implements PurHisDetailDao {
 
 
     @Override
     public PurHisDetail save(PurHisDetail pd) {
-        persist(pd);
+        saveOrUpdate(pd,pd.getKey());
         return pd;
     }
 
@@ -55,7 +55,7 @@ public class PurHisDetailDaoImpl extends AbstractDao<String, PurHisDetail> imple
                 "and op.comp_code ='"+compCode+"'\n" +
                 "and op.dept_id = "+deptId+"\n" +
                 "order by unique_id;\n";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -98,7 +98,7 @@ public class PurHisDetailDaoImpl extends AbstractDao<String, PurHisDetail> imple
     @Override
     public int delete(String id, String compCode, Integer deptId) throws Exception {
         String strSql = "delete from pur_his_detail where pd_code = '" + id + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(strSql);
+        execSql(strSql);
         return 1;
     }
 }

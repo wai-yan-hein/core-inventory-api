@@ -10,7 +10,7 @@ import java.util.List;
 public class WeightLossDaoImpl extends AbstractDao<WeightLossHisKey, WeightLossHis> implements WeightLossDao {
     @Override
     public WeightLossHis save(WeightLossHis l) {
-        persist(l);
+        saveOrUpdate(l,l.getKey());
         return l;
     }
 
@@ -22,13 +22,13 @@ public class WeightLossDaoImpl extends AbstractDao<WeightLossHisKey, WeightLossH
     @Override
     public void delete(WeightLossHisKey key) {
         String sql = "update weight_loss_his set deleted =1 where vou_no = '" + key.getVouNo() + "' and comp_code =" + key.getCompCode() + " and dept_id =" + key.getDeptId() + " ";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
     public void restore(WeightLossHisKey key) {
         String sql = "update weight_loss_his set deleted =0 where vou_no = '" + key.getVouNo() + "' and comp_code =" + key.getCompCode() + " and dept_id =" + key.getDeptId() + " ";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override

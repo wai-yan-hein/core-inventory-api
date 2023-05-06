@@ -34,7 +34,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
 
     @Override
     public StockInOut save(StockInOut stock) {
-        persist(stock);
+        saveOrUpdate(stock,stock.getKey());
         return stock;
     }
 
@@ -99,7 +99,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update stock_in_out set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
 
     }
 
@@ -109,7 +109,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update stock_in_out set deleted =0 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from stock_in_out";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

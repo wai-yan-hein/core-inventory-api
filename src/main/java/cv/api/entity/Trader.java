@@ -71,6 +71,8 @@ public class Trader implements java.io.Serializable {
     private String groupCode;
     @Column(name = "account")
     private String account;
+    @Column(name = "deleted")
+    private boolean deleted;
 
     public Trader() {
     }

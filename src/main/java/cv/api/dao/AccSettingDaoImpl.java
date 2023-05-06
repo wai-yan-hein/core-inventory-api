@@ -25,7 +25,7 @@ public class AccSettingDaoImpl extends AbstractDao<AccKey, AccSetting> implement
 
     @Override
     public AccSetting save(AccSetting setting) {
-        persist(setting);
+        saveOrUpdate(setting,setting.getKey());
         return setting;
 
     }

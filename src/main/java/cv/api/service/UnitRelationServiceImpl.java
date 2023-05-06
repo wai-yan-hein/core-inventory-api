@@ -7,6 +7,7 @@ package cv.api.service;
 
 import cv.api.common.Util1;
 import cv.api.dao.UnitRelationDao;
+import cv.api.dao.UnitRelationDetailDao;
 import cv.api.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     private SeqTableService seqService;
     @Autowired
     private UnitRelationDao dao;
+    @Autowired
+    private UnitRelationDetailDao detailDao;
 
     @Override
     public UnitRelation save(UnitRelation ur) {
@@ -58,7 +61,7 @@ public class UnitRelationServiceImpl implements UnitRelationService {
                 size--;
             }
         }
-        detail.forEach(ud -> dao.save(ud));
+        detail.forEach(ud -> detailDao.save(ud));
         ur.setRelName(getRelStr(detail));
         return dao.save(ur);
     }
@@ -89,17 +92,17 @@ public class UnitRelationServiceImpl implements UnitRelationService {
 
     @Override
     public UnitRelationDetail save(UnitRelationDetail unit) {
-        return dao.save(unit);
+        return detailDao.save(unit);
     }
 
     @Override
     public List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId) {
-        return dao.getRelationDetail(code, compCode, deptId);
+        return detailDao.getRelationDetail(code, compCode, deptId);
     }
 
     @Override
     public UnitRelationDetail findByKey(UnitRelationDetailKey key) {
-        return dao.findByKey(key);
+        return detailDao.findByKey(key);
     }
 
     @Override

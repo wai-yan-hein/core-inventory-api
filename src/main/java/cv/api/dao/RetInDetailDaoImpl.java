@@ -23,7 +23,7 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
 
     @Override
     public RetInHisDetail save(RetInHisDetail pd) {
-        persist(pd);
+        saveOrUpdate(pd,pd.getKey());
         return pd;
     }
 
@@ -54,7 +54,7 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
                 "and op.comp_code ='" + compCode + "'\n" +
                 "and op.dept_id = " + deptId + "\n" +
                 "order by unique_id";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -64,7 +64,7 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
                     key.setVouNo(rs.getString("vou_no"));
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setRdCode(rs.getString("rd_code"));
-                    op.setRiKey(key);
+                    op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setAvgQty(rs.getFloat("avg_qty"));
@@ -93,7 +93,7 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
     @Override
     public int delete(String id, String compCode, Integer deptId) throws Exception {
         String strSql = "delete from ret_in_his_detail where rd_code = '" + id + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(strSql);
+        execSql(strSql);
         return 1;
     }
 }

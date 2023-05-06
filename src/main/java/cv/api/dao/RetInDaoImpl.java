@@ -27,13 +27,11 @@ import java.util.List;
 public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements RetInDao {
 
     @Autowired
-    private SessionFactory sessionFactory;
-    @Autowired
     private RetInDetailDao dao;
 
     @Override
     public RetInHis save(RetInHis sh) {
-        persist(sh);
+        saveOrUpdate(sh,sh.getKey());
         return sh;
     }
 
@@ -97,7 +95,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update ret_in_his set deleted =1,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -106,13 +104,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update ret_in_his set deleted =0,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
-    }
-
-    @Override
-    public List<VReturnIn> search(String vouNo) {
-        String hsql = "select o from VReturnIn o where o.vouNo = '" + vouNo + "' order by uniqueId";
-        return sessionFactory.getCurrentSession().createQuery(hsql, VReturnIn.class).list();
+        execSql(sql);
     }
 
     @Override
@@ -137,7 +129,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from ret_in_his";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");
@@ -176,6 +168,6 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
         Integer deptId = key.getDeptId();
         String sql1 = "delete from ret_in_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
         String sql2 = "delete from ret_in_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        execSQL(sql1, sql2);
+        execSql(sql1, sql2);
     }
 }

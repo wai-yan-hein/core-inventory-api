@@ -20,7 +20,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
 
     @Override
     public TransferHis save(TransferHis th) {
-        persist(th);
+        saveOrUpdate(th,th.getKey());
         return th;
     }
 
@@ -48,7 +48,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update transfer_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -57,13 +57,13 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update transfer_his set deleted =0 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from transfer_his";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");
@@ -86,7 +86,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
                 // updated_date, loc_code_from, loc_code_to, mac_id, comp_code, dept_id, intg_upd_status
                 String sql = "select * from transfer_his where (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "') and intg_upd_status is null";
                 try {
-                    ResultSet rs = getResultSet(sql);
+                    ResultSet rs = getResult(sql);
                     if (rs != null) {
                         while (rs.next()) {
                             TransferHis th = new TransferHis();
@@ -131,5 +131,5 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         Integer deptId = key.getDeptId();
         String sql1 = "delete from transfer_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
         String sql2 = "delete from transfer_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        execSQL(sql1, sql2);    }
+        execSql(sql1, sql2);    }
 }

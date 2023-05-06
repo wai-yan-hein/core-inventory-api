@@ -24,7 +24,7 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
 
     @Override
     public SaleMan save(SaleMan saleMan) {
-        persist(saleMan);
+        saveOrUpdate(saleMan,saleMan.getKey());
         return saleMan;
     }
 
@@ -36,8 +36,7 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from SaleMan o where o.saleManCode ='" + id + "'";
-        return execUpdateOrDelete(hsql);
+        return 1;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from sale_man";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

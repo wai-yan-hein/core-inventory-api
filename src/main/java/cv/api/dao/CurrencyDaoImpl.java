@@ -19,7 +19,7 @@ public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements Cu
 
     @Override
     public Currency save(Currency cur) {
-        persist(cur);
+        saveOrUpdate(cur,cur.getCurCode());
         return cur;
     }
 
@@ -54,9 +54,7 @@ public class CurrencyDaoImpl extends AbstractDao<String, Currency> implements Cu
 
     @Override
     public int delete(String code, String compCode) {
-        String strSql = "delete from Currency o where o.key.code = '" + code
-                + "' and o.key.compCode = " + compCode;
-        return execUpdateOrDelete(strSql);
+    return 1;
     }
 
 }

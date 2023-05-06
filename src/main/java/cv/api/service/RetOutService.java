@@ -30,7 +30,6 @@ public interface RetOutService {
 
     void restore(RetOutHisKey key) throws Exception;
 
-    List<VReturnOut> search(String vouNo);
 
     List<RetOutHis> unUploadVoucher(String syncDate);
 

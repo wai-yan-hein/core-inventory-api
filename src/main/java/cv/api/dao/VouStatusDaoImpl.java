@@ -24,7 +24,7 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
 
     @Override
     public VouStatus save(VouStatus vouStatus) {
-        persist(vouStatus);
+        saveOrUpdate(vouStatus,vouStatus.getKey());
         return vouStatus;
     }
 
@@ -36,8 +36,7 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
 
     @Override
     public int delete(String id) {
-        String hsql = "delete from VouStatus o where o.vouStatusId='" + id + "'";
-        return execUpdateOrDelete(hsql);
+       return 1;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from vou_status";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");

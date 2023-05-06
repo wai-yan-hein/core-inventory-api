@@ -19,7 +19,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
 
     @Override
     public GRN save(GRN b) {
-        persist(b);
+        saveOrUpdate(b,b.getKey());
         return b;
     }
 
@@ -32,7 +32,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     @Override
     public boolean delete(GRNKey key) {
         String sql = "update grn set deleted =1 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
-        execSQL(sql);
+        execSql(sql);
         return true;
     }
 
@@ -56,7 +56,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
                 "and a.comp_code = t.comp_code\n" +
                 "and a.dept_id = t.dept_id";
         try {
-            ResultSet rs = getResultSet(sql);
+            ResultSet rs = getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
                     GRN g = new GRN();

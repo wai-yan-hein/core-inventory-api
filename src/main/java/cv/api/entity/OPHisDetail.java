@@ -1,6 +1,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,15 +9,12 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
+@Data
 @Entity
 @Table(name = "op_his_detail")
 public class OPHisDetail implements java.io.Serializable {
-    @Id
-    @Column(name = "op_code")
-    private String opCode;
+    @EmbeddedId
+    private OPHisDetailKey key;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty")
@@ -29,14 +27,6 @@ public class OPHisDetail implements java.io.Serializable {
     private String locCode;
     @Column(name = "unit")
     private String unitCode;
-    @Column(name = "vou_no")
-    private String vouNo;
-    @Column(name = "unique_id")
-    private Integer uniqueId;
-    @Column(name = "comp_code")
-    private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
     @Transient
     private String userCode;
     @Transient

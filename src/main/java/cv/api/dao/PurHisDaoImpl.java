@@ -34,7 +34,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
     @Override
     public PurHis save(PurHis sh) {
-        persist(sh);
+        saveOrUpdate(sh,sh.getKey());
         return sh;
     }
 
@@ -98,7 +98,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update pur_his set deleted =1,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
         String sql = "update pur_his set deleted =0,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSQL(sql);
+        execSql(sql);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
     @Override
     public Date getMaxDate() {
         String sql = "select max(updated_date) date from pur_his";
-        ResultSet rs = getResultSet(sql);
+        ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
                 Date date = rs.getTimestamp("date");
