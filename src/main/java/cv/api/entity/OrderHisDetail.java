@@ -6,10 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -17,13 +14,10 @@ import javax.persistence.*;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "order_his_detail")
-public class OrderHisDetail implements java.io.Serializable {
+public class OrderHisDetail {
 
     @EmbeddedId
     private OrderDetailKey key;

@@ -48,20 +48,19 @@ public class OrderHisServiceImpl implements OrderHisService {
         String vouNo = orderHis.getKey().getVouNo();
         //backup
         if (listDel != null) {
-            listDel.forEach(code -> {
-                if (code != null) {
-                    sdDao.delete(code.getVouNo(), code.getUniqueId(), code.getCompCode(), code.getDeptId());
-                }
-            });
+            listDel.forEach(key -> sdDao.delete(key));
         }
         for (int i = 0; i < listSD.size(); i++) {
             OrderHisDetail cSd = listSD.get(i);
-            if (cSd.getStockCode() != null) {
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
                 OrderDetailKey key = new OrderDetailKey();
                 key.setDeptId(orderHis.getKey().getDeptId());
                 key.setCompCode(orderHis.getKey().getCompCode());
                 key.setVouNo(vouNo);
+                key.setUniqueId(null);
                 cSd.setKey(key);
+            }
+            if (cSd.getStockCode() != null) {
                 if (cSd.getKey().getUniqueId() == null) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
@@ -70,11 +69,7 @@ public class OrderHisServiceImpl implements OrderHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-//                String sdCode = vouNo + "-" + cSd.getKey().getUniqueId();
-//                cSd.getKey().setSdCode(sdCode);
-//                cSd.setVouNo(vouNo);
                 sdDao.save(cSd);
-
             }
         }
         shDao.save(orderHis);

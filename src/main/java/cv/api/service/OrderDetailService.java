@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHisDetail;
 
 import java.util.List;
@@ -18,11 +19,8 @@ public interface OrderDetailService {
 
     List<OrderHisDetail> search(String vouNo, String compCode, Integer deptId);
 
-    int delete(String vouNo, Integer uniqueId, String compCode, Integer deptId);
+    int delete(OrderDetailKey key);
 
-//    List<OrderHisDetail> getOrderByBatch(String batchNo, String compCode, Integer depId);
-
-//    List<OrderHisDetail> getOrderByBatchDetail(String batchNo, String compCode, Integer depId);
 
 
 }

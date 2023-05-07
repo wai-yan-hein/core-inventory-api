@@ -5,6 +5,7 @@
  */
 package cv.api.dao;
 
+import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHisDetail;
 
 import java.util.List;
@@ -20,11 +21,7 @@ public interface OrderHisDetailDao {
 
     List<OrderHisDetail> searchDetail(String vouNo, String compCode, Integer deptId);
 
-    int delete(String vouNo, Integer uniqueId, String compCode, Integer deptId);
-
-    List<OrderHisDetail> getOrderByBatch(String batchNo, String compCode, Integer depId);
-
-    List<OrderHisDetail> getOrderByBatchDetail(String batchNo, String compCode, Integer depId);
+    int delete(OrderDetailKey key);
 
 
 }

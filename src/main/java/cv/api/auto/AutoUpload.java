@@ -53,7 +53,6 @@ public class AutoUpload {
             }
         }
     }
-
     private void uploadTrader() {
         List<Trader> traders = traderService.unUploadTrader();
         if (!traders.isEmpty()) {

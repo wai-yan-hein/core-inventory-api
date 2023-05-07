@@ -6,6 +6,7 @@
 package cv.api.service;
 
 import cv.api.dao.OrderHisDetailDao;
+import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHisDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,17 +35,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
-    public int delete(String vouCode, Integer uniqueId, String compCode, Integer deptId) {
-        return dao.delete(vouCode, uniqueId, compCode, deptId);
+    public int delete(OrderDetailKey key) {
+        return dao.delete(key);
     }
-
-//    @Override
-//    public List<OrderHisDetail> getOrderByBatch(String batchNo, String compCode, Integer depId) {
-//        return dao.getOrderByBatch(batchNo, compCode, depId);
-//    }
-
-//    @Override
-//    public List<OrderHisDetail> getOrderByBatchDetail(String batchNo, String compCode, Integer depId) {
-//        return dao.getOrderByBatchDetail(batchNo,compCode,depId);
-//    }
 }

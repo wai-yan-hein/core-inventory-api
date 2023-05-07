@@ -39,28 +39,15 @@ public class OrderController {
     private OrderDetailService odService;
     @Autowired
     private ReportService reportService;
-//    @Autowired
-//    private BackupService backupService;
-//    @Autowired
-//    private AccountRepo accountRepo;
-    @Autowired(required = false)
-    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-order")
     public Mono<?> saveOrder(@RequestBody OrderHis order) {
         order.setUpdatedDate(Util1.getTodayDate());
-        //if change location
-//        if (cloudMQSender != null) cloudMQSender.checkLocationAndTruncate(sale);
         if (isValidOrder(order, ro)) {
-//            backupService.backup(sale);
             order = ohService.save(order);
         } else {
             return Mono.justOrEmpty(ro);
         }
-        //for account
-//        accountRepo.sendSale(order);
-        //for cloud
-//        if (cloudMQSender != null) cloudMQSender.send(Order);
         return Mono.justOrEmpty(order);
     }
 
@@ -117,17 +104,12 @@ public class OrderController {
     @PostMapping(path = "/delete-order")
     public Mono<?> deleteSale(@RequestBody OrderHisKey key) throws Exception {
         ohService.delete(key);
-        //delete in account
-//        accountRepo.deleteInvVoucher(key);
-        //delete in cloud
-//        if (cloudMQSender != null) cloudMQSender.delete(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-order")
     public Mono<?> restoreSale(@RequestBody OrderHisKey key) throws Exception {
         ohService.restore(key);
-//        if (cloudMQSender != null) cloudMQSender.restore(key);
         return Mono.just(true);
     }
 
@@ -146,19 +128,8 @@ public class OrderController {
 
     @GetMapping(path = "/get-order-voucher-info")
     public Mono<?> getSaleVoucherCount(@RequestParam String vouDate,
-                                                 @RequestParam String compCode,
-                                                 @RequestParam Integer deptId) {
+                                       @RequestParam String compCode,
+                                       @RequestParam Integer deptId) {
         return Mono.justOrEmpty(ohService.getVoucherInfo(vouDate, compCode, deptId));
     }
-
-//    @GetMapping(path = "/get-sale-by-batch")
-//    public ResponseEntity<?> getSaleByBatch(@RequestParam String batchNo,
-//                                            @RequestParam String compCode,
-//                                            @RequestParam Integer deptId,
-//                                            @RequestParam boolean detail) {
-//        if (detail) {
-//            return ResponseEntity.ok(sdService.getSaleByBatchDetail(batchNo, compCode, deptId));
-//        }
-//        return ResponseEntity.ok(sdService.getSaleByBatch(batchNo, compCode, deptId));
-//    }
 }
