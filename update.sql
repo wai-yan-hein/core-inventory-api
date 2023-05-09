@@ -664,6 +664,7 @@ set comp_code ='0010010';
 alter table pur_his_detail
 change column avg_qty avg_qty float(20,3) null default 0.000 ;
 
+drop table if exists order_his;
 create table order_his (
   vou_no varchar(25) not null,
   comp_code varchar(15) not null,
@@ -696,6 +697,7 @@ create table order_his (
   primary key (vou_no,comp_code,dept_id)
 ) engine=innodb default charset=utf8mb3;
 
+drop table if exists order_his_detail;
 create table order_his_detail (
   vou_no varchar(20) not null,
   comp_code varchar(15) not null default '0010010',
