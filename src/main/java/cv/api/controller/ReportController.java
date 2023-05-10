@@ -58,6 +58,16 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
+    @GetMapping(value = "/get-order-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    byte[] getOrderReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+        String reportName = "OrderVoucher";
+        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
+        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo);
+        Util1.writeJsonFile(listVSale, exportPath);
+        return new FileInputStream(exportPath).readAllBytes();
+    }
+
     @GetMapping(value = "/get-purchase-report", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo, compCode);

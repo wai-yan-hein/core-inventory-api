@@ -165,6 +165,62 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<VOrder> getOrderVoucher(String vouNo) throws Exception {
+        List<VOrder> orderList = new ArrayList<>();
+        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
+                "v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
+                "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" +
+                "from v_order v join trader t\n" + "on v.trader_code = t.code\n" +
+                "join location l on v.loc_code = l.loc_code\n" +
+                "left join category c on v.category_code = c.cat_code\n" +
+                "where v.vou_no ='" + vouNo + "'";
+        ResultSet rs = reportDao.executeSql(sql);
+        while (rs.next()) {
+            VOrder order = new VOrder();
+            String remark = rs.getString("remark");
+            String refNo = "-";
+
+            if (remark != null) {
+                if (remark.contains("/")) {
+                    try {
+                        String[] split = remark.split("/");
+                        remark = split[0];
+                        refNo = split[1];
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+            order.setTraderCode(rs.getString("t_user_code"));
+            order.setTraderName(rs.getString("trader_name"));
+            order.setRemark(remark);
+            order.setRefNo(refNo);
+            order.setPhoneNo(rs.getString("phone"));
+            order.setAddress(rs.getString("address"));
+            order.setRfId(rs.getString("rfid"));
+            order.setVouNo(rs.getString("vou_no"));
+            order.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+            order.setStockName(rs.getString("stock_name"));
+            order.setQty(rs.getFloat("qty"));
+            order.setSalePrice(rs.getFloat("price"));
+            order.setSaleAmount(rs.getFloat("amt"));
+            order.setVouTotal(rs.getFloat("vou_total"));
+            order.setDiscount(rs.getFloat("discount"));
+            order.setPaid(rs.getFloat("paid"));
+            order.setVouBalance(rs.getFloat("vou_balance"));
+            order.setSaleUnit(rs.getString("unit"));
+            order.setCusAddress(Util1.isNull(rs.getString("phone"), "") + "/" + Util1.isNull(rs.getString("address"), ""));
+            order.setLocationName(rs.getString("loc_name"));
+            order.setCreatedBy(getAppUser(rs.getString("created_by")));
+            order.setCompCode(rs.getString("comp_code"));
+            order.setCategoryName(rs.getString("cat_name"));
+            order.setWeight(rs.getFloat("weight"));
+            order.setWeightUnit(rs.getString("weight_unit"));
+            orderList.add(order);
+        }
+        return orderList;
+    }
+
+    @Override
     public List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select t.trader_name,p.remark,p.vou_no,\n" +
