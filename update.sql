@@ -786,3 +786,6 @@ drop primary key,
 add primary key (vou_no, unique_id, dept_id, comp_code);
 drop view if exists v_transfer;
 create view v_transfer as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.ref_no as ref_no,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code_from as loc_code_from,th.loc_code_to as loc_code_to,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,td.stock_code as stock_code,td.qty as qty,td.unit as unit,td.unique_id as unique_id,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((transfer_his th join transfer_his_detail td on(th.vou_no = td.vou_no)) join stock s on(td.stock_code = s.stock_code));
+
+alter table sale_his
+add column order_no varchar(25) NULL;

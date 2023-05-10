@@ -145,6 +145,14 @@ public class ReportController {
                         List<VSale> saleByStock = reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);
                     }
+                    case "OrderByStockSummary" -> {
+                        List<VOrder> orderByStock = reportService.getOrderByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(orderByStock, exportPath);
+                    }
+                    case "OrderByStockDetail" -> {
+                        List<VOrder> orderByStock = reportService.getOrderByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
+                        Util1.writeJsonFile(orderByStock, exportPath);
+                    }
                     case "SaleByVoucherDetail","SaleByVoucherDetailExcel" -> {
                         List<VSale> list = reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
