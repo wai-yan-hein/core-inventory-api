@@ -79,6 +79,6 @@ public class VSale {
     private String weightUnit;
     private String phoneNo;
     private String address;
-
+    private String projectNo;
 
 }

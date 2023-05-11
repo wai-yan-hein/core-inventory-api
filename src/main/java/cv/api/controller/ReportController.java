@@ -124,6 +124,7 @@ public class ReportController {
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
+                String projectNo = Util1.isNull(filter.getProjectNo(), "-");
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -173,6 +174,14 @@ public class ReportController {
                     }
                     case "SaleByBatchDetail" -> {
                         List<VSale> list = reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "SaleByProjectDetail" -> {
+                        List<VSale> list = reportService.getSaleByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "SaleByProjectSummary" -> {
+                        List<VSale> list = reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "PurchaseBySupplierDetail" -> {

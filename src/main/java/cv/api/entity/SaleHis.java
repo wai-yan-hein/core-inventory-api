@@ -85,6 +85,8 @@ public class SaleHis {
     private boolean vouLock;
     @Column(name = "order_no")
     private String orderNo;
+    @Column(name = "project_no")
+    private String projectNo;
     @Transient
     private String status = "STATUS";
     @Transient

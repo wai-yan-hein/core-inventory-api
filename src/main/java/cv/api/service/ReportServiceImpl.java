@@ -335,6 +335,65 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<VSale> getSaleByProjectSummary(String fromDate, String toDate, String typeCode,
+                                                String catCode, String brandCode,
+                                                String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" +
+                "from v_sale\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code = '" + compCode + "'\n" +
+                "and dept_id =" + deptId + "\n" +
+                "and deleted = 0\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
+                "and project_no is not null\n" +
+                "group by stock_code,sale_unit,project_no\n" +
+                ")a\n" +
+                "join v_relation rel \n" +
+                "on a.rel_code = rel.rel_code\n" +
+                "and a.sale_unit = rel.unit\n" +
+                "and a.comp_code =rel.comp_code\n" +
+                "and a.dept_id =rel.dept_id\n" +
+                "join trader t\n" +
+                "on a.trader_code = t.code\n" +
+                "and a.comp_code =t.comp_code\n" +
+                "and a.dept_id =t.dept_id\n" +
+                "order by a.project_no";
+        List<VSale> list = new ArrayList<>();
+        try {
+            ResultSet rs = reportDao.executeSql(sql);
+            while (rs.next()) {
+                VSale s = new VSale();
+                //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
+                // rel_code, trader_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
+                String userCode = rs.getString("s_user_code");
+                String sCode = rs.getString("stock_code");
+                String traderUsr = rs.getString("user_code");
+                String tCode = rs.getString("trader_code");
+                String relCode = rs.getString("rel_code");
+                float smallQty = rs.getFloat("smallest_qty");
+                s.setTraderCode(Util1.isNull(traderUsr, tCode));
+                s.setStockCode(Util1.isNull(userCode, sCode));
+                s.setStockName(rs.getString("stock_name"));
+                s.setSaleAmount(rs.getFloat("ttl_amt"));
+                s.setRelName(rs.getString("rel_name"));
+                s.setQtyStr(getRelStr(relCode, compCode, deptId, smallQty));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setProjectNo(rs.getString("project_no"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            log.error(String.format("getSaleSummaryByProject : %s", e.getMessage()));
+        }
+        return list;
+    }
+
+    @Override
     public List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode,
                                                String stockCode, String smCode, String compCode, Integer deptId) {
@@ -751,6 +810,78 @@ public class ReportServiceImpl implements ReportService {
                 s.setRemark(rs.getString("remark"));
                 s.setReference(rs.getString("reference"));
                 s.setBatchNo(rs.getString("batch_no"));
+                s.setSupplierName(rs.getString("sup_name"));
+                s.setTraderCode((rs.getString("user_code")));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setCusAddress(rs.getString("address"));
+                s.setStockUserCode(rs.getString("s_user_code"));
+                s.setStockName(rs.getString("stock_name"));
+                s.setQty(rs.getFloat("qty"));
+                s.setSaleUnit(rs.getString("sale_unit"));
+                s.setSalePrice(rs.getFloat("sale_price"));
+                s.setSaleAmount(rs.getFloat("sale_amt"));
+                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setPaid(rs.getFloat("paid"));
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<VSale> getSaleByProjectDetail(String fromDate, String toDate, String curCode, String stockCode,
+                                            String typeCode, String brandCode, String catCode,
+                                            String locCode, String batchNo, String compCode,
+                                            Integer deptId, Integer macId, String projectNo) throws Exception {
+        String filter = "";
+        if (!typeCode.equals("-")) {
+            filter += "and stock_type_code='" + typeCode + "'\n";
+        }
+        if (!brandCode.equals("-")) {
+            filter += "and brand_code='" + brandCode + "'\n";
+        }
+        if (!catCode.equals("-")) {
+            filter += "and cat_code='" + catCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code='" + stockCode + "'\n";
+        }
+        if (!batchNo.equals("-")) {
+            filter += "and v.batch_no='" + batchNo + "'\n";
+        }
+        if (!projectNo.equals("-")) {
+            filter += "and v.project_no='" + projectNo + "'\n";
+        }
+        List<VSale> list = new ArrayList<>();
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
+                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt,v.project_no\n" +
+                "from v_sale v join trader t\n" +
+                "on v.trader_code = t.code\n" +
+                "left join grn g\n" +
+                "on v.batch_no = g.batch_no\n" +
+                "and v.comp_code = g.comp_code\n" +
+                "left join trader sup\n" +
+                "on g.trader_code = sup.code\n" +
+                "and g.comp_code = sup.comp_code\n" +
+                "where v.deleted = false\n" +
+                "and v.comp_code = '" + compCode + "'\n" +
+                "and v.cur_code = '" + curCode + "'\n" +
+                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and v.project_no is not null\n" +
+                "" + filter + "" +
+                "order by v.vou_date,v.project_no,v.unique_id";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
+                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
+                VSale s = new VSale();
+                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setVouNo(rs.getString("vou_no"));
+                s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
+                s.setBatchNo(rs.getString("batch_no"));
+                s.setProjectNo(rs.getString("project_no"));
                 s.setSupplierName(rs.getString("sup_name"));
                 s.setTraderCode((rs.getString("user_code")));
                 s.setTraderName(rs.getString("trader_name"));
