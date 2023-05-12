@@ -139,15 +139,15 @@ public interface ReportService {
                                String compCode, Integer deptId, String deleted, String nullBatch, String batchNo, String projectNo);
     List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
-                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo);
+                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo, String projectNo);
 
-    List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
+    List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted, String projectNo) throws Exception;
 
     List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
-                                       String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
+                                       String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted, String projectNo) throws Exception;
 
     List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
-                                         String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
+                                         String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted, String projectNo) throws Exception;
 
     List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId) throws Exception;
 

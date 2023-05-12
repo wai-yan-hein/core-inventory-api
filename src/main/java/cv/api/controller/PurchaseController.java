@@ -71,7 +71,8 @@ public class PurchaseController {
         String compCode = filter.getCompCode();
         String deleted = String.valueOf(filter.isDeleted());
         Integer deptId = filter.getDeptId();
-        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode, stockCode, locCode, compCode, deptId, deleted);
+        String projectNo = Util1.isAll(filter.getProjectNo());
+        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode, stockCode, locCode, compCode, deptId, deleted, projectNo);
         return Flux.fromIterable(listPur);
     }
 
