@@ -63,6 +63,8 @@ public class RetInHis implements java.io.Serializable {
     private Integer macId;
     @Column(name = "vou_lock")
     private boolean vouLock;
+    @Column(name = "project_no")
+    private String projectNo;
     @Transient
     private String status = "STATUS";
     @Transient

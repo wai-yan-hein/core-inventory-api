@@ -240,4 +240,12 @@ public class Util1 {
         return str;
     }
 
+    public static String isAll(String value){
+        if(value != null){
+            if(value.equals("All")){
+                return "-";
+            }
+        }
+        return Util1.isNull(value, "-");
+    }
 }

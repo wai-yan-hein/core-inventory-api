@@ -65,6 +65,8 @@ public class RetOutHis implements java.io.Serializable {
     private String status = "STATUS";
     @Column(name = "vou_lock")
     private boolean vouLock;
+    @Column(name = "project_no")
+    private String projectNo;
     @Transient
     private List<RetOutHisDetail> listRD;
     @Transient

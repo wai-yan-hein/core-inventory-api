@@ -68,8 +68,9 @@ public class RetOutController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
+        String projectNo = Util1.isAll(filter.getProjectNo());
         return Flux.fromIterable(reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode,
-                stockCode, locCode, compCode, deptId, deleted));
+                stockCode, locCode, compCode, deptId, deleted, projectNo));
     }
 
     @PostMapping(path = "/delete-retout")

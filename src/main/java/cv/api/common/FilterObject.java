@@ -37,6 +37,6 @@ public class FilterObject {
     private boolean nullBatch;
     private String batchNo;
     private boolean orderByBatch;
-
+    private String projectNo;
 
 }

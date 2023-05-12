@@ -58,6 +58,16 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
+    @GetMapping(value = "/get-order-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    byte[] getOrderReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+        String reportName = "OrderVoucher";
+        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
+        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo);
+        Util1.writeJsonFile(listVSale, exportPath);
+        return new FileInputStream(exportPath).readAllBytes();
+    }
+
     @GetMapping(value = "/get-purchase-report", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo, compCode);
@@ -114,6 +124,7 @@ public class ReportController {
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
+                String projectNo = Util1.isAll(filter.getProjectNo());
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -145,6 +156,14 @@ public class ReportController {
                         List<VSale> saleByStock = reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);
                     }
+                    case "OrderByStockSummary" -> {
+                        List<VOrder> orderByStock = reportService.getOrderByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(orderByStock, exportPath);
+                    }
+                    case "OrderByStockDetail" -> {
+                        List<VOrder> orderByStock = reportService.getOrderByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
+                        Util1.writeJsonFile(orderByStock, exportPath);
+                    }
                     case "SaleByVoucherDetail","SaleByVoucherDetailExcel" -> {
                         List<VSale> list = reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
@@ -157,6 +176,22 @@ public class ReportController {
                         List<VSale> list = reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
                     }
+                    case "SaleByProjectDetail" -> {
+                        List<VSale> list = reportService.getSaleByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "SaleByProjectSummary" -> {
+                        List<VSale> list = reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "OrderByProjectDetail" -> {
+                        List<VOrder> list = reportService.getOrderByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "OrderByProjectSummary" -> {
+                        List<VOrder> list = reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
                     case "PurchaseBySupplierDetail" -> {
                         List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
@@ -164,6 +199,14 @@ public class ReportController {
                     case "PurchaseBySupplierSummary" -> {
                         List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
+                    }
+                    case "PurchaseByProjectDetail" -> {
+                        List<VPurchase> purchaseByProject = reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
+                        Util1.writeJsonFile(purchaseByProject, exportPath);
+                    }
+                    case "PurchaseByProjectSummary" -> {
+                        List<VPurchase> purchaseByProject = reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        Util1.writeJsonFile(purchaseByProject, exportPath);
                     }
                     case "PurchaseByStockSummary" -> {
                         List<VPurchase> data = reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);

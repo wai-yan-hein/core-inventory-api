@@ -83,6 +83,10 @@ public class SaleHis {
     private String intgUpdStatus;
     @Column(name = "vou_lock")
     private boolean vouLock;
+    @Column(name = "order_no")
+    private String orderNo;
+    @Column(name = "project_no")
+    private String projectNo;
     @Transient
     private String status = "STATUS";
     @Transient
