@@ -77,6 +77,6 @@ public class VOrder {
     private String weightUnit;
     private String phoneNo;
     private String address;
-
+    private String projectNo;
 
 }

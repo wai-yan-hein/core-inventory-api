@@ -44,17 +44,21 @@ public interface ReportService {
     List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) throws Exception;
 
     List<VSale> getSaleByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) throws Exception;
+    List<VOrder> getOrderByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) throws Exception;
     List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode,
                                         String catCode, String brandCode,
                                         String stockCode, String smCode, String compCode, Integer deptId) throws Exception;
 
     List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
-
+    List<VPurchase> getPurchaseByProjectDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId,String projectNo) throws Exception;
     List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate,
                                                  String typCode, String brandCode, String catCode,
                                                  String stockCode,
                                                  String traderCode, String compCode, Integer deptId) throws Exception;
-
+    List<VPurchase> getPurchaseByProjectSummary(String fromDate, String toDate,
+                                                 String typCode, String brandCode, String catCode,
+                                                 String stockCode,
+                                                 String traderCode, String compCode, Integer deptId, String projectNo) throws Exception;
     List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception;
 
     List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
@@ -68,7 +72,7 @@ public interface ReportService {
     List<VSale> getSaleByBatchDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<VSale> getSaleByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception;
-
+    List<VOrder> getOrderByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception;
     List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
@@ -132,7 +136,7 @@ public interface ReportService {
 
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
-                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo);
+                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo, String projectNo);
     List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
                                String compCode, Integer deptId, String deleted, String nullBatch, String batchNo);

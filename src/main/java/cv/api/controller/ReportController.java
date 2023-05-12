@@ -124,7 +124,7 @@ public class ReportController {
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
-                String projectNo = Util1.isNull(filter.getProjectNo(), "-");
+                String projectNo = Util1.isAll(filter.getProjectNo());
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -184,6 +184,14 @@ public class ReportController {
                         List<VSale> list = reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
                         Util1.writeJsonFile(list, exportPath);
                     }
+                    case "OrderByProjectDetail" -> {
+                        List<VOrder> list = reportService.getOrderByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "OrderByProjectSummary" -> {
+                        List<VOrder> list = reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
                     case "PurchaseBySupplierDetail" -> {
                         List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
@@ -191,6 +199,14 @@ public class ReportController {
                     case "PurchaseBySupplierSummary" -> {
                         List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
                         Util1.writeJsonFile(purchaseBySupplier, exportPath);
+                    }
+                    case "PurchaseByProjectDetail" -> {
+                        List<VPurchase> purchaseByProject = reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
+                        Util1.writeJsonFile(purchaseByProject, exportPath);
+                    }
+                    case "PurchaseByProjectSummary" -> {
+                        List<VPurchase> purchaseByProject = reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        Util1.writeJsonFile(purchaseByProject, exportPath);
                     }
                     case "PurchaseByStockSummary" -> {
                         List<VPurchase> data = reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);

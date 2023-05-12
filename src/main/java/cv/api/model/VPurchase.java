@@ -61,4 +61,5 @@ public class VPurchase implements Serializable {
     private String weightUnit;
     private Float totalQty;
     private String batchNo;
+    private String projectNo;
 }
