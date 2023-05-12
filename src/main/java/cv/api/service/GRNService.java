@@ -15,4 +15,5 @@ public interface GRNService {
     List<GRN> search(String batchNo, String compCode, Integer deptId);
 
     boolean delete(GRNKey key);
+    boolean open(GRNKey key);
 }

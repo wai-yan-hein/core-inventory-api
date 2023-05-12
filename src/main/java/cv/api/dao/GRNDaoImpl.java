@@ -74,4 +74,10 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
         return list;
     }
 
+    @Override
+    public boolean open(GRNKey key) {
+        String sql = "update grn set closed =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId();
+        execSql(sql);
+        return true;    }
+
 }

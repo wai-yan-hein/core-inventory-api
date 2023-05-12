@@ -52,24 +52,17 @@ public class GRNController {
         String deleted = String.valueOf(filter.isDeleted());
         String close = String.valueOf(filter.isClose());
         boolean orderByBatch = filter.isOrderByBatch();
-        List<GRN> list = reportService.getGRNHistory(fromDate, toDate, batchNo, traderCode,
-                vouNo, remark, userCode, stockCode,
-                locCode, compCode, deptId, deleted,
-                close, orderByBatch);
+        List<GRN> list = reportService.getGRNHistory(fromDate, toDate, batchNo, traderCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, close, orderByBatch);
         return Flux.fromIterable(list);
     }
 
     @GetMapping(path = "/get-grn-detail")
-    public Flux<?> getGRNDetail(@RequestParam String vouNo,
-                                @RequestParam String compCode,
-                                @RequestParam Integer deptId) {
+    public Flux<?> getGRNDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId));
     }
 
     @GetMapping(path = "/get-grn-detail-batch")
-    public Flux<?> getGRNDetailBatch(@RequestParam String batchNo,
-                                     @RequestParam String compCode,
-                                     @RequestParam Integer deptId) {
+    public Flux<?> getGRNDetailBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<GRN> list = grnService.search(batchNo, compCode, deptId);
         if (!list.isEmpty()) {
             String vouNo = list.get(0).getKey().getVouNo();
@@ -80,14 +73,16 @@ public class GRNController {
 
     @PostMapping(path = "/delete-grn")
     public Mono<?> deleteGRN(@RequestBody GRNKey key) {
-        grnService.delete(key);
-        return Mono.just(true);
+        return Mono.justOrEmpty(grnService.delete(key));
+    }
+
+    @PostMapping(path = "/open-grn")
+    public Mono<?> openGRn(@RequestBody GRNKey key) {
+        return Mono.justOrEmpty(grnService.delete(key));
     }
 
     @GetMapping(path = "/get-batch-list")
-    public ResponseEntity<?> findByBatch(@RequestParam String batchNo,
-                                         @RequestParam String compCode,
-                                         @RequestParam Integer deptId) {
+    public ResponseEntity<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(grnService.search(Util1.cleanStr(batchNo), compCode, deptId));
     }
 }

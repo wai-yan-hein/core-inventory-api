@@ -2269,6 +2269,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
         General g = new General();
+        g.setSmallQty(1.0f);
         String sql = "select ud.qty,ud.smallest_qty\n" +
                 "from stock s join unit_relation_detail ud\n" +
                 "on s.rel_code = ud.rel_code\n" +

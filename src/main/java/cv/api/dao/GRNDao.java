@@ -15,4 +15,6 @@ public interface GRNDao {
     boolean delete(GRNKey key);
 
     List<GRN> search(String batchNo, String compCode, Integer deptId);
+    boolean open(GRNKey key);
+
 }

@@ -83,6 +83,11 @@ public class GRNServiceImpl implements GRNService {
         return dao.delete(key);
     }
 
+    @Override
+    public boolean open(GRNKey key) {
+        return dao.open(key);
+    }
+
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqTableService.getSequence(macId, "GRN", period, compCode);
