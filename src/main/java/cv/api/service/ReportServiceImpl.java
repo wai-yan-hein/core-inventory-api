@@ -1042,17 +1042,12 @@ public class ReportServiceImpl implements ReportService {
                         b.setUnitName(getRelStr(relCode, compCode, deptId, smallQty));
                         balances.add(b);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.error("getStockBalance : " + e.getMessage());
                 }
             }
         }
         return balances;
-    }
-
-    @Override
-    public List<VStockBalance> getStockBalanceSummary(String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception {
-        return null;
     }
 
     private String getRelStr(String relCode, String compCode, Integer deptId, float smallestQty) {
