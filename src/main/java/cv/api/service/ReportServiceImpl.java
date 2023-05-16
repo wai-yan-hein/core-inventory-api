@@ -66,10 +66,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public String getOpeningDate(String compCode, Integer deptId) {
         String opDate = null;
-        String sql = "select max(op_date) op_date\n" +
-                "from op_his \n" +
-                "where deleted =0 and comp_code ='" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")";
+        String sql = "select max(op_date) op_date\n" + "from op_his \n" + "where deleted =0 and comp_code ='" + compCode + "'\n" + "and (dept_id =" + deptId + " or 0 =" + deptId + ")";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
@@ -111,13 +108,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleVoucher(String vouNo) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
-                "v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
-                "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" +
-                "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" +
-                "join location l on v.loc_code = l.loc_code\n" +
-                "left join category c on v.cat_code = c.cat_code\n" +
-                "where v.vou_no ='" + vouNo + "'";
+        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" + "v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" + "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "join location l on v.loc_code = l.loc_code\n" + "left join category c on v.cat_code = c.cat_code\n" + "where v.vou_no ='" + vouNo + "'";
         ResultSet rs = reportDao.executeSql(sql);
         while (rs.next()) {
             VSale sale = new VSale();
@@ -167,13 +158,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VOrder> getOrderVoucher(String vouNo) throws Exception {
         List<VOrder> orderList = new ArrayList<>();
-        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" +
-                "v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" +
-                "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" +
-                "from v_order v join trader t\n" + "on v.trader_code = t.code\n" +
-                "join location l on v.loc_code = l.loc_code\n" +
-                "left join category c on v.category_code = c.cat_code\n" +
-                "where v.vou_no ='" + vouNo + "'";
+        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" + "v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" + "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" + "from v_order v join trader t\n" + "on v.trader_code = t.code\n" + "join location l on v.loc_code = l.loc_code\n" + "left join category c on v.category_code = c.cat_code\n" + "where v.vou_no ='" + vouNo + "'";
         ResultSet rs = reportDao.executeSql(sql);
         while (rs.next()) {
             VOrder order = new VOrder();
@@ -223,12 +208,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
-        String sql = "select t.trader_name,p.remark,p.vou_no,\n" +
-                "p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" +
-                "from v_purchase p join trader t\n" +
-                "on p.trader_code = t.code\n" +
-                "where p.vou_no ='" + vouNo + "'\n" +
-                "and p.comp_code ='" + compCode + "'";
+        String sql = "select t.trader_name,p.remark,p.vou_no,\n" + "p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" + "from v_purchase p join trader t\n" + "on p.trader_code = t.code\n" + "where p.vou_no ='" + vouNo + "'\n" + "and p.comp_code ='" + compCode + "'";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -278,34 +258,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode,
-                                                String catCode, String brandCode,
-                                                String stockCode, String traderCode, String compCode, Integer deptId) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "group by stock_code,sale_unit,trader_code\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "and a.dept_id =t.dept_id\n" +
-                "order by t.user_code,t.trader_name";
+    public List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) {
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" + "group by stock_code,sale_unit,trader_code\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "join trader t\n" + "on a.trader_code = t.code\n" + "and a.comp_code =t.comp_code\n" + "and a.dept_id =t.dept_id\n" + "order by t.user_code,t.trader_name";
         List<VSale> list = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(sql);
@@ -335,36 +289,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByProjectSummary(String fromDate, String toDate, String typeCode,
-                                                String catCode, String brandCode,
-                                                String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and (project_no = '" + projectNo + "' or '-' = '" + projectNo + "')\n" +
-                "and project_no is not null\n" +
-                "group by stock_code,sale_unit,project_no\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "and a.dept_id =t.dept_id\n" +
-                "order by a.project_no";
+    public List<VSale> getSaleByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" + "and (project_no = '" + projectNo + "' or '-' = '" + projectNo + "')\n" + "and project_no is not null\n" + "group by stock_code,sale_unit,project_no\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "join trader t\n" + "on a.trader_code = t.code\n" + "and a.comp_code =t.comp_code\n" + "and a.dept_id =t.dept_id\n" + "order by a.project_no";
         List<VSale> list = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(sql);
@@ -395,35 +321,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOrder> getOrderByProjectSummary(String fromDate, String toDate, String typeCode,
-                                               String catCode, String brandCode,
-                                               String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,user_code as s_user_code,stock_name,sum(qty) ttl_qty,unit,sum(amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" +
-                "from v_order\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and project_no is not null\n" +
-                "group by stock_code,unit,project_no\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "and a.dept_id =t.dept_id\n" +
-                "order by a.project_no";
+    public List<VOrder> getOrderByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,user_code as s_user_code,stock_name,sum(qty) ttl_qty,unit,sum(amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" + "from v_order\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" + "and project_no is not null\n" + "group by stock_code,unit,project_no\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "join trader t\n" + "on a.trader_code = t.code\n" + "and a.comp_code =t.comp_code\n" + "and a.dept_id =t.dept_id\n" + "order by a.project_no";
         List<VOrder> list = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(sql);
@@ -452,35 +351,10 @@ public class ReportServiceImpl implements ReportService {
         }
         return list;
     }
+
     @Override
-    public List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode,
-                                               String catCode, String brandCode,
-                                               String stockCode, String smCode, String compCode, Integer deptId) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.saleman_name,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,saleman_code,comp_code,dept_id\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (saleman_code = '" + smCode + "' or '-' = '" + smCode + "')\n" +
-                "group by stock_code,sale_unit,saleman_code\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "left join sale_man t\n" +
-                "on a.saleman_code = t.saleman_code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "and a.dept_id =t.dept_id\n" +
-                "order by t.user_code,t.saleman_name";
+    public List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String smCode, String compCode, Integer deptId) {
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.saleman_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,saleman_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (saleman_code = '" + smCode + "' or '-' = '" + smCode + "')\n" + "group by stock_code,sale_unit,saleman_code\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "left join sale_man t\n" + "on a.saleman_code = t.saleman_code\n" + "and a.comp_code =t.comp_code\n" + "and a.dept_id =t.dept_id\n" + "order by t.user_code,t.saleman_name";
         List<VSale> list = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(sql);
@@ -533,36 +407,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate,
-                                                        String typCode, String brandCode, String catCode,
-                                                        String stockCode,
-                                                        String traderCode, String compCode, Integer deptId) throws Exception {
+    public List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" +
-                "from v_purchase\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typCode + "' or '-' = '" + typCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "group by stock_code,pur_unit,trader_code\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.pur_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "and a.dept_id =t.dept_id\n" +
-                "order by t.user_code,t.trader_name";
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typCode + "' or '-' = '" + typCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" + "group by stock_code,pur_unit,trader_code\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "join trader t\n" + "on a.trader_code = t.code\n" + "and a.comp_code =t.comp_code\n" + "and a.dept_id =t.dept_id\n" + "order by t.user_code,t.trader_name";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -587,36 +434,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseByProjectSummary(String fromDate, String toDate,
-                                                        String typCode, String brandCode, String catCode,
-                                                        String stockCode,
-                                                        String traderCode, String compCode, Integer deptId, String projectNo) throws Exception {
+    public List<VPurchase> getPurchaseByProjectSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" +
-                "from v_purchase\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typCode + "' or '-' = '" + typCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "group by stock_code,pur_unit,project_no\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.pur_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "and a.dept_id =t.dept_id\n" +
-                "order by t.user_code,t.trader_name";
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typCode + "' or '-' = '" + typCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" + "group by stock_code,pur_unit,project_no\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "join trader t\n" + "on a.trader_code = t.code\n" + "and a.comp_code =t.comp_code\n" + "and a.dept_id =t.dept_id\n" + "order by t.user_code,t.trader_name";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -667,7 +487,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByProjectDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId, String projectNo) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" + "v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt,v.project_no\n" + "from v_purchase v join trader t\n" + "on v.trader_code = t.code\n" + "where (v.trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" + "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.cur_code = '" + curCode + "' or '-' ='" + curCode + "')\n"+ "and (v.project_no = '" + projectNo + "' or '-' ='" + projectNo + "')\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n order by t.trader_name,v.vou_no;";
+        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" + "v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt,v.project_no\n" + "from v_purchase v join trader t\n" + "on v.trader_code = t.code\n" + "where (v.trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" + "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.cur_code = '" + curCode + "' or '-' ='" + curCode + "')\n" + "and (v.project_no = '" + projectNo + "' or '-' ='" + projectNo + "')\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n order by t.trader_name,v.vou_no;";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -689,32 +509,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode,
-                                             String typeCode, String brandCode,
-                                             String catCode, String locCode,
-                                             String compCode, Integer deptId, Integer macId) throws Exception {
+    public List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code,dept_id\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,sale_unit\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "order by s_user_code";
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,sale_unit\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "order by s_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -733,32 +530,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOrder> getOrderByStockSummary(String fromDate, String toDate, String curCode, String stockCode,
-                                             String typeCode, String brandCode,
-                                             String catCode, String locCode,
-                                             String compCode, Integer deptId, Integer macId) throws Exception {
+    public List<VOrder> getOrderByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VOrder> saleList = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,user_code,stock_name,sum(qty) ttl_qty,unit,sum(amt) ttl_amt,rel_code,comp_code,dept_id\n" +
-                "from v_order\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,unit\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "order by user_code";
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" + "from (\n" + "select stock_code,user_code,stock_name,sum(qty) ttl_qty,unit,sum(amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_order\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "order by user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -777,11 +551,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByVoucherDetail(String fromDate, String toDate,
-                                              String curCode, String stockCode, String typeCode,
-                                              String brandCode, String catCode, String locCode,
-                                              String batchNo, String compCode,
-                                              Integer deptId, Integer macId) throws Exception {
+    public List<VSale> getSaleByVoucherDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
         String filter = "";
         if (!typeCode.equals("-")) {
             filter += "and stock_type_code='" + typeCode + "'\n";
@@ -802,22 +572,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and loc_code='" + locCode + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "left join grn g\n" +
-                "on v.batch_no = g.batch_no\n" +
-                "and v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "" + filter + "" +
-                "order by v.vou_date,v.vou_no,v.unique_id";
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "" + "order by v.vou_date,v.vou_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -869,19 +624,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and loc_code='" + locCode + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select a.*,t.trader_name\n" +
-                "from (\n" +
-                "select vou_no,vou_date,trader_code,vou_total,comp_code\n" +
-                "from sale_his\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and deleted =0\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and cur_code ='" + curCode + "'\n" +
-                "" + filter + "\n" +
-                ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "order by vou_date,vou_no";
+        String sql = "select a.*,t.trader_name\n" + "from (\n" + "select vou_no,vou_date,trader_code,vou_total,comp_code\n" + "from sale_his\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted =0\n" + "and comp_code ='" + compCode + "'\n" + "and cur_code ='" + curCode + "'\n" + "" + filter + "\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -899,10 +642,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByBatchDetail(String fromDate, String toDate, String curCode, String stockCode,
-                                            String typeCode, String brandCode, String catCode,
-                                            String locCode, String batchNo, String compCode,
-                                            Integer deptId, Integer macId) throws Exception {
+    public List<VSale> getSaleByBatchDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
         String filter = "";
         if (!typeCode.equals("-")) {
             filter += "and stock_type_code='" + typeCode + "'\n";
@@ -920,23 +660,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.batch_no='" + batchNo + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "left join grn g\n" +
-                "on v.batch_no = g.batch_no\n" +
-                "and v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.batch_no is not null\n" +
-                "" + filter + "" +
-                "order by v.vou_date,v.batch_no,v.unique_id";
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.batch_no is not null\n" + "" + filter + "" + "order by v.vou_date,v.batch_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -967,10 +691,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByProjectDetail(String fromDate, String toDate, String curCode, String stockCode,
-                                            String typeCode, String brandCode, String catCode,
-                                            String locCode, String batchNo, String compCode,
-                                            Integer deptId, Integer macId, String projectNo) throws Exception {
+    public List<VSale> getSaleByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception {
         String filter = "";
         if (!typeCode.equals("-")) {
             filter += "and stock_type_code='" + typeCode + "'\n";
@@ -991,23 +712,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.project_no='" + projectNo + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt,v.project_no\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "left join grn g\n" +
-                "on v.batch_no = g.batch_no\n" +
-                "and v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.project_no is not null\n" +
-                "" + filter + "" +
-                "order by v.vou_date,v.project_no,v.unique_id";
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt,v.project_no\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n" + "" + filter + "" + "order by v.vou_date,v.project_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1039,10 +744,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOrder> getOrderByProjectDetail(String fromDate, String toDate, String curCode, String stockCode,
-                                              String typeCode, String brandCode, String catCode,
-                                              String locCode, String batchNo, String compCode,
-                                              Integer deptId, Integer macId, String projectNo) throws Exception {
+    public List<VOrder> getOrderByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception {
         String filter = "";
         if (!typeCode.equals("-")) {
             filter += "and stock_type_code='" + typeCode + "'\n";
@@ -1063,23 +765,9 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.project_no='" + projectNo + "'\n";
         }
         List<VOrder> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt,v.project_no\n" +
-                "from v_order v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "left join grn g\n" +
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt,v.project_no\n" + "from v_order v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" +
 //                "on v.batch_no = g.batch_no\n" +
-                "on v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.project_no is not null\n" +
-                "" + filter + "" +
-                "order by v.vou_date,v.project_no,v.unique_id";
+                "on v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n" + "" + filter + "" + "order by v.vou_date,v.project_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1109,21 +797,11 @@ public class ReportServiceImpl implements ReportService {
         }
         return list;
     }
+
     @Override
     public List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by v.s_user_code,v.vou_no";
+        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" + "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "order by v.s_user_code,v.vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1147,18 +825,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VOrder> getOrderByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception {
         List<VOrder> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt\n" +
-                "from v_order v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by v.user_code,v.vou_no";
+        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt\n" + "from v_order v join trader t\n" + "on v.trader_code = t.code\n" + "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" + "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "order by v.user_code,v.vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1206,26 +873,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" +
-                "from v_purchase\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,pur_unit\n" +
-                ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.pur_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id =rel.dept_id\n" +
-                "order by s_user_code";
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,pur_unit\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id =rel.dept_id\n" + "order by s_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1248,26 +896,7 @@ public class ReportServiceImpl implements ReportService {
     public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
         General general = new General();
         general.setAmount(0.0f);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n"
-                + "from (\n"
-                + "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n"
-                + "from v_purchase pd\n"
-                + "join v_relation rel on pd.rel_code = rel.rel_code\n"
-                + "and pd.pur_unit =  rel.unit\n"
-                + "where pd.stock_code = '" + stockCode + "' and vou_no = (\n"
-                + "select ph.vou_no\n"
-                + "from pur_his ph, pur_his_detail pd\n"
-                + "where date(ph.vou_date)<= '" + purDate + "' \n"
-                + "and deleted = 0\n"
-                + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n"
-                + "and ph.dept_id = " + deptId + "\n"
-                + "and pd.stock_code = '" + stockCode + "'\n" + "group by ph.vou_no\n"
-                + "order by ph.vou_date desc\n" + "limit 1\n" + "))a\n"
-                + "join v_relation rel\n"
-                + "on a.rel_code =rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and rel.unit = '" + unit + "'";
+        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" + "from v_purchase pd\n" + "join v_relation rel on pd.rel_code = rel.rel_code\n" + "and pd.pur_unit =  rel.unit\n" + "where pd.stock_code = '" + stockCode + "' and vou_no = (\n" + "select ph.vou_no\n" + "from pur_his ph, pur_his_detail pd\n" + "where date(ph.vou_date)<= '" + purDate + "' \n" + "and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" + "and ph.dept_id = " + deptId + "\n" + "and pd.stock_code = '" + stockCode + "'\n" + "group by ph.vou_no\n" + "order by ph.vou_date desc\n" + "limit 1\n" + "))a\n" + "join v_relation rel\n" + "on a.rel_code =rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and rel.unit = '" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -1283,33 +912,7 @@ public class ReportServiceImpl implements ReportService {
     public General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode, Integer deptId) {
         General general = new General();
         general.setAmount(0.0f);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
-                "from (\n" +
-                "select v.loss_price/rel.smallest_qty smallest_price,v.rel_code,v.comp_code,v.dept_id\n" +
-                "from v_weight_loss v\n" +
-                "join v_relation rel\n" +
-                "on v.rel_code = rel.rel_code\n" +
-                "and v.loss_unit = rel.unit\n" +
-                "and v.comp_code = rel.comp_code\n" +
-                "and v.dept_id = rel.dept_id\n" +
-                "and v.stock_code ='" + stockCode + "'\n" +
-                "where vou_no =(\n" +
-                "select ph.vou_no\n" +
-                "from weight_loss_his ph, weight_loss_his_detail pd\n" +
-                "where date(ph.vou_date)<= '" + vouDate + "' \n" +
-                "and deleted = 0\n" +
-                "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
-                "and ph.dept_id = 1\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "group by ph.vou_no\n" +
-                "order by ph.vou_date desc\n" +
-                "limit 1)\n" +
-                ")a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "and rel.unit ='" + unit + "'";
+        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select v.loss_price/rel.smallest_qty smallest_price,v.rel_code,v.comp_code,v.dept_id\n" + "from v_weight_loss v\n" + "join v_relation rel\n" + "on v.rel_code = rel.rel_code\n" + "and v.loss_unit = rel.unit\n" + "and v.comp_code = rel.comp_code\n" + "and v.dept_id = rel.dept_id\n" + "and v.stock_code ='" + stockCode + "'\n" + "where vou_no =(\n" + "select ph.vou_no\n" + "from weight_loss_his ph, weight_loss_his_detail pd\n" + "where date(ph.vou_date)<= '" + vouDate + "' \n" + "and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" + "and ph.dept_id = 1\n" + "and pd.stock_code = '" + stockCode + "'\n" + "group by ph.vou_no\n" + "order by ph.vou_date desc\n" + "limit 1)\n" + ")a\n" + "join v_relation rel\n" + "on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and rel.unit ='" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -1325,32 +928,7 @@ public class ReportServiceImpl implements ReportService {
     public General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
         General general = new General();
         general.setAmount(0.0f);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
-                "from (\n" +
-                "select pd.unit,price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
-                "from v_process_his pd\n" +
-                "join v_relation rel on pd.rel_code = rel.rel_code\n" +
-                "and pd.unit =  rel.unit\n" +
-                "where pd.stock_code = '" + stockCode + "' \n" +
-                "and pd.comp_code ='" + compCode + "'\n" +
-                "and pd.dept_id =" + deptId + "\n" +
-                "and vou_no = (\n" +
-                "select ph.vou_no\n" +
-                "from process_his ph\n" +
-                "where date(ph.vou_date)<= '" + purDate + "' \n" +
-                "and deleted = 0\n" +
-                "and ph.comp_code = '" + compCode + "' \n" +
-                "and ph.dept_id = " + deptId + "\n" +
-                "and ph.stock_code = '" + stockCode + "'\n" +
-                "group by ph.vou_no\n" +
-                "order by ph.vou_date desc\n" +
-                "limit 1\n" +
-                "))a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code =rel.rel_code\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "and rel.unit = '" + unit + "'";
+        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select pd.unit,price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" + "from v_process_his pd\n" + "join v_relation rel on pd.rel_code = rel.rel_code\n" + "and pd.unit =  rel.unit\n" + "where pd.stock_code = '" + stockCode + "' \n" + "and pd.comp_code ='" + compCode + "'\n" + "and pd.dept_id =" + deptId + "\n" + "and vou_no = (\n" + "select ph.vou_no\n" + "from process_his ph\n" + "where date(ph.vou_date)<= '" + purDate + "' \n" + "and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' \n" + "and ph.dept_id = " + deptId + "\n" + "and ph.stock_code = '" + stockCode + "'\n" + "group by ph.vou_no\n" + "order by ph.vou_date desc\n" + "limit 1\n" + "))a\n" + "join v_relation rel\n" + "on a.rel_code =rel.rel_code\n" + "and a.comp_code =rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and rel.unit = '" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -1365,36 +943,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
         General g = new General();
-        String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" +
-                "from (\n" +
-                "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price,pur.rel_code,pur.comp_code,pur.dept_id\n" +
-                "from v_purchase pur\n" +
-                "join v_relation rel\n" +
-                "on pur.rel_code = rel.rel_code\n" +
-                "and pur.pur_unit = rel.unit\n" +
-                "where deleted = 0 \n" +
-                "and pur.comp_code ='" + compCode + "'\n" +
-                "and pur.stock_code ='" + stockCode + "'\n" +
-                "and date(pur.vou_date) <= '" + purDate + "'\n" +
-                "group by pur.stock_code\n" +
-                "\tunion all\n" +
-                "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price,op.rel_code,op.comp_code,op.dept_id\n" +
-                "from v_opening op\n" +
-                "join v_relation rel\n" +
-                "on op.rel_code = rel.rel_code\n" +
-                "and op.unit = rel.unit\n" +
-                "where op.price > 0\n" +
-                "and op.deleted =0 \n" +
-                "and op.comp_code ='" + compCode + "'\n" +
-                "and date(op.op_date) = '" + purDate + "'\n" +
-                "and op.stock_code ='" + stockCode + "'\n" +
-                "group by op.stock_code)a\n" +
-                "join v_relation rel on\n" +
-                "a.rel_code = rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "and rel.unit ='" + unit + "'\n" +
-                "group by stock_code";
+        String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" + "from (\n" + "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price,pur.rel_code,pur.comp_code,pur.dept_id\n" + "from v_purchase pur\n" + "join v_relation rel\n" + "on pur.rel_code = rel.rel_code\n" + "and pur.pur_unit = rel.unit\n" + "where deleted = 0 \n" + "and pur.comp_code ='" + compCode + "'\n" + "and pur.stock_code ='" + stockCode + "'\n" + "and date(pur.vou_date) <= '" + purDate + "'\n" + "group by pur.stock_code\n" + "\tunion all\n" + "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price,op.rel_code,op.comp_code,op.dept_id\n" + "from v_opening op\n" + "join v_relation rel\n" + "on op.rel_code = rel.rel_code\n" + "and op.unit = rel.unit\n" + "where op.price > 0\n" + "and op.deleted =0 \n" + "and op.comp_code ='" + compCode + "'\n" + "and date(op.op_date) = '" + purDate + "'\n" + "and op.stock_code ='" + stockCode + "'\n" + "group by op.stock_code)a\n" + "join v_relation rel on\n" + "a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and rel.unit ='" + unit + "'\n" + "group by stock_code";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
@@ -1412,21 +961,7 @@ public class ReportServiceImpl implements ReportService {
     public General getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
         General general = new General();
         general.setAmount(0.0f);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
-                "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
-                "from v_sale pd\n" +
-                "join v_relation rel on pd.rel_code = rel.rel_code\n" + "and pd.sale_unit =  rel.unit\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "where vou_no = (\n" + "select ph.vou_no\n" +
-                "from sale_his ph, sale_his_detail pd\n" + "where date(ph.vou_date)<= '" + saleDate + "' and deleted = 0\n" +
-                "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "order by ph.vou_date desc limit 1" + "))a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code =rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "and rel.unit = '" + unit + "'";
+        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" + "from v_sale pd\n" + "join v_relation rel on pd.rel_code = rel.rel_code\n" + "and pd.sale_unit =  rel.unit\n" + "and pd.stock_code = '" + stockCode + "'\n" + "where vou_no = (\n" + "select ph.vou_no\n" + "from sale_his ph, sale_his_detail pd\n" + "where date(ph.vou_date)<= '" + saleDate + "' and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" + "and pd.stock_code = '" + stockCode + "'\n" + "order by ph.vou_date desc limit 1" + "))a\n" + "join v_relation rel\n" + "on a.rel_code =rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and rel.unit = '" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -1442,8 +977,7 @@ public class ReportServiceImpl implements ReportService {
     public General getStockIORecentPrice(String stockCode, String vouDate, String unit) {
         General general = new General();
         general.setAmount(0.0f);
-        String sql = "select cost_price,stock_code,max(unique_id) \n"
-                + "from stock_in_out_detail\n" + "where stock_code = '" + stockCode + "'and (in_unit = '" + unit + "' or out_unit = '" + unit + "')\n" + "and vou_no = (select sio.vou_no \n" + "from stock_in_out sio , stock_in_out_detail siod\n" + "where date(vou_date) <= '" + vouDate + "' and deleted =0\n" + "and sio.vou_no = siod.vou_no\n" + "and cost_price <> 0\n" + "and siod.stock_code = '" + stockCode + "' and (in_unit ='" + unit + "' or out_unit = '" + unit + "')\n" + "order by sio.vou_date desc limit 1)\n";
+        String sql = "select cost_price,stock_code,max(unique_id) \n" + "from stock_in_out_detail\n" + "where stock_code = '" + stockCode + "'and (in_unit = '" + unit + "' or out_unit = '" + unit + "')\n" + "and vou_no = (select sio.vou_no \n" + "from stock_in_out sio , stock_in_out_detail siod\n" + "where date(vou_date) <= '" + vouDate + "' and deleted =0\n" + "and sio.vou_no = siod.vou_no\n" + "and cost_price <> 0\n" + "and siod.stock_code = '" + stockCode + "' and (in_unit ='" + unit + "' or out_unit = '" + unit + "')\n" + "order by sio.vou_date desc limit 1)\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -1455,173 +989,9 @@ public class ReportServiceImpl implements ReportService {
         return general;
     }
 
-    private void calStockBalanceByLocation(String typeCode, String cateCode, String brandCode, String stockCode,
-                                           boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                           String locCode, String compCode, Integer deptId, Integer macId) {
+    private void calStockBalanceByLocation(String typeCode, String cateCode, String brandCode, String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String locCode, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_balance where mac_id = " + macId + "";
-        String sql = "insert into tmp_stock_balance(stock_code, qty, unit, loc_code,smallest_qty, mac_id,comp_code,dept_id)\n"
-                + "select stock_code,qty,unit,loc_code,sum(smallest_qty) smallest_qty," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty,a.comp_code,a.dept_id\n"
-                + "\tfrom(\n"
-                + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom v_opening\n"
-                + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n"
-                + "\t\tgroup by stock_code, unit , loc_code \n"
-                + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom v_sale \n"
-                + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (cat_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand (calculate =1 and 0 = " + calSale + ")\n"
-                + "\t\tgroup by stock_code ,sale_unit ,loc_code \n"
-                + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) as qty,pur_unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom\n"
-                + "\t\tv_purchase \n" + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (calculate =1 and 0 = " + calPur + ")\n"
-                + "\t\tgroup by stock_code , pur_unit , loc_code \n"
-                + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom v_return_in\n"
-                + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand (calculate =1 and 0 = " + calRI + ")\n"
-                + "\t\tgroup by stock_code,unit ,loc_code \n"
-                + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(qty) * - 1 as qty,unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom\n" + "\t\tv_return_out\n"
-                + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand (calculate =1 and 0 = " + calRO + ")\n"
-                + "\t\tgroup by stock_code  , unit , loc_code \n"
-                + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(in_qty),in_unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom\n"
-                + "\t\tv_stock_io\n"
-                + "\t\twhere in_qty is not null\n"
-                + "\t\tand in_unit is not null\n" + "\t\tand deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n" + "\t\tgroup by stock_code ,in_unit ,loc_code \n"
-                + "\t\t\tunion all \n"
-                + "\t\tselect stock_code,sum(out_qty) * - 1,out_unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom\n"
-                + "\t\tv_stock_io\n"
-                + "\t\twhere out_qty is not null\n"
-                + "\t\tand out_unit is not null\n"
-                + "\t\tand deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n"
-                + "\t\tgroup by stock_code , out_unit , loc_code\n"
-                + "\t\t\tunion all\n"
-                + "\t\tselect stock_code,sum(qty) * - 1,unit,loc_code_from,comp_code,dept_id\n"
-                + "\t\tfrom v_transfer \n"
-                + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code_from = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n"
-                + "\t\tgroup by stock_code, unit , loc_code_from\n"
-                + "\t\t\tunion all\n" +
-                "\t\tselect stock_code,sum(qty),unit,loc_code_to,comp_code,dept_id\n"
-                + "\t\tfrom v_transfer \n"
-                + "\t\twhere deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code_to = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n"
-                + "\t\tgroup by stock_code , unit , loc_code_to\n"
-                + "\t\t\tunion all\n"
-                + "\t\tselect stock_code,sum(qty),unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom v_process_his\n"
-                + "\t\twhere  deleted = 0\n"
-                + "\t\tand finished =1\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n"
-                + "\t\tgroup by stock_code , unit , loc_code\n"
-                + "\t\t\tunion all\n"
-                + "\t\tselect stock_code,sum(qty)*-1,unit,loc_code,comp_code,dept_id\n"
-                + "\t\tfrom v_process_his_detail\n"
-                + "\t\twhere  deleted = 0\n"
-                + "\t\tand comp_code = '" + compCode + "'\n"
-                + "\t\tand dept_id = " + deptId + "\n"
-                + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n"
-                + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n"
-                + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n"
-                + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "\t\tand calculate =1\n"
-                + "\t\tgroup by stock_code , unit , loc_code"
-                + ") a\n"
-                + "join stock s\n"
-                + "on a.stock_code = s.stock_code\n"
-                + "and a.comp_code = s.comp_code\n"
-                + "and a.dept_id = s.dept_id\n"
-                + "join v_relation rel on s.rel_code = rel.rel_code \n"
-                + "and a.unit = rel.unit\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "group by a.stock_code,a.unit,a.loc_code) b\n"
-                + "group by b.stock_code,b.loc_code";
+        String sql = "insert into tmp_stock_balance(stock_code, qty, unit, loc_code,smallest_qty, mac_id,comp_code,dept_id)\n" + "select stock_code,qty,unit,loc_code,sum(smallest_qty) smallest_qty," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty,a.comp_code,a.dept_id\n" + "\tfrom(\n" + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n" + "\t\tfrom v_opening\n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code, unit , loc_code \n" + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code,comp_code,dept_id\n" + "\t\tfrom v_sale \n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (cat_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand (calculate =1 and 0 = " + calSale + ")\n" + "\t\tgroup by stock_code ,sale_unit ,loc_code \n" + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(qty) as qty,pur_unit,loc_code,comp_code,dept_id\n" + "\t\tfrom\n" + "\t\tv_purchase \n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (calculate =1 and 0 = " + calPur + ")\n" + "\t\tgroup by stock_code , pur_unit , loc_code \n" + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n" + "\t\tfrom v_return_in\n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand (calculate =1 and 0 = " + calRI + ")\n" + "\t\tgroup by stock_code,unit ,loc_code \n" + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(qty) * - 1 as qty,unit,loc_code,comp_code,dept_id\n" + "\t\tfrom\n" + "\t\tv_return_out\n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand (calculate =1 and 0 = " + calRO + ")\n" + "\t\tgroup by stock_code  , unit , loc_code \n" + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(in_qty),in_unit,loc_code,comp_code,dept_id\n" + "\t\tfrom\n" + "\t\tv_stock_io\n" + "\t\twhere in_qty is not null\n" + "\t\tand in_unit is not null\n" + "\t\tand deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code ,in_unit ,loc_code \n" + "\t\t\tunion all \n" + "\t\tselect stock_code,sum(out_qty) * - 1,out_unit,loc_code,comp_code,dept_id\n" + "\t\tfrom\n" + "\t\tv_stock_io\n" + "\t\twhere out_qty is not null\n" + "\t\tand out_unit is not null\n" + "\t\tand deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code , out_unit , loc_code\n" + "\t\t\tunion all\n" + "\t\tselect stock_code,sum(qty) * - 1,unit,loc_code_from,comp_code,dept_id\n" + "\t\tfrom v_transfer \n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code_from = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code, unit , loc_code_from\n" + "\t\t\tunion all\n" + "\t\tselect stock_code,sum(qty),unit,loc_code_to,comp_code,dept_id\n" + "\t\tfrom v_transfer \n" + "\t\twhere deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code_to = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code , unit , loc_code_to\n" + "\t\t\tunion all\n" + "\t\tselect stock_code,sum(qty),unit,loc_code,comp_code,dept_id\n" + "\t\tfrom v_process_his\n" + "\t\twhere  deleted = 0\n" + "\t\tand finished =1\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code , unit , loc_code\n" + "\t\t\tunion all\n" + "\t\tselect stock_code,sum(qty)*-1,unit,loc_code,comp_code,dept_id\n" + "\t\tfrom v_process_his_detail\n" + "\t\twhere  deleted = 0\n" + "\t\tand comp_code = '" + compCode + "'\n" + "\t\tand dept_id = " + deptId + "\n" + "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" + "\t\tand (stock_type_code = '" + typeCode + "' or '-' ='" + typeCode + "')\n" + "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" + "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" + "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" + "\t\tand calculate =1\n" + "\t\tgroup by stock_code , unit , loc_code" + ") a\n" + "join stock s\n" + "on a.stock_code = s.stock_code\n" + "and a.comp_code = s.comp_code\n" + "and a.dept_id = s.dept_id\n" + "join v_relation rel on s.rel_code = rel.rel_code \n" + "and a.unit = rel.unit\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "group by a.stock_code,a.unit,a.loc_code) b\n" + "group by b.stock_code,b.loc_code";
         try {
             reportDao.executeSql(delSql, sql);
         } catch (Exception e) {
@@ -1630,33 +1000,59 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
-                                               boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                               String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+    public List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String locCode, String compCode, Integer deptId, Integer macId, boolean summary) {
         calStockBalanceByLocation(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
         List<VStockBalance> balances = new ArrayList<>();
-        String sql = "select tmp.stock_code,tmp.loc_code,l.loc_name,tmp.unit,tmp.qty,tmp.smallest_qty,s.user_code,s.rel_code,s.stock_name\n" +
-                "from tmp_stock_balance tmp join location l\n" +
-                "on tmp.loc_code = l.loc_code\n" +
-                "join stock s on tmp.stock_code = s.stock_code\n" +
-                "where tmp.mac_id = " + macId + "";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VStockBalance b = new VStockBalance();
-                b.setUserCode(rs.getString("user_code"));
-                b.setStockCode(rs.getString("stock_code"));
-                b.setStockName(rs.getString("stock_name"));
-                b.setLocationName(rs.getString("loc_name"));
-                b.setLocCode(rs.getString("loc_code"));
-                float smallQty = rs.getFloat("smallest_qty");
-                String relCode = rs.getString("rel_code");
-                b.setTotalQty(null);
-                b.setUnitName(getRelStr(relCode, compCode, deptId, smallQty));
-                balances.add(b);
+        if (summary) {
+            String sql = "select a.stock_code,a.qty,s.user_code,s.rel_code,s.stock_name\n" + "from (\n" + "select stock_code,sum(smallest_qty)qty,comp_code,dept_id\n" + "from tmp_stock_balance\n" + "where mac_id =" + macId + "\n" + "group by stock_code)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "and a.comp_code = s.comp_code";
+            ResultSet rs = reportDao.executeSql(sql);
+            if (!Objects.isNull(rs)) {
+                try {
+                    while (rs.next()) {
+                        VStockBalance b = new VStockBalance();
+                        b.setUserCode(rs.getString("user_code"));
+                        b.setStockCode(rs.getString("stock_code"));
+                        b.setStockName(rs.getString("stock_name"));
+                        float smallQty = rs.getFloat("qty");
+                        String relCode = rs.getString("rel_code");
+                        b.setTotalQty(null);
+                        b.setUnitName(getRelStr(relCode, compCode, deptId, smallQty));
+                        b.setLocationName("All");
+                        balances.add(b);
+                    }
+                } catch (Exception e) {
+                    log.error("getStockBalance : " + e.getMessage());
+                }
+            }
+        } else {
+            String sql = "select tmp.stock_code,tmp.loc_code,l.loc_name,tmp.unit,tmp.qty,tmp.smallest_qty,s.user_code,s.rel_code,s.stock_name\n" + "from tmp_stock_balance tmp join location l\n" + "on tmp.loc_code = l.loc_code\n" + "and tmp.comp_code = l.comp_code\n" + "join stock s on tmp.stock_code = s.stock_code\n" + "and tmp.comp_code = s.comp_code\n" + "where tmp.mac_id = " + macId;
+            ResultSet rs = reportDao.executeSql(sql);
+            if (!Objects.isNull(rs)) {
+                try {
+                    while (rs.next()) {
+                        VStockBalance b = new VStockBalance();
+                        b.setUserCode(rs.getString("user_code"));
+                        b.setStockCode(rs.getString("stock_code"));
+                        b.setStockName(rs.getString("stock_name"));
+                        b.setLocationName(rs.getString("loc_name"));
+                        b.setLocCode(rs.getString("loc_code"));
+                        float smallQty = rs.getFloat("smallest_qty");
+                        String relCode = rs.getString("rel_code");
+                        b.setTotalQty(null);
+                        b.setUnitName(getRelStr(relCode, compCode, deptId, smallQty));
+                        balances.add(b);
+                    }
+                }catch (Exception e){
+                    log.error("getStockBalance : " + e.getMessage());
+                }
             }
         }
         return balances;
+    }
+
+    @Override
+    public List<VStockBalance> getStockBalanceSummary(String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception {
+        return null;
     }
 
     private String getRelStr(String relCode, String compCode, Integer deptId, float smallestQty) {
@@ -1741,51 +1137,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReorderLevel> getReorderLevel(String typeCode, String catCode,
-                                              String brandCode, String stockCode,
-                                              boolean calSale, boolean calPur, boolean calRI, boolean calRo,
-                                              String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+    public List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode, boolean calSale, boolean calPur, boolean calRI, boolean calRo, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
 
         calStockBalanceByLocation(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRo, locCode, compCode, deptId, macId);
-        String sql1 = "select *,if(small_bal_qty<small_min_qty,1,if(small_bal_qty>small_min_qty,2,if(small_bal_qty<small_max_qty,3,if(small_bal_qty> small_max_qty,4,5)))) position\n\n\n" +
-                "from (\n" +
-                "select a.*,rel.rel_name,bal_qty*rel.smallest_qty small_bal_qty,min_qty*ifnull(rel1.smallest_qty,0) small_min_qty,max_qty*ifnull(rel2.smallest_qty,0) small_max_qty\n" +
-                "from (\n" +
-                "select tmp.stock_code,tmp.loc_code,tmp.smallest_qty bal_qty, tmp.unit bal_unit,ifnull(min_qty,0) min_qty,min_unit,\n" +
-                "ifnull(max_qty,0) max_qty,max_unit,tmp.comp_code,tmp.dept_id,s.rel_code,s.user_code,s.stock_name,l.loc_name\n" +
-                "from tmp_stock_balance tmp\n" +
-                "left join reorder_level r\n" +
-                "on tmp.stock_code= r.stock_code\n" +
-                "and tmp.comp_code = r.comp_code\n" +
-                "and tmp.dept_id = r.dept_id\n" +
-                "and tmp.loc_code = r.loc_code\n" +
-                "and tmp.mac_id =" + macId + "\n" +
-                "and tmp.dept_id =" + deptId + "\n" +
-                "and tmp.comp_code ='" + compCode + "'\n" +
-                "join stock s on tmp.stock_code = s.stock_code\n" +
-                "and tmp.comp_code = s.comp_code\n" +
-                "and tmp.dept_id = s.dept_id\n" +
-                "join location l on tmp.loc_code = l.loc_code\n" +
-                "and tmp.comp_code = l.comp_code\n" +
-                "and tmp.dept_id = l.dept_id\n" +
-                ")a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.bal_unit = rel.unit\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "left join v_relation rel1\n" +
-                "on a.rel_code = rel1.rel_code\n" +
-                "and a.min_unit = rel1.unit\n" +
-                "and a.comp_code = rel1.comp_code\n" +
-                "and a.dept_id = rel1.dept_id\n" +
-                "left join v_relation rel2\n" +
-                "on a.rel_code = rel2.rel_code\n" +
-                "and a.max_unit = rel2.unit\n" +
-                "and a.comp_code = rel2.comp_code\n" +
-                "and a.dept_id = rel2.dept_id\n" +
-                ")b\n" +
-                "order by position,small_bal_qty";
+        String sql1 = "select *,if(small_bal_qty<small_min_qty,1,if(small_bal_qty>small_min_qty,2,if(small_bal_qty<small_max_qty,3,if(small_bal_qty> small_max_qty,4,5)))) position\n\n\n" + "from (\n" + "select a.*,rel.rel_name,bal_qty*rel.smallest_qty small_bal_qty,min_qty*ifnull(rel1.smallest_qty,0) small_min_qty,max_qty*ifnull(rel2.smallest_qty,0) small_max_qty\n" + "from (\n" + "select tmp.stock_code,tmp.loc_code,tmp.smallest_qty bal_qty, tmp.unit bal_unit,ifnull(min_qty,0) min_qty,min_unit,\n" + "ifnull(max_qty,0) max_qty,max_unit,tmp.comp_code,tmp.dept_id,s.rel_code,s.user_code,s.stock_name,l.loc_name\n" + "from tmp_stock_balance tmp\n" + "left join reorder_level r\n" + "on tmp.stock_code= r.stock_code\n" + "and tmp.comp_code = r.comp_code\n" + "and tmp.dept_id = r.dept_id\n" + "and tmp.loc_code = r.loc_code\n" + "and tmp.mac_id =" + macId + "\n" + "and tmp.dept_id =" + deptId + "\n" + "and tmp.comp_code ='" + compCode + "'\n" + "join stock s on tmp.stock_code = s.stock_code\n" + "and tmp.comp_code = s.comp_code\n" + "and tmp.dept_id = s.dept_id\n" + "join location l on tmp.loc_code = l.loc_code\n" + "and tmp.comp_code = l.comp_code\n" + "and tmp.dept_id = l.dept_id\n" + ")a\n" + "join v_relation rel\n" + "on a.rel_code = rel.rel_code\n" + "and a.bal_unit = rel.unit\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "left join v_relation rel1\n" + "on a.rel_code = rel1.rel_code\n" + "and a.min_unit = rel1.unit\n" + "and a.comp_code = rel1.comp_code\n" + "and a.dept_id = rel1.dept_id\n" + "left join v_relation rel2\n" + "on a.rel_code = rel2.rel_code\n" + "and a.max_unit = rel2.unit\n" + "and a.comp_code = rel2.comp_code\n" + "and a.dept_id = rel2.dept_id\n" + ")b\n" + "order by position,small_bal_qty";
         ResultSet rs = reportDao.executeSql(sql1);
         List<ReorderLevel> reorderLevels = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -1932,8 +1287,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
-                                                     String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
+    public List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" + "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "group by stock_code)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "group by stock_code\n" + "order by s.user_code";
@@ -1974,31 +1328,14 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode,
-                                          String brandCode, String stockCode, String vouStatus,
-                                          boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                          String compCode, Integer deptId, Integer macId) {
+    public void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
     }
 
     @Override
     public List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) {
-        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n"
-                + "s.rel_code,s.user_code s_user_code,a.stock_code,s.stock_name\n"
-                + "from (\n"
-                + "select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n"
-                + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id\n"
-                + "from tmp_stock_io_column\n"
-                + "where mac_id = " + macId + "\n"
-                + "and comp_code = '" + compCode + "'\n"
-                + "and dept_id = " + deptId + "\n"
-                + "group by tran_date,stock_code,tran_option,vou_no)a\n"
-                + "join stock s on a.stock_code = s.stock_code\n"
-                + "and a.comp_code = s.comp_code\n"
-                + "and a.dept_id = s.dept_id\n"
-                + "group by tran_date,stock_code,vou_no,tran_option\n"
-                + "order by s.user_code,a.tran_date,a.tran_option,a.vou_no";
+        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,a.stock_code,s.stock_name\n" + "from (\n" + "select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "and comp_code = '" + compCode + "'\n" + "and dept_id = " + deptId + "\n" + "group by tran_date,stock_code,tran_option,vou_no)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "and a.comp_code = s.comp_code\n" + "and a.dept_id = s.dept_id\n" + "group by tran_date,stock_code,vou_no,tran_option\n" + "order by s.user_code,a.tran_date,a.tran_option,a.vou_no";
         List<ClosingBalance> balances = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(getSql);
@@ -2072,11 +1409,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<StockValue> getStockValue(String opDate, String fromDate, String toDate,
-                                          String typeCode, String catCode, String brandCode,
-                                          String stockCode, String vouStatus,
-                                          boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                          String compCode, Integer deptId, Integer macId) {
+    public List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, deptId, macId);
@@ -2112,20 +1445,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode,
-                                               String stockCode, Integer macId, String compCode, Integer deptId) throws Exception {
+    public List<VOpening> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode, Integer deptId) throws Exception {
         List<VOpening> list = new ArrayList<>();
-        String sql = "select v.op_date,v.vou_no,v.remark,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n"
-                + "v.unit,v.qty,v.price,v.amount,v.comp_code,v.dept_id\n"
-                + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n"
-                + "where v.deleted = 0\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and v.loc_code in (select f_code from f_location where mac_id = " + macId + ")\n"
-                + "and v.comp_code ='" + compCode + "'\n"
-                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "order by l.loc_name,v.stock_user_code\n";
+        String sql = "select v.op_date,v.vou_no,v.remark,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n" + "v.unit,v.qty,v.price,v.amount,v.comp_code,v.dept_id\n" + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n" + "where v.deleted = 0\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and v.loc_code in (select f_code from f_location where mac_id = " + macId + ")\n" + "and v.comp_code ='" + compCode + "'\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "order by l.loc_name,v.stock_user_code\n";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -2149,18 +1471,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VOpening> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode, Integer deptId) throws Exception {
         List<VOpening> openings = new ArrayList<>();
-        String sql = "select a.*,t.stock_type_name\n"
-                + "from (select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n"
-                + "unit,qty,price,amount \n" + "from v_opening v join location l \n"
-                + "on v.loc_code = l.loc_code\n" + "where v.deleted = 0 \n"
-                + "and v.comp_code = '" + compCode + "'\n"
-                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n"
-                + "join stock_type t on a.stock_type_code = t.stock_type_code\n"
-                + "order by t.stock_type_name,a.stock_user_code";
+        String sql = "select a.*,t.stock_type_name\n" + "from (select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n" + "unit,qty,price,amount \n" + "from v_opening v join location l \n" + "on v.loc_code = l.loc_code\n" + "where v.deleted = 0 \n" + "and v.comp_code = '" + compCode + "'\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n" + "join stock_type t on a.stock_type_code = t.stock_type_code\n" + "order by t.stock_type_name,a.stock_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -2213,23 +1524,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode,
-                                                  String catCode, String brandCode, String stockCode, String compCode, Integer deptId) throws Exception {
-        String sql = "select v.vou_date,v.vou_no,v.stock_code,v.s_user_code,\n" +
-                "v.stock_name,vs.description vou_status_name,if(v.in_unit is null,v.out_unit,v.in_unit) unit, v.cost_price \n" +
-                "from v_stock_io v join vou_status vs\n" +
-                "on v.vou_status = vs.code\n" +
-                "where v.comp_code = '" + compCode + "'\n" +
-                "and v.dept_id  = " + deptId + "\n" +
-                "and v.deleted = 0\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (v.brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                "and (v.vou_status ='" + vouType + "' or '-' ='" + vouType + "')\n" +
-                "group by date(v.vou_date),v.stock_code,v.cost_price,unit\n" +
-                "order by v.s_user_code,v.vou_date\n";
+    public List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId) throws Exception {
+        String sql = "select v.vou_date,v.vou_no,v.stock_code,v.s_user_code,\n" + "v.stock_name,vs.description vou_status_name,if(v.in_unit is null,v.out_unit,v.in_unit) unit, v.cost_price \n" + "from v_stock_io v join vou_status vs\n" + "on v.vou_status = vs.code\n" + "where v.comp_code = '" + compCode + "'\n" + "and v.dept_id  = " + deptId + "\n" + "and v.deleted = 0\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (v.brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "and (v.vou_status ='" + vouType + "' or '-' ='" + vouType + "')\n" + "group by date(v.vou_date),v.stock_code,v.cost_price,unit\n" + "order by v.s_user_code,v.vou_date\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VStockIO> ioList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2249,29 +1545,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus,
-                                            String vouNo, String remark, String desp,
-                                            String userCode, String stockCode,
-                                            String locCode, String compCode, Integer deptId, String deleted) throws Exception {
-        String sql = "select a.*,v.description vou_status_name\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n"
-                + "from v_stock_io \n"
-                + "where comp_code = '" + compCode + "'\n"
-                + "and deleted = " + deleted + "\n"
-                + "and dept_id = " + deptId + "\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
-                + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
-                + "and (description like '" + desp + "%' or '-%'= '" + desp + "%')\n"
-                + "and (vou_status = '" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
-                + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "group by vou_no\n" + ")a\n"
-                + "join vou_status v on a.vou_status = v.code\n"
-                + "and a.comp_code = v.comp_code\n"
-                + "order by vou_date,vou_no";
+    public List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo, String remark, String desp, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception {
+        String sql = "select a.*,v.description vou_status_name\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n" + "from v_stock_io \n" + "where comp_code = '" + compCode + "'\n" + "and deleted = " + deleted + "\n" + "and dept_id = " + deptId + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" + "and (description like '" + desp + "%' or '-%'= '" + desp + "%')\n" + "and (vou_status = '" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" + "group by vou_no\n" + ")a\n" + "join vou_status v on a.vou_status = v.code\n" + "and a.comp_code = v.comp_code\n" + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VStockIO> ioList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2292,9 +1567,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode,
-                                      String vouNo, String remark, String reference, String userCode, String stockCode,
-                                      String locCode, String compCode, Integer deptId, String deleted, String nullBatch, String batchNo, String projectNo) {
+    public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
+                                      String remark, String reference, String userCode, String stockCode,
+                                      String locCode, String compCode, Integer deptId, String deleted,
+                                      String nullBatch, String batchNo, String projectNo,String curCode) {
         List<VSale> saleList = new ArrayList<>();
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2330,19 +1606,10 @@ public class ReportServiceImpl implements ReportService {
         if (!projectNo.equals("-")) {
             filter += "and project_no = '" + projectNo + "'\n";
         }
-        String sql = "select a.*,t.trader_name,t.user_code\n"
-                + "from (\n"
-                + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
-                + "from v_sale s \n"
-                + "where comp_code = '" + compCode + "'\n"
-                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and deleted = " + deleted + "\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "" + filter + "\n"
-                + "group by vou_no\n" + ")a\n"
-                + "join trader t on a.trader_code = t.code\n"
-                + "and a.comp_code = t.comp_code\n"
-                + "order by date(vou_date) desc,vou_no desc";
+        if (!curCode.equals("-")) {
+            filter += "and cur_code = '" + curCode + "'\n";
+        }
+        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_sale s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by date(vou_date) desc,vou_no desc";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
@@ -2367,11 +1634,13 @@ public class ReportServiceImpl implements ReportService {
         }
         return saleList;
     }
+
     @Override
     public List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode,
-                                      String vouNo, String remark, String reference, String userCode, String stockCode,
-                                      String locCode, String compCode, Integer deptId, String deleted, String nullBatch,
-                                        String batchNo, String projectNo) {
+                                        String vouNo, String remark, String reference,
+                                        String userCode, String stockCode, String locCode,
+                                        String compCode, Integer deptId, String deleted,
+                                        String nullBatch, String batchNo, String projectNo,String curCode) {
         List<VOrder> saleList = new ArrayList<>();
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2398,23 +1667,13 @@ public class ReportServiceImpl implements ReportService {
         if (!locCode.equals("-")) {
             filter += "and loc_code = '" + locCode + "'\n";
         }
-        if(!projectNo.equals("-")) {
-            filter +="and project_no = '" + projectNo + "'\n";
+        if (!projectNo.equals("-")) {
+            filter += "and project_no = '" + projectNo + "'\n";
         }
-        String sql = "select a.*,t.trader_name,t.user_code\n"
-                + "from (\n"
-                + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n"
-                + "from v_order s \n"
-                + "where comp_code = '" + compCode + "'\n"
-                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and deleted = " + deleted + "\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "" + filter + "\n"
-                + "group by vou_no\n" + ")a\n"
-                + "join trader t on a.trader_code = t.code\n"
-                + "and a.comp_code = t.comp_code\n"
-                + "and a.dept_id = t.dept_id\n"
-                + "order by date(vou_date) desc,vou_no desc";
+        if (!curCode.equals("-")) {
+            filter += "and cur_code = '" + curCode + "'\n";
+        }
+        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_order s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "order by date(vou_date) desc,vou_no desc";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
@@ -2441,29 +1700,29 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo,
-                                              String remark, String reference, String userCode,
-                                              String stockCode, String locCode, String compCode, Integer deptId, String deleted, String projectNo) throws Exception {
-        String sql = "select a.*,t.trader_name\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id\n"
-                + "from v_purchase p \n"
-                + "where comp_code = '" + compCode + "'\n"
-                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and deleted =" + deleted + "\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
-                + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
-                + "and (reference like '" + reference + "%' or '-%'= '" + reference + "%')\n"
-                + "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n"
-                + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
-                + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n"
-                + "group by vou_no)a\n"
-                + "join trader t on a.trader_code = t.code\n"
-                + "and a.comp_code = t.comp_code\n"
-                + "order by date(vou_date),vou_no";
+    public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
+                                              String compCode, Integer deptId, String deleted,
+                                              String projectNo,String curCode) throws Exception {
+        String sql = "select a.*,t.trader_name\n" +
+                "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id\n" +
+                "from v_purchase p \n" +
+                "where comp_code = '" + compCode + "'\n" +
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and deleted =" + deleted + "\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and cur_code = '" + curCode + "'\n" +
+                "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
+                "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
+                "and (reference like '" + reference + "%' or '-%'= '" + reference + "%')\n" +
+                "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n" +
+                "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
+                "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
+                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
+                "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n" +
+                "group by vou_no)a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "order by date(vou_date),vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VPurchase> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2485,28 +1744,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode,
-                                              String vouNo, String remark, String userCode,
-                                              String stockCode, String locCode, String compCode, Integer deptId, String deleted, String projectNo) throws Exception {
-        String sql = "select a.*,t.trader_name\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n"
-                + "from v_return_in \n"
-                + "where comp_code = '" + compCode + "'\n"
-                + "and deleted = " + deleted + "\n"
-                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
-                + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
-                + "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n"
-                + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
-                + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n"
-                + "group by vou_no\n" + ")a\n"
-                + "join trader t on a.trader_code = t.code\n"
-                + "and a.comp_code = t.comp_code\n"
-                + "order by vou_date,vou_no";
+    public List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo,
+                                              String remark, String userCode, String stockCode,
+                                              String locCode, String compCode, Integer deptId,
+                                              String deleted, String projectNo,String curCode) throws Exception {
+        String sql = "select a.*,t.trader_name\n" +
+                "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n" +
+                "from v_return_in \n" + "where comp_code = '" + compCode + "'\n" +
+                "and deleted = " + deleted + "\n" +
+                "and cur_code = '" + curCode + "'\n" +
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" + "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n" + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" + "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VReturnIn> returnInList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2528,29 +1776,18 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode,
-                                                String vouNo, String remark, String userCode,
-                                                String stockCode, String locCode, String compCode,
-                                                Integer deptId, String deleted, String projectNo) throws Exception {
-        String sql = "select a.*,t.trader_name\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n"
-                + "from v_return_out \n"
-                + "where comp_code = '" + compCode + "'\n"
-                + "and deleted = " + deleted + "\n"
-                + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
-                + "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
-                + "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n"
-                + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
-                + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n"
-                + "group by vou_no\n" + ")a\n"
-                + "join trader t on a.trader_code = t.code\n"
-                + "and a.comp_code= t.comp_code\n"
-                + "order by vou_date,vou_no";
+    public List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
+                                                String userCode, String stockCode, String locCode, String compCode, Integer deptId,
+                                                String deleted, String projectNo,String curCode) throws Exception {
+        String sql = "select a.*,t.trader_name\n" +
+                "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n" +
+                "from v_return_out \n" + "where comp_code = '" + compCode + "'\n" +
+                "and deleted = " + deleted + "\n" +
+                "and cur_code = '" + curCode + "'\n" +
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
+                "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" + "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n" + "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" + "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code= t.comp_code\n" + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         List<VReturnOut> returnInList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2572,20 +1809,21 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode,
-                                         String stockCode, String locCode, String compCode, Integer deptId) throws Exception {
-        String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n"
-                + "from v_opening v join location l\n" + "on v.loc_code = l.loc_code\n"
-                + "where v.comp_code = '" + compCode + "'\n"
-                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n"
-                + "and (v.remark like '" + remark + "%' or '-%'= '" + remark + "%')\n"
-                + "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n"
-                + "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n"
-                + "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n"
-                + "group by v.vou_no\n"
-                + "order by v.op_date,v.vou_no desc\n";
+    public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode,
+                                         String locCode, String compCode, Integer deptId,String curCode) throws Exception {
+        String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
+                "from v_opening v join location l\n" +
+                "on v.loc_code = l.loc_code\n" +
+                "where v.comp_code = '" + compCode + "'\n" +
+                "and v.cur_code = '" + curCode + "'\n" +
+                "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
+                "and (v.remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
+                "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
+                "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
+                "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
+                "group by v.vou_no\n" + "order by v.op_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<OPHis> list = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2609,8 +1847,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
-                                              String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception {
+    public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception {
 
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2631,19 +1868,7 @@ public class ReportServiceImpl implements ReportService {
         if (!locCode.equals("-")) {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";
         }
-        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n"
-                + "from v_transfer v join location l\n"
-                + "on v.loc_code_from = l.loc_code\n"
-                + "and v.comp_code = l.comp_code\n"
-                + "join location ll on v.loc_code_to = ll.loc_code\n"
-                + "and v.comp_code = ll.comp_code\n"
-                + "where v.comp_code = '" + compCode + "'\n"
-                + "and v.deleted = " + deleted + "\n"
-                + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
-                + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "" + filter + ""
-                + "group by v.vou_no\n"
-                + "order by v.vou_date,v.vou_no desc\n";
+        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n" + "from v_transfer v join location l\n" + "on v.loc_code_from = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "join location ll on v.loc_code_to = ll.loc_code\n" + "and v.comp_code = ll.comp_code\n" + "where v.comp_code = '" + compCode + "'\n" + "and v.deleted = " + deleted + "\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "" + "group by v.vou_no\n" + "order by v.vou_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VTransfer> openingList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
@@ -2665,23 +1890,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<WeightLossHis> getWeightLossHistory(String fromDate, String toDate, String refNo, String vouNo,
-                                                    String remark, String stockCode,
-                                                    String locCode, String compCode,
-                                                    Integer deptId, String deleted) {
+    public List<WeightLossHis> getWeightLossHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String stockCode, String locCode, String compCode, Integer deptId, String deleted) {
         List<WeightLossHis> list = new ArrayList<>();
-        String sql = "select vou_no,date(vou_date) vou_date,remark,ref_no,created_by,deleted\n" +
-                "from v_weight_loss\n" +
-                "where deleted =" + deleted + "\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and (vou_no ='" + vouNo + "' or '-' ='" + vouNo + "')\n" +
-                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "and (remark like '" + remark + "%' or '-%'='" + remark + "%')\n" +
-                "and (ref_no like '" + refNo + "%' or '-%'='" + refNo + "%')\n" +
-                "group by vou_no\n";
+        String sql = "select vou_no,date(vou_date) vou_date,remark,ref_no,created_by,deleted\n" + "from v_weight_loss\n" + "where deleted =" + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code ='" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and (vou_no ='" + vouNo + "' or '-' ='" + vouNo + "')\n" + "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "and (remark like '" + remark + "%' or '-%'='" + remark + "%')\n" + "and (ref_no like '" + refNo + "%' or '-%'='" + refNo + "%')\n" + "group by vou_no\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             while (rs.next()) {
@@ -2755,15 +1966,7 @@ public class ReportServiceImpl implements ReportService {
     public General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
         General g = new General();
         g.setSmallQty(1.0f);
-        String sql = "select ud.qty,ud.smallest_qty\n" +
-                "from stock s join unit_relation_detail ud\n" +
-                "on s.rel_code = ud.rel_code\n" +
-                "and s.comp_code =ud.comp_code\n" +
-                "and s.dept_id =ud.dept_id\n" +
-                "where s.stock_code ='" + stockCode + "'\n" +
-                "and s.comp_code ='" + compCode + "'\n" +
-                "and s.dept_id =" + deptId + "\n" +
-                "and ud.unit ='" + unit + "'";
+        String sql = "select ud.qty,ud.smallest_qty\n" + "from stock s join unit_relation_detail ud\n" + "on s.rel_code = ud.rel_code\n" + "and s.comp_code =ud.comp_code\n" + "and s.dept_id =ud.dept_id\n" + "where s.stock_code ='" + stockCode + "'\n" + "and s.comp_code ='" + compCode + "'\n" + "and s.dept_id =" + deptId + "\n" + "and ud.unit ='" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
@@ -2897,30 +2100,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode,
-                                                 String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
+    public List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
         List<VStockIO> list = new ArrayList<>();
-        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(end_date) end_date, qty,unit,price,remark,process_no,vs.description,l.loc_name\n" +
-                "from v_process_his v\n" +
-                "join vou_status vs\n" +
-                "on v.pt_code =vs.code\n" +
-                "and v.comp_code = vs.comp_code\n" +
-                "and v.dept_id = vs.dept_id\n" +
-                "join location l on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n" +
-                "and v.dept_id = l.dept_id\n" +
-                "where v.comp_code ='" + compCode + "'\n" +
-                "and v.dept_id =" + deptId + "\n" +
-                "and v.calculate=1\n" +
-                "and v.finished =1\n" +
-                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and date(v.end_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (v.pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" +
-                "and (v.stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" +
-                "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" +
-                "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" +
-                "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "order by vs.description,v.end_date\n";
+        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(end_date) end_date, qty,unit,price,remark,process_no,vs.description,l.loc_name\n" + "from v_process_his v\n" + "join vou_status vs\n" + "on v.pt_code =vs.code\n" + "and v.comp_code = vs.comp_code\n" + "and v.dept_id = vs.dept_id\n" + "join location l on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "and v.dept_id = l.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" + "and v.dept_id =" + deptId + "\n" + "and v.calculate=1\n" + "and v.finished =1\n" + "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and date(v.end_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (v.pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (v.stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "order by vs.description,v.end_date\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             //stock_code, stock_name, end_date, qty, unit, price, remark, process_no, description
@@ -2947,35 +2129,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIO> getProcessOutputSummary(String fromDate, String toDate, String ptCode, String typeCode,
-                                                  String catCode, String brandCode, String stockCode,
-                                                  String compCode, Integer deptId, Integer macId) {
+    public List<VStockIO> getProcessOutputSummary(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
         List<VStockIO> list = new ArrayList<>();
-        String sql = "select a.*,l.loc_name,vs.description\n" +
-                "from (\n" +
-                "select ifnull(user_code,stock_code) stock_code,stock_name,sum(qty) qty,unit,avg(price) avg_price,loc_code,pt_code,comp_code,dept_id\n" +
-                "from v_process_his \n" +
-                "where comp_code ='" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and calculate=1\n" +
-                "and finished =1\n" +
-                "and deleted =0\n" +
-                "and date(end_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and (pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" +
-                "and (stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" +
-                "and (category_code ='" + catCode + "'or'-'='" + catCode + "')\n" +
-                "and (brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "group by stock_code,loc_code,pt_code,unit)a\n" +
-                "join location l on a.loc_code =l.loc_code\n" +
-                "and a.comp_code = l.comp_code\n" +
-                "and a.dept_id = l.dept_id\n" +
-                "join vou_status vs\n" +
-                "on a.pt_code =vs.code\n" +
-                "and a.comp_code = vs.comp_code\n" +
-                "and a.dept_id = vs.dept_id\n" +
-                "order by vs.description,l.loc_name\n";
+        String sql = "select a.*,l.loc_name,vs.description\n" + "from (\n" + "select ifnull(user_code,stock_code) stock_code,stock_name,sum(qty) qty,unit,avg(price) avg_price,loc_code,pt_code,comp_code,dept_id\n" + "from v_process_his \n" + "where comp_code ='" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and calculate=1\n" + "and finished =1\n" + "and deleted =0\n" + "and date(end_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "group by stock_code,loc_code,pt_code,unit)a\n" + "join location l on a.loc_code =l.loc_code\n" + "and a.comp_code = l.comp_code\n" + "and a.dept_id = l.dept_id\n" + "join vou_status vs\n" + "on a.pt_code =vs.code\n" + "and a.comp_code = vs.comp_code\n" + "and a.dept_id = vs.dept_id\n" + "order by vs.description,l.loc_name\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
@@ -2999,30 +2155,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIO> getProcessUsageSummary(String fromDate, String toDate, String ptCode,
-                                                 String typeCode, String catCode, String brandCode,
-                                                 String stockCode, String compCode, Integer deptId, Integer macId) {
+    public List<VStockIO> getProcessUsageSummary(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
         List<VStockIO> list = new ArrayList<>();
-        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(vou_date) vou_date, qty,unit,price,vs.description,l.loc_name\n" +
-                "from v_process_his_detail v\n" +
-                "join vou_status vs\n" +
-                "on v.pt_code =vs.code\n" +
-                "and v.comp_code = vs.comp_code\n" +
-                "and v.dept_id = vs.dept_id\n" +
-                "join location l on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n" +
-                "and v.dept_id = l.dept_id\n" +
-                "where v.comp_code ='" + compCode + "'\n" +
-                "and v.dept_id =" + deptId + "\n" +
-                "and v.calculate=1\n" +
-                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (v.pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" +
-                "and (v.stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" +
-                "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" +
-                "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" +
-                "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "order by vs.description,v.vou_date\n";
+        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(vou_date) vou_date, qty,unit,price,vs.description,l.loc_name\n" + "from v_process_his_detail v\n" + "join vou_status vs\n" + "on v.pt_code =vs.code\n" + "and v.comp_code = vs.comp_code\n" + "and v.dept_id = vs.dept_id\n" + "join location l on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "and v.dept_id = l.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" + "and v.dept_id =" + deptId + "\n" + "and v.calculate=1\n" + "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (v.pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (v.stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "order by vs.description,v.vou_date\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
@@ -3047,34 +2182,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIO> getProcessUsageDetail(String fromDate, String toDate, String ptCode,
-                                                String typeCode, String catCode, String brandCode,
-                                                String stockCode, String compCode, Integer deptId,
-                                                Integer macId) {
+    public List<VStockIO> getProcessUsageDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
         List<VStockIO> list = new ArrayList<>();
         //vou_no, stock_code, comp_code, dept_id, unique_id, vou_date, qty, unit, price,
         // loc_code, deleted, pt_code, user_code, stock_name, stock_type_code, brand_code, category_code, calculate, rel_code, loc_name, description
-        String sql = "select v.*,l.loc_name,vs.description\n" +
-                "from v_process_his_detail v\n" +
-                "join location l\n" +
-                "on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n" +
-                "and v.dept_id = l.dept_id\n" +
-                "join vou_status vs\n" +
-                "on v.pt_code = vs.code\n" +
-                "and v.comp_code = vs.comp_code\n" +
-                "and v.dept_id = vs.dept_id\n" +
-                "where v.comp_code ='" + compCode + "'\n" +
-                "and v.dept_id =" + deptId + "\n" +
-                "and v.deleted =0\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and (pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" +
-                "and (stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" +
-                "and (category_code ='" + catCode + "'or'-'='" + catCode + "')\n" +
-                "and (brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "order by v.vou_date,vs.description,v.unique_id";
+        String sql = "select v.*,l.loc_name,vs.description\n" + "from v_process_his_detail v\n" + "join location l\n" + "on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "and v.dept_id = l.dept_id\n" + "join vou_status vs\n" + "on v.pt_code = vs.code\n" + "and v.comp_code = vs.comp_code\n" + "and v.dept_id = vs.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" + "and v.dept_id =" + deptId + "\n" + "and v.deleted =0\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "order by v.vou_date,vs.description,v.unique_id";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
@@ -3101,9 +2213,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<GRN> getGRNHistory(String fromDate, String toDate, String batchNo, String traderCode, String vouNo,
-                                   String remark, String userCode, String stockCode, String locCode,
-                                   String compCode, Integer deptId, String deleted, String close, boolean orderByBatch) {
+    public List<GRN> getGRNHistory(String fromDate, String toDate, String batchNo, String traderCode, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted, String close, boolean orderByBatch) {
         List<GRN> list = new ArrayList<>();
         String orderBy = "order by vou_no desc";
         if (orderByBatch) {
@@ -3134,24 +2244,7 @@ public class ReportServiceImpl implements ReportService {
         if (!locCode.equals("-")) {
             filter += "and gd.loc_code = '" + locCode + "'\n";
         }
-        String sql = "select a.*,t.user_code,t.trader_name\n" +
-                "from (\n" +
-                "select vou_date,g.vou_no,g.comp_code,g.dept_id,g.loc_code,g.created_by,g.batch_no,remark,g.trader_code,g.deleted,g.closed\n" +
-                "from grn g join grn_detail gd\n" +
-                "on g.vou_no = gd.vou_no\n" +
-                "and g.comp_code = gd.comp_code\n" +
-                "and g.dept_id = gd.dept_id\n" +
-                "where g.comp_code ='" + compCode + "'\n" +
-                "and (g.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted =" + deleted + "\n" +
-                "and closed =" + close + "\n" +
-                "" + filter + "" +
-                "group by g.vou_no\n" +
-                ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "and a.dept_id = t.dept_id\n" +
-                "" + orderBy + "";
+        String sql = "select a.*,t.user_code,t.trader_name\n" + "from (\n" + "select vou_date,g.vou_no,g.comp_code,g.dept_id,g.loc_code,g.created_by,g.batch_no,remark,g.trader_code,g.deleted,g.closed\n" + "from grn g join grn_detail gd\n" + "on g.vou_no = gd.vou_no\n" + "and g.comp_code = gd.comp_code\n" + "and g.dept_id = gd.dept_id\n" + "where g.comp_code ='" + compCode + "'\n" + "and (g.dept_id =" + deptId + " or 0 =" + deptId + ")\n" + "and deleted =" + deleted + "\n" + "and closed =" + close + "\n" + "" + filter + "" + "group by g.vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "" + orderBy + "";
         try {
             //vou_date, vou_no, comp_code, dept_id, created_by, batch_no, remark, trader_code, user_code, trader_name
             ResultSet rs = reportDao.executeSql(sql);
@@ -3185,16 +2278,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode) {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select 'I' group_name,user_code,stock_name,qty,unit,weight,weight_unit,0 price,0 amount,qty*weight ttl_qty,qty*weight ttl\n" +
-                "from v_grn\n" +
-                "where batch_no ='" + batchNo + "'\n" +
-                "and stock_code in (select stock_code from pur_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "')\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "\tunion all\n" +
-                "select 'R',s_user_code,stock_name,qty,pur_unit,weight,weight_unit,pur_price,pur_amt,qty*weight ttl_qty,(qty*weight)*-1 ttl\n" +
-                "from v_purchase\n" +
-                "where vou_no ='" + vouNo + "'\n" +
-                "and comp_code ='" + compCode + "'\n";
+        String sql = "select 'I' group_name,user_code,stock_name,qty,unit,weight,weight_unit,0 price,0 amount,qty*weight ttl_qty,qty*weight ttl\n" + "from v_grn\n" + "where batch_no ='" + batchNo + "'\n" + "and stock_code in (select stock_code from pur_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "')\n" + "and comp_code ='" + compCode + "'\n" + "\tunion all\n" + "select 'R',s_user_code,stock_name,qty,pur_unit,weight,weight_unit,pur_price,pur_amt,qty*weight ttl_qty,(qty*weight)*-1 ttl\n" + "from v_purchase\n" + "where vou_no ='" + vouNo + "'\n" + "and comp_code ='" + compCode + "'\n";
 
         try {
             ResultSet rs = getResult(sql);
@@ -3272,243 +2356,20 @@ public class ReportServiceImpl implements ReportService {
         executeSql(String.format("%s\n%s", insertSql, retOutSql));
     }
 
-    private void calculateClosing(String fromDate, String toDate, String typeCode, String catCode, String brandCode,
-                                  String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                  String compCode, Integer deptId, Integer macId) {
+    private void calculateClosing(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId + "";
-        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'Opening',a.tran_date,'-','Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select tmp.tran_date,tmp.stock_code,tmp.ttl_qty * rel.smallest_qty smallest_qty,tmp.loc_code,tmp.mac_id\n"
-                + "from tmp_stock_opening tmp \n"
-                + "join stock s on tmp.stock_code = s.stock_code\n"
-                + "and tmp.comp_code = s.comp_code\n"
-                + "and tmp.dept_id = s.dept_id\n"
-                + "join v_relation rel on s.rel_code = rel.rel_code\n"
-                + "and tmp.comp_code = rel.comp_code\n"
-                + "and tmp.dept_id = rel.dept_id\n"
-                + "and tmp.unit = rel.unit\n"
-                + "where tmp.mac_id =" + macId + ")a\n"
-                + "group by tran_date,stock_code,mac_id";
-        String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id\n"
-                + "from v_purchase\n"
-                + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and (calculate = 1 and " + calPur + " = 0)\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),vou_no,stock_code,pur_unit)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.pur_unit = rel.unit\n"
-                + "group by a.vou_date ,a.stock_code,a.vou_no";
+        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Opening',a.tran_date,'-','Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,'" + compCode + "'," + deptId + "\n" + "from (\n" + "select tmp.tran_date,tmp.stock_code,tmp.ttl_qty * rel.smallest_qty smallest_qty,tmp.loc_code,tmp.mac_id\n" + "from tmp_stock_opening tmp \n" + "join stock s on tmp.stock_code = s.stock_code\n" + "and tmp.comp_code = s.comp_code\n" + "and tmp.dept_id = s.dept_id\n" + "join v_relation rel on s.rel_code = rel.rel_code\n" + "and tmp.comp_code = rel.comp_code\n" + "and tmp.dept_id = rel.dept_id\n" + "and tmp.unit = rel.unit\n" + "where tmp.mac_id =" + macId + ")a\n" + "group by tran_date,stock_code,mac_id";
+        String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),vou_no,stock_code,pur_unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.pur_unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
         //ret in
-        String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'ReturnIn',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code, unit,comp_code,dept_id\n"
-                + "from v_return_in\n"
-                + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n"
-                + "and (calculate = 1 and " + calRI + " = 0)\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,vou_no,unit)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.unit = rel.unit\n"
-                + "group by vou_date,stock_code,vou_no";
-        String stockInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'StockIn',date(a.vou_date) vou_date,vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,description,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id\n"
-                + "from v_stock_io\n"
-                + "where ifnull(in_qty,0)<>0 and in_unit is not null\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and calculate = 1 \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,in_unit,vou_no)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.in_unit = rel.unit\n"
-                + "group by a.vou_date ,a.stock_code,a.vou_no";
-        String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'Sale',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, sale_unit,rel_code,comp_code,dept_id\n"
-                + "from v_sale\n"
-                + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and deleted = 0 \n" + "and (calculate = 1 and " + calSale + " = 0)\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,sale_unit,vou_no)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.sale_unit = rel.unit\n"
-                + "group by a.vou_date,a.stock_code,a.vou_no";
-        String returnOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'ReturnOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n"
-                + "from v_return_out\n"
-                + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and (calculate = 1 and " + calRO + " = 0)\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,unit,vou_no)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.unit = rel.unit\n"
-                + "group by vou_date,stock_code,vou_no";
-        String stockOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'StockOut',a.vou_date,a.vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,description,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id\n"
-                + "from v_stock_io\n"
-                + "where ifnull(out_qty,0)<>0 and out_unit is not null\n"
-                + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and calculate = 1 \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,out_unit,vou_no)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.out_unit = rel.unit\n"
-                + "group by vou_date,a.stock_code,vou_no";
-        String fFSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'Transfer-F',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,\n"
-                + "loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_from,rel_code, unit,comp_code,dept_id\n"
-                + "from v_transfer\n"
-                + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n"
-                + "and calculate = 1 \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,unit,vou_no)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.comp_code = rel.comp_code\n"
-                + "and a.dept_id = rel.dept_id\n"
-                + "and a.unit = rel.unit\n"
-                + "group by vou_date,stock_code,vou_no";
-        String tFSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n"
-                + "select 'Transfer-T',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,\n"
-                + "loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n"
-                + "from (\n"
-                + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_to,rel_code, unit\n"
-                + "from v_transfer\n"
-                + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n"
-                + "and deleted = 0 \n" + "and calculate = 1 \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by date(vou_date),stock_code,unit,vou_no)a\n"
-                + "join v_relation rel on a.rel_code = rel.rel_code\n"
-                + "and a.unit = rel.unit\n"
-                + "group by vou_date,stock_code,vou_no";
-        String pIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
-                "from (\n" +
-                "select date(end_date) end_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" +
-                "from v_process_his\n" +
-                "where date(end_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and deleted = 0 \n" +
-                "and calculate = 1\n" +
-                "and finished = 1\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" +
-                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(end_date),stock_code,unit,vou_no)a\n" +
-                "join v_relation rel on a.rel_code = rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "and a.unit = rel.unit\n" +
-                "join vou_status v on a.pt_code = v.code\n" +
-                "and a.comp_code = v.comp_code\n" +
-                "and a.dept_id = v.dept_id\n" +
-                "group by a.end_date,a.stock_code,a.vou_no";
-        String pOut = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'P-OUT',a.vou_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
-                "from (\n" +
-                "select date(vou_date) vou_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" +
-                "from v_process_his_detail\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and deleted = 0 \n" +
-                "and calculate = 1\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and dept_id =" + deptId + "\n" +
-                "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" +
-                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),stock_code,unit,vou_no)a\n" +
-                "join v_relation rel on a.rel_code = rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and a.dept_id = rel.dept_id\n" +
-                "and a.unit = rel.unit\n" +
-                "join vou_status v on a.pt_code = v.code\n" +
-                "and a.comp_code = v.comp_code\n" +
-                "and a.dept_id = v.dept_id\n" +
-                "group by a.vou_date,a.stock_code,a.vou_no";
+        String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'ReturnIn',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code, unit,comp_code,dept_id\n" + "from v_return_in\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRI + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,vou_no,unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
+        String stockInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'StockIn',date(a.vou_date) vou_date,vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,description,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id\n" + "from v_stock_io\n" + "where ifnull(in_qty,0)<>0 and in_unit is not null\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,in_unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.in_unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
+        String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Sale',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, sale_unit,rel_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calSale + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,sale_unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.sale_unit = rel.unit\n" + "group by a.vou_date,a.stock_code,a.vou_no";
+        String returnOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'ReturnOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_return_out\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRO + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
+        String stockOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'StockOut',a.vou_date,a.vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,description,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id\n" + "from v_stock_io\n" + "where ifnull(out_qty,0)<>0 and out_unit is not null\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,out_unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.out_unit = rel.unit\n" + "group by vou_date,a.stock_code,vou_no";
+        String fFSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Transfer-F',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,\n" + "loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_from,rel_code, unit,comp_code,dept_id\n" + "from v_transfer\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
+        String tFSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Transfer-T',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,\n" + "loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_to,rel_code, unit\n" + "from v_transfer\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
+        String pIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(end_date) end_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_process_his\n" + "where date(end_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1\n" + "and finished = 1\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(end_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.unit = rel.unit\n" + "join vou_status v on a.pt_code = v.code\n" + "and a.comp_code = v.comp_code\n" + "and a.dept_id = v.dept_id\n" + "group by a.end_date,a.stock_code,a.vou_no";
+        String pOut = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'P-OUT',a.vou_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_process_his_detail\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id\n" + "and a.unit = rel.unit\n" + "join vou_status v on a.pt_code = v.code\n" + "and a.comp_code = v.comp_code\n" + "and a.dept_id = v.dept_id\n" + "group by a.vou_date,a.stock_code,a.vou_no";
         try {
             reportDao.executeSql(delSql, opSql, purSql, retInSql, stockInSql, stockOutSql, saleSql, returnOutSql, fFSql, tFSql, pIn, pOut);
         } catch (Exception e) {
@@ -3518,166 +2379,11 @@ public class ReportServiceImpl implements ReportService {
 
     }
 
-    private void calculateOpening(String opDate, String fromDate, String typeCode,
-                                  String catCode, String brandCode, String stockCode, String vouStatus,
-                                  boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                  String compCode, Integer deptId, Integer macId) {
+    private void calculateOpening(String opDate, String fromDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         //delete tmp
         String delSql = "delete from tmp_stock_opening where mac_id = " + macId + "";
         //opening
-        String opSql = "insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,loc_code,unit,comp_code,dept_id,mac_id)\n"
-                + "select '" + fromDate + "' op_date ,stock_code,sum(qty) ttl_qty,loc_code,unit,'" + compCode + "'," + deptId + "," + macId + " \n"
-                + "from (\n"
-                + "select stock_code,sum(qty) qty,loc_code, unit\n"
-                + "from v_opening\n"
-                + "where date(op_date) = '" + opDate + "'\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and deleted = 0 \n" + "and calculate = 1 \n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty) qty,loc_code, pur_unit\n"
-                + "from v_purchase\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and (calculate = 1 and " + calPur + "=0) \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,pur_unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty) qty,loc_code, unit\n"
-                + "from v_return_in\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and deleted = 0 \n"
-                + "and (calculate = 1 and " + calRI + "=0) \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(in_qty) qty,loc_code, in_unit\n"
-                + "from v_stock_io\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0\n"
-                + "and calculate = 1 \n" + "and in_qty is not null and in_unit is not null\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,in_unit\n"
-                + "\tunion all \n"
-                + "select stock_code,sum(out_qty)*-1 qty,loc_code, out_unit\n"
-                + "from v_stock_io\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and deleted = 0\n" + "and calculate = 1 \n" + "and out_qty is not null and out_unit is not null\n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,out_unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty)*-1 qty,loc_code, unit\n"
-                + "from v_return_out\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and deleted = false \n"
-                + "and (calculate = 1 and " + calRO + "=0) \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty)*-1 qty,loc_code, sale_unit\n"
-                + "from v_sale\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and (calculate = 1 and " + calSale + "=0) \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,sale_unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty)*-1 qty,loc_code_from, unit\n"
-                + "from v_transfer\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and deleted = 0 \n"
-                + "and calculate = 1 \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty) qty,loc_code_to, unit\n"
-                + "from v_transfer\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n"
-                + "and calculate = 1 \n"
-                + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id ='" + deptId + "'\n"
-                + "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty)*-1 qty,loc_code, unit\n"
-                + "from v_process_his_detail\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id =" + deptId + "\n"
-                + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + "\tunion all\n"
-                + "select stock_code,sum(qty) qty,loc_code, unit\n"
-                + "from v_process_his\n"
-                + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n"
-                + "and deleted =0\n"
-                + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n"
-                + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n"
-                + "and dept_id =" + deptId + "\n"
-                + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n"
-                + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n"
-                + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n"
-                + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n"
-                + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n"
-                + "group by stock_code,unit\n"
-                + ")a\n"
-                + "group by stock_code,unit";
+        String opSql = "insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,loc_code,unit,comp_code,dept_id,mac_id)\n" + "select '" + fromDate + "' op_date ,stock_code,sum(qty) ttl_qty,loc_code,unit,'" + compCode + "'," + deptId + "," + macId + " \n" + "from (\n" + "select stock_code,sum(qty) qty,loc_code, unit\n" + "from v_opening\n" + "where date(op_date) = '" + opDate + "'\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty) qty,loc_code, pur_unit\n" + "from v_purchase\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and dept_id ='" + deptId + "'\n" + "and (calculate = 1 and " + calPur + "=0) \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,pur_unit\n" + "\tunion all\n" + "select stock_code,sum(qty) qty,loc_code, unit\n" + "from v_return_in\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and dept_id ='" + deptId + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRI + "=0) \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(in_qty) qty,loc_code, in_unit\n" + "from v_stock_io\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0\n" + "and calculate = 1 \n" + "and in_qty is not null and in_unit is not null\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,in_unit\n" + "\tunion all \n" + "select stock_code,sum(out_qty)*-1 qty,loc_code, out_unit\n" + "from v_stock_io\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0\n" + "and calculate = 1 \n" + "and out_qty is not null and out_unit is not null\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,out_unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code, unit\n" + "from v_return_out\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = false \n" + "and (calculate = 1 and " + calRO + "=0) \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code, sale_unit\n" + "from v_sale\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calSale + "=0) \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,sale_unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code_from, unit\n" + "from v_transfer\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty) qty,loc_code_to, unit\n" + "from v_transfer\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code, unit\n" + "from v_process_his_detail\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty) qty,loc_code, unit\n" + "from v_process_his\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted =0\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and dept_id =" + deptId + "\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + ")a\n" + "group by stock_code,unit";
         try {
             reportDao.executeSql(delSql, opSql);
         } catch (Exception e) {
@@ -3708,111 +2414,9 @@ public class ReportServiceImpl implements ReportService {
     private void calculatePrice(String toDate, String opDate, String stockCode, String typeCode, String catCode, String brandCode, String compCode, Integer deptId, Integer macId) {
         try {
             String delSql = "delete from tmp_stock_price where mac_id = " + macId + "";
-            String purSql = "insert into tmp_stock_price(tran_option,stock_code,pur_avg_price,mac_id)\n" +
-                    "select 'PUR-AVG',stock_code,avg(avg_price)," + macId + "\n" +
-                    "from (\n" +
-                    "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price\n" +
-                    "from v_purchase pur\n" +
-                    "join v_relation rel\n" +
-                    "on pur.rel_code = rel.rel_code\n" +
-                    "and pur.pur_unit = rel.unit\n" +
-                    "where deleted =0\n" +
-                    "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                    "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" +
-                    "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                    "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" +
-                    "and date(vou_date) <='" + toDate + "'\n" +
-                    "and pur.dept_id =" + deptId + "\n" +
-                    "and pur.comp_code ='" + compCode + "'\n" +
-                    "group by pur.stock_code\n" +
-                    "\tunion all\n" +
-                    "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price\n" +
-                    "from v_opening op\n" +
-                    "join v_relation rel\n" +
-                    "on op.rel_code = rel.rel_code\n" +
-                    "and op.unit = rel.unit\n" +
-                    "where op.price > 0\n" +
-                    "and deleted =0\n" +
-                    "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                    "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" +
-                    "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                    "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" +
-                    "and date(op_date) <='" + toDate + "'\n" +
-                    "and op.dept_id =" + deptId + "\n" +
-                    "and op.comp_code ='" + compCode + "'\n" +
-                    "group by op.stock_code)a\n" +
-                    "group by stock_code";
-            String sInSql = "insert into tmp_stock_price(tran_option,stock_code,in_avg_price,mac_id)\n" +
-                    "select 'SIN-AVG',stock_code,avg(avg_price)," + macId + "\n" +
-                    "from(\n" +
-                    "select 'SIN-AVG',sio.stock_code,avg(sio.cost_price/rel.smallest_qty) avg_price\n" +
-                    "from v_stock_io sio\n" + "join v_relation rel\n" +
-                    "on sio.rel_code = rel.rel_code\n" +
-                    "and sio.in_unit = rel.unit\n" +
-                    "where in_qty is not null and in_unit is not null and cost_price >0\n" +
-                    "and sio.deleted =0\n" +
-                    "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                    "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" +
-                    "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                    "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" +
-                    "and date(vou_date) <='" + toDate + "'\n" +
-                    "and sio.dept_id =" + deptId + "\n" +
-                    "and sio.comp_code ='" + compCode + "'\n" +
-                    "group by sio.stock_code\n" +
-                    "\tunion all\n" +
-                    "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price\n" + "from v_opening op\n" +
-                    "join v_relation rel\n" + "on op.rel_code = rel.rel_code\n" + "and op.unit = rel.unit\n" +
-                    "where op.price > 0\n" +
-                    "and op.deleted =0\n" +
-                    "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                    "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" +
-                    "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                    "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" +
-                    "and date(op_date) ='" + opDate + "'\n" +
-                    "and op.dept_id =" + deptId + "\n" +
-                    "and op.comp_code ='" + compCode + "'\n" +
-                    "group by op.stock_code\n" +
-                    "\tunion all\n" +
-                    "select 'SOUT-AVG',sio.stock_code,avg(sio.cost_price/rel.smallest_qty) avg_price\n" +
-                    "from v_stock_io sio\n" + "join v_relation rel\n" +
-                    "on sio.rel_code = rel.rel_code\n" +
-                    "and sio.out_unit = rel.unit\n" +
-                    "where out_qty is not null and out_unit is not null and cost_price >0\n" +
-                    "and sio.deleted =0\n" +
-                    "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                    "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" +
-                    "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                    "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" +
-                    "and date(vou_date) <='" + toDate + "'\n" +
-                    "and sio.dept_id =" + deptId + "\n" +
-                    "and sio.comp_code ='" + compCode + "'\n" +
-                    "group by sio.stock_code\n" + ")a\n" +
-                    "group by stock_code";
-            String purRecentSql = "insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)\n" +
-                    "select a.stock_code,'PUR_RECENT',a.pur_price/rel.smallest_qty pur_price," + macId + "\n" +
-                    "from (\n" +
-                    "with rows_and_position as \n" +
-                    "  ( \n" +
-                    "    select stock_code, pur_price,pur_unit,row_number() over (partition by stock_code order by vou_date desc) as position,rel_code,comp_code,dept_id\n" +
-                    "    from v_purchase\n" +
-                    "    where (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                    "    and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" +
-                    "    and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" +
-                    "    and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" +
-                    "    and date(vou_date) <='" + toDate + "'\n" +
-                    "    and dept_id =" + deptId + "\n" +
-                    "    and comp_code ='" + compCode + "'\n" +
-                    "    and deleted =0\n" +
-                    "  )\n" +
-                    "select stock_code, pur_price,pur_unit,rel_code,comp_code,dept_id\n" +
-                    "from  rows_and_position\n" +
-                    "where position =1\n" +
-                    ")a\n" +
-                    "join v_relation rel\n" +
-                    "on a.rel_code = rel.rel_code\n" +
-                    "and a.pur_unit = rel.unit\n" +
-                    "and a.comp_code = rel.comp_code\n" +
-                    "and a.dept_id = rel.dept_id";
+            String purSql = "insert into tmp_stock_price(tran_option,stock_code,pur_avg_price,mac_id)\n" + "select 'PUR-AVG',stock_code,avg(avg_price)," + macId + "\n" + "from (\n" + "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price\n" + "from v_purchase pur\n" + "join v_relation rel\n" + "on pur.rel_code = rel.rel_code\n" + "and pur.pur_unit = rel.unit\n" + "where deleted =0\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "and date(vou_date) <='" + toDate + "'\n" + "and pur.dept_id =" + deptId + "\n" + "and pur.comp_code ='" + compCode + "'\n" + "group by pur.stock_code\n" + "\tunion all\n" + "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price\n" + "from v_opening op\n" + "join v_relation rel\n" + "on op.rel_code = rel.rel_code\n" + "and op.unit = rel.unit\n" + "where op.price > 0\n" + "and deleted =0\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "and date(op_date) <='" + toDate + "'\n" + "and op.dept_id =" + deptId + "\n" + "and op.comp_code ='" + compCode + "'\n" + "group by op.stock_code)a\n" + "group by stock_code";
+            String sInSql = "insert into tmp_stock_price(tran_option,stock_code,in_avg_price,mac_id)\n" + "select 'SIN-AVG',stock_code,avg(avg_price)," + macId + "\n" + "from(\n" + "select 'SIN-AVG',sio.stock_code,avg(sio.cost_price/rel.smallest_qty) avg_price\n" + "from v_stock_io sio\n" + "join v_relation rel\n" + "on sio.rel_code = rel.rel_code\n" + "and sio.in_unit = rel.unit\n" + "where in_qty is not null and in_unit is not null and cost_price >0\n" + "and sio.deleted =0\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "and date(vou_date) <='" + toDate + "'\n" + "and sio.dept_id =" + deptId + "\n" + "and sio.comp_code ='" + compCode + "'\n" + "group by sio.stock_code\n" + "\tunion all\n" + "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price\n" + "from v_opening op\n" + "join v_relation rel\n" + "on op.rel_code = rel.rel_code\n" + "and op.unit = rel.unit\n" + "where op.price > 0\n" + "and op.deleted =0\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "and date(op_date) ='" + opDate + "'\n" + "and op.dept_id =" + deptId + "\n" + "and op.comp_code ='" + compCode + "'\n" + "group by op.stock_code\n" + "\tunion all\n" + "select 'SOUT-AVG',sio.stock_code,avg(sio.cost_price/rel.smallest_qty) avg_price\n" + "from v_stock_io sio\n" + "join v_relation rel\n" + "on sio.rel_code = rel.rel_code\n" + "and sio.out_unit = rel.unit\n" + "where out_qty is not null and out_unit is not null and cost_price >0\n" + "and sio.deleted =0\n" + "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "and date(vou_date) <='" + toDate + "'\n" + "and sio.dept_id =" + deptId + "\n" + "and sio.comp_code ='" + compCode + "'\n" + "group by sio.stock_code\n" + ")a\n" + "group by stock_code";
+            String purRecentSql = "insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)\n" + "select a.stock_code,'PUR_RECENT',a.pur_price/rel.smallest_qty pur_price," + macId + "\n" + "from (\n" + "with rows_and_position as \n" + "  ( \n" + "    select stock_code, pur_price,pur_unit,row_number() over (partition by stock_code order by vou_date desc) as position,rel_code,comp_code,dept_id\n" + "    from v_purchase\n" + "    where (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "    and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "    and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "    and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "    and date(vou_date) <='" + toDate + "'\n" + "    and dept_id =" + deptId + "\n" + "    and comp_code ='" + compCode + "'\n" + "    and deleted =0\n" + "  )\n" + "select stock_code, pur_price,pur_unit,rel_code,comp_code,dept_id\n" + "from  rows_and_position\n" + "where position =1\n" + ")a\n" + "join v_relation rel\n" + "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id";
             reportDao.executeSql(delSql, purSql, sInSql, purRecentSql);
         } catch (Exception e) {
             log.error(String.format("calculatePrice: %s", e.getMessage()));

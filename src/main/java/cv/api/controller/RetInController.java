@@ -71,7 +71,8 @@ public class RetInController {
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         String projectNo = Util1.isAll(filter.getProjectNo());
-        List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, projectNo);
+        String curCode = Util1.isAll(filter.getCurCode());
+        List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, projectNo, curCode);
         return Flux.fromIterable(listRI);
     }
 

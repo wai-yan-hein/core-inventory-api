@@ -25,7 +25,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public Stock save(Stock stock) {
-        saveOrUpdate(stock,stock.getKey());
+        saveOrUpdate(stock, stock.getKey());
         return stock;
     }
 
@@ -55,7 +55,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     }
 
     @Override
-    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId) {
+    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId, boolean orderFavorite) {
         String hsql = "select o from Stock o where o.active = 1 and o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")\n";
         if (!stockCode.equals("-")) {
             hsql += " and o.key.stockCode ='" + stockCode + "'\n";
@@ -68,6 +68,11 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         }
         if (!brand.equals("-")) {
             hsql += " and o.brandCode ='" + brand + "'\n";
+        }
+        if (orderFavorite) {
+            hsql += " order by o.favorite desc,o.userCode";
+        } else {
+            hsql += " order by o.userCode";
         }
         return findHSQL(hsql);
     }
@@ -121,16 +126,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     private List<Stock> getStockList(String filter, String compCode, Integer deptId) {
         List<Stock> listStock = new ArrayList<>();
-        String sql = "select s.*,rel.rel_name,st.stock_type_name,cat.cat_name,b.brand_name\n" +
-                "from stock s\n" + "join unit_relation rel on s.rel_code= rel.rel_code\n" +
-                "left join stock_type st on s.stock_type_code = st.stock_type_code\n" +
-                "left join category cat  on s.category_code = cat.cat_code\n" +
-                "left join stock_brand b on s.brand_code  = b.brand_code\n" +
-                "where s.comp_code ='" + compCode + "'\n" +
-                "and s.active =1\n" + "and (s.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and " + filter + "\n" +
-                "order by s.user_code,s.stock_name\n" +
-                "limit 100";
+        String sql = "select s.*,rel.rel_name,st.stock_type_name,cat.cat_name,b.brand_name\n" + "from stock s\n" + "join unit_relation rel on s.rel_code= rel.rel_code\n" + "left join stock_type st on s.stock_type_code = st.stock_type_code\n" + "left join category cat  on s.category_code = cat.cat_code\n" + "left join stock_brand b on s.brand_code  = b.brand_code\n" + "where s.comp_code ='" + compCode + "'\n" + "and s.active =1\n" + "and (s.dept_id =" + deptId + " or 0 =" + deptId + ")\n" + "and " + filter + "\n" + "order by s.user_code,s.stock_name\n" + "limit 100";
         ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
@@ -203,5 +199,12 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     public List<Stock> getStock(String updatedDate) {
         String hsql = "select o from Stock o where o.updatedDate > '" + updatedDate + "'";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public void update(StockKey key, boolean favorite) {
+        Stock stock = getByKey(key);
+        stock.setFavorite(favorite);
+        saveOrUpdate(stock, key);
     }
 }

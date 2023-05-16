@@ -26,7 +26,7 @@ public interface StockService {
 
     List<Stock> findActiveStock(String compCode, Integer deptId);
 
-    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId);
+    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId,boolean orderFavorite);
 
     List<Stock> getStock(String str, String compCode, Integer deptId);
 
@@ -37,4 +37,6 @@ public interface StockService {
     Date getMaxDate();
 
     List<Stock> getStock(String updatedDate);
+
+    void update(StockKey key, boolean favorite);
 }

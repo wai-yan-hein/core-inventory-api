@@ -42,6 +42,7 @@ public class ReportFilter {
     private Integer deptId;
     private String status;
     private String projectNo;
+    private boolean orderFavorite;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

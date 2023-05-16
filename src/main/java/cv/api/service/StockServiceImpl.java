@@ -79,8 +79,8 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId) {
-        return dao.search(stockCode, stockType, cat, brand, compCode, deptId);
+    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId, boolean orderFavorite) {
+        return dao.search(stockCode, stockType, cat, brand, compCode, deptId, orderFavorite);
     }
 
 
@@ -91,7 +91,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<Stock> getService(String compCode, Integer deptId) {
-        return dao.getService(compCode,deptId);
+        return dao.getService(compCode, deptId);
     }
 
     @Override
@@ -107,5 +107,10 @@ public class StockServiceImpl implements StockService {
     @Override
     public List<Stock> getStock(String updatedDate) {
         return dao.getStock(updatedDate);
+    }
+
+    @Override
+    public void update(StockKey key, boolean favorite) {
+        dao.update(key, favorite);
     }
 }

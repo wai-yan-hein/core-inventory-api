@@ -113,8 +113,9 @@ public class SaleController {
         String nullBatch = String.valueOf(filter.isNullBatch());
         String batchNo = Util1.isNull(filter.getBatchNo(), "-");
         String projectNo = Util1.isAll(filter.getProjectNo());
+        String curCode = Util1.isAll(filter.getCurCode());
         List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
-                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo);
+                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode);
         return Flux.fromIterable(saleList);
     }
 

@@ -87,6 +87,8 @@ public class Stock implements java.io.Serializable {
     private String weightUnit;
     @Column(name = "weight")
     private Float weight;
+    @Column(name = "favorite")
+    private boolean favorite;
     @Transient
     private String relName;
     @Transient

@@ -38,5 +38,6 @@ public class FilterObject {
     private String batchNo;
     private boolean orderByBatch;
     private String projectNo;
+    private String curCode;
 
 }

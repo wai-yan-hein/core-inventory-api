@@ -11,9 +11,9 @@ import java.sql.ResultSet;
  * @author wai yan
  */
 public interface ReportDao {
-    void executeSql(String... sql) throws Exception;
+    void executeSql(String... sql);
 
-    ResultSet executeSql(String sql) throws Exception;
+    ResultSet executeSql(String sql);
 
 
 }

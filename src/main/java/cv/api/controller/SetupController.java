@@ -373,6 +373,12 @@ public class SetupController {
         return ResponseEntity.ok(b);
     }
 
+    @PostMapping(path = "/update-favorite-stock")
+    public Mono<?> updateFavoriteStock(@RequestBody StockKey key, @RequestParam boolean favorite) {
+        stockService.update(key,favorite);
+        return Mono.justOrEmpty(true);
+    }
+
     @GetMapping(path = "/get-stock")
     public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
         List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
@@ -385,14 +391,15 @@ public class SetupController {
     }
 
     @PostMapping(path = "/search-stock")
-    public ResponseEntity<?> searchStock(@RequestBody ReportFilter filter) {
-        String stockCode = filter.getStockCode();
-        String typCode = filter.getStockTypeCode();
-        String catCode = filter.getCatCode();
-        String brandCode = filter.getBrandCode();
+    public Flux<?> searchStock(@RequestBody ReportFilter filter) {
+        String stockCode = Util1.isAll(filter.getStockCode());
+        String typCode = Util1.isAll(filter.getStockTypeCode());
+        String catCode = Util1.isAll(filter.getCatCode());
+        String brandCode = Util1.isAll(filter.getBrandCode());
         Integer deptId = filter.getDeptId();
         String compCode = filter.getCompCode();
-        return ResponseEntity.ok(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId));
+        boolean orderFav = filter.isOrderFavorite();
+        return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, orderFav));
     }
 
     @GetMapping(path = "/get-stock-list")
@@ -467,7 +474,9 @@ public class SetupController {
         String remark = Util1.isNull(filter.getRemark(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
-        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode, deptId);
+        String curCode = Util1.isAll(filter.getCurCode());
+        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode,
+                compCode, deptId,curCode);
         return ResponseEntity.ok(opHisList);
     }
 

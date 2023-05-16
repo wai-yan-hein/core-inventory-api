@@ -17,12 +17,12 @@ import java.sql.ResultSet;
 public class ReportDaoImpl extends AbstractDao<Serializable, Object> implements ReportDao {
 
     @Override
-    public void executeSql(String... sql) throws Exception {
+    public void executeSql(String... sql) {
         execSql(sql);
     }
 
     @Override
-    public ResultSet executeSql(String sql) throws Exception {
+    public ResultSet executeSql(String sql)  {
         return getResult(sql);
     }
 }

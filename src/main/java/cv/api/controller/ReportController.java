@@ -49,8 +49,7 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-sale-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VSale> listVSale = reportService.getSaleVoucher(vouNo);
@@ -59,8 +58,7 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-order-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    byte[] getOrderReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody byte[] getOrderReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "OrderVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VOrder> listVSale = reportService.getOrderVoucher(vouNo);
@@ -75,16 +73,13 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-purchase-weight-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getPurWeightReport(@RequestParam String vouNo,
-                                      @RequestParam String compCode,
-                                      @RequestParam String batchNo) throws IOException {
+    public Flux<?> getPurWeightReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam String batchNo) throws IOException {
         List<VPurchase> list = reportService.getPurchaseByWeightVoucher(vouNo, Util1.isNull(batchNo, "-"), compCode);
         return Flux.fromIterable(list);
     }
 
     @GetMapping(value = "/get-return-in-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnInVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VReturnIn> listRI = reportService.getReturnInVoucher(vouNo, compCode);
@@ -93,8 +88,7 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-return-out-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnOutVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         List<VReturnOut> listRO = reportService.getReturnOutVoucher(vouNo, compCode);
@@ -103,8 +97,7 @@ public class ReportController {
     }
 
     @PostMapping(value = "/get-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    ReturnObject getReport(@RequestBody ReportFilter filter) {
+    public @ResponseBody ReturnObject getReport(@RequestBody ReportFilter filter) {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
@@ -164,7 +157,7 @@ public class ReportController {
                         List<VOrder> orderByStock = reportService.getOrderByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(orderByStock, exportPath);
                     }
-                    case "SaleByVoucherDetail","SaleByVoucherDetailExcel" -> {
+                    case "SaleByVoucherDetail", "SaleByVoucherDetailExcel" -> {
                         List<VSale> list = reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
                     }
@@ -250,19 +243,16 @@ public class ReportController {
                         Util1.writeJsonFile(opGroup, exportPath);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummary(opDate, fromDate, toDate,
-                                typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetail" -> {
-                        reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode,
-                                stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockValue" -> {
-                        List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode,
-                                brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
@@ -339,38 +329,22 @@ public class ReportController {
 
 
     @GetMapping(path = "/get-purchase-recent-price")
-    public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode,
-                                                          @RequestParam String vouDate,
-                                                          @RequestParam String unit,
-                                                          @RequestParam String compCode,
-                                                          @RequestParam Integer deptId) {
+    public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-weight-loss-recent-price")
-    public ResponseEntity<General> getWeightLossRecentPrice(@RequestParam String stockCode,
-                                                            @RequestParam String vouDate,
-                                                            @RequestParam String unit,
-                                                            @RequestParam String compCode,
-                                                            @RequestParam Integer deptId) {
+    public ResponseEntity<General> getWeightLossRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-production-recent-price")
-    public ResponseEntity<General> getProductionRecentPrice(@RequestParam String stockCode,
-                                                            @RequestParam String vouDate,
-                                                            @RequestParam String unit,
-                                                            @RequestParam String compCode,
-                                                            @RequestParam Integer deptId) {
+    public ResponseEntity<General> getProductionRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-purchase-avg-price")
-    public ResponseEntity<General> getPurAvgPrice(@RequestParam String stockCode,
-                                                  @RequestParam String vouDate,
-                                                  @RequestParam String unit,
-                                                  @RequestParam String compCode,
-                                                  @RequestParam Integer deptId) {
+    public ResponseEntity<General> getPurAvgPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return ResponseEntity.ok(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
@@ -386,19 +360,19 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-stock-balance")
-    public ResponseEntity<List<VStockBalance>> getStockBalance(@RequestParam String stockCode,
-                                                               @RequestParam boolean calSale,
-                                                               @RequestParam boolean calPur,
-                                                               @RequestParam boolean calRI,
-                                                               @RequestParam boolean calRO,
-                                                               @RequestParam String compCode,
-                                                               @RequestParam Integer deptId,
-                                                               @RequestParam Integer macId) throws Exception {
-        return ResponseEntity.ok(reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId));
+    public Flux<?> getStockBalance(@RequestParam String stockCode, @RequestParam boolean calSale, @RequestParam boolean calPur, @RequestParam boolean calRI, @RequestParam boolean calRO, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam Integer macId, @RequestParam boolean summary) {
+        List<VStockBalance> list = reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
+        if (list.isEmpty()) {
+            VStockBalance b = new VStockBalance();
+            b.setLocationName("No Stock.");
+            b.setUnitName("No Stock.");
+        }
+        return Flux.fromIterable(list);
     }
 
+
     @PostMapping(path = "/get-reorder-level")
-    public ResponseEntity<List<ReorderLevel>> getReorderLevel(@RequestBody ReportFilter filter) throws Exception {
+    public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) throws Exception {
         String compCode = filter.getCompCode();
         String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
         String catCode = Util1.isNull(filter.getCatCode(), "-");
@@ -412,7 +386,7 @@ public class ReportController {
         boolean calRO = filter.isCalRO();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
-        return ResponseEntity.ok(reorderLevels);
+        return Flux.fromIterable(reorderLevels);
     }
 
     @GetMapping(path = "/get-smallest_qty")
