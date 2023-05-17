@@ -1857,13 +1857,18 @@ public class ReportServiceImpl implements ReportService {
         if (!userCode.equals("-")) {
             filter += "and created_by ='" + userCode + "'\n";
         }
-        if (!vouNo.equals("-")) {
+        if (!stockCode.equals("-")) {
             filter += "and stock_code ='" + stockCode + "'\n";
         }
         if (!locCode.equals("-")) {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";
         }
-        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n" + "from v_transfer v join location l\n" + "on v.loc_code_from = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "join location ll on v.loc_code_to = ll.loc_code\n" + "and v.comp_code = ll.comp_code\n" + "where v.comp_code = '" + compCode + "'\n" + "and v.deleted = " + deleted + "\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "" + "group by v.vou_no\n" + "order by v.vou_date,v.vou_no desc\n";
+        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n" 
+                + "from v_transfer v join location l\n" + "on v.loc_code_from = l.loc_code\n" 
+                + "and v.comp_code = l.comp_code\n" + "join location ll on v.loc_code_to = ll.loc_code\n"
+                + "and v.comp_code = ll.comp_code\n" + "where v.comp_code = '" + compCode + "'\n" 
+                + "and v.deleted = " + deleted + "\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" 
+                + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "" + "group by v.vou_no\n" + "order by v.vou_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VTransfer> openingList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
