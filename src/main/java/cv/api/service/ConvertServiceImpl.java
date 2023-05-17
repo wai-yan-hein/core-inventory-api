@@ -1,12 +1,14 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
+import cv.api.entity.Trader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -14,6 +16,8 @@ import java.sql.ResultSet;
 public class ConvertServiceImpl implements ConverterService {
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private TraderService traderService;
 
     @Override
     public void convertToUnicode() {
@@ -28,6 +32,11 @@ public class ConvertServiceImpl implements ConverterService {
         convertReturnOut();
         convertStockIO();
         convertTransfer();
+    }
+
+    @Override
+    public void trader() {
+        convertTrader();
     }
 
     private void convertVouStatus() {
@@ -89,6 +98,7 @@ public class ConvertServiceImpl implements ConverterService {
             log.error("convertStockType : " + e.getMessage());
         }
     }
+
     private void convertStockCategory() {
         String sql = "select *\n" +
                 "from category\n";
@@ -110,23 +120,17 @@ public class ConvertServiceImpl implements ConverterService {
     }
 
     private void convertTrader() {
-        String sql = "select *\n" +
-                "from trader\n";
-        try {
-            ResultSet rs = reportService.getResult(sql);
-            if (rs != null) {
-                while (rs.next()) {
-                    String typeName = rs.getString("trader_name");
-                    if (Util1.isZGText(typeName)) {
-                        rs.updateString("trader_name", Util1.convertToUniCode(typeName));
-                        rs.updateRow();
-                    }
-                }
-                log.info("converted trader.");
+        List<Trader> list = traderService.findAll();
+        list.forEach(t -> {
+            String traderName =t.getTraderName();
+            String address = t.getAddress();
+            if(Util1.isZGText(address) || Util1.isZGText(traderName)){
+                t.setTraderName(Util1.convertToUniCode(traderName));
+                t.setAddress(Util1.convertToUniCode(address));
+                traderService.saveTrader(t);
             }
-        } catch (Exception e) {
-            log.error("convertTrader : " + e.getMessage());
-        }
+        });
+        log.info("converted trader.");
     }
 
     private void convertSale() {

@@ -30,6 +30,7 @@ public class Gl {
     private boolean deleted;
     private boolean cash = false;
     private String batchNo;
+    private String projectNo;
 
     public Gl() {
     }
