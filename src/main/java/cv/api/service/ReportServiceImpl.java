@@ -2305,6 +2305,46 @@ public class ReportServiceImpl implements ReportService {
         return list;
     }
 
+    @Override
+    public List<VSale> getSalePurchaseDiffAmount(String fromDate, String toDate, String stockCode) throws Exception {
+        List<VSale> saleList = new ArrayList<>();
+        String filter = "";
+        if (!fromDate.equals("-") && !toDate.equals("-")) {
+            filter += " date(vs.vou_date) between '" + fromDate + "' and '" + toDate + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and vs.stock_code = '" + stockCode + "'\n";
+        }
+        String sql = "SELECT vs.vou_date vdate,vs.stock_name,vs.stock_code,vs.s_user_code user_code,"
+        +" vs.sale_price,vp.pur_price purchase_price,(vs.sale_price-vp.pur_price) diff_amount, "
+        +" (vs.sale_price-vp.pur_price)/100  diff_percent_amount \n"
+        +"FROM cv_inv_yzn.v_sale vs join v_purchase vp on vs.stock_code = vp.stock_code where " + filter
+        +"group by vs.stock_code \n"
+        +"order by vs.stock_code ";
+
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VSale sale = new VSale();
+                sale.setVouDate(Util1.toDateStr(rs.getDate("vdate"), "dd/MM/yyyy"));
+                sale.setStockName(rs.getString("stock_name"));
+                sale.setStockCode(rs.getString("stock_code"));
+                //sale.setStockUserCode(rs.getString("s_user_code"));
+                sale.setTraderCode(rs.getString("user_code"));
+
+                //sale.setVouNo(rs.getString("vou_no"));
+//                sale.setTraderCode(rs.getString("trader_code"));
+//                sale.setTraderName(rs.getString("trader_name"));
+                sale.setSalePrice(rs.getFloat("sale_price"));
+                sale.setSaleAmount(rs.getFloat("purchase_price"));
+                sale.setPaid(rs.getFloat("diff_amount"));
+                sale.setSessionId(rs.getInt("diff_percent_amount"));
+                saleList.add(sale);
+            }
+        }
+        return saleList;
+    }
+
     private void insertClosingIntoColumn(Integer macId) throws Exception {
         //delete tmp
         String delSql = "delete from tmp_closing_column where mac_id = " + macId + "";

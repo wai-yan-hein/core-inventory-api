@@ -203,4 +203,7 @@ public interface ReportService {
                             String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
 
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
+
+    List<VSale> getSalePurchaseDiffAmount(String fromDate, String toDate, String stockCode) throws Exception;
+
 }
