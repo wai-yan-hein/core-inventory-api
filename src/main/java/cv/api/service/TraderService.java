@@ -28,6 +28,7 @@ public interface TraderService {
     Trader saveTrader(Trader trader);
 
     List<Trader> findAll(String compCode);
+    List<Trader> findAll();
 
     List<Trader> findCustomer(String compCode, Integer deptId);
 

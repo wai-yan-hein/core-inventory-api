@@ -613,7 +613,11 @@ public class SetupController {
         converterService.convertToUnicode();
         return ResponseEntity.ok("converted.");
     }
-
+    @GetMapping(path = "/convert-trader")
+    public Mono<?> convertTrader() {
+        converterService.trader();
+        return Mono.justOrEmpty("converted.");
+    }
     @PostMapping(path = "/save-batch")
     public ResponseEntity<?> saveBatch(@RequestBody GRN b) {
         return ResponseEntity.ok(batchService.save(b));

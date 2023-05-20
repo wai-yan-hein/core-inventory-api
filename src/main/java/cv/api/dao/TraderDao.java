@@ -26,7 +26,7 @@ public interface TraderDao {
     List<Trader> search(String regionCode, String coaCode);
 
     List<Trader> findAll(String compCode);
-
+    List<Trader> findAll();
     int delete(TraderKey code);
 
     List<Trader> findCustomer(String compCode, Integer deptId);

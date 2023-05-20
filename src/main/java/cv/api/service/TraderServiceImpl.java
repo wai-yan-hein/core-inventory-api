@@ -80,6 +80,11 @@ public class TraderServiceImpl implements TraderService {
     }
 
     @Override
+    public List<Trader> findAll() {
+        return dao.findAll();
+    }
+
+    @Override
     public List<String> delete(TraderKey key) {
         List<String> str = reportService.isTraderExist(key.getCode(), key.getCompCode());
         if (str.isEmpty()) {
