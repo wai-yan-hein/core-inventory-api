@@ -120,6 +120,12 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     }
 
     @Override
+    public List<Trader> findAll() {
+        String hsql ="select o from Trader o";
+        return findHSQL(hsql);
+    }
+
+    @Override
     public int delete(TraderKey key) {
         String sql = "update trader deleted = 1 where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);

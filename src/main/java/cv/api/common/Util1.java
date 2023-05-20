@@ -91,8 +91,7 @@ public class Util1 {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         SimpleDateFormat f2 = new SimpleDateFormat("dd/MM/yyyy");
         LocalDateTime now = LocalDateTime.now();
-        String strDate = f2.format(date) + " " + now.getHour() + ":"
-                + now.getMinute() + ":" + now.getSecond();
+        String strDate = f2.format(date) + " " + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond();
         try {
             date = formatter.parse(strDate);
         } catch (ParseException ex) {
@@ -222,14 +221,20 @@ public class Util1 {
     }
 
     public static boolean isZGText(String str) {
-        ZawgyiDetector zd = new ZawgyiDetector();
-        Double score = zd.getZawgyiProbability(str);
-        return getBoolean(df0.format(score));
+        if (!Util1.isNullOrEmpty(str)) {
+            ZawgyiDetector zd = new ZawgyiDetector();
+            Double score = zd.getZawgyiProbability(str);
+            return getBoolean(df0.format(score));
+        }
+        return false;
     }
 
     public static String convertToUniCode(String str) {
-        TransliterateZ2U z2U = new TransliterateZ2U("Zawgyi to Unicode");
-        return z2U.convert(str);
+        if (!Util1.isNullOrEmpty(str)) {
+            TransliterateZ2U z2U = new TransliterateZ2U("Zawgyi to Unicode");
+            return z2U.convert(str);
+        }
+        return str;
     }
 
     public static Float toNull(float value) {
@@ -240,9 +245,9 @@ public class Util1 {
         return str;
     }
 
-    public static String isAll(String value){
-        if(value != null){
-            if(value.equals("All")){
+    public static String isAll(String value) {
+        if (value != null) {
+            if (value.equals("All")) {
                 return "-";
             }
         }
