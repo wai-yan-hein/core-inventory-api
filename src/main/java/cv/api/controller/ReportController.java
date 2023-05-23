@@ -288,9 +288,9 @@ public class ReportController {
                         List<VStockIO> values = reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
                     }
-                    case "SaleandPurchaseDifferentByStock" -> {
-                        List<VSale> salediffByStock = reportService.getSalePurchaseDiffAmount(fromDate, toDate, stockCode);
-                        Util1.writeJsonFile(salediffByStock, exportPath);
+                    case "ProfitMarginByStock" -> {
+                        List<VSale> proftiMarginamt = reportService.getProfitMarginByStock(fromDate, toDate, curCode,stockCode,compCode,deptId);
+                        Util1.writeJsonFile(proftiMarginamt, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");
                 }

@@ -204,6 +204,6 @@ public interface ReportService {
 
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
 
-    List<VSale> getSalePurchaseDiffAmount(String fromDate, String toDate, String stockCode) throws Exception;
+    List<VSale> getProfitMarginByStock(String fromDate, String toDate,String curCode, String stockCode,String compCode, Integer deptId) throws Exception;
 
 }

@@ -2306,39 +2306,71 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSalePurchaseDiffAmount(String fromDate, String toDate, String stockCode) throws Exception {
+    public List<VSale> getProfitMarginByStock(String fromDate, String toDate, String curCode,String stockCode,String compCode, Integer deptId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String filter = "";
-        if (!fromDate.equals("-") && !toDate.equals("-")) {
-            filter += " date(vs.vou_date) between '" + fromDate + "' and '" + toDate + "'\n";
-        }
-        if (!stockCode.equals("-")) {
-            filter += "and vs.stock_code = '" + stockCode + "'\n";
-        }
-        String sql = "SELECT vs.vou_date vdate,vs.stock_name,vs.stock_code,vs.s_user_code user_code,"
-        +" vs.sale_price,vp.pur_price purchase_price,(vs.sale_price-vp.pur_price) diff_amount, "
-        +" (vs.sale_price-vp.pur_price)/100  diff_percent_amount \n"
-        +"FROM cv_inv_yzn.v_sale vs join v_purchase vp on vs.stock_code = vp.stock_code where " + filter
-        +"group by vs.stock_code \n"
-        +"order by vs.stock_code ";
+//        String filter = "";
+//        if (!fromDate.equals("-") && !toDate.equals("-")) {
+//            filter += " date(vs.vou_date) between '" + fromDate + "' and '" + toDate + "'\n";
+//        }
+//        if (!stockCode.equals("-")) {
+//            filter += "and vs.stock_code = '" + stockCode + "'\n";
+//        }
+        String sql = "select  \n" +
+                "s_user_code stock_code, stock_name,\n" +
+                "sale_unit unit,\n" +
+                "sum(avg_sale_price) sale_price,\n" +
+                "sum(avg_pur_price) purchase_price,\n" +
+                "round((sum(avg_sale_price)- sum(avg_pur_price)),2) diff_amount,\n" +
+                "concat(cast(round(((sum(avg_sale_price)-sum(avg_pur_price))/(sum(avg_pur_price)))*100,2) as char),'%') diff_percent_amount\n" +
+                "from (\n" +
+                "select s.stock_code,s.s_user_code,s.stock_name, avg(s.sale_price/rel.smallest_qty) avg_sale_price,rel.unit sale_unit,0 avg_pur_price,null pur_unit,s.rel_code, s.comp_code, s.dept_id\n" +
+                "from v_sale s\n" +
+                "join v_relation rel \n" +
+                "on s.rel_code = rel.rel_code\n" +
+                "and s.sale_unit = rel.unit\n" +
+                "where s.deleted =0\n" +
+//                "and s.comp_code ='" + compCode + "'\n" +
+                "and (s.comp_code = '" + compCode + "' or '-' = '" + compCode + "')\n" +
+                "and (s.dept_id = '" + deptId + "' or '-' = '" + deptId + "')\n" +
+//                "and s.cur_code ='"+curCode+"'\n" +
+                "and (s.cur_code = '" + curCode + "' or '-' = '" + curCode + "')\n" +
+                "and  date(s.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+//                "and s.stock_code = '" + stockCode + "'\n"+
+                "and (s.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by s.stock_code\n" +
+                "\tunion all\n" +
+                "select pur.stock_code,pur.s_user_code,pur.stock_name,0,null,avg(pur.pur_price/rel.smallest_qty) avg_pur_price,rel.unit pur_unit, pur.rel_code, pur.comp_code, pur.dept_id\n" +
+                "from v_purchase pur\n" +
+                "join v_relation rel on pur.rel_code = rel.rel_code \n" +
+                "and pur.pur_unit = rel.unit\n" +
+                "where pur.deleted =0\n" +
+                "and (pur.comp_code = '" + compCode + "' or '-' = '" + compCode + "')\n" +
+                "and (pur.dept_id = '" + deptId + "' or '-' = '" + deptId + "')\n" +
+                "and (pur.cur_code = '" + curCode + "' or '-' = '" + curCode + "')\n" +
+                "and  date(pur.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+//                "and pur.stock_code = '" + stockCode + "'\n"+
+                "and (pur.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by pur.stock_code\n" +
+                ")a\n" +
+                "group by stock_code ";
 
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 VSale sale = new VSale();
-                sale.setVouDate(Util1.toDateStr(rs.getDate("vdate"), "dd/MM/yyyy"));
+//                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setStockCode(rs.getString("stock_code"));
+                sale.setSaleUnit(rs.getString("unit"));
                 //sale.setStockUserCode(rs.getString("s_user_code"));
-                sale.setTraderCode(rs.getString("user_code"));
-
+//                sale.setTraderCode(rs.getString("user_code"));
                 //sale.setVouNo(rs.getString("vou_no"));
 //                sale.setTraderCode(rs.getString("trader_code"));
 //                sale.setTraderName(rs.getString("trader_name"));
                 sale.setSalePrice(rs.getFloat("sale_price"));
                 sale.setSaleAmount(rs.getFloat("purchase_price"));
                 sale.setPaid(rs.getFloat("diff_amount"));
-                sale.setSessionId(rs.getInt("diff_percent_amount"));
+                sale.setVouNo(rs.getString("diff_percent_amount"));
                 saleList.add(sale);
             }
         }
