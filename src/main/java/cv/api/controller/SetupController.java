@@ -650,7 +650,7 @@ public class SetupController {
 
     @GetMapping(path = "/getAccSetting")
     public Flux<?> getAccSetting(@RequestParam String compCode) {
-        return Flux.just(accSettingService.findAll(compCode));
+        return Flux.fromIterable(accSettingService.findAll(compCode));
     }
 
     @PostMapping(path = "/saveAccSetting")

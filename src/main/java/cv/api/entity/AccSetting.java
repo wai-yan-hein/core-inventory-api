@@ -21,6 +21,7 @@ import java.io.Serializable;
 @Table(name = "acc_setting")
 public class AccSetting implements Serializable {
     @EmbeddedId
+    @Column(name = "type")
     private AccKey key;
     @Column(name = "source_acc")
     private String sourceAcc;
