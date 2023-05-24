@@ -176,9 +176,6 @@ public class CloudMQReceiver {
             switch (entity) {
                 case "SALE" -> {
                     SaleHis obj = gson.fromJson(data, SaleHis.class);
-                    if (obj.getKey() != null) {
-                        obj.getKey().setDeptId(userRepo.getDeptId());
-                    }
                     switch (option) {
                         case "SAVE" -> save(obj);
                         case "RECEIVE" -> {
@@ -863,7 +860,7 @@ public class CloudMQReceiver {
         SaleHisKey key = obj.getKey();
         Integer deptId = userRepo.getDeptId();
         String sql = "update sale_his set intg_upd_status ='" + SAVE + "'\n"
-                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId + "";
+                + "where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + deptId;
         try {
             service.executeSql(sql);
         } catch (Exception e) {
@@ -1028,7 +1025,7 @@ public class CloudMQReceiver {
 
     private void save(SaleHis obj) {
         Integer deptId = userRepo.getDeptId();
-        obj.setVouLock(!Objects.equals(deptId, obj.getKey().getDeptId()));
+        obj.setVouLock(!deptId.equals(obj.getKey().getDeptId()));
         obj.getKey().setDeptId(deptId);
         obj.setIntgUpdStatus(REC);
         saleHisService.save(obj);

@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -225,6 +226,11 @@ public class SetupController {
         return ResponseEntity.ok(listB);
     }
 
+    @GetMapping(path = "/getUpdateStockType")
+    public Flux<?> getUpdateStockType(@RequestParam String updatedDate) {
+        return Flux.fromIterable(typeService.getStockType(updatedDate));
+    }
+
     @DeleteMapping(path = "/delete-type")
     public ResponseEntity<ReturnObject> deleteType(@RequestParam String code) {
         typeService.delete(code);
@@ -375,7 +381,7 @@ public class SetupController {
 
     @PostMapping(path = "/update-favorite-stock")
     public Mono<?> updateFavoriteStock(@RequestBody StockKey key, @RequestParam boolean favorite) {
-        stockService.update(key,favorite);
+        stockService.update(key, favorite);
         return Mono.justOrEmpty(true);
     }
 
@@ -384,6 +390,12 @@ public class SetupController {
         List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
         return Flux.fromIterable(listB);
     }
+
+    @GetMapping(path = "/getUpdateStock")
+    public Flux<Stock> getUpdateStock(@RequestParam String updatedDate) {
+        return Flux.fromIterable(stockService.getStock(updatedDate));
+    }
+
 
     @GetMapping(path = "/get-service")
     public ResponseEntity<List<Stock>> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
@@ -475,8 +487,7 @@ public class SetupController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         String curCode = Util1.isAll(filter.getCurCode());
-        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode,
-                compCode, deptId,curCode);
+        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode, deptId, curCode);
         return ResponseEntity.ok(opHisList);
     }
 
@@ -613,11 +624,13 @@ public class SetupController {
         converterService.convertToUnicode();
         return ResponseEntity.ok("converted.");
     }
+
     @GetMapping(path = "/convert-trader")
     public Mono<?> convertTrader() {
         converterService.trader();
         return Mono.justOrEmpty("converted.");
     }
+
     @PostMapping(path = "/save-batch")
     public ResponseEntity<?> saveBatch(@RequestBody GRN b) {
         return ResponseEntity.ok(batchService.save(b));

@@ -18,7 +18,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "stock_type")
-public class StockType implements java.io.Serializable {
+public class StockType {
 
     @EmbeddedId
     private StockTypeKey key;

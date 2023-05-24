@@ -569,7 +569,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and batch_no='" + batchNo + "'\n";
         }
         if (!locCode.equals("-")) {
-            filter += "and loc_code='" + locCode + "'\n";
+            filter += "and v.loc_code='" + locCode + "'\n";
         }
         List<VSale> list = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "" + "order by v.vou_date,v.vou_no,v.unique_id";

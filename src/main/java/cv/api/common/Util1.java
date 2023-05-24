@@ -113,6 +113,14 @@ public class Util1 {
         return strDate;
     }
 
+    public static String toDateTimeStr(Date date) {
+        if (date == null) {
+            return null;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(date);
+    }
+
     public static Date getTodayDate() {
         return Calendar.getInstance().getTime();
     }
