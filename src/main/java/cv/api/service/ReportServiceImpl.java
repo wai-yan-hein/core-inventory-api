@@ -2308,16 +2308,9 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getProfitMarginByStock(String fromDate, String toDate, String curCode,String stockCode,String compCode, Integer deptId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-//        String filter = "";
-//        if (!fromDate.equals("-") && !toDate.equals("-")) {
-//            filter += " date(vs.vou_date) between '" + fromDate + "' and '" + toDate + "'\n";
-//        }
-//        if (!stockCode.equals("-")) {
-//            filter += "and vs.stock_code = '" + stockCode + "'\n";
-//        }
         String sql = "select  \n" +
                 "s_user_code stock_code, stock_name,\n" +
-                "sale_unit unit,\n" +
+                "rel.unit unit,\n" +
                 "sum(avg_sale_price) sale_price,\n" +
                 "sum(avg_pur_price) purchase_price,\n" +
                 "round((sum(avg_sale_price)- sum(avg_pur_price)),2) diff_amount,\n" +
@@ -2329,13 +2322,10 @@ public class ReportServiceImpl implements ReportService {
                 "on s.rel_code = rel.rel_code\n" +
                 "and s.sale_unit = rel.unit\n" +
                 "where s.deleted =0\n" +
-//                "and s.comp_code ='" + compCode + "'\n" +
                 "and (s.comp_code = '" + compCode + "' or '-' = '" + compCode + "')\n" +
                 "and (s.dept_id = '" + deptId + "' or '-' = '" + deptId + "')\n" +
-//                "and s.cur_code ='"+curCode+"'\n" +
                 "and (s.cur_code = '" + curCode + "' or '-' = '" + curCode + "')\n" +
                 "and  date(s.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-//                "and s.stock_code = '" + stockCode + "'\n"+
                 "and (s.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by s.stock_code\n" +
                 "\tunion all\n" +
@@ -2348,11 +2338,14 @@ public class ReportServiceImpl implements ReportService {
                 "and (pur.dept_id = '" + deptId + "' or '-' = '" + deptId + "')\n" +
                 "and (pur.cur_code = '" + curCode + "' or '-' = '" + curCode + "')\n" +
                 "and  date(pur.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-//                "and pur.stock_code = '" + stockCode + "'\n"+
                 "and (pur.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by pur.stock_code\n" +
                 ")a\n" +
-                "group by stock_code ";
+                "join v_relation rel\n"+
+                "on a.rel_code = rel.rel_code\n"+
+                "where rel.smallest_qty =1 \n"+
+                "group by stock_code \n" +
+                "order by stock_code desc";
 
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
