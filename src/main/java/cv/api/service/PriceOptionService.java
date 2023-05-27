@@ -8,4 +8,6 @@ public interface PriceOptionService {
     PriceOption save(PriceOption p);
 
     List<PriceOption> getPriceOption(String option, String compCode, Integer deptId);
+    List<PriceOption> getPriceOption(String updatedDate);
+
 }

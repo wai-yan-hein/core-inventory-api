@@ -604,7 +604,7 @@ public class AccountRepo {
                     gl.setSrcAccCode(srcAcc);
                     gl.setAccCode(balAcc);
                     gl.setTraderCode(traderCode);
-                    gl.setDrAmt(vouPaid);
+                    gl.setDrAmt(vouTotal);
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);

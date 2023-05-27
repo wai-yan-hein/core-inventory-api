@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "trader")
-public class Trader implements java.io.Serializable {
+public class Trader {
     @EmbeddedId
     private TraderKey key;
     @Column(name = "trader_name")

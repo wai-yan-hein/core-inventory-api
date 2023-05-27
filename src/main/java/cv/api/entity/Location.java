@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "location")
-public class Location implements java.io.Serializable {
+public class Location {
     @EmbeddedId
     private LocationKey key;
     @Column(name = "loc_name", nullable = false, length = 50, unique = true)

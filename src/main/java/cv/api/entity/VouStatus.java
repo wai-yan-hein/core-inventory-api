@@ -6,6 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +17,7 @@ import java.util.Date;
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "vou_status")
 public class VouStatus implements java.io.Serializable {

@@ -37,7 +37,7 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
             strSql = strSql + " and o.period = '" + period + "'";
         }
 
-        return (List<SeqTable>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
@@ -81,6 +81,6 @@ public class SeqTableDaoImpl extends AbstractDao<SeqKey, SeqTable> implements Se
     @Override
     public List<SeqTable> findAll() {
         String strSql = "select o from SeqTable o";
-        return (List<SeqTable>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 }

@@ -6,10 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,14 +16,11 @@ import java.util.Date;
  * @author wai yan
  */
 
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "stock_unit")
-public class StockUnit implements java.io.Serializable {
+public class StockUnit  {
 
     @EmbeddedId
     private StockUnitKey key;
@@ -52,6 +46,9 @@ public class StockUnit implements java.io.Serializable {
     public StockUnit(String unit) {
         this.key = new StockUnitKey();
         this.key.setUnitCode(unit);
+    }
+
+    public StockUnit() {
     }
 
     public StockUnit(Date updatedDate) {

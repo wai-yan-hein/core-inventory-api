@@ -19,6 +19,12 @@ public class PriceOptionDaoImpl extends AbstractDao<PriceOptionKey, PriceOption>
     }
 
     @Override
+    public List<PriceOption> getPriceOption(String updatedDate) {
+        String hsql = "select o from PriceOption o where o.updatedDate > '" + updatedDate + "'";
+        return findHSQL(hsql);
+    }
+
+    @Override
     public List<PriceOption> getPriceOption(String option, String compCode, Integer deptId) {
         List<PriceOption> list = new ArrayList<>();
         String sql = "select * \n" +

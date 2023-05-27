@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "sale_his_detail")
-public class SaleHisDetail implements java.io.Serializable {
+public class SaleHisDetail {
 
     @EmbeddedId
     private SaleDetailKey key;

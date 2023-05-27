@@ -2,10 +2,8 @@ package cv.api.entity;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -19,4 +17,7 @@ public class PriceOption {
     private Integer uniqueId;
     @Column(name = "tran_option")
     private String tranOption;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 }

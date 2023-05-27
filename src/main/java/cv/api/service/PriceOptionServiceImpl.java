@@ -23,4 +23,9 @@ public class PriceOptionServiceImpl implements PriceOptionService {
     public List<PriceOption> getPriceOption(String option, String compCode, Integer deptId) {
         return dao.getPriceOption(option, compCode, deptId);
     }
+
+    @Override
+    public List<PriceOption> getPriceOption(String updatedDate) {
+        return dao.getPriceOption(updatedDate);
+    }
 }

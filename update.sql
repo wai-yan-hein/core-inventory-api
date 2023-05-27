@@ -783,3 +783,6 @@ create  view v_grn as select g.vou_no as vou_no,g.comp_code as comp_code,g.dept_
 
 drop view if exists v_opening;
 CREATE VIEW v_opening AS select op.cur_code AS cur_code,op.op_date AS op_date,op.remark AS remark,op.created_by AS created_by,op.created_date AS created_date,op.updated_date AS updated_date,op.updated_by AS updated_by,op.mac_id AS mac_id,op.comp_code AS comp_code,op.deleted AS deleted,op.op_amt AS op_amt,op.dept_id AS dept_id,opd.stock_code AS stock_code,opd.qty AS qty,opd.price AS price,opd.amount AS amount,opd.loc_code AS loc_code,opd.unit AS unit,opd.vou_no AS vou_no,opd.unique_id AS unique_id,s.user_code AS stock_user_code,s.stock_name AS stock_name,s.stock_type_code AS stock_type_code,s.brand_code AS brand_code,s.category_code AS category_code,s.rel_code AS rel_code,s.calculate AS calculate from ((cv_inv_yzn.op_his op join cv_inv_yzn.op_his_detail opd on(op.vou_no = opd.vou_no)) join cv_inv_yzn.stock s on(opd.stock_code = s.stock_code));
+
+alter table price_option
+add column updated_date timestamp not null after tran_option;

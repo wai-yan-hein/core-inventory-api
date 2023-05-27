@@ -19,7 +19,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "sale_man")
-public class SaleMan implements Serializable {
+public class SaleMan {
     @EmbeddedId
     private SaleManKey key;
     @Column(name = "saleman_name", unique = true, nullable = false)

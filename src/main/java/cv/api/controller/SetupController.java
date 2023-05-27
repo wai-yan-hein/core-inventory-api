@@ -106,10 +106,15 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-category")
-    public ResponseEntity<List<Category>> getCategory(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<Category> listCat = categoryService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listCat);
+    public Flux<?> getCategory(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(categoryService.findAll(compCode, deptId));
     }
+
+    @GetMapping(path = "/getUpdateCategory")
+    public Flux<?> getUpdateCategory(@RequestParam String updatedDate) {
+        return Flux.fromIterable(categoryService.getCategory(updatedDate));
+    }
+
 
     @DeleteMapping(path = "/delete-category")
     public ResponseEntity<ReturnObject> deleteCategory(@RequestParam String code) {
@@ -134,8 +139,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-location")
-    public ResponseEntity<?> getLocation(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(locationService.findAll(compCode, deptId));
+    public Flux<?> getLocation(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(locationService.findAll(compCode, deptId));
+    }
+
+    @GetMapping(path = "/getUpdateLocation")
+    public Flux<?> getUpdateLocation(@RequestParam String updatedDate) {
+        return Flux.fromIterable(locationService.getLocation(updatedDate));
     }
 
     @DeleteMapping(path = "/delete-location")
@@ -160,9 +170,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-saleman")
-    public ResponseEntity<List<SaleMan>> getSaleMan(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<SaleMan> listSM = saleManService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listSM);
+    public Flux<?> getSaleMan(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(saleManService.findAll(compCode, deptId));
+    }
+
+    @GetMapping(path = "/getUpdateSaleMan")
+    public Flux<?> getSaleMan(@RequestParam String updatedDate) {
+        return Flux.fromIterable(saleManService.getSaleMan(updatedDate));
     }
 
     @DeleteMapping(path = "/delete-saleman")
@@ -188,16 +202,20 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-brand")
-    public ResponseEntity<List<StockBrand>> getBrand(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<StockBrand> listB = brandService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listB);
+    public Flux<?> getBrand(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(brandService.findAll(compCode, deptId));
+    }
+
+    @GetMapping(path = "/getUpdateBrand")
+    public Flux<?> getUpdateBrand(@RequestParam String updatedDate) {
+        return Flux.fromIterable(brandService.getBrand(updatedDate));
     }
 
     @DeleteMapping(path = "/delete-brand")
-    public ResponseEntity<ReturnObject> deleteBrand(@RequestParam String code) {
+    public Mono<?> deleteBrand(@RequestParam String code) {
         brandService.delete(code);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-brand")
@@ -254,9 +272,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-unit")
-    public ResponseEntity<List<StockUnit>> getUnit(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<StockUnit> listB = unitService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listB);
+    public Flux<?> getUnit(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(unitService.findAll(compCode, deptId));
+    }
+
+    @GetMapping(path = "/getUpdateUnit")
+    public Flux<?> getUpdateUnit(@RequestParam String updatedDate) {
+        return Flux.fromIterable(unitService.getUnit(updatedDate));
     }
 
     @DeleteMapping(path = "/delete-unit")
@@ -322,9 +344,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-trader")
-    public ResponseEntity<List<Trader>> getTrader(@RequestParam String compCode) {
-        List<Trader> listB = traderService.findAll(compCode);
-        return ResponseEntity.ok(listB);
+    public Flux<?> getTrader(@RequestParam String compCode) {
+        return Flux.fromIterable(traderService.findAll(compCode));
+    }
+
+    @GetMapping(path = "/getUpdateTrader")
+    public Flux<?> getUpdateTrader(@RequestParam String updatedDate) {
+        return Flux.fromIterable(traderService.getTrader(updatedDate));
     }
 
 
@@ -415,8 +441,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-stock-list")
-    public ResponseEntity<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(stockService.getStock(Util1.cleanStr(text), compCode, deptId));
+    public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId));
     }
 
     @PostMapping(path = "/delete-stock")
@@ -442,9 +468,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-voucher-status")
-    public ResponseEntity<List<VouStatus>> getVoucherStatus(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<VouStatus> listB = vouStatusService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listB);
+    public Flux<?> getVoucherStatus(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(vouStatusService.findAll(compCode, deptId));
+    }
+
+    @GetMapping(path = "/getUpdateVouStatus")
+    public Flux<?> getUpdateVouStatus(@RequestParam String updatedDate) {
+        return Flux.fromIterable(vouStatusService.getVouStatus(updatedDate));
     }
 
     @PostMapping(path = "/find-voucher-status")
@@ -570,6 +600,10 @@ public class SetupController {
     public Flux<?> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
     }
+    @GetMapping(path = "/getUpdatePriceOption")
+    public Flux<?> getUpdatePriceOption(@RequestParam String updatedDate) {
+        return Flux.fromIterable(optionService.getPriceOption(updatedDate));
+    }
 
     @GetMapping(path = "/get-unit-relation")
     public ResponseEntity<List<UnitRelation>> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
@@ -578,8 +612,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-relation")
-    public ResponseEntity<List<?>> getRelation(@RequestParam String relCode, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(unitRelationService.getRelation(relCode, compCode, deptId));
+    public Flux<?> getRelation(@RequestParam String relCode, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(unitRelationService.getRelation(relCode, compCode, deptId));
+    }
+
+    @GetMapping(path = "/getUpdateRelation")
+    public Flux<?> getUpdateRelation(@RequestParam String updatedDate) {
+        return Flux.fromIterable(unitRelationService.getRelation(updatedDate));
     }
 
     @GetMapping(path = "/get-unit-relation-detail")
