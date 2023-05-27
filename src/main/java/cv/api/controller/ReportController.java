@@ -118,6 +118,7 @@ public class ReportController {
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 String projectNo = Util1.isAll(filter.getProjectNo());
+               // String userCode = Util1.isNull(filter.getUserCode(), "-");
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -286,6 +287,10 @@ public class ReportController {
                     case "ProductionUsageDetail" -> {
                         List<VStockIO> values = reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "ProfitMarginByStock" -> {
+                        List<VSale> proftiMarginamt = reportService.getProfitMarginByStock(fromDate, toDate, curCode,stockCode,compCode,deptId);
+                        Util1.writeJsonFile(proftiMarginamt, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");
                 }
