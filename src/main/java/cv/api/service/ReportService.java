@@ -205,5 +205,5 @@ public interface ReportService {
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
 
     List<VSale> getProfitMarginByStock(String fromDate, String toDate,String curCode, String stockCode,String compCode, Integer deptId) throws Exception;
-
+    List<PaymentHisDetail> getCustomerBalance(String traderCode,String compCode);
 }

@@ -8,9 +8,11 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class ReceiveHisKey implements Serializable {
+public class PaymentHisKey implements Serializable {
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "comp_code")
     private String compCode;
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

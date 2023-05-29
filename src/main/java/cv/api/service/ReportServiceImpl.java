@@ -1565,7 +1565,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                       String remark, String reference, String userCode, String stockCode,
                                       String locCode, String compCode, Integer deptId, String deleted,
-                                      String nullBatch, String batchNo, String projectNo,String curCode) {
+                                      String nullBatch, String batchNo, String projectNo, String curCode) {
         List<VSale> saleList = new ArrayList<>();
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -1635,7 +1635,7 @@ public class ReportServiceImpl implements ReportService {
                                         String vouNo, String remark, String reference,
                                         String userCode, String stockCode, String locCode,
                                         String compCode, Integer deptId, String deleted,
-                                        String nullBatch, String batchNo, String projectNo,String curCode) {
+                                        String nullBatch, String batchNo, String projectNo, String curCode) {
         List<VOrder> saleList = new ArrayList<>();
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -1697,7 +1697,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
                                               String compCode, Integer deptId, String deleted,
-                                              String projectNo,String curCode) throws Exception {
+                                              String projectNo, String curCode) throws Exception {
         String sql = "select a.*,t.trader_name\n" +
                 "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id\n" +
                 "from v_purchase p \n" +
@@ -1742,7 +1742,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo,
                                               String remark, String userCode, String stockCode,
                                               String locCode, String compCode, Integer deptId,
-                                              String deleted, String projectNo,String curCode) throws Exception {
+                                              String deleted, String projectNo, String curCode) throws Exception {
         String sql = "select a.*,t.trader_name\n" +
                 "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n" +
                 "from v_return_in \n" + "where comp_code = '" + compCode + "'\n" +
@@ -1773,7 +1773,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                                 String userCode, String stockCode, String locCode, String compCode, Integer deptId,
-                                                String deleted, String projectNo,String curCode) throws Exception {
+                                                String deleted, String projectNo, String curCode) throws Exception {
         String sql = "select a.*,t.trader_name\n" +
                 "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n" +
                 "from v_return_out \n" + "where comp_code = '" + compCode + "'\n" +
@@ -1805,7 +1805,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode,
-                                         String locCode, String compCode, Integer deptId,String curCode) throws Exception {
+                                         String locCode, String compCode, Integer deptId, String curCode) throws Exception {
         String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
@@ -1863,11 +1863,11 @@ public class ReportServiceImpl implements ReportService {
         if (!locCode.equals("-")) {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";
         }
-        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n" 
-                + "from v_transfer v join location l\n" + "on v.loc_code_from = l.loc_code\n" 
+        String sql = "select date(v.vou_date) vou_date,v.vou_no,v.remark,v.ref_no,v.created_by,v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name\n"
+                + "from v_transfer v join location l\n" + "on v.loc_code_from = l.loc_code\n"
                 + "and v.comp_code = l.comp_code\n" + "join location ll on v.loc_code_to = ll.loc_code\n"
-                + "and v.comp_code = ll.comp_code\n" + "where v.comp_code = '" + compCode + "'\n" 
-                + "and v.deleted = " + deleted + "\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" 
+                + "and v.comp_code = ll.comp_code\n" + "where v.comp_code = '" + compCode + "'\n"
+                + "and v.deleted = " + deleted + "\n" + "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n"
                 + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "" + "group by v.vou_no\n" + "order by v.vou_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VTransfer> openingList = new ArrayList<>();
@@ -2306,7 +2306,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getProfitMarginByStock(String fromDate, String toDate, String curCode,String stockCode,String compCode, Integer deptId) throws Exception {
+    public List<VSale> getProfitMarginByStock(String fromDate, String toDate, String curCode, String stockCode, String compCode, Integer deptId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
         String sql = "select  \n" +
                 "s_user_code stock_code, stock_name,\n" +
@@ -2341,9 +2341,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (pur.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by pur.stock_code\n" +
                 ")a\n" +
-                "join v_relation rel\n"+
-                "on a.rel_code = rel.rel_code\n"+
-                "where rel.smallest_qty =1 \n"+
+                "join v_relation rel\n" +
+                "on a.rel_code = rel.rel_code\n" +
+                "where rel.smallest_qty =1 \n" +
                 "group by stock_code \n" +
                 "order by stock_code desc";
 
@@ -2368,6 +2368,53 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         return saleList;
+    }
+
+    @Override
+    public List<PaymentHisDetail> getCustomerBalance(String traderCode, String compCode) {
+        String sql = "select sh.vou_date,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding\n" +
+                "from (\n" +
+                "select vou_no,cur_code,sum(vou_balance) outstanding,comp_code\n" +
+                "from (\n" +
+                "select vou_no,cur_code,vou_balance,comp_code\n" +
+                "from sale_his \n" +
+                "where trader_code='" + traderCode + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted =0\n" +
+                "and vou_balance>0\n" +
+                "\tunion all\n" +
+                "select phd.sale_vou_no,cur_code,pay_amt*-1,pd.comp_code\n" +
+                "from payment_his pd join payment_his_detail phd\n" +
+                "on pd.vou_no = phd.vou_no\n" +
+                "and pd.comp_code = phd.comp_code\n" +
+                "where pd.trader_code='" + traderCode + "'\n" +
+                "and pd.comp_code ='" + compCode + "'\n" +
+                "and pd.deleted =0\n" +
+                ")a\n" +
+                "group by vou_no,cur_code\n" +
+                ")b\n" +
+                "join sale_his sh\n" +
+                "on b.vou_no = sh.vou_no\n" +
+                "and b.comp_code = sh.comp_code\n" +
+                "where outstanding<>0\n" +
+                "order by vou_date;";
+        List<PaymentHisDetail> list = new ArrayList<>();
+        try {
+            ResultSet rs = getResult(sql);
+            while (rs.next()) {
+                PaymentHisDetail obj = new PaymentHisDetail();
+                obj.setSaleDate(rs.getDate("vou_date"));
+                obj.setSaleVouNo(rs.getString("vou_no"));
+                obj.setRemark(rs.getString("remark"));
+                obj.setVouTotal(rs.getFloat("vou_total"));
+                obj.setVouBalance(rs.getFloat("outstanding"));
+                obj.setCurCode(rs.getString("cur_code"));
+                list.add(obj);
+            }
+        } catch (Exception e) {
+            log.error("getCustomerBalance : " + e.getMessage());
+        }
+        return list;
     }
 
     private void insertClosingIntoColumn(Integer macId) throws Exception {

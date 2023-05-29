@@ -8,10 +8,10 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "receive_his")
-public class ReceiveHis {
+@Table(name = "payment_his")
+public class PaymentHis {
     @EmbeddedId
-    private ReceiveHisKey key;
+    private PaymentHisKey key;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date")
     private Date vouDate;
@@ -23,24 +23,26 @@ public class ReceiveHis {
     private boolean deleted;
     @Column(name = "amount")
     private Float amount;
-    @Column(name = "dis_amt")
-    private Float disAmt;
-    @Column(name = "dis_p")
-    private Float disPercent;
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date")
     private Date createdDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
+    @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
     @Column(name = "mac_id")
     private Integer macId;
+    @Column(name = "account")
+    private String account;
+    @Column(name = "project_no")
+    private String projectNo;
     @Transient
-    private List<ReceiveHisDetail> listDetail;
+    private List<PaymentHisDetail> listDetail;
     @Transient
-    private List<ReceiveHisDetailKey> listDelete;
+    private List<PaymentHisDetailKey> listDelete;
+    @Transient
+    private String traderName;
 }
