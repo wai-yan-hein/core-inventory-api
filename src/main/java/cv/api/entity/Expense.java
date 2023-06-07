@@ -21,4 +21,6 @@ public class Expense{
     private String accountCode;
     @Column(name = "deleted")
     private boolean deleted;
+    @Column(name = "percent")
+    private Float percent;
 }

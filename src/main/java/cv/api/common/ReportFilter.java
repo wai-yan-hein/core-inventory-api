@@ -43,6 +43,7 @@ public class ReportFilter {
     private String status;
     private String projectNo;
     private boolean orderFavorite;
+    private float creditAmt;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

@@ -206,4 +206,7 @@ public interface ReportService {
 
     List<VSale> getProfitMarginByStock(String fromDate, String toDate,String curCode, String stockCode,String compCode, Integer deptId) throws Exception;
     List<PaymentHisDetail> getCustomerBalance(String traderCode,String compCode);
+    List<VSale> getCustomerBalanceSummary(String fromDate,String toDate,String compCode,String curCode,String traderCode,
+                                          String batchNo,String projectNo,String locCode,float creditAmt);
+    List<VSale> getCustomerBalanceDetail(String fromDate,String toDate,String compCode,String curCode,String traderCode,String batchNo,String projectNo,String locCode);
 }

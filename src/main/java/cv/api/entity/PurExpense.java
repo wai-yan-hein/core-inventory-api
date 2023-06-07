@@ -14,6 +14,8 @@ public class PurExpense {
     private PurExpenseKey key;
     @Column(name = "amount")
     private Float amount;
+    @Column(name = "percent")
+    private Float percent;
     @Transient
     private String expenseName;
 }

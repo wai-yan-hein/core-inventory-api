@@ -784,5 +784,94 @@ create  view v_grn as select g.vou_no as vou_no,g.comp_code as comp_code,g.dept_
 drop view if exists v_opening;
 CREATE VIEW v_opening AS select op.cur_code AS cur_code,op.op_date AS op_date,op.remark AS remark,op.created_by AS created_by,op.created_date AS created_date,op.updated_date AS updated_date,op.updated_by AS updated_by,op.mac_id AS mac_id,op.comp_code AS comp_code,op.deleted AS deleted,op.op_amt AS op_amt,op.dept_id AS dept_id,opd.stock_code AS stock_code,opd.qty AS qty,opd.price AS price,opd.amount AS amount,opd.loc_code AS loc_code,opd.unit AS unit,opd.vou_no AS vou_no,opd.unique_id AS unique_id,s.user_code AS stock_user_code,s.stock_name AS stock_name,s.stock_type_code AS stock_type_code,s.brand_code AS brand_code,s.category_code AS category_code,s.rel_code AS rel_code,s.calculate AS calculate from ((op_his op join op_his_detail opd on(op.vou_no = opd.vou_no)) join stock s on(opd.stock_code = s.stock_code));
 
+drop view if exists v_process_his;
+create  view v_process_his as select p.vou_no as vou_no,p.stock_code as stock_code,p.comp_code as comp_code,p.dept_id as dept_id,p.loc_code as loc_code,p.vou_date as vou_date,p.end_date as end_date,p.qty as qty,p.unit as unit,p.price as price,p.remark as remark,p.process_no as process_no,p.pt_code as pt_code,p.finished as finished,p.deleted as deleted,p.created_by as created_by,p.updated_by as updated_by,p.mac_id as mac_id,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from (process_his p join stock s on(p.stock_code = s.stock_code and p.comp_code = s.comp_code and p.dept_id = s.dept_id));
+
+drop view if exists v_process_his_detail;
+create  view v_process_his_detail as select pd.vou_no as vou_no,pd.stock_code as stock_code,pd.comp_code as comp_code,pd.dept_id as dept_id,pd.unique_id as unique_id,pd.vou_date as vou_date,pd.qty as qty,pd.unit as unit,pd.price as price,pd.loc_code as loc_code,p.deleted as deleted,p.pt_code as pt_code,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.calculate as calculate,s.rel_code as rel_code from ((process_his_detail pd join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code and pd.dept_id = s.dept_id)) join process_his p on(pd.vou_no = p.vou_no and pd.comp_code = p.comp_code and pd.dept_id = p.dept_id));
+
 alter table price_option
 add column updated_date timestamp not null after tran_option;
+
+create table payment_his (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  vou_date timestamp not null default current_timestamp() on update current_timestamp(),
+  trader_code varchar(15) not null,
+  remark varchar(255) default null,
+  amount float(20,3) default null,
+  deleted bit(1) not null default b'0',
+  created_date timestamp not null default '0000-00-00 00:00:00',
+  created_by varchar(15) not null,
+  updated_date timestamp not null default '0000-00-00 00:00:00',
+  updated_by varchar(15) default null,
+  mac_id int(11) not null,
+  account varchar(15) default null,
+  project_no varchar(15) default null,
+  intg_upd_status varchar(15) default null,
+   cur_code varchar(15) default null,
+  primary key (vou_no,comp_code,dept_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+create table payment_his_detail (
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  unique_id int(11) not null,
+  sale_vou_date date not null,
+  sale_vou_no varchar(25) not null,
+  pay_amt float(20,3) not null,
+  dis_percent float(20,3) default null,
+  dis_amt float(20,3) default null,
+  cur_code varchar(15) default null,
+  remark varchar(255) default null,
+  reference varchar(255)  default null,
+  full_paid bit(1) not null default b'0',
+  vou_total float(20,3) not null,
+  vou_balance float(20,3) not null,
+  primary key (vou_no,comp_code,dept_id,unique_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+alter table expense
+add column percent float(20,3) not null after deleted;
+
+alter table pur_expense
+add column percent float(20,3) not null;
+
+alter table payment_his_detail
+add column reference varchar(255) null after remark;
+
+alter table trader
+add column credit_amt float(20,3) null after deleted;
+
+create table weight_loss_his (
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  vou_date datetime not null,
+  ref_no varchar(255) default null,
+  remark varchar(255) default null,
+  created_by varchar(15) not null,
+  updated_by varchar(15) default null,
+  updated_date timestamp not null default current_timestamp(),
+  mac_id int(11) not null,
+  deleted bit(1) not null default b'0',
+  primary key (vou_no,comp_code,dept_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+create table weight_loss_his_detail (
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  unique_id int(11) not null,
+  stock_code varchar(15) not null,
+  qty float(20,3) not null,
+  unit varchar(15) not null,
+  price float(20,3) not null,
+  loss_qty float(20,3) not null,
+  loss_unit varchar(15) not null,
+  loss_price float(20,3) not null,
+  loc_code varchar(15) not null,
+  primary key (vou_no,comp_code,dept_id,unique_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;

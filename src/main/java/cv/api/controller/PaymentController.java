@@ -4,6 +4,8 @@ import cv.api.common.FilterObject;
 import cv.api.common.Util1;
 import cv.api.dao.PaymentHisDetailDao;
 import cv.api.entity.PaymentHis;
+import cv.api.entity.PaymentHisKey;
+import cv.api.repo.AccountRepo;
 import cv.api.service.PaymentHisService;
 import cv.api.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +22,39 @@ public class PaymentController {
     private PaymentHisService paymentHisService;
     @Autowired
     private PaymentHisDetailDao paymentHisDetailDao;
+    @Autowired
+    private AccountRepo accountRepo;
 
     @GetMapping(path = "/getCustomerBalance")
     public Flux<?> getCustomerBalance(@RequestParam String traderCode, @RequestParam String compCode) {
         return Flux.fromIterable(reportService.getCustomerBalance(traderCode, compCode));
     }
 
+    @PostMapping(path = "/deletePayment")
+    public Mono<?> deletePayment(@RequestBody PaymentHisKey key) {
+        paymentHisService.delete(key);
+        accountRepo.deleteInvVoucher(key);
+        return Mono.just(true);
+    }
+
+    @PostMapping(path = "/restorePayment")
+    public Mono<?> restorePayment(@RequestBody PaymentHisKey key) {
+        paymentHisService.restore(key);
+        return Mono.just(true);
+
+    }
+
+
     @PostMapping(path = "/savePayment")
     public Mono<?> savePayment(@RequestBody PaymentHis ph) {
-        return Mono.justOrEmpty(paymentHisService.save(ph));
+        ph =paymentHisService.save(ph);
+        accountRepo.sendPayment(ph);
+        return Mono.justOrEmpty(ph);
     }
+
     @GetMapping(path = "/getPaymentDetail")
-    public Flux<?> getPaymentDetail(@RequestParam String vouNo,@RequestParam String compCode,@RequestParam Integer deptId) {
-        return Flux.fromIterable(paymentHisDetailDao.search(vouNo,compCode,deptId));
+    public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode, deptId));
     }
 
     @PostMapping(path = "/getPaymentHistory")
@@ -42,12 +64,12 @@ public class PaymentController {
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String account = Util1.isAll(filter.getAccount());
-        String cusCode = Util1.isNull(filter.getCusCode(), "-");
+        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
         String compCode = filter.getCompCode();
         boolean deleted = filter.isDeleted();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
-        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, cusCode, curCode,vouNo,userCode,account, projectNo, remark, deleted, compCode));
+        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode, curCode, vouNo, userCode, account, projectNo, remark, deleted, compCode));
     }
 }

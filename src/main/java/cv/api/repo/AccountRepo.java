@@ -44,8 +44,7 @@ public class AccountRepo {
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
-            Mono<Response> result = accountApi.post().uri("/account/save-gl-list").body(Mono.just(glList), List.class).retrieve().bodyToMono(Response.class);
-            result.subscribe(response -> {
+            accountApi.post().uri("/account/save-gl-list").body(Mono.just(glList), List.class).retrieve().bodyToMono(Response.class).subscribe(response -> {
                 if (response != null) {
                     String vouNo = response.getVouNo();
                     String compCode = response.getCompCode();
@@ -54,6 +53,7 @@ public class AccountRepo {
                         case "PURCHASE" -> updatePurchase(vouNo, compCode);
                         case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
                         case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+                        case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
                     }
                 }
             }, (e) -> {
@@ -66,6 +66,7 @@ public class AccountRepo {
                     case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
                     case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
                     case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+                    case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
                 }
                 log.error(e.getMessage());
             });
@@ -141,6 +142,15 @@ public class AccountRepo {
         }
     }
 
+    private void updatePaymentNull(String vouNo, String compCode) {
+        String sql = "update payment_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        try {
+            reportService.executeSql(sql);
+        } catch (Exception e) {
+            log.error(String.format("updatePaymentNull: %s", e.getMessage()));
+        }
+    }
+
     private void updateReturnOut(String vouNo, String compCode) {
         String sql = "update ret_out_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         try {
@@ -158,6 +168,15 @@ public class AccountRepo {
             //log.info(String.format("updateTrader: %s", traderCode));
         } catch (Exception e) {
             log.error(String.format("updateTrader: %s", e.getMessage()));
+        }
+    }
+
+    private void updatePayment(String vouNo, String compCode, String status) {
+        String sql = "update payment_his set intg_upd_status ='" + status + "' where vou_no='" + vouNo + "' and comp_code='" + compCode + "'";
+        try {
+            reportService.executeSql(sql);
+        } catch (Exception e) {
+            log.error("updatePayment : " + e.getMessage());
         }
     }
 
@@ -734,6 +753,62 @@ public class AccountRepo {
         }
     }
 
+    public void sendPayment(PaymentHis ph) {
+        if (Util1.getBoolean(environment.getProperty("integration"))) {
+            if (ph != null) {
+                String account = ph.getAccount();
+                if (!Util1.isNullOrEmpty(account)) {
+                    String compCode = ph.getKey().getCompCode();
+                    Integer deptId = ph.getKey().getDeptId();
+                    String traderCode = ph.getTraderCode();
+                    Date vouDate = ph.getVouDate();
+                    double payAmt = ph.getAmount();
+                    String curCode = ph.getCurCode();
+                    String remark = ph.getRemark();
+                    String vouNo = ph.getKey().getVouNo();
+                    boolean deleted = ph.isDeleted();
+                    String projectNo = ph.getProjectNo();
+                    TraderKey k = new TraderKey();
+                    k.setCode(traderCode);
+                    k.setCompCode(compCode);
+                    k.setDeptId(deptId);
+                    Trader t = traderService.findById(k);
+                    AccSetting setting = settingService.findByCode(new AccKey("SALE", compCode));
+                    if (!Util1.isNullOrEmpty(t.getAccount())) {
+                        List<Gl> list = new ArrayList<>();
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Cash Received.");
+                        gl.setSrcAccCode(account);
+                        gl.setAccCode(t.getAccount());
+                        gl.setTraderCode(traderCode);
+                        gl.setDrAmt(payAmt);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(setting != null ? setting.getDeptCode() : null);
+                        gl.setCreatedDate(Util1.getTodayDate());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource("PAYMENT");
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        list.add(gl);
+                        sendAccount(list);
+                    } else {
+                        log.info(String.format("sendPayment : %s debtor account empty", traderCode));
+                    }
+                } else {
+                    updatePayment(ph.getKey().getVouNo(), ph.getKey().getCompCode(), "NN");
+                }
+            }
+        }
+    }
+
     public void deleteInvVoucher(SaleHisKey key) {
         Gl gl = new Gl();
         GlKey glKey = new GlKey();
@@ -774,6 +849,17 @@ public class AccountRepo {
         deleteGlByVoucher(gl);
     }
 
+    public void deleteInvVoucher(PaymentHisKey key) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(key.getCompCode());
+        gl.setKey(glKey);
+        gl.setTranSource("PAYMENT");
+        gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+
     public void deleteGlByVoucher(Gl gl) {
         try {
             Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher").body(Mono.just(gl), Gl.class).retrieve().bodyToMono(String.class);
@@ -785,6 +871,7 @@ public class AccountRepo {
                 case "PURCHASE" -> updatePurchase(vouNo, compCode);
                 case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
                 case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+                case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
             }
         } catch (Exception e) {
             String vouNo = gl.getRefNo();
@@ -795,6 +882,7 @@ public class AccountRepo {
                 case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
                 case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
                 case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+                case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
             }
             log.error("deleteGlByVoucher : " + e.getMessage());
         }

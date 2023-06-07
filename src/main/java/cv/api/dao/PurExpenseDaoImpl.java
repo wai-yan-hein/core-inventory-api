@@ -14,7 +14,7 @@ import java.util.List;
 public class PurExpenseDaoImpl extends AbstractDao<PurExpenseKey, PurExpense> implements PurExpenseDao {
     @Override
     public PurExpense save(PurExpense p) {
-        saveOrUpdate(p,p.getKey());
+        saveOrUpdate(p, p.getKey());
         return p;
     }
 
@@ -45,6 +45,7 @@ public class PurExpenseDaoImpl extends AbstractDao<PurExpenseKey, PurExpense> im
                     e.setKey(key);
                     e.setExpenseName(rs.getString("expense_name"));
                     e.setAmount(rs.getFloat("amount"));
+                    e.setPercent(rs.getFloat("percent"));
                     list.add(e);
                 }
             } catch (Exception e) {

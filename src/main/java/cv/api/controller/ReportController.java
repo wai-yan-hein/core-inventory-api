@@ -13,10 +13,12 @@ import cv.api.service.ReportService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -97,7 +99,7 @@ public class ReportController {
     }
 
     @PostMapping(value = "/get-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ReturnObject getReport(@RequestBody ReportFilter filter) {
+    public @ResponseBody Mono<ReturnObject> getReport(@RequestBody ReportFilter filter) {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
@@ -118,7 +120,7 @@ public class ReportController {
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 String projectNo = Util1.isAll(filter.getProjectNo());
-               // String userCode = Util1.isNull(filter.getUserCode(), "-");
+                float creditAmt =filter.getCreditAmt();
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -289,8 +291,17 @@ public class ReportController {
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "ProfitMarginByStock" -> {
-                        List<VSale> proftiMarginamt = reportService.getProfitMarginByStock(fromDate, toDate, curCode,stockCode,compCode,deptId);
-                        Util1.writeJsonFile(proftiMarginamt, exportPath);
+                        List<VSale> values= reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "CustomerBalanceDetail" -> {
+                        List<VSale> values = reportService.getCustomerBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "CustomerBalanceSummary" -> {
+                        List<VSale> values = reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo,
+                                projectNo, locCode,creditAmt);
+                        Util1.writeJsonFile(values, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");
                 }
@@ -301,7 +312,7 @@ public class ReportController {
             log.error(String.format("getReport : %s", e));
             ro.setMessage(e.getMessage());
         }
-        return ro;
+        return Mono.justOrEmpty(ro);
     }
 
 

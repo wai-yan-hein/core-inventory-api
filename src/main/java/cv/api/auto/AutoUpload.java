@@ -32,6 +32,8 @@ public class AutoUpload {
     private RetOutService retOutService;
     @Autowired
     private TraderService traderService;
+    @Autowired
+    private PaymentHisService paymentHisService;
     private boolean syncing = false;
     @Autowired
     private AccountRepo accountRepo;
@@ -49,10 +51,12 @@ public class AutoUpload {
                 uploadPurchaseVoucher();
                 uploadReturnInVoucher();
                 uploadReturnOutVoucher();
+                uploadPayment();
                 syncing = false;
             }
         }
     }
+
     private void uploadTrader() {
         List<Trader> traders = traderService.unUploadTrader();
         if (!traders.isEmpty()) {
@@ -122,6 +126,20 @@ public class AutoUpload {
                     accountRepo.deleteInvVoucher(vou.getKey());
                 } else {
                     accountRepo.sendReturnOut(vou);
+                }
+            });
+        }
+    }
+
+    private void uploadPayment() {
+        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(syncDate);
+        if (!vouchers.isEmpty()) {
+            log.info("uploadPayment : " + vouchers.size());
+            vouchers.forEach(vou -> {
+                if (vou.isDeleted()) {
+                    accountRepo.deleteInvVoucher(vou.getKey());
+                } else {
+                    accountRepo.sendPayment(vou);
                 }
             });
         }

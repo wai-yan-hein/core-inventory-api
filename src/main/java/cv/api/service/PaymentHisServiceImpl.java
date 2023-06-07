@@ -72,8 +72,18 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     }
 
     @Override
+    public void restore(PaymentHisKey key) {
+         dao.restore(key);
+    }
+
+    @Override
     public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode, String vouNo, String userCode, String account, String projectNo, String remark, boolean deleted, String compCode) {
         return dao.search(startDate, endDate, traderCode, curCode, vouNo, userCode, account, projectNo, remark, deleted, compCode);
+    }
+
+    @Override
+    public List<PaymentHis> unUploadVoucher(String syncDate) {
+        return dao.unUploadVoucher(syncDate);
     }
 
     private String getVoucherNo(Integer macId, String compCode, Integer deptId) {

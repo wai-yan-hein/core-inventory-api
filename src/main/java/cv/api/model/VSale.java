@@ -80,5 +80,8 @@ public class VSale {
     private String phoneNo;
     private String address;
     private String projectNo;
+    private String userCode;
+    private Float creditAmt;
+    private Float diffAmt;
 
 }

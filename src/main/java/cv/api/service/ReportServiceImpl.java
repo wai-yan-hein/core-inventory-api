@@ -2102,7 +2102,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
         List<VStockIO> list = new ArrayList<>();
-        String sql = "select ifnull(v.user_code,v.stock_code) stock_code,v.stock_name,date(end_date) end_date, qty,unit,price,remark,process_no,vs.description,l.loc_name\n" + "from v_process_his v\n" + "join vou_status vs\n" + "on v.pt_code =vs.code\n" + "and v.comp_code = vs.comp_code\n" + "and v.dept_id = vs.dept_id\n" + "join location l on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "and v.dept_id = l.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" + "and v.dept_id =" + deptId + "\n" + "and v.calculate=1\n" + "and v.finished =1\n" + "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and date(v.end_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (v.pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (v.stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "order by vs.description,v.end_date\n";
+        String sql = "select v.user_code stock_code,v.stock_name,date(end_date) end_date, qty,unit,price,remark,process_no,vs.description,l.loc_name\n" + "from v_process_his v\n" + "join vou_status vs\n" + "on v.pt_code =vs.code\n" + "and v.comp_code = vs.comp_code\n" + "and v.dept_id = vs.dept_id\n" + "join location l on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "and v.dept_id = l.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" + "and v.dept_id =" + deptId + "\n" + "and v.calculate=1\n" + "and v.finished =1\n" + "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and date(v.end_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and (v.pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (v.stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (v.category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (v.brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (v.stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "order by vs.description,v.end_date\n";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             //stock_code, stock_name, end_date, qty, unit, price, remark, process_no, description
@@ -2186,16 +2186,29 @@ public class ReportServiceImpl implements ReportService {
         List<VStockIO> list = new ArrayList<>();
         //vou_no, stock_code, comp_code, dept_id, unique_id, vou_date, qty, unit, price,
         // loc_code, deleted, pt_code, user_code, stock_name, stock_type_code, brand_code, category_code, calculate, rel_code, loc_name, description
-        String sql = "select v.*,l.loc_name,vs.description\n" + "from v_process_his_detail v\n" + "join location l\n" + "on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" + "and v.dept_id = l.dept_id\n" + "join vou_status vs\n" + "on v.pt_code = vs.code\n" + "and v.comp_code = vs.comp_code\n" + "and v.dept_id = vs.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" + "and v.dept_id =" + deptId + "\n" + "and v.deleted =0\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" + "and (stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" + "and (category_code ='" + catCode + "'or'-'='" + catCode + "')\n" + "and (brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" + "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" + "order by v.vou_date,vs.description,v.unique_id";
+        String sql = "select v.*,l.loc_name,vs.description\n" +
+                "from v_process_his_detail v\n" +
+                "join location l\n" +
+                "on v.loc_code = l.loc_code\n" + "and v.comp_code = l.comp_code\n" +
+                "and v.dept_id = l.dept_id\n" + "join vou_status vs\n" +
+                "on v.pt_code = vs.code\n" + "and v.comp_code = vs.comp_code\n" +
+                "and v.dept_id = vs.dept_id\n" + "where v.comp_code ='" + compCode + "'\n" +
+                "and v.dept_id =" + deptId + "\n" + "and v.deleted =0\n" +
+                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (pt_code ='" + ptCode + "' or '-'='" + ptCode + "')\n" +
+                "and (stock_type_code ='" + typeCode + "'or'-'='" + typeCode + "')\n" +
+                "and (category_code ='" + catCode + "'or'-'='" + catCode + "')\n" +
+                "and (brand_code ='" + brandCode + "'or'-'='" + brandCode + "')\n" +
+                "and (stock_code ='" + stockCode + "' or '-'='" + stockCode + "')\n" +
+                "order by v.vou_date,vs.description,v.unique_id";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
                 while (rs.next()) {
                     VStockIO io = new VStockIO();
                     io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                    String sCode = rs.getString("stock_code");
-                    String userCode = rs.getString("user_code");
-                    io.setStockCode(Util1.isNull(userCode, sCode));
+                    io.setStockCode(rs.getString("user_code"));
                     io.setStockName(rs.getString("stock_name"));
                     io.setQty(rs.getFloat("qty"));
                     io.setUnit(rs.getString("unit"));
@@ -2351,15 +2364,9 @@ public class ReportServiceImpl implements ReportService {
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 VSale sale = new VSale();
-//                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setStockCode(rs.getString("stock_code"));
                 sale.setSaleUnit(rs.getString("unit"));
-                //sale.setStockUserCode(rs.getString("s_user_code"));
-//                sale.setTraderCode(rs.getString("user_code"));
-                //sale.setVouNo(rs.getString("vou_no"));
-//                sale.setTraderCode(rs.getString("trader_code"));
-//                sale.setTraderName(rs.getString("trader_name"));
                 sale.setSalePrice(rs.getFloat("sale_price"));
                 sale.setSaleAmount(rs.getFloat("purchase_price"));
                 sale.setPaid(rs.getFloat("diff_amount"));
@@ -2372,7 +2379,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<PaymentHisDetail> getCustomerBalance(String traderCode, String compCode) {
-        String sql = "select sh.vou_date,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding\n" +
+        String sql = "select sh.vou_date,sh.reference,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding\n" +
                 "from (\n" +
                 "select vou_no,cur_code,sum(vou_balance) outstanding,comp_code\n" +
                 "from (\n" +
@@ -2383,7 +2390,7 @@ public class ReportServiceImpl implements ReportService {
                 "and deleted =0\n" +
                 "and vou_balance>0\n" +
                 "\tunion all\n" +
-                "select phd.sale_vou_no,cur_code,pay_amt*-1,pd.comp_code\n" +
+                "select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code\n" +
                 "from payment_his pd join payment_his_detail phd\n" +
                 "on pd.vou_no = phd.vou_no\n" +
                 "and pd.comp_code = phd.comp_code\n" +
@@ -2409,11 +2416,148 @@ public class ReportServiceImpl implements ReportService {
                 obj.setVouTotal(rs.getFloat("vou_total"));
                 obj.setVouBalance(rs.getFloat("outstanding"));
                 obj.setCurCode(rs.getString("cur_code"));
+                obj.setReference(rs.getString("reference"));
                 list.add(obj);
             }
         } catch (Exception e) {
             log.error("getCustomerBalance : " + e.getMessage());
         }
+        return list;
+    }
+
+    @Override
+    public List<VSale> getCustomerBalanceSummary(String fromDate, String toDate, String compCode,
+                                                 String curCode, String traderCode, String batchNo,
+                                                 String projectNo, String locCode, float creditAmt) {
+        List<VSale> list = new ArrayList<>();
+        String filter = "";
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code ='" + traderCode + "'\n";
+        }
+        if (!projectNo.equals("-")) {
+            filter += "and project_no ='" + projectNo + "'\n";
+        }
+
+        String sql = "select *\n" +
+                "from (\n" +
+                "select b.*,t.user_code,t.trader_name,t.address,if(ifnull(t.credit_amt,0)=0,"+creditAmt+",t.credit_amt) credit_amt,b.vou_balance - if(ifnull(t.credit_amt,0)=0,"+creditAmt+",t.credit_amt) diff_amt\n" +
+                "from (\n" +
+                "select trader_code,cur_code,sum(vou_balance) vou_balance,comp_code\n" +
+                "from(\n" +
+                "select trader_code,cur_code,sum(vou_balance) vou_balance,comp_code\n" +
+                "from sale_his \n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and cur_code ='" + curCode + "'\n" +
+                "and deleted =0\n" +
+                "and vou_balance>0\n" + filter +
+                "group by trader_code\n" +
+                "\tunion all\n" +
+                "select pd.trader_code,phd.cur_code,sum(ifnull(phd.pay_amt,0))*-1 paid,pd.comp_code\n" +
+                "from payment_his pd join payment_his_detail phd\n" +
+                "on pd.vou_no = phd.vou_no\n" +
+                "and pd.comp_code = phd.comp_code\n" +
+                "where date(sale_vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and pd.comp_code ='" + compCode + "'\n" +
+                "and phd.cur_code ='" + curCode + "'\n" +
+                "and pd.deleted =0\n" + filter +
+                "group by pd.trader_code\n" +
+                ")a\n" +
+                "group by trader_code\n" +
+                ")b\n" +
+                "join trader t on b.trader_code = t.code\n" +
+                "and b.comp_code = t.comp_code\n" +
+                "where b.vou_balance<>0\n" +
+                ")c\n" +
+                "order by diff_amt desc";
+        try {
+            ResultSet rs = getResult(sql);
+            while (rs.next()) {
+                // cur_code, vou_balance, user_code, trader_name,
+                // address, credit_amt, diff_amt
+                VSale s = new VSale();
+                s.setUserCode(rs.getString("user_code"));
+                s.setCurCode(rs.getString("cur_code"));
+                s.setVouBalance(rs.getFloat("vou_balance"));
+                s.setCreditAmt(rs.getFloat("credit_amt"));
+                s.setDiffAmt(rs.getFloat("diff_amt"));
+                s.setAddress(rs.getString("address"));
+                s.setTraderName(rs.getString("trader_name"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            log.error("getCustomerBalanceDetail : " + e.getMessage());
+        }
+
+
+        return list;
+    }
+
+    @Override
+    public List<VSale> getCustomerBalanceDetail(String fromDate, String toDate, String compCode, String curCode, String traderCode, String batchNo, String projectNo, String locCode) {
+        List<VSale> list = new ArrayList<>();
+        String filter = "";
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code ='" + traderCode + "'\n";
+        }
+        if (!projectNo.equals("-")) {
+            filter += "and project_no ='" + projectNo + "'\n";
+        }
+        String sql = "select sh.vou_date, b.vou_no, b.cur_code, sh.vou_total, sh.vou_balance, sh.remark, \n" +
+                "sh.reference, b.outstanding,sh.trader_code, t.user_code, t.address, t.trader_name\n" +
+                "from (\n" +
+                "select vou_no,cur_code,sum(vou_balance) outstanding,comp_code\n" +
+                "from (\n" +
+                "select vou_no,cur_code,vou_balance,comp_code\n" +
+                "from sale_his \n" +
+                "where comp_code ='" + compCode + "'\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted =0\n" +
+                "and cur_code='" + curCode + "'\n" + filter +
+                "and vou_balance>0\n" +
+                "\tunion all\n" +
+                "select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code\n" +
+                "from payment_his pd join payment_his_detail phd\n" +
+                "on pd.vou_no = phd.vou_no\n" +
+                "and pd.comp_code = phd.comp_code\n" +
+                "where pd.comp_code ='" + compCode + "'\n" +
+                "and date(phd.sale_vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and pd.deleted =0\n" +
+                "and phd.cur_code='" + curCode + "'\n" + filter +
+                ")a\n" +
+                "group by vou_no\n" +
+                ")b\n" +
+                "join sale_his sh\n" +
+                "on b.vou_no = sh.vou_no\n" +
+                "and b.comp_code = sh.comp_code\n" +
+                "join trader t on sh.trader_code = t.code\n" +
+                "and sh.comp_code = t.comp_code\n" +
+                "where outstanding<>0\n" +
+                "order by vou_date;";
+        try {
+            ResultSet rs = getResult(sql);
+            while (rs.next()) {
+                //vou_date, vou_no, cur_code, vou_total, vou_balance,
+                //  remark, reference, outstanding, user_code, address, trader_name
+                VSale s = new VSale();
+                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setUserCode(rs.getString("user_code"));
+                s.setTraderCode(rs.getString("trader_code"));
+                s.setVouNo(rs.getString("vou_no"));
+                s.setCurCode(rs.getString("cur_code"));
+                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
+                s.setVouBalance(rs.getFloat("vou_balance"));
+                s.setAddress(rs.getString("address"));
+                s.setTraderName(rs.getString("trader_name"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            log.error("getCustomerBalanceDetail : " + e.getMessage());
+        }
+
+
         return list;
     }
 
