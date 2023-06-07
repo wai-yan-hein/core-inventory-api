@@ -1,5 +1,6 @@
 package cv.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "process_his_detail")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProcessHisDetail {
     @EmbeddedId
     private ProcessHisDetailKey key;
