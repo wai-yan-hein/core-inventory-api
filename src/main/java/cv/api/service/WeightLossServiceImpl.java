@@ -32,9 +32,12 @@ public class WeightLossServiceImpl implements WeightLossService {
         }
         String vouNo = l.getKey().getVouNo();
         List<WeightLossHisDetailKey> delKeys = l.getDelKeys();
-        delKeys.forEach(key -> {
-            detailDao.delete(key);
-        });
+        if(delKeys != null) {
+            delKeys.forEach(key -> {
+                detailDao.delete(key);
+            });
+        }
+
         List<WeightLossHisDetail> list = l.getListDetail();
         for (int i = 0; i < list.size(); i++) {
             WeightLossHisDetail cSd = list.get(i);
