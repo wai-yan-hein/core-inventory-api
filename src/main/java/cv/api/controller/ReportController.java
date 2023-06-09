@@ -376,7 +376,10 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-stock-balance")
-    public Flux<?> getStockBalance(@RequestParam String stockCode, @RequestParam boolean calSale, @RequestParam boolean calPur, @RequestParam boolean calRI, @RequestParam boolean calRO, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam Integer macId, @RequestParam boolean summary) {
+    public Flux<?> getStockBalance(@RequestParam String stockCode, @RequestParam boolean calSale,
+                                   @RequestParam boolean calPur, @RequestParam boolean calRI, @RequestParam boolean calRO,
+                                   @RequestParam String compCode, @RequestParam Integer deptId,
+                                   @RequestParam Integer macId, @RequestParam boolean summary) {
         List<VStockBalance> list = reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
         if (list.isEmpty()) {
             VStockBalance b = new VStockBalance();
