@@ -24,4 +24,6 @@ public class StockValue {
     private Float fifoAmt;
     private Float lifoPrice;
     private Float lifoAmt;
+    private Float ioRecentPrice;
+    private Float ioRecentAmt;
 }

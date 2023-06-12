@@ -1409,7 +1409,27 @@ public class ReportServiceImpl implements ReportService {
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, deptId, macId);
         List<StockValue> values = new ArrayList<>();
-        String getSql = "select a.*,\n" + "sum(ifnull(tmp.pur_avg_price,0)) pur_avg_price,bal_qty*sum(ifnull(tmp.pur_avg_price,0)) pur_avg_amt,\n" + "sum(ifnull(tmp.in_avg_price,0)) in_avg_price,bal_qty*sum(ifnull(tmp.in_avg_price,0)) in_avg_amt,\n" + "sum(ifnull(tmp.std_price,0)) std_price,bal_qty*sum(ifnull(tmp.std_price,0)) std_amt,\n" + "sum(ifnull(tmp.pur_recent_price,0)) pur_recent_price,bal_qty*sum(ifnull(tmp.pur_recent_price,0)) pur_recent_amt,\n" + "sum(ifnull(tmp.fifo_price,0)) fifo_price,bal_qty*sum(ifnull(tmp.fifo_price,0)) fifo_amt,\n" + "sum(ifnull(tmp.lifo_price,0)) lifo_price,bal_qty*sum(ifnull(tmp.lifo_price,0)) lifo_amt,\n" + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" + "from (\n" + "select stock_code,sum(op_qty)+sum(pur_qty)+sum(in_qty) +sum(out_qty) +sum(sale_qty) bal_qty,mac_id\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "group by stock_code)a\n" + "left join tmp_stock_price tmp\n" + "on a.stock_code  = tmp.stock_code\n" + "and a.mac_id = tmp.mac_id\n" + "join stock s on a.stock_code = s.stock_code\n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "group by a.stock_code\n" + "order by s.user_code";
+        String getSql="select a.*,\n" +
+                "sum(ifnull(tmp.pur_avg_price,0)) pur_avg_price,bal_qty*sum(ifnull(tmp.pur_avg_price,0)) pur_avg_amt,\n" +
+                "sum(ifnull(tmp.in_avg_price,0)) in_avg_price,bal_qty*sum(ifnull(tmp.in_avg_price,0)) in_avg_amt,\n" +
+                "sum(ifnull(tmp.std_price,0)) std_price,bal_qty*sum(ifnull(tmp.std_price,0)) std_amt,\n" +
+                "sum(ifnull(tmp.pur_recent_price,0)) pur_recent_price,bal_qty*sum(ifnull(tmp.pur_recent_price,0)) pur_recent_amt,\n" +
+                "sum(ifnull(tmp.fifo_price,0)) fifo_price,bal_qty*sum(ifnull(tmp.fifo_price,0)) fifo_amt,\n" +
+                "sum(ifnull(tmp.lifo_price,0)) lifo_price,bal_qty*sum(ifnull(tmp.lifo_price,0)) lifo_amt,\n" +
+                "sum(ifnull(tmp.io_recent_price,0)) io_recent_price,bal_qty*sum(ifnull(tmp.io_recent_price,0)) io_recent_amt,\n" +
+                "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
+                "from (\n" +
+                "select stock_code,sum(op_qty)+sum(pur_qty)+sum(in_qty) +sum(out_qty) +sum(sale_qty) bal_qty,mac_id\n" +
+                "from tmp_stock_io_column\n" +
+                "where mac_id = "+macId+"\n" +
+                "group by stock_code)a\n" +
+                "left join tmp_stock_price tmp\n" +
+                "on a.stock_code  = tmp.stock_code\n" +
+                "and a.mac_id = tmp.mac_id\n" +
+                "join stock s on a.stock_code = s.stock_code\n" +
+                "join stock_type st on s.stock_type_code = st.stock_type_code\n" +
+                "group by a.stock_code\n" +
+                "order by s.user_code";
         try {
             ResultSet rs = reportDao.executeSql(getSql);
             if (!Objects.isNull(rs)) {
@@ -1430,6 +1450,8 @@ public class ReportServiceImpl implements ReportService {
                     value.setFifoAmt(rs.getFloat("fifo_amt"));
                     value.setLifoPrice(rs.getFloat("lifo_price"));
                     value.setLifoAmt(rs.getFloat("lifo_amt"));
+                    value.setIoRecentPrice(rs.getFloat("io_recent_price"));
+                    value.setIoRecentAmt(rs.getFloat("io_recent_amt"));
                     values.add(value);
                 }
             }
@@ -2803,7 +2825,29 @@ public class ReportServiceImpl implements ReportService {
                     ")a\n" +
                     "group by stock_code";
             String purRecentSql = "insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)\n" + "select a.stock_code,'PUR_RECENT',a.pur_price/rel.smallest_qty pur_price," + macId + "\n" + "from (\n" + "with rows_and_position as \n" + "  ( \n" + "    select stock_code, pur_price,pur_unit,row_number() over (partition by stock_code order by vou_date desc) as position,rel_code,comp_code,dept_id\n" + "    from v_purchase\n" + "    where (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" + "    and (stock_type_code ='" + typeCode + "' or '-' ='" + typeCode + "')\n" + "    and (brand_code ='" + brandCode + "' or '-' ='" + brandCode + "')\n" + "    and (category_code ='" + catCode + "' or '-' ='" + catCode + "')\n" + "    and date(vou_date) <='" + toDate + "'\n" + "    and dept_id =" + deptId + "\n" + "    and comp_code ='" + compCode + "'\n" + "    and deleted =0\n" + "  )\n" + "select stock_code, pur_price,pur_unit,rel_code,comp_code,dept_id\n" + "from  rows_and_position\n" + "where position =1\n" + ")a\n" + "join v_relation rel\n" + "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" + "and a.comp_code = rel.comp_code\n" + "and a.dept_id = rel.dept_id";
-            reportDao.executeSql(delSql, purSql, sInSql, purRecentSql);
+            String ioRecent ="insert into tmp_stock_price(stock_code,tran_option,io_recent_price,mac_id)\n" +
+                    "select a.stock_code,'IO_RECENT',a.cost_price/rel.smallest_qty price,"+macId+"\n" +
+                    "from (\n" +
+                    "with rows_and_position as \n" +
+                    "  ( \n" +
+                    "    select stock_code, cost_price,ifnull(in_unit,out_unit) unit,row_number() over (partition by stock_code order by vou_date desc) as position,rel_code,comp_code,dept_id\n" +
+                    "    from v_stock_io\n" +
+                    "    where date(vou_date) <='"+toDate+"'\n" +
+                    "    and dept_id ="+deptId+"\n" +
+                    "    and comp_code ='"+compCode+"'\n" +
+                    "    and deleted =0\n" +
+                    "    and cost_price>0\n" +filter+
+                    "  )\n" +
+                    "select stock_code, cost_price,unit,rel_code,comp_code,dept_id\n" +
+                    "from  rows_and_position\n" +
+                    "where position =1\n" +
+                    ")a\n" +
+                    "join v_relation rel\n" +
+                    "on a.rel_code = rel.rel_code\n" +
+                    "and a.unit = rel.unit\n" +
+                    "and a.comp_code = rel.comp_code\n" +
+                    "and a.dept_id = rel.dept_id";
+            reportDao.executeSql(delSql, purSql, sInSql, purRecentSql,ioRecent);
         } catch (Exception e) {
             log.error(String.format("calculatePrice: %s", e.getMessage()));
         }

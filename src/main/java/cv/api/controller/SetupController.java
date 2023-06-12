@@ -560,16 +560,18 @@ public class SetupController {
     @GetMapping(path = "/get-pattern")
     public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam String vouDate) {
         List<Pattern> list = patternService.search(stockCode, compCode, deptId);
-        if (!Util1.isNullOrEmpty(vouDate)) {
-            list.forEach(p -> {
+        list.forEach(p -> {
+            if (!Util1.isNullOrEmpty(vouDate)) {
                 String code = p.getKey().getStockCode();
                 String type = p.getPriceTypeCode();
                 if (type != null) {
                     General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode, deptId);
                     p.setPrice(g == null ? 0.0f : Util1.getFloat(g.getAmount()));
                 }
-            });
-        }
+            }
+            p.setAmount(Util1.getFloat(p.getQty()) * Util1.getFloat(p.getPrice()));
+        });
+
         return Flux.fromIterable(list);
     }
 
