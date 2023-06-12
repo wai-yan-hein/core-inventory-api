@@ -21,6 +21,7 @@ public class General {
     private String saleManName;
     private String saleManCode;
     private String qtyRel;
+    private String message;
 
 
 }

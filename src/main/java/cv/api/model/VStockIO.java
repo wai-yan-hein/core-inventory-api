@@ -31,4 +31,6 @@ public class VStockIO {
     private String stockCode;
     private String processNo;
     private Integer deptId;
+    private String relName;
+    private Float smallPrice;
 }

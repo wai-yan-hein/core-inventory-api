@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.common.General;
 import cv.api.entity.Trader;
 import cv.api.entity.TraderKey;
 
@@ -34,7 +35,7 @@ public interface TraderService {
 
     List<Trader> findSupplier(String compCode, Integer deptId);
 
-    List<String> delete(TraderKey key);
+    List<General> delete(TraderKey key);
 
     List<Trader> unUploadTrader();
 

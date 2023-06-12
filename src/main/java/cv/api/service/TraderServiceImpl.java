@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.dao.TraderDao;
 import cv.api.entity.Trader;
@@ -85,12 +86,12 @@ public class TraderServiceImpl implements TraderService {
     }
 
     @Override
-    public List<String> delete(TraderKey key) {
-        List<String> str = reportService.isTraderExist(key.getCode(), key.getCompCode());
-        if (str.isEmpty()) {
+    public List<General> delete(TraderKey key) {
+        List<General> list = reportService.isTraderExist(key.getCode(), key.getCompCode());
+        if (list.isEmpty()) {
             dao.delete(key);
         }
-        return str;
+        return list;
     }
 
     @Override

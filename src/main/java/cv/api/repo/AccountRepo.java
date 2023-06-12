@@ -219,8 +219,12 @@ public class AccountRepo {
     }
 
     public void deleteTrader(AccTraderKey key) {
-        Mono<ReturnObject> result = accountApi.post().uri("/account/delete-trader").body(Mono.just(key), AccTraderKey.class).retrieve().bodyToMono(ReturnObject.class).doOnError((e) -> log.error(e.getMessage()));
-        result.block();
+        accountApi.post()
+                .uri("/account/delete-trader")
+                .body(Mono.just(key), AccTraderKey.class)
+                .retrieve()
+                .bodyToMono(ReturnObject.class)
+                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
     }
 
     private String getCustomerAcc(String compCode) {

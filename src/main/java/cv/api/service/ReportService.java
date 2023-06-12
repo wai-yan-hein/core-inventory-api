@@ -184,7 +184,7 @@ public interface ReportService {
 
     List<String> isStockExist(String stockCode, String compCode);
 
-    List<String> isTraderExist(String traderCode, String compCode);
+    List<General> isTraderExist(String traderCode, String compCode);
 
     List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);
 
