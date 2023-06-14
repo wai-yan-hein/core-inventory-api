@@ -1,7 +1,6 @@
 package cv.api.service;
 
 import cv.api.entity.PaymentHis;
-import cv.api.entity.PaymentHisDetail;
 import cv.api.entity.PaymentHisKey;
 
 import java.util.List;

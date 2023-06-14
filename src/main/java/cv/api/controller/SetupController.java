@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -395,7 +396,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-stock")
     public Mono<Stock> saveStock(@RequestBody Stock stock) {
-        stock.setUpdatedDate(Util1.getTodayDate());
+        stock.setUpdatedDate(LocalDateTime.now());
         Stock b = stockService.save(stock);
         //for cloud
         if (cloudMQSender != null) cloudMQSender.send(b);
