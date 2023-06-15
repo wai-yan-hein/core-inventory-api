@@ -876,5 +876,8 @@ create table weight_loss_his_detail (
   primary key (vou_no,comp_code,dept_id,unique_id)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
+ALTER TABLE expense
+ADD COLUMN percent FLOAT(20,3) NOT NULL
+
 alter table tmp_stock_price
 add column io_recent_price float(20,3) null after lifo_price;
