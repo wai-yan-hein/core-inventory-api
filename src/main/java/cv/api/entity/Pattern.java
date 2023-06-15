@@ -40,5 +40,7 @@ public class Pattern implements java.io.Serializable {
     private String relName;
     @Transient
     private String locName;
+    @Transient
+    private float amount;
 
 }

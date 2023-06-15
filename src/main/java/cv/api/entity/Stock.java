@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -63,9 +64,8 @@ public class Stock implements java.io.Serializable {
     private Float salePriceD;
     @Column(name = "sale_price_e")
     private Float salePriceE;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date")
     private Date createdDate;
@@ -102,7 +102,7 @@ public class Stock implements java.io.Serializable {
     public Stock() {
     }
 
-    public Stock(Date updatedDate) {
+    public Stock(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
 

@@ -33,9 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Conditional(ActiveMqCondition.class)
 public class CloudMQSender {
-    private final Gson gson = new GsonBuilder()
-            .setDateFormat(DateFormat.FULL, DateFormat.FULL)
-            .create();
+    private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     @Value("${cloud.activemq.listen.queue}")
     private String listenQ;
     @Autowired
@@ -318,7 +316,7 @@ public class CloudMQSender {
         requestFile("STOCK_BRAND", gson.toJson(new StockBrand(brandService.getMaxDate())));
         requestFile("STOCK_CATEGORY", gson.toJson(new Category(categoryService.getMaxDate())));
         requestFile("LOCATION", gson.toJson(new Location(locationService.getMaxDate())));
-        requestFile("STOCK", gson.toJson(new Stock(stockService.getMaxDate())));
+        requestFile("STOCK", gson.toJson(new Stock(Util1.toLocalDateTime(stockService.getMaxDate()))));
     }
 
     private void downloadTransaction() {

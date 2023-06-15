@@ -878,3 +878,6 @@ create table weight_loss_his_detail (
 
 ALTER TABLE expense
 ADD COLUMN percent FLOAT(20,3) NOT NULL
+
+alter table tmp_stock_price
+add column io_recent_price float(20,3) null after lifo_price;

@@ -21,6 +21,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -111,6 +113,12 @@ public class Util1 {
         }
 
         return strDate;
+    }
+
+    public static String toDateStr(LocalDateTime dateTime, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // Format the LocalDateTime
+        return dateTime.format(formatter);
     }
 
     public static String toDateTimeStr(Date date) {
@@ -251,6 +259,11 @@ public class Util1 {
 
     public static String cleanStr(String str) {
         return str;
+    }
+
+    public static LocalDateTime toLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+
     }
 
     public static String isAll(String value) {

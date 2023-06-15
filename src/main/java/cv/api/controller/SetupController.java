@@ -8,13 +8,12 @@ import cv.api.repo.AccountRepo;
 import cv.api.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -79,30 +78,30 @@ public class SetupController {
     private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-currency")
-    public ResponseEntity<Currency> saveCurrency(@RequestBody Currency machine, HttpServletRequest request) {
+    public Mono<Currency> saveCurrency(@RequestBody Currency machine, HttpServletRequest request) {
         Currency currency = currencyService.save(machine);
-        return ResponseEntity.ok(currency);
+        return Mono.justOrEmpty(currency);
     }
 
     @GetMapping(path = "/find-currency")
-    public ResponseEntity<Currency> findById(@RequestParam String curCode) {
+    public Mono<Currency> findById(@RequestParam String curCode) {
         Currency cur = currencyService.findById(curCode);
-        return ResponseEntity.ok(cur);
+        return Mono.justOrEmpty(cur);
     }
 
     @GetMapping(path = "/get-currency")
-    public ResponseEntity<List<Currency>> getCurrency() {
+    public Flux<?> getCurrency() {
         List<Currency> currency = currencyService.search("-", "-");
-        return ResponseEntity.ok(currency);
+        return Flux.fromIterable(currency);
     }
 
     @PostMapping(path = "/save-category")
-    public ResponseEntity<Category> saveCategory(@RequestBody Category cat) {
+    public Mono<Category> saveCategory(@RequestBody Category cat) {
         cat.setUpdatedDate(Util1.getTodayDate());
         Category category = categoryService.save(cat);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(cat);
-        return ResponseEntity.ok(category);
+        return Mono.justOrEmpty(category);
     }
 
     @GetMapping(path = "/get-category")
@@ -117,25 +116,25 @@ public class SetupController {
 
 
     @DeleteMapping(path = "/delete-category")
-    public ResponseEntity<ReturnObject> deleteCategory(@RequestParam String code) {
+    public Mono<?> deleteCategory(@RequestParam String code) {
         categoryService.delete(code);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-category")
-    public ResponseEntity<Category> findCategory(@RequestBody CategoryKey key) {
+    public Mono<Category> findCategory(@RequestBody CategoryKey key) {
         Category cat = categoryService.findByCode(key);
-        return ResponseEntity.ok(cat);
+        return Mono.justOrEmpty(cat);
     }
 
     @PostMapping(path = "/save-location")
-    public ResponseEntity<Location> saveLocation(@RequestBody Location location) {
+    public Mono<Location> saveLocation(@RequestBody Location location) {
         location.setUpdatedDate(Util1.getTodayDate());
         Location loc = locationService.save(location);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(loc);
-        return ResponseEntity.ok(loc);
+        return Mono.justOrEmpty(loc);
     }
 
     @GetMapping(path = "/get-location")
@@ -149,24 +148,24 @@ public class SetupController {
     }
 
     @DeleteMapping(path = "/delete-location")
-    public ResponseEntity<ReturnObject> deleteLocation(@RequestParam String code) {
+    public Mono<ReturnObject> deleteLocation(@RequestParam String code) {
         locationService.delete(code);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-location")
-    public ResponseEntity<Location> findLocation(@RequestBody LocationKey key) {
-        return ResponseEntity.ok(locationService.findByCode(key));
+    public Mono<Location> findLocation(@RequestBody LocationKey key) {
+        return Mono.justOrEmpty(locationService.findByCode(key));
     }
 
     @PostMapping(path = "/save-saleman")
-    public ResponseEntity<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) {
+    public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) {
         saleMan.setUpdatedDate(Util1.getTodayDate());
         SaleMan sm = saleManService.save(saleMan);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(saleMan);
-        return ResponseEntity.ok(sm);
+        return Mono.justOrEmpty(sm);
     }
 
     @GetMapping(path = "/get-saleman")
@@ -180,25 +179,25 @@ public class SetupController {
     }
 
     @DeleteMapping(path = "/delete-saleman")
-    public ResponseEntity<ReturnObject> deleteSaleMan(@RequestParam String code) {
+    public Mono<ReturnObject> deleteSaleMan(@RequestParam String code) {
         saleManService.delete(code);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-saleman")
-    public ResponseEntity<SaleMan> findSaleMan(@RequestBody SaleManKey key) {
+    public Mono<SaleMan> findSaleMan(@RequestBody SaleManKey key) {
         SaleMan sm = saleManService.findByCode(key);
-        return ResponseEntity.ok(sm);
+        return Mono.justOrEmpty(sm);
     }
 
     @PostMapping(path = "/save-brand")
-    public ResponseEntity<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) {
+    public Mono<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) {
         brand.setUpdatedDate(Util1.getTodayDate());
         StockBrand b = brandService.save(brand);
         //send to cloud
         if (cloudMQSender != null) cloudMQSender.send(brand);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/get-brand")
@@ -219,29 +218,29 @@ public class SetupController {
     }
 
     @PostMapping(path = "/find-brand")
-    public ResponseEntity<StockBrand> findBrand(@RequestBody StockBrandKey key) {
+    public Mono<StockBrand> findBrand(@RequestBody StockBrandKey key) {
         StockBrand b = brandService.findByCode(key);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @PostMapping(path = "/find-unit-relation")
-    public ResponseEntity<?> findUnitRelation(@RequestBody RelationKey key) {
-        return ResponseEntity.ok(unitRelationService.findByKey(key));
+    public Mono<?> findUnitRelation(@RequestBody RelationKey key) {
+        return Mono.justOrEmpty(unitRelationService.findByKey(key));
     }
 
     @PostMapping(path = "/save-type")
-    public ResponseEntity<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) {
+    public Mono<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) {
         type.setUpdatedDate(Util1.getTodayDate());
         StockType b = typeService.save(type);
         //send to cloud
         if (cloudMQSender != null) cloudMQSender.send(type);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/get-type")
-    public ResponseEntity<List<StockType>> getType(@RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getType(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<StockType> listB = typeService.findAll(compCode, deptId);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
 
     @GetMapping(path = "/getUpdateStockType")
@@ -250,25 +249,25 @@ public class SetupController {
     }
 
     @DeleteMapping(path = "/delete-type")
-    public ResponseEntity<ReturnObject> deleteType(@RequestParam String code) {
+    public Mono<ReturnObject> deleteType(@RequestParam String code) {
         typeService.delete(code);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-type")
-    public ResponseEntity<StockType> findType(@RequestBody StockTypeKey key) {
+    public Mono<StockType> findType(@RequestBody StockTypeKey key) {
         StockType b = typeService.findByCode(key);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @PostMapping(path = "/save-unit")
-    public ResponseEntity<StockUnit> saveUnit(@RequestBody StockUnit unit) {
+    public Mono<StockUnit> saveUnit(@RequestBody StockUnit unit) {
         unit.setUpdatedDate(Util1.getTodayDate());
         StockUnit b = unitService.save(unit);
         //send to cloud
         if (cloudMQSender != null) cloudMQSender.send(unit);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/get-unit")
@@ -282,32 +281,32 @@ public class SetupController {
     }
 
     @DeleteMapping(path = "/delete-unit")
-    public ResponseEntity<ReturnObject> deleteUnit(@RequestParam String code) {
+    public Mono<?> deleteUnit(@RequestParam String code) {
         unitService.delete(code);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-unit")
-    public ResponseEntity<StockUnit> findUnit(@RequestBody StockUnitKey key) {
-        return ResponseEntity.ok(unitService.findByCode(key));
+    public Mono<StockUnit> findUnit(@RequestBody StockUnitKey key) {
+        return Mono.justOrEmpty(unitService.findByCode(key));
     }
 
     @PostMapping(path = "/save-region")
-    public ResponseEntity<Region> saveRegion(@RequestBody Region region, HttpServletRequest request) throws Exception {
+    public Mono<Region> saveRegion(@RequestBody Region region, HttpServletRequest request) throws Exception {
         region.setUpdatedDate(Util1.getTodayDate());
         Region b = regionService.save(region);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/get-region")
-    public ResponseEntity<List<Region>> getRegion(@RequestParam String compCode) {
+    public Flux<?> getRegion(@RequestParam String compCode) {
         List<Region> listB = regionService.findAll(compCode);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
 
     @DeleteMapping(path = "/delete-region")
-    public ResponseEntity<ReturnObject> deleteRegion(@RequestParam String code) {
+    public Mono<ReturnObject> deleteRegion(@RequestParam String code) {
         List<Trader> search = traderService.search(code, "-");
         if (search.isEmpty()) {
             regionService.delete(code);
@@ -315,32 +314,32 @@ public class SetupController {
         } else {
             ro.setMessage("Can't delete.");
         }
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @PostMapping(path = "/find-region")
-    public ResponseEntity<Region> findRegion(@RequestBody RegionKey key) {
+    public Mono<Region> findRegion(@RequestBody RegionKey key) {
         Region b = regionService.findByCode(key);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @PostMapping(path = "/save-customer")
-    public ResponseEntity<Trader> saveCustomer(@RequestBody Trader trader) {
+    public Mono<Trader> saveCustomer(@RequestBody Trader trader) {
         trader.setUpdatedDate(Util1.getTodayDate());
         trader.setType("CUS");
         trader.setMacId(0);
         Trader b = traderService.saveTrader(trader);
         accountRepo.sendTrader(b);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @PostMapping(path = "/save-trader")
-    public ResponseEntity<Trader> saveTrader(@RequestBody Trader trader) {
+    public Mono<Trader> saveTrader(@RequestBody Trader trader) {
         trader.setUpdatedDate(Util1.getTodayDate());
         trader = traderService.saveTrader(trader);
         accountRepo.sendTrader(trader);
         if (cloudMQSender != null) cloudMQSender.send(trader);
-        return ResponseEntity.ok(trader);
+        return Mono.justOrEmpty(trader);
     }
 
     @GetMapping(path = "/get-trader")
@@ -361,8 +360,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-trader-list")
-    public ResponseEntity<List<Trader>> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
+    public Flux<?> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
     }
 
     @GetMapping(path = "/get-supplier")
@@ -373,36 +372,35 @@ public class SetupController {
 
 
     @PostMapping(path = "/delete-trader")
-    public Mono<?> deleteTrader(@RequestBody TraderKey key) {
-        List<String> str = traderService.delete(key);
-        if (str.isEmpty()) {
+    public Flux<?> deleteTrader(@RequestBody TraderKey key) {
+        List<General> list = traderService.delete(key);
+        if (list.isEmpty()) {
             AccTraderKey k = new AccTraderKey();
             k.setCompCode(key.getCompCode());
             k.setCode(key.getCode());
             accountRepo.deleteTrader(k);
-            log.info("deleted trader.");
         }
-        return Mono.justOrEmpty(str);
+        return Flux.fromIterable(list);
     }
 
     @PostMapping(path = "/find-trader")
-    public ResponseEntity<Trader> findTrader(@RequestBody TraderKey key) {
+    public Mono<Trader> findTrader(@RequestBody TraderKey key) {
         Trader b = traderService.findById(key);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/find-trader-rfid")
-    public ResponseEntity<?> findTraderRfId(@RequestParam String rfId, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(traderService.findByRFID(rfId, compCode, deptId));
+    public Mono<?> findTraderRfId(@RequestParam String rfId, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(traderService.findByRFID(rfId, compCode, deptId));
     }
 
     @PostMapping(path = "/save-stock")
-    public ResponseEntity<Stock> saveStock(@RequestBody Stock stock) {
-        stock.setUpdatedDate(Util1.getTodayDate());
+    public Mono<Stock> saveStock(@RequestBody Stock stock) {
+        stock.setUpdatedDate(LocalDateTime.now());
         Stock b = stockService.save(stock);
         //for cloud
         if (cloudMQSender != null) cloudMQSender.send(b);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @PostMapping(path = "/update-favorite-stock")
@@ -424,8 +422,8 @@ public class SetupController {
 
 
     @GetMapping(path = "/get-service")
-    public ResponseEntity<List<Stock>> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(stockService.getService(compCode, deptId));
+    public Flux<?> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(stockService.getService(compCode, deptId));
     }
 
     @PostMapping(path = "/search-stock")
@@ -446,25 +444,25 @@ public class SetupController {
     }
 
     @PostMapping(path = "/delete-stock")
-    public ResponseEntity<?> deleteStock(@RequestBody StockKey key) {
+    public Mono<?> deleteStock(@RequestBody StockKey key) {
         List<String> str = stockService.delete(key);
-        return ResponseEntity.ok(str.isEmpty() ? null : str);
+        return Mono.justOrEmpty(str.isEmpty() ? null : str);
     }
 
     @PostMapping(path = "/find-stock")
-    public ResponseEntity<Stock> findStock(@RequestBody StockKey key) {
+    public Mono<Stock> findStock(@RequestBody StockKey key) {
         Stock b = stockService.findById(key);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
 
     @PostMapping(path = "/save-voucher-status")
-    public ResponseEntity<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus, HttpServletRequest request) {
+    public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus, HttpServletRequest request) {
         vouStatus.setUpdatedDate(Util1.getTodayDate());
         VouStatus b = vouStatusService.save(vouStatus);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(b);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/get-voucher-status")
@@ -478,9 +476,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/find-voucher-status")
-    public ResponseEntity<VouStatus> findVouStatus(@RequestBody VouStatusKey key) {
+    public Mono<VouStatus> findVouStatus(@RequestBody VouStatusKey key) {
         VouStatus b = vouStatusService.findById(key);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @PostMapping(path = "/save-opening")
@@ -506,7 +504,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/get-opening")
-    public ResponseEntity<?> getOpening(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getOpening(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -517,13 +515,13 @@ public class SetupController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         String curCode = Util1.isAll(filter.getCurCode());
-        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, locCode, stockCode, compCode, deptId, curCode);
-        return ResponseEntity.ok(opHisList);
+        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, curCode);
+        return Flux.fromIterable(opHisList);
     }
 
     @PostMapping(path = "/find-opening")
-    public ResponseEntity<OPHis> findOpening(@RequestBody OPHisKey key) {
-        return ResponseEntity.ok(opHisService.findByCode(key));
+    public Mono<OPHis> findOpening(@RequestBody OPHisKey key) {
+        return Mono.justOrEmpty(opHisService.findByCode(key));
     }
 
     @PostMapping(path = "/delete-opening")
@@ -533,20 +531,20 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-opening-detail")
-    public ResponseEntity<OPHisDetail> saveOpeningDetail(@RequestBody OPHisDetail opHis, HttpServletRequest request) {
+    public Mono<OPHisDetail> saveOpeningDetail(@RequestBody OPHisDetail opHis, HttpServletRequest request) {
         OPHisDetail op = opHisDetailService.save(opHis);
-        return ResponseEntity.ok(op);
+        return Mono.justOrEmpty(op);
     }
 
     @GetMapping(path = "/get-opening-detail")
-    public ResponseEntity<List<OPHisDetail>> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<OPHisDetail> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<OPHisDetail> opHis = opHisDetailService.search(vouNo, compCode, deptId);
-        return ResponseEntity.ok(opHis);
+        return Flux.fromIterable(opHis);
     }
 
     @PostMapping(path = "/save-pattern")
-    public ResponseEntity<Pattern> savePattern(@RequestBody Pattern pattern) {
-        return ResponseEntity.ok(patternService.save(pattern));
+    public Mono<?> savePattern(@RequestBody Pattern pattern) {
+        return Mono.justOrEmpty(patternService.save(pattern));
     }
 
     @PostMapping(path = "/delete-pattern")
@@ -556,23 +554,25 @@ public class SetupController {
     }
 
     @PostMapping(path = "/find-pattern")
-    public ResponseEntity<?> findPattern(@RequestBody PatternKey p) {
-        return ResponseEntity.ok(patternService.findByCode(p));
+    public Mono<?> findPattern(@RequestBody PatternKey p) {
+        return Mono.justOrEmpty(patternService.findByCode(p));
     }
 
     @GetMapping(path = "/get-pattern")
     public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam String vouDate) {
         List<Pattern> list = patternService.search(stockCode, compCode, deptId);
-        if (!Util1.isNullOrEmpty(vouDate)) {
-            list.forEach(p -> {
+        list.forEach(p -> {
+            if (!Util1.isNullOrEmpty(vouDate)) {
                 String code = p.getKey().getStockCode();
                 String type = p.getPriceTypeCode();
                 if (type != null) {
                     General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode, deptId);
                     p.setPrice(g == null ? 0.0f : Util1.getFloat(g.getAmount()));
                 }
-            });
-        }
+            }
+            p.setAmount(Util1.getFloat(p.getQty()) * Util1.getFloat(p.getPrice()));
+        });
+
         return Flux.fromIterable(list);
     }
 
@@ -587,28 +587,29 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-reorder")
-    public ResponseEntity<?> saveReorder(@RequestBody ReorderLevel rl) {
-        return ResponseEntity.ok(reorderService.save(rl));
+    public Mono<?> saveReorder(@RequestBody ReorderLevel rl) {
+        return Mono.justOrEmpty(reorderService.save(rl));
     }
 
     @PostMapping(path = "/save-price-option")
-    public ResponseEntity<?> savePriceOption(@RequestBody PriceOption po) {
-        return ResponseEntity.ok(optionService.save(po));
+    public Mono<?> savePriceOption(@RequestBody PriceOption po) {
+        return Mono.justOrEmpty(optionService.save(po));
     }
 
     @GetMapping(path = "/get-price-option")
     public Flux<?> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
     }
+
     @GetMapping(path = "/getUpdatePriceOption")
     public Flux<?> getUpdatePriceOption(@RequestParam String updatedDate) {
         return Flux.fromIterable(optionService.getPriceOption(updatedDate));
     }
 
     @GetMapping(path = "/get-unit-relation")
-    public ResponseEntity<List<UnitRelation>> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelation> listB = unitRelationService.findRelation(compCode, deptId);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
 
     @GetMapping(path = "/get-relation")
@@ -622,46 +623,46 @@ public class SetupController {
     }
 
     @GetMapping(path = "/get-unit-relation-detail")
-    public ResponseEntity<List<UnitRelationDetail>> getUnitRelation(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getUnitRelation(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode, deptId);
-        return ResponseEntity.ok(listB);
+        return Flux.fromIterable(listB);
     }
 
     @PostMapping(path = "/save-unit-relation")
-    public ResponseEntity<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
+    public Mono<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
         //sent to cloud
         if (cloudMQSender != null) cloudMQSender.send(relation);
-        return ResponseEntity.ok(b);
+        return Mono.justOrEmpty(b);
     }
 
     @GetMapping(path = "/get-font")
-    public ResponseEntity<List<CFont>> getFont() {
+    public Flux<?> getFont() {
         List<CFont> type = fontService.getFont();
-        return ResponseEntity.ok(type);
+        return Flux.fromIterable(type);
     }
 
     @PostMapping(path = "/save-trader-group")
-    public ResponseEntity<?> saveTraderGroup(@RequestBody TraderGroup group) {
+    public Mono<?> saveTraderGroup(@RequestBody TraderGroup group) {
         TraderGroup g = traderGroupService.save(group);
-        return ResponseEntity.ok(g);
+        return Mono.justOrEmpty(g);
     }
 
     @PostMapping(path = "/find-trader-group")
-    public ResponseEntity<?> findTraderGroup(@RequestBody TraderGroupKey key) {
-        return ResponseEntity.ok(traderGroupService.findById(key));
+    public Mono<?> findTraderGroup(@RequestBody TraderGroupKey key) {
+        return Mono.justOrEmpty(traderGroupService.findById(key));
     }
 
     @GetMapping(path = "/get-trader-group")
-    public ResponseEntity<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
+    public Mono<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
-        return ResponseEntity.ok(g);
+        return Mono.justOrEmpty(g);
     }
 
     @GetMapping(path = "/convert-to-unicode")
-    public ResponseEntity<?> convertToUniCode() {
+    public Mono<?> convertToUniCode() {
         converterService.convertToUnicode();
-        return ResponseEntity.ok("converted.");
+        return Mono.justOrEmpty("converted.");
     }
 
     @GetMapping(path = "/convert-trader")
@@ -671,20 +672,20 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-batch")
-    public ResponseEntity<?> saveBatch(@RequestBody GRN b) {
-        return ResponseEntity.ok(batchService.save(b));
+    public Mono<?> saveBatch(@RequestBody GRN b) {
+        return Mono.justOrEmpty(batchService.save(b));
     }
 
     @PostMapping(path = "/delete-batch")
-    public ResponseEntity<ReturnObject> deleteBatch(@RequestBody GRNKey key) {
+    public Mono<?> deleteBatch(@RequestBody GRNKey key) {
         batchService.delete(key);
         ro.setMessage("Deleted.");
-        return ResponseEntity.ok(ro);
+        return Mono.justOrEmpty(ro);
     }
 
     @GetMapping(path = "/get-batch")
-    public ResponseEntity<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(batchService.findAll(compCode, deptId));
+    public Flux<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(batchService.findAll(compCode, deptId));
     }
 
     @GetMapping(path = "/getAccSetting")

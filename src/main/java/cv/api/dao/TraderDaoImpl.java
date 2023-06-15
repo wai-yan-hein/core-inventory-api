@@ -128,20 +128,20 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public int delete(TraderKey key) {
-        String sql = "update trader deleted = 1 where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
+        String sql = "update trader set deleted = true where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return 1;
     }
 
     @Override
     public List<Trader> findCustomer(String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ") and o.type = 'CUS' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and o.type = 'CUS' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 
     @Override
     public List<Trader> findSupplier(String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ")  and o.type = 'SUP' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and o.type = 'SUP' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 
