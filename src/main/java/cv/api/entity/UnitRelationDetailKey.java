@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data

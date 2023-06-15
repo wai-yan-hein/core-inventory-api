@@ -80,7 +80,7 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                     p.setKey(key);
                     p.setStockCode(rs.getString("stock_code"));
                     p.setLocCode(rs.getString("loc_code"));
-                    p.setVouDate(rs.getDate("vou_date"));
+                    p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                     p.setEndDate(rs.getDate("end_date"));
                     p.setQty(rs.getFloat("qty"));
                     p.setUnit(rs.getString("unit"));
@@ -107,13 +107,13 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
 
     @Override
     public void delete(ProcessHisKey key) {
-        String sql = "update process_his set deleted =1 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        String sql = "update process_his set deleted = true where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         execSql(sql);
     }
 
     @Override
     public void restore(ProcessHisKey key) {
-        String sql = "update process_his set deleted =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        String sql = "update process_his set deleted = false where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         execSql(sql);
     }
 }

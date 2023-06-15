@@ -21,13 +21,13 @@ public class WeightLossDaoImpl extends AbstractDao<WeightLossHisKey, WeightLossH
 
     @Override
     public void delete(WeightLossHisKey key) {
-        String sql = "update weight_loss_his set deleted =1 where vou_no = '" + key.getVouNo() + "' and comp_code =" + key.getCompCode() + " and dept_id =" + key.getDeptId() + " ";
+        String sql = "update weight_loss_his set deleted = true where vou_no = '" + key.getVouNo() + "' and comp_code =" + key.getCompCode() + " and dept_id =" + key.getDeptId() + " ";
         execSql(sql);
     }
 
     @Override
     public void restore(WeightLossHisKey key) {
-        String sql = "update weight_loss_his set deleted =0 where vou_no = '" + key.getVouNo() + "' and comp_code =" + key.getCompCode() + " and dept_id =" + key.getDeptId() + " ";
+        String sql = "update weight_loss_his set deleted = false where vou_no = '" + key.getVouNo() + "' and comp_code =" + key.getCompCode() + " and dept_id =" + key.getDeptId() + " ";
         execSql(sql);
     }
 

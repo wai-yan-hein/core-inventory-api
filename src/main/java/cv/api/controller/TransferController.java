@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
 import cv.api.entity.TransferHis;
@@ -17,8 +16,8 @@ import cv.api.service.TransferHisDetailService;
 import cv.api.service.TransferHisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -37,23 +36,17 @@ public class TransferController {
     private ReportService reportService;
     @Autowired
     private TransferHisDetailService detailService;
-    @Autowired(required = false)
-    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-transfer")
-    public ResponseEntity<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
+    public Mono<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
         obj.setUpdatedDate(Util1.getTodayDate());
-        //if change location
-        if (cloudMQSender != null) cloudMQSender.checkLocationAndTruncate(obj);
         //save to local
         obj = thService.save(obj);
-        //send to cloud
-        if (cloudMQSender != null) cloudMQSender.send(obj);
-        return ResponseEntity.ok(obj);
+        return Mono.justOrEmpty(obj);
     }
 
     @PostMapping(path = "/get-transfer")
-    public ResponseEntity<List<VTransfer>> getTransfer(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getTransfer(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -68,32 +61,30 @@ public class TransferController {
         List<VTransfer> listStockIO = reportService.getTransferHistory(fromDate, toDate, refNo,
                 vouNo, remark, userCode,
                 stockCode, locCode, compCode, deptId, deleted);
-        return ResponseEntity.ok(listStockIO);
+        return Flux.fromIterable(listStockIO);
     }
 
     @PostMapping(path = "/find-transfer")
-    public ResponseEntity<TransferHis> findTransfer(@RequestBody TransferHisKey code) {
+    public Mono<TransferHis> findTransfer(@RequestBody TransferHisKey code) {
         TransferHis sh = thService.findById(code);
-        return ResponseEntity.ok(sh);
+        return Mono.justOrEmpty(sh);
     }
 
     @GetMapping(path = "/get-transfer-detail")
-    public ResponseEntity<List<TransferHisDetail>> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<TransferHisDetail> listSD = detailService.search(vouNo, compCode, deptId);
-        return ResponseEntity.ok(listSD);
+        return Flux.fromIterable(listSD);
     }
 
     @PostMapping(path = "/delete-transfer")
     public Mono<?> deleteTransfer(@RequestBody TransferHisKey key) {
         thService.delete(key);
-        if (cloudMQSender != null) cloudMQSender.delete(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-transfer")
     public Mono<?> restoreTransfer(@RequestBody TransferHisKey key) {
         thService.restore(key);
-        if (cloudMQSender != null) cloudMQSender.restore(key);
         return Mono.just(true);
     }
 }

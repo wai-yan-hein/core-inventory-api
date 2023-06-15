@@ -8,7 +8,7 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -19,7 +19,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "stock")
-public class Stock implements java.io.Serializable {
+public class Stock {
 
     @EmbeddedId
     private StockKey key;

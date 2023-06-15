@@ -6,7 +6,6 @@
 package cv.api.controller;
 
 import cv.api.common.FilterObject;
-import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
@@ -17,12 +16,10 @@ import cv.api.service.StockInOutDetailService;
 import cv.api.service.StockInOutService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -33,7 +30,6 @@ import java.util.List;
 @Slf4j
 public class StockInOutController {
 
-    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private StockInOutService ioService;
     @Autowired
@@ -42,10 +38,10 @@ public class StockInOutController {
     private ReportService reportService;
 
     @PostMapping(path = "/save-stockio")
-    public ResponseEntity<StockInOut> saveStockIO(@RequestBody StockInOut stockio, HttpServletRequest request) throws Exception {
+    public Mono<StockInOut> saveStockIO(@RequestBody StockInOut stockio) {
         stockio.setUpdatedDate(Util1.getTodayDate());
         stockio = ioService.save(stockio);
-        return ResponseEntity.ok(stockio);
+        return Mono.justOrEmpty(stockio);
     }
 
     @PostMapping(path = "/get-stockio")
@@ -79,9 +75,9 @@ public class StockInOutController {
     }
 
     @PostMapping(path = "/find-stockio")
-    public ResponseEntity<StockInOut> findStockIO(@RequestBody StockIOKey key) {
+    public Mono<StockInOut> findStockIO(@RequestBody StockIOKey key) {
         StockInOut sh = ioService.findById(key);
-        return ResponseEntity.ok(sh);
+        return Mono.justOrEmpty(sh);
     }
 
     @GetMapping(path = "/get-stockio-detail")

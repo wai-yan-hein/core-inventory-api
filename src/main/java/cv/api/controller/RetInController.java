@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
@@ -19,7 +18,6 @@ import cv.api.service.RetInDetailService;
 import cv.api.service.RetInService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -43,18 +41,15 @@ public class RetInController {
     private ReportService reportService;
     @Autowired
     private AccountRepo accountRepo;
-    @Autowired(required = false)
-    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-retin")
-    public ResponseEntity<RetInHis> saveReturnIn(@RequestBody RetInHis retin) {
+    public Mono<RetInHis> saveReturnIn(@RequestBody RetInHis retin) {
         retin.setUpdatedDate(Util1.getTodayDate());
         retin = riService.save(retin);
         //send message to service
         accountRepo.sendReturnIn(retin);
         //send to cloud
-        if (cloudMQSender != null) cloudMQSender.send(retin);
-        return ResponseEntity.ok(retin);
+        return Mono.justOrEmpty(retin);
     }
 
     @PostMapping(path = "/get-retin")
@@ -82,7 +77,6 @@ public class RetInController {
         //delete in account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
-        if (cloudMQSender != null) cloudMQSender.delete(key);
         return Mono.just(true);
     }
 
@@ -90,19 +84,18 @@ public class RetInController {
     public Mono<?> restoreRI(@RequestBody RetInHisKey key) throws Exception {
         riService.restore(key);
         ro.setMessage("Restored.");
-        if (cloudMQSender != null) cloudMQSender.restore(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/find-retin")
-    public ResponseEntity<RetInHis> findRI(@RequestBody RetInHisKey key) {
+    public Mono<RetInHis> findRI(@RequestBody RetInHisKey key) {
         RetInHis sh = riService.findById(key);
-        return ResponseEntity.ok(sh);
+        return Mono.justOrEmpty(sh);
     }
 
     @GetMapping(path = "/get-retin-detail")
-    public ResponseEntity<List<RetInHisDetail>> getRIDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getRIDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<RetInHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
-        return ResponseEntity.ok(listSD);
+        return Flux.fromIterable(listSD);
     }
 }

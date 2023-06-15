@@ -1,8 +1,8 @@
 package cv.api.entity;
 
+import jakarta.persistence.Embeddable;
 import lombok.Data;
 
-import javax.persistence.Embeddable;
 
 @Data
 @Embeddable

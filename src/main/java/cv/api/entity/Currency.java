@@ -6,7 +6,7 @@ package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 /**

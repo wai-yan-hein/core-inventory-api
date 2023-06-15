@@ -13,14 +13,11 @@ import cv.api.service.ReportService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,18 +34,6 @@ public class ReportController {
     private final ReturnObject ro = new ReturnObject();
     @Autowired
     private ReportService reportService;
-
-    @PostMapping(path = "/save-filter")
-    public ResponseEntity<ReturnObject> saveOpening(@RequestBody ReportFilter filter, HttpServletRequest request) {
-        log.info("/save-filter");
-        try {
-            reportService.saveReportFilter(filter);
-        } catch (Exception e) {
-            ro.setMessage(e.getMessage());
-        }
-        ro.setMessage("Saved Filter");
-        return ResponseEntity.ok(ro);
-    }
 
     @GetMapping(value = "/get-sale-report", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
@@ -75,7 +60,7 @@ public class ReportController {
     }
 
     @GetMapping(value = "/get-purchase-weight-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getPurWeightReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam String batchNo) throws IOException {
+    public Flux<?> getPurWeightReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam String batchNo) {
         List<VPurchase> list = reportService.getPurchaseByWeightVoucher(vouNo, Util1.isNull(batchNo, "-"), compCode);
         return Flux.fromIterable(list);
     }
@@ -120,7 +105,7 @@ public class ReportController {
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 String projectNo = Util1.isAll(filter.getProjectNo());
-                float creditAmt =filter.getCreditAmt();
+                float creditAmt = filter.getCreditAmt();
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -291,7 +276,7 @@ public class ReportController {
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "ProfitMarginByStock" -> {
-                        List<VSale> values= reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
+                        List<VSale> values = reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "CustomerBalanceDetail" -> {
@@ -299,8 +284,7 @@ public class ReportController {
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "CustomerBalanceSummary" -> {
-                        List<VSale> values = reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo,
-                                projectNo, locCode,creditAmt);
+                        List<VSale> values = reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
                         Util1.writeJsonFile(values, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");
@@ -345,41 +329,38 @@ public class ReportController {
 
 
     @GetMapping(path = "/get-purchase-recent-price")
-    public ResponseEntity<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-weight-loss-recent-price")
-    public ResponseEntity<General> getWeightLossRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getWeightLossRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-production-recent-price")
-    public ResponseEntity<General> getProductionRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getProductionRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-purchase-avg-price")
-    public ResponseEntity<General> getPurAvgPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getPurAvgPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.just(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
     @GetMapping(path = "/get-sale-recent-price")
-    public ResponseEntity<General> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
-        return ResponseEntity.ok(reportService.getSaleRecentPrice(stockCode, vouDate, unit, compCode));
+    public Mono<General> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
+        return Mono.justOrEmpty(reportService.getSaleRecentPrice(stockCode, vouDate, unit, compCode));
     }
 
 
     @GetMapping(path = "/get-stock-io-recent-price")
-    public ResponseEntity<General> getStockIORecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit) {
-        return ResponseEntity.ok(reportService.getStockIORecentPrice(stockCode, vouDate, unit));
+    public Mono<General> getStockIORecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit) {
+        return Mono.justOrEmpty(reportService.getStockIORecentPrice(stockCode, vouDate, unit));
     }
 
     @GetMapping(path = "/get-stock-balance")
-    public Flux<?> getStockBalance(@RequestParam String stockCode, @RequestParam boolean calSale,
-                                   @RequestParam boolean calPur, @RequestParam boolean calRI, @RequestParam boolean calRO,
-                                   @RequestParam String compCode, @RequestParam Integer deptId,
-                                   @RequestParam Integer macId, @RequestParam boolean summary) {
+    public Flux<?> getStockBalance(@RequestParam String stockCode, @RequestParam boolean calSale, @RequestParam boolean calPur, @RequestParam boolean calRI, @RequestParam boolean calRO, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam Integer macId, @RequestParam boolean summary) {
         List<VStockBalance> list = reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
         if (list.isEmpty()) {
             VStockBalance b = new VStockBalance();
@@ -409,7 +390,7 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-smallest_qty")
-    public ResponseEntity<?> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
+    public Mono<?> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
     }
 }

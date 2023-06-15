@@ -5,22 +5,18 @@
  */
 package cv.api.controller;
 
-import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.SaleHis;
-import cv.api.entity.SaleHisDetail;
 import cv.api.entity.SaleHisKey;
 import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
-import cv.api.service.BackupService;
 import cv.api.service.ReportService;
 import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -43,33 +39,25 @@ public class SaleController {
     @Autowired
     private ReportService reportService;
     @Autowired
-    private BackupService backupService;
-    @Autowired
     private AccountRepo accountRepo;
-    @Autowired(required = false)
-    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-sale")
-    public ResponseEntity<?> saveSale(@RequestBody SaleHis sale) {
+    public Mono<?> saveSale(@RequestBody SaleHis sale) {
         sale.setUpdatedDate(Util1.getTodayDate());
         //if change location
-        if (cloudMQSender != null) cloudMQSender.checkLocationAndTruncate(sale);
         if (isValidSale(sale, ro)) {
-            backupService.backup(sale);
             sale = shService.save(sale);
         } else {
-            return ResponseEntity.ok(ro);
+            return Mono.justOrEmpty(ro);
         }
         //for account
         accountRepo.sendSale(sale);
         //for cloud
-        if (cloudMQSender != null) cloudMQSender.send(sale);
-        return ResponseEntity.ok(sale);
+        return Mono.justOrEmpty(sale);
     }
 
     private boolean isValidSale(SaleHis sale, ReturnObject ro) {
         boolean status = true;
-        List<SaleHisDetail> listSH = sale.getListSH();
         if (Util1.isNullOrEmpty(sale.getTraderCode())) {
             status = false;
             ro.setMessage("Invalid Trader.");
@@ -125,21 +113,19 @@ public class SaleController {
         //delete in account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
-        if (cloudMQSender != null) cloudMQSender.delete(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-sale")
     public Mono<?> restoreSale(@RequestBody SaleHisKey key) throws Exception {
         shService.restore(key);
-        if (cloudMQSender != null) cloudMQSender.restore(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/find-sale")
-    public ResponseEntity<SaleHis> findSale(@RequestBody SaleHisKey key) {
+    public Mono<SaleHis> findSale(@RequestBody SaleHisKey key) {
         SaleHis sh = shService.findById(key);
-        return ResponseEntity.ok(sh);
+        return Mono.justOrEmpty(sh);
     }
 
     @GetMapping(path = "/get-sale-detail")
@@ -150,20 +136,20 @@ public class SaleController {
     }
 
     @GetMapping(path = "/get-sale-voucher-info")
-    public ResponseEntity<?> getSaleVoucherCount(@RequestParam String vouDate,
+    public Mono<?> getSaleVoucherCount(@RequestParam String vouDate,
                                                  @RequestParam String compCode,
                                                  @RequestParam Integer deptId) {
-        return ResponseEntity.ok(shService.getVoucherInfo(vouDate, compCode, deptId));
+        return  Mono.justOrEmpty(shService.getVoucherInfo(vouDate, compCode, deptId));
     }
 
     @GetMapping(path = "/get-sale-by-batch")
-    public ResponseEntity<?> getSaleByBatch(@RequestParam String batchNo,
+    public Flux<?> getSaleByBatch(@RequestParam String batchNo,
                                             @RequestParam String compCode,
                                             @RequestParam Integer deptId,
                                             @RequestParam boolean detail) {
         if (detail) {
-            return ResponseEntity.ok(sdService.getSaleByBatchDetail(batchNo, compCode, deptId));
+            return Flux.fromIterable(sdService.getSaleByBatchDetail(batchNo, compCode, deptId));
         }
-        return ResponseEntity.ok(sdService.getSaleByBatch(batchNo, compCode, deptId));
+        return Flux.fromIterable(sdService.getSaleByBatch(batchNo, compCode, deptId));
     }
 }

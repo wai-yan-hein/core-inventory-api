@@ -10,7 +10,6 @@ import cv.api.service.GRNService;
 import cv.api.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,11 +28,10 @@ public class GRNController {
     private GRNDetailService grnDetailService;
     @Autowired
     private ReportService reportService;
-    private final ReturnObject ro = new ReturnObject();
 
     @PostMapping
-    public ResponseEntity<?> saveGRN(@RequestBody GRN g) {
-        return ResponseEntity.ok(grnService.save(g));
+    public Mono<?> saveGRN(@RequestBody GRN g) {
+        return Mono.justOrEmpty(grnService.save(g));
     }
 
     @PostMapping(path = "/history")
@@ -82,7 +80,7 @@ public class GRNController {
     }
 
     @GetMapping(path = "/get-batch-list")
-    public ResponseEntity<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(grnService.search(Util1.cleanStr(batchNo), compCode, deptId));
+    public Flux<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(grnService.search(Util1.cleanStr(batchNo), compCode, deptId));
     }
 }

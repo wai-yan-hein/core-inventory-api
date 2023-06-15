@@ -3,7 +3,9 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,9 +16,8 @@ import java.util.List;
 public class WeightLossHis {
     @EmbeddedId
     private WeightLossHisKey key;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "ref_no")
     private String refNo;
     @Column(name = "remark")

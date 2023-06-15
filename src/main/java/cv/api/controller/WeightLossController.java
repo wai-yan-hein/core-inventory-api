@@ -6,7 +6,6 @@
 package cv.api.controller;
 
 import cv.api.common.FilterObject;
-import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.WeightLossHis;
 import cv.api.entity.WeightLossHisKey;
@@ -15,8 +14,8 @@ import cv.api.service.WeightLossDetailService;
 import cv.api.service.WeightLossService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -26,7 +25,6 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/weight")
 @Slf4j
 public class WeightLossController {
-    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private WeightLossService weightLossService;
     @Autowired
@@ -35,12 +33,12 @@ public class WeightLossController {
     private WeightLossDetailService weightLossDetailService;
 
     @PostMapping(path = "/save-weight-loss")
-    public ResponseEntity<?> saveStockIO(@RequestBody WeightLossHis w) {
-        return ResponseEntity.ok(weightLossService.save(w));
+    public Mono<?> save(@RequestBody WeightLossHis w) {
+        return Mono.justOrEmpty(weightLossService.save(w));
     }
 
     @PostMapping(path = "/get-weight-loss")
-    public ResponseEntity<?> getStockIO(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getStockIO(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -51,7 +49,7 @@ public class WeightLossController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        return ResponseEntity.ok(reportService.getWeightLossHistory(fromDate, toDate, refNo, vouNo, remark, stockCode, locCode, compCode, deptId, deleted));
+        return Flux.fromIterable(reportService.getWeightLossHistory(fromDate, toDate, refNo, vouNo, remark, stockCode, locCode, compCode, deptId, deleted));
     }
 
     @PostMapping(path = "/delete-weight-loss")
@@ -67,12 +65,12 @@ public class WeightLossController {
     }
 
     @PostMapping(path = "/find-weight-loss")
-    public ResponseEntity<?> findStockIO(@RequestBody WeightLossHisKey key) {
-        return ResponseEntity.ok(weightLossService.findById(key));
+    public Mono<?> find(@RequestBody WeightLossHisKey key) {
+        return Mono.justOrEmpty(weightLossService.findById(key));
     }
 
     @GetMapping(path = "/get-weight-loss-detail")
-    public ResponseEntity<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return ResponseEntity.ok(weightLossDetailService.search(vouNo, compCode, deptId));
+    public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(weightLossDetailService.search(vouNo, compCode, deptId));
     }
 }

@@ -5,7 +5,6 @@
  */
 package cv.api.controller;
 
-import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;

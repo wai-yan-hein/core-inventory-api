@@ -3,7 +3,9 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,9 +22,8 @@ public class TransferHis {
     private Date createdDate;
     @Column(name = "deleted")
     private boolean deleted;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "ref_no")
     private String refNo;
     @Column(name = "remark")
@@ -50,12 +51,4 @@ public class TransferHis {
     private String status = "STATUS";
     @Transient
     private List<String> location;
-
-    public TransferHis() {
-    }
-
-    public TransferHis(Date updatedDate, List<String> location) {
-        this.updatedDate = updatedDate;
-        this.location = location;
-    }
 }

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.hibernate.annotations.GenerationTime;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 /**

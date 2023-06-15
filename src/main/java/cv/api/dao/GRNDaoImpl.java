@@ -31,7 +31,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
 
     @Override
     public boolean delete(GRNKey key) {
-        String sql = "update grn set deleted =1 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        String sql = "update grn set deleted = true where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         execSql(sql);
         return true;
     }
@@ -45,7 +45,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
                 "from grn\n" +
                 "where comp_code='" + compCode + "'\n" +
                 "and (dept_id =" + deptId + " or 0=" + deptId + ")\n" +
-                "and deleted =0\n" +
+                "and deleted = false\n" +
                 "and closed =0\n" +
                 "and batch_no like '" + batchNo + "%'\n" +
                 "order by batch_no\n" +

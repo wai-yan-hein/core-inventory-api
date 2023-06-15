@@ -2,7 +2,9 @@ package cv.api.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,9 +16,8 @@ public class GRN {
     private GRNKey key;
     @Column(name = "batch_no")
     private String batchNo;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "trader_code")
     private String traderCode;
     @Column(name = "closed")

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,8 +30,6 @@ public class AccountRepo {
     private ReportService reportService;
     @Autowired
     private Environment environment;
-    @Autowired
-    private UserRepo userRepo;
     @Autowired
     private TraderService traderService;
     @Autowired
@@ -196,14 +195,8 @@ public class AccountRepo {
                 accTrader.setMacId(macId);
 
                 switch (traderType) {
-                    case "CUS" -> {
-                        accTrader.setTraderType("C");
-                        accTrader.setAccount(Util1.isNull(t.getAccount(), getCustomerAcc(key.getCompCode())));
-                    }
-                    case "SUP" -> {
-                        accTrader.setAccount(Util1.isNull(t.getAccount(), getSupplierAcc(key.getCompCode())));
-                        accTrader.setTraderType("S");
-                    }
+                    case "CUS" -> accTrader.setTraderType("C");
+                    case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
                 try {
@@ -227,16 +220,6 @@ public class AccountRepo {
                 .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
     }
 
-    private String getCustomerAcc(String compCode) {
-        SystemProperty p = userRepo.findProperty("customer.account", compCode);
-        return p == null ? null : p.getPropValue();
-    }
-
-    private String getSupplierAcc(String compCode) {
-        SystemProperty p = userRepo.findProperty("supplier.account", compCode);
-        return p == null ? null : p.getPropValue();
-    }
-
     public void sendSale(SaleHis sh) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             String tranSource = "SALE";
@@ -249,7 +232,7 @@ public class AccountRepo {
                 String balAcc = setting.getBalanceAcc();
                 String taxAcc = setting.getTaxAcc();
                 String deptCode = setting.getDeptCode();
-                Date vouDate = sh.getVouDate();
+                LocalDateTime vouDate = sh.getVouDate();
                 String traderCode = sh.getTraderCode();
                 String curCode = sh.getCurCode();
                 String remark = sh.getRemark();
@@ -409,7 +392,7 @@ public class AccountRepo {
                 String commAcc = setting.getCommAcc();
                 String disAcc = setting.getDiscountAcc();
                 String deptCode = setting.getDeptCode();
-                Date vouDate = ph.getVouDate();
+                LocalDateTime vouDate = ph.getVouDate();
                 String traderCode = ph.getTraderCode();
                 String curCode = ph.getCurCode();
                 String remark = ph.getRemark();
@@ -595,7 +578,7 @@ public class AccountRepo {
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
-                Date vouDate = ri.getVouDate();
+                LocalDateTime vouDate = ri.getVouDate();
                 String traderCode = ri.getTraderCode();
                 String curCode = ri.getCurCode();
                 String remark = ri.getRemark();
@@ -681,7 +664,7 @@ public class AccountRepo {
                 String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
                 String deptCode = setting.getDeptCode();
-                Date vouDate = ro.getVouDate();
+                LocalDateTime vouDate = ro.getVouDate();
                 String traderCode = ro.getTraderCode();
                 String curCode = ro.getCurCode();
                 String remark = ro.getRemark();
@@ -765,7 +748,7 @@ public class AccountRepo {
                     String compCode = ph.getKey().getCompCode();
                     Integer deptId = ph.getKey().getDeptId();
                     String traderCode = ph.getTraderCode();
-                    Date vouDate = ph.getVouDate();
+                    LocalDateTime vouDate = ph.getVouDate();
                     double payAmt = ph.getAmount();
                     String curCode = ph.getCurCode();
                     String remark = ph.getRemark();

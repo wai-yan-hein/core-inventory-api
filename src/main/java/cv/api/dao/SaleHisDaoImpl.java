@@ -93,7 +93,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update sale_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update sale_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSql(sql);
     }
 
@@ -102,7 +102,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update sale_his set deleted =0,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update sale_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSql(sql);
     }
 
@@ -166,7 +166,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                             sh.setKey(k);
                             sh.setTraderCode(rs.getString("trader_code"));
                             sh.setSaleManCode(rs.getString("saleman_code"));
-                            sh.setVouDate(rs.getDate("vou_date"));
+                            sh.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                             sh.setCreditTerm(rs.getDate("credit_term"));
                             sh.setCurCode(rs.getString("cur_code"));
                             sh.setRemark(rs.getString("remark"));
@@ -222,7 +222,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         General g = new General();
         String sql = "select count(*) vou_count,sum(paid) paid\n" +
                 "from sale_his\n" +
-                "where deleted =0\n" +
+                "where deleted = false\n" +
                 "and date(vou_date)='" + vouDate + "'\n" +
                 "and comp_code='" + compCode + "'\n" +
                 "and dept_id ='" + depId + "'";

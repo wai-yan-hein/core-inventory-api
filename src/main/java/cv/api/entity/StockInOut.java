@@ -8,8 +8,10 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -42,9 +44,8 @@ public class StockInOut implements Serializable {
     private String vouStatusCode;
     @Column(name = "mac_id")
     private Integer macId;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "deleted")
     private Boolean deleted;
     @Column(name = "intg_upd_status")

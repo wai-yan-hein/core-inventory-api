@@ -1,6 +1,5 @@
 package cv.api.controller;
 
-import cv.api.cloud.CloudMQSender;
 import cv.api.common.*;
 import cv.api.entity.*;
 import cv.api.model.AccTraderKey;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -62,8 +60,7 @@ public class SetupController {
     private UnitRelationService unitRelationService;
     @Autowired
     private ReportService reportService;
-    @Autowired
-    private FontService fontService;
+
     @Autowired
     private TraderGroupService traderGroupService;
     @Autowired
@@ -74,11 +71,9 @@ public class SetupController {
     private AccountRepo accountRepo;
     @Autowired
     private AccSettingService accSettingService;
-    @Autowired(required = false)
-    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-currency")
-    public Mono<Currency> saveCurrency(@RequestBody Currency machine, HttpServletRequest request) {
+    public Mono<Currency> saveCurrency(@RequestBody Currency machine) {
         Currency currency = currencyService.save(machine);
         return Mono.justOrEmpty(currency);
     }
@@ -99,8 +94,6 @@ public class SetupController {
     public Mono<Category> saveCategory(@RequestBody Category cat) {
         cat.setUpdatedDate(Util1.getTodayDate());
         Category category = categoryService.save(cat);
-        //sent to cloud
-        if (cloudMQSender != null) cloudMQSender.send(cat);
         return Mono.justOrEmpty(category);
     }
 
@@ -132,8 +125,6 @@ public class SetupController {
     public Mono<Location> saveLocation(@RequestBody Location location) {
         location.setUpdatedDate(Util1.getTodayDate());
         Location loc = locationService.save(location);
-        //sent to cloud
-        if (cloudMQSender != null) cloudMQSender.send(loc);
         return Mono.justOrEmpty(loc);
     }
 
@@ -160,11 +151,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-saleman")
-    public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan, HttpServletRequest request) {
+    public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan) {
         saleMan.setUpdatedDate(Util1.getTodayDate());
         SaleMan sm = saleManService.save(saleMan);
-        //sent to cloud
-        if (cloudMQSender != null) cloudMQSender.send(saleMan);
         return Mono.justOrEmpty(sm);
     }
 
@@ -192,11 +181,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-brand")
-    public Mono<StockBrand> saveBrand(@RequestBody StockBrand brand, HttpServletRequest request) {
+    public Mono<StockBrand> saveBrand(@RequestBody StockBrand brand) {
         brand.setUpdatedDate(Util1.getTodayDate());
         StockBrand b = brandService.save(brand);
-        //send to cloud
-        if (cloudMQSender != null) cloudMQSender.send(brand);
         return Mono.justOrEmpty(b);
     }
 
@@ -229,11 +216,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-type")
-    public Mono<StockType> saveType(@RequestBody StockType type, HttpServletRequest request) {
+    public Mono<StockType> saveType(@RequestBody StockType type) {
         type.setUpdatedDate(Util1.getTodayDate());
         StockType b = typeService.save(type);
-        //send to cloud
-        if (cloudMQSender != null) cloudMQSender.send(type);
         return Mono.justOrEmpty(b);
     }
 
@@ -265,8 +250,6 @@ public class SetupController {
     public Mono<StockUnit> saveUnit(@RequestBody StockUnit unit) {
         unit.setUpdatedDate(Util1.getTodayDate());
         StockUnit b = unitService.save(unit);
-        //send to cloud
-        if (cloudMQSender != null) cloudMQSender.send(unit);
         return Mono.justOrEmpty(b);
     }
 
@@ -293,7 +276,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-region")
-    public Mono<Region> saveRegion(@RequestBody Region region, HttpServletRequest request) throws Exception {
+    public Mono<Region> saveRegion(@RequestBody Region region) throws Exception {
         region.setUpdatedDate(Util1.getTodayDate());
         Region b = regionService.save(region);
         return Mono.justOrEmpty(b);
@@ -338,7 +321,6 @@ public class SetupController {
         trader.setUpdatedDate(Util1.getTodayDate());
         trader = traderService.saveTrader(trader);
         accountRepo.sendTrader(trader);
-        if (cloudMQSender != null) cloudMQSender.send(trader);
         return Mono.justOrEmpty(trader);
     }
 
@@ -398,8 +380,6 @@ public class SetupController {
     public Mono<Stock> saveStock(@RequestBody Stock stock) {
         stock.setUpdatedDate(LocalDateTime.now());
         Stock b = stockService.save(stock);
-        //for cloud
-        if (cloudMQSender != null) cloudMQSender.send(b);
         return Mono.justOrEmpty(b);
     }
 
@@ -457,11 +437,9 @@ public class SetupController {
 
 
     @PostMapping(path = "/save-voucher-status")
-    public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus, HttpServletRequest request) {
+    public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus) {
         vouStatus.setUpdatedDate(Util1.getTodayDate());
         VouStatus b = vouStatusService.save(vouStatus);
-        //sent to cloud
-        if (cloudMQSender != null) cloudMQSender.send(b);
         return Mono.justOrEmpty(b);
     }
 
@@ -482,7 +460,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-opening")
-    public Mono<?> saveOpening(@RequestBody OPHis opHis, HttpServletRequest request) {
+    public Mono<?> saveOpening(@RequestBody OPHis opHis) {
         if (Util1.isNullOrEmpty(opHis.getVouDate())) {
             ro.setMessage("Invalid Opening Date.");
         } else if (Util1.isNullOrEmpty(opHis.getLocCode())) {
@@ -531,7 +509,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/save-opening-detail")
-    public Mono<OPHisDetail> saveOpeningDetail(@RequestBody OPHisDetail opHis, HttpServletRequest request) {
+    public Mono<OPHisDetail> saveOpeningDetail(@RequestBody OPHisDetail opHis) {
         OPHisDetail op = opHisDetailService.save(opHis);
         return Mono.justOrEmpty(op);
     }
@@ -631,16 +609,9 @@ public class SetupController {
     @PostMapping(path = "/save-unit-relation")
     public Mono<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
-        //sent to cloud
-        if (cloudMQSender != null) cloudMQSender.send(relation);
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/get-font")
-    public Flux<?> getFont() {
-        List<CFont> type = fontService.getFont();
-        return Flux.fromIterable(type);
-    }
 
     @PostMapping(path = "/save-trader-group")
     public Mono<?> saveTraderGroup(@RequestBody TraderGroup group) {
