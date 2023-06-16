@@ -3,6 +3,7 @@ package cv.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -10,7 +11,7 @@ import java.util.Date;
 public class Gl {
 
     private GlKey key;
-    private Date glDate;
+    private LocalDateTime glDate;
     private String description;
     private String srcAccCode;
     private String accCode;

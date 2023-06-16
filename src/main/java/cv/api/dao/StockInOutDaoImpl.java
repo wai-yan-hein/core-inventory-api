@@ -98,7 +98,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update stock_in_out set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update stock_in_out set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSql(sql);
 
     }
@@ -108,7 +108,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update stock_in_out set deleted =0 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update stock_in_out set deleted = false where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSql(sql);
     }
 

@@ -2,11 +2,8 @@ package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import jakarta.persistence.*;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -75,7 +75,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 key.setVouNo(rs.getString("vou_no"));
                 key.setDeptId(rs.getInt("dept_id"));
                 p.setKey(key);
-                p.setVouDate(rs.getDate("vou_date"));
+                p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                 p.setAmount(rs.getFloat("amount"));
                 p.setRemark(rs.getString("remark"));
                 p.setDeleted(rs.getBoolean("deleted"));

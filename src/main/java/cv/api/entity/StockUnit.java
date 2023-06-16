@@ -8,8 +8,7 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import java.util.Date;
 
 
@@ -27,12 +26,14 @@ public class StockUnit  {
     private StockUnitKey key;
     @Column(name = "unit_name", nullable = false, length = 45, unique = true)
     private String unitName;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime createdDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")
@@ -42,15 +43,15 @@ public class StockUnit  {
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
 
-//    public StockUnit(String unit) {
-//        this.key = new StockUnitKey();
-//        this.key.setUnitCode(unit);
-//    }
-//
-//    public StockUnit() {
-//    }
-//
-//    public StockUnit(Date updatedDate) {
-//        this.updatedDate = updatedDate;
-//    }
+    public StockUnit(String unit) {
+        this.key = new StockUnitKey();
+        this.key.setUnitCode(unit);
+    }
+
+    public StockUnit() {
+    }
+
+    public StockUnit(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

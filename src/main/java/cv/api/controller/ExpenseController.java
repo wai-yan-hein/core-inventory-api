@@ -6,8 +6,11 @@ import cv.api.entity.ExpenseKey;
 import cv.api.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.io.Flushable;
 
 @RestController
 @RequestMapping("/expense")
@@ -17,18 +20,18 @@ public class ExpenseController {
     private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-expense")
-    public ResponseEntity<?> saveExpense(@RequestBody Expense e) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(expenseService.save(e));
+    public Mono<?> saveExpense(@RequestBody Expense e) {
+        return Mono.justOrEmpty(expenseService.save(e));
     }
 
     @GetMapping(path = "/get-expense")
-    public ResponseEntity<?> getExpense(@RequestParam String compCode) {
-        return ResponseEntity.ok(expenseService.getExpense(compCode));
+    public Flux<?> getExpense(@RequestParam String compCode) {
+        return Flux.fromIterable(expenseService.getExpense(compCode));
     }
 
     @PostMapping(path = "/delete-expense")
-    public ResponseEntity<?> deletePur(@RequestBody ExpenseKey key) {
+    public Mono<?> deletePur(@RequestBody ExpenseKey key) {
         expenseService.delete(key);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ro);
+        return Mono.justOrEmpty(true);
     }
 }

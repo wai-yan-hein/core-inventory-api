@@ -5,14 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+
+import jakarta.persistence.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 public abstract class AbstractDao<PK extends Serializable, T> {
@@ -29,18 +30,20 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     @PersistenceContext
     private EntityManager entityManager;
 
-
+    @Transactional
     public T getByKey(PK key) {
         return entityManager.find(persistentClass, key);
     }
 
-
+    @Transactional
     public void saveOrUpdate(T entity, PK pk) {
         T t = entityManager.find(persistentClass, pk);
         if (t == null) entityManager.persist(entity);
         else entityManager.merge(entity);
 
     }
+
+    @Transactional
 
     public void remove(PK pk) {
         T byKey = getByKey(pk);
@@ -49,14 +52,19 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         }
     }
 
+    @Transactional
+
     public void update(T entity) {
         entityManager.merge(entity);
     }
 
+    @Transactional
 
     public List<T> findHSQL(String hsql) {
         return entityManager.createQuery(hsql, persistentClass).getResultList();
     }
+
+    @Transactional
 
     public void execSql(String... sql) {
         for (String s : sql) {
@@ -64,11 +72,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         }
     }
 
-
-    public List<Map<String, Object>> getList(String sql) {
-        return jdbcTemplate.queryForList(sql);
-    }
-
+    @Transactional
     public ResultSet getResult(String sql) {
         return jdbcTemplate.execute((ConnectionCallback<ResultSet>) con -> {
             Statement stmt = con.createStatement();

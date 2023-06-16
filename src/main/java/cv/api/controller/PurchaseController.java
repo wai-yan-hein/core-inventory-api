@@ -5,9 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.cloud.CloudMQSender;
 import cv.api.common.FilterObject;
-import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.PurHis;
 import cv.api.entity.PurHisDetail;
@@ -19,11 +17,11 @@ import cv.api.service.PurHisService;
 import cv.api.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,7 +32,6 @@ import java.util.List;
 @Slf4j
 public class PurchaseController {
 
-    private final ReturnObject ro = new ReturnObject();
     @Autowired
     private PurHisService phService;
     @Autowired
@@ -43,18 +40,14 @@ public class PurchaseController {
     private ReportService reportService;
     @Autowired
     private AccountRepo accountRepo;
-    @Autowired(required = false)
-    private CloudMQSender cloudMQSender;
 
     @PostMapping(path = "/save-pur")
-    public ResponseEntity<PurHis> savePurchase(@RequestBody PurHis pur) {
-        pur.setUpdatedDate(Util1.getTodayDate());
+    public Mono<PurHis> savePurchase(@RequestBody PurHis pur) {
+        pur.setUpdatedDate(LocalDateTime.now());
         pur = phService.save(pur);
         //send message to service
         accountRepo.sendPurchase(pur);
-        //send to cloud
-        if (cloudMQSender != null) cloudMQSender.send(pur);
-        return ResponseEntity.ok(pur);
+        return Mono.justOrEmpty(pur);
     }
 
     @PostMapping(path = "/get-pur")
@@ -83,22 +76,19 @@ public class PurchaseController {
         phService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
-        //delete in cloud
-        if (cloudMQSender != null) cloudMQSender.delete(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/restore-pur")
     public Mono<?> restorePur(@RequestBody PurHisKey key) throws Exception {
         phService.restore(key);
-        if (cloudMQSender != null) cloudMQSender.restore(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/find-pur")
-    public ResponseEntity<PurHis> findPur(@RequestBody PurHisKey key) {
+    public Mono<PurHis> findPur(@RequestBody PurHisKey key) {
         PurHis sh = phService.findById(key);
-        return ResponseEntity.ok(sh);
+        return Mono.justOrEmpty(sh);
     }
 
     @GetMapping(path = "/get-pur-detail")

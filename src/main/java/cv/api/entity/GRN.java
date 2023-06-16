@@ -1,9 +1,9 @@
 package cv.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -11,13 +11,12 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "grn")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GRN {
     @EmbeddedId
     private GRNKey key;
     @Column(name = "batch_no")
     private String batchNo;
-    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
     @Column(name = "trader_code")
     private String traderCode;
@@ -25,12 +24,14 @@ public class GRN {
     private boolean closed;
     @Column(name = "deleted")
     private boolean deleted;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime createdDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
     @Column(name = "mac_id")

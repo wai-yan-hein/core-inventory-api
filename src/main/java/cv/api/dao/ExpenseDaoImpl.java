@@ -21,13 +21,13 @@ public class ExpenseDaoImpl extends AbstractDao<ExpenseKey, Expense> implements 
 
     @Override
     public List<Expense> getExpense(String compCode) {
-        String hsql = "select o from Expense o where o.key.compCode ='" + compCode + "' and o.deleted = 0";
+        String hsql = "select o from Expense o where o.key.compCode ='" + compCode + "' and o.deleted = false";
         return findHSQL(hsql);
     }
 
     @Override
     public void delete(ExpenseKey key) {
-        String sql = "update expense set deleted = 1 where expense_code ='" + key.getExpenseCode() + "' and comp_code ='" + key.getCompCode() + "'";
+        String sql = "update expense set deleted = true where expense_code ='" + key.getExpenseCode() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
     }
 }

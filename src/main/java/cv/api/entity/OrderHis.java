@@ -8,7 +8,8 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -28,10 +29,11 @@ public class OrderHis {
     private String traderCode;
     @Column(name = "saleman_code")
     private String saleManCode;
-    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
-    @Column(name = "credit_term", columnDefinition = "TIMESTAMP")
-    private LocalDateTime creditTerm;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "credit_term")
+    private Date creditTerm;
     @Column(name = "cur_code")
     private String curCode;
     @Column(name = "remark")
@@ -63,7 +65,8 @@ public class OrderHis {
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
     private Date updatedDate;
     @Column(name = "address")
     private String address;

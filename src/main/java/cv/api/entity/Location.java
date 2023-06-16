@@ -8,8 +8,7 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import java.util.Date;
 
 /**
@@ -28,12 +27,14 @@ public class Location {
     private String parentCode;
     @Column(name = "calc_stock")
     private boolean calcStock;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime createdDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")
@@ -44,4 +45,11 @@ public class Location {
     private String intgUpdStatus;
     @Column(name = "map_dept_id")
     private Integer mapDeptId;
+
+    public Location() {
+    }
+
+    public Location(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

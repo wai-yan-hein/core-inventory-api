@@ -47,7 +47,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update transfer_his set deleted =1 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update transfer_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSql(sql);
     }
 
@@ -56,7 +56,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update transfer_his set deleted =0 where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update transfer_his set deleted = false where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
         execSql(sql);
     }
 
@@ -98,7 +98,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
                             th.setCreatedBy(rs.getString("created_by"));
                             th.setCreatedDate(rs.getTimestamp("created_date"));
                             th.setDeleted(rs.getBoolean("deleted"));
-                            th.setVouDate(rs.getDate("vou_date"));
+                            th.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                             th.setRefNo(rs.getString("ref_no"));
                             th.setRemark(rs.getString("remark"));
                             th.setUpdatedBy(rs.getString("updated_by"));

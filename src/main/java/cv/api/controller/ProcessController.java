@@ -11,7 +11,6 @@ import cv.api.service.ProcessHisDetailService;
 import cv.api.service.ProcessHisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,8 +27,8 @@ public class ProcessController {
     private ProcessHisDetailService processHisDetailService;
 
     @PostMapping(path = "/save-process")
-    public ResponseEntity<?> saveProcess(@RequestBody ProcessHis p) {
-        return ResponseEntity.ok(processHisService.save(p));
+    public Mono<?> saveProcess(@RequestBody ProcessHis p) {
+        return Mono.just(processHisService.save(p));
     }
 
     @PostMapping(path = "/delete-process")
@@ -39,8 +38,8 @@ public class ProcessController {
     }
 
     @PostMapping(path = "/find-process")
-    public ResponseEntity<?> findProcess(@RequestBody ProcessHisKey p) {
-        return ResponseEntity.ok(processHisService.findById(p));
+    public Mono<?> findProcess(@RequestBody ProcessHisKey p) {
+        return Mono.justOrEmpty(processHisService.findById(p));
     }
 
     @PostMapping(path = "/restore-process")
@@ -67,8 +66,8 @@ public class ProcessController {
     }
 
     @PostMapping(path = "/save-process-detail")
-    public ResponseEntity<?> saveProcessDetail(@RequestBody ProcessHisDetail p) {
-        return ResponseEntity.ok(processHisDetailService.save(p));
+    public Mono<?> saveProcessDetail(@RequestBody ProcessHisDetail p) {
+        return Mono.just(processHisDetailService.save(p));
     }
 
     @PostMapping(path = "/delete-process-detail")
@@ -79,9 +78,9 @@ public class ProcessController {
     }
 
     @GetMapping(path = "/get-process-detail")
-    public ResponseEntity<?> getProcessDetail(@RequestParam String vouNo,
+    public Flux<?> getProcessDetail(@RequestParam String vouNo,
                                               @RequestParam String compCode,
                                               @RequestParam Integer deptId) {
-        return ResponseEntity.ok(processHisDetailService.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(processHisDetailService.search(vouNo, compCode, deptId));
     }
 }

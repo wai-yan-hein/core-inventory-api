@@ -2,7 +2,8 @@ package cv.api.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -23,10 +24,12 @@ public class PaymentHis {
     private boolean deleted;
     @Column(name = "amount")
     private Float amount;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime createdDate;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")

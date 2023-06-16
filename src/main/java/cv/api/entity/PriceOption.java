@@ -2,8 +2,7 @@ package cv.api.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Data
@@ -18,6 +17,7 @@ public class PriceOption {
     private Integer uniqueId;
     @Column(name = "tran_option")
     private String tranOption;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 }

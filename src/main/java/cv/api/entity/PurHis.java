@@ -7,7 +7,8 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -19,12 +20,13 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "pur_his")
-public class PurHis implements java.io.Serializable {
+public class PurHis {
 
     @EmbeddedId
     private PurHisKey key;
     @Column(name = "trader_code")
     private String traderCode;
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
     @Temporal(TemporalType.DATE)
@@ -91,11 +93,4 @@ public class PurHis implements java.io.Serializable {
     @Transient
     private List<PurExpense> listExpense;
 
-//    public PurHis() {
-//    }
-//
-//    public PurHis(Date updatedDate, List<String> location) {
-//        this.updatedDate = updatedDate;
-//        this.location = location;
-//    }
 }

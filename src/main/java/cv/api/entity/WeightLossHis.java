@@ -3,7 +3,8 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 public class WeightLossHis {
     @EmbeddedId
     private WeightLossHisKey key;
-    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
     @Column(name = "ref_no")
     private String refNo;
@@ -27,8 +28,9 @@ public class WeightLossHis {
     private String updatedBy;
     @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     @Column(name = "deleted")
     private boolean deleted;
     @Transient

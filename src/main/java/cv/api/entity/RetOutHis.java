@@ -7,7 +7,8 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -41,12 +42,14 @@ public class RetOutHis implements java.io.Serializable {
     private Float balance;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime createdDate;
+    @Column(name = "created_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedDate;
+    @Column(name = "updated_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedDate;
     @Column(name = "remark")
     private String remark;
     @Column(name = "session_id")
@@ -72,11 +75,11 @@ public class RetOutHis implements java.io.Serializable {
     @Transient
     private List<String> location;
 
-//    public RetOutHis() {
-//    }
-//
-//    public RetOutHis(Date updatedDate, List<String> location) {
-//        this.updatedDate = updatedDate;
-//        this.location = location;
-//    }
+    public RetOutHis() {
+    }
+
+    public RetOutHis(Date updatedDate, List<String> location) {
+        this.updatedDate = updatedDate;
+        this.location = location;
+    }
 }

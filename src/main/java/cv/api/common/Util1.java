@@ -9,18 +9,17 @@ import com.google.gson.GsonBuilder;
 import com.google.myanmartools.TransliterateZ2U;
 import com.google.myanmartools.ZawgyiDetector;
 import lombok.extern.slf4j.Slf4j;
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.model.enums.CompressionLevel;
-import net.lingala.zip4j.model.enums.EncryptionMethod;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -36,11 +35,7 @@ public class Util1 {
 
     private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     public static String SYNC_DATE;
-    private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
-
-    public static <T> Object cast(Object from, Class<T> to) {
-        return gson.fromJson(gson.toJson(from), to);
-    }
+    //private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
 
     public static boolean getBoolean(String obj) {
         boolean status = false;
@@ -89,17 +84,9 @@ public class Util1 {
         return date;
     }
 
-    public static Date toDateTime(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        SimpleDateFormat f2 = new SimpleDateFormat("dd/MM/yyyy");
+    public static LocalDateTime toDateTime(LocalDateTime date) {
         LocalDateTime now = LocalDateTime.now();
-        String strDate = f2.format(date) + " " + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond();
-        try {
-            date = formatter.parse(strDate);
-        } catch (ParseException ex) {
-            log.error(String.format("toDateTime: %s", ex.getMessage()));
-        }
-        return date;
+        return LocalDateTime.of(date.toLocalDate(), LocalTime.of(now.getHour(), now.getMinute(), now.getSecond()));
     }
 
     public static String toDateStr(Date date, String format) {
@@ -116,18 +103,11 @@ public class Util1 {
     }
 
     public static String toDateStr(LocalDateTime dateTime, String format) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         // Format the LocalDateTime
         return dateTime.format(formatter);
     }
 
-    public static String toDateTimeStr(Date date) {
-        if (date == null) {
-            return null;
-        }
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return formatter.format(date);
-    }
 
     public static Date getTodayDate() {
         return Calendar.getInstance().getTime();
@@ -177,25 +157,13 @@ public class Util1 {
         return value;
     }
 
-    public static Integer getInteger(Object obj) {
-        return obj != null ? Integer.parseInt(obj.toString()) : 0;
-    }
-
-    public static boolean getBoolean(Boolean obj) {
-        if (obj == null) {
-            obj = false;
-        }
-        return obj;
-
-    }
-
     public static void writeJsonFile(Object data, String exportPath) throws IOException {
         try (Writer writer = new FileWriter(exportPath, StandardCharsets.UTF_8)) {
             gson.toJson(data, writer);
         }
     }
 
-    public static void extractZipToJson(byte[] zipData, String exportPath) {
+    /*public static void extractZipToJson(byte[] zipData, String exportPath) {
         try {
             File file = new File(exportPath.concat(".zip"));
             try (FileOutputStream stream = new FileOutputStream(file)) {
@@ -230,7 +198,7 @@ public class Util1 {
         p.setCompressionLevel(CompressionLevel.HIGHER);
         p.setEncryptionMethod(EncryptionMethod.AES);
         return p;
-    }
+    }*/
 
     public static Date getOldDate() {
         return Util1.toDate("1998-10-07");
@@ -264,11 +232,6 @@ public class Util1 {
 
     public static String cleanStr(String str) {
         return str;
-    }
-
-    public static LocalDateTime toLocalDateTime(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-
     }
 
     public static String isAll(String value) {
