@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -30,9 +32,9 @@ public class Currency implements java.io.Serializable {
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_dt", columnDefinition = "TIMESTAMP")
-    private Date createdDt;
+    private LocalDateTime createdDt;
     @Column(name = "updated_by")
     private String updatedBy;
     @Column(name = "updated_dt", columnDefinition = "TIMESTAMP")
-    private Date updatedDt;
+    private LocalDateTime updatedDt;
 }

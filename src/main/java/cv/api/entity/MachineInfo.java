@@ -9,6 +9,8 @@ import lombok.Data;
 import org.hibernate.annotations.GenerationTime;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -28,16 +30,9 @@ public class MachineInfo implements java.io.Serializable {
     private String machineName;
     @Column(name = "machine_ip")
     private String ipAddress;
-    @Column(name = "created_date", insertable = false, updatable = false,
-            columnDefinition = "timestamp default current_timestamp")
-    @org.hibernate.annotations.Generated(value = GenerationTime.INSERT)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date regDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
-
-    public MachineInfo() {
-    }
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime regDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
 
 }

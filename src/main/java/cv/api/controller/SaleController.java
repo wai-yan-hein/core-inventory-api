@@ -43,7 +43,7 @@ public class SaleController {
 
     @PostMapping(path = "/save-sale")
     public Mono<?> saveSale(@RequestBody SaleHis sale) {
-        sale.setUpdatedDate(Util1.getTodayDate());
+        sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
             sale = shService.save(sale);

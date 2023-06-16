@@ -39,7 +39,7 @@ public class TransferController {
 
     @PostMapping(path = "/save-transfer")
     public Mono<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
-        obj.setUpdatedDate(Util1.getTodayDate());
+        obj.setUpdatedDate(Util1.getTodayLocalDate());
         //save to local
         obj = thService.save(obj);
         return Mono.justOrEmpty(obj);

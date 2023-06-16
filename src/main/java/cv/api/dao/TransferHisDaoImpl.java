@@ -96,13 +96,13 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
                             key.setCompCode(rs.getString("comp_code"));
                             th.setKey(key);
                             th.setCreatedBy(rs.getString("created_by"));
-                            th.setCreatedDate(rs.getTimestamp("created_date"));
+                            th.setCreatedDate(rs.getTimestamp("created_date").toLocalDateTime());
                             th.setDeleted(rs.getBoolean("deleted"));
                             th.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                             th.setRefNo(rs.getString("ref_no"));
                             th.setRemark(rs.getString("remark"));
                             th.setUpdatedBy(rs.getString("updated_by"));
-                            th.setUpdatedDate(rs.getTimestamp("updated_date"));
+                            th.setUpdatedDate(rs.getTimestamp("updated_date").toLocalDateTime());
                             th.setLocCodeFrom(rs.getString("loc_code_from"));
                             th.setLocCodeTo(rs.getString("loc_code_to"));
                             th.setMacId(rs.getInt("mac_id"));

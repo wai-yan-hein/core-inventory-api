@@ -59,7 +59,7 @@ public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, Pr
                 p.setQty(rs.getFloat("qty"));
                 p.setPrice(rs.getFloat("price"));
                 p.setUnit(rs.getString("unit"));
-                p.setVouDate(rs.getDate("vou_date"));
+                p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                 list.add(p);
             }
         } catch (Exception e) {

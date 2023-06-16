@@ -42,14 +42,12 @@ public class RetInHis implements java.io.Serializable {
     private Float balance;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "created_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "updated_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "remark")
     private String remark;
     @Column(name = "session_id")
@@ -74,11 +72,4 @@ public class RetInHis implements java.io.Serializable {
     private List<RetInKey> listDel;
     @Transient
     private List<String> location;
-    public RetInHis() {
-    }
-
-    public RetInHis(Date updatedDate, List<String> location) {
-        this.updatedDate = updatedDate;
-        this.location = location;
-    }
 }

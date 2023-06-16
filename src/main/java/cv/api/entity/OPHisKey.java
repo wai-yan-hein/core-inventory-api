@@ -15,7 +15,4 @@ public class OPHisKey implements Serializable {
     @Column(name = "dept_id")
     private Integer deptId;
 
-    public OPHisKey() {
-    }
-
 }

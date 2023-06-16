@@ -167,7 +167,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                             sh.setTraderCode(rs.getString("trader_code"));
                             sh.setSaleManCode(rs.getString("saleman_code"));
                             sh.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
-                            sh.setCreditTerm(rs.getDate("credit_term"));
+                            sh.setCreditTerm(rs.getTimestamp("credit_term").toLocalDateTime());
                             sh.setCurCode(rs.getString("cur_code"));
                             sh.setRemark(rs.getString("remark"));
                             sh.setVouTotal(rs.getFloat("vou_total"));
@@ -182,7 +182,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                             sh.setPaid(rs.getFloat("paid"));
                             sh.setBalance(rs.getFloat("vou_balance"));
                             sh.setUpdatedBy(rs.getString("updated_by"));
-                            sh.setUpdatedDate(rs.getTimestamp("updated_date"));
+                            sh.setUpdatedDate(rs.getTimestamp("updated_date").toLocalDateTime());
                             sh.setAddress(rs.getString("address"));
                             sh.setOrderCode(rs.getString("order_code"));
                             sh.setLocCode(rs.getString("loc_code"));

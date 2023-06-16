@@ -92,7 +92,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-category")
     public Mono<Category> saveCategory(@RequestBody Category cat) {
-        cat.setUpdatedDate(Util1.getTodayDate());
+        cat.setUpdatedDate(Util1.getTodayLocalDate());
         Category category = categoryService.save(cat);
         return Mono.justOrEmpty(category);
     }
@@ -123,7 +123,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-location")
     public Mono<Location> saveLocation(@RequestBody Location location) {
-        location.setUpdatedDate(Util1.getTodayDate());
+        location.setUpdatedDate(Util1.getTodayLocalDate());
         Location loc = locationService.save(location);
         return Mono.justOrEmpty(loc);
     }
@@ -152,7 +152,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-saleman")
     public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan) {
-        saleMan.setUpdatedDate(Util1.getTodayDate());
+        saleMan.setUpdatedDate(Util1.getTodayLocalDate());
         SaleMan sm = saleManService.save(saleMan);
         return Mono.justOrEmpty(sm);
     }
@@ -182,7 +182,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-brand")
     public Mono<StockBrand> saveBrand(@RequestBody StockBrand brand) {
-        brand.setUpdatedDate(Util1.getTodayDate());
+        brand.setUpdatedDate(Util1.getTodayLocalDate());
         StockBrand b = brandService.save(brand);
         return Mono.justOrEmpty(b);
     }
@@ -217,7 +217,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-type")
     public Mono<StockType> saveType(@RequestBody StockType type) {
-        type.setUpdatedDate(Util1.getTodayDate());
+        type.setUpdatedDate(Util1.getTodayLocalDate());
         StockType b = typeService.save(type);
         return Mono.justOrEmpty(b);
     }
@@ -248,7 +248,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-unit")
     public Mono<StockUnit> saveUnit(@RequestBody StockUnit unit) {
-        unit.setUpdatedDate(Util1.getTodayDate());
+        unit.setUpdatedDate(Util1.getTodayLocalDate());
         StockUnit b = unitService.save(unit);
         return Mono.justOrEmpty(b);
     }
@@ -277,7 +277,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-region")
     public Mono<Region> saveRegion(@RequestBody Region region) throws Exception {
-        region.setUpdatedDate(Util1.getTodayDate());
+        region.setUpdatedDate(Util1.getTodayLocalDate());
         Region b = regionService.save(region);
         return Mono.justOrEmpty(b);
     }
@@ -308,7 +308,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-customer")
     public Mono<Trader> saveCustomer(@RequestBody Trader trader) {
-        trader.setUpdatedDate(Util1.getTodayDate());
+        trader.setUpdatedDate(Util1.getTodayLocalDate());
         trader.setType("CUS");
         trader.setMacId(0);
         Trader b = traderService.saveTrader(trader);
@@ -318,7 +318,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-trader")
     public Mono<Trader> saveTrader(@RequestBody Trader trader) {
-        trader.setUpdatedDate(Util1.getTodayDate());
+        trader.setUpdatedDate(Util1.getTodayLocalDate());
         trader = traderService.saveTrader(trader);
         accountRepo.sendTrader(trader);
         return Mono.justOrEmpty(trader);
@@ -438,7 +438,7 @@ public class SetupController {
 
     @PostMapping(path = "/save-voucher-status")
     public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus) {
-        vouStatus.setUpdatedDate(Util1.getTodayDate());
+        vouStatus.setUpdatedDate(Util1.getTodayLocalDate());
         VouStatus b = vouStatusService.save(vouStatus);
         return Mono.justOrEmpty(b);
     }
@@ -472,7 +472,7 @@ public class SetupController {
             detailList.forEach(op -> op.setLocCode(opHis.getLocCode()));
             opHis.setDetailList(detailList);
             try {
-                opHis.setUpdatedDate(Util1.getTodayDate());
+                opHis.setUpdatedDate(Util1.getTodayLocalDate());
                 return Mono.just(opHisService.save(opHis));
             } catch (Exception e) {
                 log.error(String.format("saveOpening : %s", e.getMessage()));

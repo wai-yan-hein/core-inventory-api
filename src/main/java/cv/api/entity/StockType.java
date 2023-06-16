@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -26,14 +28,12 @@ public class StockType {
     private String stockTypeName;
     @Column(name = "account_id")
     private String account;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")
@@ -42,10 +42,4 @@ public class StockType {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
-    public StockType() {
-    }
-
-    public StockType(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
 }

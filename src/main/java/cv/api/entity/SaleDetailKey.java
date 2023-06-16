@@ -25,7 +25,4 @@ public class SaleDetailKey implements Serializable {
     private Integer uniqueId;
     @Column(name = "vou_no")
     private String vouNo;
-
-    public SaleDetailKey() {
-    }
 }

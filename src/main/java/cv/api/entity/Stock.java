@@ -97,13 +97,4 @@ public class Stock {
     @Transient
     private String catName;
 
-
-    public Stock() {
-    }
-
-    public Stock(LocalDateTime updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-
 }

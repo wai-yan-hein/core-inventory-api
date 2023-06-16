@@ -44,7 +44,7 @@ public class RetInController {
 
     @PostMapping(path = "/save-retin")
     public Mono<RetInHis> saveReturnIn(@RequestBody RetInHis retin) {
-        retin.setUpdatedDate(Util1.getTodayDate());
+        retin.setUpdatedDate(Util1.getTodayLocalDate());
         retin = riService.save(retin);
         //send message to service
         accountRepo.sendReturnIn(retin);

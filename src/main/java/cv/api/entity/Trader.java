@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -37,14 +38,12 @@ public class Trader {
     private String nrc;
     @Column(name = "mig_code")
     private String migCode;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")
@@ -75,11 +74,4 @@ public class Trader {
     private boolean deleted;
     @Column(name = "credit_amt")
     private Float creditAmt;
-
-    public Trader() {
-    }
-
-    public Trader(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
 }

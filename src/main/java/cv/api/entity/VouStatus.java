@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -26,14 +28,12 @@ public class VouStatus implements java.io.Serializable {
     private VouStatusKey key;
     @Column(name = "description")
     private String description;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")
@@ -42,12 +42,4 @@ public class VouStatus implements java.io.Serializable {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
-
-
-    public VouStatus() {
-    }
-
-    public VouStatus(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
 }

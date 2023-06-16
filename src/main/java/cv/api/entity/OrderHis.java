@@ -29,11 +29,10 @@ public class OrderHis {
     private String traderCode;
     @Column(name = "saleman_code")
     private String saleManCode;
-    @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "credit_term")
-    private Date creditTerm;
+    @Column(name = "credit_term", columnDefinition = "TIMESTAMP")
+    private LocalDateTime creditTerm;
     @Column(name = "cur_code")
     private String curCode;
     @Column(name = "remark")
@@ -65,9 +64,8 @@ public class OrderHis {
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "address")
     private String address;
     @Column(name = "loc_code")
@@ -90,12 +88,4 @@ public class OrderHis {
     private boolean backup;
     @Transient
     private List<String> location;
-
-    public OrderHis() {
-    }
-
-    public OrderHis(Date updatedDate, List<String> location) {
-        this.updatedDate = updatedDate;
-        this.location = location;
-    }
 }

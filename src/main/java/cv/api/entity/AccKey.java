@@ -11,10 +11,6 @@ public class AccKey implements Serializable {
     private String type;
     @Column(name = "comp_code")
     private String compCode;
-
-    public AccKey() {
-    }
-
     public AccKey(String type, String compCode) {
         this.type = type;
         this.compCode = compCode;

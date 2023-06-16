@@ -41,7 +41,7 @@ public class RetOutController {
 
     @PostMapping(path = "/save-retout")
     public Mono<?> saveReturnOut(@RequestBody RetOutHis retout) {
-        retout.setUpdatedDate(Util1.getTodayDate());
+        retout.setUpdatedDate(Util1.getTodayLocalDate());
         retout = roService.save(retout);
         accountRepo.sendReturnOut(retout);
         return Mono.justOrEmpty(retout);

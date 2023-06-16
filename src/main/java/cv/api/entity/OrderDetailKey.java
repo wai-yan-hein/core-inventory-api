@@ -25,6 +25,4 @@ public class OrderDetailKey implements Serializable {
     private Integer deptId;
     @Column(name = "unique_id")
     private Integer uniqueId;
-    public OrderDetailKey() {
-    }
 }

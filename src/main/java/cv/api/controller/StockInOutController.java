@@ -39,7 +39,7 @@ public class StockInOutController {
 
     @PostMapping(path = "/save-stockio")
     public Mono<StockInOut> saveStockIO(@RequestBody StockInOut stockio) {
-        stockio.setUpdatedDate(Util1.getTodayDate());
+        stockio.setUpdatedDate(Util1.getTodayLocalDate());
         stockio = ioService.save(stockio);
         return Mono.justOrEmpty(stockio);
     }

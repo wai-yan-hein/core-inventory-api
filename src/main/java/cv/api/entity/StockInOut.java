@@ -30,16 +30,14 @@ public class StockInOut implements Serializable {
     private String remark;
     @Column(name = "description")
     private String description;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "vou_status")
     private String vouStatusCode;
     @Column(name = "mac_id")
@@ -58,12 +56,4 @@ public class StockInOut implements Serializable {
     private List<StockInOutKey> listDel;
     @Transient
     private List<LocationKey> keys;
-
-    public StockInOut() {
-    }
-
-    public StockInOut(Date updatedDate, List<LocationKey> keys) {
-        this.updatedDate = updatedDate;
-        this.keys = keys;
-    }
 }

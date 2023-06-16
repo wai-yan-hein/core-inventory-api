@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -24,14 +25,12 @@ public class Region implements java.io.Serializable {
     private RegionKey key;
     @Column(name = "reg_name")
     private String regionName;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")

@@ -113,6 +113,10 @@ public class Util1 {
         return Calendar.getInstance().getTime();
     }
 
+    public static LocalDateTime getTodayLocalDate() {
+        return LocalDateTime.now();
+    }
+
     public static Date getSyncDate() {
         return Util1.toDate(SYNC_DATE);
     }
