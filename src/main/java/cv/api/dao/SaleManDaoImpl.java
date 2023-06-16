@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
 
     @Override
     public SaleMan save(SaleMan saleMan) {
-        saveOrUpdate(saleMan,saleMan.getKey());
+        saveOrUpdate(saleMan, saleMan.getKey());
         return saleMan;
     }
 
@@ -51,9 +52,9 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
     }
 
     @Override
-    public List<SaleMan> getSaleMan(String updatedDate) {
-        String hsql = "select o from SaleMan o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<SaleMan> getSaleMan(LocalDateTime updatedDate) {
+        String hsql = "select o from SaleMan o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
     @Override

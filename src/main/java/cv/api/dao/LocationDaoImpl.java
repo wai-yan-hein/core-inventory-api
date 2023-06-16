@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,9 +80,9 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     }
 
     @Override
-    public List<Location> getLocation(String updatedDate) {
-        String hsql = "select o from Location o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<Location> getLocation(LocalDateTime updatedDate) {
+        String hsql = "select o from Location o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
     @Override

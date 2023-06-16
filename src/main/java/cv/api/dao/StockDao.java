@@ -8,6 +8,7 @@ package cv.api.dao;
 import cv.api.entity.Stock;
 import cv.api.entity.StockKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public interface StockDao {
 
     Date getMaxDate();
 
-    List<Stock> getStock(String updatedDate);
+    List<Stock> getStock(LocalDateTime updatedDate);
     void update(StockKey key, boolean favorite);
 
 

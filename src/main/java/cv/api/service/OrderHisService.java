@@ -37,8 +37,6 @@ public interface OrderHisService {
 
     Date getMaxDate();
 
-    List<OrderHis> search(String updatedDate, List<String> keys);
-
     void truncate(OrderHisKey key);
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);

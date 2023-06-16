@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "unit_relation")
-public class UnitRelation implements java.io.Serializable {
+public class UnitRelation {
     @EmbeddedId
     private RelationKey key;
     @Column(name = "rel_name")

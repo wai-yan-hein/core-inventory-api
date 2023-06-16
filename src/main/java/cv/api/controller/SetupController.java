@@ -104,7 +104,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateCategory")
     public Flux<?> getUpdateCategory(@RequestParam String updatedDate) {
-        return Flux.fromIterable(categoryService.getCategory(updatedDate));
+        return Flux.fromIterable(categoryService.getCategory(Util1.toLocalDateTime(updatedDate)));
     }
 
 
@@ -135,7 +135,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateLocation")
     public Flux<?> getUpdateLocation(@RequestParam String updatedDate) {
-        return Flux.fromIterable(locationService.getLocation(updatedDate));
+        return Flux.fromIterable(locationService.getLocation(Util1.toLocalDateTime(updatedDate)));
     }
 
     @DeleteMapping(path = "/delete-location")
@@ -164,7 +164,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateSaleMan")
     public Flux<?> getSaleMan(@RequestParam String updatedDate) {
-        return Flux.fromIterable(saleManService.getSaleMan(updatedDate));
+        return Flux.fromIterable(saleManService.getSaleMan(Util1.toLocalDateTime(updatedDate)));
     }
 
     @DeleteMapping(path = "/delete-saleman")
@@ -194,7 +194,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateBrand")
     public Flux<?> getUpdateBrand(@RequestParam String updatedDate) {
-        return Flux.fromIterable(brandService.getBrand(updatedDate));
+        return Flux.fromIterable(brandService.getBrand(Util1.toLocalDateTime(updatedDate)));
     }
 
     @DeleteMapping(path = "/delete-brand")
@@ -230,7 +230,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateStockType")
     public Flux<?> getUpdateStockType(@RequestParam String updatedDate) {
-        return Flux.fromIterable(typeService.getStockType(updatedDate));
+        return Flux.fromIterable(typeService.getStockType(Util1.toLocalDateTime(updatedDate)));
     }
 
     @DeleteMapping(path = "/delete-type")
@@ -260,7 +260,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateUnit")
     public Flux<?> getUpdateUnit(@RequestParam String updatedDate) {
-        return Flux.fromIterable(unitService.getUnit(updatedDate));
+        return Flux.fromIterable(unitService.getUnit(Util1.toLocalDateTime(updatedDate)));
     }
 
     @DeleteMapping(path = "/delete-unit")
@@ -331,7 +331,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateTrader")
     public Flux<?> getUpdateTrader(@RequestParam String updatedDate) {
-        return Flux.fromIterable(traderService.getTrader(updatedDate));
+        return Flux.fromIterable(traderService.getTrader(Util1.toLocalDateTime(updatedDate)));
     }
 
 
@@ -397,7 +397,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateStock")
     public Flux<Stock> getUpdateStock(@RequestParam String updatedDate) {
-        return Flux.fromIterable(stockService.getStock(updatedDate));
+        return Flux.fromIterable(stockService.getStock(Util1.toLocalDateTime(updatedDate)));
     }
 
 
@@ -450,7 +450,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateVouStatus")
     public Flux<?> getUpdateVouStatus(@RequestParam String updatedDate) {
-        return Flux.fromIterable(vouStatusService.getVouStatus(updatedDate));
+        return Flux.fromIterable(vouStatusService.getVouStatus(Util1.toLocalDateTime(updatedDate)));
     }
 
     @PostMapping(path = "/find-voucher-status")
@@ -581,7 +581,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdatePriceOption")
     public Flux<?> getUpdatePriceOption(@RequestParam String updatedDate) {
-        return Flux.fromIterable(optionService.getPriceOption(updatedDate));
+        return Flux.fromIterable(optionService.getPriceOption(Util1.toLocalDateTime(updatedDate)));
     }
 
     @GetMapping(path = "/get-unit-relation")
@@ -597,7 +597,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateRelation")
     public Flux<?> getUpdateRelation(@RequestParam String updatedDate) {
-        return Flux.fromIterable(unitRelationService.getRelation(updatedDate));
+        return Flux.fromIterable(unitRelationService.getRelation(Util1.toLocalDateTime(updatedDate)));
     }
 
     @GetMapping(path = "/get-unit-relation-detail")

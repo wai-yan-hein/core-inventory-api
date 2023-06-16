@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.entity.SaleMan;
 import cv.api.entity.SaleManKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface SaleManService {
 
     List<SaleMan> unUpload();
 
-    List<SaleMan> getSaleMan(String updatedDate);
+    List<SaleMan> getSaleMan(LocalDateTime updatedDate);
 
     Date getMaxDate();
 }

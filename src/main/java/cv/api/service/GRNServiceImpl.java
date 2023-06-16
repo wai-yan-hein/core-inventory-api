@@ -84,6 +84,11 @@ public class GRNServiceImpl implements GRNService {
     }
 
     @Override
+    public boolean restore(GRNKey key) {
+        return dao.delete(key);
+    }
+
+    @Override
     public boolean open(GRNKey key) {
         return dao.open(key);
     }

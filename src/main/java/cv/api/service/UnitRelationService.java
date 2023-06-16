@@ -2,6 +2,7 @@ package cv.api.service;
 
 import cv.api.entity.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface UnitRelationService {
 
     Date getMaxDate();
 
-    List<UnitRelation> getRelation(String updatedDate);
+    List<UnitRelation> getRelation(LocalDateTime updatedDate);
 
 
 }

@@ -8,6 +8,7 @@ package cv.api.dao;
 import cv.api.entity.VouStatus;
 import cv.api.entity.VouStatusKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface VouStatusDao {
 
     Date getMaxDate();
 
-    List<VouStatus> getVouStatus(String updatedDate);
+    List<VouStatus> getVouStatus(LocalDateTime updatedDate);
 
 
 }

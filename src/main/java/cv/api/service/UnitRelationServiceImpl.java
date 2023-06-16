@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -116,7 +117,7 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     }
 
     @Override
-    public List<UnitRelation> getRelation(String updatedDate) {
+    public List<UnitRelation> getRelation(LocalDateTime updatedDate) {
         return dao.getRelation(updatedDate);
     }
 

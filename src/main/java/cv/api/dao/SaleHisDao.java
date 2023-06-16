@@ -34,8 +34,6 @@ public interface SaleHisDao {
 
     Date getMaxDate();
 
-    List<SaleHis> search(String updatedDate, List<String> location);
-
     void truncate(SaleHisKey key);
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);

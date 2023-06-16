@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.entity.Trader;
 import cv.api.entity.TraderKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,6 @@ public interface TraderService {
 
     Date getMaxDate();
 
-    List<Trader> getTrader(String updatedDate);
+    List<Trader> getTrader(LocalDateTime updatedDate);
 
 }

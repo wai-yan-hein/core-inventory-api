@@ -125,10 +125,6 @@ public class SaleHisServiceImpl implements SaleHisService {
         return shDao.getMaxDate();
     }
 
-    @Override
-    public List<SaleHis> search(String updatedDate, List<String> location) {
-        return shDao.search(updatedDate, location);
-    }
 
     @Override
     public void truncate(SaleHisKey key) {

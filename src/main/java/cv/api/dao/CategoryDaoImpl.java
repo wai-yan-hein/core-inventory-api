@@ -25,7 +25,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
 
     @Override
     public Category save(Category item) {
-        saveOrUpdate(item,item.getKey());
+        saveOrUpdate(item, item.getKey());
         return item;
     }
 
@@ -37,7 +37,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
 
     @Override
     public int delete(String id) {
-      return 1;
+        return 1;
     }
 
     @Override
@@ -85,8 +85,8 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
     }
 
     @Override
-    public List<Category> getCategory(String updatedDate) {
-        String hsql = "select o from Category o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<Category> getCategory(LocalDateTime updatedDate) {
+        String hsql = "select o from Category o where o.updatedDate >: updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 }

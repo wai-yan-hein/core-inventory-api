@@ -44,7 +44,6 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     }
 
     @Transactional
-
     public void remove(PK pk) {
         T byKey = getByKey(pk);
         if (byKey != null) {
@@ -53,19 +52,21 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     }
 
     @Transactional
-
     public void update(T entity) {
         entityManager.merge(entity);
     }
 
     @Transactional
-
     public List<T> findHSQL(String hsql) {
         return entityManager.createQuery(hsql, persistentClass).getResultList();
     }
 
     @Transactional
+    public TypedQuery<T> createQuery(String hsql) {
+        return entityManager.createQuery(hsql, persistentClass);
+    }
 
+    @Transactional
     public void execSql(String... sql) {
         for (String s : sql) {
             jdbcTemplate.execute(s);

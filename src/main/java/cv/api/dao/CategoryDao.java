@@ -31,6 +31,6 @@ public interface CategoryDao {
 
     LocalDateTime getMaxDate();
 
-    List<Category> getCategory(String updatedDate);
+    List<Category> getCategory(LocalDateTime updatedDate);
 
 }

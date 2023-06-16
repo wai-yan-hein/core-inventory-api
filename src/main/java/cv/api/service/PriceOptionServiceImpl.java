@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,7 +26,7 @@ public class PriceOptionServiceImpl implements PriceOptionService {
     }
 
     @Override
-    public List<PriceOption> getPriceOption(String updatedDate) {
+    public List<PriceOption> getPriceOption(LocalDateTime updatedDate) {
         return dao.getPriceOption(updatedDate);
     }
 }

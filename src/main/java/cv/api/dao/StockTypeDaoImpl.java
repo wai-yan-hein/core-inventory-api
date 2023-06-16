@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -68,9 +69,9 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
     }
 
     @Override
-    public List<StockType> getStockType(String updatedDate) {
-        String hsql = "select o from StockType o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<StockType> getStockType(LocalDateTime updatedDate) {
+        String hsql = "select o from StockType o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
 }

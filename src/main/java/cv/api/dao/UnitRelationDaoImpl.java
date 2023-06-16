@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,11 +18,12 @@ import java.util.List;
 @Repository
 @Slf4j
 public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> implements UnitRelationDao {
-   @Autowired
-   private UnitRelationDetailDao dao;
+    @Autowired
+    private UnitRelationDetailDao dao;
+
     @Override
     public UnitRelation save(UnitRelation ur) {
-        saveOrUpdate(ur,ur.getKey());
+        saveOrUpdate(ur, ur.getKey());
         return ur;
     }
 
@@ -89,9 +91,9 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
     }
 
     @Override
-    public List<UnitRelation> getRelation(String updatedDate) {
-        String hsql = "select o from UnitRelation o where o.updatedDate >'" + updatedDate + "'";
-        List<UnitRelation> list = findHSQL(hsql);
+    public List<UnitRelation> getRelation(LocalDateTime updatedDate) {
+        String hsql = "select o from UnitRelation o where o.updatedDate >:updatedDate";
+        List<UnitRelation> list = createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
         list.forEach(o -> {
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();

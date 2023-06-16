@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +24,8 @@ import java.util.List;
 public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> implements StockBrandDao {
 
     @Override
-    public StockBrand save(StockBrand item)  {
-        saveOrUpdate(item,item.getKey());
+    public StockBrand save(StockBrand item) {
+        saveOrUpdate(item, item.getKey());
         return item;
     }
 
@@ -36,7 +37,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
 
     @Override
     public int delete(String id) {
-      return 1;
+        return 1;
     }
 
     @Override
@@ -63,9 +64,9 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
     }
 
     @Override
-    public List<StockBrand> getBrand(String updatedDate) {
-        String hsql = "select o from StockBrand o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<StockBrand> getBrand(LocalDateTime updatedDate) {
+        String hsql = "select o from StockBrand o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
     @Override

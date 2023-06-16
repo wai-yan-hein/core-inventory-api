@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.entity.StockType;
 import cv.api.entity.StockTypeKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,5 +29,5 @@ public interface StockTypeService {
 
     Date getMaxDate();
 
-    List<StockType> getStockType(String updatedDate);
+    List<StockType> getStockType(LocalDateTime updatedDate);
 }

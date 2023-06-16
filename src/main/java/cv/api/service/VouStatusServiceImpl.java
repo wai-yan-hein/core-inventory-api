@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -70,7 +71,7 @@ public class VouStatusServiceImpl implements VouStatusService {
     }
 
     @Override
-    public List<VouStatus> getVouStatus(String updatedDate) {
+    public List<VouStatus> getVouStatus(LocalDateTime updatedDate) {
         return vouDao.getVouStatus(updatedDate);
     }
 

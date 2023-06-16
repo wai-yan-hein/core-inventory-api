@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class StockUnitServiceImpl implements StockUnitService {
     }
 
     @Override
-    public List<StockUnit> getUnit(String updatedDate) {
+    public List<StockUnit> getUnit(LocalDateTime updatedDate) {
         return dao.getUnit(updatedDate);
     }
 

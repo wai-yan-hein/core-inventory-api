@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,12 +30,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public Trader findByRFID(String rfId, String compCode, Integer deptId) {
-        String sql = "select code,user_code,trader_name,price_type,type\n" +
-                "from trader\n" +
-                "where comp_code='" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and rfid='" + rfId + "'\n" +
-                "limit 1\n";
+        String sql = "select code,user_code,trader_name,price_type,type\n" + "from trader\n" + "where comp_code='" + compCode + "'\n" + "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" + "and rfid='" + rfId + "'\n" + "limit 1\n";
         try {
             ResultSet rs = getResult(sql);
             if (rs.next()) {
@@ -58,18 +54,11 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
-        String filter = "where active = true\n" +
-                "and deleted = false\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and (user_code like '" + str + "%' or trader_name like '" + str + "%') \n";
+        String filter = "where active = true\n" + "and deleted = false\n" + "and comp_code ='" + compCode + "'\n" + "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" + "and (user_code like '" + str + "%' or trader_name like '" + str + "%') \n";
         if (!type.equals("-")) {
             filter += "and (multi =1 or type ='" + type + "')";
         }
-        String sql = "select code,user_code,trader_name,price_type,type,address,credit_amt\n" +
-                "from trader\n" + filter + "\n" +
-                "order by user_code,trader_name\n" +
-                "limit 100\n";
+        String sql = "select code,user_code,trader_name,price_type,type,address,credit_amt\n" + "from trader\n" + filter + "\n" + "order by user_code,trader_name\n" + "limit 100\n";
         ResultSet rs = getResult(sql);
         List<Trader> list = new ArrayList<>();
         try {
@@ -169,8 +158,8 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     }
 
     @Override
-    public List<Trader> getTrader(String updatedDate) {
-        String hsql = "select o from Trader o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<Trader> getTrader(LocalDateTime updatedDate) {
+        String hsql = "select o from Trader o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 }

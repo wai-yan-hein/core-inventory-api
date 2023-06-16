@@ -37,6 +37,12 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     }
 
     @Override
+    public boolean restore(GRNKey key) {
+        String sql = "update grn set deleted = false where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        execSql(sql);
+        return true;    }
+
+    @Override
     public List<GRN> search(String batchNo, String compCode, Integer deptId) {
         List<GRN> list = new ArrayList<>();
         String sql = "select a.batch_no,t.trader_name,a.vou_no\n" +

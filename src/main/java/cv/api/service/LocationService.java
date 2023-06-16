@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.entity.Location;
 import cv.api.entity.LocationKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public interface LocationService {
 
     Date getMaxDate();
 
-    List<Location> getLocation(String updatedDate);
+    List<Location> getLocation(LocalDateTime updatedDate);
 
     List<String> getLocation(Integer deptId);
 }

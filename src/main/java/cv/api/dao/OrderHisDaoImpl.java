@@ -30,13 +30,13 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
 
     @Override
     public OrderHis save(OrderHis sh) {
-        saveOrUpdate(sh,sh.getKey());
+        saveOrUpdate(sh, sh.getKey());
         return sh;
     }
 
     @Override
     public List<OrderHis> search(String fromDate, String toDate, String cusCode,
-                                String vouNo, String remark, String userCode) {
+                                 String vouNo, String remark, String userCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -143,68 +143,6 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
         return Util1.getSyncDate();
     }
 
-    @Override
-    public List<OrderHis> search(String updatedDate, List<String> location) {
-        List<OrderHis> list = new ArrayList<>();
-        if (location != null) {
-            for (String locCode : location) {
-                String sql = "select * from order_his o where o.loc_code='" + locCode + "' and o.updated_date > '" + updatedDate + "'";
-                ResultSet rs = getResult(sql);
-                if (rs != null) {
-                    try {
-                        while (rs.next()) {
-                            //vou_no, trader_code, saleman_code, vou_date, credit_term, cur_code, remark,
-                            // vou_total, grand_total, discount, disc_p, tax_amt, tax_p, created_date,
-                            // created_by, deleted, paid, vou_balance, updated_by,
-                            // updated_date, comp_code, address, order_code, reg_code, loc_code, mac_id,
-                            // session_id, intg_upd_status, reference, dept_id
-                            OrderHis sh = new OrderHis();
-                            OrderHisKey k = new OrderHisKey();
-                            k.setVouNo(rs.getString("vou_no"));
-                            k.setCompCode(rs.getString("comp_code"));
-                            k.setDeptId(rs.getInt("dept_id"));
-                            sh.setKey(k);
-                            sh.setTraderCode(rs.getString("trader_code"));
-                            sh.setSaleManCode(rs.getString("saleman_code"));
-                            sh.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
-                            sh.setCreditTerm(rs.getTimestamp("credit_term").toLocalDateTime());
-                            sh.setCurCode(rs.getString("cur_code"));
-                            sh.setRemark(rs.getString("remark"));
-                            sh.setVouTotal(rs.getFloat("vou_total"));
-                            sh.setGrandTotal(rs.getFloat("grand_total"));
-                            sh.setDiscount(rs.getFloat("discount"));
-                            sh.setDiscP(rs.getFloat("disc_p"));
-                            sh.setTaxAmt(rs.getFloat("tax_amt"));
-                            sh.setTaxPercent(rs.getFloat("tax_p"));
-                            sh.setCreatedDate(rs.getTimestamp("created_date"));
-                            sh.setCreatedBy(rs.getString("created_by"));
-                            sh.setDeleted(rs.getBoolean("deleted"));
-                            sh.setPaid(rs.getFloat("paid"));
-                            sh.setBalance(rs.getFloat("vou_balance"));
-                            sh.setUpdatedBy(rs.getString("updated_by"));
-                            sh.setUpdatedDate(rs.getTimestamp("updated_date").toLocalDateTime());
-                            sh.setAddress(rs.getString("address"));
-                            sh.setLocCode(rs.getString("loc_code"));
-                            sh.setMacId(rs.getInt("mac_id"));
-                            sh.setIntgUpdStatus(rs.getString("intg_upd_status"));
-                            sh.setReference(rs.getString("reference"));
-                            list.add(sh);
-                        }
-                    } catch (Exception e) {
-                        log.error(e.getMessage());
-                    }
-                }
-
-            }
-        }
-        list.forEach(o -> {
-            String vouNo = o.getKey().getVouNo();
-            String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
-            o.setListSH(dao.searchDetail(vouNo, compCode, deptId));
-        });
-        return list;
-    }
 
     @Override
     public void truncate(OrderHisKey key) {

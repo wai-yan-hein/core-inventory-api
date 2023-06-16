@@ -125,10 +125,6 @@ public class OrderHisServiceImpl implements OrderHisService {
         return shDao.getMaxDate();
     }
 
-    @Override
-    public List<OrderHis> search(String updatedDate, List<String> location) {
-        return shDao.search(updatedDate, location);
-    }
 
     @Override
     public void truncate(OrderHisKey key) {

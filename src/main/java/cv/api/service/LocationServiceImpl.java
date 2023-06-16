@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public List<Location> getLocation(String updatedDate) {
+    public List<Location> getLocation(LocalDateTime updatedDate) {
         return dao.getLocation(updatedDate);
     }
 

@@ -50,6 +50,9 @@ public class Util1 {
         return obj == null || obj.toString().isEmpty();
     }
 
+    public static LocalDateTime toLocalDateTime(String date) {
+        return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 
     public static Date toDate(Object objDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

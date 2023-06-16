@@ -4,6 +4,7 @@ import cv.api.entity.RelationKey;
 import cv.api.entity.StockUnit;
 import cv.api.entity.UnitRelation;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface UnitRelationDao {
 
     Date getMaxDate();
 
-    List<UnitRelation> getRelation(String updatedDate);
+    List<UnitRelation> getRelation(LocalDateTime updatedDate);
 
 
 }

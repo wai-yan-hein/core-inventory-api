@@ -8,6 +8,7 @@ package cv.api.dao;
 import cv.api.entity.StockBrand;
 import cv.api.entity.StockBrandKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface StockBrandDao {
 
     Date getMaxDate();
 
-    List<StockBrand> getBrand(String updatedDate);
+    List<StockBrand> getBrand(LocalDateTime updatedDate);
 
 
 }

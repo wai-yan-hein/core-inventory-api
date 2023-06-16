@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getCategory(String updatedDate) {
+    public List<Category> getCategory(LocalDateTime updatedDate) {
         return dao.getCategory(updatedDate);
     }
 

@@ -73,7 +73,10 @@ public class GRNController {
     public Mono<?> deleteGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));
     }
-
+    @PostMapping(path = "/restore-grn")
+    public Mono<?> restoreGRN(@RequestBody GRNKey key) {
+        return Mono.justOrEmpty(grnService.restore(key));
+    }
     @PostMapping(path = "/open-grn")
     public Mono<?> openGRn(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));

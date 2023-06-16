@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +15,14 @@ import java.util.List;
 public class PriceOptionDaoImpl extends AbstractDao<PriceOptionKey, PriceOption> implements PriceOptionDao {
     @Override
     public PriceOption save(PriceOption p) {
-        saveOrUpdate(p,p.getKey());
+        saveOrUpdate(p, p.getKey());
         return p;
     }
 
     @Override
-    public List<PriceOption> getPriceOption(String updatedDate) {
-        String hsql = "select o from PriceOption o where o.updatedDate > '" + updatedDate + "'";
-        return findHSQL(hsql);
+    public List<PriceOption> getPriceOption(LocalDateTime updatedDate) {
+        String hsql = "select o from PriceOption o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
     @Override

@@ -31,5 +31,5 @@ public interface CategoryService {
 
     LocalDateTime getMaxDate();
 
-    List<Category> getCategory(String updatedDate);
+    List<Category> getCategory(LocalDateTime updatedDate);
 }
