@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.entity.Category;
 import cv.api.entity.CategoryKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface CategoryService {
 
     List<Category> unUpload();
 
-    Date getMaxDate();
+    LocalDateTime getMaxDate();
 
     List<Category> getCategory(String updatedDate);
 }

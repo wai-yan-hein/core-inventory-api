@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -67,12 +68,12 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
     }
 
     @Override
-    public Date getMaxDate() {
+    public LocalDateTime getMaxDate() {
         String sql = "select max(updated_date) date from category";
         ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {
-                Date date = rs.getTimestamp("date");
+                LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
                 if (date != null) {
                     return date;
                 }
@@ -80,7 +81,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return Util1.getOldDate();
+        return Util1.getOldLocalDateTime();
     }
 
     @Override

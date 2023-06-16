@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -13,9 +14,8 @@ import java.util.Date;
 public class ProcessHisDetail {
     @EmbeddedId
     private ProcessHisDetailKey key;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "qty")
     private float qty;
     @Column(name = "unit")

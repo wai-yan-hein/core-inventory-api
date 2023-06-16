@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -29,14 +30,12 @@ public class Category {
     private String catName;
     @Column(name = "mig_id")
     private Integer migId;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "mac_id")
@@ -49,7 +48,7 @@ public class Category {
     public Category() {
     }
 
-    public Category(Date updatedDate) {
+    public Category(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
 }

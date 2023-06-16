@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +25,8 @@ public class PurHis implements java.io.Serializable {
     private PurHisKey key;
     @Column(name = "trader_code")
     private String traderCode;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Temporal(TemporalType.DATE)
     @Column(name = "due_date")
     private Date dueDate;
@@ -44,14 +44,12 @@ public class PurHis implements java.io.Serializable {
     private Float balance;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "created_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "updated_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "remark")
     private String remark;
     @Column(name = "session_id")
@@ -93,11 +91,11 @@ public class PurHis implements java.io.Serializable {
     @Transient
     private List<PurExpense> listExpense;
 
-    public PurHis() {
-    }
-
-    public PurHis(Date updatedDate, List<String> location) {
-        this.updatedDate = updatedDate;
-        this.location = location;
-    }
+//    public PurHis() {
+//    }
+//
+//    public PurHis(Date updatedDate, List<String> location) {
+//        this.updatedDate = updatedDate;
+//        this.location = location;
+//    }
 }

@@ -5,6 +5,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,32 +18,11 @@ import javax.persistence.Table;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "gender")
+@Data
 public class Gender implements java.io.Serializable {
-    private String genderId;
-    private String description;
-
     @Id
-    @Column(name = "gender_id", unique = true, nullable = false, length = 2)
-    public String getGenderId() {
-        return genderId;
-    }
-
-    public void setGenderId(String genderId) {
-        this.genderId = genderId;
-    }
-
-    @Column(name = "description", unique = true, nullable = false,
-            length = 10)
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String Description) {
-        this.description = Description;
-    }
-
-    @Override
-    public String toString() {
-        return description;
-    }
+    @Column(name = "gender_id")
+    private String genderId;
+    @Column(name = "description")
+    private String description;
 }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -27,12 +28,10 @@ public class OrderHis {
     private String traderCode;
     @Column(name = "saleman_code")
     private String saleManCode;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "credit_term")
-    private Date creditTerm;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
+    @Column(name = "credit_term", columnDefinition = "TIMESTAMP")
+    private LocalDateTime creditTerm;
     @Column(name = "cur_code")
     private String curCode;
     @Column(name = "remark")
@@ -64,8 +63,7 @@ public class OrderHis {
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private Date updatedDate;
     @Column(name = "address")
     private String address;

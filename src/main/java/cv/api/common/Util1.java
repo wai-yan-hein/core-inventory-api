@@ -236,6 +236,11 @@ public class Util1 {
         return Util1.toDate("1998-10-07");
     }
 
+    public static LocalDateTime getOldLocalDateTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return LocalDateTime.parse(LocalDateTime.now().toString(), formatter);
+    }
+
     public static boolean isZGText(String str) {
         if (!Util1.isNullOrEmpty(str)) {
             ZawgyiDetector zd = new ZawgyiDetector();

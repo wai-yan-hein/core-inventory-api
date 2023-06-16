@@ -8,6 +8,7 @@ package cv.api.dao;
 import cv.api.entity.Category;
 import cv.api.entity.CategoryKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface CategoryDao {
 
     int delete(String id);
 
-    Date getMaxDate();
+    LocalDateTime getMaxDate();
 
     List<Category> getCategory(String updatedDate);
 

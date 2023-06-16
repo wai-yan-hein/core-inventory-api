@@ -5,6 +5,9 @@
  */
 package cv.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,34 +19,14 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "file_size")
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileSize implements Serializable {
-
-    private String queue;
-    private Double fileSize;
-
-    public FileSize() {
-
-    }
-
     @Id
     @Column(name = "queue")
-    public String getQueue() {
-        return queue;
-    }
-
-    public void setQueue(String queue) {
-        this.queue = queue;
-    }
-
+    private String queue;
     @Column(name = "size")
-
-    public Double getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(Double fileSize) {
-        this.fileSize = fileSize;
-    }
+    private Double fileSize;
 
 
 }

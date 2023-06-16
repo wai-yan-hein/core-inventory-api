@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,16 +21,14 @@ public class TransferHis {
     private Date createdDate;
     @Column(name = "deleted")
     private boolean deleted;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "ref_no")
     private String refNo;
     @Column(name = "remark")
     private String remark;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "updated_by")
     private String updatedBy;
     @Column(name = "loc_code_from")
@@ -51,11 +50,11 @@ public class TransferHis {
     @Transient
     private List<String> location;
 
-    public TransferHis() {
-    }
-
-    public TransferHis(Date updatedDate, List<String> location) {
-        this.updatedDate = updatedDate;
-        this.location = location;
-    }
+//    public TransferHis() {
+//    }
+//
+//    public TransferHis(Date updatedDate, List<String> location) {
+//        this.updatedDate = updatedDate;
+//        this.location = location;
+//    }
 }

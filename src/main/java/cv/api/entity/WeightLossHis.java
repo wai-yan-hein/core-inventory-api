@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,9 +15,8 @@ import java.util.List;
 public class WeightLossHis {
     @EmbeddedId
     private WeightLossHisKey key;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "ref_no")
     private String refNo;
     @Column(name = "remark")
@@ -27,9 +27,8 @@ public class WeightLossHis {
     private String updatedBy;
     @Column(name = "mac_id")
     private Integer macId;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "deleted")
     private boolean deleted;
     @Transient

@@ -66,9 +66,8 @@ public class Stock implements java.io.Serializable {
     private Float salePriceE;
     @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "mig_code")
     private String migCode;
     @Column(name = "user_code")

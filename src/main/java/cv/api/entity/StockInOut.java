@@ -10,6 +10,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,23 +29,20 @@ public class StockInOut implements Serializable {
     private String remark;
     @Column(name = "description")
     private String description;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
     private String updatedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
-    private Date createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "vou_status")
     private String vouStatusCode;
     @Column(name = "mac_id")
     private Integer macId;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "vou_date")
-    private Date vouDate;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "deleted")
     private Boolean deleted;
     @Column(name = "intg_upd_status")
@@ -58,11 +56,11 @@ public class StockInOut implements Serializable {
     @Transient
     private List<LocationKey> keys;
 
-    public StockInOut() {
-    }
-
-    public StockInOut(Date updatedDate, List<LocationKey> keys) {
-        this.updatedDate = updatedDate;
-        this.keys = keys;
-    }
+//    public StockInOut() {
+//    }
+//
+//    public StockInOut(Date updatedDate, List<LocationKey> keys) {
+//        this.updatedDate = updatedDate;
+//        this.keys = keys;
+//    }
 }

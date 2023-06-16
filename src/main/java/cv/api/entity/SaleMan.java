@@ -10,6 +10,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -28,9 +29,8 @@ public class SaleMan {
     private Boolean active;
     @Column(name = "phone")
     private String phone;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Column(name = "address")
     private String address;
     @Column(name = "mac_id")
@@ -46,10 +46,10 @@ public class SaleMan {
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
 
-    public SaleMan(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    public SaleMan() {
-    }
+//    public SaleMan(Date updatedDate) {
+//        this.updatedDate = updatedDate;
+//    }
+//
+//    public SaleMan() {
+//    }
 }
