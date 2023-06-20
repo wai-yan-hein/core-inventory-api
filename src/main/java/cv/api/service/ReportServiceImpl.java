@@ -2757,7 +2757,7 @@ public class ReportServiceImpl implements ReportService {
                 filter+="and stock_code ='"+stockCode+"'\n";
             }
             if(!typeCode.equals("-")){
-                filter+="and type_code ='"+typeCode+"'\n";
+                filter+="and stock_type_code ='"+typeCode+"'\n";
             }
             if(!brandCode.equals("-")){
                 filter+="and brand_code ='"+brandCode+"'\n";
