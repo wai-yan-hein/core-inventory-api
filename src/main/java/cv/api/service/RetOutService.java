@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface RetOutService {
     void restore(RetOutHisKey key) throws Exception;
 
 
-    List<RetOutHis> unUploadVoucher(String syncDate);
+    List<RetOutHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<RetOutHis> unUpload(String syncDate);
 

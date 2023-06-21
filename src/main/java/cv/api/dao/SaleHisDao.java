@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface SaleHisDao {
 
     void restore(SaleHisKey key) throws Exception;
 
-    List<SaleHis> unUploadVoucher(String syncDate);
+    List<SaleHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<SaleHis> unUpload(String syncDate);
 

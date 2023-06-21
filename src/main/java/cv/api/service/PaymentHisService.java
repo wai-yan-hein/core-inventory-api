@@ -3,6 +3,7 @@ package cv.api.service;
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisKey;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PaymentHisService {
@@ -15,5 +16,5 @@ public interface PaymentHisService {
     List<PaymentHis> search(String startDate,String endDate,String traderCode,String curCode,
                             String vouNo,String userCode,String account,
                             String projectNo,String remark,boolean deleted,String compCode);
-    List<PaymentHis> unUploadVoucher(String syncDate);
+    List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 }

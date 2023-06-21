@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 "where deleted =" + deleted + "\n" + "and comp_code ='" + compCode + "'\n" +
                 "and date(vou_date) between '" + startDate + "' and '" + endDate + "'\n" + filter + "\n" + ")a\n" +
                 "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n"+
+                "and a.comp_code = t.comp_code\n" +
                 "order by a.vou_no desc";
         List<PaymentHis> list = new ArrayList<>();
         try {
@@ -94,8 +95,8 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
     }
 
     @Override
-    public List<PaymentHis> unUploadVoucher(String syncDate) {
-        String hsql = "select o from PaymentHis o where o.intgUpdStatus is null and date(o.vouDate) >='" + syncDate + "'";
-        return findHSQL(hsql);
+    public List<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from PaymentHis o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
     }
 }

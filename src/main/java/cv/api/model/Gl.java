@@ -22,7 +22,7 @@ public class Gl {
     private String deptCode;
     private String vouNo;
     private String traderCode;
-    private Date createdDate;
+    private LocalDateTime createdDate;
     private String createdBy;
     private String tranSource;
     private String remark;

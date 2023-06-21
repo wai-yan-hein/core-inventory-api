@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -82,7 +83,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     }
 
     @Override
-    public List<PaymentHis> unUploadVoucher(String syncDate) {
+    public List<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
         return dao.unUploadVoucher(syncDate);
     }
 
