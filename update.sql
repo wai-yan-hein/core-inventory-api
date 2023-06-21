@@ -881,3 +881,6 @@ ADD COLUMN percent FLOAT(20,3) NOT NULL
 
 alter table tmp_stock_price
 add column io_recent_price float(20,3) null after lifo_price;
+
+alter table process_his
+change column avg_qty avg_qty float(20,3) not null default 0 ;
