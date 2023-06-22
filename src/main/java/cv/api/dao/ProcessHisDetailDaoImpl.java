@@ -36,10 +36,8 @@ public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, Pr
                 ")a\n" +
                 "join stock s on s.stock_code = a.stock_code\n" +
                 "and s.comp_code =a.comp_code\n" +
-                "and s.dept_id = a.dept_id\n" +
                 "join location l on a.loc_code = l.loc_code\n" +
                 "and l.comp_code =a.comp_code\n" +
-                "and l.dept_id = a.dept_id\n" +
                 "order by a.unique_id\n";
         ResultSet rs = getResult(sql);
         try {

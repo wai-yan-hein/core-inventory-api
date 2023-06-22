@@ -33,16 +33,15 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
         List<PurHisDetail> listOP = new ArrayList<>();
         String sql = "select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name\n" + "from pur_his_detail op\n" + "join location l on op.loc_code = l.loc_code\n" + "and op.comp_code =l.comp_code\n" + "and op.dept_id = l.dept_id\n" + "join stock s on op.stock_code = s.stock_code\n" + "and op.comp_code =s.comp_code\n" + "and op.dept_id = s.dept_id\n" +
                 "join unit_relation rel on s.rel_code = rel.rel_code\n" +
-                "and op.comp_code =rel.comp_code\n" + "and op.dept_id = rel.dept_id\n" +
+                "and op.comp_code =rel.comp_code\n" +
                 "left join stock_type st  on s.stock_type_code = st.stock_type_code\n" +
-                "and op.comp_code =st.comp_code\n" + "and op.dept_id = st.dept_id\n" +
+                "and op.comp_code =st.comp_code\n" +
                 "left join category cat on s.category_code = cat.cat_code\n" +
-                "and op.comp_code =cat.comp_code\n" + "and op.dept_id = cat.dept_id\n" +
+                "and op.comp_code =cat.comp_code\n" +
                 "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
-                "and op.comp_code =sb.comp_code\n" + "and op.dept_id = sb.dept_id\n" +
+                "and op.comp_code =sb.comp_code\n" +
                 "where op.vou_no ='" + vouNo + "'\n" +
                 "and op.comp_code ='" + compCode + "'\n" +
-                "and op.dept_id = " + deptId + "\n" +
                 "order by unique_id;\n";
         ResultSet rs = getResult(sql);
         if (rs != null) {
