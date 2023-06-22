@@ -199,25 +199,19 @@ public class AccountRepo {
                     case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
-                try {
-                    Mono<AccTrader> result = accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).doOnError((e) -> log.error(e.getMessage()));
-                    AccTrader trader = result.block();
-                    assert trader != null;
-                    updateTrader(trader.getKey().getCode(), trader.getAccount(), trader.getKey().getCompCode());
-                } catch (Exception e) {
-                    log.error("sendTrader : " + e.getMessage());
-                }
+                accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> {
+                    updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode());
+                }, (e) -> {
+                    log.error("send Trader : " + e.getMessage());
+                });
+
+
             }
         }
     }
 
     public void deleteTrader(AccTraderKey key) {
-        accountApi.post()
-                .uri("/account/delete-trader")
-                .body(Mono.just(key), AccTraderKey.class)
-                .retrieve()
-                .bodyToMono(ReturnObject.class)
-                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
+        accountApi.post().uri("/account/delete-trader").body(Mono.just(key), AccTraderKey.class).retrieve().bodyToMono(ReturnObject.class).subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
     }
 
     public void sendSale(SaleHis sh) {
@@ -284,7 +278,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -310,7 +304,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -339,7 +333,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -365,7 +359,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -431,7 +425,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -461,7 +455,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -487,7 +481,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -514,7 +508,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -549,7 +543,7 @@ public class AccountRepo {
                             gl.setCurCode(curCode);
                             gl.setReference(remark);
                             gl.setDeptCode(deptCode);
-                            gl.setCreatedDate(Util1.getTodayDate());
+                            gl.setCreatedDate(LocalDateTime.now());
                             gl.setCreatedBy(appName);
                             gl.setTranSource(tranSource);
                             gl.setRefNo(vouNo);
@@ -614,7 +608,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -640,7 +634,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -700,7 +694,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -726,7 +720,7 @@ public class AccountRepo {
                     gl.setCurCode(curCode);
                     gl.setReference(remark);
                     gl.setDeptCode(deptCode);
-                    gl.setCreatedDate(Util1.getTodayDate());
+                    gl.setCreatedDate(LocalDateTime.now());
                     gl.setCreatedBy(appName);
                     gl.setTranSource(tranSource);
                     gl.setRefNo(vouNo);
@@ -777,7 +771,7 @@ public class AccountRepo {
                         gl.setCurCode(curCode);
                         gl.setReference(remark);
                         gl.setDeptCode(setting != null ? setting.getDeptCode() : null);
-                        gl.setCreatedDate(Util1.getTodayDate());
+                        gl.setCreatedDate(LocalDateTime.now());
                         gl.setCreatedBy(appName);
                         gl.setTranSource("PAYMENT");
                         gl.setRefNo(vouNo);

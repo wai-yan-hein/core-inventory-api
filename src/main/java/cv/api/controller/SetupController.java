@@ -71,7 +71,10 @@ public class SetupController {
     private AccountRepo accountRepo;
     @Autowired
     private AccSettingService accSettingService;
-
+    @GetMapping(path = "/hello")
+    public Mono<?> hello() {
+        return Mono.just("Hello");
+    }
     @PostMapping(path = "/save-currency")
     public Mono<Currency> saveCurrency(@RequestBody Currency machine) {
         Currency currency = currencyService.save(machine);

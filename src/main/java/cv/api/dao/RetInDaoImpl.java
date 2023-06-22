@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
 
     @Override
     public RetInHis save(RetInHis sh) {
-        saveOrUpdate(sh,sh.getKey());
+        saveOrUpdate(sh, sh.getKey());
         return sh;
     }
 
@@ -106,9 +107,9 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
     }
 
     @Override
-    public List<RetInHis> unUploadVoucher(String syncDate) {
-        String hsql = "select o from RetInHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
-        return findHSQL(hsql);
+    public List<RetInHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from RetInHis o where o.intgUpdStatus is null and o.vouDate>= :syncDate";
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
     }
 
     @Override
