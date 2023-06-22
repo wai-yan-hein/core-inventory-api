@@ -41,15 +41,11 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
                 "from pattern p join stock s\n" +
                 "on p.stock_code = s.stock_code\n" +
                 "and p.comp_code = s.comp_code\n" +
-                "and p.dept_id = s.dept_id\n" +
                 "join location l on p.loc_code = l.loc_code\n" +
                 "and p.comp_code = s.comp_code\n" +
-                "and p.dept_id = s.dept_id\n" +
                 "left join price_option po on p.price_type = po.type\n" +
                 "and p.comp_code = po.comp_code\n" +
-                "and p.dept_id = po.dept_id\n" +
                 "where p.f_stock_code = '" + stockCode + "'\n" +
-                "and p.dept_id =" + deptId + "\n" +
                 "and p.comp_code ='" + compCode + "'\n" +
                 "order by p.unique_id";
         ResultSet rs = getResult(sql);
