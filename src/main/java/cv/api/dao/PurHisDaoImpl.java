@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
     @Override
     public PurHis save(PurHis sh) {
-        saveOrUpdate(sh,sh.getKey());
+        saveOrUpdate(sh, sh.getKey());
         return sh;
     }
 
@@ -108,10 +109,11 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
 
     @Override
-    public List<PurHis> unUploadVoucher(String syncDate) {
-        String hsql = "select o from PurHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
-        return findHSQL(hsql);
+    public List<PurHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from PurHis o where o.intgUpdStatus is null and o.vouDate >=: syncDate";
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
     }
+
 
     @Override
     public List<PurHis> unUpload(String syncDate) {

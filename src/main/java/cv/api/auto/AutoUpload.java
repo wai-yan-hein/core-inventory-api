@@ -66,7 +66,7 @@ public class AutoUpload {
     }
 
     private void uploadSaleVoucher() {
-        List<SaleHis> vouchers = saleHisService.unUploadVoucher(syncDate);
+        List<SaleHis> vouchers = saleHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadSaleVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -90,7 +90,7 @@ public class AutoUpload {
     }
 
     private void uploadPurchaseVoucher() {
-        List<PurHis> vouchers = purHisService.unUploadVoucher(syncDate);
+        List<PurHis> vouchers = purHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadPurchaseVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -104,7 +104,7 @@ public class AutoUpload {
     }
 
     private void uploadReturnInVoucher() {
-        List<RetInHis> vouchers = retInService.unUploadVoucher(syncDate);
+        List<RetInHis> vouchers = retInService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadReturnInVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -118,7 +118,7 @@ public class AutoUpload {
     }
 
     private void uploadReturnOutVoucher() {
-        List<RetOutHis> vouchers = retOutService.unUploadVoucher(syncDate);
+        List<RetOutHis> vouchers = retOutService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadReturnOutVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -132,7 +132,7 @@ public class AutoUpload {
     }
 
     private void uploadPayment() {
-        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(syncDate);
+        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
             log.info("uploadPayment : " + vouchers.size());
             vouchers.forEach(vou -> {

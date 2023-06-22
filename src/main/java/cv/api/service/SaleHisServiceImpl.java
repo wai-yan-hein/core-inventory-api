@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -111,7 +112,7 @@ public class SaleHisServiceImpl implements SaleHisService {
 
 
     @Override
-    public List<SaleHis> unUploadVoucher(String syncDate) {
+    public List<SaleHis> unUploadVoucher(LocalDateTime syncDate) {
         return shDao.unUploadVoucher(syncDate);
     }
 

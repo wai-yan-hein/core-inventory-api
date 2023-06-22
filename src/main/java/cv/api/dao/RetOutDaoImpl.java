@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -108,9 +109,9 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
 
 
     @Override
-    public List<RetOutHis> unUploadVoucher(String syncDate) {
-        String hsql = "select o from RetOutHis o where o.intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
-        return findHSQL(hsql);
+    public List<RetOutHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from RetOutHis o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
     }
 
     @Override
