@@ -887,3 +887,6 @@ add column order_status varchar(15)  default null;
 
 alter table process_his
 change column avg_qty avg_qty float(20,3) not null default 0 ;
+
+alter table stock
+add column deleted bit(1) null default 0;
