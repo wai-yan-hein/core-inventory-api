@@ -52,7 +52,7 @@ public class SecurityConfig {
     public AuthenticationWebFilter webFilter() {
         log.info("webFilter.");
         AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(new JWTReactiveAuthenticationManager(jwtService));
-        authenticationWebFilter.setAuthenticationConverter(new TokenAuthenticationConverter(jwtService));
+        authenticationWebFilter.setServerAuthenticationConverter(new TokenAuthenticationConverter(jwtService));
         authenticationWebFilter.setRequiresAuthenticationMatcher(new JWTHeadersExchangeMatcher());
         authenticationWebFilter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
         return authenticationWebFilter;
@@ -62,8 +62,6 @@ public class SecurityConfig {
     public ServerSecurityContextRepository securityContextRepository() {
         return new WebSessionServerSecurityContextRepository();
     }
-
-
 
 
     @Bean
