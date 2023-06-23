@@ -891,3 +891,6 @@ add column order_status varchar(15)  default null;
 
 alter table price_option
 change column tran_type tran_option varchar(15) null default null ;
+
+alter table location
+add column dept_code varchar(15) null after map_dept_id;

@@ -33,8 +33,9 @@ public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.##";
     private static final DecimalFormat df0 = new DecimalFormat("0");
 
-    private static final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-    public static String SYNC_DATE;
+    public static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .create();    public static String SYNC_DATE;
     //private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
 
     public static boolean getBoolean(String obj) {
