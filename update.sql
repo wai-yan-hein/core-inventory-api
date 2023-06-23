@@ -890,3 +890,6 @@ change column avg_qty avg_qty float(20,3) not null default 0 ;
 
 alter table stock
 add column deleted bit(1) null default 0;
+
+alter table price_option
+change column tran_type tran_option varchar(15) null default null ;

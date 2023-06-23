@@ -31,18 +31,14 @@ public class WeightLossHisDetailDaoImpl extends AbstractDao<WeightLossHisDetailK
                 "join stock s \n" +
                 "on w.stock_code = s.stock_code\n" +
                 "and w.comp_code =s.comp_code\n" +
-                "and w.dept_id =s.dept_id\n" +
                 "join unit_relation rel\n" +
                 "on s.rel_code = rel.rel_code\n" +
                 "and s.comp_code =s.comp_code\n" +
-                "and s.dept_id =s.dept_id\n" +
                 "join location l\n" +
                 "on w.loc_code = l.loc_code\n" +
                 "and w.comp_code =l.comp_code\n" +
-                "and w.dept_id =l.dept_id\n" +
                 "where w.comp_code ='" + compCode + "'\n" +
                 "and w.vou_no ='" + vouNo + "'\n" +
-                "and w.dept_id =" + deptId + "\n" +
                 "order by unique_id";
         try {
             //vou_no, comp_code, dept_id, unique_id, stock_code, qty, unit, price, loss_qty, loss_unit, loss_price, loc_code, user_code, stock_name

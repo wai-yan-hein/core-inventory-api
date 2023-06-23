@@ -60,7 +60,6 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                 ")a\n" +
                 "join stock s on a.stock_code = s.stock_code\n" +
                 "and a.comp_code = s.comp_code\n" +
-                "and a.dept_id = s.dept_id\n" +
                 "join location l on a.loc_code = l.loc_code\n" +
                 "and a.comp_code = l.comp_code\n" +
                 "join vou_status v on a.pt_code = v.code\n" +
