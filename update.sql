@@ -790,10 +790,6 @@ create  view v_process_his as select p.vou_no as vou_no,p.stock_code as stock_co
 drop view if exists v_process_his_detail;
 create  view v_process_his_detail as select pd.vou_no as vou_no,pd.stock_code as stock_code,pd.comp_code as comp_code,pd.dept_id as dept_id,pd.unique_id as unique_id,pd.vou_date as vou_date,pd.qty as qty,pd.unit as unit,pd.price as price,pd.loc_code as loc_code,p.deleted as deleted,p.pt_code as pt_code,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.calculate as calculate,s.rel_code as rel_code from ((process_his_detail pd join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code and pd.dept_id = s.dept_id)) join process_his p on(pd.vou_no = p.vou_no and pd.comp_code = p.comp_code and pd.dept_id = p.dept_id));
 
-######################
-alter table price_option
-change column tran_type tran_option varchar(15) null default null ;
-
 alter table price_option
 add column updated_date timestamp not null after tran_option;
 
@@ -888,6 +884,12 @@ add column io_recent_price float(20,3) null after lifo_price;
 
 alter table order_his
 add column order_status varchar(15)  default null;
+
+alter table process_his
+change column avg_qty avg_qty float(20,3) not null default 0 ;
+
+alter table stock
+add column deleted bit(1) null default 0;
 
 alter table price_option
 change column tran_type tran_option varchar(15) null default null ;
