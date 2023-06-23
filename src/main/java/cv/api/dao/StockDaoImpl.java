@@ -37,7 +37,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")";
+        String hsql = "select o from Stock o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")";
         return findHSQL(hsql);
     }
 
@@ -50,14 +50,14 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> findActiveStock(String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")";
+        String hsql = "select o from Stock o where o.active is true and o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")";
         return findHSQL(hsql);
 
     }
 
     @Override
     public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId, boolean orderFavorite) {
-        String hsql = "select o from Stock o where o.active = true and o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")\n";
+        String hsql = "select o from Stock o where o.active = true and o.key.compCode ='" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")\n";
         if (!stockCode.equals("-")) {
             hsql += " and o.key.stockCode ='" + stockCode + "'\n";
         }
@@ -104,8 +104,8 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                     StockKey key = new StockKey();
                     key.setStockCode(rs.getString("stock_code"));
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     s.setKey(key);
+                    s.setDeptId(rs.getInt("dept_id"));
                     s.setSaleUnitCode(rs.getString("sale_unit"));
                     s.setSalePriceN(rs.getFloat("sale_price_n"));
                     s.setSalePriceA(rs.getFloat("sale_price_a"));
@@ -141,8 +141,8 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                     StockKey key = new StockKey();
                     key.setStockCode(rs.getString("stock_code"));
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     s.setKey(key);
+                    s.setDeptId(rs.getInt("dept_id"));
                     s.setBrandCode(rs.getString("brand_code"));
                     s.setCatCode(rs.getString("category_code"));
                     s.setTypeCode(rs.getString("stock_type_code"));
@@ -203,9 +203,18 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
     }
 
     @Override
-    public void update(StockKey key, boolean favorite) {
+    public boolean update(StockKey key, boolean favorite) {
         Stock stock = getByKey(key);
         stock.setFavorite(favorite);
-        saveOrUpdate(stock, key);
+        update(stock);
+        return true;
+    }
+
+    @Override
+    public boolean updateSaleClose(StockKey key, boolean status) {
+        Stock stock = getByKey(key);
+        stock.setSaleClosed(status);
+        update(stock);
+        return true;
     }
 }

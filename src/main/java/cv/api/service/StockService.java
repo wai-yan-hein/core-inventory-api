@@ -39,5 +39,6 @@ public interface StockService {
 
     List<Stock> getStock(LocalDateTime updatedDate);
 
-    void update(StockKey key, boolean favorite);
+    boolean update(StockKey key, boolean favorite);
+    boolean updateSaleClose(StockKey key, boolean status);
 }

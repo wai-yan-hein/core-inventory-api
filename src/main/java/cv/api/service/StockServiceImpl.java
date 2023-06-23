@@ -37,8 +37,7 @@ public class StockServiceImpl implements StockService {
             Integer macId = stock.getMacId();
             String compCode = stock.getKey().getCompCode();
             String stockCode = getStockCode(macId, compCode);
-            Integer deptId = stock.getKey().getDeptId();
-            Stock valid = findById(new StockKey(stockCode, compCode, deptId));
+            Stock valid = findById(new StockKey(stockCode, compCode));
             if (valid == null) {
                 stock.getKey().setStockCode(stockCode);
             } else {
@@ -111,7 +110,12 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void update(StockKey key, boolean favorite) {
-        dao.update(key, favorite);
+    public boolean update(StockKey key, boolean favorite) {
+        return dao.update(key, favorite);
+    }
+
+    @Override
+    public boolean updateSaleClose(StockKey key, boolean status) {
+        return dao.updateSaleClose(key, status);
     }
 }
