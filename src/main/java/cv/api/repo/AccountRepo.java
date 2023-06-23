@@ -1,5 +1,6 @@
 package cv.api.repo;
 
+import cv.api.auto.LocationSetting;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.*;
@@ -14,7 +15,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -223,12 +223,13 @@ public class AccountRepo {
             String locCode = sh.getLocCode();
             AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
             if (!Objects.isNull(setting)) {
+                LocationSetting ls = getLocationSetting(locCode, compCode);
                 String srcAcc = setting.getSourceAcc();
-                String payAcc = setting.getPayAcc();
+                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
+                String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                 String disAcc = setting.getDiscountAcc();
                 String balAcc = setting.getBalanceAcc();
                 String taxAcc = setting.getTaxAcc();
-                String deptCode = Util1.isNull(getDeptCode(locCode, compCode), setting.getDeptCode());
                 LocalDateTime vouDate = sh.getVouDate();
                 String traderCode = sh.getTraderCode();
                 String curCode = sh.getCurCode();
@@ -384,12 +385,13 @@ public class AccountRepo {
             String locCode = ph.getLocCode();
             AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
             if (setting != null) {
+                LocationSetting ls = getLocationSetting(locCode, compCode);
+                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
+                String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                 String srcAcc = setting.getSourceAcc();
-                String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
                 String commAcc = setting.getCommAcc();
                 String disAcc = setting.getDiscountAcc();
-                String deptCode = Util1.isNull(getDeptCode(locCode, compCode), setting.getDeptCode());
                 LocalDateTime vouDate = ph.getVouDate();
                 String traderCode = ph.getTraderCode();
                 String curCode = ph.getCurCode();
@@ -573,10 +575,11 @@ public class AccountRepo {
             String locCode = ri.getLocCode();
             AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
             if (setting != null) {
+                LocationSetting ls = getLocationSetting(locCode, compCode);
+                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
+                String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                 String srcAcc = setting.getSourceAcc();
-                String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
-                String deptCode = Util1.isNull(getDeptCode(locCode, compCode), setting.getDeptCode());
                 LocalDateTime vouDate = ri.getVouDate();
                 String traderCode = ri.getTraderCode();
                 String curCode = ri.getCurCode();
@@ -660,10 +663,11 @@ public class AccountRepo {
             String locCode = ro.getLocCode();
             AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
             if (setting != null) {
+                LocationSetting ls = getLocationSetting(locCode, compCode);
+                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
+                String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                 String srcAcc = setting.getSourceAcc();
-                String payAcc = setting.getPayAcc();
                 String balAcc = setting.getBalanceAcc();
-                String deptCode = Util1.isNull(getDeptCode(locCode, compCode), setting.getDeptCode());
                 LocalDateTime vouDate = ro.getVouDate();
                 String traderCode = ro.getTraderCode();
                 String curCode = ro.getCurCode();
@@ -875,14 +879,14 @@ public class AccountRepo {
         }
     }
 
-    private String getDeptCode(String locCode, String compCode) {
+    private LocationSetting getLocationSetting(String locCode, String compCode) {
         LocationKey key = new LocationKey();
         key.setCompCode(compCode);
         key.setLocCode(locCode);
         Location location = locationService.findByCode(key);
         if (location != null) {
-            return location.getDeptCode();
+            return LocationSetting.builder().cashAcc(location.getCashAcc()).deptCode(location.getDeptCode()).build();
         }
-        return null;
+        return LocationSetting.builder().build();
     }
 }

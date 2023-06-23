@@ -6,6 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -18,7 +19,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "acc_setting")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AccSetting implements Serializable {
+public class AccSetting {
     @EmbeddedId
     @Column(name = "type")
     private AccKey key;
