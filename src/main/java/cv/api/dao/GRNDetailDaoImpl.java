@@ -31,18 +31,14 @@ public class GRNDetailDaoImpl extends AbstractDao<GRNDetailKey, GRNDetail> imple
                     "from grn_detail g join stock s\n" +
                     "on g.stock_code = s.stock_code\n" +
                     "and g.comp_code =s.comp_code\n" +
-                    "and g.dept_id =s.dept_id\n" +
                     "join unit_relation rel\n" +
                     "on s.rel_code = rel.rel_code\n" +
                     "and s.comp_code =rel.comp_code\n" +
-                    "and s.dept_id =rel.dept_id\n" +
                     "join location l\n" +
                     "on g.loc_code = l.loc_code\n" +
                     "and g.comp_code =l.comp_code\n" +
-                    "and g.dept_id =l.dept_id\n" +
                     "where g.vou_no='" + vouNo + "'\n" +
                     "and g.comp_code ='" + compCode + "'\n" +
-                    "and g.dept_id =" + deptId + "\n" +
                     "order by unique_id;";
             ResultSet rs = getResult(sql);
             if (rs != null) {
