@@ -92,6 +92,8 @@ public class Stock {
     private Integer deptId;
     @Column(name = "sale_closed")
     private boolean saleClosed;
+    @Column(name = "deleted")
+    private boolean deleted;
     @Transient
     private String relName;
     @Transient

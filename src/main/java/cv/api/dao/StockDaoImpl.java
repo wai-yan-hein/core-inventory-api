@@ -37,7 +37,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Stock o where o.deleted = false o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")";
+        String hsql = "select o from Stock o where o.deleted = false and o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")";
         return findHSQL(hsql);
     }
 
