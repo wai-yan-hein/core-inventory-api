@@ -69,7 +69,7 @@ public class StockServiceImpl implements StockService {
         String compCode = key.getCompCode();
         List<String> str = reportService.isStockExist(stockCode, compCode);
         if (str.isEmpty()) {
-            dao.delete(stockCode);
+            dao.delete(key);
         }
         return str;
     }
