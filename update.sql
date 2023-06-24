@@ -893,3 +893,12 @@ add column deleted bit(1) null default 0;
 
 alter table price_option
 change column tran_type tran_option varchar(15) null default null ;
+
+alter table location
+add column dept_code varchar(15) null after map_dept_id;
+
+alter table location
+add column cash_acc varchar(15) null after dept_code;
+
+alter table stock
+add column sale_closed bit(1) not null after favorite;

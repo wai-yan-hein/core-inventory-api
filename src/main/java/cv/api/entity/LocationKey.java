@@ -11,6 +11,5 @@ public class LocationKey implements Serializable {
     private String locCode;
     @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
+
 }

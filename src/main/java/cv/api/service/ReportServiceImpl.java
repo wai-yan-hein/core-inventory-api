@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
@@ -42,15 +41,14 @@ public class ReportServiceImpl implements ReportService {
     private WebClient userApi;
 
     public String getAppUser(String userCode) {
-        String userShort;
-        if (hmUser.get(userCode) == null) {
+        /*if (hmUser.get(userCode) == null) {
             Mono<AppUser> result = userApi.get().uri(builder -> builder.path("/user/find-appuser").queryParam("userCode", userCode).build()).retrieve().bodyToMono(AppUser.class);
             userShort = result.block() == null ? "" : Objects.requireNonNull(result.block()).getUserShortName();
             hmUser.put(userCode, userShort);
         } else {
             userShort = hmUser.get(userCode);
-        }
-        return userShort;
+        }*/
+        return "";
     }
 
     @Override

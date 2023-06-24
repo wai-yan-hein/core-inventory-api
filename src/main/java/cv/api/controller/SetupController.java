@@ -71,10 +71,12 @@ public class SetupController {
     private AccountRepo accountRepo;
     @Autowired
     private AccSettingService accSettingService;
+
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
         return Mono.just("Hello");
     }
+
     @PostMapping(path = "/save-currency")
     public Mono<Currency> saveCurrency(@RequestBody Currency machine) {
         Currency currency = currencyService.save(machine);
@@ -388,8 +390,12 @@ public class SetupController {
 
     @PostMapping(path = "/update-favorite-stock")
     public Mono<?> updateFavoriteStock(@RequestBody StockKey key, @RequestParam boolean favorite) {
-        stockService.update(key, favorite);
-        return Mono.justOrEmpty(true);
+        return Mono.justOrEmpty(stockService.update(key, favorite));
+    }
+
+    @PostMapping(path = "/updateSaleClosed")
+    public Mono<?> updateSaleClosed(@RequestBody StockKey key, @RequestParam boolean status) {
+        return Mono.justOrEmpty(stockService.updateSaleClose(key, status));
     }
 
     @GetMapping(path = "/get-stock")

@@ -27,9 +27,10 @@ public interface StockDao {
 
     List<Stock> findActiveStock(String compCode, Integer deptId);
 
-    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId,boolean orderFavorite);
+    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId, boolean orderFavorite);
 
     List<Stock> getStock(String str, String compCode, Integer deptId);
+
     List<Stock> getService(String compCode, Integer deptId);
 
     List<Stock> unUpload();
@@ -37,7 +38,9 @@ public interface StockDao {
     Date getMaxDate();
 
     List<Stock> getStock(LocalDateTime updatedDate);
-    void update(StockKey key, boolean favorite);
 
+    boolean update(StockKey key, boolean favorite);
+
+    boolean updateSaleClose(StockKey key, boolean status);
 
 }

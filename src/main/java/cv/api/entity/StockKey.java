@@ -12,15 +12,12 @@ public class StockKey implements Serializable {
     private String stockCode;
     @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
 
     public StockKey() {
     }
 
-    public StockKey(String stockCode, String compCode, Integer deptId) {
+    public StockKey(String stockCode, String compCode) {
         this.stockCode = stockCode;
         this.compCode = compCode;
-        this.deptId = deptId;
     }
 }

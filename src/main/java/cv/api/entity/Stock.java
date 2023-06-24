@@ -88,8 +88,10 @@ public class Stock {
     private Float weight;
     @Column(name = "favorite")
     private boolean favorite;
-    @Column(name = "deleted")
-    private boolean deleted;
+    @Column(name = "dept_id")
+    private Integer deptId;
+    @Column(name = "sale_closed")
+    private boolean saleClosed;
     @Transient
     private String relName;
     @Transient
@@ -98,5 +100,6 @@ public class Stock {
     private String brandName;
     @Transient
     private String catName;
+
 
 }

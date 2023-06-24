@@ -33,7 +33,7 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
 
     @Override
     public List<Location> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from Location o where o.key.compCode ='" + compCode + "' and (o.key.deptId = " + deptId + " or 0 = " + deptId + ")";
+        String hsql = "select o from Location o where o.key.compCode ='" + compCode + "' and (o.deptId = " + deptId + " or 0 = " + deptId + ")";
         return findHSQL(hsql);
     }
 

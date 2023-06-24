@@ -64,7 +64,6 @@ public class AutoUpload {
             traders.forEach(vou -> accountRepo.sendTrader(vou));
         }
     }
-
     private void uploadSaleVoucher() {
         List<SaleHis> vouchers = saleHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
