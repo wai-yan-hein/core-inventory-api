@@ -23,7 +23,7 @@ public interface StockDao {
 
     List<Stock> findAll(String compCode, Integer deptId);
 
-    int delete(String id);
+    int delete(StockKey id);
 
     List<Stock> findActiveStock(String compCode, Integer deptId);
 
