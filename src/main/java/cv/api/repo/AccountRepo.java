@@ -201,11 +201,7 @@ public class AccountRepo {
                     case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
-                accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> {
-                    updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode());
-                }, (e) -> {
-                    log.error("send Trader : " + e.getMessage());
-                });
+                accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()), (e) -> log.error("send Trader : " + e.getMessage()));
 
 
             }
@@ -246,7 +242,6 @@ public class AccountRepo {
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 if (t != null) {
                     //income by trader group
@@ -409,7 +404,6 @@ public class AccountRepo {
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 if (t != null) {
                     balAcc = Util1.isNull(t.getAccount(), balAcc);
@@ -593,7 +587,6 @@ public class AccountRepo {
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(deptId);
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 if (t != null) {
@@ -681,7 +674,6 @@ public class AccountRepo {
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                k.setDeptId(ro.getKey().getDeptId());
                 Trader t = traderService.findById(k);
                 String traderName = t == null ? "" : t.getTraderName();
                 if (t != null) {
@@ -762,7 +754,6 @@ public class AccountRepo {
                     TraderKey k = new TraderKey();
                     k.setCode(traderCode);
                     k.setCompCode(compCode);
-                    k.setDeptId(deptId);
                     Trader t = traderService.findById(k);
                     AccSetting setting = settingService.findByCode(new AccKey("SALE", compCode));
                     if (!Util1.isNullOrEmpty(t.getAccount())) {

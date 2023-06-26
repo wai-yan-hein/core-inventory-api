@@ -12,6 +12,4 @@ public class VouStatusKey implements Serializable {
     private String code;
     @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
 }

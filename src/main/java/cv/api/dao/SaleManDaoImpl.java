@@ -31,7 +31,7 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
 
     @Override
     public List<SaleMan> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from SaleMan o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 = " + deptId + ")";
+        String hsql = "select o from SaleMan o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0 = " + deptId + ")";
         return findHSQL(hsql);
     }
 

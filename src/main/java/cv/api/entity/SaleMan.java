@@ -45,11 +45,6 @@ public class SaleMan {
     private String updatedBy;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
-
-//    public SaleMan(Date updatedDate) {
-//        this.updatedDate = updatedDate;
-//    }
-//
-//    public SaleMan() {
-//    }
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

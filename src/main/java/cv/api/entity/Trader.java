@@ -74,4 +74,6 @@ public class Trader {
     private boolean deleted;
     @Column(name = "credit_amt")
     private Float creditAmt;
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

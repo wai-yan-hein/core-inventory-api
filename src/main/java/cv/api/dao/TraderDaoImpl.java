@@ -38,8 +38,8 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
                 TraderKey key = new TraderKey();
                 key.setCompCode(compCode);
                 key.setCode(rs.getString("code"));
-                key.setDeptId(deptId);
                 t.setKey(key);
+                t.setDeptId(deptId);
                 t.setUserCode(rs.getString("user_code"));
                 t.setTraderName(rs.getString("trader_name"));
                 t.setPriceType(rs.getString("price_type"));
@@ -68,8 +68,8 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
                     TraderKey key = new TraderKey();
                     key.setCompCode(compCode);
                     key.setCode(rs.getString("code"));
-                    key.setDeptId(deptId);
                     t.setKey(key);
+                    t.setDeptId(deptId);
                     t.setUserCode(rs.getString("user_code"));
                     t.setTraderName(rs.getString("trader_name"));
                     t.setPriceType(rs.getString("price_type"));
@@ -124,13 +124,13 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public List<Trader> findCustomer(String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and o.type = 'CUS' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and o.type = 'CUS' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 
     @Override
     public List<Trader> findSupplier(String compCode, Integer deptId) {
-        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and o.type = 'SUP' or o.multi = true order by o.userCode";
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and o.type = 'SUP' or o.multi = true order by o.userCode";
         return findHSQL(hsql);
     }
 

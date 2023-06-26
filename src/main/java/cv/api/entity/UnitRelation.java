@@ -22,6 +22,8 @@ public class UnitRelation {
     private String intgUpdStatus;
     @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Transient
     private List<UnitRelationDetail> detailList;
 }
