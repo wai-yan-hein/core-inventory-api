@@ -58,7 +58,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
         if (!type.equals("-")) {
             filter += "and (multi =1 or type ='" + type + "')";
         }
-        String sql = "select code,user_code,trader_name,price_type,type,address,credit_amt\n" + "from trader\n" + filter + "\n" + "order by user_code,trader_name\n" + "limit 100\n";
+        String sql = "select code,user_code,trader_name,price_type,type,address,credit_amt,credit_days\n" + "from trader\n" + filter + "\n" + "order by user_code,trader_name\n" + "limit 100\n";
         ResultSet rs = getResult(sql);
         List<Trader> list = new ArrayList<>();
         try {
@@ -76,6 +76,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
                     t.setType(rs.getString("type"));
                     t.setAddress(rs.getString("address"));
                     t.setCreditAmt(rs.getFloat("credit_amt"));
+                    t.setCreditDays(rs.getInt("credit_days"));
                     list.add(t);
                 }
             }
