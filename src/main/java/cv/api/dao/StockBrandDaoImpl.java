@@ -31,7 +31,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
 
     @Override
     public List<StockBrand> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from StockBrand o where o.key.compCode = '" + compCode + "' and (o.key.deptId=" + deptId + " or 0 =" + deptId + ")";
+        String hsql = "select o from StockBrand o where o.key.compCode = '" + compCode + "' and (o.deptId=" + deptId + " or 0 =" + deptId + ")";
         return findHSQL(hsql);
     }
 

@@ -22,7 +22,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "stock_unit")
-public class StockUnit  {
+public class StockUnit {
 
     @EmbeddedId
     private StockUnitKey key;
@@ -42,4 +42,6 @@ public class StockUnit  {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

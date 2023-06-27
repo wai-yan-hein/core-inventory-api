@@ -22,7 +22,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "vou_status")
-public class VouStatus implements java.io.Serializable {
+public class VouStatus {
 
     @EmbeddedId
     private VouStatusKey key;
@@ -42,4 +42,6 @@ public class VouStatus implements java.io.Serializable {
     private String userCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

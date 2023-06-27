@@ -31,7 +31,7 @@ public class StockUnitDaoImpl extends AbstractDao<StockUnitKey, StockUnit> imple
 
     @Override
     public List<StockUnit> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from StockUnit o where o.key.compCode = '" + compCode + "' and (o.key.deptId =" + deptId + " or 0=" + deptId + ")";
+        String hsql = "select o from StockUnit o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")";
         return findHSQL(hsql);
     }
 

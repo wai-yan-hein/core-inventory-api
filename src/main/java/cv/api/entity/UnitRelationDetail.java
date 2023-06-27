@@ -8,6 +8,7 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 /**
@@ -27,4 +28,6 @@ public class UnitRelationDetail implements Serializable {
     private String unit;
     @Column(name = "smallest_qty")
     private Float smallestQty;
+    @Column(name = "dept_id")
+    private Integer deptId;
 }

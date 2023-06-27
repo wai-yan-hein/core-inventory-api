@@ -3,6 +3,7 @@ package cv.api.entity;
 import lombok.Data;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 @Data

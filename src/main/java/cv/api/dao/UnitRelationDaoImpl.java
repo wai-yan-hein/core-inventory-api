@@ -34,23 +34,23 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
 
     @Override
     public List<UnitRelation> findRelation(String compCode, Integer deptId) {
-        String hsql = "select o from UnitRelation o where o.key.compCode ='" + compCode + "' and (o.key.deptId =" + deptId + " or 0 =" + deptId + ")";
+        String hsql = "select o from UnitRelation o where o.key.compCode ='" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ")";
         return findHSQL(hsql);
     }
 
     @Override
     public List<StockUnit> getRelation(String relCode, String compCode, Integer deptId) {
         List<StockUnit> list = new ArrayList<>();
-        String sql = "select unit from unit_relation_detail where rel_code ='" + relCode + "' and comp_code ='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "select unit from unit_relation_detail where rel_code ='" + relCode + "' and comp_code ='" + compCode + "' and dept_id =" + deptId;
         ResultSet rs = getResult(sql);
         try {
             while (rs.next()) {
                 StockUnitKey key = new StockUnitKey();
                 key.setUnitCode(rs.getString("unit"));
                 key.setCompCode(compCode);
-                key.setDeptId(deptId);
                 StockUnit u = new StockUnit();
                 u.setKey(key);
+                u.setDeptId(deptId);
                 list.add(u);
             }
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
         list.forEach(o -> {
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setDetailList(dao.getRelationDetail(code, compCode, deptId));
         });
         return list;
@@ -97,7 +97,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
         list.forEach(o -> {
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setDetailList(dao.getRelationDetail(code, compCode, deptId));
         });
         return list;
