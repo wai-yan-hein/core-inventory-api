@@ -155,14 +155,14 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
     }
 
     @Override
-    public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
+    public General getVoucherInfo(String vouDate, String compCode, Integer deptId) {
         General g = new General();
         String sql = "select count(*) vou_count,sum(paid) paid\n" +
                 "from order_his\n" +
                 "where deleted = false\n" +
                 "and date(vou_date)='" + vouDate + "'\n" +
                 "and comp_code='" + compCode + "'\n" +
-                "and dept_id ='" + depId + "'";
+                "and (dept_id =" + deptId + " or 0 =" + deptId + ")";
         try {
             ResultSet rs = getResult(sql);
             if (rs.next()) {

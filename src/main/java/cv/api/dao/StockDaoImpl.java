@@ -43,8 +43,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public int delete(StockKey key) {
-        String sql = "update stock set deleted = true " +
-                "where stock_code = '" + key.getStockCode() + "' and comp_code = '" + key.getCompCode() + "'";
+        String sql = "update stock set deleted = true " + "where stock_code = '" + key.getStockCode() + "' and comp_code = '" + key.getCompCode() + "'";
         execSql(sql);
         return 1;
     }
@@ -204,19 +203,14 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
-    @Override
-    public boolean update(StockKey key, boolean favorite) {
-        Stock stock = getByKey(key);
-        stock.setFavorite(favorite);
-        update(stock);
-        return true;
-    }
 
     @Override
-    public boolean updateSaleClose(StockKey key, boolean status) {
-        Stock stock = getByKey(key);
-        stock.setSaleClosed(status);
-        update(stock);
+    public boolean updateStock(Stock s) {
+        Stock obj = getByKey(s.getKey());
+        obj.setSaleQty(Util1.getFloat(s.getSaleQty()));
+        obj.setSaleClosed(s.isSaleClosed());
+        obj.setFavorite(s.isFavorite());
+        update(obj);
         return true;
     }
 }

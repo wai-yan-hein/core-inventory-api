@@ -32,7 +32,7 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
                 "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
                 "where op.vou_no ='" + vouNo + "'\n" +
                 "and op.comp_code ='" + compCode + "'\n" +
-                "and op.dept_id = " + deptId + "\n" +
+                "and (op.dept_id =" + deptId + " or 0 ="+deptId+")\n" +
                 "order by unique_id";
         ResultSet rs = getResult(sql);
         if (rs != null) {

@@ -14,7 +14,7 @@ import java.util.List;
 public class TmpDaoImpl extends AbstractDao<TmpStockIOKey, TmpStockIO> implements TmpDao {
     @Override
     public TmpStockIO save(TmpStockIO io) {
-        saveOrUpdate(io,io.getKey());
+        saveOrUpdate(io, io.getKey());
         return io;
     }
 
@@ -25,7 +25,7 @@ public class TmpDaoImpl extends AbstractDao<TmpStockIOKey, TmpStockIO> implement
                 + "from tmp_stock_io_column"
                 + " where mac_id =" + macId + "\n"
                 + " and comp_code ='" + compCode + "'\n"
-                + " and dept_id =" + deptId + "\n"
+                + "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n"
                 + " order by tran_date,tran_option,vou_no";
         ResultSet rs = getResult(sql);
         if (rs != null) {

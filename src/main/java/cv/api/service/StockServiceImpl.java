@@ -110,12 +110,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public boolean update(StockKey key, boolean favorite) {
-        return dao.update(key, favorite);
-    }
-
-    @Override
-    public boolean updateSaleClose(StockKey key, boolean status) {
-        return dao.updateSaleClose(key, status);
+    public boolean updateStock(Stock stock) {
+        return dao.updateStock(stock);
     }
 }

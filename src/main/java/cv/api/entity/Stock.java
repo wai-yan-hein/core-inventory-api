@@ -92,6 +92,8 @@ public class Stock {
     private Integer deptId;
     @Column(name = "sale_closed")
     private boolean saleClosed;
+    @Column(name = "sale_qty")
+    private Float saleQty;
     @Column(name = "deleted")
     private boolean deleted;
     @Transient

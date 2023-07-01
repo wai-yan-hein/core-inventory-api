@@ -94,7 +94,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update sale_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update sale_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
 
@@ -103,7 +103,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update sale_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update sale_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
 
@@ -161,8 +161,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
                 "from sale_his\n" +
                 "where deleted = false\n" +
                 "and date(vou_date)='" + vouDate + "'\n" +
-                "and comp_code='" + compCode + "'\n" +
-                "and dept_id ='" + depId + "'";
+                "and comp_code='" + compCode + "'";
         try {
             ResultSet rs = getResult(sql);
             if (rs.next()) {

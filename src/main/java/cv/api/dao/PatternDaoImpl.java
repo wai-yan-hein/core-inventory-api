@@ -28,8 +28,8 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
     public void delete(Pattern pattern) {
         PatternKey key = pattern.getKey();
         String sql = "delete from pattern where comp_code ='" + key.getCompCode() + "'\n"
-                + "and dept_id =" + key.getDeptId() + " and stock_code ='" + key.getStockCode() + "'\n"
-                + "and f_stock_code ='" + key.getMapStockCode() + "' and unique_id =" + key.getUniqueId() + "";
+                + " and stock_code ='" + key.getStockCode() + "'\n"
+                + "and f_stock_code ='" + key.getMapStockCode() + "' and unique_id =" + key.getUniqueId();
         execSql(sql);
     }
 
