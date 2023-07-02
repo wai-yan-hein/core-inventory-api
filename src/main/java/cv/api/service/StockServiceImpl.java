@@ -110,7 +110,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public boolean updateStock(Stock stock) {
+    public Stock updateStock(Stock stock) {
         return dao.updateStock(stock);
     }
 }

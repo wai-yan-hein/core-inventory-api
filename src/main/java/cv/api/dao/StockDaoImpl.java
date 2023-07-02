@@ -205,12 +205,13 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
 
     @Override
-    public boolean updateStock(Stock s) {
+    public Stock updateStock(Stock s) {
         Stock obj = getByKey(s.getKey());
         obj.setSaleQty(Util1.getFloat(s.getSaleQty()));
         obj.setSaleClosed(s.isSaleClosed());
         obj.setFavorite(s.isFavorite());
+        obj.setUpdatedDate(LocalDateTime.now());
         update(obj);
-        return true;
+        return obj;
     }
 }

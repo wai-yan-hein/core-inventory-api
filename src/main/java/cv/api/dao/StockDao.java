@@ -39,6 +39,6 @@ public interface StockDao {
 
     List<Stock> getStock(LocalDateTime updatedDate);
 
-    boolean updateStock(Stock stock);
+    Stock updateStock(Stock stock);
 
 }

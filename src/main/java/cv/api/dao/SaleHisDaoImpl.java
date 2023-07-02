@@ -93,7 +93,6 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     public void delete(SaleHisKey key) throws Exception {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
         String sql = "update sale_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
@@ -102,7 +101,6 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     public void restore(SaleHisKey key) {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
         String sql = "update sale_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
