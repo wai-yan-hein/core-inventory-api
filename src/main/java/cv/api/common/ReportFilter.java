@@ -45,6 +45,9 @@ public class ReportFilter {
     private boolean orderFavorite;
     private float creditAmt;
 
+    private String fromDueDate;
+    private String toDueDate;
+
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;
         this.compCode = compCode;

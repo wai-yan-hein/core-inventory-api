@@ -203,10 +203,16 @@ public interface ReportService {
                             String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
 
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
-
-    List<VSale> getProfitMarginByStock(String fromDate, String toDate,String curCode, String stockCode,String compCode, Integer deptId) throws Exception;
     List<PaymentHisDetail> getCustomerBalance(String traderCode,String compCode);
     List<VSale> getCustomerBalanceSummary(String fromDate,String toDate,String compCode,String curCode,String traderCode,
                                           String batchNo,String projectNo,String locCode,float creditAmt);
-    List<VSale> getCustomerBalanceDetail(String fromDate,String toDate,String compCode,String curCode,String traderCode,String batchNo,String projectNo,String locCode);
+    List<VSale> getCustomerBalanceDetail(String fromDate,String toDate,String compCode,String curCode,String traderCode,
+                                         String batchNo,String projectNo,String locCode);
+
+    List<VSale> getProfitMarginByStock(String fromDate, String toDate,String curCode, String stockCode,String compCode,
+                                       Integer deptId) throws Exception;
+    List<VSale> getSaleByDueDate(String fromDueDate, String toDueDate, String curCode, String stockCode, String typeCode,
+                                        String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
+    List<VSale> getSaleByDueDateDetail(String fromDueDate, String toDueDate, String curCode, String stockCode, String typeCode,
+                                 String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
 }
