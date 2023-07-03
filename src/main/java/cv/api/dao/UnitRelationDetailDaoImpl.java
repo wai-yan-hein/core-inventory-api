@@ -25,12 +25,12 @@ public class UnitRelationDetailDaoImpl extends AbstractDao<UnitRelationDetailKey
     }
 
     @Override
-    public List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId) {
+    public List<UnitRelationDetail> getRelationDetail(String code, String compCode) {
         String hsql;
         if (code.equals("-")) {
-            hsql = "select o from UnitRelationDetail o where o.key.compCode ='" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ")";
+            hsql = "select o from UnitRelationDetail o where o.key.compCode ='" + compCode + "'";
         } else {
-            hsql = "select o from UnitRelationDetail o where o.key.relCode = '" + code + "' and o.key.compCode ='" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ")";
+            hsql = "select o from UnitRelationDetail o where o.key.relCode = '" + code + "' and o.key.compCode ='" + compCode + "'";
         }
         return findHSQL(hsql);    }
 

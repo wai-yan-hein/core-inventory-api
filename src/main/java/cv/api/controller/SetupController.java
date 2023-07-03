@@ -606,7 +606,7 @@ public class SetupController {
 
     @GetMapping(path = "/get-unit-relation-detail")
     public Flux<?> getUnitRelation(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
-        List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode, deptId);
+        List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode);
         return Flux.fromIterable(listB);
     }
 
