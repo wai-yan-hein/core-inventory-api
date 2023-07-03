@@ -2568,6 +2568,7 @@ public class ReportServiceImpl implements ReportService {
         if (!locCode.equals("-")) {
             filter += "and gd.loc_code = '" + locCode + "'\n";
         }
+
         String sql = "select a.*,t.user_code,t.trader_name\n" + "from (\n" + "select vou_date,g.vou_no,g.comp_code,g.dept_id,g.loc_code,g.created_by,g.batch_no,remark,g.trader_code,g.deleted,g.closed\n" + "from grn g join grn_detail gd\n" + "on g.vou_no = gd.vou_no\n" + "and g.comp_code = gd.comp_code\n" +
                 "where g.comp_code ='" + compCode + "'\n" +
                 "and (g.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
@@ -2692,6 +2693,118 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         return saleList;
+    }
+
+    @Override
+    public List<VSale> getSaleByDueDate(String fromDueDate, String toDueDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
+        String filter = "";
+        if (!fromDueDate.equals("-") && !toDueDate.equals("-")) {
+            filter += "and date(credit_term) between '" + fromDueDate + "' and '" + toDueDate + "'\n";
+        }
+        if (!typeCode.equals("-")) {
+            filter += "and stock_type_code='" + typeCode + "'\n";
+        }
+        if (!brandCode.equals("-")) {
+            filter += "and brand_code='" + brandCode + "'\n";
+        }
+        if (!catCode.equals("-")) {
+            filter += "and cat_code='" + catCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code='" + stockCode + "'\n";
+        }
+        if (!batchNo.equals("-")) {
+            filter += "and batch_no='" + batchNo + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and loc_code='" + locCode + "'\n";
+        }
+        List<VSale> list = new ArrayList<>();
+        String sql = "select a.*,t.trader_name\n" +
+                "from (select vou_date,credit_term,vou_no,trader_code,vou_total,comp_code\n" +
+                "from sale_his\n" +
+                "where deleted = false\n" + filter +
+                "and comp_code ='" + compCode + "'\n" +
+                "and cur_code ='" + curCode + "'\n" +
+                "and dept_id = "+ deptId+"\n" +
+                ")a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "order by credit_term,vou_date,vou_no";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VSale s = new VSale();
+                s.setCreditTerm(Util1.toDateStr(rs.getDate("credit_term"), "dd/MM/yyyy"));
+                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setVouNo(rs.getString("vou_no"));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setVouTotal(rs.getFloat("vou_total"));
+                list.add(s);
+            }
+        }
+        return list;
+    }
+    @Override
+    public List<VSale> getSaleByDueDateDetail(String fromDueDate, String toDueDate, String curCode, String stockCode, String typeCode,
+                                              String brandCode, String catCode, String locCode, String batchNo, String compCode,
+                                              Integer deptId, Integer macId) throws Exception {
+        String filter = "";
+        if (!typeCode.equals("-")) {
+            filter += "and stock_type_code='" + typeCode + "'\n";
+        }
+        if (!brandCode.equals("-")) {
+            filter += "and brand_code='" + brandCode + "'\n";
+        }
+        if (!catCode.equals("-")) {
+            filter += "and cat_code='" + catCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code='" + stockCode + "'\n";
+        }
+        if (!batchNo.equals("-")) {
+            filter += "and v.batch_no='" + batchNo + "'\n";
+        }
+//        if (!projectNo.equals("-")) {
+//            filter += "and v.project_no='" + projectNo + "'\n";
+//        }
+        List<VSale> list = new ArrayList<>();
+        String sql = "select v.credit_term,v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
+                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
+                "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" +
+                "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" +
+                "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" +
+                "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" +
+                "and date(v.credit_term) between '" + fromDueDate + "' and '" + toDueDate + "'\n" +
+//                "and v.project_no is not null\n" + "" +
+                filter +
+                "order by v.credit_term,v.vou_date,v.unique_id";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VSale s = new VSale();
+                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setCreditTerm(Util1.toDateStr(rs.getDate("credit_term"), "dd/MM/yyyy"));
+                s.setVouNo(rs.getString("vou_no"));
+                s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
+                s.setBatchNo(rs.getString("batch_no"));
+                s.setSupplierName(rs.getString("sup_name"));
+                s.setTraderCode((rs.getString("user_code")));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setCusAddress(rs.getString("address"));
+                s.setStockUserCode(rs.getString("s_user_code"));
+                s.setStockName(rs.getString("stock_name"));
+                s.setQty(rs.getFloat("qty"));
+                s.setSaleUnit(rs.getString("sale_unit"));
+                s.setSalePrice(rs.getFloat("sale_price"));
+                s.setSaleAmount(rs.getFloat("sale_amt"));
+                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setPaid(rs.getFloat("paid"));
+                list.add(s);
+            }
+        }
+        return list;
     }
 
     @Override

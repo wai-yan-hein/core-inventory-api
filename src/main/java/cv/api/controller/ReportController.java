@@ -110,6 +110,8 @@ public class ReportController {
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
                 boolean calRO = filter.isCalRO();
+                String fromDueDate = filter.getFromDueDate();
+                String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location");
                 switch (reportName) {
@@ -287,6 +289,14 @@ public class ReportController {
                         List<VSale> values = reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
                         Util1.writeJsonFile(values, exportPath);
                     }
+                    case "SaleByDueDateSummary" -> {
+                        List<VSale> list = reportService.getSaleByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "SaleByDueDateDetail" -> {
+                        List<VSale> list = reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
                     default -> ro.setMessage("Report Not Exists.");
                 }
                 byte[] bytes = new FileInputStream(exportPath).readAllBytes();
@@ -304,6 +314,8 @@ public class ReportController {
         boolean status = true;
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
+        String fromDueDate = filter.getFromDueDate();
+        String toDueDate = filter.getToDueDate();
         String curCode = filter.getCurCode();
         String compCode = filter.getCompCode();
         Integer macId = filter.getMacId();
@@ -323,6 +335,12 @@ public class ReportController {
         } else if (Util1.isNullOrEmpty(macId)) {
             status = false;
             ro.setMessage("Invalid Machine Id.");
+        }else if (Util1.isNullOrEmpty(fromDueDate)) {
+            status = false;
+            ro.setMessage("Invalid From Due Date.");
+        } else if (Util1.isNullOrEmpty(toDueDate)) {
+            status = false;
+            ro.setMessage("Invalid To Due Date.");
         }
         return status;
     }
