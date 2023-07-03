@@ -902,3 +902,9 @@ add column cash_acc varchar(15) null after dept_code;
 
 alter table stock
 add column sale_closed bit(1) not null after favorite;
+
+alter table stock
+change column user_code user_code varchar(50) null default null ;
+
+alter table stock
+add column sale_qty float(20,3) null after deleted;

@@ -388,14 +388,9 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @PostMapping(path = "/update-favorite-stock")
-    public Mono<?> updateFavoriteStock(@RequestBody StockKey key, @RequestParam boolean favorite) {
-        return Mono.justOrEmpty(stockService.update(key, favorite));
-    }
-
-    @PostMapping(path = "/updateSaleClosed")
-    public Mono<?> updateSaleClosed(@RequestBody StockKey key, @RequestParam boolean status) {
-        return Mono.justOrEmpty(stockService.updateSaleClose(key, status));
+    @PostMapping(path = "/updateStock")
+    public Mono<?> updateSaleClosed(@RequestBody Stock stock) {
+        return Mono.justOrEmpty(stockService.updateStock(stock));
     }
 
     @GetMapping(path = "/get-stock")

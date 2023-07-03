@@ -47,7 +47,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update transfer_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update transfer_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
 
@@ -56,7 +56,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         Integer deptId = key.getDeptId();
-        String sql = "update transfer_his set deleted = false where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
+        String sql = "update transfer_his set deleted = false where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
 

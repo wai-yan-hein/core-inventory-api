@@ -54,7 +54,10 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
-        String filter = "where active = true\n" + "and deleted = false\n" + "and comp_code ='" + compCode + "'\n" + "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" + "and (user_code like '" + str + "%' or trader_name like '" + str + "%') \n";
+        str = Util1.cleanStr(str);
+        String filter = "where active = true\n" + "and deleted = false\n" + "and comp_code ='" + compCode + "'\n" +
+                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
+                "and (LOWER(REPLACE(user_code, ' ', '')) like '" + str + "%' or LOWER(REPLACE(trader_name, ' ', '')) like '" + str + "%') \n";
         if (!type.equals("-")) {
             filter += "and (multi =1 or type ='" + type + "')";
         }

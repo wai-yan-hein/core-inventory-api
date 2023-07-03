@@ -39,8 +39,6 @@ public interface StockDao {
 
     List<Stock> getStock(LocalDateTime updatedDate);
 
-    boolean update(StockKey key, boolean favorite);
-
-    boolean updateSaleClose(StockKey key, boolean status);
+    Stock updateStock(Stock stock);
 
 }

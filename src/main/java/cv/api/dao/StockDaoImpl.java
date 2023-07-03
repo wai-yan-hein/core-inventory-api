@@ -43,8 +43,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public int delete(StockKey key) {
-        String sql = "update stock set deleted = true " +
-                "where stock_code = '" + key.getStockCode() + "' and comp_code = '" + key.getCompCode() + "'" ;
+        String sql = "update stock set deleted = true " + "where stock_code = '" + key.getStockCode() + "' and comp_code = '" + key.getCompCode() + "'";
         execSql(sql);
         return 1;
     }
@@ -81,9 +80,10 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public List<Stock> getStock(String str, String compCode, Integer deptId) {
-        List<Stock> list = getStockList("s.user_code like '" + str + "%'", compCode, deptId);
+        str = Util1.cleanStr(str);
+        List<Stock> list = getStockList("LOWER(REPLACE(s.user_code, ' ', '')) like '" + str + "%'", compCode, deptId);
         if (list.isEmpty()) {
-            list = getStockList("s.stock_name like '" + str + "%'", compCode, deptId);
+            list = getStockList("LOWER(REPLACE(s.stock_name, ' ', '')) like '" + str + "%'", compCode, deptId);
         }
         return list;
     }
@@ -203,19 +203,15 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
-    @Override
-    public boolean update(StockKey key, boolean favorite) {
-        Stock stock = getByKey(key);
-        stock.setFavorite(favorite);
-        update(stock);
-        return true;
-    }
 
     @Override
-    public boolean updateSaleClose(StockKey key, boolean status) {
-        Stock stock = getByKey(key);
-        stock.setSaleClosed(status);
-        update(stock);
-        return true;
+    public Stock updateStock(Stock s) {
+        Stock obj = getByKey(s.getKey());
+        obj.setSaleQty(Util1.getFloat(s.getSaleQty()));
+        obj.setSaleClosed(s.isSaleClosed());
+        obj.setFavorite(s.isFavorite());
+        obj.setUpdatedDate(LocalDateTime.now());
+        update(obj);
+        return obj;
     }
 }

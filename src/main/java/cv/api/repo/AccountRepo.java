@@ -12,7 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,15 +194,13 @@ public class AccountRepo {
                 accTrader.setActive(true);
                 accTrader.setAppName(appName);
                 accTrader.setMacId(macId);
-
+                accTrader.setAccount(t.getAccount());
                 switch (traderType) {
                     case "CUS" -> accTrader.setTraderType("C");
                     case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
                 accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()), (e) -> log.error("send Trader : " + e.getMessage()));
-
-
             }
         }
     }
