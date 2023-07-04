@@ -99,8 +99,8 @@ public class UnitRelationServiceImpl implements UnitRelationService {
     }
 
     @Override
-    public List<UnitRelationDetail> getRelationDetail(String code, String compCode, Integer deptId) {
-        return detailDao.getRelationDetail(code, compCode, deptId);
+    public List<UnitRelationDetail> getRelationDetail(String code, String compCode) {
+        return detailDao.getRelationDetail(code, compCode);
     }
 
     @Override

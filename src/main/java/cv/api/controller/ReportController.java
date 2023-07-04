@@ -343,13 +343,13 @@ public class ReportController {
         } else if (Util1.isNullOrEmpty(macId)) {
             status = false;
             ro.setMessage("Invalid Machine Id.");
-        }else if (Util1.isNullOrEmpty(fromDueDate)) {
+        }/*else if (Util1.isNullOrEmpty(fromDueDate)) {
             status = false;
             ro.setMessage("Invalid From Due Date.");
         } else if (Util1.isNullOrEmpty(toDueDate)) {
             status = false;
             ro.setMessage("Invalid To Due Date.");
-        }
+        }*/
         return status;
     }
 

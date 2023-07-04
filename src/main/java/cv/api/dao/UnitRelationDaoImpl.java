@@ -67,8 +67,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
         list.forEach(o -> {
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getDeptId();
-            o.setDetailList(dao.getRelationDetail(code, compCode, deptId));
+            o.setDetailList(dao.getRelationDetail(code, compCode));
         });
         return list;
     }
@@ -97,8 +96,7 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
         list.forEach(o -> {
             String code = o.getKey().getRelCode();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getDeptId();
-            o.setDetailList(dao.getRelationDetail(code, compCode, deptId));
+            o.setDetailList(dao.getRelationDetail(code, compCode));
         });
         return list;
     }
