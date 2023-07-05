@@ -59,7 +59,7 @@ public class StockInOutController {
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, locCode, compCode, deptId, deleted);
-        return Flux.fromIterable(listStockIO);
+        return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-stockio")
@@ -83,6 +83,6 @@ public class StockInOutController {
     @GetMapping(path = "/get-stockio-detail")
     public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<StockInOutDetail> listSD = iodService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(listSD);
+        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 }

@@ -27,7 +27,7 @@ public class PaymentController {
 
     @GetMapping(path = "/getCustomerBalance")
     public Flux<?> getCustomerBalance(@RequestParam String traderCode, @RequestParam String compCode) {
-        return Flux.fromIterable(reportService.getCustomerBalance(traderCode, compCode));
+        return Flux.fromIterable(reportService.getCustomerBalance(traderCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/deletePayment")
@@ -54,7 +54,7 @@ public class PaymentController {
 
     @GetMapping(path = "/getPaymentDetail")
     public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/getPaymentHistory")
@@ -70,6 +70,6 @@ public class PaymentController {
         boolean deleted = filter.isDeleted();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
-        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode, curCode, vouNo, userCode, account, projectNo, remark, deleted, compCode));
+        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode, curCode, vouNo, userCode, account, projectNo, remark, deleted, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 }

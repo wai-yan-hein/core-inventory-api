@@ -49,7 +49,8 @@ public class WeightLossController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        return Flux.fromIterable(reportService.getWeightLossHistory(fromDate, toDate, refNo, vouNo, remark, stockCode, locCode, compCode, deptId, deleted));
+        return Flux.fromIterable(reportService.getWeightLossHistory(fromDate, toDate, refNo, vouNo, remark, stockCode,
+                locCode, compCode, deptId, deleted)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-weight-loss")
@@ -71,6 +72,6 @@ public class WeightLossController {
 
     @GetMapping(path = "/get-weight-loss-detail")
     public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(weightLossDetailService.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(weightLossDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }

@@ -104,7 +104,7 @@ public class SaleController {
         String curCode = Util1.isAll(filter.getCurCode());
         List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
                 reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode);
-        return Flux.fromIterable(saleList);
+        return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-sale")
@@ -132,7 +132,7 @@ public class SaleController {
     public Flux<?> getSaleDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {
-        return Flux.fromIterable(sdService.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(sdService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-sale-voucher-info")
@@ -148,8 +148,8 @@ public class SaleController {
                                             @RequestParam Integer deptId,
                                             @RequestParam boolean detail) {
         if (detail) {
-            return Flux.fromIterable(sdService.getSaleByBatchDetail(batchNo, compCode, deptId));
+            return Flux.fromIterable(sdService.getSaleByBatchDetail(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
         }
-        return Flux.fromIterable(sdService.getSaleByBatch(batchNo, compCode, deptId));
+        return Flux.fromIterable(sdService.getSaleByBatch(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }

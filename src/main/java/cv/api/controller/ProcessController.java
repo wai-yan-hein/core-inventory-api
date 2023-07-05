@@ -62,7 +62,8 @@ public class ProcessController {
         boolean finished = filter.isFinished();
         String processNo = Util1.isNull(filter.getProcessNo(), "-");
         String pt = filter.getVouStatus();
-        return Flux.fromIterable(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode, finished, deleted, compCode, deptId));
+        return Flux.fromIterable(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode,
+                finished, deleted, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/save-process-detail")
@@ -81,6 +82,6 @@ public class ProcessController {
     public Flux<?> getProcessDetail(@RequestParam String vouNo,
                                               @RequestParam String compCode,
                                               @RequestParam Integer deptId) {
-        return Flux.fromIterable(processHisDetailService.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(processHisDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }

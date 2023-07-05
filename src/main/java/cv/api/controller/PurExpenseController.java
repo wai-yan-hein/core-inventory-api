@@ -18,7 +18,7 @@ public class PurExpenseController {
     @GetMapping(path = "/get-pur-expense")
     public Flux<PurExpense> getExpense(@RequestParam String vouNo,
                                        @RequestParam String compCode) {
-        return Flux.fromIterable(service.search(vouNo, compCode));
+        return Flux.fromIterable(service.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
 }

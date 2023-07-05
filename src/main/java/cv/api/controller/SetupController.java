@@ -521,7 +521,7 @@ public class SetupController {
     @GetMapping(path = "/get-opening-detail")
     public Flux<OPHisDetail> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<OPHisDetail> opHis = opHisDetailService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(opHis);
+        return Flux.fromIterable(opHis).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/save-pattern")
@@ -555,7 +555,7 @@ public class SetupController {
             p.setAmount(Util1.getFloat(p.getQty()) * Util1.getFloat(p.getPrice()));
         });
 
-        return Flux.fromIterable(list);
+        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
     public General getPrice(String stockCode, String vouDate, String unit, String type, String compCode, Integer deptId) {
@@ -580,34 +580,34 @@ public class SetupController {
 
     @GetMapping(path = "/get-price-option")
     public Flux<?> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId));
+        return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdatePriceOption")
     public Flux<?> getUpdatePriceOption(@RequestParam String updatedDate) {
-        return Flux.fromIterable(optionService.getPriceOption(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(optionService.getPriceOption(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-unit-relation")
     public Flux<?> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelation> listB = unitRelationService.findRelation(compCode, deptId);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-relation")
     public Flux<?> getRelation(@RequestParam String relCode, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(unitRelationService.getRelation(relCode, compCode, deptId));
+        return Flux.fromIterable(unitRelationService.getRelation(relCode, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateRelation")
     public Flux<?> getUpdateRelation(@RequestParam String updatedDate) {
-        return Flux.fromIterable(unitRelationService.getRelation(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(unitRelationService.getRelation(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-unit-relation-detail")
     public Flux<?> getUnitRelation(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/save-unit-relation")
@@ -660,12 +660,12 @@ public class SetupController {
 
     @GetMapping(path = "/get-batch")
     public Flux<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(batchService.findAll(compCode, deptId));
+        return Flux.fromIterable(batchService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getAccSetting")
     public Flux<?> getAccSetting(@RequestParam String compCode) {
-        return Flux.fromIterable(accSettingService.findAll(compCode));
+        return Flux.fromIterable(accSettingService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/saveAccSetting")

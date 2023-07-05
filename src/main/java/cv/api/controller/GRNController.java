@@ -51,12 +51,12 @@ public class GRNController {
         String close = String.valueOf(filter.isClose());
         boolean orderByBatch = filter.isOrderByBatch();
         List<GRN> list = reportService.getGRNHistory(fromDate, toDate, batchNo, traderCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, close, orderByBatch);
-        return Flux.fromIterable(list);
+        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-grn-detail")
     public Flux<?> getGRNDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-grn-detail-batch")
@@ -64,7 +64,7 @@ public class GRNController {
         List<GRN> list = grnService.search(batchNo, compCode, deptId);
         if (!list.isEmpty()) {
             String vouNo = list.get(0).getKey().getVouNo();
-            return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId));
+            return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
         }
         return Flux.fromIterable(new ArrayList<>());
     }
@@ -84,6 +84,6 @@ public class GRNController {
 
     @GetMapping(path = "/get-batch-list")
     public Flux<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(grnService.search(Util1.cleanStr(batchNo), compCode, deptId));
+        return Flux.fromIterable(grnService.search(Util1.cleanStr(batchNo), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }
