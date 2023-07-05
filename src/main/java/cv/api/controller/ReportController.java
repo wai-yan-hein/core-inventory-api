@@ -297,6 +297,14 @@ public class ReportController {
                         List<VSale> list = reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
                     }
+                    case "OrderByDueDateSummary" -> {
+                        List<VOrder> list = reportService.getOrderByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "OrderByDueDateDetail" -> {
+                        List<VOrder> list = reportService.getOrderByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
                     default -> ro.setMessage("Report Not Exists.");
                 }
                 byte[] bytes = new FileInputStream(exportPath).readAllBytes();
