@@ -61,7 +61,7 @@ public class TransferController {
         List<VTransfer> listStockIO = reportService.getTransferHistory(fromDate, toDate, refNo,
                 vouNo, remark, userCode,
                 stockCode, locCode, compCode, deptId, deleted);
-        return Flux.fromIterable(listStockIO);
+        return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/find-transfer")
@@ -73,7 +73,7 @@ public class TransferController {
     @GetMapping(path = "/get-transfer-detail")
     public Flux<?> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<TransferHisDetail> listSD = detailService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(listSD);
+        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-transfer")

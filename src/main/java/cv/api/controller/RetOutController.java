@@ -62,7 +62,8 @@ public class RetOutController {
         String deleted = String.valueOf(filter.isDeleted());
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
-        return Flux.fromIterable(reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, projectNo, curCode));
+        return Flux.fromIterable(reportService.getReturnOutHistory(fromDate, toDate, cusCode, vouNo, remark, userCode,
+                stockCode, locCode, compCode, deptId, deleted, projectNo, curCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-retout")
@@ -89,6 +90,6 @@ public class RetOutController {
     @GetMapping(path = "/get-retout-detail")
     public Flux<?> getRODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<RetOutHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(listSD);
+        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 }

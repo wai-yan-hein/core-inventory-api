@@ -68,7 +68,7 @@ public class RetInController {
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
         List<VReturnIn> listRI = reportService.getReturnInHistory(fromDate, toDate, cusCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted, projectNo, curCode);
-        return Flux.fromIterable(listRI);
+        return Flux.fromIterable(listRI).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-retin")
@@ -96,6 +96,6 @@ public class RetInController {
     @GetMapping(path = "/get-retin-detail")
     public Flux<?> getRIDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<RetInHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(listSD);
+        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 }

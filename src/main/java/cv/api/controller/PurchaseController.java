@@ -68,7 +68,7 @@ public class PurchaseController {
         String curCode = Util1.isAll(filter.getCurCode());
         List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
                 stockCode, locCode, compCode, deptId, deleted, projectNo,curCode);
-        return Flux.fromIterable(listPur);
+        return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-pur")
@@ -96,6 +96,6 @@ public class PurchaseController {
                                            @RequestParam String compCode,
                                            @RequestParam Integer deptId) {
         List<PurHisDetail> listSD = pdService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(listSD);
+        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 }

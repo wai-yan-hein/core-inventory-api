@@ -393,7 +393,7 @@ public class ReportController {
             b.setLocationName("No Stock.");
             b.setUnitName("No Stock.");
         }
-        return Flux.fromIterable(list);
+        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
 
@@ -412,7 +412,7 @@ public class ReportController {
         boolean calRO = filter.isCalRO();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
-        return Flux.fromIterable(reorderLevels);
+        return Flux.fromIterable(reorderLevels).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-smallest_qty")

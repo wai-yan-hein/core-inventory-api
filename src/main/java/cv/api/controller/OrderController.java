@@ -99,7 +99,7 @@ public class OrderController {
         String curCode = Util1.isAll(filter.getCurCode());
         List<VOrder> orderList = reportService.getOrderHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
                 reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode);
-        return Flux.fromIterable(orderList);
+        return Flux.fromIterable(orderList).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-order")
@@ -124,7 +124,7 @@ public class OrderController {
     public Flux<?> getSaleDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {
-        return Flux.fromIterable(odService.search(vouNo, compCode, deptId));
+        return Flux.fromIterable(odService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-order-voucher-info")
