@@ -908,3 +908,15 @@ change column user_code user_code varchar(50) null default null ;
 
 alter table stock
 add column sale_qty float(20,3) null after deleted;
+
+alter table pur_his_detail
+change column weight_unit weight_unit varchar(10) null default null ;
+
+alter table pur_his
+add column car_no varchar(255) null after project_no;
+
+alter table pur_his_detail
+add column length float(20,3) null after weight,
+add column width float(20,3) null after length,
+add column total_weight float(20,3) null after width,
+add column m_percent varchar(255) null after total_weight;
