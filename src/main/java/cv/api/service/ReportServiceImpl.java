@@ -2884,10 +2884,12 @@ public class ReportServiceImpl implements ReportService {
 //            filter += "and v.project_no='" + projectNo + "'\n";
 //        }
         List<VOrder> list = new ArrayList<>();
-        String sql = "select v.credit_term,v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_order v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" +
-                "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" +
+        String sql = "select v.credit_term,v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,sup.trader_name sup_name,\n"+
+                "t.user_code,t.trader_name,t.address,v.user_code s_user_code,v.stock_name,v.qty,v.unit,v.price,v.amt\n"+
+                "from v_order v join trader t\n" + "on v.trader_code = t.code\n" +
+                "left join grn g\n" +
+//                "on v.batch_no = g.batch_no\n" +
+                "on v.comp_code = g.comp_code\n" + "left join trader sup\n" +
                 "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" +
                 "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" +
                 "and date(v.credit_term) between '" + fromDueDate + "' and '" + toDueDate + "'\n" +
@@ -2903,17 +2905,17 @@ public class ReportServiceImpl implements ReportService {
                 s.setVouNo(rs.getString("vou_no"));
                 s.setRemark(rs.getString("remark"));
                 s.setReference(rs.getString("reference"));
-                s.setBatchNo(rs.getString("batch_no"));
-                s.setSupplierName(rs.getString("sup_name"));
+//                s.setBatchNo(rs.getString("batch_no"));
+//                s.setSupplierName(rs.getString("sup_name"));
                 s.setTraderCode((rs.getString("user_code")));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setCusAddress(rs.getString("address"));
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
                 s.setQty(rs.getFloat("qty"));
-                s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getFloat("sale_price"));
-                s.setSaleAmount(rs.getFloat("sale_amt"));
+                s.setSaleUnit(rs.getString("unit"));
+                s.setSalePrice(rs.getFloat("price"));
+                s.setSaleAmount(rs.getFloat("amt"));
                 s.setVouTotal(rs.getFloat("vou_total"));
                 s.setPaid(rs.getFloat("paid"));
                 list.add(s);
