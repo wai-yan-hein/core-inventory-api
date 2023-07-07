@@ -8,6 +8,7 @@ package cv.api.dao;
 import cv.api.common.Util1;
 import cv.api.entity.PurHis;
 import cv.api.entity.PurHisKey;
+import cv.api.model.VDescription;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -160,6 +161,28 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
             Integer deptId = o.getKey().getDeptId();
             o.setListPD(dao.search(vouNo, compCode, deptId));
         });
+        return list;
+    }
+
+    @Override
+    public List<VDescription> getDescription(String str, String compCode) {
+        List<VDescription> list = new ArrayList<>();
+        String sql = """
+                select distinct car_no
+                from pur_his
+                where comp_code =?
+                and (car_no like ?)
+                limit 20""";
+        try {
+            ResultSet rs = getResult(sql, compCode, str + "%");
+            while (rs.next()) {
+                VDescription v = new VDescription();
+                v.setDescription(rs.getString("car_no"));
+                list.add(v);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         return list;
     }
 }
