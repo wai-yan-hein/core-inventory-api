@@ -82,6 +82,8 @@ public class PurHis {
     private Float expense;
     @Column(name = "project_no")
     private String projectNo;
+    @Column(name = "car_no")
+    private String carNo;
     @Transient
     private String status = "STATUS";
     @Transient

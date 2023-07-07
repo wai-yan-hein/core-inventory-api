@@ -10,6 +10,7 @@ import cv.api.dao.PurExpenseDao;
 import cv.api.dao.PurHisDao;
 import cv.api.dao.SeqTableDao;
 import cv.api.entity.*;
+import cv.api.model.VDescription;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -148,5 +149,8 @@ public class PurHisServiceImpl implements PurHisService {
         String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
         return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
-
+    @Override
+    public List<VDescription> getDescription(String str, String compCode) {
+        return phDao.getDescription(str, compCode);
+    }
 }

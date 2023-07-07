@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 public interface ReportDao {
     void executeSql(String... sql);
 
+    ResultSet executeSql(String sql, Object... params);
     ResultSet executeSql(String sql);
-
 
 }

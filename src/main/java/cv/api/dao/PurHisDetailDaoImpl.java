@@ -44,10 +44,10 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                 "and op.comp_code =cat.comp_code\n" +
                 "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
                 "and op.comp_code =sb.comp_code\n" +
-                "where op.vou_no ='" + vouNo + "'\n" +
-                "and op.comp_code ='" + compCode + "'\n" +
+                "where op.vou_no =?\n" +
+                "and op.comp_code =?\n" +
                 "order by unique_id;\n";
-        ResultSet rs = getResult(sql);
+        ResultSet rs = getResult(sql, vouNo, compCode);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -77,6 +77,9 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
+                    op.setLength(rs.getFloat("length"));
+                    op.setWidth(rs.getFloat("width"));
+                    op.setMPercent(rs.getString("m_percent"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

@@ -7,6 +7,7 @@ package cv.api.service;
 
 import cv.api.entity.PurHis;
 import cv.api.entity.PurHisKey;
+import cv.api.model.VDescription;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -39,6 +40,6 @@ public interface PurHisService {
     Date getMaxDate();
 
     List<PurHis> search(String updatedDate, List<String> keys);
-
+    List<VDescription> getDescription(String str, String compCode);
 
 }

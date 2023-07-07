@@ -98,4 +98,9 @@ public class PurchaseController {
         List<PurHisDetail> listSD = pdService.search(vouNo, compCode, deptId);
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
+
+    @GetMapping(path = "/get-description")
+    public Flux<?> getDescription(@RequestParam String str, @RequestParam String compCode) {
+        return Flux.fromIterable(phService.getDescription(Util1.cleanStr(str), compCode));
+    }
 }
