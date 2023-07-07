@@ -57,6 +57,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public ResultSet getResult(String sql, Object... params) throws Exception{
+        return reportDao.executeSql(sql, params);
+    }
+
+    @Override
     public ResultSet getResult(String sql) throws Exception {
         return reportDao.executeSql(sql);
     }
@@ -1959,24 +1964,25 @@ public class ReportServiceImpl implements ReportService {
         String sql = "select a.*,t.trader_name\n" +
                 "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id\n" +
                 "from v_purchase p \n" +
-                "where comp_code = '" + compCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted =" + deleted + "\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and cur_code = '" + curCode + "'\n" +
-                "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
-                "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
-                "and (reference like '" + reference + "%' or '-%'= '" + reference + "%')\n" +
-                "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n" +
-                "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n" +
+                "where comp_code = ?\n" +
+                "and (dept_id = ? or 0 = ?)\n" +
+                "and deleted =?\n" +
+                "and date(vou_date) between ? and ?\n" +
+                "and cur_code = ?\n" +
+                "and (vou_no = ? or '-' = ?)\n" +
+                "and (remark LIKE CONCAT(?, '%') or '-'= ?)\n" +
+                "and (reference LIKE CONCAT(?, '%') or '-'= ?)\n" +
+                "and (trader_code = ? or '-'= ?)\n" +
+                "and (created_by = ? or '-'= ?)\n" +
+                "and (stock_code =? or '-' =?)\n" +
+                "and (loc_code =? or '-' =?)\n" +
+                "and (project_no =? or '-' =?)\n" +
                 "group by vou_no)a\n" +
                 "join trader t on a.trader_code = t.code\n" +
                 "and a.comp_code = t.comp_code\n" +
                 "order by date(vou_date),vou_no";
-        ResultSet rs = reportDao.executeSql(sql);
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
+                reference, traderCode, traderCode, userCode, userCode, stockCode, stockCode, locCode, locCode, projectNo,projectNo);
         List<VPurchase> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
