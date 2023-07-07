@@ -93,6 +93,11 @@ public class GRNServiceImpl implements GRNService {
         return dao.open(key);
     }
 
+    @Override
+    public GRN findByBatchNo(String batchNo, String compCode, Integer deptId) {
+        return dao.findByBatchNo(batchNo,compCode,deptId);
+    }
+
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         int seqNo = seqTableService.getSequence(macId, "GRN", period, compCode);

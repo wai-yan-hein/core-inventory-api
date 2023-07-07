@@ -99,13 +99,13 @@ public interface ReportService {
 
     General getStockIORecentPrice(String stockCode, String purDate, String unit);
 
-    List<VStockBalance> getStockBalance(String typeCode, String catCode, String brandCode, String stockCode,
+    List<VStockBalance> getStockBalance(String opDate,String clDate,String typeCode, String catCode, String brandCode, String stockCode,
                                         boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                         String locCode, String compCode, Integer deptId, Integer macId, boolean summary);
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
-    List<ReorderLevel> getReorderLevel(String typeCode, String catCode, String brandCode, String stockCode,
+    List<ReorderLevel> getReorderLevel(String opDate,String clDate,String typeCode, String catCode, String brandCode, String stockCode,
                                        boolean calSale, boolean calPur, boolean calRI, boolean calRo,
                                        String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 

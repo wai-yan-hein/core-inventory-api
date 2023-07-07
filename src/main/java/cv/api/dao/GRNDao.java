@@ -17,5 +17,7 @@ public interface GRNDao {
 
     List<GRN> search(String batchNo, String compCode, Integer deptId);
     boolean open(GRNKey key);
+    GRN findByBatchNo(String batchNo,String compCode,Integer deptId);
+
 
 }

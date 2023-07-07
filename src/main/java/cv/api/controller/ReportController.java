@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -343,13 +342,13 @@ public class ReportController {
         } else if (Util1.isNullOrEmpty(macId)) {
             status = false;
             ro.setMessage("Invalid Machine Id.");
-        }/*else if (Util1.isNullOrEmpty(fromDueDate)) {
+        }else if (Util1.isNullOrEmpty(fromDueDate)) {
             status = false;
             ro.setMessage("Invalid From Due Date.");
         } else if (Util1.isNullOrEmpty(toDueDate)) {
             status = false;
             ro.setMessage("Invalid To Due Date.");
-        }*/
+        }
         return status;
     }
 
@@ -386,8 +385,15 @@ public class ReportController {
     }
 
     @GetMapping(path = "/get-stock-balance")
-    public Flux<?> getStockBalance(@RequestParam String stockCode, @RequestParam boolean calSale, @RequestParam boolean calPur, @RequestParam boolean calRI, @RequestParam boolean calRO, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam Integer macId, @RequestParam boolean summary) {
-        List<VStockBalance> list = reportService.getStockBalance("-", "-", "-", stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
+    public Flux<?> getStockBalance(@RequestParam String stockCode,
+                                   @RequestParam boolean calSale, @RequestParam boolean calPur,
+                                   @RequestParam boolean calRI, @RequestParam boolean calRO,
+                                   @RequestParam String compCode, @RequestParam Integer deptId,
+                                   @RequestParam Integer macId, @RequestParam boolean summary) {
+        String opDate =reportService.getOpeningDate(compCode,deptId);
+        String clDate =Util1.toDateStr(Util1.getTodayDate(),"yyyy-MM-dd");
+        List<VStockBalance> list = reportService.getStockBalance(opDate,clDate,"-", "-", "-",
+                stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
         if (list.isEmpty()) {
             VStockBalance b = new VStockBalance();
             b.setLocationName("No Stock.");
@@ -411,7 +417,10 @@ public class ReportController {
         boolean calRI = filter.isCalRI();
         boolean calRO = filter.isCalRO();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
+        String opDate = reportService.getOpeningDate(compCode, deptId);
+        String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
+        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(opDate, clDate, typeCode, catCode,
+                brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
         return Flux.fromIterable(reorderLevels).onErrorResume(throwable -> Flux.empty());
     }
 

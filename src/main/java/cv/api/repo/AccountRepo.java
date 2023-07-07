@@ -44,7 +44,11 @@ public class AccountRepo {
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
-            accountApi.post().uri("/account/save-gl-list").body(Mono.just(glList), List.class).retrieve().bodyToMono(Response.class).subscribe(response -> {
+            accountApi.post().uri("/account/save-gl-list")
+                    .body(Mono.just(glList), List.class)
+                    .retrieve()
+                    .bodyToMono(Response.class)
+                    .subscribe(response -> {
                 if (response != null) {
                     String vouNo = response.getVouNo();
                     String compCode = response.getCompCode();
@@ -549,8 +553,6 @@ public class AccountRepo {
                             gl.setBatchNo(batchNo);
                             gl.setProjectNo(projectNo);
                             listGl.add(gl);
-
-
                         }
                     }
                 }
@@ -841,7 +843,9 @@ public class AccountRepo {
 
     public void deleteGlByVoucher(Gl gl) {
         try {
-            Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher").body(Mono.just(gl), Gl.class).retrieve().bodyToMono(String.class);
+            Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher")
+                    .body(Mono.just(gl), Gl.class).retrieve()
+                    .bodyToMono(String.class);
             result.block();
             String vouNo = gl.getRefNo();
             String compCode = gl.getKey().getCompCode();

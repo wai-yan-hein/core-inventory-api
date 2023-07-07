@@ -18,4 +18,5 @@ public interface GRNService {
     boolean restore(GRNKey key);
 
     boolean open(GRNKey key);
+    GRN findByBatchNo(String batchNo,String compCode,Integer deptId);
 }

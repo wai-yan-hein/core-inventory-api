@@ -73,10 +73,12 @@ public class GRNController {
     public Mono<?> deleteGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));
     }
+
     @PostMapping(path = "/restore-grn")
     public Mono<?> restoreGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.restore(key));
     }
+
     @PostMapping(path = "/open-grn")
     public Mono<?> openGRn(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));
@@ -85,5 +87,10 @@ public class GRNController {
     @GetMapping(path = "/get-batch-list")
     public Flux<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(grnService.search(Util1.cleanStr(batchNo), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/findByBatchNo")
+    public Mono<?> findByBatchNo(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(grnService.findByBatchNo(batchNo, compCode, deptId));
     }
 }

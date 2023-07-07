@@ -19,7 +19,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
 
     @Override
     public GRN save(GRN b) {
-        saveOrUpdate(b,b.getKey());
+        saveOrUpdate(b, b.getKey());
         return b;
     }
 
@@ -40,29 +40,31 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     public boolean restore(GRNKey key) {
         String sql = "update grn set deleted = false where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
         execSql(sql);
-        return true;    }
+        return true;
+    }
 
     @Override
     public List<GRN> search(String batchNo, String compCode, Integer deptId) {
         List<GRN> list = new ArrayList<>();
-        String sql = "select a.batch_no,t.trader_name,a.vou_no\n" +
-                "from (\n" +
-                "select batch_no,trader_code,comp_code,dept_id,vou_no\n" +
-                "from grn\n" +
-                "where comp_code='" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0=" + deptId + ")\n" +
-                "and deleted = false\n" +
-                "and closed =0\n" +
-                "and batch_no like '" + batchNo + "%'\n" +
-                "order by batch_no\n" +
-                "limit 20\n" +
-                ")a\n" +
-                "join trader t on\n" +
-                "a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "and a.dept_id = t.dept_id";
+        String sql = """
+                select a.batch_no,t.trader_name,a.vou_no
+                from (
+                select batch_no,trader_code,comp_code,dept_id,vou_no
+                from grn
+                where comp_code=?
+                and (dept_id =? or 0=?)
+                and deleted = false
+                and closed =0
+                and batch_no like ?
+                order by batch_no
+                limit 20
+                )a
+                join trader t on
+                a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                and a.dept_id = t.dept_id""";
         try {
-            ResultSet rs = getResult(sql);
+            ResultSet rs = getResult(sql, compCode, deptId, deptId, batchNo + "%");
             if (rs != null) {
                 while (rs.next()) {
                     GRN g = new GRN();
@@ -84,6 +86,37 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     public boolean open(GRNKey key) {
         String sql = "update grn set closed =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId();
         execSql(sql);
-        return true;    }
+        return true;
+    }
+
+    @Override
+    public GRN findByBatchNo(String batchNo, String compCode, Integer deptId) {
+        GRN grn = new GRN();
+        String sql = """
+                select batch_no,trader_code,comp_code,dept_id,vou_no
+                from grn
+                where comp_code=?
+                and (dept_id =? or 0=?)
+                and deleted = false
+                and batch_no = ?
+                limit 1
+                """;
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, batchNo);
+        try {
+            if (rs.next()) {
+                GRNKey key = new GRNKey();
+                key.setVouNo(rs.getString("vou_no"));
+                key.setCompCode(rs.getString("comp_code"));
+                key.setDeptId(rs.getInt("dept_id"));
+                grn.setKey(key);
+                grn.setBatchNo(rs.getString("batch_no"));
+                grn.setTraderCode(rs.getString("trader_code"));
+                return grn;
+            }
+        } catch (Exception e) {
+            log.error("findByBatchNo : " + e.getMessage());
+        }
+        return grn;
+    }
 
 }
