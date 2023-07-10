@@ -38,9 +38,19 @@ public class ReportController {
     public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
+        createFilePath(exportPath);
         List<VSale> listVSale = reportService.getSaleVoucher(vouNo);
         Util1.writeJsonFile(listVSale, exportPath);
         return new FileInputStream(exportPath).readAllBytes();
+    }
+
+    private String createFilePath(String path) {
+        File file = new File(path);
+        File parentDir = file.getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+        return path;
     }
 
     @GetMapping(value = "/get-order-report", produces = MediaType.APPLICATION_JSON_VALUE)

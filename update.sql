@@ -920,3 +920,6 @@ add column length float(20,3) null after weight,
 add column width float(20,3) null after length,
 add column total_weight float(20,3) null after width,
 add column m_percent varchar(255) null after total_weight;
+
+alter table sale_his
+add column car_no varchar(255) null;

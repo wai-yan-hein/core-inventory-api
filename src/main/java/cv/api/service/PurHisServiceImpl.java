@@ -150,7 +150,7 @@ public class PurHisServiceImpl implements PurHisService {
         return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
     @Override
-    public List<VDescription> getDescription(String str, String compCode) {
-        return phDao.getDescription(str, compCode);
+    public List<VDescription> getDescription(String str, String compCode, String tranType) {
+        return phDao.getDescription(str, compCode, tranType);
     }
 }

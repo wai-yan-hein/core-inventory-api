@@ -40,6 +40,6 @@ public interface PurHisService {
     Date getMaxDate();
 
     List<PurHis> search(String updatedDate, List<String> keys);
-    List<VDescription> getDescription(String str, String compCode);
+    List<VDescription> getDescription(String str, String compCode, String tranType);
 
 }
