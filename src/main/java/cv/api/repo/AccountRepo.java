@@ -12,6 +12,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,31 +50,31 @@ public class AccountRepo {
                     .retrieve()
                     .bodyToMono(Response.class)
                     .subscribe(response -> {
-                if (response != null) {
-                    String vouNo = response.getVouNo();
-                    String compCode = response.getCompCode();
-                    switch (response.getTranSource()) {
-                        case "SALE" -> updateSale(vouNo, compCode);
-                        case "PURCHASE" -> updatePurchase(vouNo, compCode);
-                        case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
-                        case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
-                        case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
-                    }
-                }
-            }, (e) -> {
-                Gl gl = glList.get(0);
-                String vouNo = gl.getRefNo();
-                String compCode = gl.getKey().getCompCode();
-                String tranSource = gl.getTranSource();
-                switch (tranSource) {
-                    case "SALE" -> updateSaleNull(vouNo, compCode);
-                    case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
-                    case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
-                    case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
-                    case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
-                }
-                log.error(e.getMessage());
-            });
+                        if (response != null) {
+                            String vouNo = response.getVouNo();
+                            String compCode = response.getCompCode();
+                            switch (response.getTranSource()) {
+                                case "SALE" -> updateSale(vouNo, compCode);
+                                case "PURCHASE" -> updatePurchase(vouNo, compCode);
+                                case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
+                                case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+                                case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
+                            }
+                        }
+                    }, (e) -> {
+                        Gl gl = glList.get(0);
+                        String vouNo = gl.getRefNo();
+                        String compCode = gl.getKey().getCompCode();
+                        String tranSource = gl.getTranSource();
+                        switch (tranSource) {
+                            case "SALE" -> updateSaleNull(vouNo, compCode);
+                            case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
+                            case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
+                            case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+                            case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
+                        }
+                        log.error(e.getMessage());
+                    });
         }
     }
 
@@ -195,10 +196,11 @@ public class AccountRepo {
                 accTrader.setKey(key);
                 accTrader.setTraderName(t.getTraderName());
                 accTrader.setUserCode(t.getUserCode());
-                accTrader.setActive(true);
+                accTrader.setActive(t.isActive());
                 accTrader.setAppName(appName);
                 accTrader.setMacId(macId);
                 accTrader.setAccount(t.getAccount());
+                accTrader.setDeleted(t.isDeleted());
                 switch (traderType) {
                     case "CUS" -> accTrader.setTraderType("C");
                     case "SUP" -> accTrader.setTraderType("S");
@@ -210,7 +212,11 @@ public class AccountRepo {
     }
 
     public void deleteTrader(AccTraderKey key) {
-        accountApi.post().uri("/account/delete-trader").body(Mono.just(key), AccTraderKey.class).retrieve().bodyToMono(ReturnObject.class).subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
+        accountApi.post().uri("/account/delete-trader")
+                .body(Mono.just(key), AccTraderKey.class)
+                .retrieve()
+                .bodyToMono(ReturnObject.class)
+                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
     }
 
     public void sendSale(SaleHis sh) {
