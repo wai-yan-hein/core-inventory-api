@@ -165,14 +165,14 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
     }
 
     @Override
-    public List<VDescription> getDescription(String str, String compCode) {
+    public List<VDescription> getDescription(String str, String compCode, String tranType) {
         List<VDescription> list = new ArrayList<>();
-        String sql = """
-                select distinct car_no
-                from pur_his
-                where comp_code =?
-                and (car_no like ?)
-                limit 20""";
+        String table = tranType.equals("Sale")? "sale_his" : "pur_his";
+        String sql = "SELECT DISTINCT car_no " +
+                "FROM " + table + " " +
+                "WHERE comp_code = ? " +
+                "AND (car_no LIKE ?) " +
+                "LIMIT 20";
         try {
             ResultSet rs = getResult(sql, compCode, str + "%");
             while (rs.next()) {

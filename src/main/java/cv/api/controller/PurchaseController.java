@@ -100,7 +100,7 @@ public class PurchaseController {
     }
 
     @GetMapping(path = "/get-description")
-    public Flux<?> getDescription(@RequestParam String str, @RequestParam String compCode) {
-        return Flux.fromIterable(phService.getDescription(Util1.cleanStr(str), compCode));
+    public Flux<?> getDescription(@RequestParam String str, @RequestParam String compCode, @RequestParam String tranType) {
+        return Flux.fromIterable(phService.getDescription(Util1.cleanStr(str), compCode, tranType));
     }
 }
