@@ -12,9 +12,12 @@ public interface PaymentHisService {
     PaymentHis find(PaymentHisKey key);
 
     void delete(PaymentHisKey key);
+
     void restore(PaymentHisKey key);
-    List<PaymentHis> search(String startDate,String endDate,String traderCode,String curCode,
-                            String vouNo,String userCode,String account,
-                            String projectNo,String remark,boolean deleted,String compCode);
+
+    List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode,
+                            String vouNo, String saleVouNo, String userCode, String account,
+                            String projectNo, String remark, boolean deleted, String compCode);
+
     List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 }

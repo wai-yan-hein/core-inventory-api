@@ -47,7 +47,7 @@ public class PaymentController {
 
     @PostMapping(path = "/savePayment")
     public Mono<?> savePayment(@RequestBody PaymentHis ph) {
-        ph =paymentHisService.save(ph);
+        ph = paymentHisService.save(ph);
         accountRepo.sendPayment(ph);
         return Mono.justOrEmpty(ph);
     }
@@ -62,6 +62,7 @@ public class PaymentController {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
+        String saleVouNo = Util1.isNull(filter.getSaleVouNo(), "-");
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String account = Util1.isAll(filter.getAccount());
         String traderCode = Util1.isNull(filter.getTraderCode(), "-");
@@ -70,6 +71,9 @@ public class PaymentController {
         boolean deleted = filter.isDeleted();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
-        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode, curCode, vouNo, userCode, account, projectNo, remark, deleted, compCode)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode,
+                        curCode, vouNo, saleVouNo, userCode, account, projectNo, remark,
+                        deleted, compCode))
+                .onErrorResume(throwable -> Flux.empty());
     }
 }

@@ -40,5 +40,6 @@ public class FilterObject {
     private String projectNo;
     private String curCode;
     private String account;
+    private String saleVouNo;
 
 }

@@ -39,33 +39,44 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
     }
 
     @Override
-    public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode, String vouNo, String userCode, String account, String projectNo, String remark, boolean deleted, String compCode) {
+    public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode,
+                                   String vouNo,String saleVouNo, String userCode, String account, String projectNo,
+                                   String remark, boolean deleted, String compCode) {
         String filter = "";
         if (!traderCode.equals("-")) {
-            filter += "and trader_code ='" + traderCode + "'";
+            filter += "and ph.trader_code ='" + traderCode + "'";
         }
         if (!projectNo.equals("-")) {
-            filter += "and project_no ='" + projectNo + "'";
+            filter += "and  ph.project_no ='" + projectNo + "'";
         }
         if (!vouNo.equals("-")) {
-            filter += "and vou_no ='" + vouNo + "'";
+            filter += "and  ph.vou_no ='" + vouNo + "'";
         }
         if (!account.equals("-")) {
-            filter += "and account ='" + account + "'";
+            filter += "and  ph.account ='" + account + "'";
         }
         if (!userCode.equals("-")) {
-            filter += "and created_by ='" + userCode + "'";
+            filter += "and  ph.created_by ='" + userCode + "'";
         }
         if (!remark.equals("-")) {
-            filter += "and remark like '" + remark + "'%";
+            filter += "and  ph.remark like '" + remark + "'%";
+        }
+        if (!saleVouNo.equals("-")) {
+            filter += "and  phd.sale_vou_no = '" + saleVouNo + "'";
         }
         String sql = "select a.*,t.trader_name\n" +
-                "from (\n" + "select *\n" + "from payment_his\n" +
-                "where deleted =" + deleted + "\n" + "and comp_code ='" + compCode + "'\n" +
-                "and date(vou_date) between '" + startDate + "' and '" + endDate + "'\n" + filter + "\n" + ")a\n" +
+                "from (\n" +
+                "select ph.*\n" +
+                "from payment_his ph,payment_his_detail phd\n" +
+                "where ph.vou_no = phd.vou_no\n" +
+                "and ph.comp_code = phd.comp_code\n"+
+                "and ph.deleted =" + deleted + "\n" +
+                "and ph.comp_code ='" + compCode + "'\n" +
+                "and date(ph.vou_date) between '" + startDate + "' and '" + endDate + "'\n" + filter + "\n" + ")a\n" +
                 "join trader t on a.trader_code = t.code\n" +
                 "and a.comp_code = t.comp_code\n" +
-                "order by a.vou_no desc";
+                "group by a.vou_no\n"+
+                "order by a.vou_date,a.vou_no desc";
         List<PaymentHis> list = new ArrayList<>();
         try {
             ResultSet rs = getResult(sql);
