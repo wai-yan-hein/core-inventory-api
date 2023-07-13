@@ -847,12 +847,11 @@ public class AccountRepo {
     }
 
 
-    public void deleteGlByVoucher(Gl gl) {
-        try {
-            Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher")
-                    .body(Mono.just(gl), Gl.class).retrieve()
-                    .bodyToMono(String.class);
-            result.block();
+    private void deleteGlByVoucher(Gl gl) {
+        Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher")
+                .body(Mono.just(gl), Gl.class).retrieve()
+                .bodyToMono(String.class);
+        result.subscribe(s -> {
             String vouNo = gl.getRefNo();
             String compCode = gl.getKey().getCompCode();
             switch (gl.getTranSource()) {
@@ -862,7 +861,7 @@ public class AccountRepo {
                 case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
                 case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
             }
-        } catch (Exception e) {
+        }, (e) -> {
             String vouNo = gl.getRefNo();
             String compCode = gl.getKey().getCompCode();
             String tranSource = gl.getTranSource();
@@ -874,7 +873,7 @@ public class AccountRepo {
                 case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
             }
             log.error("deleteGlByVoucher : " + e.getMessage());
-        }
+        });
     }
 
     private LocationSetting getLocationSetting(String locCode, String compCode) {
