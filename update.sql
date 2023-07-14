@@ -1006,7 +1006,7 @@ create table milling_expense (
   primary key (expense_code,comp_code,vou_no,unique_id)
 ) engine=innodb default charset=utf8mb3;
 
-create table miling_raw (
+create table milling_raw (
   vou_no varchar(20) not null,
   stock_code varchar(10) default null,
   expire_date date default null,
