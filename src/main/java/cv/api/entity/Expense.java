@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 public class Expense{
     @EmbeddedId
     private ExpenseKey key;
+    @Column(name = "user_code")
+    private String userCode;
     @Column(name = "expense_name")
     private String expenseName;
     @Column(name = "account_code")

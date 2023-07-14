@@ -923,3 +923,6 @@ add column m_percent varchar(255) null after total_weight;
 
 alter table sale_his
 add column car_no varchar(255) null;
+
+alter table expense
+add column user_code varchar(15) null after percent;
