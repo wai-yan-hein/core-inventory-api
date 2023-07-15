@@ -12,14 +12,14 @@ import java.util.List;
 /**
  * @author wai yan
  */
-public interface MilingExpenseService {
+public interface MillingExpenseService {
 
-    MilingExpense findById(MilingExpenseKey key);
-    MilingExpense save(MilingExpense exp);
+    MillingExpense findById(MillingExpenseKey key);
+    MillingExpense save(MillingExpense exp);
 
-    List<MilingExpense> getExpense(String compCode);
+    List<MillingExpense> getExpense(String compCode);
 
-    void delete(MilingExpenseKey key);
+    void delete(MillingExpenseKey key);
 
 
 }

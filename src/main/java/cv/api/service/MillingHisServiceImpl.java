@@ -24,32 +24,33 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
-public class MilingHisServiceImpl implements MilingHisService {
+public class MillingHisServiceImpl implements MillingHisService {
 
     @Autowired
-    private MilingHisDao hDao;
+    private MillingHisDao hDao;
     @Autowired
-    private MilingRawDao rDao;
+    private MillingRawDao rDao;
     @Autowired
-    private MilingOutDao oDao;
+    private MillingOutDao oDao;
     @Autowired
-    private MilingExpenseDao eDao;
+    private MillingExpenseDao eDao;
     @Autowired
     private SeqTableDao seqDao;
 
     @Override
-    public MilingHis save(MilingHis milingHis) {
-        milingHis.setVouDate(Util1.toDateTime(milingHis.getVouDate()));
-        if (Util1.isNullOrEmpty(milingHis.getKey().getVouNo())) {
-            milingHis.getKey().setVouNo(getVoucherNo(milingHis.getKey().getDeptId(), milingHis.getMacId(), milingHis.getKey().getCompCode()));
+    public MillingHis save(MillingHis milling) {
+        milling.setVouDate(Util1.toDateTime(milling.getVouDate()));
+        Integer deptId = milling.getDeptId();
+        if (Util1.isNullOrEmpty(milling.getKey().getVouNo())) {
+            milling.getKey().setVouNo(getVoucherNo(deptId, milling.getMacId(), milling.getKey().getCompCode()));
         }
-        List<MilingRawDetail> listRaw = milingHis.getListRaw();
-        List<MilingRawDetailKey> listRawDel = milingHis.getListRawDel();
-        List<MilingExpense> listExp = milingHis.getListExpense();
-        List<MilingExpenseKey> listExpDel = milingHis.getListExpenseDel();
-        List<MilingOutDetail> listOut = milingHis.getListOutput();
-        List<MilingOutDetailKey> listOutDel = milingHis.getListOutputDel();
-        String vouNo = milingHis.getKey().getVouNo();
+        List<MillingRawDetail> listRaw = milling.getListRaw();
+        List<MillingRawDetailKey> listRawDel = milling.getListRawDel();
+        List<MillingExpense> listExp = milling.getListExpense();
+        List<MillingExpenseKey> listExpDel = milling.getListExpenseDel();
+        List<MillingOutDetail> listOut = milling.getListOutput();
+        List<MillingOutDetailKey> listOutDel = milling.getListOutputDel();
+        String vouNo = milling.getKey().getVouNo();
         //backup
         if (listRawDel != null) {
             listRawDel.forEach(key -> rDao.delete(key));
@@ -61,11 +62,10 @@ public class MilingHisServiceImpl implements MilingHisService {
             listExpDel.forEach(key -> eDao.delete(key));
         }
         for (int i = 0; i < listRaw.size(); i++) {
-            MilingRawDetail cSd = listRaw.get(i);
+            MillingRawDetail cSd = listRaw.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
-                MilingRawDetailKey key = new MilingRawDetailKey();
-                key.setDeptId(milingHis.getKey().getDeptId());
-                key.setCompCode(milingHis.getKey().getCompCode());
+                MillingRawDetailKey key = new MillingRawDetailKey();
+                key.setCompCode(milling.getKey().getCompCode());
                 key.setVouNo(vouNo);
                 key.setUniqueId(null);
                 cSd.setKey(key);
@@ -75,19 +75,19 @@ public class MilingHisServiceImpl implements MilingHisService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        MilingRawDetail pSd = listRaw.get(i - 1);
+                        MillingRawDetail pSd = listRaw.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setDeptId(deptId);
                 rDao.save(cSd);
             }
         }
         for (int i = 0; i < listOut.size(); i++) {
-            MilingOutDetail cSd = listOut.get(i);
+            MillingOutDetail cSd = listOut.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
-                MilingOutDetailKey key = new MilingOutDetailKey();
-                key.setDeptId(milingHis.getKey().getDeptId());
-                key.setCompCode(milingHis.getKey().getCompCode());
+                MillingOutDetailKey key = new MillingOutDetailKey();
+                key.setCompCode(milling.getKey().getCompCode());
                 key.setVouNo(vouNo);
                 key.setUniqueId(null);
                 cSd.setKey(key);
@@ -97,19 +97,20 @@ public class MilingHisServiceImpl implements MilingHisService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        MilingOutDetail pSd = listOut.get(i - 1);
+                        MillingOutDetail pSd = listOut.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setDeptId(deptId);
                 oDao.save(cSd);
             }
         }
         for (int i = 0; i < listExp.size(); i++) {
-            MilingExpense cSd = listExp.get(i);
+            MillingExpense cSd = listExp.get(i);
             if (cSd.getKey() != null && cSd.getKey().getExpenseCode() != null) {
-                    MilingExpenseKey key = new MilingExpenseKey();
+                    MillingExpenseKey key = new MillingExpenseKey();
                     key.setExpenseCode(cSd.getKey().getExpenseCode());
-                    key.setCompCode(milingHis.getKey().getCompCode());
+                    key.setCompCode(milling.getKey().getCompCode());
                     key.setVouNo(vouNo);
                     key.setUniqueId(null);
                     cSd.setKey(key);
@@ -120,42 +121,42 @@ public class MilingHisServiceImpl implements MilingHisService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        MilingExpense pSd = listExp.get(i - 1);
+                        MillingExpense pSd = listExp.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
                 eDao.save(cSd);
             }
         }
-        hDao.save(milingHis);
-        milingHis.setListRaw(listRaw);
-        milingHis.setListOutput(listOut);
-        milingHis.setListExpense(listExp);
-        return milingHis;
+        hDao.save(milling);
+        milling.setListRaw(listRaw);
+        milling.setListOutput(listOut);
+        milling.setListExpense(listExp);
+        return milling;
     }
 
     @Override
-    public MilingHis update(MilingHis milingHis) {
-        return hDao.save(milingHis);
+    public MillingHis update(MillingHis milling) {
+        return hDao.save(milling);
     }
 
     @Override
-    public List<MilingHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
+    public List<MillingHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
         return hDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
     }
 
     @Override
-    public MilingHis findById(MilingHisKey id) {
+    public MillingHis findById(MillingHisKey id) {
         return hDao.findById(id);
     }
 
     @Override
-    public void delete(MilingHisKey key) throws Exception {
+    public void delete(MillingHisKey key) throws Exception {
         hDao.delete(key);
     }
 
     @Override
-    public void restore(MilingHisKey key) throws Exception {
+    public void restore(MillingHisKey key) throws Exception {
         hDao.restore(key);
     }
 
@@ -168,12 +169,12 @@ public class MilingHisServiceImpl implements MilingHisService {
 
 
     @Override
-    public List<MilingHis> unUploadVoucher(LocalDateTime syncDate) {
+    public List<MillingHis> unUploadVoucher(LocalDateTime syncDate) {
         return hDao.unUploadVoucher(syncDate);
     }
 
     @Override
-    public List<MilingHis> unUpload(String syncDate) {
+    public List<MillingHis> unUpload(String syncDate) {
         return hDao.unUpload(syncDate);
     }
 
@@ -184,7 +185,7 @@ public class MilingHisServiceImpl implements MilingHisService {
 
 
     @Override
-    public void truncate(MilingHisKey key) {
+    public void truncate(MillingHisKey key) {
         hDao.truncate(key);
     }
 

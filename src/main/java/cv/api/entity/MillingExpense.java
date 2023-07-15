@@ -18,11 +18,11 @@ import jakarta.persistence.Table;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "miling_expense")
-public class MilingExpense {
+@Table(name = "milling_expense")
+public class MillingExpense {
 
     @EmbeddedId
-    private MilingExpenseKey key;
+    private MillingExpenseKey key;
     @Column(name = "expense_name")
     private String expenseName;
     @Column(name = "qty")

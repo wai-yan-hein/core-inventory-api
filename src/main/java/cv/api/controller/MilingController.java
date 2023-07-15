@@ -30,20 +30,20 @@ public class MilingController {
 
     private final ReturnObject ro = new ReturnObject();
     @Autowired
-    private MilingHisService hService;
+    private MillingHisService hService;
     @Autowired
-    private MilingRawService rawService;
+    private MillingRawService rawService;
     @Autowired
-    private MilingOutService outService;
+    private MillingOutService outService;
     @Autowired
-    private MilingExpenseService expService;
+    private MillingExpenseService expService;
     @Autowired
     private ReportService reportService;
     @Autowired
     private AccountRepo accountRepo;
 
     @PostMapping(path = "/save-miling")
-    public Mono<?> saveSale(@RequestBody MilingHis sale) {
+    public Mono<?> saveSale(@RequestBody MillingHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
@@ -57,7 +57,7 @@ public class MilingController {
         return Mono.justOrEmpty(sale);
     }
 
-    private boolean isValidSale(MilingHis sale, ReturnObject ro) {
+    private boolean isValidSale(MillingHis sale, ReturnObject ro) {
         boolean status = true;
         if (Util1.isNullOrEmpty(sale.getTraderCode())) {
             status = false;
@@ -103,7 +103,7 @@ public class MilingController {
     }
 
     @PostMapping(path = "/delete-miling")
-    public Mono<?> deleteSale(@RequestBody MilingHisKey key) throws Exception {
+    public Mono<?> deleteSale(@RequestBody MillingHisKey key) throws Exception {
         hService.delete(key);
         //delete in account
 //        accountRepo.deleteInvVoucher(key);
@@ -112,14 +112,14 @@ public class MilingController {
     }
 
     @PostMapping(path = "/restore-miling")
-    public Mono<?> restoreSale(@RequestBody MilingHisKey key) throws Exception {
+    public Mono<?> restoreSale(@RequestBody MillingHisKey key) throws Exception {
         hService.restore(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/find-miling")
-    public Mono<MilingHis> findSale(@RequestBody MilingHisKey key) {
-        MilingHis sh = hService.findById(key);
+    public Mono<MillingHis> findSale(@RequestBody MillingHisKey key) {
+        MillingHis sh = hService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 

@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MilingExpenseKey implements Serializable {
+public class MillingExpenseKey implements Serializable {
 
     @Column(name = "expense_code")
     private String expenseCode;

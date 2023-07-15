@@ -5,12 +5,8 @@
  */
 package cv.api.service;
 
-import cv.api.dao.SaleHisDetailDao;
-import cv.api.entity.MilingExpense;
-import cv.api.entity.MilingExpenseKey;
-import cv.api.entity.SaleDetailKey;
-import cv.api.entity.SaleHisDetail;
-import org.springframework.beans.factory.annotation.Autowired;
+import cv.api.entity.MillingExpense;
+import cv.api.entity.MillingExpenseKey;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,25 +17,25 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class MilingExpenseServiceImpl implements MilingExpenseService {
+public class MillingExpenseServiceImpl implements MillingExpenseService {
 
     @Override
-    public MilingExpense findById(MilingExpenseKey key) {
+    public MillingExpense findById(MillingExpenseKey key) {
         return null;
     }
 
     @Override
-    public MilingExpense save(MilingExpense exp) {
+    public MillingExpense save(MillingExpense exp) {
         return null;
     }
 
     @Override
-    public List<MilingExpense> getExpense(String compCode) {
+    public List<MillingExpense> getExpense(String compCode) {
         return null;
     }
 
     @Override
-    public void delete(MilingExpenseKey key) {
+    public void delete(MillingExpenseKey key) {
 
     }
 }

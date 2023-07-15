@@ -926,36 +926,25 @@ add column car_no varchar(255) null;
 
 alter table expense
 add column user_code varchar(15) null after percent;
+
+drop table if exists milling_his;
 create table milling_his (
   vou_no varchar(25) not null,
   trader_code varchar(15) not null,
-  saleman_code varchar(45) default null,
   vou_date datetime not null,
-  credit_term date default null,
   cur_code varchar(15) not null,
   remark varchar(500) default null,
-  discount float(20,3) default null,
-  disc_p float(20,3) default null,
-  tax_amt float(20,3) default null,
-  tax_p float(20,3) default null,
   created_date datetime not null,
   created_by varchar(15) not null,
   deleted bit(1) default null,
-  paid float(20,3) default null,
-  vou_balance float(20,3) default null,
   updated_by varchar(15) default null,
   updated_date timestamp not null default current_timestamp(),
   comp_code varchar(15) not null,
-  address varchar(255) default null,
-  order_code varchar(15) default null,
-  reg_code varchar(15) default null,
   mac_id varchar(15) not null,
-  session_id int(11) default null,
   intg_upd_status varchar(5) default null,
   reference varchar(255) default null,
   dept_id int(11) not null default 1,
   vou_lock bit(1) not null default b'0',
-  order_no varchar(25) default null,
   project_no varchar(15) default null,
   car_no varchar(255) default null,
   vou_status_id varchar(255) default null,
@@ -968,32 +957,29 @@ create table milling_his (
   output_weight float(20,3) default null,
   output_amount float(20,3) default null,
   diff_weight float(20,3) default null,
-  primary key (vou_no,dept_id,comp_code)
+  primary key (vou_no,comp_code)
 ) engine=innodb default charset=utf8mb3;
 
+drop table if exists milling_output;
 create table milling_output (
   vou_no varchar(20) not null,
   stock_code varchar(10) default null,
-  expire_date date default null,
   qty float(20,3) not null,
-  sale_unit varchar(10) not null,
-  sale_price float(20,3) not null,
-  sale_amt float(20,3) not null,
+  unit varchar(10) not null,
+  price float(20,3) not null,
+  amt float(20,3) not null,
   loc_code varchar(15) not null,
   unique_id int(11) not null,
   comp_code varchar(15) not null,
   dept_id int(11) not null default 1,
-  batch_no varchar(15) default null,
   weight float(20,3) default null,
   weight_unit varchar(15) default null,
-  std_weight float(20,3) default null,
   percent float(20,3) not null,
   tot_weight float(20,3) not null,
-  primary key (vou_no,dept_id,unique_id,comp_code),
-  key fk_item_unt_idx (sale_unit),
-  key fk__idx (stock_code)
+  primary key (vou_no,unique_id,comp_code)
 ) engine=innodb default charset=utf8mb3;
 
+drop table if exists milling_expense;
 create table milling_expense (
   expense_code varchar(15) not null,
   vou_no varchar(15) not null,
@@ -1006,24 +992,20 @@ create table milling_expense (
   primary key (expense_code,comp_code,vou_no,unique_id)
 ) engine=innodb default charset=utf8mb3;
 
+drop table if exists milling_raw;
 create table milling_raw (
   vou_no varchar(20) not null,
   stock_code varchar(10) default null,
-  expire_date date default null,
   qty float(20,3) not null,
-  sale_unit varchar(10) not null,
-  sale_price float(20,3) not null,
-  sale_amt float(20,3) not null,
+  unit varchar(10) not null,
+  price float(20,3) not null,
+  amt float(20,3) not null,
   loc_code varchar(15) not null,
   unique_id int(11) not null,
   comp_code varchar(15) not null,
   dept_id int(11) not null default 1,
-  batch_no varchar(15) default null,
   weight float(20,3) default null,
   weight_unit varchar(15) default null,
-  std_weight float(20,3) default null,
   tot_weight float(20,3) not null,
-  primary key (vou_no,dept_id,unique_id,comp_code),
-  key fk_item_unt_idx (sale_unit),
-  key fk__idx (stock_code)
+  primary key (vou_no,unique_id,comp_code)
 ) engine=innodb default charset=utf8mb3;

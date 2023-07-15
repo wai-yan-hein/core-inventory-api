@@ -10,31 +10,31 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class MilingExpenseDaoImpl extends AbstractDao<MilingExpenseKey, MilingExpense> implements MilingExpenseDao {
+public class MillingExpenseDaoImpl extends AbstractDao<MillingExpenseKey, MillingExpense> implements MillingExpenseDao {
     @Override
-    public MilingExpense findById(MilingExpenseKey key) {
+    public MillingExpense findById(MillingExpenseKey key) {
         return getByKey(key);
     }
 
     @Override
-    public MilingExpense save(MilingExpense exp) {
+    public MillingExpense save(MillingExpense exp) {
         saveOrUpdate(exp,exp.getKey());
         return exp;
     }
 
     @Override
-    public List<MilingExpense> getExpense(String compCode) {
+    public List<MillingExpense> getExpense(String compCode) {
         String hsql = "select o from miling_expense o where o.key.compCode ='" + compCode + "' and o.deleted = false";
         return findHSQL(hsql);
     }
 
     @Override
-    public void delete(MilingExpenseKey key) {
+    public void delete(MillingExpenseKey key) {
         String sql = "update miling_expense set deleted = true where expense_code ='" + key.getExpenseCode() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
     }
     @Override
-    public List<MilingExpense> search(String vouNo, String compCode) {
+    public List<MillingExpense> search(String vouNo, String compCode) {
         String sql = "select a.*,e.expense_name\n" +
                 "from (\n" +
                 "select *\n" +
@@ -47,12 +47,12 @@ public class MilingExpenseDaoImpl extends AbstractDao<MilingExpenseKey, MilingEx
                 "and a.comp_code = e.comp_code\n" +
                 "order by a.unique_id";
         ResultSet rs = getResult(sql);
-        List<MilingExpense> list = new ArrayList<>();
+        List<MillingExpense> list = new ArrayList<>();
         if (rs != null) {
             try {
                 while (rs.next()) {
-                    MilingExpense e = new MilingExpense();
-                    MilingExpenseKey key = new MilingExpenseKey();
+                    MillingExpense e = new MillingExpense();
+                    MillingExpenseKey key = new MillingExpenseKey();
                     key.setExpenseCode(rs.getString("expense_code"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));

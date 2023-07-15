@@ -17,12 +17,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Embeddable
-public class MilingHisKey implements Serializable{
+public class MillingHisKey implements Serializable{
 
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
+
 }

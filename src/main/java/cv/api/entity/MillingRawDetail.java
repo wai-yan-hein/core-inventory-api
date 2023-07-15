@@ -23,38 +23,33 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "miling_output")
-public class MilingOutDetail {
+@Table(name = "milling_raw")
+public class MillingRawDetail {
 
     @EmbeddedId
-    private MilingOutDetailKey key;
+    private MillingRawDetailKey key;
     @Column(name = "stock_code")
     private String stockCode;
-    @Temporal(TemporalType.DATE)
-    @Column(name = "expire_date")
-    private Date expDate;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "qty", nullable = false)
     private Float qty;
-    @Column(name = "sale_unit")
+    @Column(name = "unit")
     private String unitCode;
-    @Column(name = "sale_price", nullable = false)
+    @Column(name = "price", nullable = false)
     private Float price;
-    @Column(name = "sale_amt", nullable = false)
+    @Column(name = "amt", nullable = false)
     private Float amount;
     @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "batch_no")
-    private String batchNo;
     @Column(name = "weight")
     private Float weight;
     @Column(name = "weight_unit")
     private String weightUnit;
-    @Column(name = "std_weight")
-    private Float stdWeight;
-    @Column(name = "percent")
-    private Float percent;
     @Column(name = "tot_weight")
     private Float totalWeight;
+    @Transient
+    private Float totalAmount;
     @Transient
     private String userCode;
     @Transient

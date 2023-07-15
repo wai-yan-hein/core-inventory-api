@@ -7,10 +7,8 @@ package cv.api.dao;
 
 import cv.api.common.General;
 import cv.api.common.Util1;
-import cv.api.entity.MilingHis;
-import cv.api.entity.MilingHisKey;
-import cv.api.entity.SaleHis;
-import cv.api.entity.SaleHisKey;
+import cv.api.entity.MillingHis;
+import cv.api.entity.MillingHisKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,20 +23,20 @@ import java.util.List;
  */
 @Repository
 @Slf4j
-public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> implements MilingHisDao {
+public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> implements MillingHisDao {
 
     @Autowired
     private SaleHisDetailDao dao;
 
     @Override
-    public MilingHis save(MilingHis sh) {
+    public MillingHis save(MillingHis sh) {
         saveOrUpdate(sh,sh.getKey());
         return sh;
     }
 
     @Override
-    public List<MilingHis> search(String fromDate, String toDate, String cusCode,
-                                String vouNo, String remark, String userCode) {
+    public List<MillingHis> search(String fromDate, String toDate, String cusCode,
+                                   String vouNo, String remark, String userCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -77,7 +75,7 @@ public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> imple
                 strFilter = strFilter + " and o.remark like '" + remark + "%'";
             }
         }
-        String strSql = "select o from MilingHis o";
+        String strSql = "select o from milling o";
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
         }
@@ -86,12 +84,12 @@ public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> imple
     }
 
     @Override
-    public MilingHis findById(MilingHisKey id) {
+    public MillingHis findById(MillingHisKey id) {
         return getByKey(id);
     }
 
     @Override
-    public void delete(MilingHisKey key) throws Exception {
+    public void delete(MillingHisKey key) throws Exception {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         String sql = "update miling_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
@@ -99,7 +97,7 @@ public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> imple
     }
 
     @Override
-    public void restore(MilingHisKey key) {
+    public void restore(MillingHisKey key) {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
         String sql = "update miling_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
@@ -108,18 +106,17 @@ public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> imple
 
 
     @Override
-    public List<MilingHis> unUploadVoucher(LocalDateTime syncDate) {
-        String hsql = "select o from MilingHis o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
+    public List<MillingHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from milling o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
         return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();    }
 
     @Override
-    public List<MilingHis> unUpload(String syncDate) {
-        String hql = "select o from MilingHis o where (o.intgUpdStatus ='ACK' or o.intgUpdStatus is null) and date(o.vouDate) >= '" + syncDate + "'";
-        List<MilingHis> list = findHSQL(hql);
+    public List<MillingHis> unUpload(String syncDate) {
+        String hql = "select o from milling o where (o.intgUpdStatus ='ACK' or o.intgUpdStatus is null) and date(o.vouDate) >= '" + syncDate + "'";
+        List<MillingHis> list = findHSQL(hql);
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
 //            o.setListSH(dao.search(vouNo, compCode, deptId));
         });
         return list;
@@ -144,14 +141,13 @@ public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> imple
 
 
     @Override
-    public void truncate(MilingHisKey key) {
+    public void truncate(MillingHisKey key) {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql1 = "delete from miling_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        String sql2 = "delete from miling_raw where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        String sql3 = "delete from miling_output where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        String sql4 = "delete from miling_expense where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
+        String sql1 = "delete from milling_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
+        String sql2 = "delete from milling_raw where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
+        String sql3 = "delete from milling_output where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
+        String sql4 = "delete from milling_expense where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
         execSql(sql1, sql2, sql3, sql4);
     }
 
@@ -159,7 +155,7 @@ public class MilingHisDaoImpl extends AbstractDao<MilingHisKey, MilingHis> imple
     public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
         General g = new General();
         String sql = "select count(*) vou_count,sum(paid) paid\n" +
-                "from miling_his\n" +
+                "from milling_his\n" +
                 "where deleted = false\n" +
                 "and date(vou_date)='" + vouDate + "'\n" +
                 "and comp_code='" + compCode + "'";
