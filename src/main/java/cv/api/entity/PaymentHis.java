@@ -14,6 +14,8 @@ import java.util.List;
 public class PaymentHis {
     @EmbeddedId
     private PaymentHisKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
     @Column(name = "trader_code")
@@ -42,6 +44,8 @@ public class PaymentHis {
     private String curCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "tran_option")
+    private String tranOption;
     @Transient
     private List<PaymentHisDetail> listDetail;
     @Transient

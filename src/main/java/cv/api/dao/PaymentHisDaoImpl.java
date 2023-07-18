@@ -41,7 +41,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
     @Override
     public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode,
                                    String vouNo,String saleVouNo, String userCode, String account, String projectNo,
-                                   String remark, boolean deleted, String compCode) {
+                                   String remark, boolean deleted, String compCode,String tranOption) {
         String filter = "";
         if (!traderCode.equals("-")) {
             filter += "and ph.trader_code ='" + traderCode + "'";
@@ -72,6 +72,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 "and ph.comp_code = phd.comp_code\n"+
                 "and ph.deleted =" + deleted + "\n" +
                 "and ph.comp_code ='" + compCode + "'\n" +
+                "and ph.tran_option ='" + tranOption + "'\n" +
                 "and date(ph.vou_date) between '" + startDate + "' and '" + endDate + "'\n" + filter + "\n" + ")a\n" +
                 "join trader t on a.trader_code = t.code\n" +
                 "and a.comp_code = t.comp_code\n" +
@@ -85,8 +86,8 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 PaymentHisKey key = new PaymentHisKey();
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
-                key.setDeptId(rs.getInt("dept_id"));
                 p.setKey(key);
+                p.setDeptId(rs.getInt("dept_id"));
                 p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                 p.setAmount(rs.getFloat("amount"));
                 p.setRemark(rs.getString("remark"));

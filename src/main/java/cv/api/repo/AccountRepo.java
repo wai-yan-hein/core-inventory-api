@@ -747,13 +747,14 @@ public class AccountRepo {
                 String account = ph.getAccount();
                 if (!Util1.isNullOrEmpty(account)) {
                     String compCode = ph.getKey().getCompCode();
-                    Integer deptId = ph.getKey().getDeptId();
+                    Integer deptId = ph.getDeptId();
                     String traderCode = ph.getTraderCode();
                     LocalDateTime vouDate = ph.getVouDate();
                     double payAmt = ph.getAmount();
                     String curCode = ph.getCurCode();
                     String remark = ph.getRemark();
                     String vouNo = ph.getKey().getVouNo();
+                    String tranOption = ph.getTranOption();
                     boolean deleted = ph.isDeleted();
                     String projectNo = ph.getProjectNo();
                     TraderKey k = new TraderKey();
@@ -769,11 +770,19 @@ public class AccountRepo {
                         key.setDeptId(deptId);
                         gl.setKey(key);
                         gl.setGlDate(vouDate);
-                        gl.setDescription("Cash Received.");
-                        gl.setSrcAccCode(account);
-                        gl.setAccCode(t.getAccount());
-                        gl.setTraderCode(traderCode);
-                        gl.setDrAmt(payAmt);
+                        if (tranOption.equals("C")) {
+                            gl.setDescription("Cash Received.");
+                            gl.setSrcAccCode(account);
+                            gl.setAccCode(t.getAccount());
+                            gl.setTraderCode(traderCode);
+                            gl.setDrAmt(payAmt);
+                        } else if (tranOption.equals("S")) {
+                            gl.setDescription("Cash Payment.");
+                            gl.setSrcAccCode(account);
+                            gl.setAccCode(t.getAccount());
+                            gl.setTraderCode(traderCode);
+                            gl.setDrAmt(payAmt);
+                        }
                         gl.setCurCode(curCode);
                         gl.setReference(remark);
                         gl.setDeptCode(setting != null ? setting.getDeptCode() : null);

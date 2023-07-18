@@ -16,7 +16,7 @@ public interface PaymentHisDao {
 
     List<PaymentHis> search(String startDate, String endDate, String traderCode,
                             String curCode, String vouNo,String saleVouNo, String userCode, String account,
-                            String projectNo, String remark, boolean deleted, String compCode);
+                            String projectNo, String remark, boolean deleted, String compCode,String tranOption);
     List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 
 }

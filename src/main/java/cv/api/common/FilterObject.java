@@ -41,5 +41,6 @@ public class FilterObject {
     private String curCode;
     private String account;
     private String saleVouNo;
+    private String tranOption;
 
 }
