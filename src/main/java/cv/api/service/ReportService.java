@@ -181,7 +181,7 @@ public interface ReportService {
 
     General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId);
 
-    List<String> isStockExist(String stockCode, String compCode);
+    List<General> isStockExist(String stockCode, String compCode);
 
     List<General> isTraderExist(String traderCode, String compCode);
 

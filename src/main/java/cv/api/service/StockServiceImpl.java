@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.dao.StockDao;
 import cv.api.entity.Stock;
@@ -63,10 +64,10 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<String> delete(StockKey key) {
+    public List<General> delete(StockKey key) {
         String stockCode = key.getStockCode();
         String compCode = key.getCompCode();
-        List<String> str = reportService.isStockExist(stockCode, compCode);
+        List<General> str = reportService.isStockExist(stockCode, compCode);
         if (str.isEmpty()) {
             dao.delete(key);
         }

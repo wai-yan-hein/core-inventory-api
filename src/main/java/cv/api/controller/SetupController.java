@@ -428,9 +428,9 @@ public class SetupController {
     }
 
     @PostMapping(path = "/delete-stock")
-    public Mono<?> deleteStock(@RequestBody StockKey key) {
-        List<String> str = stockService.delete(key);
-        return Mono.justOrEmpty(str.isEmpty() ? null : str);
+    public Flux<?> deleteStock(@RequestBody StockKey key) {
+        List<General> str = stockService.delete(key);
+        return Flux.fromIterable(str);
     }
 
     @PostMapping(path = "/find-stock")

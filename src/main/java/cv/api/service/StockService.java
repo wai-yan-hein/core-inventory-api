@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.common.General;
 import cv.api.entity.Stock;
 import cv.api.entity.StockKey;
 
@@ -23,7 +24,7 @@ public interface StockService {
 
     List<Stock> findAll(String compCode, Integer deptId);
 
-    List<String> delete(StockKey key);
+    List<General> delete(StockKey key);
 
     List<Stock> findActiveStock(String compCode, Integer deptId);
 

@@ -24,7 +24,7 @@ import java.util.List;
  * @author wai yan
  */
 @RestController
-@RequestMapping("/miling")
+@RequestMapping("/milling")
 @Slf4j
 public class MilingController {
 
@@ -42,7 +42,7 @@ public class MilingController {
     @Autowired
     private AccountRepo accountRepo;
 
-    @PostMapping(path = "/save-miling")
+    @PostMapping(path = "/save-milling")
     public Mono<?> saveSale(@RequestBody MillingHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
@@ -78,7 +78,7 @@ public class MilingController {
         return status;
     }
 
-    @PostMapping(path = "/get-miling")
+    @PostMapping(path = "/get-milling")
     public Flux<?> getSale(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -102,7 +102,7 @@ public class MilingController {
         return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-miling")
+    @PostMapping(path = "/delete-milling")
     public Mono<?> deleteSale(@RequestBody MillingHisKey key) throws Exception {
         hService.delete(key);
         //delete in account
@@ -111,13 +111,13 @@ public class MilingController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-miling")
+    @PostMapping(path = "/restore-milling")
     public Mono<?> restoreSale(@RequestBody MillingHisKey key) throws Exception {
         hService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-miling")
+    @PostMapping(path = "/find-milling")
     public Mono<MillingHis> findSale(@RequestBody MillingHisKey key) {
         MillingHis sh = hService.findById(key);
         return Mono.justOrEmpty(sh);

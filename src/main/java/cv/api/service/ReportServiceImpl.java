@@ -2412,12 +2412,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<String> isStockExist(String stockCode, String compCode) {
+    public List<General> isStockExist(String stockCode, String compCode) {
         return searchDetail(stockCode, compCode);
     }
 
-    private List<String> searchDetail(String code, String compCode) {
-        List<String> str = new ArrayList<>();
+    private List<General> searchDetail(String code, String compCode) {
+        List<General> str = new ArrayList<>();
         HashMap<String, String> hm = new HashMap<>();
         hm.put("sale_his_detail", "Sale");
         hm.put("pur_his_detail", "Purchase");
@@ -2431,7 +2431,9 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.executeSql(sql);
                 if (rs.next()) {
                     if (rs.getBoolean("exist")) {
-                        str.add("Transaction exist in " + s2);
+                        General g = new General();
+                        g.setMessage("Transaction exist in " + s2);
+                        str.add(g);
                     }
                 }
             } catch (Exception e) {
