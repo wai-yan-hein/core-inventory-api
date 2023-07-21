@@ -25,9 +25,11 @@ public class PaymentController {
     @Autowired
     private AccountRepo accountRepo;
 
-    @GetMapping(path = "/getCustomerBalance")
-    public Flux<?> getCustomerBalance(@RequestParam String traderCode, @RequestParam String compCode) {
-        return Flux.fromIterable(reportService.getCustomerBalance(traderCode, compCode)).onErrorResume(throwable -> Flux.empty());
+    @GetMapping(path = "/getTraderBalance")
+    public Flux<?> getCustomerBalance(@RequestParam String traderCode,
+                                      @RequestParam String tranOption,
+                                      @RequestParam String compCode) {
+        return Flux.fromIterable(reportService.getTraderBalance(traderCode, tranOption,compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/deletePayment")
@@ -59,21 +61,25 @@ public class PaymentController {
 
     @PostMapping(path = "/getPaymentHistory")
     public Flux<?> getPaymentHistory(@RequestBody FilterObject filter) {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String saleVouNo = Util1.isNull(filter.getSaleVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String account = Util1.isAll(filter.getAccount());
-        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String compCode = filter.getCompCode();
-        boolean deleted = filter.isDeleted();
-        String projectNo = Util1.isAll(filter.getProjectNo());
-        String curCode = Util1.isAll(filter.getCurCode());
-        return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode,
-                        curCode, vouNo, saleVouNo, userCode, account, projectNo, remark,
-                        deleted, compCode))
-                .onErrorResume(throwable -> Flux.empty());
+        String tranOption = Util1.isNull(filter.getTranOption(),"-");
+        if(tranOption.equals("C") || tranOption.equals("S")){
+            String fromDate = Util1.isNull(filter.getFromDate(), "-");
+            String toDate = Util1.isNull(filter.getToDate(), "-");
+            String vouNo = Util1.isNull(filter.getVouNo(), "-");
+            String saleVouNo = Util1.isNull(filter.getSaleVouNo(), "-");
+            String userCode = Util1.isNull(filter.getUserCode(), "-");
+            String account = Util1.isAll(filter.getAccount());
+            String traderCode = Util1.isNull(filter.getTraderCode(), "-");
+            String remark = Util1.isNull(filter.getRemark(), "-");
+            String compCode = filter.getCompCode();
+            boolean deleted = filter.isDeleted();
+            String projectNo = Util1.isAll(filter.getProjectNo());
+            String curCode = Util1.isAll(filter.getCurCode());
+            return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode,
+                            curCode, vouNo, saleVouNo, userCode, account, projectNo, remark,
+                            deleted, compCode,tranOption))
+                    .onErrorResume(throwable -> Flux.empty());
+        }
+        return Flux.empty();
     }
 }

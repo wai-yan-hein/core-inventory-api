@@ -1009,3 +1009,25 @@ create table milling_raw (
   tot_weight float(20,3) not null,
   primary key (vou_no,unique_id,comp_code)
 ) engine=innodb default charset=utf8mb3;
+
+alter table payment_his
+add column tran_option varchar(1) not null default 'C' after intg_upd_status,
+change column dept_id dept_id int(11) null ,
+drop primary key,
+add primary key (vou_no, comp_code);
+
+alter table payment_his_detail
+change column unique_id unique_id int(11) not null after comp_code,
+change column dept_id dept_id int(11) null ,
+drop primary key,
+add primary key (vou_no, comp_code, unique_id);
+
+alter table payment_his_detail
+change column vou_no vou_no varchar(25) not null ;
+
+set sql_safe_updates =0;
+update payment_his
+set vou_no=concat('C-',vou_no);
+
+update payment_his_detail
+set vou_no=concat('C-',vou_no);

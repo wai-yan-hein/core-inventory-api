@@ -26,7 +26,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     public PaymentHis save(PaymentHis obj) {
         obj.setVouDate(Util1.toDateTime(obj.getVouDate()));
         if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
-            obj.getKey().setVouNo(getVoucherNo(obj.getMacId(), obj.getKey().getCompCode(), obj.getKey().getDeptId()));
+            obj.getKey().setVouNo(getVoucherNo(obj.getMacId(), obj.getKey().getCompCode(), obj.getDeptId(), obj.getTranOption()));
         }
         List<PaymentHisDetail> listDetail = obj.getListDetail();
         List<PaymentHisDetailKey> listDel = obj.getListDelete();
@@ -41,7 +41,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                 key.setCompCode(obj.getKey().getCompCode());
                 key.setVouNo(vouNo);
                 key.setUniqueId(null);
-                key.setDeptId(obj.getKey().getDeptId());
+                key.setDeptId(obj.getDeptId());
                 cSd.setKey(key);
             }
             if (Util1.getFloat(cSd.getPayAmt()) > 0) {
@@ -79,8 +79,10 @@ public class PaymentHisServiceImpl implements PaymentHisService {
 
     @Override
     public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode, String vouNo,
-                                   String saleVouNo, String userCode, String account, String projectNo, String remark, boolean deleted, String compCode) {
-        return dao.search(startDate, endDate, traderCode, curCode, vouNo, saleVouNo, userCode, account, projectNo, remark, deleted, compCode);
+                                   String saleVouNo, String userCode, String account, String projectNo, String remark,
+                                   boolean deleted, String compCode,String tranOption) {
+        return dao.search(startDate, endDate, traderCode, curCode, vouNo, saleVouNo, userCode, account,
+                projectNo, remark, deleted, compCode,tranOption);
     }
 
     @Override
@@ -88,10 +90,11 @@ public class PaymentHisServiceImpl implements PaymentHisService {
         return dao.unUploadVoucher(syncDate);
     }
 
-    private String getVoucherNo(Integer macId, String compCode, Integer deptId) {
+    private String getVoucherNo(Integer macId, String compCode, Integer deptId, String tranOption) {
+        String option = tranOption.equals("C") ? "RECEIVE" : "PAYMENT";
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
-        int seqNo = seqDao.getSequence(macId, "RECEIVE", period, compCode);
+        int seqNo = seqDao.getSequence(macId, option, period, compCode);
         String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
-        return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
+        return tranOption + "-" + deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
 }

@@ -57,7 +57,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public ResultSet getResult(String sql, Object... params) throws Exception{
+    public ResultSet getResult(String sql, Object... params) throws Exception {
         return reportDao.executeSql(sql, params);
     }
 
@@ -816,7 +816,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.project_no='" + projectNo + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt,v.project_no\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n" + "" + filter + "" + "order by v.vou_date,v.project_no,v.unique_id";
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt,v.project_no\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n" + filter + "order by v.vou_date,v.project_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1298,10 +1298,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockBalance> getStockBalance(String opDate,String clDate,String typeCode, String catCode, String brandCode, String stockCode,
+    public List<VStockBalance> getStockBalance(String opDate, String clDate, String typeCode, String catCode, String brandCode, String stockCode,
                                                boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                String locCode, String compCode, Integer deptId, Integer macId, boolean summary) {
-        calStockBalanceByLocation(opDate,clDate,typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
+        calStockBalanceByLocation(opDate, clDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
         List<VStockBalance> balances = new ArrayList<>();
         if (summary) {
             String sql = "select a.stock_code,a.qty,s.user_code,s.rel_code,s.stock_name\n" +
@@ -1443,11 +1443,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReorderLevel> getReorderLevel(String opDate,String clDate,String typeCode, String catCode, String brandCode,
+    public List<ReorderLevel> getReorderLevel(String opDate, String clDate, String typeCode, String catCode, String brandCode,
                                               String stockCode, boolean calSale, boolean calPur, boolean calRI,
                                               boolean calRo, String locCode, String compCode,
                                               Integer deptId, Integer macId) throws Exception {
-        calStockBalanceByLocation(opDate,clDate,typeCode, catCode, brandCode,
+        calStockBalanceByLocation(opDate, clDate, typeCode, catCode, brandCode,
                 stockCode, calSale, calPur,
                 calRI, calRo, locCode, compCode, deptId, macId);
         String sql1 = "select *,if(small_bal_qty<small_min_qty,1,if(small_bal_qty>small_min_qty,2,if(small_bal_qty<small_max_qty,3,if(small_bal_qty> small_max_qty,4,5)))) position\n\n\n" + "from (\n" + "select a.*,rel.rel_name,bal_qty*rel.smallest_qty small_bal_qty,min_qty*ifnull(rel1.smallest_qty,0) small_min_qty,max_qty*ifnull(rel2.smallest_qty,0) small_max_qty\n" + "from (\n" + "select tmp.stock_code,tmp.loc_code,tmp.smallest_qty bal_qty, tmp.unit bal_unit,ifnull(min_qty,0) min_qty,min_unit,\n" + "ifnull(max_qty,0) max_qty,max_unit,tmp.comp_code,tmp.dept_id,s.rel_code,s.user_code,s.stock_name,l.loc_name\n" + "from tmp_stock_balance tmp\n" + "left join reorder_level r\n" + "on tmp.stock_code= r.stock_code\n" + "and tmp.comp_code = r.comp_code\n" +
@@ -2145,7 +2145,7 @@ public class ReportServiceImpl implements ReportService {
                 "and a.comp_code = t.comp_code\n" +
                 "order by date(vou_date),vou_no";
         ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
-                reference, traderCode, traderCode, userCode, userCode, stockCode, stockCode, locCode, locCode, projectNo,projectNo);
+                reference, traderCode, traderCode, userCode, userCode, stockCode, stockCode, locCode, locCode, projectNo, projectNo);
         List<VPurchase> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -3099,50 +3099,88 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<PaymentHisDetail> getCustomerBalance(String traderCode, String compCode) {
-        String sql = "select sh.vou_date,sh.reference,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding\n" +
-                "from (\n" +
-                "select vou_no,cur_code,sum(vou_balance) outstanding,comp_code\n" +
-                "from (\n" +
-                "select vou_no,cur_code,vou_balance,comp_code\n" +
-                "from sale_his \n" +
-                "where trader_code='" + traderCode + "'\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and deleted = false\n" +
-                "and vou_balance>0\n" +
-                "\tunion all\n" +
-                "select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code\n" +
-                "from payment_his pd join payment_his_detail phd\n" +
-                "on pd.vou_no = phd.vou_no\n" +
-                "and pd.comp_code = phd.comp_code\n" +
-                "where pd.trader_code='" + traderCode + "'\n" +
-                "and pd.comp_code ='" + compCode + "'\n" +
-                "and pd.deleted = false\n" +
-                ")a\n" +
-                "group by vou_no,cur_code\n" +
-                ")b\n" +
-                "join sale_his sh\n" +
-                "on b.vou_no = sh.vou_no\n" +
-                "and b.comp_code = sh.comp_code\n" +
-                "where outstanding<>0\n" +
-                "order by vou_date;";
+    public List<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode) {
         List<PaymentHisDetail> list = new ArrayList<>();
-        try {
-            ResultSet rs = getResult(sql);
-            while (rs.next()) {
-                PaymentHisDetail obj = new PaymentHisDetail();
-                obj.setSaleDate(rs.getDate("vou_date"));
-                obj.setSaleVouNo(rs.getString("vou_no"));
-                obj.setRemark(rs.getString("remark"));
-                obj.setVouTotal(rs.getFloat("vou_total"));
-                obj.setVouBalance(rs.getFloat("outstanding"));
-                obj.setCurCode(rs.getString("cur_code"));
-                obj.setReference(rs.getString("reference"));
-                list.add(obj);
+        if (tranOption.equals("C") || tranOption.equals("S")) {
+            String sql;
+            if (tranOption.equals("C")) {
+                sql = """
+                        select sh.vou_date,sh.reference,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding
+                        from (
+                        select vou_no,cur_code,sum(vou_balance) outstanding,comp_code
+                        from (
+                        select vou_no,cur_code,vou_balance,comp_code
+                        from sale_his\s
+                        where trader_code=?
+                        and comp_code =?
+                        and deleted = false
+                        and vou_balance>0
+                        \tunion all
+                        select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code
+                        from payment_his pd join payment_his_detail phd
+                        on pd.vou_no = phd.vou_no
+                        and pd.comp_code = phd.comp_code
+                        where pd.trader_code=?
+                        and pd.comp_code =?
+                        and pd.tran_option =?
+                        and pd.deleted = false
+                        )a
+                        group by vou_no,cur_code
+                        )b
+                        join sale_his sh
+                        on b.vou_no = sh.vou_no
+                        and b.comp_code = sh.comp_code
+                        where outstanding<>0
+                        order by vou_date;""";
+            } else {
+                sql = """
+                        select sh.vou_date,sh.reference,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding
+                        from (
+                        select vou_no,cur_code,sum(balance) outstanding,comp_code
+                        from (
+                        select vou_no,cur_code,balance,comp_code
+                        from pur_his\s
+                        where trader_code=?
+                        and comp_code =?
+                        and deleted = false
+                        and balance>0
+                        \tunion all
+                        select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code
+                        from payment_his pd join payment_his_detail phd
+                        on pd.vou_no = phd.vou_no
+                        and pd.comp_code = phd.comp_code
+                        where pd.trader_code=?
+                        and pd.comp_code =?
+                        and pd.tran_option =?
+                        and pd.deleted = false
+                        )a
+                        group by vou_no,cur_code
+                        )b
+                        join pur_his sh
+                        on b.vou_no = sh.vou_no
+                        and b.comp_code = sh.comp_code
+                        where outstanding<>0
+                        order by vou_date;""";
+
             }
-        } catch (Exception e) {
-            log.error("getCustomerBalance : " + e.getMessage());
+            try {
+                ResultSet rs = getResult(sql, traderCode, compCode, traderCode, compCode, tranOption);
+                while (rs.next()) {
+                    PaymentHisDetail obj = new PaymentHisDetail();
+                    obj.setSaleDate(rs.getDate("vou_date"));
+                    obj.setSaleVouNo(rs.getString("vou_no"));
+                    obj.setRemark(rs.getString("remark"));
+                    obj.setVouTotal(rs.getFloat("vou_total"));
+                    obj.setVouBalance(rs.getFloat("outstanding"));
+                    obj.setCurCode(rs.getString("cur_code"));
+                    obj.setReference(rs.getString("reference"));
+                    list.add(obj);
+                }
+            } catch (Exception e) {
+                log.error("getCustomerBalance : " + e.getMessage());
+            }
         }
+
         return list;
     }
 
