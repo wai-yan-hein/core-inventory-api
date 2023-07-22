@@ -29,7 +29,7 @@ public class PaymentController {
     public Flux<?> getCustomerBalance(@RequestParam String traderCode,
                                       @RequestParam String tranOption,
                                       @RequestParam String compCode) {
-        return Flux.fromIterable(reportService.getTraderBalance(traderCode, tranOption,compCode)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(reportService.getTraderBalance(traderCode, tranOption, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/deletePayment")
@@ -54,6 +54,11 @@ public class PaymentController {
         return Mono.justOrEmpty(ph);
     }
 
+    @PostMapping(path = "/paymentReport")
+    public Flux<?> paymentReport(@RequestBody PaymentHisKey ph) {
+        return Flux.fromIterable(paymentHisService.getPaymentVoucher(ph.getVouNo(), ph.getCompCode())).onErrorResume(throwable -> Flux.empty());
+    }
+
     @GetMapping(path = "/getPaymentDetail")
     public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
@@ -61,8 +66,8 @@ public class PaymentController {
 
     @PostMapping(path = "/getPaymentHistory")
     public Flux<?> getPaymentHistory(@RequestBody FilterObject filter) {
-        String tranOption = Util1.isNull(filter.getTranOption(),"-");
-        if(tranOption.equals("C") || tranOption.equals("S")){
+        String tranOption = Util1.isNull(filter.getTranOption(), "-");
+        if (tranOption.equals("C") || tranOption.equals("S")) {
             String fromDate = Util1.isNull(filter.getFromDate(), "-");
             String toDate = Util1.isNull(filter.getToDate(), "-");
             String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -77,7 +82,7 @@ public class PaymentController {
             String curCode = Util1.isAll(filter.getCurCode());
             return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode,
                             curCode, vouNo, saleVouNo, userCode, account, projectNo, remark,
-                            deleted, compCode,tranOption))
+                            deleted, compCode, tranOption))
                     .onErrorResume(throwable -> Flux.empty());
         }
         return Flux.empty();

@@ -83,5 +83,8 @@ public class VSale {
     private String userCode;
     private Float creditAmt;
     private Float diffAmt;
+    private String tranOption;
+    private String saleVouNo;
+    private String payDate;
 
 }

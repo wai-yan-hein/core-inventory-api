@@ -5,6 +5,7 @@ import cv.api.dao.PaymentHisDao;
 import cv.api.dao.PaymentHisDetailDao;
 import cv.api.dao.SeqTableDao;
 import cv.api.entity.*;
+import cv.api.model.VSale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,14 +81,19 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     @Override
     public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode, String vouNo,
                                    String saleVouNo, String userCode, String account, String projectNo, String remark,
-                                   boolean deleted, String compCode,String tranOption) {
+                                   boolean deleted, String compCode, String tranOption) {
         return dao.search(startDate, endDate, traderCode, curCode, vouNo, saleVouNo, userCode, account,
-                projectNo, remark, deleted, compCode,tranOption);
+                projectNo, remark, deleted, compCode, tranOption);
     }
 
     @Override
     public List<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
         return dao.unUploadVoucher(syncDate);
+    }
+
+    @Override
+    public List<VSale> getPaymentVoucher(String vouNo, String compCode) {
+        return dao.getPaymentVoucher(vouNo, compCode);
     }
 
     private String getVoucherNo(Integer macId, String compCode, Integer deptId, String tranOption) {

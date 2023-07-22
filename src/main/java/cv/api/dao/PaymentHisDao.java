@@ -2,6 +2,7 @@ package cv.api.dao;
 
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisKey;
+import cv.api.model.VSale;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,5 +19,7 @@ public interface PaymentHisDao {
                             String curCode, String vouNo,String saleVouNo, String userCode, String account,
                             String projectNo, String remark, boolean deleted, String compCode,String tranOption);
     List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
+    List<VSale> getPaymentVoucher(String vouNo, String compCode);
+
 
 }
