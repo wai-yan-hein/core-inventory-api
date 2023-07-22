@@ -53,8 +53,6 @@ public class MillingHis {
     private String updatedBy;
     @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
-    @Column(name = "loc_code")
-    private String locCode;
     @Column(name = "mac_id")
     private Integer macId;
     @Column(name = "intg_upd_status")

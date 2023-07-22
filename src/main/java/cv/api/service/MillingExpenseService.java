@@ -14,12 +14,9 @@ import java.util.List;
  */
 public interface MillingExpenseService {
 
-    MillingExpense findById(MillingExpenseKey key);
-    MillingExpense save(MillingExpense exp);
+    MillingExpense save(MillingExpense p);
 
-    List<MillingExpense> getExpense(String compCode);
+    List<MillingExpense> search(String vouNo, String compCode);
 
-    void delete(MillingExpenseKey key);
-
-
+void delete(MillingExpenseKey key);
 }

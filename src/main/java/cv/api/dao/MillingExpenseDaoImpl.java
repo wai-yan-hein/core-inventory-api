@@ -12,33 +12,17 @@ import java.util.List;
 @Slf4j
 public class MillingExpenseDaoImpl extends AbstractDao<MillingExpenseKey, MillingExpense> implements MillingExpenseDao {
     @Override
-    public MillingExpense findById(MillingExpenseKey key) {
-        return getByKey(key);
+    public MillingExpense save(MillingExpense p) {
+        saveOrUpdate(p, p.getKey());
+        return p;
     }
 
-    @Override
-    public MillingExpense save(MillingExpense exp) {
-        saveOrUpdate(exp,exp.getKey());
-        return exp;
-    }
-
-    @Override
-    public List<MillingExpense> getExpense(String compCode) {
-        String hsql = "select o from miling_expense o where o.key.compCode ='" + compCode + "' and o.deleted = false";
-        return findHSQL(hsql);
-    }
-
-    @Override
-    public void delete(MillingExpenseKey key) {
-        String sql = "update miling_expense set deleted = true where expense_code ='" + key.getExpenseCode() + "' and comp_code ='" + key.getCompCode() + "'";
-        execSql(sql);
-    }
     @Override
     public List<MillingExpense> search(String vouNo, String compCode) {
         String sql = "select a.*,e.expense_name\n" +
                 "from (\n" +
                 "select *\n" +
-                "from miling_expense\n" +
+                "from milling_expense\n" +
                 "where vou_no ='" + vouNo + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 ")a\n" +
@@ -60,6 +44,7 @@ public class MillingExpenseDaoImpl extends AbstractDao<MillingExpenseKey, Millin
                     e.setKey(key);
                     e.setExpenseName(rs.getString("expense_name"));
                     e.setAmount(rs.getFloat("amount"));
+//                    e.setPercent(rs.getFloat("percent"));
                     list.add(e);
                 }
             } catch (Exception e) {
@@ -67,5 +52,11 @@ public class MillingExpenseDaoImpl extends AbstractDao<MillingExpenseKey, Millin
             }
         }
         return list;
+    }
+
+    @Override
+    public void delete(MillingExpenseKey key) {
+        String sql = "update milling_expense set deleted = true where expense_code ='" + key.getExpenseCode() + "' and comp_code ='" + key.getCompCode() + "'";
+        execSql(sql);
     }
 }
