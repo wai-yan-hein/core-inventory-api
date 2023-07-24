@@ -9,7 +9,6 @@ import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.*;
-import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
 import cv.api.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/milling")
 @Slf4j
-public class MilingController {
+public class MillingController {
 
     private final ReturnObject ro = new ReturnObject();
     @Autowired
@@ -79,7 +78,7 @@ public class MilingController {
     }
 
     @PostMapping(path = "/get-milling")
-    public Flux<?> getSale(@RequestBody FilterObject filter) {
+    public Flux<?> getSale(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -87,19 +86,16 @@ public class MilingController {
         String cusCode = Util1.isNull(filter.getCusCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String saleManCode = Util1.isNull(filter.getSaleManCode(), "-");
-        String reference = Util1.isNull(filter.getReference(), "-");
-        String compCode = filter.getCompCode();
+        String ref = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        Integer deptId = filter.getDeptId();
+        String compCode = filter.getCompCode();
         String deleted = String.valueOf(filter.isDeleted());
-        String nullBatch = String.valueOf(filter.isNullBatch());
-        String batchNo = Util1.isNull(filter.getBatchNo(), "-");
+        Integer deptId = filter.getDeptId();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
-                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode);
-        return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
+        List<MillingHis> listPur = reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
+                stockCode, locCode, compCode, deptId, deleted, projectNo,curCode);
+        return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/delete-milling")

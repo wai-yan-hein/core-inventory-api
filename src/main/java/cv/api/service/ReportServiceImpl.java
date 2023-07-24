@@ -2166,6 +2166,52 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
+                                              String compCode, Integer deptId, String deleted,
+                                              String projectNo, String curCode) throws Exception {
+        String sql = "select a.*,t.trader_name, v.description\n" +
+                "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id\n" +
+                "from milling_his p \n" +
+                "where comp_code = ?\n" +
+                "and (dept_id = ? or 0 = ?)\n" +
+                "and deleted =?\n" +
+                "and date(vou_date) between ? and ?\n" +
+                "and cur_code = ?\n" +
+                "and (vou_no = ? or '-' = ?)\n" +
+                "and (remark LIKE CONCAT(?, '%') or '-'= ?)\n" +
+                "and (reference LIKE CONCAT(?, '%') or '-'= ?)\n" +
+                "and (trader_code = ? or '-'= ?)\n" +
+                "and (created_by = ? or '-'= ?)\n" +
+                "and (project_no =? or '-' =?)\n" +
+                "group by vou_no)a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "join vou_status v on a.vou_status_id = v.code\n" +
+                "and a.comp_code = v.comp_code\n" +
+                "order by date(vou_date),vou_no";
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
+                reference, traderCode, traderCode, userCode, userCode, stockCode, stockCode, locCode, locCode, projectNo, projectNo);
+        List<MillingHis> purchaseList = new ArrayList<>();
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                MillingHis s = new MillingHis();
+                MillingHisKey key = new MillingHisKey();
+                s.setVouDateStr(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                key.setVouNo(rs.getString("vou_no"));
+                s.setKey(key);
+                s.setTraderName(rs.getString("trader_name"));
+                s.setProcessType(rs.getString("description"));
+                s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
+                s.setCreatedBy(rs.getString("created_by"));
+                s.setDeptId(rs.getInt("dept_id"));
+                purchaseList.add(s);
+            }
+        }
+        return purchaseList;
+    }
+
+    @Override
     public List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo,
                                               String remark, String userCode, String stockCode,
                                               String locCode, String compCode, Integer deptId,
