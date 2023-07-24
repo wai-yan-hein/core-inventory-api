@@ -3,6 +3,7 @@ package cv.api.repo;
 import cv.api.auto.LocationSetting;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
+import cv.api.dao.SaleExpenseDao;
 import cv.api.entity.*;
 import cv.api.model.*;
 import cv.api.service.*;
@@ -42,6 +43,8 @@ public class AccountRepo {
     private AccSettingService settingService;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private SaleExpenseDao saleExpenseDao;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -240,6 +243,7 @@ public class AccountRepo {
                 boolean deleted = sh.isDeleted();
                 String vouNo = sh.getKey().getVouNo();
                 String projectNo = sh.getProjectNo();
+                String batchNo = sh.getBatchNo();
                 double vouTotal = Util1.getDouble(sh.getVouTotal());
                 double vouDis = Util1.getDouble(sh.getDiscount());
                 double vouPaid = Util1.getDouble(sh.getPaid());
@@ -373,7 +377,43 @@ public class AccountRepo {
                     gl.setMacId(macId);
                     gl.setProjectNo(projectNo);
                     listGl.add(gl);
-
+                }
+                List<SaleExpense> listExp = saleExpenseDao.search(vouNo, compCode);
+                for (SaleExpense e : listExp) {
+                    String expCode = e.getKey().getExpenseCode();
+                    ExpenseKey ek = new ExpenseKey();
+                    ek.setExpenseCode(expCode);
+                    ek.setCompCode(compCode);
+                    Expense expense = expenseService.findById(ek);
+                    if (expense != null) {
+                        String account = expense.getAccountCode();
+                        double amt = Util1.getDouble(e.getAmount());
+                        if (!Util1.isNullOrEmpty(account)) {
+                            Gl gl = new Gl();
+                            GlKey key = new GlKey();
+                            key.setCompCode(compCode);
+                            key.setDeptId(deptId);
+                            gl.setKey(key);
+                            gl.setGlDate(vouDate);
+                            gl.setSrcAccCode(account);
+                            gl.setAccCode(balAcc);
+                            gl.setDrAmt(amt);
+                            gl.setTraderCode(traderCode);
+                            gl.setCurCode(curCode);
+                            gl.setDescription(expense.getExpenseName());
+                            gl.setReference(remark);
+                            gl.setDeptCode(deptCode);
+                            gl.setCreatedDate(LocalDateTime.now());
+                            gl.setCreatedBy(appName);
+                            gl.setTranSource(tranSource);
+                            gl.setRefNo(vouNo);
+                            gl.setDeleted(deleted);
+                            gl.setMacId(macId);
+                            gl.setBatchNo(batchNo);
+                            gl.setProjectNo(projectNo);
+                            listGl.add(gl);
+                        }
+                    }
                 }
                 sendAccount(listGl);
             }
@@ -781,7 +821,7 @@ public class AccountRepo {
                             gl.setSrcAccCode(account);
                             gl.setAccCode(t.getAccount());
                             gl.setTraderCode(traderCode);
-                            gl.setDrAmt(payAmt);
+                            gl.setCrAmt(payAmt);
                         }
                         gl.setCurCode(curCode);
                         gl.setReference(remark);

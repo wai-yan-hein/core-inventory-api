@@ -7,13 +7,11 @@ package cv.api.service;
 
 import cv.api.common.General;
 import cv.api.common.Util1;
+import cv.api.dao.SaleExpenseDao;
 import cv.api.dao.SaleHisDao;
 import cv.api.dao.SaleHisDetailDao;
 import cv.api.dao.SeqTableDao;
-import cv.api.entity.SaleDetailKey;
-import cv.api.entity.SaleHis;
-import cv.api.entity.SaleHisDetail;
-import cv.api.entity.SaleHisKey;
+import cv.api.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +35,8 @@ public class SaleHisServiceImpl implements SaleHisService {
     private SaleHisDetailDao sdDao;
     @Autowired
     private SeqTableDao seqDao;
+    @Autowired
+    private SaleExpenseDao saleExpenseDao;
 
     @Override
     public SaleHis save(SaleHis saleHis) {
@@ -50,6 +50,26 @@ public class SaleHisServiceImpl implements SaleHisService {
         //backup
         if (listDel != null) {
             listDel.forEach(key -> sdDao.delete(key));
+        }
+        List<SaleExpense> listExp = saleHis.getListExpense();
+        if (listExp != null) {
+            for (int i = 0; i < listExp.size(); i++) {
+                SaleExpense e = listExp.get(i);
+                if (Util1.getFloat(e.getAmount()) > 0) {
+                    if (e.getKey().getExpenseCode() != null) {
+                        if (e.getKey().getUniqueId() == null) {
+                            if (i == 0) {
+                                e.getKey().setUniqueId(1);
+                            } else {
+                                SaleExpense pe = listExp.get(i - 1);
+                                e.getKey().setUniqueId(pe.getKey().getUniqueId() + 1);
+                            }
+                        }
+                        e.getKey().setVouNo(vouNo);
+                        saleExpenseDao.save(e);
+                    }
+                }
+            }
         }
         for (int i = 0; i < listSD.size(); i++) {
             SaleHisDetail cSd = listSD.get(i);
