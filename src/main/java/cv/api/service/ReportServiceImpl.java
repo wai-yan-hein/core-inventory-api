@@ -1616,7 +1616,17 @@ public class ReportServiceImpl implements ReportService {
     public List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" + "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "group by stock_code)a\n" + "join stock s on a.stock_code = s.stock_code\n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "group by stock_code\n" + "order by s.user_code";
+        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
+                "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
+                "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
+                "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty\n" +
+                "from tmp_stock_io_column\n" +
+                "where mac_id = " + macId + "\n" +
+                "group by stock_code)a\n" +
+                "join stock s on a.stock_code = s.stock_code\n" +
+                "join stock_type st on s.stock_type_code = st.stock_type_code\n" +
+                "group by stock_code\n" +
+                "order by s.user_code";
         List<ClosingBalance> balances = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(getSql);
@@ -1661,7 +1671,13 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) {
-        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" + "s.rel_code,s.user_code s_user_code,a.stock_code,s.stock_name\n" + "from (\n" + "select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" + "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id\n" + "from tmp_stock_io_column\n" + "where mac_id = " + macId + "\n" + "and comp_code = '" + compCode + "'\n" +
+        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
+                "s.rel_code,s.user_code s_user_code,a.stock_code,s.stock_name\n" +
+                "from (\n" + "select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
+                "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id\n" +
+                "from tmp_stock_io_column\n" +
+                "where mac_id = " + macId + "\n" +
+                "and comp_code = '" + compCode + "'\n" +
                 "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "group by tran_date,stock_code,tran_option,vou_no)a\n" +
                 "join stock s on a.stock_code = s.stock_code\n" +
@@ -1919,7 +1935,7 @@ public class ReportServiceImpl implements ReportService {
                 "select date(vou_date) vou_date,vou_no,vou_status,remark,stock_code,s_user_code,stock_name,rel_code,\n" +
                 "cost_price,ifnull(in_unit,out_unit) unit,comp_code\n" +
                 "from v_stock_io\n" +
-                "and deleted = 0\n" +
+                "where deleted = 0\n" +
                 "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and comp_code = '" + compCode + "'\n" + filter +
                 "group by stock_code,cost_price,ifnull(in_unit,out_unit)\n" +

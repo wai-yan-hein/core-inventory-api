@@ -88,6 +88,8 @@ public class SaleHis {
     private String projectNo;
     @Column(name = "car_no")
     private String carNo;
+    @Column(name = "batch_no")
+    private String batchNo;
     @Transient
     private String status = "STATUS";
     @Transient
@@ -98,4 +100,6 @@ public class SaleHis {
     private boolean backup;
     @Transient
     private List<String> location;
+    @Transient
+    private List<SaleExpense> listExpense;
 }
