@@ -243,7 +243,7 @@ public class AccountRepo {
                 boolean deleted = sh.isDeleted();
                 String vouNo = sh.getKey().getVouNo();
                 String projectNo = sh.getProjectNo();
-                String batchNo = sh.getBatchNo();
+//                String batchNo = sh.getBatchNo();
                 double vouTotal = Util1.getDouble(sh.getVouTotal());
                 double vouDis = Util1.getDouble(sh.getDiscount());
                 double vouPaid = Util1.getDouble(sh.getPaid());
@@ -409,7 +409,7 @@ public class AccountRepo {
                             gl.setRefNo(vouNo);
                             gl.setDeleted(deleted);
                             gl.setMacId(macId);
-                            gl.setBatchNo(batchNo);
+//                            gl.setBatchNo(batchNo);
                             gl.setProjectNo(projectNo);
                             listGl.add(gl);
                         }

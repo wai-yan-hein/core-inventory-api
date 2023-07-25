@@ -119,12 +119,25 @@ public class MillingController {
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-sale-detail")
-    public Flux<?> getSaleDetail(@RequestParam String vouNo,
+    @GetMapping(path = "/get-raw-detail")
+    public Flux<?> getRawDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {
-//        return Flux.fromIterable(sdService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
-    return null;
+        return Flux.fromIterable(rawService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/get-expense-detail")
+    public Flux<?> getExpenseDetail(@RequestParam String vouNo,
+                                    @RequestParam String compCode,
+                                    @RequestParam Integer deptId) {
+        return Flux.fromIterable(expService.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/get-output-detail")
+    public Flux<?> getMillingDetail(@RequestParam String vouNo,
+                                    @RequestParam String compCode,
+                                    @RequestParam Integer deptId) {
+        return Flux.fromIterable(outService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/get-sale-voucher-info")
