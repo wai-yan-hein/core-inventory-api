@@ -2183,7 +2183,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
-                                              String compCode, Integer deptId, String deleted,
+                                              String compCode, Integer deptId, boolean deleted,
                                               String projectNo, String curCode) throws Exception {
         String sql = "select a.*,t.trader_name, v.description\n" +
                 "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id\n" +
@@ -2206,7 +2206,7 @@ public class ReportServiceImpl implements ReportService {
                 "and a.comp_code = v.comp_code\n" +
                 "order by date(vou_date),vou_no";
         ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
-                reference, traderCode, traderCode, userCode, userCode, stockCode, stockCode, locCode, locCode, projectNo, projectNo);
+                reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo);
         List<MillingHis> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
