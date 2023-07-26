@@ -155,4 +155,24 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
         }
         return list;
     }
+
+    @Override
+    public boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption) {
+        String sql = """
+                select *
+                from payment_his ph,payment_his_detail phd
+                where ph.vou_no = phd.vou_no
+                and ph.deleted = false
+                and phd.sale_vou_no =?
+                and ph.comp_code =?
+                and ph.trader_code =?
+                and ph.tran_option=?""";
+        ResultSet rs = getResult(sql, vouNo, compCode, traderCode, tranOption);
+        try {
+            return rs.next();
+        } catch (Exception e) {
+            log.error("checkPaymentExists : " + e.getMessage());
+        }
+        return false;
+    }
 }

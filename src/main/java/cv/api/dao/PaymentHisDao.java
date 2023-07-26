@@ -20,6 +20,7 @@ public interface PaymentHisDao {
                             String projectNo, String remark, boolean deleted, String compCode,String tranOption);
     List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
     List<VSale> getPaymentVoucher(String vouNo, String compCode);
+    boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption);
 
 
 }
