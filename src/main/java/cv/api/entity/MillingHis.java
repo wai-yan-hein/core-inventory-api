@@ -93,6 +93,9 @@ public class MillingHis {
     private transient List<MillingExpense> listExpense;
     private transient List<MillingExpenseKey> listExpenseDel;
     private transient boolean local = false;
+    private transient String traderName = "";
+    private transient String processType = "";
+    private transient String vouDateStr = "";
 
     public MillingHis() {
     }

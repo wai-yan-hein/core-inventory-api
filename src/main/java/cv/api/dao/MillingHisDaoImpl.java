@@ -92,7 +92,7 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
     public void delete(MillingHisKey key) throws Exception {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
-        String sql = "update miling_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        String sql = "update milling_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
 
@@ -100,7 +100,7 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
     public void restore(MillingHisKey key) {
         String vouNo = key.getVouNo();
         String compCode = key.getCompCode();
-        String sql = "update miling_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
+        String sql = "update milling_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
         execSql(sql);
     }
 
@@ -124,7 +124,7 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
 
     @Override
     public Date getMaxDate() {
-        String sql = "select max(updated_date) date from miling_his";
+        String sql = "select max(updated_date) date from milling_his";
         ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {

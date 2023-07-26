@@ -30,23 +30,12 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
     @Override
     public List<MillingOutDetail> search(String vouNo, String compCode, Integer deptId) {
         List<MillingOutDetail> listOP = new ArrayList<>();
-        String sql = "select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name,t.trader_name\n" +
-                "from miling_output op\n" + "join location l on op.loc_code = l.loc_code\n" +
+        String sql = "select op.*,s.user_code,s.stock_name,l.loc_name\n" +
+                "from milling_output op\n" +
+                "join location l on op.loc_code = l.loc_code\n" +
                 "and op.comp_code = l.comp_code\n" +
                 "join stock s on op.stock_code = s.stock_code\n" +
                 "and op.comp_code = s.comp_code\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
-                "and op.comp_code = rel.comp_code\n" +
-                "left join stock_type st  on s.stock_type_code = st.stock_type_code\n" +
-                "and op.comp_code = st.comp_code\n" +
-                "left join category cat on s.category_code = cat.cat_code\n" +
-                "and op.comp_code = cat.comp_code\n" +
-                "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
-                "and op.comp_code = sb.comp_code\n" +
-                "left join grn g on op.batch_no = g.batch_no\n" + "and op.comp_code = g.comp_code\n" +
-                "and g.deleted = 0\n" +
-                "left join trader t on g.trader_code = t.code\n" +
-                "and g.comp_code = t.comp_code\n" +
                 "where op.vou_no ='" + vouNo + "'\n" +
                 "and op.comp_code ='" + compCode + "'\n" +
                 "order by unique_id";
@@ -66,18 +55,20 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
                     op.setWeight(rs.getFloat("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
                     op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("sale_price"));
-                    op.setAmount(rs.getFloat("sale_amt"));
+                    op.setPrice(rs.getFloat("price"));
+                    op.setAmount(rs.getFloat("amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
-                    op.setUnitCode(rs.getString("sale_unit"));
+                    op.setUnitCode(rs.getString("unit"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
-                    op.setCatName(rs.getString("cat_name"));
-                    op.setGroupName(rs.getString("stock_type_name"));
-                    op.setBrandName(rs.getString("brand_name"));
-                    op.setRelName(rs.getString("rel_name"));
-                    op.setTraderName(rs.getString("trader_name"));
+                    op.setTotalWeight(rs.getFloat("tot_weight"));
+                    op.setPercent(rs.getFloat("percent"));
+//                    op.setCatName(rs.getString("cat_name"));
+//                    op.setGroupName(rs.getString("stock_type_name"));
+//                    op.setBrandName(rs.getString("brand_name"));
+//                    op.setRelName(rs.getString("rel_name"));
+//                    op.setTraderName(rs.getString("trader_name"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

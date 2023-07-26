@@ -43,6 +43,8 @@ public class MillingExpenseDaoImpl extends AbstractDao<MillingExpenseKey, Millin
                     key.setVouNo(rs.getString("vou_no"));
                     e.setKey(key);
                     e.setExpenseName(rs.getString("expense_name"));
+                    e.setQty(rs.getFloat("qty"));
+                    e.setPrice(rs.getFloat("price"));
                     e.setAmount(rs.getFloat("amount"));
 //                    e.setPercent(rs.getFloat("percent"));
                     list.add(e);
