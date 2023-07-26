@@ -629,6 +629,20 @@ add column std_weight float(20,3);
 alter table grn
 add column loc_code varchar(15) null after mac_id;
 
+create table acc_setting (
+  type varchar(15) not null,
+  comp_code varchar(15) not null,
+  dis_acc varchar(15) not null,
+  pay_acc varchar(15) not null,
+  tax_acc varchar(15) not null,
+  dep_code varchar(15) not null,
+  source_acc varchar(15) not null,
+  bal_acc varchar(15) not null,
+  comm_acc varchar(15) default null,
+  primary key (type,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+
 alter table acc_setting
 add column comp_code varchar(15) not null after type,
 drop primary key,
@@ -1041,4 +1055,7 @@ create table sale_expense (
   amount float not null,
   primary key (expense_code,comp_code,vou_no,unique_id)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+alter table cv_inv_ants.milling_expense
+add column deleted bit(1) null after price;
 
