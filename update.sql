@@ -924,7 +924,7 @@ add column m_percent varchar(255) null after total_weight;
 alter table sale_his
 add column car_no varchar(255) null;
 alter table sale_his
-add column batch_no varchar(15) null;
+add column grn_vou_no varchar(20) null;
 alter table expense
 add column user_code varchar(15) null after percent;
 
@@ -1033,7 +1033,8 @@ set vou_no=concat('C-',vou_no);
 update payment_his_detail
 set vou_no=concat('C-',vou_no);
 
-create table sale_expense (  expense_code varchar(15) not null,
+create table sale_expense (
+  expense_code varchar(15) not null,
   vou_no varchar(15) not null,
   comp_code varchar(15) not null,
   unique_id int(11) not null,

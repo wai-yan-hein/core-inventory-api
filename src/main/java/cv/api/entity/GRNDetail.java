@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 public class GRNDetail {
     @EmbeddedId
     private GRNDetailKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty")

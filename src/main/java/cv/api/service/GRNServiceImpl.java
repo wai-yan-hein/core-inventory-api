@@ -32,7 +32,7 @@ public class GRNServiceImpl implements GRNService {
     public GRN save(GRN g) {
         g.setVouDate(Util1.toDateTime(g.getVouDate()));
         if (Util1.isNullOrEmpty(g.getKey().getVouNo())) {
-            g.getKey().setVouNo(getVoucherNo(g.getKey().getDeptId(), g.getMacId(), g.getKey().getCompCode()));
+            g.getKey().setVouNo(getVoucherNo(g.getDeptId(), g.getMacId(), g.getKey().getCompCode()));
         }
         List<GRNDetail> listDetail = g.getListDetail();
         List<GRNDetailKey> listDel = g.getListDel();
@@ -44,7 +44,6 @@ public class GRNServiceImpl implements GRNService {
             GRNDetail cSd = listDetail.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
                 GRNDetailKey key = new GRNDetailKey();
-                key.setDeptId(g.getKey().getDeptId());
                 key.setCompCode(g.getKey().getCompCode());
                 key.setVouNo(g.getKey().getVouNo());
                 key.setUniqueId(null);
@@ -59,6 +58,7 @@ public class GRNServiceImpl implements GRNService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setDeptId(g.getDeptId());
                 gdDao.save(cSd);
 
             }
@@ -95,7 +95,7 @@ public class GRNServiceImpl implements GRNService {
 
     @Override
     public GRN findByBatchNo(String batchNo, String compCode, Integer deptId) {
-        return dao.findByBatchNo(batchNo,compCode,deptId);
+        return dao.findByBatchNo(batchNo, compCode, deptId);
     }
 
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {

@@ -1,9 +1,13 @@
 package cv.api.controller;
 
 import cv.api.common.ReturnObject;
+import cv.api.dao.SaleExpenseDao;
 import cv.api.entity.Expense;
 import cv.api.entity.ExpenseKey;
+import cv.api.entity.PurExpense;
+import cv.api.entity.SaleExpense;
 import cv.api.service.ExpenseService;
+import cv.api.service.PurExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +20,12 @@ import java.io.Flushable;
 @RequestMapping("/expense")
 public class ExpenseController {
     @Autowired
+    private PurExpenseService purExpenseService;
+    @Autowired
+    private SaleExpenseDao saleExpenseDao;
+
+    @Autowired
     private ExpenseService expenseService;
-    private final ReturnObject ro = new ReturnObject();
 
     @PostMapping(path = "/save-expense")
     public Mono<?> saveExpense(@RequestBody Expense e) {
@@ -33,5 +41,17 @@ public class ExpenseController {
     public Mono<?> deletePur(@RequestBody ExpenseKey key) {
         expenseService.delete(key);
         return Mono.justOrEmpty(true);
+    }
+
+    @GetMapping(path = "/getPurExpense")
+    public Flux<PurExpense> getPurExpense(@RequestParam String vouNo,
+                                          @RequestParam String compCode) {
+        return Flux.fromIterable(purExpenseService.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/getSaleExpense")
+    public Flux<SaleExpense> getSaleExpense(@RequestParam String vouNo,
+                                            @RequestParam String compCode) {
+        return Flux.fromIterable(saleExpenseDao.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 }

@@ -45,6 +45,8 @@ public class AccountRepo {
     private LocationService locationService;
     @Autowired
     private SaleExpenseDao saleExpenseDao;
+    @Autowired
+    private GRNService grnService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -243,7 +245,6 @@ public class AccountRepo {
                 boolean deleted = sh.isDeleted();
                 String vouNo = sh.getKey().getVouNo();
                 String projectNo = sh.getProjectNo();
-                String batchNo = sh.getBatchNo();
                 double vouTotal = Util1.getDouble(sh.getVouTotal());
                 double vouDis = Util1.getDouble(sh.getDiscount());
                 double vouPaid = Util1.getDouble(sh.getPaid());
@@ -269,6 +270,17 @@ public class AccountRepo {
                     }
                     if (!Util1.isNullOrEmpty(t.getAccount())) {
                         balAcc = t.getAccount();
+                    }
+                }
+                String batchNo = "";
+                String grnVouNo = sh.getGrnVouNo();
+                if (grnVouNo != null) {
+                    GRNKey grnKey = new GRNKey();
+                    grnKey.setVouNo(grnVouNo);
+                    grnKey.setCompCode(compCode);
+                    GRN grn = grnService.findByCode(grnKey);
+                    if (grn != null) {
+                        batchNo = grn.getBatchNo();
                     }
                 }
                 List<Gl> listGl = new ArrayList<>();

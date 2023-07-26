@@ -83,7 +83,10 @@ public class GRNController {
     public Mono<?> openGRn(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));
     }
-
+    @PostMapping(path = "/findGRN")
+    public Mono<?> findGRN(@RequestBody GRNKey key) {
+        return Mono.justOrEmpty(grnService.findByCode(key));
+    }
     @GetMapping(path = "/get-batch-list")
     public Flux<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(grnService.search(Util1.cleanStr(batchNo), compCode, deptId)).onErrorResume(throwable -> Flux.empty());

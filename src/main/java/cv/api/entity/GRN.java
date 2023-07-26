@@ -15,6 +15,8 @@ import java.util.List;
 public class GRN {
     @EmbeddedId
     private GRNKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "batch_no")
     private String batchNo;
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")

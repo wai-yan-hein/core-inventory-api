@@ -47,9 +47,9 @@ public class GRNDetailDaoImpl extends AbstractDao<GRNDetailKey, GRNDetail> imple
                     GRNDetailKey key = new GRNDetailKey();
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     g.setKey(key);
+                    g.setDeptId(rs.getInt("dept_id"));
                     g.setStockCode(rs.getString("stock_code"));
                     g.setUserCode(rs.getString("user_code"));
                     g.setStockName(rs.getString("stock_name"));

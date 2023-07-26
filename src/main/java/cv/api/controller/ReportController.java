@@ -298,6 +298,14 @@ public class ReportController {
                         List<VSale> values = reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
                         Util1.writeJsonFile(values, exportPath);
                     }
+                    case "SupplierBalanceDetail" -> {
+                        List<VSale> values = reportService.getSupplierBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "SupplierBalanceSummary" -> {
+                        List<VSale> values = reportService.getSupplierBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
+                        Util1.writeJsonFile(values, exportPath);
+                    }
                     case "SaleByDueDateSummary" -> {
                         List<VSale> list = reportService.getSaleByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
@@ -352,7 +360,7 @@ public class ReportController {
         } else if (Util1.isNullOrEmpty(macId)) {
             status = false;
             ro.setMessage("Invalid Machine Id.");
-        }else if (Util1.isNullOrEmpty(fromDueDate)) {
+        } else if (Util1.isNullOrEmpty(fromDueDate)) {
             status = false;
             ro.setMessage("Invalid From Due Date.");
         } else if (Util1.isNullOrEmpty(toDueDate)) {
@@ -400,9 +408,9 @@ public class ReportController {
                                    @RequestParam boolean calRI, @RequestParam boolean calRO,
                                    @RequestParam String compCode, @RequestParam Integer deptId,
                                    @RequestParam Integer macId, @RequestParam boolean summary) {
-        String opDate =reportService.getOpeningDate(compCode,deptId);
-        String clDate =Util1.toDateStr(Util1.getTodayDate(),"yyyy-MM-dd");
-        List<VStockBalance> list = reportService.getStockBalance(opDate,clDate,"-", "-", "-",
+        String opDate = reportService.getOpeningDate(compCode, deptId);
+        String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
+        List<VStockBalance> list = reportService.getStockBalance(opDate, clDate, "-", "-", "-",
                 stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
         if (list.isEmpty()) {
             VStockBalance b = new VStockBalance();

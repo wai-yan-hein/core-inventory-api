@@ -25,20 +25,20 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
 
     @Override
     public List<GRN> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from GRN o where o.key.compCode ='" + compCode + "' and o.key.deptId =" + deptId + "";
+        String hsql = "select o from GRN o where o.key.compCode ='" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
     public boolean delete(GRNKey key) {
-        String sql = "update grn set deleted = true where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        String sql = "update grn set deleted = true where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return true;
     }
 
     @Override
     public boolean restore(GRNKey key) {
-        String sql = "update grn set deleted = false where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId() + "";
+        String sql = "update grn set deleted = false where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return true;
     }
@@ -84,7 +84,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
 
     @Override
     public boolean open(GRNKey key) {
-        String sql = "update grn set closed =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "' and dept_id =" + key.getDeptId();
+        String sql = "update grn set closed =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return true;
     }
@@ -107,8 +107,8 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
                 GRNKey key = new GRNKey();
                 key.setVouNo(rs.getString("vou_no"));
                 key.setCompCode(rs.getString("comp_code"));
-                key.setDeptId(rs.getInt("dept_id"));
                 grn.setKey(key);
+                grn.setDeptId(rs.getInt("dept_id"));
                 grn.setBatchNo(rs.getString("batch_no"));
                 grn.setTraderCode(rs.getString("trader_code"));
                 return grn;
