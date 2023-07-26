@@ -62,6 +62,7 @@ public class MillingRawDaoImpl extends AbstractDao<MillingRawDetailKey, MillingR
                     op.setUnitCode(rs.getString("unit"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
+                    op.setTotalWeight(rs.getFloat("tot_weight"));
 //                    op.setCatName(rs.getString("cat_name"));
 //                    op.setGroupName(rs.getString("stock_type_name"));
 //                    op.setBrandName(rs.getString("brand_name"));
