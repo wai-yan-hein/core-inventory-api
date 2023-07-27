@@ -38,6 +38,7 @@ public interface ReportService {
 
     List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception;
 
+    List<VPurchase> getGRNVoucher(String vouNo, String compCode) throws Exception;
     List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
 

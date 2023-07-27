@@ -236,6 +236,52 @@ public class ReportServiceImpl implements ReportService {
         return purchaseList;
     }
 
+    @Override
+    public List<VPurchase> getGRNVoucher(String vouNo, String compCode) throws Exception {
+        List<VPurchase> purchaseList = new ArrayList<>();
+        String sql = """
+                select a.*, t.trader_name, t.address, l.loc_name, s.stock_name
+                from (
+                select p.stock_code, g.vou_no, g.vou_date, p.weight, p.weight_unit, p.qty, p.unit, g.loc_code, g.trader_code, g.comp_code, g.remark, g.batch_no
+                from grn g, grn_detail p
+                where g.vou_no = p.vou_no
+                and g.comp_code = p.comp_code
+                and g.vou_no =?
+                and g.comp_code =? ) a
+                join trader t
+                on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                join location l
+                on a.loc_code = l.loc_code
+                and a.comp_code = l.comp_code
+                join stock s
+                on a.stock_code = s.stock_code
+                and a.comp_code = s.comp_code
+                """;
+        ResultSet rs = getResult(sql, vouNo, compCode);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VPurchase purchase = new VPurchase();
+                purchase.setVouNo(rs.getString("vou_no"));
+                purchase.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                purchase.setLocationName(rs.getString("loc_name"));
+                purchase.setTraderName(rs.getString("trader_name"));
+                purchase.setCompAddress(rs.getString("address"));
+                purchase.setRemark(rs.getString("remark"));
+                purchase.setBatchNo(rs.getString("batch_no"));
+                purchase.setStockCode(rs.getString("stock_code"));
+                purchase.setStockName(rs.getString("stock_name"));
+                purchase.setQty(rs.getFloat("qty"));
+                purchase.setPurUnit(rs.getString("unit"));
+                purchase.setWeight(rs.getFloat("weight"));
+                purchase.setWeightUnit(rs.getString("weight_unit"));
+                purchase.setTotal(rs.getFloat("weight") * rs.getFloat("qty"));
+                purchaseList.add(purchase);
+            }
+        }
+        return purchaseList;
+    }
+
 
     @Override
     public List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) throws Exception {
