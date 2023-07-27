@@ -32,7 +32,7 @@ public class VSale {
     private Float taxPrice;
     private String createdDate;
     private String createdBy;
-    private boolean deleted;
+    private Boolean deleted;
     private Float paid;
     private Float vouBalance;
     private String updatedBy;
@@ -67,7 +67,7 @@ public class VSale {
     private String regionName;
     private String stockTypeName;
     private String refNo;
-    private float lastBalance;
+    private Float lastBalance;
     private String compCode;
     private String relName;
     private String qtyStr;
@@ -86,5 +86,6 @@ public class VSale {
     private String tranOption;
     private String saleVouNo;
     private String payDate;
+    private Integer vouCount;
 
 }

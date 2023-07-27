@@ -44,13 +44,18 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
-    private String createFilePath(String path) {
+    private void createFilePath(String path) {
         File file = new File(path);
         File parentDir = file.getParentFile();
         if (!parentDir.exists()) {
-            parentDir.mkdirs();
+            if (parentDir.mkdirs()) {
+                log.info("Directory path created: " + parentDir.getAbsolutePath());
+            } else {
+                log.error("Failed to create directory path: " + parentDir.getAbsolutePath());
+            }
+        } else {
+            log.info("Directory path already exists: " + parentDir.getAbsolutePath());
         }
-        return path;
     }
 
     @GetMapping(value = "/get-order-report", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -445,5 +450,13 @@ public class ReportController {
     @GetMapping(path = "/get-smallest_qty")
     public Mono<?> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
+    }
+
+    @PostMapping(path = "/getSaleSummaryByDepartment")
+    public Flux<?> getSaleSummaryByDepartment(@RequestBody FilterObject filter) {
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String compCode = filter.getCompCode();
+        return Flux.fromIterable(reportService.getSaleSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 }

@@ -139,24 +139,4 @@ public class MillingController {
                                     @RequestParam Integer deptId) {
         return Flux.fromIterable(outService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
-
-    @GetMapping(path = "/get-sale-voucher-info")
-    public Mono<?> getSaleVoucherCount(@RequestParam String vouDate,
-                                                 @RequestParam String compCode,
-                                                 @RequestParam Integer deptId) {
-//        return  Mono.justOrEmpty(shService.getVoucherInfo(vouDate, compCode, deptId));
-    return null;
-    }
-
-    @GetMapping(path = "/get-sale-by-batch")
-    public Flux<?> getSaleByBatch(@RequestParam String batchNo,
-                                            @RequestParam String compCode,
-                                            @RequestParam Integer deptId,
-                                            @RequestParam boolean detail) {
-        if (detail) {
-//            return Flux.fromIterable(sdService.getSaleByBatchDetail(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
-        }
-//        return Flux.fromIterable(sdService.getSaleByBatch(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
-    return null;
-    }
 }

@@ -220,6 +220,7 @@ public interface ReportService {
 
     List<VSale> getCustomerBalanceDetail(String fromDate, String toDate, String compCode, String curCode, String traderCode,
                                          String batchNo, String projectNo, String locCode);
+
     List<VSale> getSupplierBalanceDetail(String fromDate, String toDate, String compCode, String curCode, String traderCode,
                                          String batchNo, String projectNo, String locCode);
 
@@ -237,4 +238,6 @@ public interface ReportService {
 
     List<VOrder> getOrderByDueDateDetail(String fromDueDate, String toDueDate, String curCode, String stockCode, String typeCode,
                                          String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
+
+    List<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode);
 }
