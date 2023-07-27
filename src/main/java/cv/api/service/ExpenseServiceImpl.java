@@ -25,7 +25,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense save(Expense exp) {
-        if (Util1.isNullOrEmpty(exp.getKey().getExpenseCode())) {
+        if (Util1.isNullOrEmpty(exp.getKey()) || Util1.isNullOrEmpty(exp.getKey().getExpenseCode())) {
+            exp.setKey(new ExpenseKey());
             exp.getKey().setExpenseCode(getCode(exp.getKey().getCompCode()));
         }
         return dao.save(exp);
