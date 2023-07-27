@@ -59,6 +59,15 @@ public class PaymentController {
         return Flux.fromIterable(paymentHisService.getPaymentVoucher(ph.getVouNo(), ph.getCompCode())).onErrorResume(throwable -> Flux.empty());
     }
 
+    @PostMapping(path = "/checkPaymentExist")
+    public Mono<?> checkPaymentExist(@RequestBody FilterObject ph) {
+        String vouNo = ph.getVouNo();
+        String tranOption = ph.getTranOption();
+        String compCode = ph.getCompCode();
+        String traderCode = ph.getTraderCode();
+        return Mono.just(paymentHisService.checkPaymentExists(vouNo, traderCode, compCode, tranOption));
+    }
+
     @GetMapping(path = "/getPaymentDetail")
     public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());

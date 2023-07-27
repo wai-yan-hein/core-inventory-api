@@ -23,4 +23,6 @@ public interface PaymentHisService {
     List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<VSale> getPaymentVoucher(String vouNo, String compCode);
+
+    boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption);
 }

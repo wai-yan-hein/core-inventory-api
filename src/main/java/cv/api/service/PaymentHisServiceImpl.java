@@ -96,6 +96,11 @@ public class PaymentHisServiceImpl implements PaymentHisService {
         return dao.getPaymentVoucher(vouNo, compCode);
     }
 
+    @Override
+    public boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption) {
+        return dao.checkPaymentExists(vouNo, traderCode, compCode, tranOption);
+    }
+
     private String getVoucherNo(Integer macId, String compCode, Integer deptId, String tranOption) {
         String option = tranOption.equals("C") ? "RECEIVE" : "PAYMENT";
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");

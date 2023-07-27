@@ -2140,28 +2140,37 @@ public class ReportServiceImpl implements ReportService {
     public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
                                               String compCode, Integer deptId, String deleted,
                                               String projectNo, String curCode) throws Exception {
-        String sql = "select a.*,t.trader_name\n" +
-                "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id\n" +
-                "from v_purchase p \n" +
-                "where comp_code = ?\n" +
-                "and (dept_id = ? or 0 = ?)\n" +
-                "and deleted =?\n" +
-                "and date(vou_date) between ? and ?\n" +
-                "and cur_code = ?\n" +
-                "and (vou_no = ? or '-' = ?)\n" +
-                "and (remark LIKE CONCAT(?, '%') or '-'= ?)\n" +
-                "and (reference LIKE CONCAT(?, '%') or '-'= ?)\n" +
-                "and (trader_code = ? or '-'= ?)\n" +
-                "and (created_by = ? or '-'= ?)\n" +
-                "and (stock_code =? or '-' =?)\n" +
-                "and (loc_code =? or '-' =?)\n" +
-                "and (project_no =? or '-' =?)\n" +
-                "group by vou_no)a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "order by date(vou_date),vou_no";
-        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
-                reference, traderCode, traderCode, userCode, userCode, stockCode, stockCode, locCode, locCode, projectNo, projectNo);
+        remark = remark.concat("%");
+        reference =reference.concat("%");
+        String sql = """
+                select a.*,t.trader_name
+                from (
+                select date(vou_date) vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id
+                from v_purchase\s
+                where comp_code = ?
+                and (dept_id = ? or 0 = ?)
+                and deleted =?
+                and date(vou_date) between ? and ?
+                and cur_code = ?
+                and (vou_no = ? or '-' = ?)
+                and (remark like ? or '-%'= ?)
+                and (reference like ? or '-%'= ?)
+                and (trader_code = ? or '-'= ?)
+                and (created_by = ? or '-'= ?)
+                and (stock_code =? or '-' =?)
+                and (loc_code =? or '-' =?)
+                and (project_no =? or '-' =?)
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                order by date(vou_date),vou_no""";
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, Util1.getBoolean(deleted), fromDate, toDate, curCode, vouNo, vouNo,
+                remark, remark, reference, reference,
+                traderCode, traderCode,
+                userCode, userCode,
+                stockCode, stockCode,
+                locCode, locCode,
+                projectNo, projectNo);
         List<VPurchase> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {

@@ -89,7 +89,15 @@ public abstract class AbstractDao<PK extends Serializable, T> {
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
             }
+            String formattedSql = formatSqlWithParams(sql, params);
+            //log.info("Executing SQL query: {}", formattedSql);
             return stmt.executeQuery();
         });
+    }
+    private String formatSqlWithParams(String sql, Object[] params) {
+        for (Object param : params) {
+            sql = sql.replaceFirst("\\?", param.toString());
+        }
+        return sql;
     }
 }
