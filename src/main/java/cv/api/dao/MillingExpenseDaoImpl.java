@@ -19,7 +19,7 @@ public class MillingExpenseDaoImpl extends AbstractDao<MillingExpenseKey, Millin
 
     @Override
     public List<MillingExpense> search(String vouNo, String compCode) {
-        String sql = "select a.*,e.expense_name\n" +
+        String sql = "select a.*\n" +
                 "from (\n" +
                 "select *\n" +
                 "from milling_expense\n" +
