@@ -3278,13 +3278,13 @@ public class ReportServiceImpl implements ReportService {
                 s.setGroupName(rs.getString("group_name"));
                 s.setStockUserCode(rs.getString("user_code"));
                 s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getFloat("qty"));
+                s.setQty(Util1.toNull(rs.getFloat("qty")));
                 s.setSaleUnit(rs.getString("unit"));
-                s.setWeight(rs.getFloat("weight"));
+                s.setWeight(Util1.toNull(rs.getFloat("weight")));
                 s.setWeightUnit(rs.getString("weight_unit"));
-                s.setSalePrice(rs.getFloat("price"));
-                s.setSaleAmount(rs.getFloat("amount"));
-                s.setTotalQty(rs.getFloat("ttl_qty"));
+                s.setSalePrice(Util1.toNull(rs.getFloat("price")));
+                s.setSaleAmount(Util1.toNull(rs.getFloat("amount")));
+                s.setTotalQty(Util1.toNull(rs.getFloat("ttl_qty")));
                 list.add(s);
             }
         } catch (Exception e) {
