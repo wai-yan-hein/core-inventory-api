@@ -15,7 +15,7 @@ import lombok.Data;
 @Data
 public class VSale {
 
-    private String sdCode;
+    private String groupName;
     private String vouNo;
     private String traderCode;
     private String rfId;
@@ -87,5 +87,6 @@ public class VSale {
     private String saleVouNo;
     private String payDate;
     private Integer vouCount;
+    private Float totalQty;
 
 }

@@ -44,6 +44,13 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
+    @GetMapping(value = "/getSaleByBatchReport", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Flux<VSale> getSaleByBatchReport(@RequestParam String vouNo,
+                                                          @RequestParam String grnVouNo,
+                                                          @RequestParam String compCode) {
+        return Flux.fromIterable(reportService.getSaleByBatchReport(vouNo, grnVouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
     private void createFilePath(String path) {
         File file = new File(path);
         File parentDir = file.getParentFile();

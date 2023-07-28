@@ -1056,6 +1056,6 @@ create table sale_expense (
   primary key (expense_code,comp_code,vou_no,unique_id)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
-alter table cv_inv_ants.milling_expense
+alter table milling_expense
 add column deleted bit(1) null after price;
 

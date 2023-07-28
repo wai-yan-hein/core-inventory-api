@@ -16,6 +16,7 @@ import cv.api.service.ReportService;
 import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -42,7 +43,7 @@ public class SaleController {
     private AccountRepo accountRepo;
 
     @PostMapping(path = "/save-sale")
-    public Mono<?> saveSale(@RequestBody SaleHis sale) {
+    public Mono<?> saveSale(@NotNull @RequestBody SaleHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
@@ -56,7 +57,7 @@ public class SaleController {
         return Mono.justOrEmpty(sale);
     }
 
-    private boolean isValidSale(SaleHis sale, ReturnObject ro) {
+    private boolean isValidSale(@NotNull SaleHis sale, ReturnObject ro) {
         boolean status = true;
         if (Util1.isNullOrEmpty(sale.getTraderCode())) {
             status = false;
@@ -84,7 +85,7 @@ public class SaleController {
     }
 
     @PostMapping(path = "/get-sale")
-    public Flux<?> getSale(@RequestBody FilterObject filter) {
+    public Flux<?> getSale(@NotNull @RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
