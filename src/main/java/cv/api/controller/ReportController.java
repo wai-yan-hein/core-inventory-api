@@ -76,10 +76,6 @@ public class ReportController {
     @GetMapping(value = "/get-grn-report", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getGRNReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
         List<VPurchase> listPur = reportService.getGRNVoucher(vouNo, compCode);
-        String reportName = "GrnVoucher";
-        String exportPath = String.format("temp%s%s.json", File.separator, reportName);
-        Util1.writeJsonFile(listPur, exportPath);
-        new FileInputStream(exportPath).readAllBytes();
         return Flux.fromIterable(listPur);
     }
 

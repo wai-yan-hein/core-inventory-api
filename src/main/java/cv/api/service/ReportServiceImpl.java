@@ -212,7 +212,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception {
         List<VPurchase> list = new ArrayList<>();
         String sql = "select t.trader_name,p.remark,p.vou_no,\n" +
-                "p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance\n" +
+                "p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,p.vou_total,p.discount,p.paid,p.balance,\n" +
                 "p.weight,p.weight_unit\n" +
                 "from v_purchase p join trader t\n" +
                 "on p.trader_code = t.code\n" +
