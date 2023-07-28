@@ -3257,6 +3257,43 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode) {
+        List<VSale> list = new ArrayList<>();
+        String sql = """
+                select 'I' group_name,user_code,stock_name,qty,unit,weight,weight_unit,0 price,0 amount,qty*weight ttl_qty\s
+                from v_grn\s
+                where vou_no =?\s
+                and comp_code =?\s
+                union all\s
+                select 'R',s_user_code,stock_name,qty,sale_unit,weight,weight_unit,sale_price,sale_amt,qty*weight ttl_qty\s
+                from v_sale
+                where vou_no =?\s
+                and comp_code =?;""";
+        try {
+            ResultSet rs = getResult(sql, grnVouNo, compCode, vouNo, compCode);
+            while (rs.next()) {
+                //group_name, user_code, stock_name, qty, unit, weight,
+                // weight_unit, price, amount, ttl_qty, ttl
+                VSale s = new VSale();
+                s.setGroupName(rs.getString("group_name"));
+                s.setStockUserCode(rs.getString("user_code"));
+                s.setStockName(rs.getString("stock_name"));
+                s.setQty(rs.getFloat("qty"));
+                s.setSaleUnit(rs.getString("unit"));
+                s.setWeight(rs.getFloat("weight"));
+                s.setWeightUnit(rs.getString("weight_unit"));
+                s.setSalePrice(rs.getFloat("price"));
+                s.setSaleAmount(rs.getFloat("amount"));
+                s.setTotalQty(rs.getFloat("ttl_qty"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            log.error("getSaleByBatchReport : " + e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
     public List<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode) {
         List<PaymentHisDetail> list = new ArrayList<>();
         if (tranOption.equals("C") || tranOption.equals("S")) {

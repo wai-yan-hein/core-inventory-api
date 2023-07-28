@@ -241,4 +241,6 @@ public interface ReportService {
                                          String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode);
+    List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode);
+
 }

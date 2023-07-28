@@ -13,6 +13,7 @@ import cv.api.dao.SaleHisDetailDao;
 import cv.api.dao.SeqTableDao;
 import cv.api.entity.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     private SaleExpenseDao saleExpenseDao;
 
     @Override
-    public SaleHis save(SaleHis saleHis) {
+    public SaleHis save(@NotNull SaleHis saleHis) {
         saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
             saleHis.getKey().setVouNo(getVoucherNo(saleHis.getKey().getDeptId(), saleHis.getMacId(), saleHis.getKey().getCompCode()));
