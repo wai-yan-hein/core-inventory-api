@@ -80,6 +80,7 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                     op.setLength(rs.getFloat("length"));
                     op.setWidth(rs.getFloat("width"));
                     op.setMPercent(rs.getString("m_percent"));
+                    op.setTotalWeight(rs.getFloat("total_weight"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
