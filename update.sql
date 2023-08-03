@@ -1062,16 +1062,9 @@ add column deleted bit(1) null after price;
 alter table sale_his
 add column expense float(20,3) not null after grn_vou_no;
 
+drop view if exists v_milling_raw;
 create view v_milling_raw as
-select a.*,s.user_code AS s_user_code,
-        s.stock_name AS stock_name,
-        s.stock_type_code AS stock_type_code,
-        s.category_code AS cat_code,
-        s.brand_code AS brand_code,
-        s.rel_code AS rel_code,
-        s.calculate AS calculate
-from (
-  SELECT
+SELECT
         sh.project_no AS project_no,
         sh.vou_no AS vou_no,
         sh.trader_code AS trader_code,
@@ -1095,15 +1088,21 @@ from (
         sd.price AS price,
         sd.amt AS amt,
         sd.loc_code AS loc_code,
-        sd.unique_id AS unique_id
-        FROM
-    milling_his sh, milling_raw sd
-WHERE
-    sh.vou_no = sd.vou_no
-    and sh.comp_code = sd.comp_code
-)a
-join stock s on a.stock_code = s.stock_code
-and a.comp_code =s.comp_code
+        sd.tot_weight AS tot_weight,
+        sd.unique_id AS unique_id,
+        s.user_code AS s_user_code,
+        s.stock_name AS stock_name,
+        s.stock_type_code AS stock_type_code,
+        s.category_code AS cat_code,
+        s.brand_code AS brand_code,
+        s.rel_code AS rel_code,
+        s.calculate AS calculate
+    FROM
+    milling_his sh, milling_raw sd, stock s
+WHERE sh.vou_no = sd.vou_no
+    and sh.comp_code =sd.comp_code
+    AND sd.stock_code = s.stock_code
+    and sd.comp_code = s.comp_code;
 
 create view v_milling_output as
 select a.*,s.user_code AS s_user_code,
