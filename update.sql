@@ -1147,3 +1147,7 @@ WHERE
 join stock s on a.stock_code = s.stock_code
 and a.comp_code =s.comp_code
 
+alter table cv_inv_ants.op_his_detail
+add column weight float(20,3) null after dept_id,
+add column weight_unit varchar(10) null after weight;
+
