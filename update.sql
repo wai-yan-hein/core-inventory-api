@@ -1062,3 +1062,92 @@ add column deleted bit(1) null after price;
 alter table sale_his
 add column expense float(20,3)  null after grn_vou_no;
 
+drop view if exists v_milling_raw;
+create view v_milling_raw as
+SELECT
+        sh.project_no AS project_no,
+        sh.vou_no AS vou_no,
+        sh.trader_code AS trader_code,
+        sh.vou_date AS vou_date,
+        sh.cur_code AS cur_code,
+        sh.remark AS remark,
+        sh.created_date AS created_date,
+        sh.created_by AS created_by,
+        sh.deleted AS deleted,
+        sh.updated_by AS updated_by,
+        sh.updated_date AS updated_date,
+        sh.comp_code AS comp_code,
+        sh.mac_id AS mac_id,
+        sh.reference AS reference,
+        sh.dept_id AS dept_id,
+        sd.stock_code AS stock_code,
+        sd.weight AS weight,
+        sd.weight_unit AS weight_unit,
+        sd.qty AS qty,
+        sd.unit AS unit,
+        sd.price AS price,
+        sd.amt AS amt,
+        sd.loc_code AS loc_code,
+        sd.tot_weight AS tot_weight,
+        sd.unique_id AS unique_id,
+        s.user_code AS s_user_code,
+        s.stock_name AS stock_name,
+        s.stock_type_code AS stock_type_code,
+        s.category_code AS cat_code,
+        s.brand_code AS brand_code,
+        s.rel_code AS rel_code,
+        s.calculate AS calculate
+    FROM
+    milling_his sh, milling_raw sd, stock s
+WHERE sh.vou_no = sd.vou_no
+    and sh.comp_code =sd.comp_code
+    AND sd.stock_code = s.stock_code
+    and sd.comp_code = s.comp_code;
+
+create view v_milling_output as
+select a.*,s.user_code AS s_user_code,
+        s.stock_name AS stock_name,
+        s.stock_type_code AS stock_type_code,
+        s.category_code AS cat_code,
+        s.brand_code AS brand_code,
+        s.rel_code AS rel_code,
+        s.calculate AS calculate
+from (
+  SELECT
+        sh.project_no AS project_no,
+        sh.vou_no AS vou_no,
+        sh.trader_code AS trader_code,
+        sh.vou_date AS vou_date,
+        sh.cur_code AS cur_code,
+        sh.remark AS remark,
+        sh.created_date AS created_date,
+        sh.created_by AS created_by,
+        sh.deleted AS deleted,
+        sh.updated_by AS updated_by,
+        sh.updated_date AS updated_date,
+        sh.comp_code AS comp_code,
+        sh.mac_id AS mac_id,
+        sh.reference AS reference,
+        sh.dept_id AS dept_id,
+        sd.stock_code AS stock_code,
+        sd.weight AS weight,
+        sd.weight_unit AS weight_unit,
+        sd.qty AS qty,
+        sd.unit AS unit,
+        sd.price AS price,
+        sd.amt AS amt,
+        sd.loc_code AS loc_code,
+        sd.unique_id AS unique_id
+        FROM
+    milling_his sh, milling_output sd
+WHERE
+    sh.vou_no = sd.vou_no
+    and sh.comp_code = sd.comp_code
+)a
+join stock s on a.stock_code = s.stock_code
+and a.comp_code =s.comp_code
+
+alter table cv_inv_ants.op_his_detail
+add column weight float(20,3) null after dept_id,
+add column weight_unit varchar(10) null after weight;
+
