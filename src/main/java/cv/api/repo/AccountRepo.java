@@ -909,32 +909,34 @@ public class AccountRepo {
 
 
     private void deleteGlByVoucher(Gl gl) {
-        Mono<String> result = accountApi.post().uri("/account/delete-gl-by-voucher")
-                .body(Mono.just(gl), Gl.class).retrieve()
-                .bodyToMono(String.class);
-        result.subscribe(s -> {
-            String vouNo = gl.getRefNo();
-            String compCode = gl.getKey().getCompCode();
-            switch (gl.getTranSource()) {
-                case "SALE" -> updateSale(vouNo, compCode);
-                case "PURCHASE" -> updatePurchase(vouNo, compCode);
-                case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
-                case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
-                case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
-            }
-        }, (e) -> {
-            String vouNo = gl.getRefNo();
-            String compCode = gl.getKey().getCompCode();
-            String tranSource = gl.getTranSource();
-            switch (tranSource) {
-                case "SALE" -> updateSaleNull(vouNo, compCode);
-                case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
-                case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
-                case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
-                case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
-            }
-            log.error("deleteGlByVoucher : " + e.getMessage());
-        });
+        accountApi.post()
+                .uri("/account/delete-gl-by-voucher")
+                .body(Mono.just(gl), Gl.class)
+                .retrieve()
+                .bodyToMono(String.class)
+                .subscribe(s -> {
+                    String vouNo = gl.getRefNo();
+                    String compCode = gl.getKey().getCompCode();
+                    switch (gl.getTranSource()) {
+                        case "SALE" -> updateSale(vouNo, compCode);
+                        case "PURCHASE" -> updatePurchase(vouNo, compCode);
+                        case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
+                        case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+                        case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
+                    }
+                }, (e) -> {
+                    String vouNo = gl.getRefNo();
+                    String compCode = gl.getKey().getCompCode();
+                    String tranSource = gl.getTranSource();
+                    switch (tranSource) {
+                        case "SALE" -> updateSaleNull(vouNo, compCode);
+                        case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
+                        case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
+                        case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+                        case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
+                    }
+                    log.error("deleteGlByVoucher : " + e.getMessage());
+                });
     }
 
     private LocationSetting getLocationSetting(String locCode, String compCode) {

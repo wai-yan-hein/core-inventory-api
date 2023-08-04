@@ -1060,5 +1060,5 @@ alter table milling_expense
 add column deleted bit(1) null after price;
 
 alter table sale_his
-add column expense float(20,3) not null after grn_vou_no;
+add column expense float(20,3)  null after grn_vou_no;
 
