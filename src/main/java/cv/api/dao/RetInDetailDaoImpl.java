@@ -61,7 +61,6 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
-                    op.setAvgQty(rs.getFloat("avg_qty"));
                     op.setPrice(rs.getFloat("price"));
                     op.setAmount(rs.getFloat("amt"));
                     op.setLocCode(rs.getString("loc_code"));
@@ -73,6 +72,9 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
+                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeightUnit(rs.getString("weight_unit"));
+                    op.setTotalWeight(rs.getFloat("total_weight"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
