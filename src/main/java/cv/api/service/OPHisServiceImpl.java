@@ -51,6 +51,7 @@ public class OPHisServiceImpl implements OPHisService {
                         OPHisDetail pSd = listSD.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
+                    cSd.setTotalWeight(cSd.getWeight() * cSd.getQty());
                 }
                 opHisDetailDao.save(cSd);
             }
