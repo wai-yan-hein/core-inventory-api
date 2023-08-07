@@ -1147,28 +1147,36 @@ WHERE
 join stock s on a.stock_code = s.stock_code
 and a.comp_code =s.comp_code
 
-alter table cv_inv_ants.op_his_detail
+alter table op_his_detail
 add column weight float(20,3) null after dept_id,
 add column weight_unit varchar(10) null after weight
 add column total_weight float(20,3) null after weight_unit;
 
-alter table cv_inv_ants.ret_in_his_detail
+alter table ret_in_his_detail
 add column weight float(20,3) null,
 add column weight_unit varchar(10) null after weight,
 add column total_weight float(20,3) null after weight_unit;
 
-alter table cv_inv_ants.ret_out_his_detail
+alter table ret_out_his_detail
 add column weight float(20,3) null,
 add column weight_unit varchar(10) null after weight,
 add column total_weight float(20,3) null after weight_unit;
 
-alter table cv_inv_ants.transfer_his_detail
+alter table transfer_his_detail
 add column weight float(20,3) null after dept_id,
+add column weight_unit varchar(10) null after weight,
+add column total_weight float(20,3) null after weight_unit;
+
+alter table stock_in_out_detail
+add column weight float(20,3) null,
 add column weight_unit varchar(10) null after weight,
 add column total_weight float(20,3) null after weight_unit;
 
 alter table cv_inv_ants.ret_in_his_detail
 drop column avg_qty;
+
+alter table grn_detail
+add column total_weight float(20,3) null after weight_unit;
 
 drop view if exists v_return_in;
 create
