@@ -1172,7 +1172,7 @@ add column weight float(20,3) null,
 add column weight_unit varchar(10) null after weight,
 add column total_weight float(20,3) null after weight_unit;
 
-alter table cv_inv_ants.ret_in_his_detail
+alter table ret_in_his_detail
 drop column avg_qty;
 
 alter table grn_detail

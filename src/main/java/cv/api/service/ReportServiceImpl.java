@@ -2578,7 +2578,7 @@ public class ReportServiceImpl implements ReportService {
         hm.put("ret_in_his", "Return In");
         hm.put("ret_out_his", "Return Out");
         hm.forEach((s, s2) -> {
-            String sql = "select exists(select " + "trader_code" + " from " + s + " where " + "trader_code" + " ='" + code + "' and comp_code ='" + compCode + "') exist";
+            String sql = "select exists(select " + "trader_code" + " from " + s + " where deleted = false and " + "trader_code" + " ='" + code + "' and comp_code ='" + compCode + "') exist";
             try {
                 ResultSet rs = reportDao.executeSql(sql);
                 if (rs.next()) {
