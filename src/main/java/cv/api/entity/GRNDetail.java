@@ -26,6 +26,8 @@ public class GRNDetail {
     private Float weight;
     @Column(name = "weight_unit")
     private String weightUnit;
+    @Column(name = "total_weight")
+    private Float totalWeight;
     @Transient
     private String userCode;
     @Transient

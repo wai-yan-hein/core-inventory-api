@@ -58,6 +58,7 @@ public class GRNServiceImpl implements GRNService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setTotalWeight(cSd.getWeight() * cSd.getQty());
                 cSd.setDeptId(g.getDeptId());
                 gdDao.save(cSd);
 

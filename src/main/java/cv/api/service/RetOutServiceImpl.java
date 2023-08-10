@@ -68,6 +68,7 @@ public class RetOutServiceImpl implements RetOutService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setTotalWeight(Util1.getFloat(cSd.getWeight()) * cSd.getQty());
                 rd.save(cSd);
             }
         }

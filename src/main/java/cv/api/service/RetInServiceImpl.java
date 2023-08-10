@@ -69,6 +69,7 @@ public class RetInServiceImpl implements RetInService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setTotalWeight(Util1.getFloat(cSd.getWeight()) * cSd.getQty());
                 sdDao.save(cSd);
             }
             rDao.save(rin);

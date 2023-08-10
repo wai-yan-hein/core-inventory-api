@@ -65,6 +65,9 @@ public class RetOutDetailDaoImpl extends AbstractDao<RetOutKey, RetOutHisDetail>
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
+                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeightUnit(rs.getString("weight_unit"));
+                    op.setTotalWeight(rs.getFloat("total_weight"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

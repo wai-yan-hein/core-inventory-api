@@ -1149,6 +1149,82 @@ and a.comp_code =s.comp_code
 
 alter table op_his_detail
 add column weight float(20,3) null after dept_id,
+add column weight_unit varchar(10) null after weight
+add column total_weight float(20,3) null after weight_unit;
+
+alter table ret_in_his_detail
+add column weight float(20,3) null,
 add column weight_unit varchar(10) null after weight,
 add column total_weight float(20,3) null after weight_unit;
 
+alter table ret_out_his_detail
+add column weight float(20,3) null,
+add column weight_unit varchar(10) null after weight,
+add column total_weight float(20,3) null after weight_unit;
+
+alter table transfer_his_detail
+add column weight float(20,3) null after dept_id,
+add column weight_unit varchar(10) null after weight,
+add column total_weight float(20,3) null after weight_unit;
+
+alter table stock_in_out_detail
+add column weight float(20,3) null,
+add column weight_unit varchar(10) null after weight,
+add column total_weight float(20,3) null after weight_unit;
+
+alter table ret_in_his_detail
+drop column avg_qty;
+
+alter table grn_detail
+add column total_weight float(20,3) null after weight_unit;
+
+drop view if exists v_return_in;
+create
+    algorithm = undefined
+    definer = root@localhost
+    sql security definer
+view v_return_in as
+    select
+        rh.project_no as project_no,
+        rh.balance as balance,
+        rh.created_by as created_by,
+        rh.created_date as created_date,
+        rh.deleted as deleted,
+        rh.discount as discount,
+        rh.paid as paid,
+        rh.vou_date as vou_date,
+        rh.ref_no as ref_no,
+        rh.remark as remark,
+        rh.session_id as session_id,
+        rh.updated_by as updated_by,
+        rh.updated_date as updated_date,
+        rh.vou_total as vou_total,
+        rh.cur_code as cur_code,
+        rh.trader_code as trader_code,
+        rh.disc_p as disc_p,
+        rh.intg_upd_status as intg_upd_status,
+        rh.mac_id as mac_id,
+        rh.comp_code as comp_code,
+        rh.dept_id as dept_id,
+        rd.vou_no as vou_no,
+        rd.stock_code as stock_code,
+		rd.qty as qty,
+        rd.unit as unit,
+        rd.price as price,
+        rd.amt as amt,
+        rd.loc_code as loc_code,
+        rd.unique_id as unique_id,
+        s.stock_name as stock_name,
+        s.stock_type_code as stock_type_code,
+        s.brand_code as brand_code,
+        s.category_code as category_code,
+        s.rel_code as rel_code,
+        s.calculate as calculate
+    from
+        ((ret_in_his rh
+        join ret_in_his_detail rd on (rh.vou_no = rd.vou_no))
+        join stock s on (rd.stock_code = s.stock_code))
+
+
+ alter table sale_his
+ add column account varchar(15) null after expense;

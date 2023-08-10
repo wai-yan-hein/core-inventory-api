@@ -53,6 +53,9 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
                     td.setQty(rs.getFloat("qty"));
                     td.setUnitCode(rs.getString("unit"));
                     td.setRelName(rs.getString("rel_name"));
+                    td.setWeight(rs.getFloat("weight"));
+                    td.setWeightUnit(rs.getString("weight_unit"));
+                    td.setTotalWeight(rs.getFloat("total_weight"));
                     list.add(td);
                 }
             } catch (Exception e) {

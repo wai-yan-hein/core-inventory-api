@@ -57,6 +57,7 @@ public class TransferHisServiceImpl implements TransferHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setTotalWeight(Util1.getFloat(cSd.getWeight()) * cSd.getQty());
                 detailDao.save(cSd);
             }
         }
