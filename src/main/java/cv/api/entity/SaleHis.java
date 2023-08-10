@@ -92,6 +92,8 @@ public class SaleHis {
     private String grnVouNo;
     @Column(name = "expense")
     private Float expense;
+    @Column(name = "account")
+    private String account;
     @Transient
     private String status = "STATUS";
     @Transient

@@ -1224,3 +1224,7 @@ view v_return_in as
         ((ret_in_his rh
         join ret_in_his_detail rd on (rh.vou_no = rd.vou_no))
         join stock s on (rd.stock_code = s.stock_code))
+
+
+ alter table sale_his
+ add column account varchar(15) null after expense;

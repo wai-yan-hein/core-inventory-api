@@ -52,7 +52,7 @@ public class OPHisServiceImpl implements OPHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                cSd.setTotalWeight(cSd.getWeight() * cSd.getQty());
+                cSd.setTotalWeight(Util1.getFloat(cSd.getWeight()) * cSd.getQty());
                 opHisDetailDao.save(cSd);
             }
         }

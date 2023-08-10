@@ -233,6 +233,7 @@ public class AccountRepo {
             if (!Objects.isNull(setting)) {
                 LocationSetting ls = getLocationSetting(locCode, compCode);
                 String srcAcc = setting.getSourceAcc();
+                srcAcc = Util1.isNull(sh.getAccount(), srcAcc);
                 String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
                 String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                 String disAcc = setting.getDiscountAcc();
