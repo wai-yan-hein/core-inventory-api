@@ -106,4 +106,7 @@ public class SaleHis {
     private List<String> location;
     @Transient
     private List<SaleExpense> listExpense;
+    @Transient
+    private transient List<SaleExpenseKey> listDelExpense;
+
 }

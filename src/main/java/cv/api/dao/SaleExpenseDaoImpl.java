@@ -55,4 +55,9 @@ public class SaleExpenseDaoImpl extends AbstractDao<SaleExpenseKey, SaleExpense>
         }
         return list;
     }
+
+    @Override
+    public void delete(SaleExpenseKey key) {
+        remove(key);
+    }
 }

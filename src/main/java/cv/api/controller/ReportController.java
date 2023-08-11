@@ -60,8 +60,6 @@ public class ReportController {
             } else {
                 log.error("Failed to create directory path: " + parentDir.getAbsolutePath());
             }
-        } else {
-            log.info("Directory path already exists: " + parentDir.getAbsolutePath());
         }
     }
 
@@ -265,6 +263,15 @@ public class ReportController {
                     }
                     case "StockInOutDetail" -> {
                         reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(listBalance, exportPath);
+                    }
+                    case "StockInOutSummaryByWeight" -> {
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        Util1.writeJsonFile(listBalance, exportPath);
+                    }
+                    case "StockInOutDetailByWeight" -> {
+                        reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         List<ClosingBalance> listBalance = reportService.getStockInOutDetail(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }

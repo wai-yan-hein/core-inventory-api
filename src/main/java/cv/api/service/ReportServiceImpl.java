@@ -730,7 +730,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.loc_code='" + locCode + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "" + "order by v.vou_date,v.vou_no,v.unique_id";
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "order by v.vou_date,v.vou_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -782,7 +782,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and loc_code='" + locCode + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select a.*,t.trader_name\n" + "from (\n" + "select vou_no,vou_date,trader_code,vou_total,comp_code\n" + "from sale_his\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = false\n" + "and comp_code ='" + compCode + "'\n" + "and cur_code ='" + curCode + "'\n" + "" + filter + "\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by vou_date,vou_no";
+        String sql = "select a.*,t.trader_name\n" + "from (\n" + "select vou_no,vou_date,trader_code,vou_total,comp_code\n" + "from sale_his\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = false\n" + "and comp_code ='" + compCode + "'\n" + "and cur_code ='" + curCode + "'\n" + filter + "\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by vou_date,vou_no";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -818,7 +818,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.batch_no='" + batchNo + "'\n";
         }
         List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.batch_no is not null\n" + "" + filter + "" + "order by v.vou_date,v.batch_no,v.unique_id";
+        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" + "from v_sale v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" + "on v.batch_no = g.batch_no\n" + "and v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.batch_no is not null\n" + filter + "order by v.vou_date,v.batch_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -925,7 +925,7 @@ public class ReportServiceImpl implements ReportService {
         List<VOrder> list = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,sup.trader_name sup_name,\n" + "t.user_code,t.trader_name,t.address,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt,v.project_no\n" + "from v_order v join trader t\n" + "on v.trader_code = t.code\n" + "left join grn g\n" +
 //                "on v.batch_no = g.batch_no\n" +
-                "on v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n" + "" + filter + "" + "order by v.vou_date,v.project_no,v.unique_id";
+                "on v.comp_code = g.comp_code\n" + "left join trader sup\n" + "on g.trader_code = sup.code\n" + "and g.comp_code = sup.comp_code\n" + "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" + "and v.cur_code = '" + curCode + "'\n" + "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and v.project_no is not null\n" + filter + "order by v.vou_date,v.project_no,v.unique_id";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
@@ -1724,6 +1724,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
+        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+    }
+
+    @Override
     public List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) {
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
                 "s.rel_code,s.user_code s_user_code,a.stock_code,s.stock_name\n" +
@@ -2101,7 +2107,7 @@ public class ReportServiceImpl implements ReportService {
         if (!curCode.equals("-")) {
             filter += "and cur_code = '" + curCode + "'\n";
         }
-        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_sale s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by date(vou_date) desc,vou_no desc";
+        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_sale s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "order by date(vou_date) desc,vou_no desc";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
@@ -2165,7 +2171,7 @@ public class ReportServiceImpl implements ReportService {
         if (!curCode.equals("-")) {
             filter += "and cur_code = '" + curCode + "'\n";
         }
-        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_order s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "order by date(vou_date) desc,vou_no desc";
+        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_order s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "order by date(vou_date) desc,vou_no desc";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
@@ -3294,6 +3300,59 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
+                                                             String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                             String compCode, Integer deptId, Integer macId) {
+        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
+                "s.weight_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
+                "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
+                "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty\n" +
+                "from tmp_stock_io_column\n" +
+                "where mac_id = " + macId + "\n" +
+                "group by stock_code)a\n" +
+                "join stock s on a.stock_code = s.stock_code\n" +
+                "join stock_type st on s.stock_type_code = st.stock_type_code\n" +
+                "group by stock_code\n" +
+                "order by s.user_code";
+        List<ClosingBalance> balances = new ArrayList<>();
+        try {
+            ResultSet rs = reportDao.executeSql(getSql);
+            if (!Objects.isNull(rs)) {
+                while (rs.next()) {
+                    ClosingBalance b = new ClosingBalance();
+                    float opQty = rs.getFloat("op_qty");
+                    float purQty = rs.getFloat("pur_qty");
+                    float inQty = rs.getFloat("in_qty");
+                    float saleQty = rs.getFloat("sale_qty");
+                    float outQty = rs.getFloat("out_qty");
+                    float balQty = rs.getFloat("bal_qty");
+                    String unit = rs.getString("weight_unit");
+                    b.setOpenQty(opQty);
+                    b.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
+                    b.setPurQty(purQty);
+                    b.setPurRel(purQty == 0 ? null : Util1.format(purQty) + " " + unit);
+                    b.setInQty(inQty);
+                    b.setInRel(inQty == 0 ? null : Util1.format(inQty) + " " + unit);
+                    b.setSaleQty(saleQty);
+                    b.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty) + " " + unit);
+                    b.setOutQty(outQty);
+                    b.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
+                    b.setBalQty(balQty);
+                    b.setBalRel(balQty == 0 ? null : Util1.format(balQty) + " " + unit);
+                    b.setStockUsrCode(rs.getString("s_user_code"));
+                    b.setStockName(rs.getString("stock_name"));
+                    balances.add(b);
+                }
+            }
+        } catch (Exception e) {
+            log.error("getStockInOutSummaryByWeight: " + Arrays.toString(e.getStackTrace()));
+        }
+        return balances;
+    }
+
+    @Override
     public List<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode) {
         List<PaymentHisDetail> list = new ArrayList<>();
         if (tranOption.equals("C") || tranOption.equals("S")) {
@@ -3651,7 +3710,7 @@ public class ReportServiceImpl implements ReportService {
 
     private void insertClosingIntoColumn(Integer macId) throws Exception {
         //delete tmp
-        String delSql = "delete from tmp_closing_column where mac_id = " + macId + "";
+        String delSql = "delete from tmp_closing_column where mac_id = " + macId;
         executeSql(delSql);
         //opening
         String opSql = "insert into tmp_closing_column(tran_option,vou_no, tran_date,stock_code,loc_code,op_qty,op_price,op_amt,op_unit,mac_id,comp_code)\n" + "select tran_option,vou_no,tran_date, stock_code,loc_code,sum(qty) ttl_qty,sum(price) ttl_price,\n" + "sum(qty)*sum(price) ttl_amt,unit,mac_id,comp_code\n" + "from tmp_inv_closing\n" + "where tran_option ='Opening' and mac_id = " + macId + "\n" + "group by tran_option,vou_no,tran_date,stock_code,loc_code,mac_id\n";
@@ -3674,7 +3733,7 @@ public class ReportServiceImpl implements ReportService {
 
     private void insertPriceDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
         //delete tmp
-        String delSql = "delete from tmp_inv_closing where mac_id = " + macId + "";
+        String delSql = "delete from tmp_inv_closing where mac_id = " + macId;
         executeSql(delSql);
         //opening
         String insertSql = "insert into tmp_inv_closing(tran_option, tran_date, vou_no, stock_code, qty, price, loc_code, unit, mac_id,comp_code)\n";
@@ -3741,14 +3800,17 @@ public class ReportServiceImpl implements ReportService {
                 "group by stock_code,unit\n" +
                 "\tunion all\n" +
                 "select stock_code,sum(qty) qty,loc_code, pur_unit\n" +
-                "from v_purchase\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
-                "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + "=0) \n" + "and comp_code ='" + compCode + "'\n" +
+                "from v_purchase\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and deleted = 0 \n" +
+                "and (calculate = 1 and " + calPur + "=0) \n" + "and comp_code ='" + compCode + "'\n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,pur_unit\n" + "\tunion all\n" +
+                "group by stock_code,pur_unit\n"
+                + "\tunion all\n" +
                 "select stock_code,sum(qty) qty,loc_code, unit\n" +
                 "from v_return_in\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
@@ -3782,92 +3844,255 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    private void calculateClosingT(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
+    private void calculateClosingByWeight(String fromDate, String toDate, String typeCode, String catCode, String brandCode,
+                                          String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI,
+                                          boolean calRO, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
-        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Opening',a.tran_date,'-','Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,'" + compCode + "'," + deptId + "\n" + "from (\n" + "select tmp.tran_date,tmp.stock_code,tmp.ttl_qty * rel.smallest_qty smallest_qty,tmp.loc_code,tmp.mac_id\n" + "from tmp_stock_opening tmp \n" + "join stock s on tmp.stock_code = s.stock_code\n" + "and tmp.comp_code = s.comp_code\n" + "join v_relation rel on s.rel_code = rel.rel_code\n" + "and tmp.comp_code = rel.comp_code\n" + "and tmp.unit = rel.unit\n" + "where tmp.mac_id =" + macId + ")a\n" + "group by tran_date,stock_code,mac_id";
-        String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),vou_no,stock_code,pur_unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.pur_unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
-        String rawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Raw',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) * -1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_milling_raw\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),vou_no,stock_code,unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
-        String outputSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Output',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_milling_output\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),vou_no,stock_code,unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
-        //ret in
+        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,loc_code,mac_id,'" + compCode + "'," + deptId + "\n" +
+                "from tmp_stock_opening tmp \n" +
+                "where mac_id =" + macId + "\n" +
+                "group by tran_date,stock_code,mac_id";
+        String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Purchase',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_purchase\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calPur + " = 0)\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
         String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'ReturnIn',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code, unit,comp_code,dept_id\n" + "from v_return_in\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRI + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,vou_no,unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
-        String stockInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'StockIn',date(a.vou_date) vou_date,vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,description,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id\n" + "from v_stock_io\n" + "where ifnull(in_qty,0)<>0 and in_unit is not null\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,in_unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.in_unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
-        String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Sale',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, sale_unit,rel_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calSale + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,sale_unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.sale_unit = rel.unit\n" + "group by a.vou_date,a.stock_code,a.vou_no";
-        String returnOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'ReturnOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_return_out\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRO + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
-        String stockOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'StockOut',a.vou_date,a.vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,description,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id\n" + "from v_stock_io\n" + "where ifnull(out_qty,0)<>0 and out_unit is not null\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,out_unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.out_unit = rel.unit\n" + "group by vou_date,a.stock_code,vou_no";
-        String fFSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Transfer-F',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,\n" + "loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_from,rel_code, unit,comp_code,dept_id\n" + "from v_transfer\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
-        String tFSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Transfer-T',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,\n" + "loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_to,rel_code, unit\n" + "from v_transfer\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
-        String pIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(end_date) end_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_process_his\n" + "where date(end_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1\n" + "and finished = 1\n" + "and comp_code ='" + compCode + "'\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(end_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "join vou_status v on a.pt_code = v.code\n" + "and a.comp_code = v.comp_code\n" + "group by a.end_date,a.stock_code,a.vou_no";
-        String pOut = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'P-OUT',a.vou_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_process_his_detail\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1\n" + "and comp_code ='" + compCode + "'\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "join vou_status v on a.pt_code = v.code\n" + "and a.comp_code = v.comp_code\n" + "group by a.vou_date,a.stock_code,a.vou_no";
+                "select 'ReturnIn',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_return_in\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calRI + " = 0)\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
+        String retOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_return_out\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calRO + " = 0)\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
+        String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_sale\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calSale + " = 0)\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
+        String tfSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight)*-1 ttl_weight,loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_transfer\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
+        String ttSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Transfer-T',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_transfer\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
+        String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'M-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_milling_raw\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
+        String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'M-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "from v_milling_output\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by date(vou_date),vou_no,stock_code,weight_unit";
         try {
-            reportDao.executeSql(delSql, opSql, purSql, rawSql, outputSql, retInSql, stockInSql, stockOutSql, saleSql, returnOutSql, fFSql, tFSql, pIn, pOut);
+            reportDao.executeSql(delSql, opSql, purSql, retInSql, saleSql, retOutSql, tfSql, ttSql, mRawSql, mOutSql);
         } catch (Exception e) {
-            log.error(String.format("calculateClosing: %s", e.getMessage()));
+            log.error(String.format("calculateClosingByWeight: %s", e.getMessage()));
         }
     }
 
-    private void calculateOpeningT(String opDate, String fromDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
+    private void calculateOpeningByWeight(String opDate, String fromDate, String typeCode, String catCode, String brandCode,
+                                          String stockCode, String vouStatus, boolean calSale,
+                                          boolean calPur, boolean calRI, boolean calRO, String compCode,
+                                          Integer deptId, Integer macId) {
         //delete tmp
         String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
         //opening
         String opSql = "insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,loc_code,unit,comp_code,dept_id,mac_id)\n" +
-                "select '" + fromDate + "' op_date ,stock_code,sum(qty) ttl_qty,loc_code,unit,'" + compCode + "'," + deptId + "," + macId + " \n" +
-                "from (\n" + "select stock_code,sum(qty) qty,loc_code, unit\n" +
+                "select '" + opDate + "' op_date ,stock_code,sum(qty) ttl_qty,loc_code,weight_unit,'" + compCode + "'," + deptId + "," + macId + " \n" +
+                "from (\n" +
+                "select stock_code,sum(total_weight) qty,loc_code, weight_unit\n" +
                 "from v_opening\n" +
                 "where date(op_date) = '" + opDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
-                "and deleted = 0 \n" + "and calculate = 1 \n" +
+                "and deleted = false \n" +
+                "and calculate = true \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,unit\n" +
+                "group by stock_code,weight_unit\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(qty) qty,loc_code, pur_unit\n" +
-                "from v_purchase\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
-                "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + "=0) \n" + "and comp_code ='" + compCode + "'\n" +
+                "select stock_code,sum(total_weight) qty,loc_code, weight_unit\n" +
+                "from v_purchase\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calPur + "=false) \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,pur_unit\n" + "\tunion all\n" +
-                "select stock_code,sum(qty) qty,loc_code, unit\n" +
+                "group by stock_code,weight_unit\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(total_weight) qty,loc_code, weight_unit\n" +
                 "from v_return_in\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
-                "and deleted = 0 \n" + "and (calculate = 1 and " + calRI + "=0) \n" +
                 "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calRI + "=false) \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,unit\n" +
+                "group by stock_code,weight_unit\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(tot_weight) ttl_qty,loc_code,weight_unit\n"+
-                "from v_milling_raw\n"+
-                "group by stock_code,weight_unit\n"+
-                "union all\n"+
-                "select stock_code,sum(in_qty) qty,loc_code, in_unit\n" +
-                "from v_stock_io\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
-                "and deleted = 0\n" + "and calculate = 1 \n" +
-                "and in_qty is not null and in_unit is not null\n" +
+                "select stock_code,sum(total_weight)*-1 qty,loc_code, weight_unit\n" +
+                "from v_return_out\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
-                "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calRO + "=false) \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,in_unit\n" +
-                "\tunion all \n" +
-                "select stock_code,sum(out_qty)*-1 qty,loc_code, out_unit\n" + "from v_stock_io\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0\n" + "and calculate = 1 \n" + "and out_qty is not null and out_unit is not null\n" + "and comp_code ='" + compCode + "'\n" + "and (vou_status ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,out_unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code, unit\n" + "from v_return_out\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = false \n" + "and (calculate = 1 and " + calRO + "=0) \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code, sale_unit\n" + "from v_sale\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calSale + "=0) \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,sale_unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code_from, unit\n" + "from v_transfer\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty) qty,loc_code_to, unit\n" + "from v_transfer\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = 0 \n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty)*-1 qty,loc_code, unit\n" + "from v_process_his_detail\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + "\tunion all\n" + "select stock_code,sum(qty) qty,loc_code, unit\n" + "from v_process_his\n" + "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" + "and deleted = false\n" + "and (pt_code ='" + vouStatus + "' or '-'='" + vouStatus + "')\n" + "and calculate = 1 \n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by stock_code,unit\n" + ")a\n" + "group by stock_code,unit";
-        try {
-            reportDao.executeSql(delSql, opSql);
-        } catch (Exception e) {
-            log.error(String.format("calculateOpening: %s", e.getMessage()));
-        }
+                "group by stock_code,weight_unit\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(total_weight)*-1 qty,loc_code, weight_unit\n" +
+                "from v_sale\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and (calculate = true and " + calSale + "=false) \n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,weight_unit\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(total_weight)*-1 qty,loc_code_from, weight_unit\n" +
+                "from v_transfer\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and loc_code_from in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,weight_unit\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(total_weight) qty,loc_code_to, weight_unit\n" +
+                "from v_transfer\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and loc_code_to in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,weight_unit\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(tot_weight)*-1 qty,loc_code, weight_unit\n" +
+                "from v_milling_raw\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,weight_unit\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(tot_weight) qty,loc_code, weight_unit\n" +
+                "from v_milling_output\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,weight_unit\n" +
+                ")a\n" +
+                "group by stock_code,weight_unit";
+        reportDao.executeSql(delSql, opSql);
     }
 
     @Override
@@ -3889,7 +4114,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void deleteTmp(String tableName, Integer macId) throws Exception {
-        String delSql = "delete from " + tableName + " where mac_id =" + macId + "";
+        String delSql = "delete from " + tableName + " where mac_id =" + macId;
         executeSql(delSql);
     }
 

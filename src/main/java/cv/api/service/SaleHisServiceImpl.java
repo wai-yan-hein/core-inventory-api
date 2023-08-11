@@ -47,10 +47,14 @@ public class SaleHisServiceImpl implements SaleHisService {
         }
         List<SaleHisDetail> listSD = saleHis.getListSH();
         List<SaleDetailKey> listDel = saleHis.getListDel();
+        List<SaleExpenseKey> listDelExp = saleHis.getListDelExpense();
         String vouNo = saleHis.getKey().getVouNo();
         //backup
         if (listDel != null) {
             listDel.forEach(key -> sdDao.delete(key));
+        }
+        if (listDelExp != null) {
+            listDelExp.forEach(key -> saleExpenseDao.delete(key));
         }
         List<SaleExpense> listExp = saleHis.getListExpense();
         if (listExp != null) {
@@ -91,6 +95,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setTotalWeight(Util1.getFloat(cSd.getWeight()) * cSd.getQty());
                 sdDao.save(cSd);
             }
         }

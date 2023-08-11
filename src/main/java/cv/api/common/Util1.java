@@ -260,4 +260,10 @@ public class Util1 {
         return Util1.isNull(value, "-");
     }
 
+    public static String format(float opQty) {
+        String pattern = "#,###.##;(#,###.##)";
+        DecimalFormat decimalFormat = new DecimalFormat(pattern);
+        // Format the float number
+        return decimalFormat.format(opQty);
+    }
 }
