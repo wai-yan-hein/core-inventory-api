@@ -131,6 +131,7 @@ public interface ReportService {
                                    boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
+    List<ClosingBalance> getStockInOutDetailByWeight(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode,
                                    String brandCode, String stockCode, String vouStatus,
