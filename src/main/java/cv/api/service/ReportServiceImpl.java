@@ -2707,6 +2707,41 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
+        String sql = """
+                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName, t.vou_no, t.vou_date
+                from v_transfer t
+                join location ft
+                on ft.loc_code = t.loc_code_from
+                join location tt
+                on tt.loc_code = t.loc_code_to
+                where t.comp_code =?
+                and t.vou_no =?
+                order by unique_id
+                """;
+        List<VTransfer> riList = new ArrayList<>();
+        try {
+            ResultSet rs = getResult(sql, compCode, vouNo);
+            if (!Objects.isNull(rs)) {
+                while (rs.next()) {
+                    VTransfer in = new VTransfer();
+                    in.setStockName(rs.getString("stock_name"));
+                    in.setUnit(rs.getString("unit"));
+                    in.setQty(rs.getFloat("qty"));
+                    in.setVouNo(rs.getString("vou_no"));
+                    in.setVouDate(rs.getString("vou_date"));
+                    in.setFromLocationName(rs.getString("fLocName"));
+                    in.setToLocationName(rs.getString("tLocName"));
+                    riList.add(in);
+                }
+            }
+        } catch (Exception e) {
+            log.error(String.format("getTransferVoucher: %s", e.getMessage()));
+        }
+        return riList;
+    }
+
+    @Override
     public List<VReturnIn> getReturnInVoucher(String vouNo, String compCode) {
         String sql = "select stock_name,unit,qty,price,amt,t.trader_name,r.remark,date(vou_date) vou_date,\n" + "r.vou_total,r.paid,r.balance,r.vou_no\n" + "from v_return_in r join trader t\n" + "on r.trader_code = t.code\n" + "where r.comp_code = '" + compCode + "'\n" + "and vou_no ='" + vouNo + "'\n" + "order by unique_id\n ";
         List<VReturnIn> riList = new ArrayList<>();
