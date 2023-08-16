@@ -2709,7 +2709,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
         String sql = """
-                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName, t.vou_no, t.vou_date
+                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName, t.vou_no, t.vou_date, t.stock_code, t.remark
                 from v_transfer t
                 join location ft
                 on ft.loc_code = t.loc_code_from
@@ -2732,6 +2732,8 @@ public class ReportServiceImpl implements ReportService {
                     in.setVouDate(rs.getString("vou_date"));
                     in.setFromLocationName(rs.getString("fLocName"));
                     in.setToLocationName(rs.getString("tLocName"));
+                    in.setStockCode(rs.getString("stock_code"));
+                    in.setRemark(rs.getString("remark"));
                     riList.add(in);
                 }
             }
