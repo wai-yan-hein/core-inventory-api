@@ -99,6 +99,15 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
+    @GetMapping(value = "/get-transfer-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody byte[] getTransferReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
+        String reportName = "TransferVoucher";
+        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
+        List<VTransfer> listRI = reportService.getTransferVoucher(vouNo, compCode);
+        Util1.writeJsonFile(listRI, exportPath);
+        return new FileInputStream(exportPath).readAllBytes();
+    }
+
     @GetMapping(value = "/get-return-out-report", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnOutVoucher";

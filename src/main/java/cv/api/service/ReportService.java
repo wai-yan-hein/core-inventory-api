@@ -198,6 +198,8 @@ public interface ReportService {
 
     List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);
 
+    List<VTransfer> getTransferVoucher(String vouNo, String compCode);
+
     List<VReturnOut> getReturnOutVoucher(String vouNo, String compCode);
 
     List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
