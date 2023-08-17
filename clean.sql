@@ -1,7 +1,6 @@
 #setup
 truncate category;
 truncate location;
-truncate machine_info;
 truncate stock;
 truncate stock_type;
 truncate stock_brand;
@@ -11,6 +10,8 @@ truncate unit_relation;
 truncate unit_relation_detail;
 truncate seq_table;
 truncate trader;
+truncate sale_man;
+truncate trader_group;
 #transaction
 truncate op_his;
 truncate op_his_detail;
@@ -19,13 +20,25 @@ truncate order_his_detail;
 truncate pattern;
 truncate pur_his;
 truncate pur_his_detail;
+truncate pur_expense;
 truncate ret_in_his;
 truncate ret_in_his_detail;
 truncate ret_out_his;
 truncate ret_out_his_detail;
 truncate sale_his;
 truncate sale_his_detail;
-
+truncate sale_expense;
+truncate grn;
+truncate grn_detail;
+truncate payment_his;
+truncate payment_his_detail;
+truncate process_his;
+truncate process_his_detail;
+truncate transfer_his;
+truncate transfer_his_detail;
+truncate weight_loss_his;
+truncate weight_loss_his_detail;
+truncate reorder_level;
 #tmp
 truncate tmp_closing_column;
 truncate tmp_inv_closing;

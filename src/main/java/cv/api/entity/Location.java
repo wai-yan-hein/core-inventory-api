@@ -51,4 +51,8 @@ public class Location {
     private String deptCode;
     @Column(name = "cash_acc")
     private String cashAcc;
+    @Column(name = "deleted")
+    private boolean deleted;
+    @Column(name = "active")
+    private boolean active;
 }

@@ -34,7 +34,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
 
     @Override
     public StockInOut save(StockInOut stock) {
-        saveOrUpdate(stock,stock.getKey());
+        saveOrUpdate(stock, stock.getKey());
         return stock;
     }
 
@@ -95,21 +95,16 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
 
     @Override
     public void delete(StockIOKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update stock_in_out set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSql(sql);
-
+        StockInOut io = findById(key);
+        io.setDeleted(true);
+        update(io);
     }
 
     @Override
     public void restore(StockIOKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update stock_in_out set deleted = false where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSql(sql);
+        StockInOut io = findById(key);
+        io.setDeleted(false);
+        update(io);
     }
 
     @Override
@@ -119,8 +114,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         list.forEach((o) -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer depId = o.getKey().getDeptId();
-            o.setListSH(dao.search(vouNo, compCode, depId));
+            o.setListSH(dao.search(vouNo, compCode));
         });
         return list;
     }
@@ -154,8 +148,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
-            o.setListSH(dao.search(vouNo, compCode, deptId));
+            o.setListSH(dao.search(vouNo, compCode));
         });
         return list;
     }

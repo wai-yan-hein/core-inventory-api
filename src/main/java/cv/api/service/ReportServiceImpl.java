@@ -4033,7 +4033,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
         String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'M-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "select 'UM-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_milling_raw\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4046,7 +4046,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
         String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'M-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "select 'UM-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_milling_output\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +

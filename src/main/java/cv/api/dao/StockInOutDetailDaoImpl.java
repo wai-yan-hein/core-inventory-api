@@ -34,7 +34,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
     }
 
     @Override
-    public List<StockInOutDetail> search(String vouNo, String compCode, Integer deptId) {
+    public List<StockInOutDetail> search(String vouNo, String compCode) {
         List<StockInOutDetail> listOP = new ArrayList<>();
         String sql = "select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name\n" +
                 "from stock_in_out_detail op\n" +
@@ -61,10 +61,10 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     StockInOutDetail op = new StockInOutDetail();
                     StockInOutKey key = new StockInOutKey();
                     key.setVouNo(rs.getString("vou_no"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setInQty(rs.getFloat("in_qty"));
                     op.setInUnitCode(rs.getString("in_unit"));

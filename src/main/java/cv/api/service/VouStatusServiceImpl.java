@@ -41,8 +41,8 @@ public class VouStatusServiceImpl implements VouStatusService {
     }
 
     @Override
-    public List<VouStatus> findAll(String compCode, Integer deptId) {
-        return vouDao.findAll(compCode, deptId);
+    public List<VouStatus> findAll(String compCode) {
+        return vouDao.findAll(compCode);
     }
 
     @Override

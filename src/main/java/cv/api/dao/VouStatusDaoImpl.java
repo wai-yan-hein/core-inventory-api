@@ -30,8 +30,8 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
     }
 
     @Override
-    public List<VouStatus> findAll(String compCode, Integer deptId) {
-        String hsql = "select o from VouStatus o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0=" + deptId + ")";
+    public List<VouStatus> findAll(String compCode) {
+        String hsql = "select o from VouStatus o where o.key.compCode = '" + compCode + "'";
         return findHSQL(hsql);
     }
 

@@ -37,14 +37,14 @@ public class StockInOutController {
     @Autowired
     private ReportService reportService;
 
-    @PostMapping(path = "/save-stockio")
+    @PostMapping(path = "/saveStockIO")
     public Mono<StockInOut> saveStockIO(@RequestBody StockInOut stockio) {
         stockio.setUpdatedDate(Util1.getTodayLocalDate());
         stockio = ioService.save(stockio);
         return Mono.justOrEmpty(stockio);
     }
 
-    @PostMapping(path = "/get-stockio")
+    @PostMapping(path = "/getStockIO")
     public Flux<?> getStockIO(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -62,27 +62,27 @@ public class StockInOutController {
         return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-stockio")
+    @PostMapping(path = "/deleteStockIO")
     public Mono<?> deleteStockIO(@RequestBody StockIOKey key) throws Exception {
         ioService.delete(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-stockio")
+    @PostMapping(path = "/restoreStockIO")
     public Mono<?> restoreStockIO(@RequestBody StockIOKey key) throws Exception {
         ioService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-stockio")
+    @PostMapping(path = "/findStockIO")
     public Mono<StockInOut> findStockIO(@RequestBody StockIOKey key) {
         StockInOut sh = ioService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-stockio-detail")
-    public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        List<StockInOutDetail> listSD = iodService.search(vouNo, compCode, deptId);
+    @GetMapping(path = "/getStockIODetail")
+    public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        List<StockInOutDetail> listSD = iodService.search(vouNo, compCode);
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 }

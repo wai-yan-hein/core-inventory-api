@@ -43,8 +43,10 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public int delete(StockKey key) {
-        String sql = "update stock set deleted = true " + "where stock_code = '" + key.getStockCode() + "' and comp_code = '" + key.getCompCode() + "'";
-        execSql(sql);
+        Stock s = findById(key);
+        s.setDeleted(true);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
         return 1;
     }
 

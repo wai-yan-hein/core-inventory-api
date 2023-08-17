@@ -44,4 +44,8 @@ public class StockType {
     private String intgUpdStatus;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "deleted")
+    private boolean deleted;
+    @Column(name = "active")
+    private boolean active;
 }

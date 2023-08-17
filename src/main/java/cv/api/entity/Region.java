@@ -39,5 +39,9 @@ public class Region implements java.io.Serializable {
     private String userCode;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "deleted")
+    private boolean deleted;
+    @Column(name = "active")
+    private boolean active;
 
 }

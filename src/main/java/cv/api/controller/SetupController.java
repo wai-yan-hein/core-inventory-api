@@ -76,33 +76,14 @@ public class SetupController {
     public Mono<?> hello() {
         return Mono.just("Hello");
     }
-
-    @PostMapping(path = "/save-currency")
-    public Mono<Currency> saveCurrency(@RequestBody Currency machine) {
-        Currency currency = currencyService.save(machine);
-        return Mono.justOrEmpty(currency);
-    }
-
-    @GetMapping(path = "/find-currency")
-    public Mono<Currency> findById(@RequestParam String curCode) {
-        Currency cur = currencyService.findById(curCode);
-        return Mono.justOrEmpty(cur);
-    }
-
-    @GetMapping(path = "/get-currency")
-    public Flux<?> getCurrency() {
-        List<Currency> currency = currencyService.search("-", "-");
-        return Flux.fromIterable(currency);
-    }
-
-    @PostMapping(path = "/save-category")
+    @PostMapping(path = "/saveCategory")
     public Mono<Category> saveCategory(@RequestBody Category cat) {
         cat.setUpdatedDate(Util1.getTodayLocalDate());
         Category category = categoryService.save(cat);
         return Mono.justOrEmpty(category);
     }
 
-    @GetMapping(path = "/get-category")
+    @GetMapping(path = "/getCategory")
     public Flux<?> getCategory(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(categoryService.findAll(compCode, deptId));
     }
@@ -113,27 +94,27 @@ public class SetupController {
     }
 
 
-    @DeleteMapping(path = "/delete-category")
+    @DeleteMapping(path = "/deleteCategory")
     public Mono<?> deleteCategory(@RequestParam String code) {
         categoryService.delete(code);
         ro.setMessage("Deleted.");
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-category")
+    @PostMapping(path = "/findCategory")
     public Mono<Category> findCategory(@RequestBody CategoryKey key) {
         Category cat = categoryService.findByCode(key);
         return Mono.justOrEmpty(cat);
     }
 
-    @PostMapping(path = "/save-location")
+    @PostMapping(path = "/saveLocation")
     public Mono<Location> saveLocation(@RequestBody Location location) {
         location.setUpdatedDate(Util1.getTodayLocalDate());
         Location loc = locationService.save(location);
         return Mono.justOrEmpty(loc);
     }
 
-    @GetMapping(path = "/get-location")
+    @GetMapping(path = "/getLocation")
     public Flux<?> getLocation(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(locationService.findAll(compCode, deptId));
     }
@@ -143,26 +124,26 @@ public class SetupController {
         return Flux.fromIterable(locationService.getLocation(Util1.toLocalDateTime(updatedDate)));
     }
 
-    @DeleteMapping(path = "/delete-location")
+    @DeleteMapping(path = "/deleteLocation")
     public Mono<ReturnObject> deleteLocation(@RequestParam String code) {
         locationService.delete(code);
         ro.setMessage("Deleted.");
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-location")
+    @PostMapping(path = "/findLocation")
     public Mono<Location> findLocation(@RequestBody LocationKey key) {
         return Mono.justOrEmpty(locationService.findByCode(key));
     }
 
-    @PostMapping(path = "/save-saleman")
+    @PostMapping(path = "/saveSaleMan")
     public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan) {
         saleMan.setUpdatedDate(Util1.getTodayLocalDate());
         SaleMan sm = saleManService.save(saleMan);
         return Mono.justOrEmpty(sm);
     }
 
-    @GetMapping(path = "/get-saleman")
+    @GetMapping(path = "/getSaleMan")
     public Flux<?> getSaleMan(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(saleManService.findAll(compCode, deptId));
     }
@@ -172,27 +153,27 @@ public class SetupController {
         return Flux.fromIterable(saleManService.getSaleMan(Util1.toLocalDateTime(updatedDate)));
     }
 
-    @DeleteMapping(path = "/delete-saleman")
+    @DeleteMapping(path = "/deleteSaleMan")
     public Mono<ReturnObject> deleteSaleMan(@RequestParam String code) {
         saleManService.delete(code);
         ro.setMessage("Deleted.");
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-saleman")
+    @PostMapping(path = "/findSaleMan")
     public Mono<SaleMan> findSaleMan(@RequestBody SaleManKey key) {
         SaleMan sm = saleManService.findByCode(key);
         return Mono.justOrEmpty(sm);
     }
 
-    @PostMapping(path = "/save-brand")
+    @PostMapping(path = "/saveBrand")
     public Mono<StockBrand> saveBrand(@RequestBody StockBrand brand) {
         brand.setUpdatedDate(Util1.getTodayLocalDate());
         StockBrand b = brandService.save(brand);
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/get-brand")
+    @GetMapping(path = "/getBrand")
     public Flux<?> getBrand(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(brandService.findAll(compCode, deptId));
     }
@@ -202,32 +183,32 @@ public class SetupController {
         return Flux.fromIterable(brandService.getBrand(Util1.toLocalDateTime(updatedDate)));
     }
 
-    @DeleteMapping(path = "/delete-brand")
+    @DeleteMapping(path = "/deleteBrand")
     public Mono<?> deleteBrand(@RequestParam String code) {
         brandService.delete(code);
         ro.setMessage("Deleted.");
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-brand")
+    @PostMapping(path = "/findBrand")
     public Mono<StockBrand> findBrand(@RequestBody StockBrandKey key) {
         StockBrand b = brandService.findByCode(key);
         return Mono.justOrEmpty(b);
     }
 
-    @PostMapping(path = "/find-unit-relation")
+    @PostMapping(path = "/findUnitRelation")
     public Mono<?> findUnitRelation(@RequestBody RelationKey key) {
         return Mono.justOrEmpty(unitRelationService.findByKey(key));
     }
 
-    @PostMapping(path = "/save-type")
+    @PostMapping(path = "/saveType")
     public Mono<StockType> saveType(@RequestBody StockType type) {
         type.setUpdatedDate(Util1.getTodayLocalDate());
         StockType b = typeService.save(type);
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/get-type")
+    @GetMapping(path = "/getType")
     public Flux<?> getType(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<StockType> listB = typeService.findAll(compCode, deptId);
         return Flux.fromIterable(listB);
@@ -238,27 +219,27 @@ public class SetupController {
         return Flux.fromIterable(typeService.getStockType(Util1.toLocalDateTime(updatedDate)));
     }
 
-    @DeleteMapping(path = "/delete-type")
+    @DeleteMapping(path = "/deleteType")
     public Mono<ReturnObject> deleteType(@RequestParam String code) {
         typeService.delete(code);
         ro.setMessage("Deleted.");
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-type")
+    @PostMapping(path = "/findType")
     public Mono<StockType> findType(@RequestBody StockTypeKey key) {
         StockType b = typeService.findByCode(key);
         return Mono.justOrEmpty(b);
     }
 
-    @PostMapping(path = "/save-unit")
+    @PostMapping(path = "/saveUnit")
     public Mono<StockUnit> saveUnit(@RequestBody StockUnit unit) {
         unit.setUpdatedDate(Util1.getTodayLocalDate());
         StockUnit b = unitService.save(unit);
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/get-unit")
+    @GetMapping(path = "/getUnit")
     public Flux<?> getUnit(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(unitService.findAll(compCode, deptId));
     }
@@ -268,14 +249,14 @@ public class SetupController {
         return Flux.fromIterable(unitService.getUnit(Util1.toLocalDateTime(updatedDate)));
     }
 
-    @DeleteMapping(path = "/delete-unit")
+    @DeleteMapping(path = "/deleteUnit")
     public Mono<?> deleteUnit(@RequestParam String code) {
         unitService.delete(code);
         ro.setMessage("Deleted.");
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-unit")
+    @PostMapping(path = "/findUnit")
     public Mono<StockUnit> findUnit(@RequestBody StockUnitKey key) {
         return Mono.justOrEmpty(unitService.findByCode(key));
     }
@@ -447,9 +428,9 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/get-voucher-status")
-    public Flux<?> getVoucherStatus(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(vouStatusService.findAll(compCode, deptId));
+    @GetMapping(path = "/getVouStatus")
+    public Flux<?> getVoucherStatus(@RequestParam String compCode) {
+        return Flux.fromIterable(vouStatusService.findAll(compCode));
     }
 
     @GetMapping(path = "/getUpdateVouStatus")
@@ -457,7 +438,7 @@ public class SetupController {
         return Flux.fromIterable(vouStatusService.getVouStatus(Util1.toLocalDateTime(updatedDate)));
     }
 
-    @PostMapping(path = "/find-voucher-status")
+    @PostMapping(path = "/findVouStatus")
     public Mono<VouStatus> findVouStatus(@RequestBody VouStatusKey key) {
         VouStatus b = vouStatusService.findById(key);
         return Mono.justOrEmpty(b);

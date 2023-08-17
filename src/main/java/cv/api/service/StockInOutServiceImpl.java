@@ -37,7 +37,7 @@ public class StockInOutServiceImpl implements StockInOutService {
     public StockInOut save(StockInOut io) {
         io.setVouDate(Util1.toDateTime(io.getVouDate()));
         if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
-            io.getKey().setVouNo(getVoucherNo(io.getKey().getDeptId(), io.getMacId(), io.getKey().getCompCode()));
+            io.getKey().setVouNo(getVoucherNo(io.getDeptId(), io.getMacId(), io.getKey().getCompCode()));
         }
 
         List<StockInOutDetail> listSD = io.getListSH();
@@ -50,10 +50,10 @@ public class StockInOutServiceImpl implements StockInOutService {
             StockInOutDetail cSd = listSD.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
                 StockInOutKey key = new StockInOutKey();
-                key.setDeptId(io.getKey().getDeptId());
                 key.setCompCode(io.getKey().getCompCode());
                 key.setVouNo(vouNo);
                 key.setUniqueId(null);
+                cSd.setDeptId(io.getDeptId());
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {

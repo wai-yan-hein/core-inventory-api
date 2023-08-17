@@ -17,7 +17,7 @@ public interface StockInOutDetailService {
 
     StockInOutDetail save(StockInOutDetail stock);
 
-    List<StockInOutDetail> search(String vouNo, String compCode, Integer deptId);
+    List<StockInOutDetail> search(String vouNo, String compCode);
 
     int delete(StockInOutKey key);
 }

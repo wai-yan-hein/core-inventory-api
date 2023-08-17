@@ -131,8 +131,10 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
 
     @Override
     public int delete(TraderKey key) {
-        String sql = "update trader set deleted = true where code = '" + key.getCode() + "' and comp_code ='" + key.getCompCode() + "'";
-        execSql(sql);
+        Trader t = findById(key);
+        t.setDeleted(true);
+        t.setUpdatedDate(LocalDateTime.now());
+        update(t);
         return 1;
     }
 

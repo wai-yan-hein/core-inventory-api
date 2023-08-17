@@ -1038,6 +1038,33 @@ add column account varchar(15) null after expense;
 alter table sale_his_detail
 add column total_weight float(20,3) null after std_weight;
 
+alter table stock_type
+add column deleted bit(1) not null default 0 after intg_upd_status,
+add column active bit(1) not null default 1 after deleted;
+
+alter table location
+add column deleted bit(1) not null default 0 after cash_acc,
+add column active bit(1) not null default 1 after deleted;
+
+alter table category
+add column deleted bit(1) not null default 0,
+add column active bit(1) not null default 1;
+
+alter table stock_brand
+add column deleted bit(1) not null default 0,
+add column active bit(1) not null default 1;
+
+alter table region
+add column deleted bit(1) not null default 0,
+add column active bit(1) not null default 1;
+
+alter table vou_status
+add column deleted bit(1) not null default 0,
+add column active bit(1) not null default 1;
+
+alter table sale_man
+add column deleted bit(1) not null default 0;
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;

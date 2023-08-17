@@ -47,4 +47,6 @@ public class SaleMan {
     private String intgUpdStatus;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "deleted")
+    private boolean deleted;
 }

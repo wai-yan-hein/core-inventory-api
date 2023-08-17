@@ -19,7 +19,7 @@ public interface VouStatusService {
 
     VouStatus save(VouStatus vouStatus);
 
-    List<VouStatus> findAll(String compCode, Integer deptId);
+    List<VouStatus> findAll(String compCode);
 
     int delete(String id);
 
