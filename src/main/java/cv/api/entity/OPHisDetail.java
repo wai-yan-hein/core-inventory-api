@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 public class OPHisDetail implements java.io.Serializable {
     @EmbeddedId
     private OPHisDetailKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty")

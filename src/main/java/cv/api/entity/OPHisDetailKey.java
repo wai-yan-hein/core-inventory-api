@@ -13,7 +13,5 @@ public class OPHisDetailKey implements java.io.Serializable {
     private Integer uniqueId;
     @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "dept_id")
-    private Integer deptId;
 
 }

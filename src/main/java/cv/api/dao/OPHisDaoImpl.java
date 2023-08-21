@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
 
     @Override
     public OPHis save(OPHis op) {
-        saveOrUpdate(op,op.getKey());
+        saveOrUpdate(op, op.getKey());
         return op;
     }
 
@@ -43,7 +44,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         list.forEach(o -> {
             String compCode = o.getKey().getCompCode();
             String vouNo = o.getKey().getVouNo();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setDetailList(dao.search(vouNo, compCode, deptId));
         });
         return list;
@@ -51,11 +52,10 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
 
     @Override
     public void delete(OPHisKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update op_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSql(sql);
+        OPHis op = findByCode(key);
+        op.setDeleted(true);
+        op.setUpdatedDate(LocalDateTime.now());
+        update(op);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setDetailList(dao.search(vouNo, compCode, deptId));
         });
         return list;

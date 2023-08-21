@@ -37,7 +37,7 @@ public class TransferController {
     @Autowired
     private TransferHisDetailService detailService;
 
-    @PostMapping(path = "/save-transfer")
+    @PostMapping(path = "/saveTransfer")
     public Mono<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
         obj.setUpdatedDate(Util1.getTodayLocalDate());
         //save to local
@@ -45,7 +45,7 @@ public class TransferController {
         return Mono.justOrEmpty(obj);
     }
 
-    @PostMapping(path = "/get-transfer")
+    @PostMapping(path = "/getTransfer")
     public Flux<?> getTransfer(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -64,25 +64,25 @@ public class TransferController {
         return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/find-transfer")
+    @PostMapping(path = "/findTransfer")
     public Mono<TransferHis> findTransfer(@RequestBody TransferHisKey code) {
         TransferHis sh = thService.findById(code);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-transfer-detail")
-    public Flux<?> getPurDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getTransferDetail")
+    public Flux<?> getTransferDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<TransferHisDetail> listSD = detailService.search(vouNo, compCode, deptId);
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-transfer")
+    @PostMapping(path = "/deleteTransfer")
     public Mono<?> deleteTransfer(@RequestBody TransferHisKey key) {
         thService.delete(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-transfer")
+    @PostMapping(path = "/restoreTransfer")
     public Mono<?> restoreTransfer(@RequestBody TransferHisKey key) {
         thService.restore(key);
         return Mono.just(true);

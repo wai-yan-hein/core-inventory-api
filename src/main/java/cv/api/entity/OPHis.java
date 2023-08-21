@@ -20,6 +20,8 @@ import java.util.List;
 public class OPHis implements java.io.Serializable {
     @EmbeddedId
     private OPHisKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "op_date")
     @Temporal(TemporalType.DATE)
     private Date vouDate;

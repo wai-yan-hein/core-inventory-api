@@ -44,9 +44,9 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
                     OPHisDetailKey key = new OPHisDetailKey();
                     key.setVouNo(rs.getString("vou_no"));
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setPrice(rs.getFloat("price"));

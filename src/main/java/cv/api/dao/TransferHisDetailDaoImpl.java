@@ -42,11 +42,11 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
                     //td_code, vou_no, stock_code, qty, unit, unique_id, comp_code, dept_id, stock_name, rel_name
                     TransferHisDetail td = new TransferHisDetail();
                     THDetailKey key = new THDetailKey();
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     td.setKey(key);
+                    td.setDeptId(rs.getInt("dept_id"));
                     td.setUserCode(rs.getString("user_code"));
                     td.setStockCode(rs.getString("stock_code"));
                     td.setStockName(rs.getString("stock_name"));
@@ -76,15 +76,14 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
                     //td_code, vou_no, stock_code, qty, unit, unique_id, comp_code, dept_id
                     TransferHisDetail td = new TransferHisDetail();
                     THDetailKey key = new THDetailKey();
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     td.setKey(key);
+                    td.setDeptId(rs.getInt("dept_id"));
                     td.setStockCode(rs.getString("stock_code"));
                     td.setQty(rs.getFloat("qty"));
                     td.setUnitCode(rs.getString("unit"));
-
                     list.add(td);
                 }
             } catch (Exception e) {

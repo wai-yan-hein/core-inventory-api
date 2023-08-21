@@ -2485,8 +2485,8 @@ public class ReportServiceImpl implements ReportService {
                 OPHisKey key = new OPHisKey();
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
-                key.setDeptId(rs.getInt("dept_id"));
                 s.setKey(key);
+                s.setDeptId(rs.getInt("dept_id"));
                 s.setOpAmt(rs.getFloat("amount"));
                 s.setVouDateStr(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
                 s.setRemark(rs.getString("remark"));
@@ -2740,6 +2740,46 @@ public class ReportServiceImpl implements ReportService {
             }
         } catch (Exception e) {
             log.error(String.format("getTransferVoucher: %s", e.getMessage()));
+        }
+        return riList;
+    }
+
+    @Override
+    public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
+        String sql = """
+                select vou_no,vou_date,remark,description,s_user_code,stock_name,in_qty,
+                in_unit,out_qty,out_unit,l.loc_name
+                from v_stock_io v join location l
+                on v.loc_code = l.loc_code
+                and v.comp_code =l.comp_code
+                where v.vou_no =?
+                and v.comp_code=?
+                order by unique_id;
+                """;
+        List<VStockIO> riList = new ArrayList<>();
+        try {
+            ResultSet rs = getResult(sql, vouNo, compCode);
+            if (!Objects.isNull(rs)) {
+                while (rs.next()) {
+                    VStockIO in = new VStockIO();
+                    //vou_no, vou_date, remark, description, s_user_code, stock_name, in_qty, in_unit, out_qty, out_unit, loc_name
+                    in.setStockName(rs.getString("stock_name"));
+                    in.setInUnit(rs.getString("in_unit"));
+                    in.setInQty(Util1.toNull(rs.getFloat("in_qty")));
+                    in.setOutUnit(rs.getString("out_unit"));
+                    in.setOutQty(Util1.toNull(rs.getFloat("out_qty")));
+                    in.setVouNo(rs.getString("vou_no"));
+                    in.setVouDate(rs.getString("vou_date"));
+                    in.setLocName(rs.getString("loc_name"));
+                    in.setStockCode(rs.getString("s_user_code"));
+                    in.setRemark(rs.getString("remark"));
+                    in.setDescription(rs.getString("description"));
+                    in.setUnit(Util1.isNull(in.getInUnit(), in.getOutUnit()));
+                    riList.add(in);
+                }
+            }
+        } catch (Exception e) {
+            log.error(String.format("getStockInOutVoucher: %s", e.getMessage()));
         }
         return riList;
     }

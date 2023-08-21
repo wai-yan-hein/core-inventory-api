@@ -16,6 +16,8 @@ import java.util.List;
 public class TransferHis {
     @EmbeddedId
     private TransferHisKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date", columnDefinition = "TIMESTAMP")

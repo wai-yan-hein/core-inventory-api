@@ -487,8 +487,8 @@ public class SetupController {
         return Mono.justOrEmpty(opHisService.findByCode(key));
     }
 
-    @PostMapping(path = "/delete-opening")
-    public Mono<?> deleteStockIO(@RequestBody OPHisKey key) {
+    @PostMapping(path = "/deleteOpening")
+    public Mono<?> deleteOpening(@RequestBody OPHisKey key) {
         opHisService.delete(key);
         return Mono.just(true);
     }
