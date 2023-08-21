@@ -227,16 +227,16 @@ public class ReportServiceImpl implements ReportService {
                 p.setVouNo(rs.getString("vou_no"));
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
-                p.setVouTotal(rs.getFloat("vou_total"));
-                p.setDiscount(rs.getFloat("discount"));
-                p.setPaid(rs.getFloat("paid"));
-                p.setBalance(rs.getFloat("balance"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
+                p.setVouTotal(rs.getDouble("vou_total"));
+                p.setDiscount(rs.getDouble("discount"));
+                p.setPaid(rs.getDouble("paid"));
+                p.setBalance(rs.getDouble("balance"));
                 p.setBatchNo(rs.getString("batch_no"));
-                p.setWeight(rs.getFloat("weight"));
+                p.setWeight(rs.getDouble("weight"));
                 p.setWeightUnit(rs.getString("weight_unit"));
                 list.add(p);
             }
@@ -279,11 +279,11 @@ public class ReportServiceImpl implements ReportService {
                 purchase.setBatchNo(rs.getString("batch_no"));
                 purchase.setStockCode(rs.getString("stock_code"));
                 purchase.setStockName(rs.getString("stock_name"));
-                purchase.setQty(rs.getFloat("qty"));
+                purchase.setQty(rs.getDouble("qty"));
                 purchase.setPurUnit(rs.getString("unit"));
-                purchase.setWeight(rs.getFloat("weight"));
+                purchase.setWeight(rs.getDouble("weight"));
                 purchase.setWeightUnit(rs.getString("weight_unit"));
-                purchase.setTotal(rs.getFloat("weight") * rs.getFloat("qty"));
+                purchase.setTotal(rs.getDouble("weight") * rs.getDouble("qty"));
                 purchaseList.add(purchase);
             }
         }
@@ -548,7 +548,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setPurAmount(rs.getFloat("ttl_amt"));
+                s.setPurAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
@@ -587,7 +587,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setPurAmount(rs.getFloat("ttl_amt"));
+                s.setPurAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
@@ -611,10 +611,10 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderCode(rs.getString("trader_code"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
                 purchaseList.add(p);
             }
         }
@@ -634,10 +634,10 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderCode(rs.getString("trader_code"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
                 p.setProjectNo(rs.getString("project_no"));
                 purchaseList.add(p);
             }
@@ -1018,10 +1018,10 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockUserCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
                 purchaseList.add(p);
             }
         }
@@ -1051,7 +1051,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setStockCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
                 p.setRelName(rs.getString("rel_name"));
-                p.setPurAmount(rs.getFloat("ttl_amt"));
+                p.setPurAmount(rs.getDouble("ttl_amt"));
                 p.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 list.add(p);
             }
@@ -2340,8 +2340,8 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderName(rs.getString("trader_name"));
                 s.setRemark(rs.getString("remark"));
                 s.setCreatedBy(rs.getString("created_by"));
-                s.setPaid(rs.getFloat("paid"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
                 s.setDeptId(rs.getInt("dept_id"));
                 purchaseList.add(s);
@@ -2610,7 +2610,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
                 s.setPurUnit(rs.getString("pur_unit"));
-                s.setPurPrice(rs.getFloat("pur_price"));
+                s.setPurPrice(rs.getDouble("pur_price"));
                 s.setRemark(rs.getString("remark"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setCurCode(rs.getString("cur_code"));
@@ -3107,14 +3107,14 @@ public class ReportServiceImpl implements ReportService {
                     p.setGroupName(rs.getString("group_name"));
                     p.setStockUserCode(rs.getString("user_code"));
                     p.setStockName(rs.getString("stock_name"));
-                    p.setQty(Util1.toNull(rs.getFloat("qty")));
+                    p.setQty(Util1.toNull(rs.getDouble("qty")));
                     p.setPurUnit(rs.getString("unit"));
-                    p.setWeight(Util1.toNull(rs.getFloat("weight")));
+                    p.setWeight(Util1.toNull(rs.getDouble("weight")));
                     p.setWeightUnit(rs.getString("weight_unit"));
-                    p.setPurAmount(Util1.toNull(rs.getFloat("amount")));
-                    p.setTotalQty(Util1.toNull(rs.getFloat("ttl_qty")));
-                    p.setPurPrice(Util1.toNull(rs.getFloat("price")));
-                    p.setTotal(Util1.toNull(rs.getFloat("ttl")));
+                    p.setPurAmount(Util1.toNull(rs.getDouble("amount")));
+                    p.setTotalQty(Util1.toNull(rs.getDouble("ttl_qty")));
+                    p.setPurPrice(Util1.toNull(rs.getDouble("price")));
+                    p.setTotal(Util1.toNull(rs.getDouble("ttl")));
                     list.add(p);
                 }
             }

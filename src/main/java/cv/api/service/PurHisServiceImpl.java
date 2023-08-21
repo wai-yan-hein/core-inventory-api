@@ -65,7 +65,7 @@ public class PurHisServiceImpl implements PurHisService {
                             }
                         }
                         e.getKey().setVouNo(vouNo);
-                        e.setPercent(Util1.getFloat(e.getPercent()));
+                        e.setPercent(Util1.getDouble(e.getPercent()));
                         purExpenseDao.save(e);
                     }
                 }
