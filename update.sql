@@ -1078,7 +1078,18 @@ change column disc_p disc_p double(20,3) null default 0,
 change column tax_amt tax_amt double(20,3) null default 0,
 change column comm_p comm_p double(20,3) null default 0,
 change column comm_amt comm_amt double(20,3) null default 0;
-
+alter table pur_his_detail
+change column qty qty double(20,3) not null ,
+change column pur_price pur_price double(20,3) not null ,
+change column pur_amt pur_amt double(20,3) not null ,
+change column avg_qty avg_qty double(20,3) null default 0.000 ,
+change column avg_price avg_price double(20,3) null default null ,
+change column org_price org_price double(20,3) null default null ,
+change column weight weight double(20,3) null default null ,
+change column length length double(20,3) null default null ,
+change column width width double(20,3) null default null ,
+change column total_weight total_weight double(20,3) null default null ,
+change column std_weight std_weight double(20,3) null default null ;
 alter table pur_expense
 change column amount amount double(20,3) not null default 0 ,
 change column percent percent double(20,3) not null default 0 ;
