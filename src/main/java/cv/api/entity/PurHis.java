@@ -37,13 +37,13 @@ public class PurHis {
     @Column(name = "deleted")
     private boolean deleted;
     @Column(name = "vou_total")
-    private Float vouTotal;
+    private Double vouTotal;
     @Column(name = "paid")
-    private Float paid;
+    private Double paid;
     @Column(name = "discount")
-    private Float discount;
+    private Double discount;
     @Column(name = "balance")
-    private Float balance;
+    private Double balance;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date", columnDefinition = "TIMESTAMP")
@@ -59,11 +59,11 @@ public class PurHis {
     @Column(name = "cur_code")
     private String curCode;
     @Column(name = "disc_p")
-    private Float discP;
+    private Double discP;
     @Column(name = "tax_p")
-    private Float taxP;
+    private Double taxP;
     @Column(name = "tax_amt")
-    private Float taxAmt;
+    private Double taxAmt;
     @Column(name = "reference")
     private String reference;
     @Column(name = "intg_upd_status")
@@ -75,11 +75,11 @@ public class PurHis {
     @Column(name = "batch_no")
     private String batchNo;
     @Column(name = "comm_p")
-    private Float commP;
+    private Double commP;
     @Column(name = "comm_amt")
-    private Float commAmt;
+    private Double commAmt;
     @Column(name = "expense")
-    private Float expense;
+    private Double expense;
     @Column(name = "project_no")
     private String projectNo;
     @Column(name = "car_no")

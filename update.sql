@@ -1065,6 +1065,54 @@ add column active bit(1) not null default 1;
 alter table sale_man
 add column deleted bit(1) not null default 0;
 
+alter table pur_his
+change column vou_total vou_total double(20,3) null default null ;
+
+alter table pur_his
+change column vou_total vou_total double(20,3) null default 0,
+change column balance balance double(20,3) null default 0,
+change column discount discount double(20,3) null default 0,
+change column paid paid double(20,3) null default 0,
+change column tax_p tax_p double(20,3) null default 0,
+change column disc_p disc_p double(20,3) null default 0,
+change column tax_amt tax_amt double(20,3) null default 0,
+change column comm_p comm_p double(20,3) null default 0,
+change column comm_amt comm_amt double(20,3) null default 0;
+alter table pur_his_detail
+change column qty qty double(20,3) not null ,
+change column pur_price pur_price double(20,3) not null ,
+change column pur_amt pur_amt double(20,3) not null ,
+change column avg_qty avg_qty double(20,3) null default 0.000 ,
+change column avg_price avg_price double(20,3) null default null ,
+change column org_price org_price double(20,3) null default null ,
+change column weight weight double(20,3) null default null ,
+change column length length double(20,3) null default null ,
+change column width width double(20,3) null default null ,
+change column total_weight total_weight double(20,3) null default null ,
+change column std_weight std_weight double(20,3) null default null ;
+alter table pur_expense
+change column amount amount double(20,3) not null default 0 ,
+change column percent percent double(20,3) not null default 0 ;
+
+alter table sale_his
+change column vou_total vou_total double(20,3) not null ,
+change column grand_total grand_total double(20,3) not null ,
+change column discount discount double(20,3) null default null ,
+change column disc_p disc_p double(20,3) null default null ,
+change column tax_amt tax_amt double(20,3) null default null ,
+change column tax_p tax_p double(20,3) null default null ,
+change column paid paid double(20,3) null default null ,
+change column vou_balance vou_balance double(20,3) null default null ,
+change column expense expense double(20,3) null default null ;
+alter table sale_his_detail
+change column qty qty double(20,3) not null ,
+change column sale_price sale_price double(20,3) not null ,
+change column sale_amt sale_amt double(20,3) not null ,
+change column weight weight double(20,3) null default null ,
+change column std_weight std_weight double(20,3) null default null ,
+change column total_weight total_weight double(20,3) null default null ;
+
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;

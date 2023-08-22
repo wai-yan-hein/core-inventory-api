@@ -44,8 +44,8 @@ public class PurExpenseDaoImpl extends AbstractDao<PurExpenseKey, PurExpense> im
                     key.setVouNo(rs.getString("vou_no"));
                     e.setKey(key);
                     e.setExpenseName(rs.getString("expense_name"));
-                    e.setAmount(rs.getFloat("amount"));
-                    e.setPercent(rs.getFloat("percent"));
+                    e.setAmount(rs.getDouble("amount"));
+                    e.setPercent(rs.getDouble("percent"));
                     list.add(e);
                 }
             } catch (Exception e) {

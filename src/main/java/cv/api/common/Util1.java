@@ -244,6 +244,10 @@ public class Util1 {
         return value == 0 ? null : value;
     }
 
+    public static Double toNull(double value) {
+        return value == 0 ? null : value;
+    }
+
     public static String cleanStr(String str) {
         if (str != null) {
             return str.replaceAll(" ", "").toLowerCase();

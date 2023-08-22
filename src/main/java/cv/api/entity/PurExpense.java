@@ -13,9 +13,9 @@ public class PurExpense {
     @EmbeddedId
     private PurExpenseKey key;
     @Column(name = "amount")
-    private Float amount;
+    private Double amount;
     @Column(name = "percent")
-    private Float percent;
+    private Double percent;
     @Transient
     private String expenseName;
 }

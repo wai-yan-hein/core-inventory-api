@@ -138,20 +138,20 @@ public class ReportServiceImpl implements ReportService {
             sale.setVouNo(rs.getString("vou_no"));
             sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
             sale.setStockName(rs.getString("stock_name"));
-            sale.setQty(rs.getFloat("qty"));
-            sale.setSalePrice(rs.getFloat("sale_price"));
-            sale.setSaleAmount(rs.getFloat("sale_amt"));
-            sale.setVouTotal(rs.getFloat("vou_total"));
-            sale.setDiscount(rs.getFloat("discount"));
-            sale.setPaid(rs.getFloat("paid"));
-            sale.setVouBalance(rs.getFloat("vou_balance"));
+            sale.setQty(rs.getDouble("qty"));
+            sale.setSalePrice(rs.getDouble("sale_price"));
+            sale.setSaleAmount(rs.getDouble("sale_amt"));
+            sale.setVouTotal(rs.getDouble("vou_total"));
+            sale.setDiscount(rs.getDouble("discount"));
+            sale.setPaid(rs.getDouble("paid"));
+            sale.setVouBalance(rs.getDouble("vou_balance"));
             sale.setSaleUnit(rs.getString("sale_unit"));
             sale.setCusAddress(Util1.isNull(rs.getString("phone"), "") + "/" + Util1.isNull(rs.getString("address"), ""));
             sale.setLocationName(rs.getString("loc_name"));
             sale.setCreatedBy(getAppUser(rs.getString("created_by")));
             sale.setCompCode(rs.getString("comp_code"));
             sale.setCategoryName(rs.getString("cat_name"));
-            sale.setWeight(rs.getFloat("weight"));
+            sale.setWeight(rs.getDouble("weight"));
             sale.setWeightUnit(rs.getString("weight_unit"));
             saleList.add(sale);
         }
@@ -227,16 +227,16 @@ public class ReportServiceImpl implements ReportService {
                 p.setVouNo(rs.getString("vou_no"));
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
-                p.setVouTotal(rs.getFloat("vou_total"));
-                p.setDiscount(rs.getFloat("discount"));
-                p.setPaid(rs.getFloat("paid"));
-                p.setBalance(rs.getFloat("balance"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
+                p.setVouTotal(rs.getDouble("vou_total"));
+                p.setDiscount(rs.getDouble("discount"));
+                p.setPaid(rs.getDouble("paid"));
+                p.setBalance(rs.getDouble("balance"));
                 p.setBatchNo(rs.getString("batch_no"));
-                p.setWeight(rs.getFloat("weight"));
+                p.setWeight(rs.getDouble("weight"));
                 p.setWeightUnit(rs.getString("weight_unit"));
                 list.add(p);
             }
@@ -279,11 +279,11 @@ public class ReportServiceImpl implements ReportService {
                 purchase.setBatchNo(rs.getString("batch_no"));
                 purchase.setStockCode(rs.getString("stock_code"));
                 purchase.setStockName(rs.getString("stock_name"));
-                purchase.setQty(rs.getFloat("qty"));
+                purchase.setQty(rs.getDouble("qty"));
                 purchase.setPurUnit(rs.getString("unit"));
-                purchase.setWeight(rs.getFloat("weight"));
+                purchase.setWeight(rs.getDouble("weight"));
                 purchase.setWeightUnit(rs.getString("weight_unit"));
-                purchase.setTotal(rs.getFloat("weight") * rs.getFloat("qty"));
+                purchase.setTotal(rs.getDouble("weight") * rs.getDouble("qty"));
                 purchaseList.add(purchase);
             }
         }
@@ -304,10 +304,10 @@ public class ReportServiceImpl implements ReportService {
                 sale.setSaleManCode(rs.getString("saleman_code"));
                 sale.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
                 sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getFloat("qty"));
+                sale.setQty(rs.getDouble("qty"));
                 sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSalePrice(rs.getFloat("sale_price"));
-                sale.setSaleAmount(rs.getFloat("sale_amt"));
+                sale.setSalePrice(rs.getDouble("sale_price"));
+                sale.setSaleAmount(rs.getDouble("sale_amt"));
                 saleList.add(sale);
             }
         }
@@ -342,7 +342,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getFloat("ttl_amt"));
+                s.setSaleAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
@@ -388,7 +388,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getFloat("ttl_amt"));
+                s.setSaleAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
@@ -479,7 +479,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setSaleManCode(Util1.isNull(smUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getFloat("ttl_amt"));
+                s.setSaleAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
@@ -504,10 +504,10 @@ public class ReportServiceImpl implements ReportService {
                 sale.setTraderCode(rs.getString("trader_code"));
                 sale.setTraderName(rs.getString("trader_name"));
                 sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getFloat("qty"));
+                sale.setQty(rs.getDouble("qty"));
                 sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSalePrice(rs.getFloat("sale_price"));
-                sale.setSaleAmount(rs.getFloat("sale_amt"));
+                sale.setSalePrice(rs.getDouble("sale_price"));
+                sale.setSaleAmount(rs.getDouble("sale_amt"));
                 saleList.add(sale);
             }
         }
@@ -548,7 +548,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setPurAmount(rs.getFloat("ttl_amt"));
+                s.setPurAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
@@ -587,7 +587,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
-                s.setPurAmount(rs.getFloat("ttl_amt"));
+                s.setPurAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
@@ -611,10 +611,10 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderCode(rs.getString("trader_code"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
                 purchaseList.add(p);
             }
         }
@@ -634,10 +634,10 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderCode(rs.getString("trader_code"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
                 p.setProjectNo(rs.getString("project_no"));
                 purchaseList.add(p);
             }
@@ -669,7 +669,7 @@ public class ReportServiceImpl implements ReportService {
                 sale.setStockCode(rs.getString("s_user_code"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setRelName(rs.getString("rel_name"));
-                sale.setSaleAmount(rs.getFloat("ttl_amt"));
+                sale.setSaleAmount(rs.getDouble("ttl_amt"));
                 sale.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 saleList.add(sale);
             }
@@ -748,12 +748,12 @@ public class ReportServiceImpl implements ReportService {
                 s.setCusAddress(rs.getString("address"));
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getFloat("qty"));
+                s.setQty(rs.getDouble("qty"));
                 s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getFloat("sale_price"));
-                s.setSaleAmount(rs.getFloat("sale_amt"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setSalePrice(rs.getDouble("sale_price"));
+                s.setSaleAmount(rs.getDouble("sale_amt"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
                 list.add(s);
             }
         }
@@ -792,7 +792,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderName(rs.getString("trader_name"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 list.add(s);
             }
         }
@@ -836,12 +836,12 @@ public class ReportServiceImpl implements ReportService {
                 s.setCusAddress(rs.getString("address"));
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getFloat("qty"));
+                s.setQty(rs.getDouble("qty"));
                 s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getFloat("sale_price"));
-                s.setSaleAmount(rs.getFloat("sale_amt"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setSalePrice(rs.getDouble("sale_price"));
+                s.setSaleAmount(rs.getDouble("sale_amt"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
                 list.add(s);
             }
         }
@@ -889,12 +889,12 @@ public class ReportServiceImpl implements ReportService {
                 s.setCusAddress(rs.getString("address"));
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getFloat("qty"));
+                s.setQty(rs.getDouble("qty"));
                 s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getFloat("sale_price"));
-                s.setSaleAmount(rs.getFloat("sale_amt"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setSalePrice(rs.getDouble("sale_price"));
+                s.setSaleAmount(rs.getDouble("sale_amt"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
                 list.add(s);
             }
         }
@@ -970,10 +970,10 @@ public class ReportServiceImpl implements ReportService {
                 sale.setTraderName(rs.getString("trader_name"));
                 sale.setStockUserCode(rs.getString("s_user_code"));
                 sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getFloat("qty"));
+                sale.setQty(rs.getDouble("qty"));
                 sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSalePrice(rs.getFloat("sale_price"));
-                sale.setSaleAmount(rs.getFloat("sale_amt"));
+                sale.setSalePrice(rs.getDouble("sale_price"));
+                sale.setSaleAmount(rs.getDouble("sale_amt"));
                 saleList.add(sale);
             }
         }
@@ -1018,10 +1018,10 @@ public class ReportServiceImpl implements ReportService {
                 p.setTraderName(rs.getString("trader_name"));
                 p.setStockUserCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getFloat("qty"));
+                p.setQty(rs.getDouble("qty"));
                 p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getFloat("pur_price"));
-                p.setPurAmount(rs.getFloat("pur_amt"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
                 purchaseList.add(p);
             }
         }
@@ -1051,7 +1051,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setStockCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
                 p.setRelName(rs.getString("rel_name"));
-                p.setPurAmount(rs.getFloat("ttl_amt"));
+                p.setPurAmount(rs.getDouble("ttl_amt"));
                 p.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 list.add(p);
             }
@@ -2219,8 +2219,8 @@ public class ReportServiceImpl implements ReportService {
                     s.setRemark(rs.getString("remark"));
                     s.setReference(rs.getString("reference"));
                     s.setCreatedBy(rs.getString("created_by"));
-                    s.setPaid(rs.getFloat("paid"));
-                    s.setVouTotal(rs.getFloat("vou_total"));
+                    s.setPaid(rs.getDouble("paid"));
+                    s.setVouTotal(rs.getDouble("vou_total"));
                     s.setDeleted(rs.getBoolean("deleted"));
                     s.setDeptId(rs.getInt("dept_id"));
                     saleList.add(s);
@@ -2340,8 +2340,8 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderName(rs.getString("trader_name"));
                 s.setRemark(rs.getString("remark"));
                 s.setCreatedBy(rs.getString("created_by"));
-                s.setPaid(rs.getFloat("paid"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
                 s.setDeptId(rs.getInt("dept_id"));
                 purchaseList.add(s);
@@ -2587,7 +2587,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
                 s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getFloat("sale_price"));
+                s.setSalePrice(rs.getDouble("sale_price"));
                 s.setRemark(rs.getString("remark"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setCurCode(rs.getString("cur_code"));
@@ -2610,7 +2610,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
                 s.setPurUnit(rs.getString("pur_unit"));
-                s.setPurPrice(rs.getFloat("pur_price"));
+                s.setPurPrice(rs.getDouble("pur_price"));
                 s.setRemark(rs.getString("remark"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setCurCode(rs.getString("cur_code"));
@@ -3107,14 +3107,14 @@ public class ReportServiceImpl implements ReportService {
                     p.setGroupName(rs.getString("group_name"));
                     p.setStockUserCode(rs.getString("user_code"));
                     p.setStockName(rs.getString("stock_name"));
-                    p.setQty(Util1.toNull(rs.getFloat("qty")));
+                    p.setQty(Util1.toNull(rs.getDouble("qty")));
                     p.setPurUnit(rs.getString("unit"));
-                    p.setWeight(Util1.toNull(rs.getFloat("weight")));
+                    p.setWeight(Util1.toNull(rs.getDouble("weight")));
                     p.setWeightUnit(rs.getString("weight_unit"));
-                    p.setPurAmount(Util1.toNull(rs.getFloat("amount")));
-                    p.setTotalQty(Util1.toNull(rs.getFloat("ttl_qty")));
-                    p.setPurPrice(Util1.toNull(rs.getFloat("price")));
-                    p.setTotal(Util1.toNull(rs.getFloat("ttl")));
+                    p.setPurAmount(Util1.toNull(rs.getDouble("amount")));
+                    p.setTotalQty(Util1.toNull(rs.getDouble("ttl_qty")));
+                    p.setPurPrice(Util1.toNull(rs.getDouble("price")));
+                    p.setTotal(Util1.toNull(rs.getDouble("ttl")));
                     list.add(p);
                 }
             }
@@ -3173,9 +3173,9 @@ public class ReportServiceImpl implements ReportService {
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setStockCode(rs.getString("stock_code"));
                 sale.setSaleUnit(rs.getString("unit"));
-                sale.setSalePrice(rs.getFloat("sale_price"));
-                sale.setSaleAmount(rs.getFloat("purchase_price"));
-                sale.setPaid(rs.getFloat("diff_amount"));
+                sale.setSalePrice(rs.getDouble("sale_price"));
+                sale.setSaleAmount(rs.getDouble("purchase_price"));
+                sale.setPaid(rs.getDouble("diff_amount"));
                 sale.setVouNo(rs.getString("diff_percent_amount"));
                 saleList.add(sale);
             }
@@ -3229,7 +3229,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderName(rs.getString("trader_name"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 list.add(s);
             }
         }
@@ -3286,12 +3286,12 @@ public class ReportServiceImpl implements ReportService {
                 s.setCusAddress(rs.getString("address"));
                 s.setStockUserCode(rs.getString("s_user_code"));
                 s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getFloat("qty"));
+                s.setQty(rs.getDouble("qty"));
                 s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getFloat("sale_price"));
-                s.setSaleAmount(rs.getFloat("sale_amt"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setSalePrice(rs.getDouble("sale_price"));
+                s.setSaleAmount(rs.getDouble("sale_amt"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
                 list.add(s);
             }
         }
@@ -3426,9 +3426,9 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode);
             while (rs.next()) {
                 VSale s = new VSale();
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setVouBalance(rs.getFloat("vou_balance"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setVouBalance(rs.getDouble("vou_balance"));
+                s.setPaid(rs.getDouble("paid"));
                 s.setDeptId(rs.getInt("dept_id"));
                 s.setVouCount(rs.getInt("vou_count"));
                 list.add(s);
@@ -3461,13 +3461,13 @@ public class ReportServiceImpl implements ReportService {
                 s.setGroupName(rs.getString("group_name"));
                 s.setStockUserCode(rs.getString("user_code"));
                 s.setStockName(rs.getString("stock_name"));
-                s.setQty(Util1.toNull(rs.getFloat("qty")));
+                s.setQty(Util1.toNull(rs.getDouble("qty")));
                 s.setSaleUnit(rs.getString("unit"));
-                s.setWeight(Util1.toNull(rs.getFloat("weight")));
+                s.setWeight(Util1.toNull(rs.getDouble("weight")));
                 s.setWeightUnit(rs.getString("weight_unit"));
-                s.setSalePrice(Util1.toNull(rs.getFloat("price")));
-                s.setSaleAmount(Util1.toNull(rs.getFloat("amount")));
-                s.setTotalQty(Util1.toNull(rs.getFloat("ttl_qty")));
+                s.setSalePrice(Util1.toNull(rs.getDouble("price")));
+                s.setSaleAmount(Util1.toNull(rs.getDouble("amount")));
+                s.setTotalQty(Util1.toNull(rs.getDouble("ttl_qty")));
                 list.add(s);
             }
         } catch (Exception e) {
@@ -3671,9 +3671,9 @@ public class ReportServiceImpl implements ReportService {
                 VSale s = new VSale();
                 s.setUserCode(rs.getString("user_code"));
                 s.setCurCode(rs.getString("cur_code"));
-                s.setVouBalance(rs.getFloat("vou_balance"));
-                s.setCreditAmt(rs.getFloat("credit_amt"));
-                s.setDiffAmt(rs.getFloat("diff_amt"));
+                s.setVouBalance(rs.getDouble("vou_balance"));
+                s.setCreditAmt(rs.getDouble("credit_amt"));
+                s.setDiffAmt(rs.getDouble("diff_amt"));
                 s.setAddress(rs.getString("address"));
                 s.setTraderName(rs.getString("trader_name"));
                 list.add(s);
@@ -3736,9 +3736,9 @@ public class ReportServiceImpl implements ReportService {
                 VSale s = new VSale();
                 s.setUserCode(rs.getString("user_code"));
                 s.setCurCode(rs.getString("cur_code"));
-                s.setVouBalance(rs.getFloat("vou_balance"));
-                s.setCreditAmt(rs.getFloat("credit_amt"));
-                s.setDiffAmt(rs.getFloat("diff_amt"));
+                s.setVouBalance(rs.getDouble("vou_balance"));
+                s.setCreditAmt(rs.getDouble("credit_amt"));
+                s.setDiffAmt(rs.getDouble("diff_amt"));
                 s.setAddress(rs.getString("address"));
                 s.setTraderName(rs.getString("trader_name"));
                 list.add(s);
@@ -3804,10 +3804,10 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(rs.getString("trader_code"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setCurCode(rs.getString("cur_code"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 s.setRemark(rs.getString("remark"));
                 s.setReference(rs.getString("reference"));
-                s.setVouBalance(rs.getFloat("vou_balance"));
+                s.setVouBalance(rs.getDouble("vou_balance"));
                 s.setAddress(rs.getString("address"));
                 s.setTraderName(rs.getString("trader_name"));
                 list.add(s);
@@ -3873,10 +3873,10 @@ public class ReportServiceImpl implements ReportService {
                 s.setTraderCode(rs.getString("trader_code"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setCurCode(rs.getString("cur_code"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 s.setRemark(rs.getString("remark"));
                 s.setReference(rs.getString("reference"));
-                s.setVouBalance(rs.getFloat("balance"));
+                s.setVouBalance(rs.getDouble("balance"));
                 s.setAddress(rs.getString("address"));
                 s.setTraderName(rs.getString("trader_name"));
                 list.add(s);
