@@ -63,12 +63,12 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     key.setVouNo(rs.getString("vou_no"));
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setStdWeight(rs.getFloat("std_weight"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("sale_price"));
-                    op.setAmount(rs.getFloat("sale_amt"));
+                    op.setStdWeight(rs.getDouble("std_weight"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setPrice(rs.getDouble("sale_price"));
+                    op.setAmount(rs.getDouble("sale_amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("sale_unit"));
@@ -107,10 +107,10 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     sh.setKey(key);
                     sh.setStockCode(rs.getString("stock_code"));
                     sh.setExpDate(rs.getDate("expire_date"));
-                    sh.setQty(rs.getFloat("qty"));
+                    sh.setQty(rs.getDouble("qty"));
                     sh.setUnitCode(rs.getString("sale_unit"));
-                    sh.setPrice(rs.getFloat("sale_price"));
-                    sh.setAmount(rs.getFloat("sale_amt"));
+                    sh.setPrice(rs.getDouble("sale_price"));
+                    sh.setAmount(rs.getDouble("sale_amt"));
                     sh.setLocCode(rs.getString("loc_code"));
                     list.add(sh);
                 }
@@ -144,9 +144,9 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     key.setDeptId(rs.getInt("dept_id"));
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("sale_price"));
-                    op.setAmount(rs.getFloat("sale_amt"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setPrice(rs.getDouble("sale_price"));
+                    op.setAmount(rs.getDouble("sale_amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("sale_unit"));
@@ -187,9 +187,9 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     key.setDeptId(rs.getInt("dept_id"));
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("sale_price"));
-                    op.setAmount(rs.getFloat("sale_amt"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setPrice(rs.getDouble("sale_price"));
+                    op.setAmount(rs.getDouble("sale_amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("sale_unit"));

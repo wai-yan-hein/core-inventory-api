@@ -60,14 +60,14 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                     key.setUniqueId(rs.getInt("unique_id"));
                     op.setKey(key);
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setAvgQty(rs.getFloat("avg_qty"));
-                    op.setOrgPrice(rs.getFloat("org_price"));
-                    op.setWeight(rs.getFloat("weight"));
-                    op.setStdWeight(rs.getFloat("std_weight"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setAvgQty(rs.getDouble("avg_qty"));
+                    op.setOrgPrice(rs.getDouble("org_price"));
+                    op.setWeight(rs.getDouble("weight"));
+                    op.setStdWeight(rs.getDouble("std_weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setPrice(rs.getFloat("pur_price"));
-                    op.setAmount(rs.getFloat("pur_amt"));
+                    op.setPrice(rs.getDouble("pur_price"));
+                    op.setAmount(rs.getDouble("pur_amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("pur_unit"));
@@ -77,10 +77,10 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
-                    op.setLength(rs.getFloat("length"));
-                    op.setWidth(rs.getFloat("width"));
+                    op.setLength(rs.getDouble("length"));
+                    op.setWidth(rs.getDouble("width"));
                     op.setMPercent(rs.getString("m_percent"));
-                    op.setTotalWeight(rs.getFloat("total_weight"));
+                    op.setTotalWeight(rs.getDouble("total_weight"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

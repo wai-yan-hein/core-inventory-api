@@ -1083,6 +1083,24 @@ alter table pur_expense
 change column amount amount double(20,3) not null default 0 ,
 change column percent percent double(20,3) not null default 0 ;
 
+alter table sale_his
+change column vou_total vou_total double(20,3) not null ,
+change column grand_total grand_total double(20,3) not null ,
+change column discount discount double(20,3) null default null ,
+change column disc_p disc_p double(20,3) null default null ,
+change column tax_amt tax_amt double(20,3) null default null ,
+change column tax_p tax_p double(20,3) null default null ,
+change column paid paid double(20,3) null default null ,
+change column vou_balance vou_balance double(20,3) null default null ,
+change column expense expense double(20,3) null default null ;
+alter table sale_his_detail
+change column qty qty double(20,3) not null ,
+change column sale_price sale_price double(20,3) not null ,
+change column sale_amt sale_amt double(20,3) not null ,
+change column weight weight double(20,3) null default null ,
+change column std_weight std_weight double(20,3) null default null ,
+change column total_weight total_weight double(20,3) null default null ;
+
 
 #view
 drop view if exists v_milling_output;

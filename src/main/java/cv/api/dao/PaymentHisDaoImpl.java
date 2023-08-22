@@ -138,14 +138,14 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderCode(rs.getString("trader_code"));
                 s.setCurCode(rs.getString("cur_code"));
-                s.setPaid(rs.getFloat("pay_amt"));
-                s.setVouBalance(rs.getFloat("vou_balance"));
+                s.setPaid(rs.getDouble("pay_amt"));
+                s.setVouBalance(rs.getDouble("vou_balance"));
                 s.setUserCode(rs.getString("user_code"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setAddress(rs.getString("address"));
                 s.setTranOption(rs.getString("tran_option"));
                 s.setSaleVouNo(rs.getString("sale_vou_no"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 s.setPayDate(Util1.toDateStr(rs.getTimestamp("vou_date").toLocalDateTime(), "dd/MM/yyyy"));
                 s.setVouDate(Util1.toDateStr(rs.getDate("sale_vou_date"), "dd/MM/yyyy"));
                 list.add(s);
