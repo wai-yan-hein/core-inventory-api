@@ -42,7 +42,7 @@ public class SaleController {
     @Autowired
     private AccountRepo accountRepo;
 
-    @PostMapping(path = "/save-sale")
+    @PostMapping(path = "/saveSale")
     public Mono<?> saveSale(@NotNull @RequestBody SaleHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
@@ -84,7 +84,7 @@ public class SaleController {
         return status;
     }
 
-    @PostMapping(path = "/get-sale")
+    @PostMapping(path = "/getSale")
     public Flux<?> getSale(@NotNull @RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -108,7 +108,7 @@ public class SaleController {
         return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-sale")
+    @PostMapping(path = "/deleteSale")
     public Mono<?> deleteSale(@RequestBody SaleHisKey key) throws Exception {
         shService.delete(key);
         //delete in account
@@ -117,19 +117,19 @@ public class SaleController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-sale")
+    @PostMapping(path = "/restoreSale")
     public Mono<?> restoreSale(@RequestBody SaleHisKey key) throws Exception {
         shService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-sale")
+    @PostMapping(path = "/findSale")
     public Mono<SaleHis> findSale(@RequestBody SaleHisKey key) {
         SaleHis sh = shService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-sale-detail")
+    @GetMapping(path = "/getSaleDetail")
     public Flux<?> getSaleDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {

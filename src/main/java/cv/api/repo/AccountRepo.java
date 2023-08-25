@@ -251,7 +251,7 @@ public class AccountRepo {
                 double vouPaid = Util1.getDouble(sh.getPaid());
                 double vouTax = Util1.getDouble(sh.getTaxAmt());
                 double taxPercent = Util1.getDouble(sh.getTaxPercent());
-                Integer deptId = sh.getKey().getDeptId();
+                Integer deptId = sh.getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);

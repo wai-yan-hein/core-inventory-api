@@ -58,10 +58,10 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     SaleHisDetail op = new SaleHisDetail();
                     SaleDetailKey key = new SaleDetailKey();
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
@@ -100,11 +100,11 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 while (rs.next()) {
                     SaleHisDetail sh = new SaleHisDetail();
                     SaleDetailKey key = new SaleDetailKey();
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     sh.setKey(key);
+                    sh.setDeptId(rs.getInt("dept_id"));
                     sh.setStockCode(rs.getString("stock_code"));
                     sh.setExpDate(rs.getDate("expire_date"));
                     sh.setQty(rs.getDouble("qty"));
@@ -141,8 +141,8 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     SaleHisDetail op = new SaleHisDetail();
                     SaleDetailKey key = new SaleDetailKey();
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getDouble("qty"));
                     op.setPrice(rs.getDouble("sale_price"));
@@ -184,8 +184,8 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     SaleHisDetail op = new SaleHisDetail();
                     SaleDetailKey key = new SaleDetailKey();
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getDouble("qty"));
                     op.setPrice(rs.getDouble("sale_price"));

@@ -510,18 +510,18 @@ public class SetupController {
         return Mono.justOrEmpty(patternService.save(pattern));
     }
 
-    @PostMapping(path = "/delete-pattern")
+    @PostMapping(path = "/deletePattern")
     public Mono<?> deletePattern(@RequestBody Pattern p) {
         patternService.delete(p);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-pattern")
+    @PostMapping(path = "/findPattern")
     public Mono<?> findPattern(@RequestBody PatternKey p) {
         return Mono.justOrEmpty(patternService.findByCode(p));
     }
 
-    @GetMapping(path = "/get-pattern")
+    @GetMapping(path = "/getPattern")
     public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam String vouDate) {
         List<Pattern> list = patternService.search(stockCode, compCode, deptId);
         list.forEach(p -> {

@@ -118,7 +118,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setListSH(dao.search(vouNo, compCode, deptId));
         });
         return list;
@@ -144,12 +144,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
 
     @Override
     public void truncate(SaleHisKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql1 = "delete from sale_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        String sql2 = "delete from sale_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        execSql(sql1, sql2);
+
     }
 
     @Override

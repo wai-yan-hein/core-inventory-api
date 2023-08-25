@@ -22,7 +22,7 @@ public class MessageController {
     }
 
     @GetMapping(path = "/receive", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Message> receive() {
-        return Flux.create(sink -> processor.register(sink::next));
+    public Flux<Message> receive(@RequestParam String messageId) {
+        return Flux.create(sink -> processor.register(messageId, sink::next));
     }
 }

@@ -49,7 +49,7 @@ public class TransferHisServiceImpl implements TransferHisService {
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {
-                if (cSd.getKey().getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == null || cSd.getKey().getUniqueId()==0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {

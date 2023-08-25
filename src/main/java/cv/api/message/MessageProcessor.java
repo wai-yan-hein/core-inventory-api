@@ -4,21 +4,22 @@ import cv.api.common.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 @Service
 @Slf4j
 public class MessageProcessor {
-    private final List<Consumer<Message>> listeners = new CopyOnWriteArrayList<>();
+    private final Map<String, Consumer<Message>> listeners = new HashMap<>();
 
-    public void register(Consumer<Message> listener) {
-        listeners.add(listener);
-        log.info("Message listener add.");
+    public void register(String id, Consumer<Message> listener) {
+        listeners.put(id, listener);
     }
 
-    public void process(Message gl) {
-        listeners.forEach(c -> c.accept(gl));
+    public void process(Message message) {
+        listeners.values().forEach(listener -> listener.accept(message));
     }
 }
