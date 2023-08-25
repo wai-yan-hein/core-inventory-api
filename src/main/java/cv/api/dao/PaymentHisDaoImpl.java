@@ -46,25 +46,25 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                                    String remark, boolean deleted, String compCode, String tranOption) {
         String filter = "";
         if (!traderCode.equals("-")) {
-            filter += "and ph.trader_code ='" + traderCode + "'";
+            filter += "and ph.trader_code =?";
         }
         if (!projectNo.equals("-")) {
-            filter += "and  ph.project_no ='" + projectNo + "'";
+            filter += "and  ph.project_no =?";
         }
         if (!vouNo.equals("-")) {
-            filter += "and  ph.vou_no ='" + vouNo + "'";
+            filter += "and  ph.vou_no =?";
         }
         if (!account.equals("-")) {
-            filter += "and  ph.account ='" + account + "'";
+            filter += "and  ph.account =?";
         }
         if (!userCode.equals("-")) {
-            filter += "and  ph.created_by ='" + userCode + "'";
+            filter += "and  ph.created_by =?";
         }
         if (!remark.equals("-")) {
-            filter += "and  ph.remark like '" + remark + "'%";
+            filter += "and  ph.remark like ?";
         }
         if (!saleVouNo.equals("-")) {
-            filter += "and  phd.sale_vou_no = '" + saleVouNo + "'";
+            filter += "and  phd.sale_vou_no = ?";
         }
         String sql = "select a.*,t.trader_name\n" +
                 "from (\n" +
@@ -72,17 +72,19 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 "from payment_his ph,payment_his_detail phd\n" +
                 "where ph.vou_no = phd.vou_no\n" +
                 "and ph.comp_code = phd.comp_code\n" +
-                "and ph.deleted =" + deleted + "\n" +
-                "and ph.comp_code ='" + compCode + "'\n" +
-                "and ph.tran_option ='" + tranOption + "'\n" +
-                "and date(ph.vou_date) between '" + startDate + "' and '" + endDate + "'\n" + filter + "\n" + ")a\n" +
+                "and ph.deleted =?\n" +
+                "and ph.comp_code =?\n" +
+                "and ph.cur_code = ?\n"+
+                "and ph.tran_option =?\n" +
+                "and date(ph.vou_date) between ? and ?\n" + filter + "\n" + ")a\n" +
                 "join trader t on a.trader_code = t.code\n" +
                 "and a.comp_code = t.comp_code\n" +
                 "group by a.vou_no\n" +
                 "order by a.vou_date,a.vou_no desc";
         List<PaymentHis> list = new ArrayList<>();
         try {
-            ResultSet rs = getResult(sql);
+            ResultSet rs = getResult(sql, deleted, compCode, curCode, tranOption, startDate, endDate,
+                    traderCode, projectNo,vouNo,account,userCode,remark + "%",saleVouNo);
             while (rs.next()) {
                 PaymentHis p = new PaymentHis();
                 PaymentHisKey key = new PaymentHisKey();
