@@ -268,7 +268,7 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/get-region")
+    @GetMapping(path = "/getRegion")
     public Flux<?> getRegion(@RequestParam String compCode) {
         List<Region> listB = regionService.findAll(compCode);
         return Flux.fromIterable(listB);
@@ -286,7 +286,7 @@ public class SetupController {
         return Mono.justOrEmpty(ro);
     }
 
-    @PostMapping(path = "/find-region")
+    @PostMapping(path = "/findRegion")
     public Mono<Region> findRegion(@RequestBody RegionKey key) {
         Region b = regionService.findByCode(key);
         return Mono.justOrEmpty(b);
@@ -302,7 +302,7 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @PostMapping(path = "/save-trader")
+    @PostMapping(path = "/saveTrader")
     public Mono<Trader> saveTrader(@RequestBody Trader trader) {
         trader.setUpdatedDate(Util1.getTodayLocalDate());
         trader = traderService.saveTrader(trader);
@@ -321,13 +321,13 @@ public class SetupController {
     }
 
 
-    @GetMapping(path = "/get-customer")
+    @GetMapping(path = "/getCustomer")
     public Flux<Trader> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<Trader> listB = traderService.findCustomer(compCode, deptId);
         return Flux.fromIterable(listB);
     }
 
-    @GetMapping(path = "/get-trader-list")
+    @GetMapping(path = "/getTraderList")
     public Flux<?> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
     }
@@ -351,7 +351,7 @@ public class SetupController {
         return Flux.fromIterable(list);
     }
 
-    @PostMapping(path = "/find-trader")
+    @PostMapping(path = "/findTrader")
     public Mono<Trader> findTrader(@RequestBody TraderKey key) {
         Trader b = traderService.findById(key);
         return Mono.justOrEmpty(b);
@@ -391,7 +391,7 @@ public class SetupController {
         return Flux.fromIterable(stockService.getService(compCode, deptId));
     }
 
-    @PostMapping(path = "/search-stock")
+    @PostMapping(path = "/searchStock")
     public Flux<?> searchStock(@RequestBody ReportFilter filter) {
         String stockCode = Util1.isAll(filter.getStockCode());
         String typCode = Util1.isAll(filter.getStockTypeCode());
@@ -569,7 +569,7 @@ public class SetupController {
         return Flux.fromIterable(optionService.getPriceOption(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-unit-relation")
+    @GetMapping(path = "/getUnitRelation")
     public Flux<?> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelation> listB = unitRelationService.findRelation(compCode, deptId);
         return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
@@ -604,12 +604,12 @@ public class SetupController {
         return Mono.justOrEmpty(g);
     }
 
-    @PostMapping(path = "/find-trader-group")
+    @PostMapping(path = "/findTraderGroup")
     public Mono<?> findTraderGroup(@RequestBody TraderGroupKey key) {
         return Mono.justOrEmpty(traderGroupService.findById(key));
     }
 
-    @GetMapping(path = "/get-trader-group")
+    @GetMapping(path = "/getTraderGroup")
     public Mono<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
         return Mono.justOrEmpty(g);
