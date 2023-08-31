@@ -44,7 +44,7 @@ public class StockInOutController {
         return Mono.justOrEmpty(stockio);
     }
 
-    @PostMapping(path = "/g")
+    @PostMapping(path = "/getStockIO")
     public Flux<?> getStockIO(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
