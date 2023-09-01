@@ -665,12 +665,13 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 VSale sale = new VSale();
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 sale.setStockCode(rs.getString("s_user_code"));
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setRelName(rs.getString("rel_name"));
                 sale.setSaleAmount(rs.getDouble("ttl_amt"));
                 sale.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                sale.setQty(smallQty);
                 saleList.add(sale);
             }
         }
@@ -1415,7 +1416,7 @@ public class ReportServiceImpl implements ReportService {
         return balances;
     }
 
-    private String getRelStr(String relCode, String compCode, float smallestQty) {
+    private String getRelStr(String relCode, String compCode, double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
@@ -1425,8 +1426,8 @@ public class ReportServiceImpl implements ReportService {
             List<UnitRelationDetail> detailList = hmRelation.get(relCode);
             if (detailList != null) {
                 for (UnitRelationDetail unitRelationDetail : detailList) {
-                    float smallQty = unitRelationDetail.getSmallestQty();
-                    float divider = smallestQty / smallQty;
+                    double smallQty = unitRelationDetail.getSmallestQty();
+                    double divider = smallestQty / smallQty;
                     smallestQty = smallestQty % smallQty;
                     String str;
                     if (smallQty == 1) {
