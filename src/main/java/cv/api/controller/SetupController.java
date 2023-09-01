@@ -25,8 +25,6 @@ public class SetupController {
 
     private final ReturnObject ro = new ReturnObject();
     @Autowired
-    private CurrencyService currencyService;
-    @Autowired
     private CategoryService categoryService;
     @Autowired
     private LocationService locationService;
@@ -261,7 +259,7 @@ public class SetupController {
         return Mono.justOrEmpty(unitService.findByCode(key));
     }
 
-    @PostMapping(path = "/save-region")
+    @PostMapping(path = "/saveRegion")
     public Mono<Region> saveRegion(@RequestBody Region region) throws Exception {
         region.setUpdatedDate(Util1.getTodayLocalDate());
         Region b = regionService.save(region);
@@ -274,7 +272,7 @@ public class SetupController {
         return Flux.fromIterable(listB);
     }
 
-    @DeleteMapping(path = "/delete-region")
+    @DeleteMapping(path = "/deleteRegion")
     public Mono<ReturnObject> deleteRegion(@RequestParam String code) {
         List<Trader> search = traderService.search(code, "-");
         if (search.isEmpty()) {
@@ -292,7 +290,7 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @PostMapping(path = "/save-customer")
+    @PostMapping(path = "/saveCustomer")
     public Mono<Trader> saveCustomer(@RequestBody Trader trader) {
         trader.setUpdatedDate(Util1.getTodayLocalDate());
         trader.setType("CUS");
@@ -310,7 +308,7 @@ public class SetupController {
         return Mono.justOrEmpty(trader);
     }
 
-    @GetMapping(path = "/get-trader")
+    @GetMapping(path = "/getTrader")
     public Flux<?> getTrader(@RequestParam String compCode) {
         return Flux.fromIterable(traderService.findAll(compCode));
     }
@@ -328,18 +326,18 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getTraderList")
-    public Flux<?> getCustomerList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
     }
 
-    @GetMapping(path = "/get-supplier")
+    @GetMapping(path = "/getSupplier")
     public Flux<?> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<Trader> listB = traderService.findSupplier(compCode, deptId);
         return Flux.fromIterable(listB);
     }
 
 
-    @PostMapping(path = "/delete-trader")
+    @PostMapping(path = "/deleteTrader")
     public Flux<?> deleteTrader(@RequestBody TraderKey key) {
         List<General> list = traderService.delete(key);
         if (list.isEmpty()) {
@@ -357,12 +355,12 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @GetMapping(path = "/find-trader-rfid")
+    @GetMapping(path = "/findTraderRFID")
     public Mono<?> findTraderRfId(@RequestParam String rfId, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(traderService.findByRFID(rfId, compCode, deptId));
     }
 
-    @PostMapping(path = "/save-stock")
+    @PostMapping(path = "/saveStock")
     public Mono<Stock> saveStock(@RequestBody Stock stock) {
         stock.setUpdatedDate(LocalDateTime.now());
         Stock b = stockService.save(stock);
@@ -374,7 +372,7 @@ public class SetupController {
         return Mono.justOrEmpty(stockService.updateStock(stock));
     }
 
-    @GetMapping(path = "/get-stock")
+    @GetMapping(path = "/getStock")
     public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
         List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
         return Flux.fromIterable(listB);
@@ -386,7 +384,7 @@ public class SetupController {
     }
 
 
-    @GetMapping(path = "/get-service")
+    @GetMapping(path = "/getService")
     public Flux<?> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(stockService.getService(compCode, deptId));
     }
@@ -403,25 +401,25 @@ public class SetupController {
         return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, orderFav));
     }
 
-    @GetMapping(path = "/get-stock-list")
+    @GetMapping(path = "/getStockList")
     public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId));
     }
 
-    @PostMapping(path = "/delete-stock")
+    @PostMapping(path = "/deleteStock")
     public Flux<?> deleteStock(@RequestBody StockKey key) {
         List<General> str = stockService.delete(key);
         return Flux.fromIterable(str);
     }
 
-    @PostMapping(path = "/find-stock")
+    @PostMapping(path = "/findStock")
     public Mono<Stock> findStock(@RequestBody StockKey key) {
         Stock b = stockService.findById(key);
         return Mono.justOrEmpty(b);
     }
 
 
-    @PostMapping(path = "/save-voucher-status")
+    @PostMapping(path = "/saveVoucherStatus")
     public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus) {
         vouStatus.setUpdatedDate(Util1.getTodayLocalDate());
         VouStatus b = vouStatusService.save(vouStatus);
@@ -444,7 +442,7 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
-    @PostMapping(path = "/save-opening")
+    @PostMapping(path = "/saveOpening")
     public Mono<?> saveOpening(@RequestBody OPHis opHis) {
         if (Util1.isNullOrEmpty(opHis.getVouDate())) {
             ro.setMessage("Invalid Opening Date.");
@@ -466,7 +464,7 @@ public class SetupController {
         return Mono.just(ro);
     }
 
-    @PostMapping(path = "/get-opening")
+    @PostMapping(path = "/getOpening")
     public Flux<?> getOpening(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -482,7 +480,7 @@ public class SetupController {
         return Flux.fromIterable(opHisList);
     }
 
-    @PostMapping(path = "/find-opening")
+    @PostMapping(path = "/findOpening")
     public Mono<OPHis> findOpening(@RequestBody OPHisKey key) {
         return Mono.justOrEmpty(opHisService.findByCode(key));
     }
@@ -493,19 +491,15 @@ public class SetupController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/save-opening-detail")
-    public Mono<OPHisDetail> saveOpeningDetail(@RequestBody OPHisDetail opHis) {
-        OPHisDetail op = opHisDetailService.save(opHis);
-        return Mono.justOrEmpty(op);
-    }
 
-    @GetMapping(path = "/get-opening-detail")
+
+    @GetMapping(path = "/getOpeningDetail")
     public Flux<OPHisDetail> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<OPHisDetail> opHis = opHisDetailService.search(vouNo, compCode, deptId);
         return Flux.fromIterable(opHis).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/save-pattern")
+    @PostMapping(path = "/savePattern")
     public Mono<?> savePattern(@RequestBody Pattern pattern) {
         return Mono.justOrEmpty(patternService.save(pattern));
     }
@@ -549,17 +543,17 @@ public class SetupController {
         };
     }
 
-    @PostMapping(path = "/save-reorder")
+    @PostMapping(path = "/saveReorder")
     public Mono<?> saveReorder(@RequestBody ReorderLevel rl) {
         return Mono.justOrEmpty(reorderService.save(rl));
     }
 
-    @PostMapping(path = "/save-price-option")
+    @PostMapping(path = "/savePriceOption")
     public Mono<?> savePriceOption(@RequestBody PriceOption po) {
         return Mono.justOrEmpty(optionService.save(po));
     }
 
-    @GetMapping(path = "/get-price-option")
+    @GetMapping(path = "/getPriceOption")
     public Flux<?> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
@@ -575,7 +569,7 @@ public class SetupController {
         return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-relation")
+    @GetMapping(path = "/getRelation")
     public Flux<?> getRelation(@RequestParam String relCode, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(unitRelationService.getRelation(relCode, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
@@ -591,14 +585,14 @@ public class SetupController {
         return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/save-unit-relation")
-    public Mono<UnitRelation> saveRelation(@RequestBody UnitRelation relation) {
+    @PostMapping(path = "/saveUnitRelation")
+    public Mono<UnitRelation> saveUnitRelation(@RequestBody UnitRelation relation) {
         UnitRelation b = unitRelationService.save(relation);
         return Mono.justOrEmpty(b);
     }
 
 
-    @PostMapping(path = "/save-trader-group")
+    @PostMapping(path = "/saveTraderGroup")
     public Mono<?> saveTraderGroup(@RequestBody TraderGroup group) {
         TraderGroup g = traderGroupService.save(group);
         return Mono.justOrEmpty(g);
@@ -627,19 +621,7 @@ public class SetupController {
         return Mono.justOrEmpty("converted.");
     }
 
-    @PostMapping(path = "/save-batch")
-    public Mono<?> saveBatch(@RequestBody GRN b) {
-        return Mono.justOrEmpty(batchService.save(b));
-    }
-
-    @PostMapping(path = "/delete-batch")
-    public Mono<?> deleteBatch(@RequestBody GRNKey key) {
-        batchService.delete(key);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
-    }
-
-    @GetMapping(path = "/get-batch")
+    @GetMapping(path = "/getBatch")
     public Flux<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(batchService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
