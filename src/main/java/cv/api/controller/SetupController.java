@@ -74,6 +74,7 @@ public class SetupController {
     public Mono<?> hello() {
         return Mono.just("Hello");
     }
+
     @PostMapping(path = "/saveCategory")
     public Mono<Category> saveCategory(@RequestBody Category cat) {
         cat.setUpdatedDate(Util1.getTodayLocalDate());
@@ -83,12 +84,12 @@ public class SetupController {
 
     @GetMapping(path = "/getCategory")
     public Flux<?> getCategory(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(categoryService.findAll(compCode, deptId));
+        return Flux.fromIterable(categoryService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateCategory")
     public Flux<?> getUpdateCategory(@RequestParam String updatedDate) {
-        return Flux.fromIterable(categoryService.getCategory(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(categoryService.getCategory(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
 
@@ -114,12 +115,12 @@ public class SetupController {
 
     @GetMapping(path = "/getLocation")
     public Flux<?> getLocation(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(locationService.findAll(compCode, deptId));
+        return Flux.fromIterable(locationService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateLocation")
     public Flux<?> getUpdateLocation(@RequestParam String updatedDate) {
-        return Flux.fromIterable(locationService.getLocation(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(locationService.getLocation(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @DeleteMapping(path = "/deleteLocation")
@@ -143,12 +144,12 @@ public class SetupController {
 
     @GetMapping(path = "/getSaleMan")
     public Flux<?> getSaleMan(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(saleManService.findAll(compCode, deptId));
+        return Flux.fromIterable(saleManService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateSaleMan")
     public Flux<?> getSaleMan(@RequestParam String updatedDate) {
-        return Flux.fromIterable(saleManService.getSaleMan(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(saleManService.getSaleMan(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @DeleteMapping(path = "/deleteSaleMan")
@@ -173,12 +174,12 @@ public class SetupController {
 
     @GetMapping(path = "/getBrand")
     public Flux<?> getBrand(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(brandService.findAll(compCode, deptId));
+        return Flux.fromIterable(brandService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateBrand")
     public Flux<?> getUpdateBrand(@RequestParam String updatedDate) {
-        return Flux.fromIterable(brandService.getBrand(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(brandService.getBrand(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @DeleteMapping(path = "/deleteBrand")
@@ -208,13 +209,12 @@ public class SetupController {
 
     @GetMapping(path = "/getType")
     public Flux<?> getType(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<StockType> listB = typeService.findAll(compCode, deptId);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(typeService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateStockType")
     public Flux<?> getUpdateStockType(@RequestParam String updatedDate) {
-        return Flux.fromIterable(typeService.getStockType(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(typeService.getStockType(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @DeleteMapping(path = "/deleteType")
@@ -244,7 +244,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateUnit")
     public Flux<?> getUpdateUnit(@RequestParam String updatedDate) {
-        return Flux.fromIterable(unitService.getUnit(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(unitService.getUnit(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @DeleteMapping(path = "/deleteUnit")
@@ -268,8 +268,7 @@ public class SetupController {
 
     @GetMapping(path = "/getRegion")
     public Flux<?> getRegion(@RequestParam String compCode) {
-        List<Region> listB = regionService.findAll(compCode);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(regionService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @DeleteMapping(path = "/deleteRegion")
@@ -310,30 +309,28 @@ public class SetupController {
 
     @GetMapping(path = "/getTrader")
     public Flux<?> getTrader(@RequestParam String compCode) {
-        return Flux.fromIterable(traderService.findAll(compCode));
+        return Flux.fromIterable(traderService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateTrader")
     public Flux<?> getUpdateTrader(@RequestParam String updatedDate) {
-        return Flux.fromIterable(traderService.getTrader(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(traderService.getTrader(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
 
     @GetMapping(path = "/getCustomer")
     public Flux<Trader> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<Trader> listB = traderService.findCustomer(compCode, deptId);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(traderService.findCustomer(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getTraderList")
     public Flux<?> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId));
+        return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getSupplier")
     public Flux<?> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<Trader> listB = traderService.findSupplier(compCode, deptId);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(traderService.findSupplier(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
 
@@ -346,7 +343,7 @@ public class SetupController {
             k.setCode(key.getCode());
             accountRepo.deleteTrader(k);
         }
-        return Flux.fromIterable(list);
+        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/findTrader")
@@ -375,18 +372,18 @@ public class SetupController {
     @GetMapping(path = "/getStock")
     public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
         List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
-        return Flux.fromIterable(listB);
+        return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateStock")
     public Flux<Stock> getUpdateStock(@RequestParam String updatedDate) {
-        return Flux.fromIterable(stockService.getStock(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(stockService.getStock(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
 
     @GetMapping(path = "/getService")
     public Flux<?> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(stockService.getService(compCode, deptId));
+        return Flux.fromIterable(stockService.getService(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/searchStock")
@@ -398,12 +395,12 @@ public class SetupController {
         Integer deptId = filter.getDeptId();
         String compCode = filter.getCompCode();
         boolean orderFav = filter.isOrderFavorite();
-        return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, orderFav));
+        return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, orderFav)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getStockList")
     public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId));
+        return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/deleteStock")
@@ -433,7 +430,7 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateVouStatus")
     public Flux<?> getUpdateVouStatus(@RequestParam String updatedDate) {
-        return Flux.fromIterable(vouStatusService.getVouStatus(Util1.toLocalDateTime(updatedDate)));
+        return Flux.fromIterable(vouStatusService.getVouStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/findVouStatus")
@@ -477,7 +474,7 @@ public class SetupController {
         Integer deptId = filter.getDeptId();
         String curCode = Util1.isAll(filter.getCurCode());
         List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, curCode);
-        return Flux.fromIterable(opHisList);
+        return Flux.fromIterable(opHisList).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/findOpening")
@@ -490,7 +487,6 @@ public class SetupController {
         opHisService.delete(key);
         return Mono.just(true);
     }
-
 
 
     @GetMapping(path = "/getOpeningDetail")
@@ -579,8 +575,8 @@ public class SetupController {
         return Flux.fromIterable(unitRelationService.getRelation(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-unit-relation-detail")
-    public Flux<?> getUnitRelation(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getUnitRelationDetail")
+    public Flux<?> getUnitRelationDetail(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode);
         return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
     }
@@ -604,9 +600,9 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getTraderGroup")
-    public Mono<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
         List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
-        return Mono.justOrEmpty(g);
+        return Flux.fromIterable(g).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/convert-to-unicode")
