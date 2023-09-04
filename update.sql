@@ -1133,3 +1133,6 @@ create  view v_transfer as select th.vou_no as vou_no,th.created_by as created_b
 
 alter table trader
 change column user_code user_code varchar(255) null default null;
+
+alter table milling_expense
+change column expense_name expense_name varchar(255) not null ;
