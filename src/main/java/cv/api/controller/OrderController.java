@@ -39,7 +39,7 @@ public class OrderController {
     @Autowired
     private ReportService reportService;
 
-    @PostMapping(path = "/save-order")
+    @PostMapping(path = "/saveOrder")
     public Mono<?> saveOrder(@RequestBody OrderHis order) {
         order.setUpdatedDate(Util1.getTodayLocalDate());
         if (isValidOrder(order, ro)) {
@@ -78,7 +78,7 @@ public class OrderController {
         return status;
     }
 
-    @PostMapping(path = "/get-order")
+    @PostMapping(path = "/getOrder")
     public Flux<?> getOrder(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -102,35 +102,28 @@ public class OrderController {
         return Flux.fromIterable(orderList).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-order")
-    public Mono<?> deleteSale(@RequestBody OrderHisKey key) throws Exception {
+    @PostMapping(path = "/deleteOrder")
+    public Mono<?> deleteOrder(@RequestBody OrderHisKey key) throws Exception {
         ohService.delete(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-order")
-    public Mono<?> restoreSale(@RequestBody OrderHisKey key) throws Exception {
+    @PostMapping(path = "/restoreOrder")
+    public Mono<?> restoreOrder(@RequestBody OrderHisKey key) throws Exception {
         ohService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-order")
-    public Mono<OrderHis> findSale(@RequestBody OrderHisKey key) {
+    @PostMapping(path = "/findOrder")
+    public Mono<OrderHis> findOrder(@RequestBody OrderHisKey key) {
         OrderHis sh = ohService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-order-detail")
-    public Flux<?> getSaleDetail(@RequestParam String vouNo,
+    @GetMapping(path = "/getOrderDetail")
+    public Flux<?> getOrderDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {
         return Flux.fromIterable(odService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
-    }
-
-    @GetMapping(path = "/get-order-voucher-info")
-    public Mono<?> getSaleVoucherCount(@RequestParam String vouDate,
-                                       @RequestParam String compCode,
-                                       @RequestParam Integer deptId) {
-        return Mono.justOrEmpty(ohService.getVoucherInfo(vouDate, compCode, deptId));
     }
 }
