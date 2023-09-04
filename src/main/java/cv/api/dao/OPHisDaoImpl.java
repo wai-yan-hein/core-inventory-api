@@ -51,11 +51,21 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
     }
 
     @Override
-    public void delete(OPHisKey key) {
+    public boolean delete(OPHisKey key) {
         OPHis op = findByCode(key);
         op.setDeleted(true);
         op.setUpdatedDate(LocalDateTime.now());
         update(op);
+        return true;
+    }
+
+    @Override
+    public boolean restore(OPHisKey key) {
+        OPHis op = findByCode(key);
+        op.setDeleted(false);
+        op.setUpdatedDate(LocalDateTime.now());
+        update(op);
+        return true;
     }
 
     @Override

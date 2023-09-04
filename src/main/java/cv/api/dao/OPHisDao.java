@@ -16,7 +16,9 @@ public interface OPHisDao {
 
     List<OPHis> unUpload();
 
-    void delete(OPHisKey key);
+    boolean delete(OPHisKey key);
+    boolean restore(OPHisKey key);
+
 
     List<OPHis> search(String updatedDate, List<LocationKey> keys);
 

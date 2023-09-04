@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,20 +91,18 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
 
     @Override
     public void delete(OrderHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update order_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSql(sql);
+        OrderHis obj = findById(key);
+        obj.setDeleted(true);
+        obj.setUpdatedDate(LocalDateTime.now());
+        update(obj);
     }
 
     @Override
     public void restore(OrderHisKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update order_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "' and dept_id =" + deptId + "";
-        execSql(sql);
+        OrderHis obj = findById(key);
+        obj.setDeleted(false);
+        obj.setUpdatedDate(LocalDateTime.now());
+        update(obj);
     }
 
 
@@ -120,7 +119,7 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setListSH(dao.search(vouNo, compCode, deptId));
         });
         return list;
@@ -146,12 +145,7 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
 
     @Override
     public void truncate(OrderHisKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql1 = "delete from order_his where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        String sql2 = "delete from order_his_detail where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "' and " + deptId + "";
-        execSql(sql1, sql2);
+
     }
 
     @Override

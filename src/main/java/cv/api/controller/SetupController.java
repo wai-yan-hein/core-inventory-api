@@ -473,7 +473,9 @@ public class SetupController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         String curCode = Util1.isAll(filter.getCurCode());
-        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, curCode);
+        String deleted = String.valueOf(filter.isDeleted());
+        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode,
+                stockCode, locCode, compCode, deptId, curCode, deleted);
         return Flux.fromIterable(opHisList).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -484,8 +486,12 @@ public class SetupController {
 
     @PostMapping(path = "/deleteOpening")
     public Mono<?> deleteOpening(@RequestBody OPHisKey key) {
-        opHisService.delete(key);
-        return Mono.just(true);
+        return Mono.just(opHisService.delete(key));
+    }
+
+    @PostMapping(path = "/restoreOpening")
+    public Mono<?> restoreOpening(@RequestBody OPHisKey key) {
+        return Mono.just(opHisService.delete(key));
     }
 
 

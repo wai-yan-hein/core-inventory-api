@@ -60,10 +60,10 @@ public class OrderHisDetailDaoImpl extends AbstractDao<OrderDetailKey, OrderHisD
                     OrderHisDetail op = new OrderHisDetail();
                     OrderDetailKey key = new OrderDetailKey();
                     key.setCompCode(rs.getString("comp_code"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setWeight(rs.getFloat("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
@@ -107,10 +107,10 @@ public class OrderHisDetailDaoImpl extends AbstractDao<OrderDetailKey, OrderHisD
                     OrderHisDetail sh = new OrderHisDetail();
                     OrderDetailKey key = new OrderDetailKey();
                     key.setVouNo(rs.getString("vou_no"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     sh.setKey(key);
+                    sh.setDeptId(rs.getInt("dept_id"));
                     sh.setStockCode(rs.getString("stock_code"));
                     sh.setQty(rs.getFloat("qty"));
                     sh.setUnitCode(rs.getString("sale_unit"));

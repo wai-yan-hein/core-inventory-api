@@ -179,7 +179,7 @@ public interface ReportService {
 
     List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark,
                                   String userCode, String stockCode, String locCode, String compCode,
-                                  Integer deptId, String curCode) throws Exception;
+                                  Integer deptId, String curCode,String deleted) throws Exception;
 
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;

@@ -2479,12 +2479,13 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode,
-                                         String locCode, String compCode, Integer deptId, String curCode) throws Exception {
+                                         String locCode, String compCode, Integer deptId, String curCode,String deleted) throws Exception {
         String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
                 "where v.comp_code = '" + compCode + "'\n" +
                 "and v.cur_code = '" + curCode + "'\n" +
+                "and v.deleted = " + deleted + "\n" +
                 "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
                 "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
@@ -2492,7 +2493,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
                 "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
                 "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "group by v.vou_no\n" + "order by v.op_date,v.vou_no desc\n";
+                "group by v.vou_no\n" +
+                "order by v.op_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<OPHis> list = new ArrayList<>();
         if (!Objects.isNull(rs)) {

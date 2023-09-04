@@ -41,7 +41,7 @@ public class OrderHisServiceImpl implements OrderHisService {
     public OrderHis save(OrderHis orderHis) {
         orderHis.setVouDate(Util1.toDateTime(orderHis.getVouDate()));
         if (Util1.isNullOrEmpty(orderHis.getKey().getVouNo())) {
-            orderHis.getKey().setVouNo(getVoucherNo(orderHis.getKey().getDeptId(), orderHis.getMacId(), orderHis.getKey().getCompCode()));
+            orderHis.getKey().setVouNo(getVoucherNo(orderHis.getDeptId(), orderHis.getMacId(), orderHis.getKey().getCompCode()));
         }
         List<OrderHisDetail> listSD = orderHis.getListSH();
         List<OrderDetailKey> listDel = orderHis.getListDel();
@@ -54,10 +54,10 @@ public class OrderHisServiceImpl implements OrderHisService {
             OrderHisDetail cSd = listSD.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
                 OrderDetailKey key = new OrderDetailKey();
-                key.setDeptId(orderHis.getKey().getDeptId());
                 key.setCompCode(orderHis.getKey().getCompCode());
                 key.setVouNo(vouNo);
                 key.setUniqueId(null);
+                cSd.setDeptId(orderHis.getDeptId());
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {

@@ -25,6 +25,8 @@ public class OrderHis {
 
     @EmbeddedId
     private OrderHisKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "trader_code")
     private String traderCode;
     @Column(name = "saleman_code")

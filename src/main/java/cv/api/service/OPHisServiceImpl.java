@@ -84,8 +84,13 @@ public class OPHisServiceImpl implements OPHisService {
     }
 
     @Override
-    public void delete(OPHisKey key) {
-        opHisDao.delete(key);
+    public boolean delete(OPHisKey key) {
+        return opHisDao.delete(key);
+    }
+
+    @Override
+    public boolean restore(OPHisKey key) {
+        return opHisDao.restore(key);
     }
 
     @Override
