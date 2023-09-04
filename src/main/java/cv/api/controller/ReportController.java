@@ -493,4 +493,12 @@ public class ReportController {
         String compCode = filter.getCompCode();
         return Flux.fromIterable(reportService.getSaleSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
     }
+
+    @PostMapping(path = "/getOrderSummaryByDepartment")
+    public Flux<?> getOrderSummaryByDepartment(@RequestBody FilterObject filter) {
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String compCode = filter.getCompCode();
+        return Flux.fromIterable(reportService.getOrderSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
 }

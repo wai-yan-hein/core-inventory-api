@@ -22,7 +22,7 @@ public class VOrder {
     private String creditTerm;
     private String curCode;
     private String remark;
-    private Float vouTotal;
+    private double vouTotal;
     private Float grandTotal;
     private Float discount;
     private Float discountPrice;
@@ -31,8 +31,8 @@ public class VOrder {
     private String createdDate;
     private String createdBy;
     private boolean deleted;
-    private Float paid;
-    private Float vouBalance;
+    private double paid;
+    private double vouBalance;
     private String updatedBy;
     private String updatedDate;
     private String cusPhoneNo;
@@ -78,5 +78,5 @@ public class VOrder {
     private String phoneNo;
     private String address;
     private String projectNo;
-
+    private Integer vouCount;
 }
