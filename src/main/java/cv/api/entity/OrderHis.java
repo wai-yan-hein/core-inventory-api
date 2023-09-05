@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -42,26 +43,25 @@ public class OrderHis {
     @Column(name = "reference")
     private String reference;
     @Column(name = "vou_total")
-    private Float vouTotal;
+    private Double vouTotal;
     @Column(name = "grand_total")
-    private Float grandTotal;
+    private Double grandTotal;
     @Column(name = "discount")
-    private Float discount;
+    private Double discount;
     @Column(name = "disc_p")
-    private Float discP;
+    private Double discP;
     @Column(name = "tax_amt")
-    private Float taxAmt;
+    private Double taxAmt;
     @Column(name = "tax_p")
-    private Float taxPercent;
+    private Double taxPercent;
     @Column(name = "deleted")
     private boolean deleted;
     @Column(name = "paid")
-    private Float paid;
+    private Double paid;
     @Column(name = "vou_balance")
-    private Float balance;
-    @Temporal(TemporalType.DATE)
-    @Column(name = "created_date")
-    private Date createdDate;
+    private Double balance;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
