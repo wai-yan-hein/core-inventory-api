@@ -3457,6 +3457,33 @@ public class ReportServiceImpl implements ReportService {
         return list;
     }
 
+
+
+    @Override
+    public List<VOrder> getOrderSummaryByDepartment(String fromDate, String toDate, String compCode) {
+        List<VOrder> list = new ArrayList<>();
+        String sql = "select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count\n" +
+                "from order_his\n" +
+                "where date(vou_date) between ? and ?\n" +
+                "and deleted = false\n" +
+                "and comp_code =?\n" +
+                "group by dept_id,cur_code";
+        try {
+            ResultSet rs = getResult(sql, fromDate, toDate, compCode);
+            while (rs.next()) {
+                VOrder s = new VOrder();
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setVouBalance(rs.getDouble("vou_balance"));
+                s.setPaid(rs.getDouble("paid"));
+                s.setDeptId(rs.getInt("dept_id"));
+                s.setVouCount(rs.getInt("vou_count"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            log.error("getOrderSummaryByDepartment : " + e.getMessage());
+        }
+        return list;
+    }
     @Override
     public List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode) {
         List<VSale> list = new ArrayList<>();

@@ -47,6 +47,9 @@ public class SaleController {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
+            if(sale.getExpense() == null) {
+                sale.setExpense(0.0);
+            }
             sale = shService.save(sale);
         } else {
             return Mono.justOrEmpty(ro);
