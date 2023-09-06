@@ -191,10 +191,10 @@ public class ReportServiceImpl implements ReportService {
             order.setQty(rs.getFloat("qty"));
             order.setSalePrice(rs.getFloat("price"));
             order.setSaleAmount(rs.getFloat("amt"));
-            order.setVouTotal(rs.getFloat("vou_total"));
+            order.setVouTotal(rs.getDouble("vou_total"));
             order.setDiscount(rs.getFloat("discount"));
-            order.setPaid(rs.getFloat("paid"));
-            order.setVouBalance(rs.getFloat("vou_balance"));
+            order.setPaid(rs.getDouble("paid"));
+            order.setVouBalance(rs.getDouble("vou_balance"));
             order.setSaleUnit(rs.getString("unit"));
             order.setCusAddress(Util1.isNull(rs.getString("phone"), "") + "/" + Util1.isNull(rs.getString("address"), ""));
             order.setLocationName(rs.getString("loc_name"));
@@ -949,8 +949,8 @@ public class ReportServiceImpl implements ReportService {
                 s.setSaleUnit(rs.getString("unit"));
                 s.setSalePrice(rs.getFloat("price"));
                 s.setSaleAmount(rs.getFloat("amt"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
                 list.add(s);
             }
         }
@@ -2299,8 +2299,8 @@ public class ReportServiceImpl implements ReportService {
                     s.setRemark(rs.getString("remark"));
                     s.setReference(rs.getString("reference"));
                     s.setCreatedBy(rs.getString("created_by"));
-                    s.setPaid(rs.getFloat("paid"));
-                    s.setVouTotal(rs.getFloat("vou_total"));
+                    s.setPaid(rs.getDouble("paid"));
+                    s.setVouTotal(rs.getDouble("vou_total"));
                     s.setDeleted(rs.getBoolean("deleted"));
                     s.setDeptId(rs.getInt("dept_id"));
                     saleList.add(s);
@@ -3362,7 +3362,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderName(rs.getString("trader_name"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 list.add(s);
             }
         }
@@ -3423,8 +3423,8 @@ public class ReportServiceImpl implements ReportService {
                 s.setSaleUnit(rs.getString("unit"));
                 s.setSalePrice(rs.getFloat("price"));
                 s.setSaleAmount(rs.getFloat("amt"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setPaid(rs.getFloat("paid"));
+                s.setVouTotal(rs.getDouble("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
                 list.add(s);
             }
         }

@@ -52,7 +52,6 @@ public class OrderController {
 
     private boolean isValidOrder(OrderHis order, ReturnObject ro) {
         boolean status = true;
-        List<OrderHisDetail> listSH = order.getListSH();
         if (Util1.isNullOrEmpty(order.getTraderCode())) {
             status = false;
             ro.setMessage("Invalid Trader.");

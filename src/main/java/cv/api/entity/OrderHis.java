@@ -44,22 +44,8 @@ public class OrderHis {
     private String reference;
     @Column(name = "vou_total")
     private Double vouTotal;
-    @Column(name = "grand_total")
-    private Double grandTotal;
-    @Column(name = "discount")
-    private Double discount;
-    @Column(name = "disc_p")
-    private Double discP;
-    @Column(name = "tax_amt")
-    private Double taxAmt;
-    @Column(name = "tax_p")
-    private Double taxPercent;
     @Column(name = "deleted")
     private boolean deleted;
-    @Column(name = "paid")
-    private Double paid;
-    @Column(name = "vou_balance")
-    private Double balance;
     @Column(name = "created_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime createdDate;
     @Column(name = "created_by")
@@ -68,8 +54,6 @@ public class OrderHis {
     private String updatedBy;
     @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
-    @Column(name = "address")
-    private String address;
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "mac_id")

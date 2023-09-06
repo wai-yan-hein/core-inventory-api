@@ -65,12 +65,11 @@ public class OrderHisDetailDaoImpl extends AbstractDao<OrderDetailKey, OrderHisD
                     op.setKey(key);
                     op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setStdWeight(rs.getFloat("std_weight"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("price"));
-                    op.setAmount(rs.getFloat("amt"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setPrice(rs.getDouble("price"));
+                    op.setAmount(rs.getDouble("amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("unit"));
@@ -112,10 +111,10 @@ public class OrderHisDetailDaoImpl extends AbstractDao<OrderDetailKey, OrderHisD
                     sh.setKey(key);
                     sh.setDeptId(rs.getInt("dept_id"));
                     sh.setStockCode(rs.getString("stock_code"));
-                    sh.setQty(rs.getFloat("qty"));
+                    sh.setQty(rs.getDouble("qty"));
                     sh.setUnitCode(rs.getString("sale_unit"));
-                    sh.setPrice(rs.getFloat("sale_price"));
-                    sh.setAmount(rs.getFloat("sale_amt"));
+                    sh.setPrice(rs.getDouble("sale_price"));
+                    sh.setAmount(rs.getDouble("sale_amt"));
                     sh.setLocCode(rs.getString("loc_code"));
                     list.add(sh);
                 }
