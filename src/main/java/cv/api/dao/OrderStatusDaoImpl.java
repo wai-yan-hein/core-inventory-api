@@ -34,7 +34,7 @@ public class OrderStatusDaoImpl extends AbstractDao<OrderStatusKey, OrderStatus>
 
     @Override
     public OrderStatus findById(OrderStatusKey id) {
-        return findById(id);
+        return getByKey(id);
     }
 
     @Override

@@ -67,7 +67,6 @@ public class OrderHisDetailDaoImpl extends AbstractDao<OrderDetailKey, OrderHisD
                     op.setStockCode(rs.getString("stock_code"));
                     op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setStdWeight(rs.getDouble("std_weight"));
                     op.setQty(rs.getDouble("qty"));
                     op.setPrice(rs.getDouble("price"));
                     op.setAmount(rs.getDouble("amt"));

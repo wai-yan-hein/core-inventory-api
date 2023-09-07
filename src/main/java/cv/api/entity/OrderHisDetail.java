@@ -39,8 +39,6 @@ public class OrderHisDetail {
     private Double weight;
     @Column(name = "weight_unit")
     private String weightUnit;
-    @Column(name = "std_weight")
-    private Double stdWeight;
     @Transient
     private String userCode;
     @Transient
