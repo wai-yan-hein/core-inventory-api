@@ -79,4 +79,5 @@ public class VOrder {
     private String address;
     private String projectNo;
     private Integer vouCount;
+    private String orderStatus;
 }

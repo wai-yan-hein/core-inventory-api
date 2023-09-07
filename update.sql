@@ -1137,4 +1137,53 @@ change column user_code user_code varchar(255) null default null;
 alter table milling_expense
 change column expense_name expense_name varchar(255) not null ;
 
-create view v_order as select oh.project_no as project_no,oh.vou_no as vou_no,oh.comp_code as comp_code,oh.dept_id as dept_id,oh.trader_code as trader_code,oh.saleman_code as saleman_code,oh.vou_date as vou_date,oh.credit_term as credit_term,oh.cur_code as cur_code,oh.remark as remark,oh.vou_total as vou_total,oh.grand_total as grand_total,oh.discount as discount,oh.disc_p as disc_p,oh.tax_amt as tax_amt,oh.tax_p as tax_p,oh.created_date as created_date,oh.created_by as created_by,oh.deleted as deleted,oh.paid as paid,oh.vou_balance as vou_balance,oh.updated_by as updated_by,oh.updated_date as updated_date,oh.address as address,oh.mac_id as mac_id,oh.intg_upd_status as intg_upd_status,oh.reference as reference,oh.vou_lock as vou_lock,ohd.unique_id as unique_id,ohd.stock_code as stock_code,ohd.qty as qty,ohd.unit as unit,ohd.price as price,ohd.amt as amt,ohd.loc_code as loc_code,ohd.weight as weight,ohd.weight_unit as weight_unit,ohd.std_weight as std_weight,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((order_his oh join order_his_detail ohd on(oh.vou_no = ohd.vou_no and oh.comp_code = ohd.comp_code)) join stock s on(ohd.stock_code = s.stock_code and ohd.comp_code = s.comp_code));
+
+drop table if exists order_his;
+create table order_his (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null default 1,
+  trader_code varchar(15) not null,
+  saleman_code varchar(45) default null,
+  vou_date datetime not null,
+  credit_term date default null,
+  cur_code varchar(15) not null,
+  remark varchar(500) default null,
+  vou_total float(20,3) not null,
+  created_date datetime not null,
+  created_by varchar(15) not null,
+  deleted bit(1) default null,
+  vou_balance float(20,3) default null,
+  updated_by varchar(15) default null,
+  updated_date timestamp not null default current_timestamp(),
+  loc_code varchar(15) not null,
+  mac_id varchar(15) not null,
+  intg_upd_status varchar(5) default null,
+  reference varchar(255) default null,
+  vou_lock bit(1) not null default b'0',
+  project_no varchar(15) default null,
+  order_status varchar(15) default null,
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+drop table if exists order_his_detail;
+create table order_his_detail (
+  vou_no varchar(20) not null,
+  comp_code varchar(15) not null default '0010010',
+  unique_id int(11) not null,
+  dept_id int(11) not null default 1,
+  stock_code varchar(10) default null,
+  qty float(20,3) not null,
+  unit varchar(10) not null,
+  price float(20,3) not null,
+  amt float(20,3) not null,
+  loc_code varchar(15) not null,
+  weight float(20,3) default null,
+  weight_unit varchar(15) default null,
+  primary key (vou_no,comp_code,unique_id),
+  key fk_item_unt_idx (unit),
+  key fk__idx (stock_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+drop view if exists v_order;
+create view v_order as  select oh.order_status,oh.project_no as project_no,oh.vou_no as vou_no,oh.comp_code as comp_code,oh.dept_id as dept_id,oh.trader_code as trader_code,oh.saleman_code as saleman_code,oh.vou_date as vou_date,oh.credit_term as credit_term,oh.cur_code as cur_code,oh.remark as remark,oh.vou_total as vou_total,oh.created_date as created_date,oh.created_by as created_by,oh.deleted as deleted,oh.updated_by as updated_by,oh.updated_date as updated_date,oh.mac_id as mac_id,oh.intg_upd_status as intg_upd_status,oh.reference as reference,oh.vou_lock as vou_lock,ohd.unique_id as unique_id,ohd.stock_code as stock_code,ohd.qty as qty,ohd.unit as unit,ohd.price as price,ohd.amt as amt,ohd.loc_code as loc_code,ohd.weight as weight,ohd.weight_unit as weight_unit,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((order_his oh join order_his_detail ohd on(oh.vou_no = ohd.vou_no and oh.comp_code = ohd.comp_code)) join stock s on(ohd.stock_code = s.stock_code and ohd.comp_code = s.comp_code));
