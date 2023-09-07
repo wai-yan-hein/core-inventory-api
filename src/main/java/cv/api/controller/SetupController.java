@@ -69,7 +69,8 @@ public class SetupController {
     private AccountRepo accountRepo;
     @Autowired
     private AccSettingService accSettingService;
-
+@Autowired
+private OrderStatusService orderStatusService;
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
         return Mono.just("Hello");
@@ -436,6 +437,29 @@ public class SetupController {
     @PostMapping(path = "/findVouStatus")
     public Mono<VouStatus> findVouStatus(@RequestBody VouStatusKey key) {
         VouStatus b = vouStatusService.findById(key);
+        return Mono.justOrEmpty(b);
+    }
+
+    @PostMapping(path = "/saveOrderStatus")
+    public Mono<OrderStatus> saveOrderStatus(@RequestBody OrderStatus orderStatus) {
+        orderStatus.setUpdatedDate(Util1.getTodayLocalDate());
+        OrderStatus b = orderStatusService.save(orderStatus);
+        return Mono.justOrEmpty(b);
+    }
+
+    @GetMapping(path = "/getOrderStatus")
+    public Flux<?> getOrderStatus(@RequestParam String compCode) {
+        return Flux.fromIterable(orderStatusService.findAll(compCode));
+    }
+
+    @GetMapping(path = "/getUpdateOrderStatus")
+    public Flux<?> getUpdateOrderStatus(@RequestParam String updatedDate) {
+        return Flux.fromIterable(orderStatusService.getOrderStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @PostMapping(path = "/findOrderStatus")
+    public Mono<OrderStatus> findOrderStatus(@RequestBody OrderStatusKey key) {
+        OrderStatus b = orderStatusService.findById(key);
         return Mono.justOrEmpty(b);
     }
 
