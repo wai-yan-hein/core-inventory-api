@@ -2286,7 +2286,11 @@ public class ReportServiceImpl implements ReportService {
         if (!curCode.equals("-")) {
             filter += "and cur_code = '" + curCode + "'\n";
         }
-        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" + "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id\n" + "from v_order s \n" + "where comp_code = '" + compCode + "'\n" + "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "order by date(vou_date) desc,vou_no desc";
+        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" +
+                "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,paid,vou_total,deleted,trader_code,loc_code,comp_code,dept_id,order_status\n" +
+                "from v_order s \n" +
+                "where comp_code = '" + compCode + "'\n" +
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "order by date(vou_date) desc,vou_no desc";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
@@ -2303,6 +2307,7 @@ public class ReportServiceImpl implements ReportService {
                     s.setVouTotal(rs.getDouble("vou_total"));
                     s.setDeleted(rs.getBoolean("deleted"));
                     s.setDeptId(rs.getInt("dept_id"));
+                    s.setOrderStatus(rs.getString("order_status"));
                     saleList.add(s);
                 }
             }
@@ -2479,7 +2484,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode,
-                                         String locCode, String compCode, Integer deptId, String curCode,String deleted) throws Exception {
+                                         String locCode, String compCode, Integer deptId, String curCode, String deleted) throws Exception {
         String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
@@ -2753,6 +2758,12 @@ public class ReportServiceImpl implements ReportService {
                     in.setStockCode(rs.getString("user_code"));
                     in.setRemark(rs.getString("remark"));
                     in.setRefNo(rs.getString("ref_no"));
+                    float qty = rs.getFloat("weight");
+                    String unit = rs.getString("weight_unit");
+                    if (qty > 0 && unit != null) {
+                        in.setWeight(qty);
+                        in.setWeightUnit(qty + " " + unit);
+                    }
                     riList.add(in);
                 }
             }
@@ -3458,7 +3469,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-
     @Override
     public List<VOrder> getOrderSummaryByDepartment(String fromDate, String toDate, String compCode) {
         List<VOrder> list = new ArrayList<>();
@@ -3484,6 +3494,7 @@ public class ReportServiceImpl implements ReportService {
         }
         return list;
     }
+
     @Override
     public List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode) {
         List<VSale> list = new ArrayList<>();

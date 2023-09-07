@@ -23,4 +23,6 @@ public class VTransfer {
     private String createdBy;
     private boolean deleted;
     private Integer deptId;
+    private Float weight;
+    private String weightUnit;
 }
