@@ -50,7 +50,7 @@ public class AccountRepo {
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
-            accountApi.post().uri("/account/save-gl-list")
+            accountApi.post().uri("/account/saveGlList")
                     .body(Mono.just(glList), List.class)
                     .retrieve()
                     .bodyToMono(Response.class)
@@ -211,13 +211,13 @@ public class AccountRepo {
                     case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
-                accountApi.post().uri("/account/save-trader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()), (e) -> log.error("send Trader : " + e.getMessage()));
+                accountApi.post().uri("/account/saveTrader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()), (e) -> log.error("send Trader : " + e.getMessage()));
             }
         }
     }
 
     public void deleteTrader(AccTraderKey key) {
-        accountApi.post().uri("/account/delete-trader")
+        accountApi.post().uri("/account/deleteTrader")
                 .body(Mono.just(key), AccTraderKey.class)
                 .retrieve()
                 .bodyToMono(ReturnObject.class)
@@ -911,7 +911,7 @@ public class AccountRepo {
 
     private void deleteGlByVoucher(Gl gl) {
         accountApi.post()
-                .uri("/account/delete-gl-by-voucher")
+                .uri("/account/deleteGlByVoucher")
                 .body(Mono.just(gl), Gl.class)
                 .retrieve()
                 .bodyToMono(String.class)
