@@ -1205,3 +1205,6 @@ create table order_status (
   order_by int(5) default null,
   primary key (code,dept_id,comp_code)
 ) engine=innodb default charset=utf8mb3;
+
+alter table transfer_his
+add column trader_code varchar(45) null after vou_lock;
