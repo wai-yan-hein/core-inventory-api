@@ -3472,19 +3472,18 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VOrder> getOrderSummaryByDepartment(String fromDate, String toDate, String compCode) {
         List<VOrder> list = new ArrayList<>();
-        String sql = "select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count\n" +
-                "from order_his\n" +
-                "where date(vou_date) between ? and ?\n" +
-                "and deleted = false\n" +
-                "and comp_code =?\n" +
-                "group by dept_id,cur_code";
+        String sql = """
+                select sum(vou_total) vou_total,cur_code,dept_id,count(*) vou_count
+                from order_his
+                where date(vou_date) between ? and ?
+                and deleted = false
+                and comp_code =?
+                group by dept_id,cur_code""";
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode);
             while (rs.next()) {
                 VOrder s = new VOrder();
                 s.setVouTotal(rs.getDouble("vou_total"));
-                s.setVouBalance(rs.getDouble("vou_balance"));
-                s.setPaid(rs.getDouble("paid"));
                 s.setDeptId(rs.getInt("dept_id"));
                 s.setVouCount(rs.getInt("vou_count"));
                 list.add(s);
