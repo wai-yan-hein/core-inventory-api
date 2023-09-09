@@ -2253,7 +2253,7 @@ public class ReportServiceImpl implements ReportService {
                                         String vouNo, String remark, String reference,
                                         String userCode, String stockCode, String locCode,
                                         String compCode, Integer deptId, String deleted,
-                                        String nullBatch, String batchNo, String projectNo, String curCode) {
+                                        String nullBatch, String batchNo, String projectNo, String curCode, String orderStauts) {
         List<VOrder> saleList = new ArrayList<>();
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2285,6 +2285,9 @@ public class ReportServiceImpl implements ReportService {
         }
         if (!curCode.equals("-")) {
             filter += "and cur_code = '" + curCode + "'\n";
+        }
+        if (!orderStauts.equals("-")) {
+            filter += "and order_status = '" + orderStauts + "'\n";
         }
         String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" +
                 "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code,comp_code,dept_id,order_status\n" +
