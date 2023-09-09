@@ -25,4 +25,5 @@ public class VTransfer {
     private Integer deptId;
     private Float weight;
     private String weightUnit;
+    private String traderName;
 }
