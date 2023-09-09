@@ -182,7 +182,8 @@ public interface ReportService {
                                   Integer deptId, String curCode,String deleted) throws Exception;
 
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
-                                       String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception;
+                                       String userCode, String stockCode, String locCode, String compCode, Integer deptId,
+                                       String deleted, String traderCode) throws Exception;
 
     List<WeightLossHis> getWeightLossHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String stockCode, String locCode, String compCode, Integer deptId, String deleted);
 

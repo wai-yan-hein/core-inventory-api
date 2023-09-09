@@ -2526,7 +2526,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception {
+    public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode,
+                                              String locCode, String compCode, Integer deptId, String deleted, String traderCode) throws Exception {
 
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2543,6 +2544,9 @@ public class ReportServiceImpl implements ReportService {
         }
         if (!stockCode.equals("-")) {
             filter += "and stock_code ='" + stockCode + "'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
         }
         if (!locCode.equals("-")) {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";
