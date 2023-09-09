@@ -22,7 +22,7 @@ public class OrderStatusDaoImpl extends AbstractDao<OrderStatusKey, OrderStatus>
 
     @Override
     public List<OrderStatus> findAll(String compCode) {
-        String hsql = "select o from OrderStatus o where o.key.compCode = '" + compCode + "'";
+        String hsql = "select o from OrderStatus o where o.key.compCode = '" + compCode + "' order by orderBy";
         return findHSQL(hsql);
     }
 
