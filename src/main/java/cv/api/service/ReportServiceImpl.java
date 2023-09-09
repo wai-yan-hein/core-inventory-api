@@ -2253,7 +2253,7 @@ public class ReportServiceImpl implements ReportService {
                                         String vouNo, String remark, String reference,
                                         String userCode, String stockCode, String locCode,
                                         String compCode, Integer deptId, String deleted,
-                                        String nullBatch, String batchNo, String projectNo, String curCode) {
+                                        String nullBatch, String batchNo, String projectNo, String curCode, String orderStauts) {
         List<VOrder> saleList = new ArrayList<>();
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2285,6 +2285,9 @@ public class ReportServiceImpl implements ReportService {
         }
         if (!curCode.equals("-")) {
             filter += "and cur_code = '" + curCode + "'\n";
+        }
+        if (!orderStauts.equals("-")) {
+            filter += "and order_status = '" + orderStauts + "'\n";
         }
         String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" +
                 "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code,comp_code,dept_id,order_status\n" +
@@ -2523,7 +2526,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception {
+    public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode,
+                                              String locCode, String compCode, Integer deptId, String deleted, String traderCode) throws Exception {
 
         String filter = "";
         if (!vouNo.equals("-")) {
@@ -2540,6 +2544,9 @@ public class ReportServiceImpl implements ReportService {
         }
         if (!stockCode.equals("-")) {
             filter += "and stock_code ='" + stockCode + "'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
         }
         if (!locCode.equals("-")) {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";

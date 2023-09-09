@@ -96,8 +96,10 @@ public class OrderController {
         String batchNo = Util1.isNull(filter.getBatchNo(), "-");
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
+        String orderStatus = Util1.isNull(filter.getOrderStatus(), "-");
         List<VOrder> orderList = reportService.getOrderHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
-                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode);
+                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode,
+        orderStatus);
         return Flux.fromIterable(orderList).onErrorResume(throwable -> Flux.empty());
     }
 

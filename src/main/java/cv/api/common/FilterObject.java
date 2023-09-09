@@ -42,5 +42,5 @@ public class FilterObject {
     private String account;
     private String saleVouNo;
     private String tranOption;
-
+    private String orderStatus;
 }
