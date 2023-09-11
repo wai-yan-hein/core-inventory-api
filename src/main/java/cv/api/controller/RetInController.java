@@ -42,7 +42,7 @@ public class RetInController {
     @Autowired
     private AccountRepo accountRepo;
 
-    @PostMapping(path = "/save-retin")
+    @PostMapping(path = "/saveReturnIn")
     public Mono<RetInHis> saveReturnIn(@RequestBody RetInHis retin) {
         retin.setUpdatedDate(Util1.getTodayLocalDate());
         retin = riService.save(retin);
@@ -52,8 +52,8 @@ public class RetInController {
         return Mono.justOrEmpty(retin);
     }
 
-    @PostMapping(path = "/get-retin")
-    public Flux<?> getRI(@RequestBody FilterObject filter) throws Exception {
+    @PostMapping(path = "/getReturnIn")
+    public Flux<?> getReturnIn(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -71,8 +71,8 @@ public class RetInController {
         return Flux.fromIterable(listRI).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-retin")
-    public Mono<?> deleteRI(@RequestBody RetInHisKey key) throws Exception {
+    @PostMapping(path = "/deleteReturnIn")
+    public Mono<?> deleteReturnIn(@RequestBody RetInHisKey key) throws Exception {
         riService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
@@ -80,21 +80,21 @@ public class RetInController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-retin")
-    public Mono<?> restoreRI(@RequestBody RetInHisKey key) throws Exception {
+    @PostMapping(path = "/restoreReturnIn")
+    public Mono<?> restoreReturnIn(@RequestBody RetInHisKey key) throws Exception {
         riService.restore(key);
         ro.setMessage("Restored.");
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-retin")
-    public Mono<RetInHis> findRI(@RequestBody RetInHisKey key) {
+    @PostMapping(path = "/findReturnIn")
+    public Mono<RetInHis> findReturnIn(@RequestBody RetInHisKey key) {
         RetInHis sh = riService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-retin-detail")
-    public Flux<?> getRIDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getReturnInDetail")
+    public Flux<?> getReturnInDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<RetInHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }

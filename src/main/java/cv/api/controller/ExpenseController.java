@@ -27,17 +27,17 @@ public class ExpenseController {
     @Autowired
     private ExpenseService expenseService;
 
-    @PostMapping(path = "/save-expense")
+    @PostMapping(path = "/saveExpense")
     public Mono<?> saveExpense(@RequestBody Expense e) {
         return Mono.justOrEmpty(expenseService.save(e));
     }
 
-    @GetMapping(path = "/get-expense")
+    @GetMapping(path = "/getExpense")
     public Flux<?> getExpense(@RequestParam String compCode) {
         return Flux.fromIterable(expenseService.getExpense(compCode));
     }
 
-    @PostMapping(path = "/delete-expense")
+    @PostMapping(path = "/deleteExpense")
     public Mono<?> deletePur(@RequestBody ExpenseKey key) {
         expenseService.delete(key);
         return Mono.justOrEmpty(true);

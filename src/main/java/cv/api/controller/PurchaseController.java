@@ -41,7 +41,7 @@ public class PurchaseController {
     @Autowired
     private AccountRepo accountRepo;
 
-    @PostMapping(path = "/save-pur")
+    @PostMapping(path = "/savePurchase")
     public Mono<PurHis> savePurchase(@RequestBody PurHis pur) {
         pur.setUpdatedDate(LocalDateTime.now());
         pur = phService.save(pur);
@@ -50,7 +50,7 @@ public class PurchaseController {
         return Mono.justOrEmpty(pur);
     }
 
-    @PostMapping(path = "/get-pur")
+    @PostMapping(path = "/getPur")
     public Flux<?> getPur(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -71,7 +71,7 @@ public class PurchaseController {
         return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-pur")
+    @PostMapping(path = "/deletePur")
     public Mono<?> deletePur(@RequestBody PurHisKey key) throws Exception {
         phService.delete(key);
         //delete in account
@@ -79,19 +79,19 @@ public class PurchaseController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-pur")
+    @PostMapping(path = "/restorePur")
     public Mono<?> restorePur(@RequestBody PurHisKey key) throws Exception {
         phService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-pur")
+    @PostMapping(path = "/findPur")
     public Mono<PurHis> findPur(@RequestBody PurHisKey key) {
         PurHis sh = phService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-pur-detail")
+    @GetMapping(path = "/getPurDetail")
     public Flux<PurHisDetail> getPurDetail(@RequestParam String vouNo,
                                            @RequestParam String compCode,
                                            @RequestParam Integer deptId) {
@@ -99,7 +99,7 @@ public class PurchaseController {
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-description")
+    @GetMapping(path = "/getDescription")
     public Flux<?> getDescription(@RequestParam String str, @RequestParam String compCode, @RequestParam String tranType) {
         return Flux.fromIterable(phService.getDescription(Util1.cleanStr(str), compCode, tranType));
     }

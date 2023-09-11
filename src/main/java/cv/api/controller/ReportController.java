@@ -34,7 +34,7 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @GetMapping(value = "/get-sale-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
@@ -63,7 +63,7 @@ public class ReportController {
         }
     }
 
-    @GetMapping(value = "/get-order-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getOrderReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] getOrderReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
         String reportName = "OrderVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
@@ -72,25 +72,25 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
-    @GetMapping(value = "/get-purchase-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getPurchaseReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
         List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo, compCode);
         return Flux.fromIterable(listPur);
     }
 
-    @GetMapping(value = "/get-grn-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getGRNReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getGRNReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
         List<VPurchase> listPur = reportService.getGRNVoucher(vouNo, compCode);
         return Flux.fromIterable(listPur);
     }
 
-    @GetMapping(value = "/get-purchase-weight-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getPurWeightReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getPurWeightReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam String batchNo) {
         List<VPurchase> list = reportService.getPurchaseByWeightVoucher(vouNo, Util1.isNull(batchNo, "-"), compCode);
         return Flux.fromIterable(list);
     }
 
-    @GetMapping(value = "/get-return-in-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getReturnInReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnInVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
@@ -113,7 +113,7 @@ public class ReportController {
         return Flux.fromIterable(listRI).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(value = "/get-return-out-report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getReturnOutReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
         String reportName = "ReturnOutVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
@@ -122,8 +122,8 @@ public class ReportController {
         return new FileInputStream(exportPath).readAllBytes();
     }
 
-    @PostMapping(value = "/get-report", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Mono<ReturnObject> getReport(@RequestBody ReportFilter filter) {
+    @PostMapping(value = "/getReport", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ReturnObject> getReport(@RequestBody ReportFilter filter) {
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
@@ -410,33 +410,33 @@ public class ReportController {
     }
 
 
-    @GetMapping(path = "/get-purchase-recent-price")
+    @GetMapping(path = "/getPurchaseRecentPrice")
     public Mono<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
-    @GetMapping(path = "/get-weight-loss-recent-price")
+    @GetMapping(path = "/getWeightLossRecentPrice")
     public Mono<General> getWeightLossRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
-    @GetMapping(path = "/get-production-recent-price")
+    @GetMapping(path = "/getProductionRecentPrice")
     public Mono<General> getProductionRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
-    @GetMapping(path = "/get-purchase-avg-price")
+    @GetMapping(path = "/getPurAvgPrice")
     public Mono<General> getPurAvgPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.just(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId));
     }
 
-    @GetMapping(path = "/get-sale-recent-price")
+    @GetMapping(path = "/getSaleRecentPrice")
     public Mono<General> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
         return Mono.justOrEmpty(reportService.getSaleRecentPrice(stockCode, vouDate, unit, compCode));
     }
 
 
-    @GetMapping(path = "/get-stock-io-recent-price")
+    @GetMapping(path = "/getStockIORecentPrice")
     public Mono<General> getStockIORecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit) {
         return Mono.justOrEmpty(reportService.getStockIORecentPrice(stockCode, vouDate, unit));
     }
@@ -460,7 +460,7 @@ public class ReportController {
     }
 
 
-    @PostMapping(path = "/get-reorder-level")
+    @PostMapping(path = "/getReorderLevel")
     public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) throws Exception {
         String compCode = filter.getCompCode();
         String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
@@ -481,8 +481,8 @@ public class ReportController {
         return Flux.fromIterable(reorderLevels).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-smallest_qty")
-    public Mono<?> getSaleRecentPrice(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getSmallQty")
+    public Mono<?> getSmallQty(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
     }
 

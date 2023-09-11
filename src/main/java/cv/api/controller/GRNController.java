@@ -54,12 +54,12 @@ public class GRNController {
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-grn-detail")
+    @GetMapping(path = "/getGRNDetail")
     public Flux<?> getGRNDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(grnDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-grn-detail-batch")
+    @GetMapping(path = "/getGRNDetailBatch")
     public Flux<?> getGRNDetailBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<GRN> list = grnService.search(batchNo, compCode, deptId);
         if (!list.isEmpty()) {
@@ -69,26 +69,26 @@ public class GRNController {
         return Flux.fromIterable(new ArrayList<>());
     }
 
-    @PostMapping(path = "/delete-grn")
+    @PostMapping(path = "/deleteGRN")
     public Mono<?> deleteGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));
     }
 
-    @PostMapping(path = "/restore-grn")
+    @PostMapping(path = "/restoreGRN")
     public Mono<?> restoreGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.restore(key));
     }
 
-    @PostMapping(path = "/open-grn")
-    public Mono<?> openGRn(@RequestBody GRNKey key) {
+    @PostMapping(path = "/openGRN")
+    public Mono<?> openGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.delete(key));
     }
     @PostMapping(path = "/findGRN")
     public Mono<?> findGRN(@RequestBody GRNKey key) {
         return Mono.justOrEmpty(grnService.findByCode(key));
     }
-    @GetMapping(path = "/get-batch-list")
-    public Flux<?> findByBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getBatchList")
+    public Flux<?> getBatchList(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(grnService.search(Util1.cleanStr(batchNo), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 

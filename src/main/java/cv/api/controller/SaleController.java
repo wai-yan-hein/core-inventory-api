@@ -139,14 +139,14 @@ public class SaleController {
         return Flux.fromIterable(sdService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-sale-voucher-info")
-    public Mono<?> getSaleVoucherCount(@RequestParam String vouDate,
+    @GetMapping(path = "/getSaleVoucherInfo")
+    public Mono<?> getSaleVoucherInfo(@RequestParam String vouDate,
                                                  @RequestParam String compCode,
                                                  @RequestParam Integer deptId) {
         return  Mono.justOrEmpty(shService.getVoucherInfo(vouDate, compCode, deptId));
     }
 
-    @GetMapping(path = "/get-sale-by-batch")
+    @GetMapping(path = "/getSaleByBatch")
     public Flux<?> getSaleByBatch(@RequestParam String batchNo,
                                             @RequestParam String compCode,
                                             @RequestParam Integer deptId,

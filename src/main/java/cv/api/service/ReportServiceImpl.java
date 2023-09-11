@@ -2289,11 +2289,21 @@ public class ReportServiceImpl implements ReportService {
         if (!orderStauts.equals("-")) {
             filter += "and order_status = '" + orderStauts + "'\n";
         }
-        String sql = "select a.*,t.trader_name,t.user_code\n" + "from (\n" +
-                "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code,comp_code,dept_id,order_status\n" +
+        String sql = "select a.*,t.trader_name,t.user_code,os.description order_status_name\n" +
+                "from (\n" +
+                "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code," +
+                "comp_code,dept_id,order_status\n" +
                 "from v_order s \n" +
                 "where comp_code = '" + compCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" + "and deleted = " + deleted + "\n" + "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" + "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" + "and a.comp_code = t.comp_code\n" + "and a.dept_id = t.dept_id\n" + "order by date(vou_date) desc,vou_no desc";
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and deleted = " + deleted + "\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" +
+                "group by vou_no\n" + ")a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "left join order_status os on a.order_status = os.code\n" +
+                "and a.comp_code = os.comp_code\n" +
+                "order by date(vou_date) desc,vou_no desc";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
@@ -2306,11 +2316,11 @@ public class ReportServiceImpl implements ReportService {
                     s.setRemark(rs.getString("remark"));
                     s.setReference(rs.getString("reference"));
                     s.setCreatedBy(rs.getString("created_by"));
-//                    s.setPaid(rs.getDouble("paid"));
                     s.setVouTotal(rs.getDouble("vou_total"));
                     s.setDeleted(rs.getBoolean("deleted"));
                     s.setDeptId(rs.getInt("dept_id"));
                     s.setOrderStatus(rs.getString("order_status"));
+                    s.setOrderStatusName(rs.getString("order_status_name"));
                     saleList.add(s);
                 }
             }
@@ -2749,7 +2759,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
         String sql = """
-                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName, t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no
+                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
+                t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit
                 from v_transfer t
                 join location ft
                 on ft.loc_code = t.loc_code_from

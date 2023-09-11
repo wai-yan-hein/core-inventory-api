@@ -38,11 +38,9 @@ public class MillingController {
     private MillingExpenseService expService;
     @Autowired
     private ReportService reportService;
-    @Autowired
-    private AccountRepo accountRepo;
 
-    @PostMapping(path = "/save-milling")
-    public Mono<?> saveSale(@RequestBody MillingHis sale) {
+    @PostMapping(path = "/saveMilling")
+    public Mono<?> saveMilling(@RequestBody MillingHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
@@ -50,9 +48,6 @@ public class MillingController {
         } else {
             return Mono.justOrEmpty(ro);
         }
-        //for account
-//        accountRepo.sendSale(sale);
-        //for cloud
         return Mono.justOrEmpty(sale);
     }
 
@@ -77,8 +72,8 @@ public class MillingController {
         return status;
     }
 
-    @PostMapping(path = "/get-milling")
-    public Flux<?> getSale(@RequestBody FilterObject filter) throws Exception {
+    @PostMapping(path = "/getMilling")
+    public Flux<?> getMilling(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -98,7 +93,7 @@ public class MillingController {
         return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-milling")
+    @PostMapping(path = "/deleteMilling")
     public Mono<?> deleteSale(@RequestBody MillingHisKey key) throws Exception {
         hService.delete(key);
         //delete in account
@@ -107,34 +102,34 @@ public class MillingController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-milling")
-    public Mono<?> restoreSale(@RequestBody MillingHisKey key) throws Exception {
+    @PostMapping(path = "/restoreMilling")
+    public Mono<?> restoreMilling(@RequestBody MillingHisKey key) throws Exception {
         hService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-milling")
-    public Mono<MillingHis> findSale(@RequestBody MillingHisKey key) {
+    @PostMapping(path = "/findMilling")
+    public Mono<MillingHis> findMilling(@RequestBody MillingHisKey key) {
         MillingHis sh = hService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-raw-detail")
+    @GetMapping(path = "/getRawDetail")
     public Flux<?> getRawDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {
         return Flux.fromIterable(rawService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-expense-detail")
+    @GetMapping(path = "/getExpenseDetail")
     public Flux<?> getExpenseDetail(@RequestParam String vouNo,
                                     @RequestParam String compCode,
                                     @RequestParam Integer deptId) {
         return Flux.fromIterable(expService.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/get-output-detail")
-    public Flux<?> getMillingDetail(@RequestParam String vouNo,
+    @GetMapping(path = "/getOutputDetail")
+    public Flux<?> getOutputDetail(@RequestParam String vouNo,
                                     @RequestParam String compCode,
                                     @RequestParam Integer deptId) {
         return Flux.fromIterable(outService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());

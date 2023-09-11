@@ -26,29 +26,29 @@ public class ProcessController {
     @Autowired
     private ProcessHisDetailService processHisDetailService;
 
-    @PostMapping(path = "/save-process")
+    @PostMapping(path = "/saveProcess")
     public Mono<?> saveProcess(@RequestBody ProcessHis p) {
         return Mono.just(processHisService.save(p));
     }
 
-    @PostMapping(path = "/delete-process")
+    @PostMapping(path = "/deleteProcess")
     public Mono<?> deleteProcess(@RequestBody ProcessHisKey p) {
         processHisService.delete(p);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-process")
+    @PostMapping(path = "/findProcess")
     public Mono<?> findProcess(@RequestBody ProcessHisKey p) {
         return Mono.justOrEmpty(processHisService.findById(p));
     }
 
-    @PostMapping(path = "/restore-process")
+    @PostMapping(path = "/restoreProcess")
     public Mono<?> restoreProcess(@RequestBody ProcessHisKey p) {
         processHisService.restore(p);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/get-process")
+    @PostMapping(path = "/getProcess")
     public Flux<?> getProcess(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
@@ -66,19 +66,19 @@ public class ProcessController {
                 finished, deleted, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/save-process-detail")
+    @PostMapping(path = "/saveProcessDetail")
     public Mono<?> saveProcessDetail(@RequestBody ProcessHisDetail p) {
         return Mono.just(processHisDetailService.save(p));
     }
 
-    @PostMapping(path = "/delete-process-detail")
+    @PostMapping(path = "/deleteProcessDetail")
     public Mono<?> deleteProcessDetail(@RequestBody ProcessHisDetailKey p) {
         processHisDetailService.delete(p);
         ro.setMessage("Deleted.");
         return Mono.just(true);
     }
 
-    @GetMapping(path = "/get-process-detail")
+    @GetMapping(path = "/getProcessDetail")
     public Flux<?> getProcessDetail(@RequestParam String vouNo,
                                               @RequestParam String compCode,
                                               @RequestParam Integer deptId) {

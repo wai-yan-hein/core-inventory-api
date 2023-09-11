@@ -17,8 +17,8 @@ public class MillingExpenseController {
     @Autowired
     private MillingExpenseService service;
 
-    @GetMapping(path = "/get-pur-expense")
-    public Flux<MillingExpense> getExpense(@RequestParam String vouNo,
+    @GetMapping(path = "/getMillingExpense")
+    public Flux<MillingExpense> getMillingExpense(@RequestParam String vouNo,
                                            @RequestParam String compCode) {
         return Flux.fromIterable(service.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }

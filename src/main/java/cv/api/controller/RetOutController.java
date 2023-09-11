@@ -39,7 +39,7 @@ public class RetOutController {
     @Autowired
     private AccountRepo accountRepo;
 
-    @PostMapping(path = "/save-retout")
+    @PostMapping(path = "/saveReturnOut")
     public Mono<?> saveReturnOut(@RequestBody RetOutHis retout) {
         retout.setUpdatedDate(Util1.getTodayLocalDate());
         retout = roService.save(retout);
@@ -47,8 +47,8 @@ public class RetOutController {
         return Mono.justOrEmpty(retout);
     }
 
-    @PostMapping(path = "/get-retout")
-    public Flux<?> getRO(@RequestBody FilterObject filter) throws Exception {
+    @PostMapping(path = "/getReturnOut")
+    public Flux<?> getReturnOut(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -66,8 +66,8 @@ public class RetOutController {
                 stockCode, locCode, compCode, deptId, deleted, projectNo, curCode)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-retout")
-    public Mono<?> deleteRO(@RequestBody RetOutHisKey key) throws Exception {
+    @PostMapping(path = "/deleteReturnOut")
+    public Mono<?> deleteReturnOut(@RequestBody RetOutHisKey key) throws Exception {
         roService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);
@@ -75,20 +75,20 @@ public class RetOutController {
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-retout")
-    public Mono<?> restoreRo(@RequestBody RetOutHisKey key) throws Exception {
+    @PostMapping(path = "/restoreReturnOut")
+    public Mono<?> restoreReturnOut(@RequestBody RetOutHisKey key) throws Exception {
         roService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-retout")
-    public Mono<RetOutHis> findRO(@RequestBody RetOutHisKey key) {
+    @PostMapping(path = "/findReturnOut")
+    public Mono<RetOutHis> findReturnOut(@RequestBody RetOutHisKey key) {
         RetOutHis sh = roService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
-    @GetMapping(path = "/get-retout-detail")
-    public Flux<?> getRODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getReturnOutDetail")
+    public Flux<?> getReturnOutDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         List<RetOutHisDetail> listSD = rdService.search(vouNo, compCode, deptId);
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }

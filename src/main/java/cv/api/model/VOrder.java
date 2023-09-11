@@ -80,4 +80,5 @@ public class VOrder {
     private String projectNo;
     private Integer vouCount;
     private String orderStatus;
+    private String orderStatusName;
 }
