@@ -61,9 +61,6 @@ public class OrderController {
         } else if (Util1.isNullOrEmpty(order.getCurCode())) {
             status = false;
             ro.setMessage("Invalid Currency.");
-        } else if (Util1.getFloat(order.getVouTotal()) <= 0) {
-            status = false;
-            ro.setMessage("Invalid Voucher Total.");
         } else if (Util1.isNullOrEmpty(order.getLocCode())) {
             status = false;
             ro.setMessage("Invalid Location.");
@@ -98,8 +95,8 @@ public class OrderController {
         String curCode = Util1.isAll(filter.getCurCode());
         String orderStatus = Util1.isNull(filter.getOrderStatus(), "-");
         List<VOrder> orderList = reportService.getOrderHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
-                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode,
-        orderStatus);
+                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo, curCode,
+                orderStatus);
         return Flux.fromIterable(orderList).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -123,8 +120,8 @@ public class OrderController {
 
     @GetMapping(path = "/getOrderDetail")
     public Flux<?> getOrderDetail(@RequestParam String vouNo,
-                                 @RequestParam String compCode,
-                                 @RequestParam Integer deptId) {
+                                  @RequestParam String compCode,
+                                  @RequestParam Integer deptId) {
         return Flux.fromIterable(odService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }

@@ -1,6 +1,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,12 +13,10 @@ import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-@ToString
+@Data
 @Entity
 @Table(name = "op_his")
-public class OPHis implements java.io.Serializable {
+public class OPHis {
     @EmbeddedId
     private OPHisKey key;
     @Column(name = "dept_id")

@@ -25,14 +25,16 @@ public class OrderHisDetail {
     private Integer deptId;
     @Column(name = "stock_code")
     private String stockCode;
+    @Column(name = "order_qty")
+    private Double orderQty;
     @Column(name = "qty", nullable = false)
     private Double qty;
     @Column(name = "unit")
     private String unitCode;
     @Column(name = "price", nullable = false)
-    private Double price;
+    private double price;
     @Column(name = "amt", nullable = false)
-    private Double amount;
+    private double amount;
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "weight")

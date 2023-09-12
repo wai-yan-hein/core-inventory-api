@@ -43,7 +43,7 @@ public class OrderHis {
     @Column(name = "reference")
     private String reference;
     @Column(name = "vou_total")
-    private Double vouTotal;
+    private double vouTotal;
     @Column(name = "deleted")
     private boolean deleted;
     @Column(name = "created_date", columnDefinition = "TIMESTAMP")
