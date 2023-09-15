@@ -441,7 +441,7 @@ public class ReportController {
         return Mono.justOrEmpty(reportService.getStockIORecentPrice(stockCode, vouDate, unit));
     }
 
-    @GetMapping(path = "/get-stock-balance")
+    @GetMapping(path = "/getStockBalance")
     public Flux<?> getStockBalance(@RequestParam String stockCode,
                                    @RequestParam boolean calSale, @RequestParam boolean calPur,
                                    @RequestParam boolean calRI, @RequestParam boolean calRO,

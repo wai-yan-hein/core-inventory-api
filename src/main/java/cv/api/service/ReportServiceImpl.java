@@ -2291,7 +2291,7 @@ public class ReportServiceImpl implements ReportService {
         }
         String sql = "select a.*,t.trader_name,t.user_code,os.description order_status_name\n" +
                 "from (\n" +
-                "select  vou_no,date(vou_date) vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code," +
+                "select  vou_no,vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code," +
                 "comp_code,dept_id,order_status\n" +
                 "from v_order s \n" +
                 "where comp_code = '" + compCode + "'\n" +
@@ -2309,6 +2309,7 @@ public class ReportServiceImpl implements ReportService {
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
                     VOrder s = new VOrder();
+                    s.setVouDateTime(rs.getTimestamp("vou_date").toLocalDateTime());
                     s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     s.setVouNo(rs.getString("vou_no"));
                     s.setTraderCode(rs.getString("user_code"));
@@ -2575,7 +2576,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
                 "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter +
                 "group by v.vou_no\n" +
-                "order by v.vou_date,v.vou_no desc\n";
+                "order by v.vou_date desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VTransfer> openingList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
