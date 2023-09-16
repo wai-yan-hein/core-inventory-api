@@ -1622,7 +1622,7 @@ public class ReportServiceImpl implements ReportService {
     public List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode,
                                            String brandCode, String catCode, String compCode,
                                            Integer deptId) throws Exception {
-        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty*rel.smallest_qty) smallest_qty\n" +
+        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty*rel.smallest_qty) smallest_qty, rel.unit\n" +
                 "from (select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code\n" +
                 "from v_sale\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
@@ -1647,6 +1647,8 @@ public class ReportServiceImpl implements ReportService {
                 float smallQty = rs.getFloat("smallest_qty");
                 g.setQtyRel(getRelStr(relCode, compCode, smallQty));
                 g.setAmount(rs.getFloat("ttl_amt"));
+                g.setUnit(rs.getString("unit"));
+                g.setSmallQty(smallQty);
                 generals.add(g);
             }
         }
