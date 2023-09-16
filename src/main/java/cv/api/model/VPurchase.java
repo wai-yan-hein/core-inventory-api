@@ -62,4 +62,5 @@ public class VPurchase implements Serializable {
     private Double totalQty;
     private String batchNo;
     private String projectNo;
+    private String address;
 }
