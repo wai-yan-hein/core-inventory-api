@@ -27,15 +27,19 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
     @Override
     public List<TransferHisDetail> search(String vouNo, String compCode, Integer deptId) {
         List<TransferHisDetail> list = new ArrayList<>();
-        String sql = "select td.*,s.user_code,s.stock_name,rel.rel_name\n" +
-                "from transfer_his_detail td \n" + "join stock s on td.stock_code = s.stock_code\n" +
-                "and td.comp_code = s.comp_code\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
-                "and td.comp_code = rel.comp_code\n" +
-                "where td.vou_no ='" + vouNo + "'\n" +
-                "and td.comp_code ='" + compCode + "'\n" +
-                "order by td.unique_id";
-        ResultSet rs = getResult(sql);
+        String sql = """
+                select td.*,s.user_code,s.stock_name,st.stock_type_name,rel.rel_name
+                from transfer_his_detail td\s
+                join stock s on td.stock_code = s.stock_code
+                and td.comp_code = s.comp_code
+                join stock_type st on s.stock_type_code = st.stock_type_code
+                and s.comp_code = st.comp_code
+                join unit_relation rel on s.rel_code = rel.rel_code
+                and td.comp_code = rel.comp_code
+                where td.vou_no =?
+                and td.comp_code =?
+                order by td.unique_id""";
+        ResultSet rs = getResult(sql,vouNo,compCode);
         if (rs != null) {
             try {
                 while (rs.next()) {
@@ -50,6 +54,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
                     td.setUserCode(rs.getString("user_code"));
                     td.setStockCode(rs.getString("stock_code"));
                     td.setStockName(rs.getString("stock_name"));
+                    td.setGroupName(rs.getString("stock_type_name"));
                     td.setQty(rs.getFloat("qty"));
                     td.setUnitCode(rs.getString("unit"));
                     td.setRelName(rs.getString("rel_name"));

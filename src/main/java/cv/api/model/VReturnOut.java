@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -18,7 +19,6 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VReturnOut implements Serializable {
 
-    private String rdCode;
     private String vouNo;
     private String traderCode;
     private String vouDate;
@@ -49,4 +49,5 @@ public class VReturnOut implements Serializable {
     private String stockName;
     private String locationName;
     private Integer deptId;
+    private ZonedDateTime vouDateTime;
 }

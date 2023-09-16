@@ -6,6 +6,7 @@ import lombok.Data;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -54,4 +55,6 @@ public class TransferHis {
     private String status = "STATUS";
     @Transient
     private List<String> location;
+    @Transient
+    private ZonedDateTime vouDateTime;
 }

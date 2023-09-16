@@ -10,6 +10,7 @@ import lombok.Data;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -72,4 +73,6 @@ public class RetOutHis implements java.io.Serializable {
     private List<RetOutKey> listDel;
     @Transient
     private List<String> location;
+    @Transient
+    private ZonedDateTime vouDateTime;
 }

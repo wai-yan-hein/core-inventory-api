@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,8 +53,8 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
-    public int delete(String code) {
-        return dao.delete(code);
+    public int delete(RegionKey key) {
+        return dao.delete(key);
     }
 
     private String getRegionCode(Integer macId, String compCode) {
@@ -63,5 +65,15 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public List<Region> findAll(String compCode) {
         return dao.findAll(compCode);
+    }
+
+    @Override
+    public List<Region> getRegion(LocalDateTime updatedDate) {
+        return dao.getRegion(updatedDate);
+    }
+
+    @Override
+    public Date getMaxDate() {
+        return dao.getMaxDate();
     }
 }

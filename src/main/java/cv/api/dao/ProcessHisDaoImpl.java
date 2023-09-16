@@ -1,5 +1,6 @@
 package cv.api.dao;
 
+import cv.api.common.Util1;
 import cv.api.entity.ProcessHis;
 import cv.api.entity.ProcessHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -14,14 +15,17 @@ import java.util.List;
 public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> implements ProcessHisDao {
     @Override
     public ProcessHis save(ProcessHis ph) {
-        saveOrUpdate(ph,ph.getKey());
+        saveOrUpdate(ph, ph.getKey());
         return ph;
     }
 
     @Override
     public ProcessHis findById(ProcessHisKey key) {
-
-        return getByKey(key);
+        ProcessHis byKey = getByKey(key);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
@@ -80,6 +84,7 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                     p.setStockCode(rs.getString("stock_code"));
                     p.setLocCode(rs.getString("loc_code"));
                     p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
+                    p.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                     p.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
                     p.setQty(rs.getFloat("qty"));
                     p.setUnit(rs.getString("unit"));

@@ -11,6 +11,7 @@ import lombok.Data;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -109,5 +110,7 @@ public class SaleHis {
     private List<SaleExpense> listExpense;
     @Transient
     private transient List<SaleExpenseKey> listDelExpense;
+    @Transient
+    private ZonedDateTime vouDateTime;
 
 }

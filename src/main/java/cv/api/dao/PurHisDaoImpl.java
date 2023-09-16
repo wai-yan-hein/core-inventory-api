@@ -87,7 +87,11 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
     @Override
     public PurHis findById(PurHisKey id) {
-        return getByKey(id);
+        PurHis byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
@@ -167,7 +171,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
     @Override
     public List<VDescription> getDescription(String str, String compCode, String tranType) {
         List<VDescription> list = new ArrayList<>();
-        String table = tranType.equals("Sale")? "sale_his" : "pur_his";
+        String table = tranType.equals("Sale") ? "sale_his" : "pur_his";
         String sql = "SELECT DISTINCT car_no " +
                 "FROM " + table + " " +
                 "WHERE comp_code = ? " +

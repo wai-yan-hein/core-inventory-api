@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-public class VPurchase implements Serializable {
+public class VPurchase {
     private String pdCode;
     private Double balance;
     private String createdBy;
@@ -18,6 +19,7 @@ public class VPurchase implements Serializable {
     private Double total;
     private Double paid;
     private String vouDate;
+    private ZonedDateTime vouDateTime;
     private String remark;
     private String sessionId;
     private String updatedBy;

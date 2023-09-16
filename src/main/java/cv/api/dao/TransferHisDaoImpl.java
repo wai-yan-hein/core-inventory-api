@@ -27,7 +27,11 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
 
     @Override
     public TransferHis findById(TransferHisKey key) {
-        return getByKey(key);
+        TransferHis byKey = getByKey(key);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override

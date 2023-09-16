@@ -8,6 +8,8 @@ package cv.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.time.ZonedDateTime;
+
 /**
  * @author wai yan
  */
@@ -21,6 +23,7 @@ public class VSale {
     private String rfId;
     private String saleManCode;
     private String vouDate;
+    private ZonedDateTime vouDateTime;
     private String creditTerm;
     private String curCode;
     private String remark;

@@ -3,6 +3,8 @@ package cv.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.time.ZonedDateTime;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VStockIO {
@@ -33,4 +35,5 @@ public class VStockIO {
     private Integer deptId;
     private String relName;
     private Float smallPrice;
+    private ZonedDateTime vouDateTime;
 }

@@ -23,7 +23,11 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
 
     @Override
     public PaymentHis find(PaymentHisKey key) {
-        return getByKey(key);
+        PaymentHis byKey = getByKey(key);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
@@ -74,7 +78,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 "and ph.comp_code = phd.comp_code\n" +
                 "and ph.deleted =?\n" +
                 "and ph.comp_code =?\n" +
-                "and ph.cur_code = ?\n"+
+                "and ph.cur_code = ?\n" +
                 "and ph.tran_option =?\n" +
                 "and date(ph.vou_date) between ? and ?\n" + filter + "\n" + ")a\n" +
                 "join trader t on a.trader_code = t.code\n" +
@@ -84,7 +88,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
         List<PaymentHis> list = new ArrayList<>();
         try {
             ResultSet rs = getResult(sql, deleted, compCode, curCode, tranOption, startDate, endDate,
-                    traderCode, projectNo,vouNo,account,userCode,remark + "%",saleVouNo);
+                    traderCode, projectNo, vouNo, account, userCode, remark + "%", saleVouNo);
             while (rs.next()) {
                 PaymentHis p = new PaymentHis();
                 PaymentHisKey key = new PaymentHisKey();

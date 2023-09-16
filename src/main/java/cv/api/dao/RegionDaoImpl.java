@@ -5,22 +5,28 @@
  */
 package cv.api.dao;
 
+import cv.api.common.Util1;
 import cv.api.entity.Region;
 import cv.api.entity.RegionKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author WSwe
  */
 @Repository
+@Slf4j
 public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements RegionDao {
 
 
     @Override
     public Region save(Region region) {
-        saveOrUpdate(region,region.getKey());
+        saveOrUpdate(region, region.getKey());
         return region;
     }
 
@@ -65,11 +71,15 @@ public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements Reg
             strSql = strSql + " where " + strFilter + " order by o.regionName";
         }
 
-        return (List<Region>) findHSQL(strSql);
+        return findHSQL(strSql);
     }
 
     @Override
-    public int delete(String code) {
+    public int delete(RegionKey key) {
+        Region r =getByKey(key);
+        r.setDeleted(true);
+        r.setUpdatedDate(LocalDateTime.now());
+        update(r);
         return 1;
     }
 
@@ -77,5 +87,28 @@ public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements Reg
     public List<Region> findAll(String compCode) {
         String hsql = "select o from Region o where o.key.compCode = '" + compCode + "'";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<Region> getRegion(LocalDateTime updatedDate) {
+        String hsql = "select o from Region o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
+    }
+
+    @Override
+    public Date getMaxDate() {
+        String sql = "select max(updated_date) date from region";
+        ResultSet rs = getResult(sql);
+        try {
+            if (rs.next()) {
+                Date date = rs.getTimestamp("date");
+                if (date != null) {
+                    return date;
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.getOldDate();
     }
 }

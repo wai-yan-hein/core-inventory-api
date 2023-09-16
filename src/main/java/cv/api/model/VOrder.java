@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author wai yan
@@ -21,7 +22,7 @@ public class VOrder {
     private String rfId;
     private String saleManCode;
     private String vouDate;
-    private LocalDateTime vouDateTime;
+    private ZonedDateTime vouDateTime;
     private String creditTerm;
     private String curCode;
     private String remark;

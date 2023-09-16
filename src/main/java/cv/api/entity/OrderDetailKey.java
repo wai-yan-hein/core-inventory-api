@@ -22,5 +22,5 @@ public class OrderDetailKey implements Serializable {
     @Column(name = "comp_code")
     private String compCode;
     @Column(name = "unique_id")
-    private Integer uniqueId;
+    private int uniqueId;
 }

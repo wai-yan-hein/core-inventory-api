@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -58,4 +59,6 @@ public class StockInOut implements Serializable {
     private List<StockInOutKey> listDel;
     @Transient
     private List<LocationKey> keys;
+    @Transient
+    private ZonedDateTime vouDateTime;
 }

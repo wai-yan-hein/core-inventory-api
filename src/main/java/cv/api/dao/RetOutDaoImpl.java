@@ -6,6 +6,7 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
+import cv.api.entity.RetInHis;
 import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
 
     @Override
     public RetOutHis save(RetOutHis sh) {
-        saveOrUpdate(sh,sh.getKey());
+        saveOrUpdate(sh, sh.getKey());
         return sh;
     }
 
@@ -85,27 +86,28 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
 
     @Override
     public RetOutHis findById(RetOutHisKey id) {
-        return getByKey(id);
+        RetOutHis byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
     public void delete(RetOutHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update ret_out_his set deleted = true,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        RetOutHis s = findById(key);
+        s.setDeleted(true);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
     }
 
     @Override
     public void restore(RetOutHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update ret_out_his set deleted = false,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        RetOutHis s = findById(key);
+        s.setDeleted(false);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
     }
-
 
 
     @Override

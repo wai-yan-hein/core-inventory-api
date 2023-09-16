@@ -8,6 +8,8 @@ package cv.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.time.ZonedDateTime;
+
 /**
  * @author wai yan
  */
@@ -19,6 +21,7 @@ public class VReturnIn {
     private String vouNo;
     private String traderCode;
     private String vouDate;
+    private ZonedDateTime vouDateTime;
     private String curCode;
     private String remark;
     private Float vouTotal;

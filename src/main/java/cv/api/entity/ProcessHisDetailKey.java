@@ -19,5 +19,5 @@ public class ProcessHisDetailKey implements Serializable {
     @Column(name = "dept_id")
     private Integer deptId;
     @Column(name = "unique_id")
-    private Integer uniqueId;
+    private int uniqueId;
 }
