@@ -1,5 +1,6 @@
 package cv.api.dao;
 
+import cv.api.common.Util1;
 import cv.api.entity.GRN;
 import cv.api.entity.GRNKey;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,11 @@ import java.util.List;
 public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     @Override
     public GRN findByCode(GRNKey key) {
-        return getByKey(key);
+        GRN grn = getByKey(key);
+        if (grn != null) {
+            grn.setVouDateTime(Util1.toZonedDateTime(grn.getVouDate()));
+        }
+        return grn;
     }
 
     @Override

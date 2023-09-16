@@ -86,7 +86,11 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
 
     @Override
     public OrderHis findById(OrderHisKey id) {
-        return getByKey(id);
+        OrderHis byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override

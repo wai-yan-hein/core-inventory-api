@@ -10,6 +10,7 @@ import lombok.Data;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -94,5 +95,7 @@ public class PurHis {
     private List<String> location;
     @Transient
     private List<PurExpense> listExpense;
+    @Transient
+    private ZonedDateTime vouDateTime;
 
 }

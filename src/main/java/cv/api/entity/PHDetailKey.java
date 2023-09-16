@@ -10,6 +10,6 @@ public class PHDetailKey {
     private String compCode;
     private Integer deptId;
     private String vouNo;
-    private Integer uniqueId;
+    private int uniqueId;
     private String stockCode;
 }

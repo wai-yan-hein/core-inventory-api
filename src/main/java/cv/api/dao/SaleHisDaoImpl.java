@@ -7,6 +7,7 @@ package cv.api.dao;
 
 import cv.api.common.General;
 import cv.api.common.Util1;
+import cv.api.entity.RetOutHis;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
 
     @Override
     public SaleHis save(SaleHis sh) {
-        saveOrUpdate(sh,sh.getKey());
+        saveOrUpdate(sh, sh.getKey());
         return sh;
     }
 
@@ -86,30 +87,35 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
 
     @Override
     public SaleHis findById(SaleHisKey id) {
-        return getByKey(id);
+        SaleHis byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
     public void delete(SaleHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        String sql = "update sale_his set deleted = true where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        SaleHis s = findById(key);
+        s.setDeleted(true);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
     }
 
     @Override
     public void restore(SaleHisKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        String sql = "update sale_his set deleted = false,intg_upd_status=null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        SaleHis s = findById(key);
+        s.setDeleted(false);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
     }
 
 
     @Override
     public List<SaleHis> unUploadVoucher(LocalDateTime syncDate) {
         String hsql = "select o from SaleHis o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
-        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();    }
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
+    }
 
     @Override
     public List<SaleHis> unUpload(String syncDate) {

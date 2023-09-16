@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 public class WeightLossHisDetail {
     @EmbeddedId
     private WeightLossHisDetailKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "loc_code")

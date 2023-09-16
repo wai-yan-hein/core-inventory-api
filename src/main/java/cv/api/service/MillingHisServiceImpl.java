@@ -67,11 +67,11 @@ public class MillingHisServiceImpl implements MillingHisService {
                 MillingRawDetailKey key = new MillingRawDetailKey();
                 key.setCompCode(milling.getKey().getCompCode());
                 key.setVouNo(vouNo);
-                key.setUniqueId(null);
+                key.setUniqueId(0);
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {
-                if (cSd.getKey().getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == 0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
@@ -89,11 +89,11 @@ public class MillingHisServiceImpl implements MillingHisService {
                 MillingOutDetailKey key = new MillingOutDetailKey();
                 key.setCompCode(milling.getKey().getCompCode());
                 key.setVouNo(vouNo);
-                key.setUniqueId(null);
+                key.setUniqueId(0);
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {
-                if (cSd.getKey().getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == 0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
@@ -112,12 +112,12 @@ public class MillingHisServiceImpl implements MillingHisService {
                     key.setExpenseCode(cSd.getKey().getExpenseCode());
                     key.setCompCode(milling.getKey().getCompCode());
                     key.setVouNo(vouNo);
-                    key.setUniqueId(null);
+                    key.setUniqueId(0);
                     cSd.setKey(key);
 
             }
             if (cSd.getKey() != null && cSd.getKey().getExpenseCode() != null) {
-                if (cSd.getKey().getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == 0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {

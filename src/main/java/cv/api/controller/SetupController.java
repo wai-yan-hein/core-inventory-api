@@ -69,8 +69,9 @@ public class SetupController {
     private AccountRepo accountRepo;
     @Autowired
     private AccSettingService accSettingService;
-@Autowired
-private OrderStatusService orderStatusService;
+    @Autowired
+    private OrderStatusService orderStatusService;
+
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
         return Mono.just("Hello");
@@ -218,6 +219,7 @@ private OrderStatusService orderStatusService;
         return Flux.fromIterable(typeService.getStockType(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
+
     @DeleteMapping(path = "/deleteType")
     public Mono<ReturnObject> deleteType(@RequestParam String code) {
         typeService.delete(code);
@@ -272,22 +274,20 @@ private OrderStatusService orderStatusService;
         return Flux.fromIterable(regionService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @DeleteMapping(path = "/deleteRegion")
-    public Mono<ReturnObject> deleteRegion(@RequestParam String code) {
-        List<Trader> search = traderService.search(code, "-");
-        if (search.isEmpty()) {
-            regionService.delete(code);
-            ro.setMessage("Deleted.");
-        } else {
-            ro.setMessage("Can't delete.");
-        }
-        return Mono.justOrEmpty(ro);
+    @PostMapping(path = "/deleteRegion")
+    public Mono<?> deleteRegion(@RequestBody RegionKey key) {
+        return Mono.just(regionService.delete(key));
     }
 
     @PostMapping(path = "/findRegion")
     public Mono<Region> findRegion(@RequestBody RegionKey key) {
         Region b = regionService.findByCode(key);
         return Mono.justOrEmpty(b);
+    }
+
+    @GetMapping(path = "/getUpdateRegion")
+    public Flux<?> getUpdateRegion(@RequestParam String updatedDate) {
+        return Flux.fromIterable(regionService.getRegion(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/saveCustomer")

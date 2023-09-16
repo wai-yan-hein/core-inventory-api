@@ -10,7 +10,7 @@ public class OPHisDetailKey implements java.io.Serializable {
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "unique_id")
-    private Integer uniqueId;
+    private int uniqueId;
     @Column(name = "comp_code")
     private String compCode;
 

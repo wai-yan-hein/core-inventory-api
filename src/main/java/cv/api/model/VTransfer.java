@@ -3,11 +3,14 @@ package cv.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.time.ZonedDateTime;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VTransfer {
     private String vouNo;
     private String vouDate;
+    private ZonedDateTime vouDateTime;
     private String remark;
     private String fromLocationName;
     private String toLocationName;

@@ -8,6 +8,7 @@ package cv.api.dao;
 import cv.api.common.Util1;
 import cv.api.entity.RetInHis;
 import cv.api.entity.RetInHisKey;
+import cv.api.entity.Stock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -85,25 +86,27 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
 
     @Override
     public RetInHis findById(RetInHisKey id) {
-        return getByKey(id);
+        RetInHis byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
     public void delete(RetInHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update ret_in_his set deleted = true,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        RetInHis s = findById(key);
+        s.setDeleted(true);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
     }
 
     @Override
     public void restore(RetInHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update ret_in_his set deleted = false,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        RetInHis s = findById(key);
+        s.setDeleted(false);
+        s.setUpdatedDate(LocalDateTime.now());
+        update(s);
     }
 
     @Override

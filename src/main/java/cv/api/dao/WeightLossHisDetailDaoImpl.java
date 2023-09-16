@@ -48,10 +48,10 @@ public class WeightLossHisDetailDaoImpl extends AbstractDao<WeightLossHisDetailK
                     WeightLossHisDetail h = new WeightLossHisDetail();
                     WeightLossHisDetailKey key = new WeightLossHisDetailKey();
                     key.setVouNo(vouNo);
-                    key.setDeptId(deptId);
                     key.setCompCode(compCode);
                     key.setUniqueId(rs.getInt("unique_id"));
                     h.setKey(key);
+                    h.setDeptId(deptId);
                     h.setStockUserCode(rs.getString("user_code"));
                     h.setStockCode(rs.getString("stock_code"));
                     h.setStockName(rs.getString("stock_name"));

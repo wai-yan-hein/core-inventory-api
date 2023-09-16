@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -76,4 +77,6 @@ public class OrderHis {
     private boolean backup;
     @Transient
     private List<String> location;
+    @Transient
+    private ZonedDateTime vouDateTime;
 }

@@ -14,13 +14,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +33,10 @@ public class Util1 {
     public static final String DECIMAL_FORMAT = "##0.##";
     private static final DecimalFormat df0 = new DecimalFormat("0");
 
-    public static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
+    public static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
+            .create();
     public static String SYNC_DATE;
     //private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
 
@@ -171,6 +174,11 @@ public class Util1 {
         return value;
     }
 
+    public static int getInteger(Integer number) {
+        return (number != null) ? number : 0;
+    }
+
+
     public static void writeJsonFile(Object data, String exportPath) throws IOException {
         try (Writer writer = new FileWriter(exportPath, StandardCharsets.UTF_8)) {
             gson.toJson(data, writer);
@@ -269,5 +277,12 @@ public class Util1 {
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
         // Format the float number
         return decimalFormat.format(opQty);
+    }
+
+    public static ZonedDateTime toZonedDateTime(LocalDateTime ldt) {
+        if (ldt != null) {
+            return ldt.atZone(ZoneId.systemDefault());
+        }
+        return null;
     }
 }

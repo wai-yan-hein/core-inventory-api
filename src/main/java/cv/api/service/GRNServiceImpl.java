@@ -46,11 +46,11 @@ public class GRNServiceImpl implements GRNService {
                 GRNDetailKey key = new GRNDetailKey();
                 key.setCompCode(g.getKey().getCompCode());
                 key.setVouNo(g.getKey().getVouNo());
-                key.setUniqueId(null);
+                key.setUniqueId(0);
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {
-                if (cSd.getKey().getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == 0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {

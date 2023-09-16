@@ -6,6 +6,7 @@ import lombok.Data;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class WeightLossHis {
     @EmbeddedId
     private WeightLossHisKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "vou_date",columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
     @Column(name = "ref_no")
@@ -36,6 +39,8 @@ public class WeightLossHis {
     private List<WeightLossHisDetail> listDetail;
     @Transient
     private List<WeightLossHisDetailKey> delKeys;
+    @Transient
+    private ZonedDateTime vouDateTime;
 
 
 }

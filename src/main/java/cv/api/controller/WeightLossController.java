@@ -32,13 +32,13 @@ public class WeightLossController {
     @Autowired
     private WeightLossDetailService weightLossDetailService;
 
-    @PostMapping(path = "/save-weight-loss")
-    public Mono<?> save(@RequestBody WeightLossHis w) {
+    @PostMapping(path = "/saveWeightLoss")
+    public Mono<?> saveWeightLoss(@RequestBody WeightLossHis w) {
         return Mono.justOrEmpty(weightLossService.save(w));
     }
 
-    @PostMapping(path = "/get-weight-loss")
-    public Flux<?> getStockIO(@RequestBody FilterObject filter) {
+    @PostMapping(path = "/getWeightLoss")
+    public Flux<?> getWeightLoss(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -53,25 +53,25 @@ public class WeightLossController {
                 locCode, compCode, deptId, deleted)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/delete-weight-loss")
-    public Mono<?> deleteStockIO(@RequestBody WeightLossHisKey key) {
+    @PostMapping(path = "/deleteWeightLoss")
+    public Mono<?> deleteWeightLoss(@RequestBody WeightLossHisKey key) {
         weightLossService.delete(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/restore-weight-loss")
-    public Mono<?> restoreStockIO(@RequestBody WeightLossHisKey key) {
+    @PostMapping(path = "/restoreWeightLoss")
+    public Mono<?> restoreWeightLoss(@RequestBody WeightLossHisKey key) {
         weightLossService.restore(key);
         return Mono.just(true);
     }
 
-    @PostMapping(path = "/find-weight-loss")
+    @PostMapping(path = "/findWeightLoss")
     public Mono<?> find(@RequestBody WeightLossHisKey key) {
         return Mono.justOrEmpty(weightLossService.findById(key));
     }
 
-    @GetMapping(path = "/get-weight-loss-detail")
-    public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    @GetMapping(path = "/getWeightLossDetail")
+    public Flux<?> getWeightLossDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(weightLossDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }

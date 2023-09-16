@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -49,5 +50,7 @@ public class GRN {
     private String traderName;
     @Transient
     private String traderUserCode;
+    @Transient
+    private ZonedDateTime vouDateTime;
 
 }

@@ -25,12 +25,9 @@ import java.util.List;
 @Slf4j
 public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> implements MillingHisDao {
 
-    @Autowired
-    private SaleHisDetailDao dao;
-
     @Override
     public MillingHis save(MillingHis sh) {
-        saveOrUpdate(sh,sh.getKey());
+        saveOrUpdate(sh, sh.getKey());
         return sh;
     }
 
@@ -85,7 +82,11 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
 
     @Override
     public MillingHis findById(MillingHisKey id) {
-        return getByKey(id);
+        MillingHis byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
@@ -108,7 +109,8 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
     @Override
     public List<MillingHis> unUploadVoucher(LocalDateTime syncDate) {
         String hsql = "select o from milling o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
-        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();    }
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
+    }
 
     @Override
     public List<MillingHis> unUpload(String syncDate) {

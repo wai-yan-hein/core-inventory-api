@@ -41,12 +41,12 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                 PaymentHisDetailKey key = new PaymentHisDetailKey();
                 key.setCompCode(obj.getKey().getCompCode());
                 key.setVouNo(vouNo);
-                key.setUniqueId(null);
+                key.setUniqueId(0);
                 key.setDeptId(obj.getDeptId());
                 cSd.setKey(key);
             }
             if (Util1.getFloat(cSd.getPayAmt()) > 0) {
-                if (cSd.getKey().getUniqueId() == null) {
+                if (cSd.getKey().getUniqueId() == 0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {

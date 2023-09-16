@@ -24,6 +24,6 @@ public class RetInKey implements Serializable {
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "dept_id")
-    private Integer deptId;
+    private int deptId;
 
 }

@@ -19,7 +19,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "region")
-public class Region implements java.io.Serializable {
+public class Region {
 
     @EmbeddedId
     private RegionKey key;

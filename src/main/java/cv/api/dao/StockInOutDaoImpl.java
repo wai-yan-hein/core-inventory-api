@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,11 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
 
     @Override
     public StockInOut findById(StockIOKey id) {
-        return getByKey(id);
+        StockInOut byKey = getByKey(id);
+        if (byKey != null) {
+            byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
+        }
+        return byKey;
     }
 
     @Override
@@ -97,6 +102,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
     public void delete(StockIOKey key) {
         StockInOut io = findById(key);
         io.setDeleted(true);
+        io.setUpdatedDate(LocalDateTime.now());
         update(io);
     }
 
@@ -104,6 +110,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
     public void restore(StockIOKey key) throws Exception {
         StockInOut io = findById(key);
         io.setDeleted(false);
+        io.setUpdatedDate(LocalDateTime.now());
         update(io);
     }
 
