@@ -1560,7 +1560,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<General> getStockListByGroup(String typeCode, String compCode, Integer macId) throws Exception {
-        String sql = "select s.stock_code,s.user_code,s.stock_name,s.stock_type_code,\n" + "st.stock_type_name,b.brand_name,c.cat_name,rel.rel_name\n" + "from stock s \n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "left join stock_brand b on s.brand_code = b.brand_code\n" + "left join category c on s.category_code = c.cat_code\n" + "left join unit_relation rel on s.rel_code = rel.rel_code\n" + "where s.active = true and s.comp_code = '" + compCode + "' \n" + "and (s.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "order by st.user_code";
+        String sql = "select s.stock_code,s.user_code,s.stock_name,s.stock_type_code,\n" + "st.stock_type_name,b.brand_name,c.cat_name,rel.rel_name\n" + "from stock s \n" + "join stock_type st on s.stock_type_code = st.stock_type_code\n" + "left join stock_brand b on s.brand_code = b.brand_code\n" + "left join category c on s.category_code = c.cat_code\n" + "left join unit_relation rel on s.rel_code = rel.rel_code\n" + "where s.active = true and s.comp_code = '" + compCode + "' \n" + "and (s.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "order by st.stock_type_code";
         ResultSet rs = reportDao.executeSql(sql);
         List<General> generalList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
