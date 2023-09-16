@@ -2843,8 +2843,11 @@ public class ReportServiceImpl implements ReportService {
                     in.setStockCode(rs.getString("user_code"));
                     in.setRemark(rs.getString("remark"));
                     in.setRefNo(rs.getString("ref_no"));
-                    in.setWeight(rs.getFloat("weight"));
-                    in.setWeightUnit(rs.getString("weight_unit"));
+                    float weight = rs.getFloat("weight");
+                    if (weight > 0) {
+                        in.setWeight(weight);
+                        in.setWeightUnit(rs.getString("weight_unit"));
+                    }
                     riList.add(in);
                 }
             }
