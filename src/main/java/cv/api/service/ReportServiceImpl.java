@@ -317,7 +317,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name,t.address,rel.unit\n" +
                 "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" +
                 "from v_sale\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
@@ -339,7 +339,7 @@ public class ReportServiceImpl implements ReportService {
                 String traderUsr = rs.getString("user_code");
                 String tCode = rs.getString("trader_code");
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
@@ -347,6 +347,10 @@ public class ReportServiceImpl implements ReportService {
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
+                s.setAddress(rs.getString("address"));
+                s.setTotalQty(smallQty);
+                s.setSaleUnit(rs.getString("unit"));
+
                 list.add(s);
             }
         } catch (Exception e) {
@@ -450,7 +454,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String smCode, String compCode, Integer deptId) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.saleman_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,saleman_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.saleman_name,rel.rel_name,rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,saleman_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
                 "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and deleted = 0\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -476,7 +480,7 @@ public class ReportServiceImpl implements ReportService {
                 String smUsr = rs.getString("user_code");
                 String tCode = rs.getString("saleman_code");
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 s.setSaleManCode(Util1.isNull(smUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
@@ -484,6 +488,9 @@ public class ReportServiceImpl implements ReportService {
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
+                s.setTotalQty(smallQty);
+                s.setSaleUnit(rs.getString("unit"));
+
                 list.add(s);
             }
         } catch (Exception e) {
@@ -519,7 +526,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name,rel.unit, t.address\n" +
                 "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" +
                 "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and comp_code = '" + compCode + "'\n" +
@@ -546,7 +553,7 @@ public class ReportServiceImpl implements ReportService {
                 String traderUsr = rs.getString("user_code");
                 String tCode = rs.getString("trader_code");
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
@@ -554,6 +561,9 @@ public class ReportServiceImpl implements ReportService {
                 s.setRelName(rs.getString("rel_name"));
                 s.setQtyStr(getRelStr(relCode, compCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
+                s.setTotalQty(smallQty);
+                s.setPurUnit(rs.getString("unit"));
+                s.setAddress(rs.getString("address"));
                 list.add(s);
             }
         }
@@ -651,7 +661,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VSale> saleList = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
                 "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and deleted = 0\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
@@ -674,7 +684,8 @@ public class ReportServiceImpl implements ReportService {
                 sale.setRelName(rs.getString("rel_name"));
                 sale.setSaleAmount(rs.getDouble("ttl_amt"));
                 sale.setQtyStr(getRelStr(relCode, compCode, smallQty));
-                sale.setQty(smallQty);
+                sale.setTotalQty(smallQty);
+                sale.setSaleUnit(rs.getString("unit"));
                 saleList.add(sale);
             }
         }
@@ -1035,7 +1046,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
                 "and deleted = 0\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
@@ -1051,12 +1062,14 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 VPurchase p = new VPurchase();
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 p.setStockCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
                 p.setRelName(rs.getString("rel_name"));
                 p.setPurAmount(rs.getDouble("ttl_amt"));
                 p.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                p.setTotalQty(smallQty);
+                p.setPurUnit(rs.getString("unit"));
                 list.add(p);
             }
         }
