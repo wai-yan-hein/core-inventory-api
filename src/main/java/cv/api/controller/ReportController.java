@@ -64,10 +64,12 @@ public class ReportController {
     }
 
     @GetMapping(value = "/getOrderReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getOrderReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody byte[] getOrderReport(@RequestParam String vouNo,
+                                               @RequestParam String compCode,
+                                               @RequestParam Integer macId) throws Exception {
         String reportName = "OrderVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo);
+        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo,compCode);
         Util1.writeJsonFile(listVSale, exportPath);
         return new FileInputStream(exportPath).readAllBytes();
     }

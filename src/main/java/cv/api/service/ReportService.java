@@ -30,11 +30,9 @@ public interface ReportService {
 
     String getOpeningDate(String compCode, Integer deptIdF);
 
-    void saveReportFilter(ReportFilter filter) throws Exception;
-
     List<VSale> getSaleVoucher(String vouNo) throws Exception;
 
-    List<VOrder> getOrderVoucher(String vouNo) throws Exception;
+    List<VOrder> getOrderVoucher(String vouNo,String compCode) throws Exception;
 
     List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception;
 
