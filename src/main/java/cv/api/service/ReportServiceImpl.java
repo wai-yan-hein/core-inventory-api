@@ -7,7 +7,6 @@ package cv.api.service;
 
 import cv.api.common.*;
 import cv.api.dao.ReportDao;
-import cv.api.dao.UnitRelationDao;
 import cv.api.dao.UnitRelationDetailDao;
 import cv.api.entity.*;
 import cv.api.model.*;
@@ -15,11 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
-import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -31,35 +28,19 @@ import java.util.*;
 public class ReportServiceImpl implements ReportService {
     private final DecimalFormat formatter = new DecimalFormat("###.##");
     private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
-    private final HashMap<String, String> hmUser = new HashMap<>();
     @Autowired
     private ReportDao reportDao;
     @Autowired
-    private UnitRelationDao relationDao;
-    @Autowired
     private UnitRelationDetailDao detailDao;
-    @Autowired
-    private WebClient userApi;
-
-    public String getAppUser(String userCode) {
-        /*if (hmUser.get(userCode) == null) {
-            Mono<AppUser> result = userApi.get().uri(builder -> builder.path("/user/find-appuser").queryParam("userCode", userCode).build()).retrieve().bodyToMono(AppUser.class);
-            userShort = result.block() == null ? "" : Objects.requireNonNull(result.block()).getUserShortName();
-            hmUser.put(userCode, userShort);
-        } else {
-            userShort = hmUser.get(userCode);
-        }*/
-        return "";
-    }
 
     @Override
-    public void executeSql(String... sql) throws Exception {
+    public void executeSql(String... sql) {
         reportDao.executeSql(sql);
     }
 
     @Override
     public ResultSet getResult(String sql, Object... params) throws Exception {
-        return reportDao.executeSql(sql, params);
+        return reportDao.getResultSql(sql, params);
     }
 
     @Override
@@ -87,27 +68,6 @@ public class ReportServiceImpl implements ReportService {
         return Util1.isNull(opDate, "1998-10-07");
     }
 
-
-    @Override
-    public void saveReportFilter(ReportFilter filter) {
-        Integer macId = filter.getMacId();
-        List<String> listBrand = filter.getListBrand();
-        List<String> listLocation = filter.getListLocation();
-        List<String> listCategory = filter.getListCategory();
-        List<String> listSaleMan = filter.getListSaleMan();
-        List<String> listTrader = filter.getListTrader();
-        List<String> listRegion = filter.getListRegion();
-        List<String> listStockType = filter.getListStockType();
-        List<String> listStock = filter.getListStock();
-        insertTmp(listBrand, macId, "f_brand");
-        insertTmp(listLocation, macId, "f_location");
-        insertTmp(listCategory, macId, "f_category");
-        insertTmp(listSaleMan, macId, "f_sale_man");
-        insertTmp(listTrader, macId, "f_trader");
-        insertTmp(listRegion, macId, "f_region");
-        insertTmp(listStockType, macId, "f_stock_type");
-        insertTmp(listStock, macId, "f_stock");
-    }
 
     @Override
     public List<VSale> getSaleVoucher(String vouNo) throws Exception {
@@ -149,7 +109,7 @@ public class ReportServiceImpl implements ReportService {
             sale.setSaleUnit(rs.getString("sale_unit"));
             sale.setCusAddress(Util1.isNull(rs.getString("phone"), "") + "/" + Util1.isNull(rs.getString("address"), ""));
             sale.setLocationName(rs.getString("loc_name"));
-            sale.setCreatedBy(getAppUser(rs.getString("created_by")));
+            sale.setCreatedBy(rs.getString("created_by"));
             sale.setCompCode(rs.getString("comp_code"));
             sale.setCategoryName(rs.getString("cat_name"));
             sale.setWeight(rs.getDouble("weight"));
@@ -160,29 +120,28 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOrder> getOrderVoucher(String vouNo) throws Exception {
+    public List<VOrder> getOrderVoucher(String vouNo, String compCode) throws Exception {
         List<VOrder> orderList = new ArrayList<>();
-        String sql = "select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name, \n" + "v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,v.vou_total,v.discount,v.paid,v.vou_balance,\n" + "t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name\n" + "from v_order v join trader t\n" + "on v.trader_code = t.code\n" + "join location l on v.loc_code = l.loc_code\n" + "left join category c on v.category_code = c.cat_code\n" + "where v.vou_no ='" + vouNo + "'";
-        ResultSet rs = reportDao.executeSql(sql);
+        String sql = """
+                select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
+                v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,t.user_code t_user_code,t.phone,t.address,
+                l.loc_name,v.created_by,v.comp_code,os.description
+                from v_order v join trader t
+                on v.trader_code = t.code
+                and v.comp_code = t.comp_code
+                join location l on v.loc_code = l.loc_code
+                and  v.comp_code = l.comp_code
+                join order_status os on v.order_status = os.code
+                and v.comp_code = os.comp_code 
+                where v.vou_no =?
+                and v.comp_code =?""";
+        ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
         while (rs.next()) {
             VOrder order = new VOrder();
             String remark = rs.getString("remark");
-            String refNo = "-";
-
-            if (remark != null) {
-                if (remark.contains("/")) {
-                    try {
-                        String[] split = remark.split("/");
-                        remark = split[0];
-                        refNo = split[1];
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
             order.setTraderCode(rs.getString("t_user_code"));
             order.setTraderName(rs.getString("trader_name"));
             order.setRemark(remark);
-            order.setRefNo(refNo);
             order.setPhoneNo(rs.getString("phone"));
             order.setAddress(rs.getString("address"));
             order.setRfId(rs.getString("rfid"));
@@ -192,18 +151,16 @@ public class ReportServiceImpl implements ReportService {
             order.setQty(rs.getFloat("qty"));
             order.setSalePrice(rs.getFloat("price"));
             order.setSaleAmount(rs.getFloat("amt"));
-            order.setVouTotal(rs.getDouble("vou_total"));
-            order.setDiscount(rs.getFloat("discount"));
-            order.setPaid(rs.getDouble("paid"));
-            order.setVouBalance(rs.getDouble("vou_balance"));
             order.setSaleUnit(rs.getString("unit"));
-            order.setCusAddress(Util1.isNull(rs.getString("phone"), "") + "/" + Util1.isNull(rs.getString("address"), ""));
             order.setLocationName(rs.getString("loc_name"));
-            order.setCreatedBy(getAppUser(rs.getString("created_by")));
+            order.setCreatedBy(rs.getString("created_by"));
             order.setCompCode(rs.getString("comp_code"));
-            order.setCategoryName(rs.getString("cat_name"));
-            order.setWeight(rs.getFloat("weight"));
-            order.setWeightUnit(rs.getString("weight_unit"));
+            float weight = rs.getFloat("weight");
+            if (weight > 0) {
+                order.setWeight(weight);
+                order.setWeightUnit(rs.getString("weight_unit"));
+            }
+            order.setOrderStatusName(rs.getString("description"));
             orderList.add(order);
         }
         return orderList;
@@ -931,9 +888,6 @@ public class ReportServiceImpl implements ReportService {
         if (!stockCode.equals("-")) {
             filter += "and stock_code='" + stockCode + "'\n";
         }
-//        if (!batchNo.equals("-")) {
-//            filter += "and v.batch_no='" + batchNo + "'\n";
-//        }
         if (!projectNo.equals("-")) {
             filter += "and v.project_no='" + projectNo + "'\n";
         }
@@ -1760,8 +1714,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
-        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
     }
 
     @Override
@@ -1899,7 +1853,6 @@ public class ReportServiceImpl implements ReportService {
                     ClosingBalance prv = balances.get(i - 1);
                     float prvCl = prv.getBalQty();
                     ClosingBalance c = balances.get(i);
-                    String relCode = c.getRelCode();
                     c.setOpenQty(prvCl);
                     float opQty = c.getOpenQty();
                     float purQty = c.getPurQty();
@@ -1922,7 +1875,6 @@ public class ReportServiceImpl implements ReportService {
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty) + " " + unit);
                 } else {
                     ClosingBalance c = balances.get(i);
-                    String relCode = c.getRelCode();
                     float opQty = c.getOpenQty();
                     float purQty = c.getPurQty();
                     float inQty = c.getInQty();
@@ -1954,7 +1906,7 @@ public class ReportServiceImpl implements ReportService {
     public List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, deptId, macId);
+        calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, macId);
         List<StockValue> values = new ArrayList<>();
         String getSql = "select a.*,\n" +
                 "sum(ifnull(tmp.pur_avg_price,0)) pur_avg_price,bal_qty*sum(ifnull(tmp.pur_avg_price,0)) pur_avg_amt,\n" +
@@ -2425,26 +2377,28 @@ public class ReportServiceImpl implements ReportService {
     public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
                                               String compCode, Integer deptId, boolean deleted,
                                               String projectNo, String curCode) throws Exception {
-        String sql = "select a.*,t.trader_name, v.description\n" +
-                "from (\n" + "select date(vou_date) vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id\n" +
-                "from milling_his p \n" +
-                "where comp_code = ?\n" +
-                "and (dept_id = ? or 0 = ?)\n" +
-                "and deleted =?\n" +
-                "and date(vou_date) between ? and ?\n" +
-                "and cur_code = ?\n" +
-                "and (vou_no = ? or '-' = ?)\n" +
-                "and (remark LIKE CONCAT(?, '%') or '-'= ?)\n" +
-                "and (reference LIKE CONCAT(?, '%') or '-'= ?)\n" +
-                "and (trader_code = ? or '-'= ?)\n" +
-                "and (created_by = ? or '-'= ?)\n" +
-                "and (project_no =? or '-' =?)\n" +
-                "group by vou_no)a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "join vou_status v on a.vou_status_id = v.code\n" +
-                "and a.comp_code = v.comp_code\n" +
-                "order by date(vou_date),vou_no";
+        String sql = """
+                select a.*,t.trader_name, v.description
+                from (
+                select date(vou_date) vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
+                from milling_his p\s
+                where comp_code = ?
+                and (dept_id = ? or 0 = ?)
+                and deleted =?
+                and date(vou_date) between ? and ?
+                and cur_code = ?
+                and (vou_no = ? or '-' = ?)
+                and (remark LIKE CONCAT(?, '%') or '-'= ?)
+                and (reference LIKE CONCAT(?, '%') or '-'= ?)
+                and (trader_code = ? or '-'= ?)
+                and (created_by = ? or '-'= ?)
+                and (project_no =? or '-' =?)
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                join vou_status v on a.vou_status_id = v.code
+                and a.comp_code = v.comp_code
+                order by date(vou_date),vou_no""";
         ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
                 reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo);
         List<MillingHis> purchaseList = new ArrayList<>();
@@ -2861,8 +2815,11 @@ public class ReportServiceImpl implements ReportService {
                     in.setStockCode(rs.getString("user_code"));
                     in.setRemark(rs.getString("remark"));
                     in.setRefNo(rs.getString("ref_no"));
-                    in.setWeight(rs.getFloat("weight"));
-                    in.setWeightUnit(rs.getString("weight_unit"));
+                    float weight = rs.getFloat("weight");
+                    if (weight > 0) {
+                        in.setWeight(weight);
+                        in.setWeightUnit(rs.getString("weight_unit"));
+                    }
                     riList.add(in);
                 }
             }
@@ -3384,9 +3341,6 @@ public class ReportServiceImpl implements ReportService {
         if (!batchNo.equals("-")) {
             filter += "and v.batch_no='" + batchNo + "'\n";
         }
-//        if (!projectNo.equals("-")) {
-//            filter += "and v.project_no='" + projectNo + "'\n";
-//        }
         List<VSale> list = new ArrayList<>();
         String sql = "select v.credit_term,v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
                 "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
@@ -3499,9 +3453,6 @@ public class ReportServiceImpl implements ReportService {
         if (!batchNo.equals("-")) {
             filter += "and v.batch_no='" + batchNo + "'\n";
         }
-//        if (!projectNo.equals("-")) {
-//            filter += "and v.project_no='" + projectNo + "'\n";
-//        }
         List<VOrder> list = new ArrayList<>();
         String sql = "select v.credit_term,v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,sup.trader_name sup_name,\n" +
                 "t.user_code,t.trader_name,t.address,v.user_code s_user_code,v.stock_name,v.qty,v.unit,v.price,v.amt\n" +
@@ -3544,12 +3495,13 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode) {
         List<VSale> list = new ArrayList<>();
-        String sql = "select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count\n" +
-                "from sale_his\n" +
-                "where date(vou_date) between ? and ?\n" +
-                "and deleted = false\n" +
-                "and comp_code =?\n" +
-                "group by dept_id,cur_code";
+        String sql = """
+                select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count
+                from sale_his
+                where date(vou_date) between ? and ?
+                and deleted = false
+                and comp_code =?
+                group by dept_id,cur_code""";
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode);
             while (rs.next()) {
@@ -3634,8 +3586,8 @@ public class ReportServiceImpl implements ReportService {
     public List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
                                                              String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                              String compCode, Integer deptId, Integer macId) {
-        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
                 "s.weight_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
                 "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
@@ -4041,7 +3993,7 @@ public class ReportServiceImpl implements ReportService {
         return list;
     }
 
-    private void insertClosingIntoColumn(Integer macId) throws Exception {
+    private void insertClosingIntoColumn(Integer macId) {
         //delete tmp
         String delSql = "delete from tmp_closing_column where mac_id = " + macId;
         executeSql(delSql);
@@ -4064,7 +4016,7 @@ public class ReportServiceImpl implements ReportService {
         //return out
     }
 
-    private void insertPriceDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
+    private void insertPriceDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) {
         //delete tmp
         String delSql = "delete from tmp_inv_closing where mac_id = " + macId;
         executeSql(delSql);
@@ -4110,32 +4062,6 @@ public class ReportServiceImpl implements ReportService {
         String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'UM-RAW',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, unit,rel_code,comp_code,dept_id\n" + "from v_milling_raw\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRO + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,unit,vou_no)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
         String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'UM-OUTPUT',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code, unit,comp_code,dept_id\n" + "from v_milling_output\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calRI + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),stock_code,vou_no,unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.unit = rel.unit\n" + "group by vou_date,stock_code,vou_no";
-//        String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-//                "select 'UM-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
-//                "from v_milling_raw\n" +
-//                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-//                "and deleted = false \n" +
-//                "and calculate = true\n" +
-//                "and comp_code ='" + compCode + "'\n" +
-//                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
-//                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-//                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-//                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-//                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-//                "group by date(vou_date),vou_no,stock_code";
-//        String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-//                "select 'UM-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
-//                "from v_milling_output\n" +
-//                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-//                "and deleted = false \n" +
-//                "and calculate = true\n" +
-//                "and comp_code ='" + compCode + "'\n" +
-//                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
-//                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-//                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-//                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-//                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-//                "group by date(vou_date),vou_no,stock_code";
         try {
             reportDao.executeSql(delSql, opSql, purSql, retInSql, stockInSql, stockOutSql, saleSql, returnOutSql, fFSql, tFSql, pIn, pOut, mRawSql, mOutSql);
         } catch (Exception e) {
@@ -4314,7 +4240,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void calculateClosingByWeight(String fromDate, String toDate, String typeCode, String catCode, String brandCode,
-                                          String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI,
+                                          String stockCode, boolean calSale, boolean calPur, boolean calRI,
                                           boolean calRO, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
         String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" +
@@ -4434,7 +4360,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void calculateOpeningByWeight(String opDate, String fromDate, String typeCode, String catCode, String brandCode,
-                                          String stockCode, String vouStatus, boolean calSale,
+                                          String stockCode, boolean calSale,
                                           boolean calPur, boolean calRI, boolean calRO, String compCode,
                                           Integer deptId, Integer macId) {
         //delete tmp
@@ -4582,14 +4508,14 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    private void deleteTmp(String tableName, Integer macId) throws Exception {
+    private void deleteTmp(String tableName, Integer macId) {
         String delSql = "delete from " + tableName + " where mac_id =" + macId;
         executeSql(delSql);
     }
 
     private void calculatePrice(String toDate, String opDate, String stockCode,
                                 String typeCode, String catCode, String brandCode,
-                                String compCode, Integer deptId, Integer macId) {
+                                String compCode, Integer macId) {
         try {
             String filter = "";
             if (!stockCode.equals("-")) {
