@@ -66,6 +66,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
                     op.setStdWeight(rs.getDouble("std_weight"));
+                    op.setTotalWeight(rs.getDouble("total_weight"));
                     op.setQty(rs.getDouble("qty"));
                     op.setPrice(rs.getDouble("sale_price"));
                     op.setAmount(rs.getDouble("sale_amt"));

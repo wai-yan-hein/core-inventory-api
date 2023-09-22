@@ -2386,7 +2386,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select a.*,t.trader_name, v.description
                 from (
-                select date(vou_date) vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
+                select vou_date vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
                 from milling_his p\s
                 where comp_code = ?
                 and (dept_id = ? or 0 = ?)
@@ -2404,7 +2404,7 @@ public class ReportServiceImpl implements ReportService {
                 and a.comp_code = t.comp_code
                 join vou_status v on a.vou_status_id = v.code
                 and a.comp_code = v.comp_code
-                order by date(vou_date),vou_no""";
+                order by vou_date""";
         ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
                 reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo);
         List<MillingHis> purchaseList = new ArrayList<>();
@@ -2634,7 +2634,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (remark like '" + remark + "%' or '-%'='" + remark + "%')\n" +
                 "and (ref_no like '" + refNo + "%' or '-%'='" + refNo + "%')\n" +
                 "group by vou_no\n" +
-                "order by vou_date desc";
+                "order by vou_date";
         try {
             ResultSet rs = reportDao.executeSql(sql);
             while (rs.next()) {
