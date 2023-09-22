@@ -26,4 +26,6 @@ public class StockValue {
     private Float lifoAmt;
     private Float ioRecentPrice;
     private Float ioRecentAmt;
+    private double qty;
+    private String relation;
 }

@@ -1589,7 +1589,7 @@ public class ReportServiceImpl implements ReportService {
     public List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode,
                                            String brandCode, String catCode, String compCode,
                                            Integer deptId) throws Exception {
-        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty*rel.smallest_qty) smallest_qty, rel.unit\n" +
+        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty*rel.smallest_qty) smallest_qty, rel.rel_name\n" +
                 "from (select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code\n" +
                 "from v_sale\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
@@ -1614,7 +1614,7 @@ public class ReportServiceImpl implements ReportService {
                 float smallQty = rs.getFloat("smallest_qty");
                 g.setQtyRel(getRelStr(relCode, compCode, smallQty));
                 g.setAmount(rs.getFloat("ttl_amt"));
-                g.setUnit(rs.getString("unit"));
+                g.setRelation(rs.getString("rel_name"));
                 g.setSmallQty(smallQty);
                 generals.add(g);
             }
@@ -1916,9 +1916,9 @@ public class ReportServiceImpl implements ReportService {
                 "sum(ifnull(tmp.fifo_price,0)) fifo_price,bal_qty*sum(ifnull(tmp.fifo_price,0)) fifo_amt,\n" +
                 "sum(ifnull(tmp.lifo_price,0)) lifo_price,bal_qty*sum(ifnull(tmp.lifo_price,0)) lifo_amt,\n" +
                 "sum(ifnull(tmp.io_recent_price,0)) io_recent_price,bal_qty*sum(ifnull(tmp.io_recent_price,0)) io_recent_amt,\n" +
-                "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
+                "s.rel_code,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name,rel.rel_name\n" +
                 "from (\n" +
-                "select stock_code,sum(op_qty)+sum(pur_qty)+sum(in_qty) +sum(out_qty) +sum(sale_qty) bal_qty,mac_id\n" +
+                "select stock_code,sum(op_qty)+sum(pur_qty)+sum(in_qty) +sum(out_qty) +sum(sale_qty) bal_qty,mac_id,comp_code\n" +
                 "from tmp_stock_io_column\n" +
                 "where mac_id = " + macId + "\n" +
                 "group by stock_code)a\n" +
@@ -1926,7 +1926,11 @@ public class ReportServiceImpl implements ReportService {
                 "on a.stock_code  = tmp.stock_code\n" +
                 "and a.mac_id = tmp.mac_id\n" +
                 "join stock s on a.stock_code = s.stock_code\n" +
+                "and a.comp_code = s.comp_code\n" +
+                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
+                "and a.comp_code = rel.comp_code\n" +
                 "join stock_type st on s.stock_type_code = st.stock_type_code\n" +
+                "and a.comp_code = st.comp_code\n" +
                 "group by a.stock_code\n" +
                 "order by s.user_code";
         try {
@@ -1937,6 +1941,8 @@ public class ReportServiceImpl implements ReportService {
                     value.setStockUserCode(rs.getString("s_user_code"));
                     value.setStockName(rs.getString("stock_name"));
                     value.setBalRel(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("bal_qty")));
+                    value.setQty(rs.getDouble("bal_qty"));
+                    value.setRelation(rs.getString("rel_name"));
                     value.setPurAvgPrice(rs.getFloat("pur_avg_price"));
                     value.setPurAvgAmount(rs.getFloat("pur_avg_amt"));
                     value.setInAvgPrice(rs.getFloat("in_avg_price"));
