@@ -29,7 +29,6 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "milling_his")
 public class MillingHis {
-
     @EmbeddedId
     private MillingHisKey key;
     @Column(name = "dept_id")
@@ -40,6 +39,8 @@ public class MillingHis {
     private LocalDateTime vouDate;
     @Column(name = "cur_code")
     private String curCode;
+    @Column(name = "loc_code")
+    private String locCode;
     @Column(name = "remark")
     private String remark;
     @Column(name = "reference")
@@ -84,6 +85,12 @@ public class MillingHis {
     private Float outputAmount;
     @Column(name = "diff_weight")
     private Float diffWeight;
+    @Column(name = "diff_qty")
+    private double diffQty;
+    @Column(name = "percent_weight")
+    private double percentWeight;
+    @Column(name = "percent_qty")
+    private double percentQty;
     @Transient
     private String localVouNo;
     private transient String status = "STATUS";
@@ -99,6 +106,7 @@ public class MillingHis {
     private transient String vouDateStr = "";
     @Transient
     private ZonedDateTime vouDateTime;
+
     public MillingHis() {
     }
 }

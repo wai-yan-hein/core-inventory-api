@@ -41,6 +41,7 @@ public class MillingHisServiceImpl implements MillingHisService {
     public MillingHis save(MillingHis milling) {
         milling.setVouDate(Util1.toDateTime(milling.getVouDate()));
         Integer deptId = milling.getDeptId();
+        String locCode = milling.getLocCode();
         if (Util1.isNullOrEmpty(milling.getKey().getVouNo())) {
             milling.getKey().setVouNo(getVoucherNo(deptId, milling.getMacId(), milling.getKey().getCompCode()));
         }
@@ -80,6 +81,7 @@ public class MillingHisServiceImpl implements MillingHisService {
                     }
                 }
                 cSd.setDeptId(deptId);
+                cSd.setLocCode(Util1.isNull(cSd.getLocCode(),locCode));
                 rDao.save(cSd);
             }
         }
@@ -101,6 +103,7 @@ public class MillingHisServiceImpl implements MillingHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setLocCode(Util1.isNull(cSd.getLocCode(),locCode));
                 cSd.setDeptId(deptId);
                 oDao.save(cSd);
             }

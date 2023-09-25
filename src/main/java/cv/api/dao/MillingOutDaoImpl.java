@@ -52,23 +52,19 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
                     op.setKey(key);
                     op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("price"));
-                    op.setAmount(rs.getFloat("amt"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setPrice(rs.getDouble("price"));
+                    op.setAmount(rs.getDouble("amt"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
                     op.setUnitCode(rs.getString("unit"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
-                    op.setTotalWeight(rs.getFloat("tot_weight"));
-                    op.setPercent(rs.getFloat("percent"));
-//                    op.setCatName(rs.getString("cat_name"));
-//                    op.setGroupName(rs.getString("stock_type_name"));
-//                    op.setBrandName(rs.getString("brand_name"));
-//                    op.setRelName(rs.getString("rel_name"));
-//                    op.setTraderName(rs.getString("trader_name"));
+                    op.setTotalWeight(rs.getDouble("tot_weight"));
+                    op.setPercent(rs.getDouble("percent"));
+                    op.setPercentQty(rs.getDouble("percent_qty"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
@@ -95,10 +91,10 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
                     sh.setKey(key);
                     sh.setDeptId(rs.getInt("dept_id"));
                     sh.setStockCode(rs.getString("stock_code"));
-                    sh.setQty(rs.getFloat("qty"));
+                    sh.setQty(rs.getDouble("qty"));
                     sh.setUnitCode(rs.getString("sale_unit"));
-                    sh.setPrice(rs.getFloat("sale_price"));
-                    sh.setAmount(rs.getFloat("sale_amt"));
+                    sh.setPrice(rs.getDouble("sale_price"));
+                    sh.setAmount(rs.getDouble("sale_amt"));
                     sh.setLocCode(rs.getString("loc_code"));
                     list.add(sh);
                 }

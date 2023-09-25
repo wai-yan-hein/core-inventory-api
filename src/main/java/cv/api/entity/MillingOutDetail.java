@@ -13,7 +13,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
+
 import java.util.Date;
+
 import lombok.Data;
 
 /**
@@ -33,23 +35,25 @@ public class MillingOutDetail {
     @Column(name = "dept_id")
     private Integer deptId;
     @Column(name = "qty", nullable = false)
-    private Float qty;
+    private double qty;
     @Column(name = "unit")
     private String unitCode;
     @Column(name = "price", nullable = false)
-    private Float price;
+    private double price;
     @Column(name = "amt", nullable = false)
-    private Float amount;
+    private double amount;
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "weight")
-    private Float weight;
+    private double weight;
     @Column(name = "weight_unit")
     private String weightUnit;
     @Column(name = "percent")
-    private Float percent;
+    private double percent;
     @Column(name = "tot_weight")
-    private Float totalWeight;
+    private double totalWeight;
+    @Column(name = "percent_qty")
+    private double percentQty;
     @Transient
     private String userCode;
     @Transient
