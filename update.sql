@@ -187,22 +187,22 @@ alter table unit_relation
 add column comp_code varchar(15) not null default '0010010',
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (rel_code, dept_id,comp_code);
+add primary key (rel_code,comp_code);
 
 alter table trader_group
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (group_code, dept_id,comp_code);
+add primary key (group_code,comp_code);
 
 alter table trader
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (code, dept_id,comp_code);
+add primary key (code,comp_code);
 
 alter table stock_unit
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (unit_code, dept_id,comp_code);
+add primary key (unit_code,comp_code);
 
 alter table stock_unit
 drop index item_unit_name_UNIQUE ,
@@ -211,37 +211,37 @@ drop index item_unit_code ;
 alter table stock_type
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (stock_type_code, dept_id,comp_code);
+add primary key (stock_type_code,comp_code);
 
 alter table stock_brand
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (brand_code, dept_id,comp_code);
+add primary key (brand_code,comp_code);
 
 alter table stock
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (stock_code, dept_id,comp_code);
+add primary key (stock_code,comp_code);
 
 alter table sale_man
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (saleman_code, dept_id,comp_code);
+add primary key (saleman_code,comp_code);
 
 alter table category
 add column dept_id int not null default 1 after comp_code,
 drop primary key,
-add primary key (cat_code, dept_id,comp_code);
+add primary key (cat_code,comp_code);
 
 alter table location
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (loc_code, dept_id,comp_code);
+add primary key (loc_code,comp_code);
 
 alter table op_his
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table op_his_detail
 add column dept_id int not null default 1;
@@ -249,12 +249,12 @@ add column dept_id int not null default 1;
 alter table pur_his
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table ret_in_his
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table ret_in_his_detail
 add column dept_id int not null default 1;
@@ -268,7 +268,7 @@ drop column cost_price;
 alter table ret_out_his
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table ret_out_his_detail
 add column dept_id int not null default 1;
@@ -277,7 +277,7 @@ add column dept_id int not null default 1;
 alter table sale_his
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table sale_his_detail
 add column dept_id int not null default 1;
@@ -291,12 +291,12 @@ add column dept_id int not null default 1;
 alter table stock_in_out
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table transfer_his
 add column dept_id int not null default 1,
 drop primary key,
-add primary key (vou_no, dept_id,comp_code);
+add primary key (vou_no,comp_code);
 
 alter table pur_his_detail
 add column dept_id int not null default 1,

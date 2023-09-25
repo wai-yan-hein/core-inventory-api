@@ -3158,6 +3158,7 @@ public class ReportServiceImpl implements ReportService {
                     key.setVouNo(rs.getString("vou_no"));
                     g.setKey(key);
                     g.setDeptId(rs.getInt("dept_id"));
+                    g.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                     g.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                     g.setBatchNo(rs.getString("batch_no"));
                     g.setRemark(rs.getString("remark"));
