@@ -76,4 +76,6 @@ public class Trader {
     private Float creditAmt;
     @Column(name = "dept_id")
     private Integer deptId;
+    @Column(name = "country_code")
+    private String countryCode;
 }
