@@ -16,25 +16,30 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
 
     @Override
     public OPHisDetail save(OPHisDetail op) {
-        saveOrUpdate(op,op.getKey());
+        saveOrUpdate(op, op.getKey());
         return op;
     }
 
     @Override
     public List<OPHisDetail> search(String vouNo, String compCode, Integer deptId) {
         List<OPHisDetail> listOP = new ArrayList<>();
-        String sql = "select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name\n" +
-                "from op_his_detail op\n" +
-                "join stock s on op.stock_code = s.stock_code\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
-                "left join stock_type st  on s.stock_type_code = st.stock_type_code\n" +
-                "left join category cat on s.category_code = cat.cat_code\n" +
-                "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
-                "where op.vou_no ='" + vouNo + "'\n" +
-                "and op.comp_code ='" + compCode + "'\n" +
-                "and (op.dept_id =" + deptId + " or 0 ="+deptId+")\n" +
-                "order by unique_id";
-        ResultSet rs = getResult(sql);
+        String sql = """
+                select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name
+                from op_his_detail op
+                join stock s on op.stock_code = s.stock_code
+                and op.comp_code =s.comp_code
+                join unit_relation rel on s.rel_code = rel.rel_code
+                and op.comp_code =rel.comp_code
+                left join stock_type st  on s.stock_type_code = st.stock_type_code
+                and op.comp_code =st.comp_code
+                left join category cat on s.category_code = cat.cat_code
+                and op.comp_code =cat.comp_code
+                left join stock_brand sb on s.brand_code = sb.brand_code
+                and op.comp_code =sb.comp_code
+                where op.vou_no =?
+                and op.comp_code =?
+                order by unique_id""";
+        ResultSet rs = getResult(sql, vouNo, compCode);
         if (rs != null) {
             try {
                 //op_code, stock_code, qty, price, amount, loc_code, unit, vou_no, unique_id,

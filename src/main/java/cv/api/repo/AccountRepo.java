@@ -460,7 +460,7 @@ public class AccountRepo {
                 String vouNo = ph.getKey().getVouNo();
                 String batchNo = ph.getBatchNo();
                 String projectNo = ph.getProjectNo();
-                Integer deptId = ph.getKey().getDeptId();
+                Integer deptId = ph.getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);

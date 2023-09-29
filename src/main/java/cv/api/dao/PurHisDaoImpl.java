@@ -96,20 +96,18 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
     @Override
     public void delete(PurHisKey key) {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update pur_his set deleted = true,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        PurHis obj =findById(key);
+        obj.setDeleted(true);
+        obj.setUpdatedDate(LocalDateTime.now());
+        update(obj);
     }
 
     @Override
     public void restore(PurHisKey key) throws Exception {
-        String vouNo = key.getVouNo();
-        String compCode = key.getCompCode();
-        Integer deptId = key.getDeptId();
-        String sql = "update pur_his set deleted = false,intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        execSql(sql);
+        PurHis obj =findById(key);
+        obj.setDeleted(false);
+        obj.setUpdatedDate(LocalDateTime.now());
+        update(obj);
     }
 
 
@@ -127,7 +125,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         list.forEach((o) -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer depId = o.getKey().getDeptId();
+            Integer depId = o.getDeptId();
             o.setListPD(dao.search(vouNo, compCode, depId));
         });
         return list;
@@ -162,7 +160,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setListPD(dao.search(vouNo, compCode, deptId));
         });
         return list;
