@@ -14,11 +14,11 @@ public class PaymentHisDetail {
     @Column(name = "sale_vou_no")
     private String saleVouNo;
     @Column(name = "pay_amt")
-    private Float payAmt;
+    private double payAmt;
     @Column(name = "dis_amt")
-    private Float disAmt;
+    private double disAmt;
     @Column(name = "dis_percent")
-    private Float disPercent;
+    private double disPercent;
     @Column(name = "full_paid")
     private boolean fullPaid;
     @Column(name = "cur_code")
@@ -31,8 +31,8 @@ public class PaymentHisDetail {
     @Column(name = "sale_vou_date")
     private Date saleDate;
     @Column(name = "vou_total")
-    private Float vouTotal;
+    private double vouTotal;
     @Column(name = "vou_balance")
-    private Float vouBalance;
+    private double vouBalance;
 
 }
