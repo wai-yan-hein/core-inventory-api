@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class General {
-    private Float amount;
+    private double amount;
     private Float qty;
     private Float smallQty;
     private String stockCode;

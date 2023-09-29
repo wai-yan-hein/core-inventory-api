@@ -36,24 +36,25 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
     @Override
     public List<StockInOutDetail> search(String vouNo, String compCode) {
         List<StockInOutDetail> listOP = new ArrayList<>();
-        String sql = "select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name\n" +
-                "from stock_in_out_detail op\n" +
-                "join location l on op.loc_code = l.loc_code\n" +
-                "and op.comp_code = l.comp_code\n" +
-                "join stock s on op.stock_code = s.stock_code\n" +
-                "and op.comp_code = s.comp_code\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
-                "and op.comp_code = rel.comp_code\n" +
-                "left join stock_type st  on s.stock_type_code = st.stock_type_code\n" +
-                "and op.comp_code = st.comp_code\n" +
-                "left join category cat on s.category_code = cat.cat_code\n" +
-                "and op.comp_code = cat.comp_code\n" +
-                "left join stock_brand sb on s.brand_code = sb.brand_code\n" +
-                "and op.comp_code = sb.comp_code\n" +
-                "where op.vou_no ='" + vouNo + "'\n" +
-                "and op.comp_code ='" + compCode + "'\n" +
-                "order by unique_id";
-        ResultSet rs = getResult(sql);
+        String sql = """
+                select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name
+                from stock_in_out_detail op
+                join location l on op.loc_code = l.loc_code
+                and op.comp_code = l.comp_code
+                join stock s on op.stock_code = s.stock_code
+                and op.comp_code = s.comp_code
+                join unit_relation rel on s.rel_code = rel.rel_code
+                and op.comp_code = rel.comp_code
+                left join stock_type st  on s.stock_type_code = st.stock_type_code
+                and op.comp_code = st.comp_code
+                left join category cat on s.category_code = cat.cat_code
+                and op.comp_code = cat.comp_code
+                left join stock_brand sb on s.brand_code = sb.brand_code
+                and op.comp_code = sb.comp_code
+                where op.vou_no =?
+                and op.comp_code =?
+                order by unique_id""";
+        ResultSet rs = getResult(sql,vouNo,compCode);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -66,9 +67,9 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setKey(key);
                     op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setInQty(rs.getFloat("in_qty"));
+                    op.setInQty(rs.getDouble("in_qty"));
                     op.setInUnitCode(rs.getString("in_unit"));
-                    op.setOutQty(rs.getFloat("out_qty"));
+                    op.setOutQty(rs.getDouble("out_qty"));
                     op.setOutUnitCode(rs.getString("out_unit"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setLocName(rs.getString("loc_name"));
@@ -78,7 +79,10 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
-                    op.setCostPrice(rs.getFloat("cost_price"));
+                    op.setCostPrice(rs.getDouble("cost_price"));
+                    op.setWeight(rs.getDouble("weight"));
+                    op.setWeightUnit(rs.getString("weight_unit"));
+                    op.setTotalWegiht(rs.getDouble("total_weight"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
@@ -86,7 +90,5 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
             }
         }
         return listOP;
-
     }
-
 }
