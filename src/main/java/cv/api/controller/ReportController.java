@@ -35,11 +35,13 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo, @RequestParam Integer macId) throws Exception {
+    public @ResponseBody byte[] getSaleReport(@RequestParam String vouNo,
+                                              @RequestParam String compCode,
+                                              @RequestParam Integer macId) throws Exception {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         createFilePath(exportPath);
-        List<VSale> listVSale = reportService.getSaleVoucher(vouNo);
+        List<VSale> listVSale = reportService.getSaleVoucher(vouNo,compCode);
         Util1.writeJsonFile(listVSale, exportPath);
         return new FileInputStream(exportPath).readAllBytes();
     }

@@ -25,6 +25,8 @@ public class RetOutHis implements java.io.Serializable {
 
     @EmbeddedId
     private RetOutHisKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "trader_code")
     private String traderCode;
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")

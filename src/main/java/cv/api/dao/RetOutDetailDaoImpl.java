@@ -48,10 +48,10 @@ public class RetOutDetailDaoImpl extends AbstractDao<RetOutKey, RetOutHisDetail>
                     RetOutHisDetail op = new RetOutHisDetail();
                     RetOutKey key = new RetOutKey();
                     key.setVouNo(rs.getString("vou_no"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getFloat("qty"));
                     op.setPrice(rs.getFloat("price"));

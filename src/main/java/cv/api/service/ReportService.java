@@ -30,7 +30,7 @@ public interface ReportService {
 
     String getOpeningDate(String compCode, Integer deptIdF);
 
-    List<VSale> getSaleVoucher(String vouNo) throws Exception;
+    List<VSale> getSaleVoucher(String vouNo,String compCode) throws Exception;
 
     List<VOrder> getOrderVoucher(String vouNo,String compCode) throws Exception;
 
