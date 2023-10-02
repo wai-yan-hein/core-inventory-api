@@ -83,7 +83,7 @@ public class ReportServiceImpl implements ReportService {
                 join location l on v.loc_code = l.loc_code
                 and v.comp_code = l.comp_code
                 left join category c on v.cat_code = c.cat_code
-                and v.comp_code = a.comp_code
+                and v.comp_code = c.comp_code
                 where v.vou_no =?
                 and v.comp_code =?""";
         ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
@@ -125,8 +125,11 @@ public class ReportServiceImpl implements ReportService {
             sale.setCreatedBy(rs.getString("created_by"));
             sale.setCompCode(rs.getString("comp_code"));
             sale.setCategoryName(rs.getString("cat_name"));
-            sale.setWeight(rs.getDouble("weight"));
-            sale.setWeightUnit(rs.getString("weight_unit"));
+            double weight = rs.getDouble("weight");
+            if (weight > 0) {
+                sale.setWeight(weight);
+                sale.setWeightUnit(rs.getString("weight_unit"));
+            }
             saleList.add(sale);
         }
         return saleList;
@@ -2277,7 +2280,7 @@ public class ReportServiceImpl implements ReportService {
                 "v.unit,v.qty,v.price,v.amount,v.comp_code,v.dept_id\n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n"+
+                "and v.comp_code = l.comp_code\n" +
                 "where v.deleted = false\n" +
                 "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -2315,7 +2318,7 @@ public class ReportServiceImpl implements ReportService {
                 "unit,qty,price,amount,comp_code\n" +
                 "from v_opening v join location l \n" +
                 "on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n"+
+                "and v.comp_code = l.comp_code\n" +
                 "where v.deleted = false \n" +
                 "and v.comp_code = '" + compCode + "'\n" +
                 "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
@@ -2324,7 +2327,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n" +
                 "join stock_type t on a.stock_type_code = t.stock_type_code\n" +
-                "a.comp_code = t.comp_code\n"+
+                "a.comp_code = t.comp_code\n" +
                 "order by t.stock_type_name,a.stock_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
@@ -2353,9 +2356,9 @@ public class ReportServiceImpl implements ReportService {
                 "v.out_qty,v.out_unit,v.cur_code,v.cost_price,v.cost_price* v.out_qty out_amt \n" +
                 "from v_stock_io v join vou_status s\n" +
                 "on v.vou_status = s.code\n" +
-                "and v.comp_code = s.comp_code\n"+
+                "and v.comp_code = s.comp_code\n" +
                 "join location l on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n"+
+                "and v.comp_code = l.comp_code\n" +
                 "where v.comp_code = '" + compCode + "'\n" + "and v.deleted = 0\n" +
                 "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -2871,7 +2874,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n"+
+                "and v.comp_code = l.comp_code\n" +
                 "where v.comp_code = '" + compCode + "'\n" +
                 "and v.cur_code = '" + curCode + "'\n" +
                 "and v.deleted = " + deleted + "\n" +
@@ -3015,7 +3018,7 @@ public class ReportServiceImpl implements ReportService {
                 "s.stock_name,s.sale_unit,s.sale_price,s.remark,t.trader_name,s.cur_code \n" +
                 "from v_sale s join trader t\n" +
                 "on s.trader_code = t.code\n" +
-                "and s.comp_code = t.comp_code\n"+
+                "and s.comp_code = t.comp_code\n" +
                 "where s.comp_code = '" + compCode + "'\n" +
                 "and s.deleted = false\n" +
                 "and date(s.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
@@ -3051,7 +3054,7 @@ public class ReportServiceImpl implements ReportService {
                 "s.stock_name,s.pur_unit,s.pur_price,s.remark,t.trader_name,s.cur_code \n" +
                 "from v_purchase s join trader t\n" +
                 "on s.trader_code = t.code\n" +
-                "and s.comp_code = t.comp_code\n"+
+                "and s.comp_code = t.comp_code\n" +
                 "where s.comp_code = '" + compCode + "'\n" +
                 "and s.deleted = false\n" +
                 "and date(s.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
@@ -3266,7 +3269,7 @@ public class ReportServiceImpl implements ReportService {
                 order by unique_id""";
         List<VReturnIn> riList = new ArrayList<>();
         try {
-            ResultSet rs = reportDao.getResultSql(sql,compCode,vouNo);
+            ResultSet rs = reportDao.getResultSql(sql, compCode, vouNo);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
                     VReturnIn in = new VReturnIn();
@@ -3304,7 +3307,7 @@ public class ReportServiceImpl implements ReportService {
                 order by unique_id""";
         List<VReturnOut> riList = new ArrayList<>();
         try {
-            ResultSet rs = reportDao.getResultSql(sql,compCode,vouNo);
+            ResultSet rs = reportDao.getResultSql(sql, compCode, vouNo);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
                     VReturnOut in = new VReturnOut();
@@ -3630,7 +3633,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_sale s\n" +
                 "join v_relation rel \n" +
                 "on s.rel_code = rel.rel_code\n" +
-                "and s.comp_code = rel.comp_code\n"+
+                "and s.comp_code = rel.comp_code\n" +
                 "and s.sale_unit = rel.unit\n" +
                 "where s.deleted = false\n" +
                 "and (s.comp_code = '" + compCode + "' or '-' = '" + compCode + "')\n" +
@@ -4945,7 +4948,7 @@ public class ReportServiceImpl implements ReportService {
                     "from v_purchase pur\n" +
                     "join v_relation rel\n" +
                     "on pur.rel_code = rel.rel_code\n" +
-                    "and pur.comp_code = rel.comp_code\n"+
+                    "and pur.comp_code = rel.comp_code\n" +
                     "and pur.pur_unit = rel.unit\n" +
                     "where deleted = false\n" +
                     "and date(vou_date) <='" + toDate + "'\n" +
@@ -4956,7 +4959,7 @@ public class ReportServiceImpl implements ReportService {
                     "from v_opening op\n" +
                     "join v_relation rel\n" +
                     "on op.rel_code = rel.rel_code\n" +
-                    "and op.comp_code = rel.comp_code\n"+
+                    "and op.comp_code = rel.comp_code\n" +
                     "and op.unit = rel.unit\n" +
                     "where op.price > 0\n" +
                     "and deleted = false\n" +
@@ -4986,7 +4989,7 @@ public class ReportServiceImpl implements ReportService {
                     "from v_opening op\n" +
                     "join v_relation rel\n" +
                     "on op.rel_code = rel.rel_code\n" +
-                    "and op.comp_code = rel.comp_code\n"+
+                    "and op.comp_code = rel.comp_code\n" +
                     "and op.unit = rel.unit\n" +
                     "where op.price > 0\n" +
                     "and op.deleted = false\n" +
