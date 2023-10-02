@@ -55,10 +55,10 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                     PurHisDetail op = new PurHisDetail();
                     PurDetailKey key = new PurDetailKey();
                     key.setVouNo(rs.getString("vou_no"));
-                    key.setDeptId(rs.getInt("dept_id"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
                     op.setQty(rs.getDouble("qty"));
                     op.setAvgQty(rs.getDouble("avg_qty"));

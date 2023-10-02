@@ -460,7 +460,7 @@ public class AccountRepo {
                 String vouNo = ph.getKey().getVouNo();
                 String batchNo = ph.getBatchNo();
                 String projectNo = ph.getProjectNo();
-                Integer deptId = ph.getKey().getDeptId();
+                Integer deptId = ph.getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
@@ -641,7 +641,7 @@ public class AccountRepo {
                 String projectNo = ri.getProjectNo();
                 double vouTotal = Util1.getDouble(ri.getVouTotal());
                 double vouPaid = Util1.getDouble(ri.getPaid());
-                Integer deptId = ri.getKey().getDeptId();
+                Integer deptId = ri.getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
@@ -728,7 +728,7 @@ public class AccountRepo {
                 String projectNo = ro.getProjectNo();
                 double vouTotal = Util1.getDouble(ro.getVouTotal());
                 double vouPaid = Util1.getDouble(ro.getPaid());
-                Integer deptId = ro.getKey().getDeptId();
+                Integer deptId = ro.getDeptId();
                 TraderKey k = new TraderKey();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);

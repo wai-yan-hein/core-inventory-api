@@ -19,8 +19,6 @@ public class PurDetailKey implements Serializable {
 
     @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "dept_id")
-    private Integer deptId;
     @Column(name = "unique_id")
     private int uniqueId;
     @Column(name = "comp_code")

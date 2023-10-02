@@ -123,7 +123,7 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
         list.forEach((o) -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setListRD(dao.search(vouNo, compCode, deptId));
         });
         return list;
@@ -158,7 +158,7 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
         list.forEach(o -> {
             String vouNo = o.getKey().getVouNo();
             String compCode = o.getKey().getCompCode();
-            Integer deptId = o.getKey().getDeptId();
+            Integer deptId = o.getDeptId();
             o.setListRD(dao.search(vouNo, compCode, deptId));
         });
         return list;
