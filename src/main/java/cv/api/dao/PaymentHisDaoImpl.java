@@ -84,7 +84,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 "join trader t on a.trader_code = t.code\n" +
                 "and a.comp_code = t.comp_code\n" +
                 "group by a.vou_no\n" +
-                "order by a.vou_date,a.vou_no desc";
+                "order by a.vou_date desc";
         List<PaymentHis> list = new ArrayList<>();
         try {
             ResultSet rs = getResult(sql, deleted, compCode, curCode, tranOption, startDate, endDate,
@@ -97,6 +97,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
                 p.setKey(key);
                 p.setDeptId(rs.getInt("dept_id"));
                 p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
+                p.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                 p.setAmount(rs.getFloat("amount"));
                 p.setRemark(rs.getString("remark"));
                 p.setDeleted(rs.getBoolean("deleted"));
