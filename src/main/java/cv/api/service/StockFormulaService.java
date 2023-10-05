@@ -14,7 +14,7 @@ public interface StockFormulaService {
 
     List<StockFormula> getFormula(String compCode);
 
-    StockFormulaDetail save(StockFormulaService s);
+    StockFormulaDetail save(StockFormulaDetail s);
 
     boolean delete(StockFormulaDetailKey key);
 
