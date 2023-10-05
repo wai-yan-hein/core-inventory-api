@@ -23,7 +23,7 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     @Override
     public StockFormula save(StockFormula s) {
         if (Util1.isNullOrEmpty(s.getKey().getCode())) {
-            s.getKey().setCode(getStockCode(s.getMacId(), s.getKey().getCompCode()));
+            s.getKey().setCode(getCode(s.getKey().getCompCode()));
             s.setCreatedDate(Util1.getTodayLocalDate());
         } else {
             s.setUpdatedDate(Util1.getTodayLocalDate());
@@ -56,9 +56,9 @@ public class StockFormulaServiceImpl implements StockFormulaService {
         return s;
     }
 
-    private String getStockCode(Integer macId, String compCode) {
-        int seqNo = seqService.getSequence(macId, "Stock", "-", compCode);
-        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 5 + "d", seqNo);
+    private String getCode(String compCode) {
+        int seqNo = seqService.getSequence(0, "StockFormula", "-", compCode);
+        return String.format("%0" + 3 + "d", seqNo);
     }
 
     @Override
