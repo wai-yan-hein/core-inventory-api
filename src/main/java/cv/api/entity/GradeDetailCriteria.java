@@ -8,14 +8,16 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "grn_detail_formula")
-public class GRNDetailFormula {
+@Table(name = "grade_detail_criteria")
+public class GradeDetailCriteria {
     @EmbeddedId
-    private GRNDetailFormulaKey key;
-    @Column(name = "description")
-    private String description;
+    private GradeDetailCriteriaKey key;
+    @Column(name = "criteria_code")
+    private String criteriaCode;
     @Column(name = "percent")
     private double percent;
     @Column(name = "price")
     private double price;
+    private transient String criteriaUserCode;
+    private transient String criteriaName;
 }

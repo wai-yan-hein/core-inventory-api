@@ -35,7 +35,7 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     }
 
     @Override
-    public StockFormulaDetail save(StockFormulaService s) {
+    public StockFormulaDetail save(StockFormulaDetail s) {
         return formulaDetailDao.save(s);
     }
 

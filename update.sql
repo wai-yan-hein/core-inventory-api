@@ -1215,10 +1215,25 @@ create table stock_formula_detail (
   code varchar(15) not null,
   comp_code varchar(15) not null,
   unique_id int not null,
-  description varchar(255) not null,
+  criteria_code varchar(255) not null,
   percent double(10,3) not null,
   price double(20,3) not null,
   primary key (code, comp_code, unique_id));
+
+create table stock_criteria (
+  criteria_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  user_code varchar(15) not null,
+  criteria_name varchar(255) not null,
+  created_by varchar(15) not null,
+  created_date timestamp not null,
+  updated_by varchar(15) default null,
+  updated_date timestamp not null,
+  active bit(1) not null,
+  deleted bit(1) not null,
+  primary key (criteria_code,comp_code)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
+
 
 #view
 drop view if exists v_milling_output;
