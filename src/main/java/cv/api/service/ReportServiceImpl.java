@@ -3581,6 +3581,79 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public List<GradeHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String compCode, Integer deptId, String deleted, String close) {
+        List<GradeHis> list = new ArrayList<>();
+        String orderBy = "order by vou_no desc";
+//        if (orderByBatch) {
+//            orderBy = "order by batch_no";
+//        }
+        String filter = "";
+        if (!fromDate.equals("-") && !toDate.equals("-")) {
+            filter += "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n";
+        }
+//        if (!batchNo.equals("-")) {
+//            filter += "and g.batch_no = '" + batchNo + "'\n";
+//        }
+        if (!vouNo.equals("-")) {
+            filter += "and g.vou_no = '" + vouNo + "'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and g.trader_code = '" + traderCode + "'\n";
+        }
+        if (!remark.equals("-")) {
+            filter += "and g.remark like '" + traderCode + "%'\n";
+        }
+        if (!userCode.equals("-")) {
+            filter += "and g.created_by = '" + userCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and gd.stock_code = '" + stockCode + "'\n";
+        }
+//        if (!locCode.equals("-")) {
+//            filter += "and gd.loc_code = '" + locCode + "'\n";
+//        }
+
+        String sql = "select a.*,t.user_code,t.trader_name\n" +
+                "from (\n" + "select vou_date,g.vou_no,g.comp_code,g.dept_id,g.created_by,remark,g.trader_code,g.deleted\n" +
+                "from grade_his g join grade_his_detail gd\n" +
+                "on g.vou_no = gd.vou_no\n" +
+                "and g.comp_code = gd.comp_code\n" +
+                "where g.comp_code ='" + compCode + "'\n" +
+                "and (g.dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
+                "and deleted =" + deleted + "\n" +
+                "and closed =" + close + "\n" + filter +
+                "group by g.vou_no\n" + ")a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" + orderBy;
+        try {
+            //vou_date, vou_no, comp_code, dept_id, created_by, batch_no, remark, trader_code, user_code, trader_name
+            ResultSet rs = reportDao.executeSql(sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    GradeHis g = new GradeHis();
+                    GradeHisKey key = new GradeHisKey();
+                    key.setCompCode(rs.getString("comp_code"));
+                    key.setVouNo(rs.getString("vou_no"));
+                    g.setKey(key);
+                    g.setDeptId(rs.getInt("dept_id"));
+                    g.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                    g.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
+                    g.setRemark(rs.getString("remark"));
+                    g.setTraderCode(rs.getString("trader_code"));
+                    g.setTraderUserCode(rs.getString("user_code"));
+                    g.setTraderName(rs.getString("trader_name"));
+                    g.setDeleted(rs.getBoolean("deleted"));
+                    g.setCreatedBy(rs.getString("created_by"));
+                    list.add(g);
+                }
+            }
+        } catch (Exception e) {
+            log.error("getGRNHistory : " + e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
     public List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode) {
         List<VPurchase> list = new ArrayList<>();
         String sql = "select 'I' group_name,user_code,stock_name,qty,unit,weight,weight_unit,0 price,0 amount,qty*weight ttl_qty,qty*weight ttl\n" +

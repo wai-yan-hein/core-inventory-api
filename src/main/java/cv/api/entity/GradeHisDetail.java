@@ -23,7 +23,7 @@ import jakarta.persistence.Transient;
 public class GradeHisDetail {
 
     @EmbeddedId
-    private GRNDetailKey key;
+    private GradeHisDetailKey key;
     @Column(name = "dept_id")
     private int deptId;
     @Column(name = "stock_code")

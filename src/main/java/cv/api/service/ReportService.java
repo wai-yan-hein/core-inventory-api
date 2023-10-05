@@ -214,6 +214,11 @@ public interface ReportService {
                             String remark, String userCode, String stockCode, String locCode,
                             String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
 
+
+    List<GradeHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo,
+                            String remark, String userCode, String stockCode,
+                            String compCode, Integer deptId, String deleted, String close);
+
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
 
     List<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode);

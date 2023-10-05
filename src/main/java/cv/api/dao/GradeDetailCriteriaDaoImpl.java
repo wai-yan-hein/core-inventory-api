@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class GRNDetailFormulaDaoImpl extends AbstractDao<GradeDetailCriteriaKey, GradeDetailCriteria> implements GRNDetailFormulaDao {
+public class GradeDetailCriteriaDaoImpl extends AbstractDao<GradeDetailCriteriaKey, GradeDetailCriteria> implements GradeDetailCriteriaDao {
     @Override
     public GradeDetailCriteria save(GradeDetailCriteria f) {
         return f;
@@ -22,8 +22,8 @@ public class GRNDetailFormulaDaoImpl extends AbstractDao<GradeDetailCriteriaKey,
     }
 
     @Override
-    public List<GradeDetailCriteria> getGRNDetailFormula(String vouNo, int uniqueId, String compCode) {
-        String hsql = "select o from GRNDetailFormula o where o.key.vouNo ='" + vouNo + "'\n" +
+    public List<GradeDetailCriteria> getGradeDetailCriteria(String vouNo, int uniqueId, String compCode) {
+        String hsql = "select o from GradeDetailCriteria o where o.key.vouNo ='" + vouNo + "'\n" +
                 " and o.key.fUniqueId =" + uniqueId + " and o.key.compCode='" + compCode + "'";
         return findHSQL(hsql);
     }
