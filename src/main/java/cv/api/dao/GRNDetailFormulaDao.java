@@ -1,13 +1,13 @@
 package cv.api.dao;
 
-import cv.api.entity.GRNDetailFormula;
-import cv.api.entity.GRNDetailFormulaKey;
+import cv.api.entity.GradeDetailCriteria;
+import cv.api.entity.GradeDetailCriteriaKey;
 
 import java.util.List;
 
 public interface GRNDetailFormulaDao {
-    GRNDetailFormula save(GRNDetailFormula f);
-    boolean delete(GRNDetailFormulaKey key);
+    GradeDetailCriteria save(GradeDetailCriteria f);
+    boolean delete(GradeDetailCriteriaKey key);
 
-    List<GRNDetailFormula> getGRNDetailFormula(String vouNo,int uniqueId,String compCode);
+    List<GradeDetailCriteria> getGRNDetailFormula(String vouNo, int uniqueId, String compCode);
 }

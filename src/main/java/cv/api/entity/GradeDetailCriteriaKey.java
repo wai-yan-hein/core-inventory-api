@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class GRNDetailFormulaKey implements Serializable {
+public class GradeDetailCriteriaKey implements Serializable {
     @Column(name = "vou_no")
     private String vouNo;
     @Column(name = "comp_code")
