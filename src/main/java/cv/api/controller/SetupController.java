@@ -71,6 +71,8 @@ public class SetupController {
     private AccSettingService accSettingService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private StockFormulaService stockFormulaService;
 
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
@@ -661,5 +663,26 @@ public class SetupController {
     public Mono<?> saveAccSetting(@RequestBody AccSetting setting) {
         return Mono.just(accSettingService.save(setting));
     }
+
+    @PostMapping(path = "/saveStockFormula")
+    public Mono<?> saveStockFormula(@RequestBody StockFormula f) {
+        return Mono.just(stockFormulaService.save(f));
+    }
+
+    @PostMapping(path = "/deleteStockFormula")
+    public Mono<?> deleteStockFormula(@RequestBody StockFormulaKey key) {
+        return Mono.just(stockFormulaService.delete(key));
+    }
+
+    @GetMapping(path = "/getStockFormula")
+    public Mono<?> getStockFormula(@RequestParam String compCode) {
+        return Mono.just(stockFormulaService.getFormula(compCode));
+    }
+
+    @GetMapping(path = "/getStockFormulaDetail")
+    public Mono<?> getStockFormula(@RequestParam String code, @RequestParam String compCode) {
+        return Mono.just(stockFormulaService.getFormulaDetail(code, compCode));
+    }
+
 
 }

@@ -1,33 +1,47 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package cv.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
-import jakarta.persistence.*;
-
+/**
+ *
+ * @author DELL
+ */
 @Data
 @Entity
-@Table(name = "grn_detail")
+@Table(name = "grade_his_detail")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GRNDetail {
+public class GradeHisDetail {
+
     @EmbeddedId
     private GRNDetailKey key;
     @Column(name = "dept_id")
-    private Integer deptId;
+    private int deptId;
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty")
     private double qty;
     @Column(name = "unit")
     private String unit;
-    @Column(name = "loc_code")
-    private String locCode;
     @Column(name = "weight")
     private double weight;
     @Column(name = "weight_unit")
     private String weightUnit;
     @Column(name = "total_weight")
     private double totalWeight;
+    @Column(name = "price")
+    private double price;
+    @Column(name = "amount")
+    private double amount;
     @Transient
     private String userCode;
     @Transient
@@ -37,5 +51,5 @@ public class GRNDetail {
     @Transient
     private String locName;
     @Transient
-    private double stdWeight;
+    private Stock stock;
 }
