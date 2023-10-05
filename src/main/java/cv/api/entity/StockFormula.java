@@ -1,14 +1,11 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.tags.Tags;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,4 +30,8 @@ public class StockFormula {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
+    @Column(name = "mac_id")
+    private Integer macId;
+    @Transient
+    private List<StockFormulaDetail> listDtl;
 }
