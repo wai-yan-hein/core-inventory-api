@@ -1195,6 +1195,31 @@ add column order_qty double not null after stock_code;
 alter table op_his change column comp_code comp_code varchar(15) not null after vou_no,change column dept_id dept_id int(11) not null default 1 after comp_code,drop primary key,add primary key (vou_no, comp_code);
 alter table op_his_detail change column vou_no vou_no varchar(15) not null first,change column unique_id unique_id int(11) not null after vou_no,change column comp_code comp_code varchar(15) not null default '0010010' after unique_id,drop primary key,add primary key (vou_no, unique_id, comp_code);
 
+alter table trader
+add column country_code varchar(15) null after credit_amt;
+
+create table stock_formula (
+  code varchar(15) not null,
+  comp_code varchar(15) not null,
+  user_code varchar(15) null,
+  formula_name varchar(255) not null,
+  created_by varchar(15) not null,
+  created_date timestamp not null,
+  updated_by varchar(15) null,
+  updated_date timestamp not null,
+  active bit(1) not null default 0,
+  deleted bit(1) not null default 0,
+  primary key (code, comp_code));
+
+create table stock_formula_detail (
+  code varchar(15) not null,
+  comp_code varchar(15) not null,
+  unique_id int not null,
+  description varchar(255) not null,
+  percent double(10,3) not null,
+  price double(20,3) not null,
+  primary key (code, comp_code, unique_id));
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;
@@ -1216,6 +1241,3 @@ drop view if exists v_order;
 create view v_order as  select oh.order_status,oh.project_no as project_no,oh.vou_no as vou_no,oh.comp_code as comp_code,oh.dept_id as dept_id,oh.trader_code as trader_code,oh.saleman_code as saleman_code,oh.vou_date as vou_date,oh.credit_term as credit_term,oh.cur_code as cur_code,oh.remark as remark,oh.vou_total as vou_total,oh.created_date as created_date,oh.created_by as created_by,oh.deleted as deleted,oh.updated_by as updated_by,oh.updated_date as updated_date,oh.mac_id as mac_id,oh.intg_upd_status as intg_upd_status,oh.reference as reference,oh.vou_lock as vou_lock,ohd.unique_id as unique_id,ohd.stock_code as stock_code,ohd.order_qty as order_qty,ohd.qty as qty,ohd.unit as unit,ohd.price as price,ohd.amt as amt,ohd.loc_code as loc_code,ohd.weight as weight,ohd.weight_unit as weight_unit,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((order_his oh join order_his_detail ohd on(oh.vou_no = ohd.vou_no and oh.comp_code = ohd.comp_code)) join stock s on(ohd.stock_code = s.stock_code and ohd.comp_code = s.comp_code));
 drop view if exists v_weight_loss;
 create  view v_weight_loss as select wlh.vou_no as vou_no,wlh.comp_code as comp_code,wlh.dept_id as dept_id,wlh.vou_date as vou_date,wlh.ref_no as ref_no,wlh.remark as remark,wlh.created_by as created_by,wlh.updated_by as updated_by,wlh.updated_date as updated_date,wlh.mac_id as mac_id,wlh.deleted as deleted,wlhd.unique_id as unique_id,wlhd.stock_code as stock_code,wlhd.qty as qty,wlhd.unit as unit,wlhd.price as price,wlhd.loss_qty as loss_qty,wlhd.loss_unit as loss_unit,wlhd.loss_price as loss_price,wlhd.loc_code as loc_code,s.user_code as user_code,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from ((weight_loss_his wlh join weight_loss_his_detail wlhd on(wlh.vou_no = wlhd.vou_no and wlh.comp_code = wlhd.comp_code)) join stock s on(wlhd.stock_code = s.stock_code and wlhd.comp_code = s.comp_code));
-
-alter table trader
-add column country_code varchar(15) null after credit_amt;

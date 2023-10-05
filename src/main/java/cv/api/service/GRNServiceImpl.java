@@ -3,10 +3,9 @@ package cv.api.service;
 import cv.api.common.Util1;
 import cv.api.dao.GRNDao;
 import cv.api.dao.GRNDetailDao;
-import cv.api.entity.GRN;
-import cv.api.entity.GRNDetail;
-import cv.api.entity.GRNDetailKey;
-import cv.api.entity.GRNKey;
+import cv.api.dao.GRNDetailFormulaDao;
+import cv.api.entity.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,13 +14,11 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class GRNServiceImpl implements GRNService {
-    @Autowired
-    private SeqTableService seqTableService;
-    @Autowired
-    private GRNDao dao;
-    @Autowired
-    private GRNDetailDao gdDao;
+    private final SeqTableService seqTableService;
+    private final GRNDao dao;
+    private final GRNDetailDao gdDao;
 
     @Override
     public GRN findByCode(GRNKey key) {
@@ -38,10 +35,18 @@ public class GRNServiceImpl implements GRNService {
         List<GRNDetailKey> listDel = g.getListDel();
         //backup
         if (listDel != null) {
-            listDel.forEach(key -> gdDao.delete(key));
+            listDel.forEach(gdDao::delete);
         }
-        for (int i = 0; i < listDetail.size(); i++) {
-            GRNDetail cSd = listDetail.get(i);
+
+        saveGRNDetail(listDetail, g);
+        g.setListDetail(listDetail);
+        dao.save(g);
+        return g;
+    }
+
+    private void saveGRNDetail(List<GRNDetail> list, GRN g) {
+        for (int i = 0; i < list.size(); i++) {
+            GRNDetail cSd = list.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
                 GRNDetailKey key = new GRNDetailKey();
                 key.setCompCode(g.getKey().getCompCode());
@@ -54,20 +59,40 @@ public class GRNServiceImpl implements GRNService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        GRNDetail pSd = listDetail.get(i - 1);
+                        GRNDetail pSd = list.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-//                cSd.setTotalWeight(cSd.getWeight() * cSd.getQty());
+                if (cSd.getTotalWeight() == 0) cSd.setTotalWeight(cSd.getWeight() * cSd.getQty());
                 cSd.setDeptId(g.getDeptId());
                 gdDao.save(cSd);
-
             }
         }
-        g.setListDetail(listDetail);
-        dao.save(g);
-        return g;
     }
+
+//    private void saveGRNDetailFormula(List<GRNDetailFormula> list, GRN g) {
+//        for (int i = 0; i < list.size(); i++) {
+//            GRNDetailFormula cSd = list.get(i);
+//            if (Util1.isNullOrEmpty(cSd.getKey())) {
+//                GRNDetailFormulaKey key = new GRNDetailFormulaKey();
+//                key.setCompCode(g.getKey().getCompCode());
+//                key.setVouNo(g.getKey().getVouNo());
+//                key.setUniqueId(0);
+//                cSd.setKey(key);
+//            }
+//            if (Util1.isNullOrEmpty(cSd.getDescription() != null)) {
+//                if (cSd.getKey().getUniqueId() == 0) {
+//                    if (i == 0) {
+//                        cSd.getKey().setUniqueId(1);
+//                    } else {
+//                        GRNDetailFormula pSd = list.get(i - 1);
+//                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+//                    }
+//                }
+//                gdfDao.save(cSd);
+//            }
+//        }
+//    }
 
     @Override
     public List<GRN> findAll(String compCode, Integer deptId) {
