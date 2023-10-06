@@ -26,7 +26,7 @@ public interface StockCriteriaService {
 
     int delete(String id);
 
-    List<StockCriteria> search(String catName);
+    List<StockCriteria> search(String text,String compCode);
 
     List<StockCriteria> unUpload();
 

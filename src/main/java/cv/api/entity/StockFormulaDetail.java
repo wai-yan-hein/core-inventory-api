@@ -18,4 +18,6 @@ public class StockFormulaDetail {
     private double percent;
     @Column(name = "price")
     private double price;
+    private transient String criteriaName;
+
 }

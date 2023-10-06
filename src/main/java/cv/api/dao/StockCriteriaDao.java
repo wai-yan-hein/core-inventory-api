@@ -21,7 +21,7 @@ public interface StockCriteriaDao {
 
     List<StockCriteria> findAll(String compCode);
 
-    List<StockCriteria> search(String name);
+    List<StockCriteria> search(String text,String compCode);
 
     List<StockCriteria> unUpload();
 

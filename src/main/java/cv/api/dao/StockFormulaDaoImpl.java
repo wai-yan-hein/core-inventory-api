@@ -29,7 +29,7 @@ public class StockFormulaDaoImpl extends AbstractDao<StockFormulaKey, StockFormu
 
     @Override
     public List<StockFormula> getFormula(String compCode) {
-        String hsql = "select o from StockFormula o where o.key.compCode = '" + compCode + "'";
+        String hsql = "select o from StockFormula o where o.key.compCode = '" + compCode + "' order by o.userCode,o.formulaName";
         return findHSQL(hsql);
     }
 }

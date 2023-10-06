@@ -30,8 +30,4 @@ public class StockFormula {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
-    @Column(name = "mac_id")
-    private Integer macId;
-    @Transient
-    private List<StockFormulaDetail> listDtl;
 }

@@ -441,10 +441,10 @@ public class SetupController {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-//    @GetMapping(path = "/getStockCriteriaList")
-//    public Flux<?> getStockCriteriaList(@RequestParam String text, @RequestParam String compCode) {
-//        return Flux.fromIterable(stockCriteriaService.getStockCriteria(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
-//    }
+    @GetMapping(path = "/searchStockCriteria")
+    public Flux<?> searchStockCriteria(@RequestParam String text, @RequestParam String compCode) {
+        return Flux.fromIterable(stockCriteriaService.search(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
+    }
 
     @PostMapping(path = "/deleteStock")
     public Flux<?> deleteStock(@RequestBody StockKey key) {
@@ -720,9 +720,7 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getStockFormulaDetail")
-    public Mono<?> getStockFormula(@RequestParam String code, @RequestParam String compCode) {
-        return Mono.just(stockFormulaService.getFormulaDetail(code, compCode));
+    public Mono<?> getStockFormula(@RequestParam String compCode, @RequestParam String formulaCode) {
+        return Mono.just(stockFormulaService.getFormulaDetail(formulaCode, compCode));
     }
-
-
 }
