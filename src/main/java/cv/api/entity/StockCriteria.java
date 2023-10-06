@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 public class StockCriteria {
     @EmbeddedId
     private StockCriteriaKey key;
+    @Column(name = "user_code")
+    private String userCode;
     @Column(name = "criteria_name")
     private String criteriaName;
     @Column(name = "user_code")
