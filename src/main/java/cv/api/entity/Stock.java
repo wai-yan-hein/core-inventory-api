@@ -96,6 +96,8 @@ public class Stock {
     private Float saleQty;
     @Column(name = "deleted")
     private boolean deleted;
+    @Column(name = "formula_code")
+    private String formulaCode;
     @Transient
     private String relName;
     @Transient

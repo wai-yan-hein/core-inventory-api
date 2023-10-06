@@ -15,8 +15,6 @@ public class StockCriteria {
     private String userCode;
     @Column(name = "criteria_name")
     private String criteriaName;
-    @Column(name = "user_code")
-    private String userCode;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
