@@ -12,10 +12,11 @@ import lombok.Data;
 public class StockFormulaDetail {
     @EmbeddedId
     private StockFormulaDetailKey key;
-    @Column(name = "description")
-    private String description;
+    @Column(name = "criteria_code")
+    private String criteriaCode;
     @Column(name = "percent")
     private double percent;
     @Column(name = "price")
     private double price;
+    private transient String criteriaName;
 }

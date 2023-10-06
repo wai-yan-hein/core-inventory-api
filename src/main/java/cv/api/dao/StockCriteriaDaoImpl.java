@@ -30,8 +30,11 @@ public class StockCriteriaDaoImpl extends AbstractDao<StockCriteriaKey, StockCri
     }
 
     @Override
-    public List<StockCriteria> findAll(String compCode) {
+    public List<StockCriteria> findAll(String compCode, boolean active) {
         String hsql = "select o from StockCriteria o where o.key.compCode = '" + compCode + "'";
+        if (active) {
+            hsql += " and active = " + active;
+        }
         return findHSQL(hsql);
     }
 
@@ -41,17 +44,17 @@ public class StockCriteriaDaoImpl extends AbstractDao<StockCriteriaKey, StockCri
     }
 
     @Override
-    public List<StockCriteria> search(String name) {
+    public List<StockCriteria> search(String compCode, String name) {
         String strFilter = "";
 
         if (!name.equals("-")) {
-            strFilter = "o.criteriaName like '%" + name + "%'";
+            strFilter = "o.criteriaName like '%" + name + "%' or o.key.criteriaCode like '%" + name + "%'";
         }
 
         if (strFilter.isEmpty()) {
             strFilter = "select o from StockCriteria o";
         } else {
-            strFilter = "select o from StockCriteria o where " + strFilter;
+            strFilter = "select o from StockCriteria o where o.key.compCode = ' " + compCode + "' and " + strFilter;
         }
         return findHSQL(strFilter);
     }

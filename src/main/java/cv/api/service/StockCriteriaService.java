@@ -22,11 +22,10 @@ public interface StockCriteriaService {
 
     StockCriteria save(StockCriteria category);
 
-    List<StockCriteria> findAll(String compCode);
+    List<StockCriteria> findAll(String compCode, boolean active);
 
+    List<StockCriteria> search(String compCode,String text);
     int delete(String id);
-
-    List<StockCriteria> search(String catName);
 
     List<StockCriteria> unUpload();
 

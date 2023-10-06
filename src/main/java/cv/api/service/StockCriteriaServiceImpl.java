@@ -42,18 +42,18 @@ public class StockCriteriaServiceImpl implements StockCriteriaService {
     }
 
     @Override
-    public List<StockCriteria> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<StockCriteria> findAll(String compCode, boolean active) {
+        return dao.findAll(compCode, active);
+    }
+
+    @Override
+    public List<StockCriteria> search(String compCode, String text) {
+        return dao.search(compCode, text);
     }
 
     @Override
     public int delete(String id) {
         return dao.delete(id);
-    }
-
-    @Override
-    public List<StockCriteria> search(String name) {
-        return dao.search(name);
     }
 
     @Override

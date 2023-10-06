@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -21,33 +22,35 @@ public class StockFormulaServiceImpl implements StockFormulaService {
 
     @Override
     public StockFormula save(StockFormula s) {
-        if (Util1.isNullOrEmpty(s.getKey().getCode())) {
-            s.getKey().setCode(getCode(s.getKey().getCompCode()));
+        if (Util1.isNullOrEmpty(s.getKey().getFormulaCode())) {
+            s.getKey().setFormulaCode(getCode(s.getKey().getCompCode()));
             s.setCreatedDate(Util1.getTodayLocalDate());
         } else {
             s.setUpdatedDate(Util1.getTodayLocalDate());
         }
         List<StockFormulaDetail> listSD = s.getListDtl();
-        String vouNo = s.getKey().getCode();
-        for (int i = 0; i < listSD.size(); i++) {
-            StockFormulaDetail cSd = listSD.get(i);
-            if (Util1.isNullOrEmpty(cSd.getKey())) {
-                StockFormulaDetailKey key = new StockFormulaDetailKey();
-                key.setCompCode(s.getKey().getCompCode());
-                key.setCode(vouNo);
-                key.setUniqueId(0);
-                cSd.setKey(key);
-            }
-            if (cSd.getKey().getCode() != null) {
-                if (cSd.getKey().getUniqueId() == 0) {
-                    if (i == 0) {
-                        cSd.getKey().setUniqueId(1);
-                    } else {
-                        StockFormulaDetail pSd = listSD.get(i - 1);
-                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
-                    }
+        String vouNo = s.getKey().getFormulaCode();
+        if (listSD != null) {
+            for (int i = 0; i < listSD.size(); i++) {
+                StockFormulaDetail cSd = listSD.get(i);
+                if (Util1.isNullOrEmpty(cSd.getKey())) {
+                    StockFormulaDetailKey key = new StockFormulaDetailKey();
+                    key.setCompCode(s.getKey().getCompCode());
+                    key.setFormulaCode(vouNo);
+                    key.setUniqueId(0);
+                    cSd.setKey(key);
                 }
-                formulaDetailDao.save(cSd);
+                if (cSd.getKey().getFormulaCode() != null) {
+                    if (cSd.getKey().getUniqueId() == 0) {
+                        if (i == 0) {
+                            cSd.getKey().setUniqueId(1);
+                        } else {
+                            StockFormulaDetail pSd = listSD.get(i - 1);
+                            cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                        }
+                    }
+                    formulaDetailDao.save(cSd);
+                }
             }
         }
         formulaDao.save(s);

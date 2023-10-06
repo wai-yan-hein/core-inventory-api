@@ -26,7 +26,7 @@ public class StockFormulaDetailDaoImpl extends AbstractDao<StockFormulaDetailKey
 
     @Override
     public List<StockFormulaDetail> getFormulaDetail(String code, String compCode) {
-        String hsql = "select o from StockFormulaDetail o where o.key.compCode = '" + compCode + "' and o.key.code ='" + code + "'";
+        String hsql = "select o from StockFormulaDetail o where o.key.compCode = '" + compCode + "' and o.key.formulaCode ='" + code + "'";
         return findHSQL(hsql);
     }
 }

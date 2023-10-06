@@ -121,8 +121,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getStockCriteria")
-    public Flux<?> getStockCriteria(@RequestParam String compCode) {
-        return Flux.fromIterable(stockCriteriaService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<?> getStockCriteria(@RequestParam String compCode, @RequestParam boolean active) {
+        return Flux.fromIterable(stockCriteriaService.findAll(compCode, active)).onErrorResume(throwable -> Flux.empty());
     }
 
 
@@ -144,6 +144,12 @@ public class SetupController {
         StockCriteria cat = stockCriteriaService.findByCode(key);
         return Mono.justOrEmpty(cat);
     }
+
+    @GetMapping(path = "/searchStockCriteria")
+    public Mono<?> searchStockCriteria(@RequestParam String text, @RequestParam String compCode) {
+        return Mono.just(stockCriteriaService.search(compCode, text));
+    }
+
 
     @PostMapping(path = "/saveLocation")
     public Mono<Location> saveLocation(@RequestBody Location location) {
@@ -720,9 +726,15 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getStockFormulaDetail")
-    public Mono<?> getStockFormula(@RequestParam String code, @RequestParam String compCode) {
-        return Mono.just(stockFormulaService.getFormulaDetail(code, compCode));
+    public Mono<?> getStockFormula(@RequestParam String formulaCode, @RequestParam String compCode) {
+        return Mono.just(stockFormulaService.getFormulaDetail(formulaCode, compCode));
     }
+
+    @PostMapping(path = "/saveStockFormulaDetail")
+    public Mono<?> saveStockFormulaDetail(@RequestBody StockFormulaDetail f) {
+        return Mono.just(stockFormulaService.save(f));
+    }
+
 
 
 }
