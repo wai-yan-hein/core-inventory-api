@@ -43,6 +43,8 @@ public class SetupController {
     @Autowired
     private StockService stockService;
     @Autowired
+    private StockCriteriaService stockCriteriaService;
+    @Autowired
     private VouStatusService vouStatusService;
     @Autowired
     private OPHisService opHisService;
@@ -404,6 +406,10 @@ public class SetupController {
     @GetMapping(path = "/getStockList")
     public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    }
+    @GetMapping(path = "/getStockCriteriaList")
+    public Flux<?> getStockCriteriaList(@RequestParam String text, @RequestParam String compCode) {
+        return Flux.fromIterable(stockCriteriaService.getStockCriteria(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/deleteStock")

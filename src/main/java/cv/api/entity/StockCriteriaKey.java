@@ -12,4 +12,9 @@ public class StockCriteriaKey implements Serializable {
     private String criteriaCode;
     @Column(name = "comp_code")
     private String compCode;
+    public StockCriteriaKey() {}
+    public StockCriteriaKey(String criteriaCode, String compCode) {
+        this.criteriaCode = criteriaCode;
+        this.compCode = compCode;
+    }
 }

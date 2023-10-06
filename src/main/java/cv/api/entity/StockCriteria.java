@@ -1,9 +1,6 @@
 package cv.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,8 @@ public class StockCriteria {
     private StockCriteriaKey key;
     @Column(name = "criteria_name")
     private String criteriaName;
+    @Column(name = "user_code")
+    private String userCode;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "updated_by")
@@ -28,4 +27,12 @@ public class StockCriteria {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
+    @Transient
+    private String relName;
+    @Transient
+    private String groupName;
+    @Transient
+    private String brandName;
+    @Transient
+    private String catName;
 }
