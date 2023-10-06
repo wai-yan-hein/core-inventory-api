@@ -1,10 +1,8 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.dao.GRNDao;
-import cv.api.dao.GRNDetailDao;
-import cv.api.dao.GradeHisDao;
-import cv.api.dao.GradeHisDetailDao;
+import cv.api.dao.LandingHisDao;
+import cv.api.dao.LandingHisDetailDao;
 import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,24 +13,24 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class GradeServiceImpl implements GradeService {
+public class LandingServiceImpl implements LandingService {
     private final SeqTableService seqTableService;
-    private final GradeHisDao dao;
-    private final GradeHisDetailDao gdDao;
+    private final LandingHisDao dao;
+    private final LandingHisDetailDao gdDao;
 
     @Override
-    public GradeHis findByCode(GradeHisKey key) {
+    public LandingHis findByCode(LandingHisKey key) {
         return dao.findByCode(key);
     }
 
     @Override
-    public GradeHis save(GradeHis g) {
+    public LandingHis save(LandingHis g) {
         g.setVouDate(Util1.toDateTime(g.getVouDate()));
         if (Util1.isNullOrEmpty(g.getKey().getVouNo())) {
             g.getKey().setVouNo(getVoucherNo(g.getDeptId(), g.getMacId(), g.getKey().getCompCode()));
         }
-        List<GradeHisDetail> listDetail = g.getListDetail();
-        List<GradeHisDetailKey> listDel = g.getListDel();
+        List<LandingHisDetail> listDetail = g.getListDetail();
+        List<LandingHisDetailKey> listDel = g.getListDel();
         //backup
         if (listDel != null) {
             listDel.forEach(gdDao::delete);
@@ -44,11 +42,11 @@ public class GradeServiceImpl implements GradeService {
         return g;
     }
 
-    private void saveGradeDetail(List<GradeHisDetail> list, GradeHis g) {
+    private void saveGradeDetail(List<LandingHisDetail> list, LandingHis g) {
         for (int i = 0; i < list.size(); i++) {
-            GradeHisDetail cSd = list.get(i);
+            LandingHisDetail cSd = list.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
-                GradeHisDetailKey key = new GradeHisDetailKey();
+                LandingHisDetailKey key = new LandingHisDetailKey();
                 key.setCompCode(g.getKey().getCompCode());
                 key.setVouNo(g.getKey().getVouNo());
                 key.setUniqueId(0);
@@ -59,7 +57,7 @@ public class GradeServiceImpl implements GradeService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        GradeHisDetail pSd = list.get(i - 1);
+                        LandingHisDetail pSd = list.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
@@ -95,27 +93,27 @@ public class GradeServiceImpl implements GradeService {
 //    }
 
     @Override
-    public List<GradeHis> findAll(String compCode, Integer deptId) {
+    public List<LandingHis> findAll(String compCode, Integer deptId) {
         return dao.findAll(compCode, deptId);
     }
 
     @Override
-    public List<GradeHis> search(String compCode, Integer deptId) {
+    public List<LandingHis> search(String compCode, Integer deptId) {
         return dao.search(compCode, deptId);
     }
 
     @Override
-    public boolean delete(GradeHisKey key) {
+    public boolean delete(LandingHisKey key) {
         return dao.delete(key);
     }
 
     @Override
-    public boolean restore(GradeHisKey key) {
+    public boolean restore(LandingHisKey key) {
         return dao.delete(key);
     }
 
     @Override
-    public boolean open(GradeHisKey key) {
+    public boolean open(LandingHisKey key) {
         return dao.open(key);
     }
 
@@ -129,17 +127,17 @@ public class GradeServiceImpl implements GradeService {
     // grade detail
 
     @Override
-    public GradeHisDetail save(GradeHisDetail b) {
+    public LandingHisDetail save(LandingHisDetail b) {
         return gdDao.save(b);
     }
 
     @Override
-    public void delete(GradeHisDetailKey key) {
+    public void delete(LandingHisDetailKey key) {
         gdDao.delete(key);
     }
 
     @Override
-    public List<GradeHisDetail> searchDetail(String vouNo, String compCode, Integer deptId) {
+    public List<LandingHisDetail> searchDetail(String vouNo, String compCode, Integer deptId) {
         return gdDao.search(vouNo, compCode, deptId);
     }
 }

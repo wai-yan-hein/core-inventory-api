@@ -1,9 +1,7 @@
 package cv.api.dao;
 
-import cv.api.entity.GRNDetail;
-import cv.api.entity.GRNDetailKey;
-import cv.api.entity.GradeHisDetail;
-import cv.api.entity.GradeHisDetailKey;
+import cv.api.entity.LandingHisDetail;
+import cv.api.entity.LandingHisDetailKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -13,21 +11,21 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class GradeHisDetailDaoImpl extends AbstractDao<GradeHisDetailKey, GradeHisDetail> implements GradeHisDetailDao {
+public class LandingHisDetailDaoImpl extends AbstractDao<LandingHisDetailKey, LandingHisDetail> implements LandingHisDetailDao {
     @Override
-    public GradeHisDetail save(GradeHisDetail b) {
+    public LandingHisDetail save(LandingHisDetail b) {
         saveOrUpdate(b, b.getKey());
         return b;
     }
 
     @Override
-    public void delete(GradeHisDetailKey key) {
+    public void delete(LandingHisDetailKey key) {
         remove(key);
     }
 
     @Override
-    public List<GradeHisDetail> search(String vouNo, String compCode, Integer deptId) {
-        List<GradeHisDetail> list = new ArrayList<>();
+    public List<LandingHisDetail> search(String vouNo, String compCode, Integer deptId) {
+        List<LandingHisDetail> list = new ArrayList<>();
         try {
             String sql = "select g.*,s.user_code,s.stock_name,s.weight std_weight,rel.rel_name,l.loc_name\n" +
                     "from grade_his_detail g join stock s\n" +
@@ -45,8 +43,8 @@ public class GradeHisDetailDaoImpl extends AbstractDao<GradeHisDetailKey, GradeH
             ResultSet rs = getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
-                    GradeHisDetail g = new GradeHisDetail();
-                    GradeHisDetailKey key = new GradeHisDetailKey();
+                    LandingHisDetail g = new LandingHisDetail();
+                    LandingHisDetailKey key = new LandingHisDetailKey();
                     key.setCompCode(rs.getString("comp_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     key.setVouNo(rs.getString("vou_no"));

@@ -19,4 +19,5 @@ public class StockFormulaDetail {
     @Column(name = "price")
     private double price;
     private transient String criteriaName;
+    private transient String userCode;
 }

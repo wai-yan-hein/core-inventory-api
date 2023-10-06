@@ -1,10 +1,8 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.GRN;
-import cv.api.entity.GradeHisKey;
-import cv.api.entity.GradeHis;
-import cv.api.entity.GradeHisKey;
+import cv.api.entity.LandingHisKey;
+import cv.api.entity.LandingHis;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -14,10 +12,10 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class GradeHisDaoImpl extends AbstractDao<GradeHisKey, GradeHis> implements GradeHisDao {
+public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> implements LandingHisDao {
     @Override
-    public GradeHis findByCode(GradeHisKey key) {
-        GradeHis grn = getByKey(key);
+    public LandingHis findByCode(LandingHisKey key) {
+        LandingHis grn = getByKey(key);
         if (grn != null) {
             grn.setVouDateTime(Util1.toZonedDateTime(grn.getVouDate()));
         }
@@ -25,34 +23,34 @@ public class GradeHisDaoImpl extends AbstractDao<GradeHisKey, GradeHis> implemen
     }
 
     @Override
-    public GradeHis save(GradeHis b) {
+    public LandingHis save(LandingHis b) {
         saveOrUpdate(b, b.getKey());
         return b;
     }
 
     @Override
-    public List<GradeHis> findAll(String compCode, Integer deptId) {
+    public List<LandingHis> findAll(String compCode, Integer deptId) {
         String hsql = "select o from GradeHis o where o.key.compCode ='" + compCode + "'";
         return findHSQL(hsql);
     }
 
     @Override
-    public boolean delete(GradeHisKey key) {
+    public boolean delete(LandingHisKey key) {
         String sql = "update grade_his set deleted = true where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return true;
     }
 
     @Override
-    public boolean restore(GradeHisKey key) {
+    public boolean restore(LandingHisKey key) {
         String sql = "update grade_his set deleted = false where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return true;
     }
 
     @Override
-    public List<GradeHis> search(String compCode, Integer deptId) {
-        List<GradeHis> list = new ArrayList<>();
+    public List<LandingHis> search(String compCode, Integer deptId) {
+        List<LandingHis> list = new ArrayList<>();
         String sql = """
                 select t.trader_name,a.vou_no
                 from (
@@ -72,8 +70,8 @@ public class GradeHisDaoImpl extends AbstractDao<GradeHisKey, GradeHis> implemen
             ResultSet rs = getResult(sql, compCode, deptId, deptId + "%");
             if (rs != null) {
                 while (rs.next()) {
-                    GradeHis g = new GradeHis();
-                    GradeHisKey key = new GradeHisKey();
+                    LandingHis g = new LandingHis();
+                    LandingHisKey key = new LandingHisKey();
                     key.setVouNo(rs.getString("vou_no"));
                     g.setKey(key);
 //                    g.setBatchNo(rs.getString("batch_no"));
@@ -88,7 +86,7 @@ public class GradeHisDaoImpl extends AbstractDao<GradeHisKey, GradeHis> implemen
     }
 
     @Override
-    public boolean open(GradeHisKey key) {
+    public boolean open(LandingHisKey key) {
         String sql = "update grade_his set closed =0 where vou_no ='" + key.getVouNo() + "' and comp_code ='" + key.getCompCode() + "'";
         execSql(sql);
         return true;

@@ -10,12 +10,12 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "grade_his")
+@Table(name = "landing_his")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GradeHis {
+public class LandingHis {
 
     @EmbeddedId
-    private GradeHisKey key;
+    private LandingHisKey key;
     @Column(name = "dept_id")
     private Integer deptId;
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
@@ -36,10 +36,12 @@ public class GradeHis {
     private Integer macId;
     @Column(name = "remark")
     private String remark;
+    @Column(name = "loc_code")
+    private String locCode;
     @Transient
-    private List<GradeHisDetail> listDetail;
+    private List<LandingHisDetail> listDetail;
     @Transient
-    private List<GradeHisDetailKey> listDel;
+    private List<LandingHisDetailKey> listDel;
     @Transient
     private String traderName;
     @Transient
@@ -47,6 +49,6 @@ public class GradeHis {
     @Transient
     private ZonedDateTime vouDateTime;
 
-    public GradeHis() {
+    public LandingHis() {
     }
 }

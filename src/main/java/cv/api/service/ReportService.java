@@ -7,7 +7,6 @@ package cv.api.service;
 
 import cv.api.common.ClosingBalance;
 import cv.api.common.General;
-import cv.api.common.ReportFilter;
 import cv.api.common.StockValue;
 import cv.api.entity.*;
 import cv.api.model.*;
@@ -215,9 +214,9 @@ public interface ReportService {
                             String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
 
 
-    List<GradeHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo,
-                            String remark, String userCode, String stockCode,
-                            String compCode, Integer deptId, String deleted, String close);
+    List<LandingHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo,
+                                     String remark, String userCode, String stockCode,
+                                     String compCode, Integer deptId, String deleted, String close);
 
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
 

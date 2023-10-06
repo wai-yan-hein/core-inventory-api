@@ -2,13 +2,9 @@ package cv.api.controller;
 
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
-import cv.api.entity.GRN;
-import cv.api.entity.GRNKey;
-import cv.api.entity.GradeHis;
-import cv.api.entity.GradeHisKey;
-import cv.api.service.GRNDetailService;
-import cv.api.service.GRNService;
-import cv.api.service.GradeService;
+import cv.api.entity.LandingHis;
+import cv.api.entity.LandingHisKey;
+import cv.api.service.LandingService;
 import cv.api.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -25,12 +20,12 @@ import java.util.List;
 @Slf4j
 public class GradeController {
     @Autowired
-    private GradeService gradeService;
+    private LandingService gradeService;
     @Autowired
     private ReportService reportService;
 
     @PostMapping
-    public Mono<?> saveGrade(@RequestBody GradeHis g) {
+    public Mono<?> saveGrade(@RequestBody LandingHis g) {
         return Mono.justOrEmpty(gradeService.save(g));
     }
 
@@ -47,7 +42,7 @@ public class GradeController {
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
         String close = String.valueOf(filter.isClose());
-        List<GradeHis> list = reportService.getGradeHistory(fromDate, toDate, traderCode, vouNo, remark, userCode, stockCode, compCode, deptId, deleted, close);
+        List<LandingHis> list = reportService.getGradeHistory(fromDate, toDate, traderCode, vouNo, remark, userCode, stockCode, compCode, deptId, deleted, close);
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -57,22 +52,22 @@ public class GradeController {
     }
 
     @PostMapping(path = "/deleteGrade")
-    public Mono<?> deleteGrade(@RequestBody GradeHisKey key) {
+    public Mono<?> deleteGrade(@RequestBody LandingHisKey key) {
         return Mono.justOrEmpty(gradeService.delete(key));
     }
 
     @PostMapping(path = "/restoreGrade")
-    public Mono<?> restoreGrade(@RequestBody GradeHisKey key) {
+    public Mono<?> restoreGrade(@RequestBody LandingHisKey key) {
         return Mono.justOrEmpty(gradeService.restore(key));
     }
 
     @PostMapping(path = "/openGrade")
-    public Mono<?> openGrade(@RequestBody GradeHisKey key) {
+    public Mono<?> openGrade(@RequestBody LandingHisKey key) {
         return Mono.justOrEmpty(gradeService.delete(key));
     }
 
     @PostMapping(path = "/findGrade")
-    public Mono<?> findGrade(@RequestBody GradeHisKey key) {
+    public Mono<?> findGrade(@RequestBody LandingHisKey key) {
         return Mono.justOrEmpty(gradeService.findByCode(key));
     }
 

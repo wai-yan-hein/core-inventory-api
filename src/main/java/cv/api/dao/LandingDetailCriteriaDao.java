@@ -5,9 +5,9 @@ import cv.api.entity.LandingDetailCriteriaKey;
 
 import java.util.List;
 
-public interface GRNDetailFormulaDao {
+public interface LandingDetailCriteriaDao {
     LandingDetailCriteria save(LandingDetailCriteria f);
     boolean delete(LandingDetailCriteriaKey key);
 
-    List<LandingDetailCriteria> getGRNDetailFormula(String vouNo, int uniqueId, String compCode);
+    List<LandingDetailCriteria> getGradeDetailCriteria(String vouNo, int uniqueId, String compCode);
 }

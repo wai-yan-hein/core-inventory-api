@@ -32,7 +32,7 @@ public class StockFormulaDetailDaoImpl extends AbstractDao<StockFormulaDetailKey
     @Override
     public List<StockFormulaDetail> getFormulaDetail(String code, String compCode) {
         String sql = """
-                select s.*,sc.criteria_name
+                select s.*,sc.criteria_name,sc.user_code
                 from stock_formula_detail s
                 join stock_criteria sc on s.criteria_code = sc.criteria_code
                 and s.comp_code = s.comp_code
@@ -51,6 +51,7 @@ public class StockFormulaDetailDaoImpl extends AbstractDao<StockFormulaDetailKey
                 key.setUniqueId(rs.getInt("unique_id"));
                 d.setKey(key);
                 d.setCriteriaCode(rs.getString("criteria_code"));
+                d.setUserCode(rs.getString("user_code"));
                 d.setCriteriaName(rs.getString("criteria_name"));
                 d.setPercent(rs.getDouble("percent"));
                 d.setPrice(rs.getDouble("price"));

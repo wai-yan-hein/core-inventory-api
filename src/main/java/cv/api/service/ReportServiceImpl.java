@@ -3581,8 +3581,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<GradeHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String compCode, Integer deptId, String deleted, String close) {
-        List<GradeHis> list = new ArrayList<>();
+    public List<LandingHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String userCode, String stockCode, String compCode, Integer deptId, String deleted, String close) {
+        List<LandingHis> list = new ArrayList<>();
         String orderBy = "order by vou_no desc";
 //        if (orderByBatch) {
 //            orderBy = "order by batch_no";
@@ -3630,8 +3630,8 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
                 while (rs.next()) {
-                    GradeHis g = new GradeHis();
-                    GradeHisKey key = new GradeHisKey();
+                    LandingHis g = new LandingHis();
+                    LandingHisKey key = new LandingHisKey();
                     key.setCompCode(rs.getString("comp_code"));
                     key.setVouNo(rs.getString("vou_no"));
                     g.setKey(key);

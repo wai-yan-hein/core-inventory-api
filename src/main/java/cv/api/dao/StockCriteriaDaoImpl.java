@@ -44,22 +44,8 @@ public class StockCriteriaDaoImpl extends AbstractDao<StockCriteriaKey, StockCri
     }
 
     @Override
-//    public List<StockCriteria> search(String compCode, String name) {
-//        String strFilter = "";
-
-//        if (!name.equals("-")) {
-//            strFilter = "o.criteriaName like '%" + name + "%' or o.key.criteriaCode like '%" + name + "%'";
-//        }
-//
-//        if (strFilter.isEmpty()) {
-//            strFilter = "select o from StockCriteria o";
-//        } else {
-//            strFilter = "select o from StockCriteria o where o.key.compCode = ' " + compCode + "' and " + strFilter;
-//        }
-//        return findHSQL(strFilter);
-
     public List<StockCriteria> search(String compCode, String text) {
-        text += text + "%";
+        text = text + "%";
         String sql = """
                 select *
                 from stock_criteria
@@ -70,13 +56,14 @@ public class StockCriteriaDaoImpl extends AbstractDao<StockCriteriaKey, StockCri
                 """;
         List<StockCriteria> list = new ArrayList<>();
         try {
-            ResultSet rs = getResult(sql, text, text, compCode);
+            ResultSet rs = getResult(sql, text, text,   compCode);
             while (rs.next()) {
                 StockCriteria sc = new StockCriteria();
                 StockCriteriaKey key = new StockCriteriaKey();
                 key.setCriteriaCode(rs.getString("criteria_code"));
                 key.setCompCode(rs.getString("comp_code"));
                 sc.setKey(key);
+                sc.setUserCode(rs.getString("user_code"));
                 sc.setCriteriaName(rs.getString("criteria_name"));
                 list.add(sc);
             }
