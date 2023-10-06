@@ -5,10 +5,7 @@
  */
 package cv.api.dao;
 
-import cv.api.entity.Stock;
-import cv.api.entity.StockCriteria;
-import cv.api.entity.StockCriteriaKey;
-import cv.api.entity.StockKey;
+import cv.api.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -18,29 +15,25 @@ import java.util.List;
  * @author wai yan
  */
 public interface StockCriteriaDao {
+    StockCriteria findByCode(StockCriteriaKey key);
 
-    StockCriteria save(StockCriteria stock);
-
-    StockCriteria findById(StockCriteriaKey key);
+    StockCriteria save(StockCriteria item);
 
     List<StockCriteria> findAll(String compCode);
 
-    int delete(StockCriteriaKey id);
-
-    List<StockCriteria> findActiveStock(String compCode);
-
-    List<StockCriteria> search(String stockCode, String stockType, String cat, String brand, String compCode, boolean orderFavorite);
-
-    List<StockCriteria> getStock(String str, String compCode);
-
-    List<StockCriteria> getService(String compCode);
+    List<StockCriteria> search(String name);
 
     List<StockCriteria> unUpload();
 
-    Date getMaxDate();
+    int delete(String id);
 
-    List<StockCriteria> getStock(LocalDateTime updatedDate);
+    LocalDateTime getMaxDate();
 
-    StockCriteria updateStock(StockCriteria stock);
+    List<StockCriteria> getCriteria(LocalDateTime updatedDate);
+
+
+    List<StockCriteria> search(String stockCode, String stockType, String cat, String brand, String compCode, boolean orderFavorite);
+
+
 
 }

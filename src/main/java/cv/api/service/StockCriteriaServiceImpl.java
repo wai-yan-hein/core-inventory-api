@@ -5,21 +5,15 @@
  */
 package cv.api.service;
 
-import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.dao.StockCriteriaDao;
-import cv.api.dao.StockDao;
-import cv.api.entity.Stock;
-import cv.api.entity.StockCriteria;
-import cv.api.entity.StockCriteriaKey;
-import cv.api.entity.StockKey;
+import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,24 +31,14 @@ public class StockCriteriaServiceImpl implements StockCriteriaService {
     private ReportService reportService;
 
     @Override
-    public StockCriteria save(StockCriteria stock) {
-        if (Util1.isNull(stock.getKey().getCriteriaCode())) {
-//            Integer macId = stock.getMacId();
-            String compCode = stock.getKey().getCompCode();
+    public StockCriteria save(StockCriteria cat) {
+        if (Util1.isNull(cat.getKey().getCriteriaCode())) {
+            String compCode = cat.getKey().getCompCode();
             String code = getCode(compCode);
-            StockCriteria valid = findById(new StockCriteriaKey(code, compCode));
-            if (valid == null) {
-                stock.getKey().setCriteriaCode(code);
-            } else {
-                throw new IllegalStateException("Duplicate Stock Criteria Code");
-            }
-        }
-        return dao.save(stock);
-    }
+            cat.getKey().setCriteriaCode(code);
 
-    @Override
-    public StockCriteria findById(StockCriteriaKey key) {
-        return dao.findById(key);
+        }
+        return dao.save(cat);
     }
 
     @Override
@@ -63,40 +47,13 @@ public class StockCriteriaServiceImpl implements StockCriteriaService {
     }
 
     @Override
-    public List<StockCriteria> findActiveStock(String compCode) {
-        return dao.findActiveStock(compCode);
+    public int delete(String id) {
+        return dao.delete(id);
     }
 
     @Override
-    public List<General> delete(StockCriteriaKey key) {
-        String code = key.getCriteriaCode();
-        String compCode = key.getCompCode();
-        List<General> str = reportService.isStockExist(code, compCode);
-        if (str.isEmpty()) {
-            dao.delete(key);
-        }
-        return str;
-    }
-
-    private String getCode(String compCode) {
-        int seqNo = seqService.getSequence(0, "StockCriteria", "-", compCode);
-        return String.format("%0" + 3 + "d", seqNo);
-    }
-
-    @Override
-    public List<StockCriteria> search(String stockCode, String stockType, String cat, String brand, String compCode, boolean orderFavorite) {
-        return dao.search(stockCode, stockType, cat, brand, compCode, orderFavorite);
-    }
-
-
-    @Override
-    public List<StockCriteria> getStockCriteria(String str, String compCode) {
-        return dao.getStock(str, compCode);
-    }
-
-    @Override
-    public List<StockCriteria> getService(String compCode) {
-        return dao.getService(compCode);
+    public List<StockCriteria> search(String name) {
+        return dao.search(name);
     }
 
     @Override
@@ -105,17 +62,21 @@ public class StockCriteriaServiceImpl implements StockCriteriaService {
     }
 
     @Override
-    public Date getMaxDate() {
+    public LocalDateTime getMaxDate() {
         return dao.getMaxDate();
     }
 
     @Override
-    public List<StockCriteria> getStock(LocalDateTime updatedDate) {
-        return dao.getStock(updatedDate);
+    public List<StockCriteria> getCriteria(LocalDateTime updatedDate) {
+        return dao.getCriteria(updatedDate);
     }
 
     @Override
-    public StockCriteria updateStock(StockCriteria stock) {
-        return dao.updateStock(stock);
+    public StockCriteria findByCode(StockCriteriaKey key) {
+        return dao.findByCode(key);
+    }
+    private String getCode(String compCode) {
+        int seqNo = seqService.getSequence(0, "StockCriteria", "-", compCode);
+        return String.format("%0" + 3 + "d", seqNo);
     }
 }

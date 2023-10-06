@@ -6,10 +6,7 @@
 package cv.api.service;
 
 import cv.api.common.General;
-import cv.api.entity.Stock;
-import cv.api.entity.StockCriteria;
-import cv.api.entity.StockCriteriaKey;
-import cv.api.entity.StockKey;
+import cv.api.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -19,28 +16,20 @@ import java.util.List;
  * @author wai yan
  */
 public interface StockCriteriaService {
+    List<StockCriteria> getCriteria(LocalDateTime updatedDate);
 
-    StockCriteria save(StockCriteria stock);
+    StockCriteria findByCode(StockCriteriaKey key);
 
-    StockCriteria findById(StockCriteriaKey key);
+    StockCriteria save(StockCriteria category);
 
     List<StockCriteria> findAll(String compCode);
 
-    List<General> delete(StockCriteriaKey key);
+    int delete(String id);
 
-    List<StockCriteria> findActiveStock(String compCode);
-
-    List<StockCriteria> search(String stockCode, String stockType, String cat, String brand, String compCode, boolean orderFavorite);
-
-    List<StockCriteria> getStockCriteria(String str, String compCode);
-
-    List<StockCriteria> getService(String compCode);
+    List<StockCriteria> search(String catName);
 
     List<StockCriteria> unUpload();
 
-    Date getMaxDate();
+    LocalDateTime getMaxDate();
 
-    List<StockCriteria> getStock(LocalDateTime updatedDate);
-
-    StockCriteria updateStock(StockCriteria stock);
 }
