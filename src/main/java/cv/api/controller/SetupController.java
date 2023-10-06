@@ -447,9 +447,9 @@ public class SetupController {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-//    @GetMapping(path = "/getStockCriteriaList")
-//    public Flux<?> getStockCriteriaList(@RequestParam String text, @RequestParam String compCode) {
-//        return Flux.fromIterable(stockCriteriaService.getStockCriteria(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
+//    @GetMapping(path = "/searchStockCriteria")
+//    public Flux<?> searchStockCriteria(@RequestParam String text, @RequestParam String compCode) {
+//        return Flux.fromIterable(stockCriteriaService.search(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
 //    }
 
     @PostMapping(path = "/deleteStock")
@@ -734,7 +734,5 @@ public class SetupController {
     public Mono<?> saveStockFormulaDetail(@RequestBody StockFormulaDetail f) {
         return Mono.just(stockFormulaService.save(f));
     }
-
-
 
 }

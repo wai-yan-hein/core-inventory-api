@@ -54,13 +54,12 @@ public class StockFormulaServiceImpl implements StockFormulaService {
             }
         }
         formulaDao.save(s);
-        s.setListDtl(listSD);
         return s;
     }
 
     private String getCode(String compCode) {
         int seqNo = seqService.getSequence(0, "StockFormula", "-", compCode);
-        return String.format("%0" + 3 + "d", seqNo);
+        return String.format("%0" + 5 + "d", seqNo);
     }
 
     @Override

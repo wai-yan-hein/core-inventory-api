@@ -24,9 +24,9 @@ public interface StockCriteriaService {
 
     List<StockCriteria> findAll(String compCode, boolean active);
 
-    List<StockCriteria> search(String compCode,String text);
     int delete(String id);
 
+    List<StockCriteria> search(String text,String compCode);
     List<StockCriteria> unUpload();
 
     LocalDateTime getMaxDate();

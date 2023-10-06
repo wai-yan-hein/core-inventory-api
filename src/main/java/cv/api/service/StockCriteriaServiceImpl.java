@@ -25,10 +25,7 @@ import java.util.List;
 public class StockCriteriaServiceImpl implements StockCriteriaService {
 
     private final StockCriteriaDao dao;
-    @Autowired
-    private SeqTableService seqService;
-    @Autowired
-    private ReportService reportService;
+    private final SeqTableService seqService;
 
     @Override
     public StockCriteria save(StockCriteria cat) {
@@ -47,16 +44,15 @@ public class StockCriteriaServiceImpl implements StockCriteriaService {
     }
 
     @Override
-    public List<StockCriteria> search(String compCode, String text) {
-        return dao.search(compCode, text);
-    }
-
-    @Override
     public int delete(String id) {
         return dao.delete(id);
     }
 
     @Override
+    public List<StockCriteria> search(String text, String compCode) {
+        return dao.search(text, compCode);
+    }
+
     public List<StockCriteria> unUpload() {
         return dao.unUpload();
     }
@@ -75,8 +71,9 @@ public class StockCriteriaServiceImpl implements StockCriteriaService {
     public StockCriteria findByCode(StockCriteriaKey key) {
         return dao.findByCode(key);
     }
+
     private String getCode(String compCode) {
         int seqNo = seqService.getSequence(0, "StockCriteria", "-", compCode);
-        return String.format("%0" + 3 + "d", seqNo);
+        return String.format("%0" + 5 + "d", seqNo);
     }
 }
