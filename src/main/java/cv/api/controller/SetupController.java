@@ -93,6 +93,7 @@ public class SetupController {
         return Flux.fromIterable(categoryService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
+
     @GetMapping(path = "/getUpdateCategory")
     public Flux<?> getUpdateCategory(@RequestParam String updatedDate) {
         return Flux.fromIterable(categoryService.getCategory(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
@@ -109,6 +110,38 @@ public class SetupController {
     @PostMapping(path = "/findCategory")
     public Mono<Category> findCategory(@RequestBody CategoryKey key) {
         Category cat = categoryService.findByCode(key);
+        return Mono.justOrEmpty(cat);
+    }
+
+    @PostMapping(path = "/saveStockCriteria")
+    public Mono<StockCriteria> saveStockCriteria(@RequestBody StockCriteria cat) {
+        cat.setUpdatedDate(Util1.getTodayLocalDate());
+        StockCriteria category = stockCriteriaService.save(cat);
+        return Mono.justOrEmpty(category);
+    }
+
+    @GetMapping(path = "/getStockCriteria")
+    public Flux<?> getStockCriteria(@RequestParam String compCode) {
+        return Flux.fromIterable(stockCriteriaService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+
+    @GetMapping(path = "/getUpdateStockCriteria")
+    public Flux<?> getUpdateStockCriteria(@RequestParam String updatedDate) {
+        return Flux.fromIterable(stockCriteriaService.getCriteria(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
+
+    @DeleteMapping(path = "/deleteStockCriteria")
+    public Mono<?> deleteStockCriteria(@RequestParam String code) {
+        stockCriteriaService.delete(code);
+        ro.setMessage("Deleted.");
+        return Mono.justOrEmpty(ro);
+    }
+
+    @PostMapping(path = "/findStockCriteria")
+    public Mono<StockCriteria> findStockCriteria(@RequestBody StockCriteriaKey key) {
+        StockCriteria cat = stockCriteriaService.findByCode(key);
         return Mono.justOrEmpty(cat);
     }
 
@@ -407,10 +440,11 @@ public class SetupController {
     public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
-    @GetMapping(path = "/getStockCriteriaList")
-    public Flux<?> getStockCriteriaList(@RequestParam String text, @RequestParam String compCode) {
-        return Flux.fromIterable(stockCriteriaService.getStockCriteria(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
-    }
+
+//    @GetMapping(path = "/getStockCriteriaList")
+//    public Flux<?> getStockCriteriaList(@RequestParam String text, @RequestParam String compCode) {
+//        return Flux.fromIterable(stockCriteriaService.getStockCriteria(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
+//    }
 
     @PostMapping(path = "/deleteStock")
     public Flux<?> deleteStock(@RequestBody StockKey key) {
