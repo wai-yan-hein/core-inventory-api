@@ -1,9 +1,6 @@
 package cv.api.dao;
 
-import cv.api.entity.StockFormula;
-import cv.api.entity.StockFormulaDetail;
-import cv.api.entity.StockFormulaDetailKey;
-import cv.api.entity.StockFormulaKey;
+import cv.api.entity.*;
 import cv.api.service.StockFormulaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -62,4 +59,38 @@ public class StockFormulaDetailDaoImpl extends AbstractDao<StockFormulaDetailKey
         }
         return list;
     }
+
+    @Override
+    public List<StockFormulaDetail> getFormulaDetail(String code) {
+        String sql = """
+                select s.*,sc.criteria_name,sc.user_code
+                from stock_formula_detail s
+                join stock_criteria sc on s.criteria_code = sc.criteria_code
+                and s.comp_code = s.comp_code
+                where s.formula_code = ?
+                """;
+        ResultSet rs = getResult(sql, code);
+        List<StockFormulaDetail> list = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                //formula_code, comp_code, unique_id, criteria_code, percent, price
+                StockFormulaDetail d = new StockFormulaDetail();
+                StockFormulaDetailKey key = new StockFormulaDetailKey();
+                key.setFormulaCode(rs.getString("formula_code"));
+                key.setCompCode(rs.getString("comp_code"));
+                key.setUniqueId(rs.getInt("unique_id"));
+                d.setKey(key);
+                d.setCriteriaCode(rs.getString("criteria_code"));
+                d.setUserCode(rs.getString("user_code"));
+                d.setCriteriaName(rs.getString("criteria_name"));
+                d.setPercent(rs.getDouble("percent"));
+                d.setPrice(rs.getDouble("price"));
+                list.add(d);
+            }
+        } catch (Exception e) {
+            log.error("getFormulaDetail : "+e.getMessage());
+        }
+        return list;
+    }
+
 }

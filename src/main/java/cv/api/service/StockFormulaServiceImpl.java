@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -85,5 +86,19 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     @Override
     public List<StockFormulaDetail> getFormulaDetail(String code, String compCode) {
         return formulaDetailDao.getFormulaDetail(code, compCode);
+    }
+
+    @Override
+    public List<StockFormulaDetail> getFormulaDetail(String code) {
+        return formulaDetailDao.getFormulaDetail(code);
+    }
+
+    @Override
+    public List<StockFormula> getStockFormula(LocalDateTime updatedDate) {
+        List<StockFormula> hList = formulaDao.getStockFormula(updatedDate);
+        hList.forEach((h) -> {
+            h.setListDtl(formulaDetailDao.getFormulaDetail(h.getKey().getFormulaCode()));
+        });
+        return hList;
     }
 }
