@@ -95,8 +95,13 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         });
     }
     private String formatSqlWithParams(String sql, Object[] params) {
+        sql = "\n" + sql;
         for (Object param : params) {
-            sql = sql.replaceFirst("\\?", param.toString());
+            if (param instanceof String str) {
+                sql = sql.replaceFirst("\\?", "'" + str + "'");
+            } else {
+                sql = sql.replaceFirst("\\?", param.toString());
+            }
         }
         return sql;
     }

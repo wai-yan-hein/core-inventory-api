@@ -57,6 +57,11 @@ public class StockFormulaServiceImpl implements StockFormulaService {
         return s;
     }
 
+    @Override
+    public StockFormula find(StockFormulaKey key) {
+        return formulaDao.find(key);
+    }
+
     private String getCode(String compCode) {
         int seqNo = seqService.getSequence(0, "StockFormula", "-", compCode);
         return String.format("%0" + 5 + "d", seqNo);

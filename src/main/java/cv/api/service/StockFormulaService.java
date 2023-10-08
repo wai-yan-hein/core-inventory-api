@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface StockFormulaService {
     StockFormula save(StockFormula s);
+    StockFormula find(StockFormulaKey key);
 
     boolean delete(StockFormulaKey key);
 

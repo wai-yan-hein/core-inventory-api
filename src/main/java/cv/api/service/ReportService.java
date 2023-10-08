@@ -29,13 +29,14 @@ public interface ReportService {
 
     String getOpeningDate(String compCode, Integer deptIdF);
 
-    List<VSale> getSaleVoucher(String vouNo,String compCode) throws Exception;
+    List<VSale> getSaleVoucher(String vouNo, String compCode) throws Exception;
 
-    List<VOrder> getOrderVoucher(String vouNo,String compCode) throws Exception;
+    List<VOrder> getOrderVoucher(String vouNo, String compCode) throws Exception;
 
     List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception;
 
     List<VPurchase> getGRNVoucher(String vouNo, String compCode) throws Exception;
+
     List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception;
 
 
@@ -124,10 +125,12 @@ public interface ReportService {
 
     void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus,
                                    boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
+
     void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus,
-                                   boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
+                                           boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
+
     List<ClosingBalance> getStockInOutDetailByWeight(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<StockValue> getStockValue(String opDate, String fromDate, String toDate, String typeCode, String catCode,
@@ -176,7 +179,7 @@ public interface ReportService {
 
     List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark,
                                   String userCode, String stockCode, String locCode, String compCode,
-                                  Integer deptId, String curCode,String deleted) throws Exception;
+                                  Integer deptId, String curCode, String deleted) throws Exception;
 
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode, Integer deptId,
@@ -197,6 +200,7 @@ public interface ReportService {
     List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);
 
     List<VTransfer> getTransferVoucher(String vouNo, String compCode);
+
     List<VStockIO> getStockInOutVoucher(String vouNo, String compCode);
 
     List<VReturnOut> getReturnOutVoucher(String vouNo, String compCode);
@@ -212,11 +216,6 @@ public interface ReportService {
     List<GRN> getGRNHistory(String fromDate, String toDate, String batchNo, String traderCode, String vouNo,
                             String remark, String userCode, String stockCode, String locCode,
                             String compCode, Integer deptId, String deleted, String close, boolean orderByBatch);
-
-
-    List<LandingHis> getGradeHistory(String fromDate, String toDate, String traderCode, String vouNo,
-                                     String remark, String userCode, String stockCode,
-                                     String compCode, Integer deptId, String deleted, String close);
 
     List<VPurchase> getPurchaseByWeightVoucher(String vouNo, String batchNo, String compCode);
 
@@ -250,7 +249,9 @@ public interface ReportService {
                                          String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode);
+
     List<VOrder> getOrderSummaryByDepartment(String fromDate, String toDate, String compCode);
+
     List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode);
 
     List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId);

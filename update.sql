@@ -1235,7 +1235,9 @@ create table stock_criteria (
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 alter table stock
-add column formula_code varchar(15) null after sale_qty;
+add column formula_code varchar(15) null after sale_qty,
+add column sale_amt double(20,3) not null default 0 after formula_code,
+add column pur_amt double(20,3) not null default 0 after sale_amt;
 
 #view
 drop view if exists v_milling_output;

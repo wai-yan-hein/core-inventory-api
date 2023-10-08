@@ -8,16 +8,20 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "landing_detail_criteria")
-public class LandingDetailCriteria {
+@Table(name = "landing_his_criteria")
+public class LandingHisCriteria {
     @EmbeddedId
-    private LandingDetailCriteriaKey key;
+    private LandingHisCriteriaKey key;
     @Column(name = "criteria_code")
     private String criteriaCode;
     @Column(name = "percent")
     private double percent;
+    @Column(name = "percent_allow")
+    private double percentAllow;
     @Column(name = "price")
     private double price;
+    @Column(name = "amount")
+    private double amount;
     private transient String criteriaUserCode;
     private transient String criteriaName;
 }

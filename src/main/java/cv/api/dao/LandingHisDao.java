@@ -14,9 +14,10 @@ public interface LandingHisDao {
 
     boolean delete(LandingHisKey key);
     boolean restore(LandingHisKey key);
+    List<LandingHis> getLandingHistory(String fromDate, String toDate,String traderCode, String vouNo,
+                                       String remark, String userCode, String stockCode, String locCode,
+                                       String compCode, Integer deptId, boolean deleted);
 
-    List<LandingHis> search(String compCode, Integer deptId);
-    boolean open(LandingHisKey key);
 
 
 }

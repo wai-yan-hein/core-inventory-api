@@ -16,6 +16,11 @@ public class StockFormulaDaoImpl extends AbstractDao<StockFormulaKey, StockFormu
     }
 
     @Override
+    public StockFormula find(StockFormulaKey key) {
+        return getByKey(key);
+    }
+
+    @Override
     public boolean delete(StockFormulaKey key) {
         StockFormula f = getByKey(key);
         if (f != null) {

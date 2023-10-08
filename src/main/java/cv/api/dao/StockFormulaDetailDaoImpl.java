@@ -38,6 +38,7 @@ public class StockFormulaDetailDaoImpl extends AbstractDao<StockFormulaDetailKey
                 and s.comp_code = s.comp_code
                 where s.comp_code =?
                 and s.formula_code = ?
+                order by s.unique_id
                 """;
         ResultSet rs = getResult(sql, compCode, code);
         List<StockFormulaDetail> list = new ArrayList<>();
@@ -55,6 +56,7 @@ public class StockFormulaDetailDaoImpl extends AbstractDao<StockFormulaDetailKey
                 d.setCriteriaName(rs.getString("criteria_name"));
                 d.setPercent(rs.getDouble("percent"));
                 d.setPrice(rs.getDouble("price"));
+                d.setPercentAllow(rs.getDouble("percent_allow"));
                 list.add(d);
             }
         } catch (Exception e) {

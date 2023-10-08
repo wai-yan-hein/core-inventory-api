@@ -41,7 +41,6 @@ public class OrderController {
 
     @PostMapping(path = "/saveOrder")
     public Mono<?> saveOrder(@RequestBody OrderHis order) {
-        order.setUpdatedDate(Util1.getTodayLocalDate());
         if (isValidOrder(order, ro)) {
             order = ohService.save(order);
         } else {

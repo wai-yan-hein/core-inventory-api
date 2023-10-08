@@ -98,6 +98,10 @@ public class Stock {
     private boolean deleted;
     @Column(name = "formula_code")
     private String formulaCode;
+    @Column(name = "pur_amt")
+    private double purAmt;
+    @Column(name = "sale_amt")
+    private double saleAmt;
     @Transient
     private String relName;
     @Transient

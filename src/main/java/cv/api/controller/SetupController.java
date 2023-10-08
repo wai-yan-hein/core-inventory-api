@@ -720,6 +720,11 @@ public class SetupController {
         return Mono.just(stockFormulaService.delete(key));
     }
 
+    @PostMapping(path = "/findStockFormula")
+    public Mono<?> findStockFormula(@RequestBody StockFormulaKey key) {
+        return Mono.justOrEmpty(stockFormulaService.find(key));
+    }
+
     @GetMapping(path = "/getStockFormula")
     public Mono<?> getStockFormula(@RequestParam String compCode) {
         return Mono.just(stockFormulaService.getFormula(compCode));
@@ -733,6 +738,11 @@ public class SetupController {
     @PostMapping(path = "/saveStockFormulaDetail")
     public Mono<?> saveStockFormulaDetail(@RequestBody StockFormulaDetail f) {
         return Mono.just(stockFormulaService.save(f));
+    }
+
+    @PostMapping(path = "/deleteStockFormulaDetail")
+    public Mono<?> deleteStockFormulaDetail(@RequestBody StockFormulaDetailKey key) {
+        return Mono.justOrEmpty(stockFormulaService.delete(key));
     }
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface StockFormulaDao {
     StockFormula save(StockFormula s);
+    StockFormula find(StockFormulaKey key);
 
     boolean delete(StockFormulaKey key);
 

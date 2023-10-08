@@ -176,11 +176,14 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
                     s.setSalePriceE(rs.getFloat("sale_price_e"));
                     s.setStockName(rs.getString("stock_name"));
                     s.setUserCode(rs.getString("user_code"));
+                    s.setFormulaCode(rs.getString("formula_code"));
                     s.setRelName(rs.getString("rel_name"));
                     s.setGroupName(rs.getString("stock_type_name"));
                     s.setCatName(rs.getString("cat_name"));
                     s.setBrandName(rs.getString("brand_name"));
                     s.setExplode(rs.getBoolean("explode"));
+                    s.setPurAmt(rs.getDouble("pur_amt"));
+                    s.setSaleAmt(rs.getDouble("sale_amt"));
                     listStock.add(s);
                 }
             } catch (Exception e) {

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class OrderHisServiceImpl implements OrderHisService {
     @Override
     public OrderHis save(OrderHis orderHis) {
         orderHis.setVouDate(Util1.toDateTime(orderHis.getVouDate()));
+        orderHis.setUpdatedDate(LocalDateTime.now());
         if (Util1.isNullOrEmpty(orderHis.getKey().getVouNo())) {
             orderHis.getKey().setVouNo(getVoucherNo(orderHis.getDeptId(), orderHis.getMacId(), orderHis.getKey().getCompCode()));
         }
