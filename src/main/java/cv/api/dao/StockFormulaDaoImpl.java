@@ -37,4 +37,11 @@ public class StockFormulaDaoImpl extends AbstractDao<StockFormulaKey, StockFormu
         String hsql = "select o from StockFormula o where o.key.compCode = '" + compCode + "' order by o.userCode,o.formulaName";
         return findHSQL(hsql);
     }
+
+
+    @Override
+    public List<StockFormula> getStockFormula(LocalDateTime updatedDate) {
+        String hsql = "select o from StockFormula o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
+    }
 }

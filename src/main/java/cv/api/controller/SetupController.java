@@ -424,6 +424,21 @@ public class SetupController {
         return Flux.fromIterable(stockService.getStock(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
+    @GetMapping(path = "/getUpdateStockFormula")
+    public Flux<StockFormula> getUpdateStockFourmula(@RequestParam String updatedDate) {
+        List<StockFormula> list = stockFormulaService.getStockFormula(Util1.toLocalDateTime(updatedDate));
+        list.forEach(p -> {
+            if (!Util1.isNullOrEmpty(p.getKey().getFormulaCode())) {
+                String code = p.getKey().getFormulaCode();
+                if (code != null) {
+                    List<StockFormulaDetail> dtlList = stockFormulaService.getFormulaDetail(code);
+                    p.setListDtl(dtlList);
+                }
+            }
+        });
+
+        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+    }
 
     @GetMapping(path = "/getService")
     public Flux<?> getService(@RequestParam String compCode, @RequestParam Integer deptId) {

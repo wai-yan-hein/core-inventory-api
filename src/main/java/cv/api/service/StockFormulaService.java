@@ -1,10 +1,8 @@
 package cv.api.service;
 
-import cv.api.entity.StockFormula;
-import cv.api.entity.StockFormulaDetail;
-import cv.api.entity.StockFormulaDetailKey;
-import cv.api.entity.StockFormulaKey;
+import cv.api.entity.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StockFormulaService {
@@ -20,5 +18,9 @@ public interface StockFormulaService {
     boolean delete(StockFormulaDetailKey key);
 
     List<StockFormulaDetail> getFormulaDetail(String code, String compCode);
+
+    List<StockFormulaDetail> getFormulaDetail(String code);
+
+    List<StockFormula> getStockFormula(LocalDateTime updatedDate);
 
 }
