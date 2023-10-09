@@ -755,10 +755,16 @@ public class SetupController {
         return Flux.fromIterable(stockFormulaService.getGradeDetail(formulaCode, criteriaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
+    @GetMapping(path = "/getCriteriaByFormula")
+    public Flux<?> getCriteriaByFormula(@RequestParam String formulaCode, @RequestParam String compCode) {
+        return Flux.fromIterable(stockFormulaService.getCriteriaByFormula(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
     @PostMapping(path = "/saveStockFormulaDetail")
     public Mono<?> saveStockFormulaDetail(@RequestBody StockFormulaDetail f) {
         return Mono.just(stockFormulaService.save(f));
     }
+
     @PostMapping(path = "/saveGradeDetail")
     public Mono<?> saveGradeDetail(@RequestBody GradeDetail f) {
         return Mono.just(stockFormulaService.save(f));

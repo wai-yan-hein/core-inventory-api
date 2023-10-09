@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface StockFormulaService {
     StockFormula save(StockFormula s);
+
     StockFormula find(StockFormulaKey key);
 
     boolean delete(StockFormulaKey key);
@@ -22,8 +23,12 @@ public interface StockFormulaService {
     List<StockFormulaDetail> getFormulaDetail(String code);
 
     List<StockFormula> getStockFormula(LocalDateTime updatedDate);
+
     GradeDetail save(GradeDetail g);
-    List<GradeDetail> getGradeDetail(String formulaCode,String criteriaCode, String compCode);
+
+    List<GradeDetail> getGradeDetail(String formulaCode, String criteriaCode, String compCode);
+
+    List<GradeDetail> getCriteriaByFormula(String formulaCode, String compCode);
 
 
 }
