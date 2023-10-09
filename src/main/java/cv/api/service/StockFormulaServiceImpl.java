@@ -1,6 +1,7 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
+import cv.api.dao.GradeDetailDao;
 import cv.api.dao.StockFormulaDao;
 import cv.api.dao.StockFormulaDetailDao;
 import cv.api.entity.*;
@@ -18,6 +19,7 @@ import java.util.List;
 public class StockFormulaServiceImpl implements StockFormulaService {
     private final StockFormulaDao formulaDao;
     private final StockFormulaDetailDao formulaDetailDao;
+    private final GradeDetailDao gradeDetailDao;
     @Autowired
     private SeqTableService seqService;
 
@@ -101,9 +103,17 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     @Override
     public List<StockFormula> getStockFormula(LocalDateTime updatedDate) {
         List<StockFormula> hList = formulaDao.getStockFormula(updatedDate);
-        hList.forEach((h) -> {
-            h.setListDtl(formulaDetailDao.getFormulaDetail(h.getKey().getFormulaCode()));
-        });
+        hList.forEach((h) -> h.setListDtl(formulaDetailDao.getFormulaDetail(h.getKey().getFormulaCode())));
         return hList;
+    }
+
+    @Override
+    public GradeDetail save(GradeDetail g) {
+        return gradeDetailDao.save(g);
+    }
+
+    @Override
+    public List<GradeDetail> getGradeDetail(String formulaCode, String criteriaCode, String compCode) {
+        return gradeDetailDao.getGradeDetail(formulaCode,criteriaCode,compCode);
     }
 }

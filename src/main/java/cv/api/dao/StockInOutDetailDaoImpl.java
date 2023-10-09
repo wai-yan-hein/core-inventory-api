@@ -82,7 +82,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setCostPrice(rs.getDouble("cost_price"));
                     op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setTotalWegiht(rs.getDouble("total_weight"));
+                    op.setTotalWeight(rs.getDouble("total_weight"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

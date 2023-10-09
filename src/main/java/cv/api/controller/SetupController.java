@@ -746,12 +746,21 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getStockFormulaDetail")
-    public Mono<?> getStockFormula(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Mono.just(stockFormulaService.getFormulaDetail(formulaCode, compCode));
+    public Flux<?> getStockFormula(@RequestParam String formulaCode, @RequestParam String compCode) {
+        return Flux.fromIterable(stockFormulaService.getFormulaDetail(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/getGradeDetail")
+    public Flux<?> getGradeDetail(@RequestParam String formulaCode, @RequestParam String criteriaCode, @RequestParam String compCode) {
+        return Flux.fromIterable(stockFormulaService.getGradeDetail(formulaCode, criteriaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/saveStockFormulaDetail")
     public Mono<?> saveStockFormulaDetail(@RequestBody StockFormulaDetail f) {
+        return Mono.just(stockFormulaService.save(f));
+    }
+    @PostMapping(path = "/saveGradeDetail")
+    public Mono<?> saveGradeDetail(@RequestBody GradeDetail f) {
         return Mono.just(stockFormulaService.save(f));
     }
 
