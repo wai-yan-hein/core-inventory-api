@@ -8,20 +8,20 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "landing_his_criteria")
-public class LandingHisCriteria {
+@Table(name = "stock_formula_qty")
+public class StockFormulaQty {
     @EmbeddedId
-    private LandingHisCriteriaKey key;
+    private StockFormulaQtyKey key;
     @Column(name = "criteria_code")
     private String criteriaCode;
     @Column(name = "percent")
-    private double percent;
+    private Double percent;
+    @Column(name = "qty")
+    private Double qty;
+    @Column(name = "unit")
+    private String unit;
     @Column(name = "percent_allow")
     private double percentAllow;
-    @Column(name = "price")
-    private double price;
-    @Column(name = "amount")
-    private double amount;
-    private transient String criteriaUserCode;
     private transient String criteriaName;
+    private transient String userCode;
 }

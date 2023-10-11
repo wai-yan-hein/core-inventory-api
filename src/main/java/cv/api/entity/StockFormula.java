@@ -30,6 +30,6 @@ public class StockFormula {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
-    @Transient
-    private List<StockFormulaDetail> listDtl;
+    private transient List<StockFormulaQty> listQty;
+    private transient List<StockFormulaPrice> listPrice;
 }

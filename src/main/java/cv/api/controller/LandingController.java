@@ -42,9 +42,17 @@ public class LandingController {
     }
 
 
-    @GetMapping(path = "/getLandingCriteria")
-    public Flux<?> getLandingCriteria(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Flux.fromIterable(landingService.getLandingHisCriteria(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    @GetMapping(path = "/getLandingHisPrice")
+    public Flux<?> getLandingHisPrice(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(landingService.getLandingPrice(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+    @GetMapping(path = "/getLandingQty")
+    public Flux<?> getLandingQty(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(landingService.getLandingQty(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+    @GetMapping(path = "/getLandingGrade")
+    public Flux<?> getLandingGrade(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(landingService.getLandingGrade(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/history")

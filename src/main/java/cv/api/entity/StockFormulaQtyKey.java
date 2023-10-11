@@ -8,10 +8,9 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class
-LandingHisCriteriaKey implements Serializable {
-    @Column(name = "vou_no")
-    private String vouNo;
+public class StockFormulaQtyKey implements Serializable {
+    @Column(name = "formula_code")
+    private String formulaCode;
     @Column(name = "comp_code")
     private String compCode;
     @Column(name = "unique_id")

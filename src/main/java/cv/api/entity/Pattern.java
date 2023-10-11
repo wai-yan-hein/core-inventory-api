@@ -13,9 +13,9 @@ public class Pattern implements java.io.Serializable {
     @EmbeddedId
     private PatternKey key;
     @Column(name = "qty")
-    private Float qty;
+    private Double qty;
     @Column(name = "price")
-    private Float price;
+    private Double price;
     @Column(name = "unit")
     private String unitCode;
     @Column(name = "loc_code")
@@ -41,6 +41,6 @@ public class Pattern implements java.io.Serializable {
     @Transient
     private String locName;
     @Transient
-    private float amount;
+    private Double amount;
 
 }

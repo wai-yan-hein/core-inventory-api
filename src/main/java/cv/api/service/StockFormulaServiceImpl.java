@@ -1,9 +1,7 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.dao.GradeDetailDao;
-import cv.api.dao.StockFormulaDao;
-import cv.api.dao.StockFormulaDetailDao;
+import cv.api.dao.*;
 import cv.api.entity.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockFormulaServiceImpl implements StockFormulaService {
     private final StockFormulaDao formulaDao;
-    private final StockFormulaDetailDao formulaDetailDao;
+    private final StockFormulaPriceDao formulaPriceDao;
+    private final StockFormulaQtyDao formulaQtyDao;
     private final GradeDetailDao gradeDetailDao;
     @Autowired
     private SeqTableService seqService;
@@ -30,31 +29,6 @@ public class StockFormulaServiceImpl implements StockFormulaService {
             s.setCreatedDate(Util1.getTodayLocalDate());
         } else {
             s.setUpdatedDate(Util1.getTodayLocalDate());
-        }
-        List<StockFormulaDetail> listSD = s.getListDtl();
-        String vouNo = s.getKey().getFormulaCode();
-        if (listSD != null) {
-            for (int i = 0; i < listSD.size(); i++) {
-                StockFormulaDetail cSd = listSD.get(i);
-                if (Util1.isNullOrEmpty(cSd.getKey())) {
-                    StockFormulaDetailKey key = new StockFormulaDetailKey();
-                    key.setCompCode(s.getKey().getCompCode());
-                    key.setFormulaCode(vouNo);
-                    key.setUniqueId(0);
-                    cSd.setKey(key);
-                }
-                if (cSd.getKey().getFormulaCode() != null) {
-                    if (cSd.getKey().getUniqueId() == 0) {
-                        if (i == 0) {
-                            cSd.getKey().setUniqueId(1);
-                        } else {
-                            StockFormulaDetail pSd = listSD.get(i - 1);
-                            cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
-                        }
-                    }
-                    formulaDetailDao.save(cSd);
-                }
-            }
         }
         formulaDao.save(s);
         return s;
@@ -81,30 +55,38 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     }
 
     @Override
-    public StockFormulaDetail save(StockFormulaDetail s) {
-        return formulaDetailDao.save(s);
+    public StockFormulaPrice save(StockFormulaPrice s) {
+        return formulaPriceDao.save(s);
     }
 
     @Override
-    public boolean delete(StockFormulaDetailKey key) {
-        return formulaDetailDao.delete(key);
+    public StockFormulaQty save(StockFormulaQty s) {
+        return formulaQtyDao.save(s);
     }
 
     @Override
-    public List<StockFormulaDetail> getFormulaDetail(String code, String compCode) {
-        return formulaDetailDao.getFormulaDetail(code, compCode);
+    public boolean delete(StockFormulaPriceKey key) {
+        return formulaPriceDao.delete(key);
     }
 
     @Override
-    public List<StockFormulaDetail> getFormulaDetail(String code) {
-        return formulaDetailDao.getFormulaDetail(code);
+    public boolean delete(StockFormulaQtyKey key) {
+        return formulaQtyDao.delete(key);
+    }
+
+    @Override
+    public List<StockFormulaPrice> getFormulaPrice(String code, String compCode) {
+        return formulaPriceDao.getFormulaDetail(code, compCode);
+    }
+
+    @Override
+    public List<StockFormulaQty> getFormulaQty(String code, String compCode) {
+        return formulaQtyDao.getFormulaDetail(code, compCode);
     }
 
     @Override
     public List<StockFormula> getStockFormula(LocalDateTime updatedDate) {
-        List<StockFormula> hList = formulaDao.getStockFormula(updatedDate);
-        hList.forEach((h) -> h.setListDtl(formulaDetailDao.getFormulaDetail(h.getKey().getFormulaCode())));
-        return hList;
+        return formulaDao.getStockFormula(updatedDate);
     }
 
     @Override
@@ -114,11 +96,11 @@ public class StockFormulaServiceImpl implements StockFormulaService {
 
     @Override
     public List<GradeDetail> getGradeDetail(String formulaCode, String criteriaCode, String compCode) {
-        return gradeDetailDao.getGradeDetail(formulaCode,criteriaCode,compCode);
+        return gradeDetailDao.getGradeDetail(formulaCode, criteriaCode, compCode);
     }
 
     @Override
     public List<GradeDetail> getCriteriaByFormula(String formulaCode, String compCode) {
-        return gradeDetailDao.getCriteriaByFormula(formulaCode,compCode);
+        return gradeDetailDao.getCriteriaByFormula(formulaCode, compCode);
     }
 }

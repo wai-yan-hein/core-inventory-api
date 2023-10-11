@@ -1,12 +1,11 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.dao.LandingHisCriteriaDao;
+import cv.api.dao.LandingHisGradeDao;
+import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.LandingHisDao;
-import cv.api.entity.LandingHis;
-import cv.api.entity.LandingHisCriteria;
-import cv.api.entity.LandingHisCriteriaKey;
-import cv.api.entity.LandingHisKey;
+import cv.api.dao.LandingHisQtyDao;
+import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,9 @@ import java.util.List;
 public class LandingServiceImpl implements LandingService {
     private final SeqTableService seqTableService;
     private final LandingHisDao dao;
-    private final LandingHisCriteriaDao criteriaDao;
+    private final LandingHisPriceDao priceDao;
+    private final LandingHisQtyDao qtyDao;
+    private final LandingHisGradeDao gradeDao;
 
     @Override
     public LandingHis findByCode(LandingHisKey key) {
@@ -32,21 +33,31 @@ public class LandingServiceImpl implements LandingService {
         if (Util1.isNullOrEmpty(g.getKey().getVouNo())) {
             g.getKey().setVouNo(getVoucherNo(g.getDeptId(), g.getMacId(), g.getKey().getCompCode()));
         }
-        List<LandingHisCriteriaKey> listDel = g.getListDel();
-        if (listDel != null) listDel.forEach(criteriaDao::delete);
-        List<LandingHisCriteria> listDetail = g.getListDetail();
-        //backup
-        saveLandingDetail(listDetail, g);
-        g.setListDetail(listDetail);
+        List<LandingHisPriceKey> listDelPrice = g.getListDelPrice();
+        if (listDelPrice != null) listDelPrice.forEach(priceDao::delete);
+        List<LandingHisPrice> listPrice = g.getListPrice();
+        saveLandingPrice(listPrice, g);
+
+        List<LandingHisQtyKey> listDelQy = g.getListDelQty();
+        if (listDelQy != null) listDelQy.forEach(qtyDao::delete);
+        List<LandingHisQty> listQty = g.getListQty();
+        saveLandingQty(listQty, g);
+
+        List<LandingHisGrade> listGrade = g.getListGrade();
+        saveLandingGrade(listGrade, g);
+
+        g.setListGrade(listGrade);
+        g.setListPrice(listPrice);
+        g.setListQty(listQty);
         dao.save(g);
         return g;
     }
 
-    private void saveLandingDetail(List<LandingHisCriteria> list, LandingHis g) {
+    private void saveLandingPrice(List<LandingHisPrice> list, LandingHis g) {
         for (int i = 0; i < list.size(); i++) {
-            LandingHisCriteria cSd = list.get(i);
+            LandingHisPrice cSd = list.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
-                LandingHisCriteriaKey key = new LandingHisCriteriaKey();
+                LandingHisPriceKey key = new LandingHisPriceKey();
                 key.setCompCode(g.getKey().getCompCode());
                 key.setVouNo(g.getKey().getVouNo());
                 key.setUniqueId(0);
@@ -57,15 +68,65 @@ public class LandingServiceImpl implements LandingService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        LandingHisCriteria pSd = list.get(i - 1);
+                        LandingHisPrice pSd = list.get(i - 1);
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                criteriaDao.save(cSd);
+                priceDao.save(cSd);
             }
         }
     }
 
+    private void saveLandingQty(List<LandingHisQty> list, LandingHis g) {
+        for (int i = 0; i < list.size(); i++) {
+            LandingHisQty cSd = list.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                LandingHisQtyKey key = new LandingHisQtyKey();
+                key.setCompCode(g.getKey().getCompCode());
+                key.setVouNo(g.getKey().getVouNo());
+                key.setUniqueId(0);
+                cSd.setKey(key);
+            }
+            if (cSd.getCriteriaCode() != null) {
+                if (cSd.getKey().getUniqueId() == 0) {
+                    if (i == 0) {
+                        cSd.getKey().setUniqueId(1);
+                    } else {
+                        LandingHisQty pSd = list.get(i - 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                    }
+                }
+                qtyDao.save(cSd);
+            }
+        }
+    }
+
+    private void saveLandingGrade(List<LandingHisGrade> list, LandingHis g) {
+        String vouNo = g.getKey().getVouNo();
+        String compCode = g.getKey().getCompCode();
+        gradeDao.delete(vouNo, compCode);
+        for (int i = 0; i < list.size(); i++) {
+            LandingHisGrade cSd = list.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                LandingHisGradeKey key = new LandingHisGradeKey();
+                key.setCompCode(g.getKey().getCompCode());
+                key.setVouNo(g.getKey().getVouNo());
+                key.setUniqueId(0);
+                cSd.setKey(key);
+            }
+            if (cSd.getStockCode() != null) {
+                if (cSd.getKey().getUniqueId() == 0) {
+                    if (i == 0) {
+                        cSd.getKey().setUniqueId(1);
+                    } else {
+                        LandingHisGrade pSd = list.get(i - 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                    }
+                }
+                gradeDao.save(cSd);
+            }
+        }
+    }
 
     @Override
     public List<LandingHis> findAll(String compCode, Integer deptId) {
@@ -83,8 +144,18 @@ public class LandingServiceImpl implements LandingService {
     }
 
     @Override
-    public List<LandingHisCriteria> getLandingHisCriteria(String vouNo, String compCode) {
-        return criteriaDao.getLandingDetailCriteria(vouNo, compCode);
+    public List<LandingHisPrice> getLandingPrice(String vouNo, String compCode) {
+        return priceDao.getLandingPrice(vouNo, compCode);
+    }
+
+    @Override
+    public List<LandingHisQty> getLandingQty(String vouNo, String compCode) {
+        return qtyDao.getLandingQty(vouNo, compCode);
+    }
+
+    @Override
+    public List<LandingHisGrade> getLandingGrade(String vouNo, String compCode) {
+        return gradeDao.getLandingGrade(vouNo, compCode);
     }
 
     @Override

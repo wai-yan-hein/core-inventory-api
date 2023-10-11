@@ -8,16 +8,16 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "stock_formula_detail")
-public class StockFormulaDetail {
+@Table(name = "stock_formula_price")
+public class StockFormulaPrice {
     @EmbeddedId
-    private StockFormulaDetailKey key;
+    private StockFormulaPriceKey key;
     @Column(name = "criteria_code")
     private String criteriaCode;
     @Column(name = "percent")
-    private double percent;
+    private Double percent;
     @Column(name = "price")
-    private double price;
+    private Double price;
     @Column(name = "percent_allow")
     private double percentAllow;
     private transient String criteriaName;

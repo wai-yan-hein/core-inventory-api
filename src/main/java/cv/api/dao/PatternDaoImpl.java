@@ -64,8 +64,8 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
                     p.setStockName(rs.getString("stock_name"));
                     p.setLocCode(rs.getString("loc_code"));
                     p.setLocName(rs.getString("loc_name"));
-                    p.setQty(rs.getFloat("qty"));
-                    p.setPrice(rs.getFloat("price"));
+                    p.setQty(rs.getDouble("qty"));
+                    p.setPrice(rs.getDouble("price"));
                     p.setUnitCode(rs.getString("unit"));
                     p.setPriceTypeCode(rs.getString("price_type"));
                     p.setPriceTypeName(rs.getString("desp"));

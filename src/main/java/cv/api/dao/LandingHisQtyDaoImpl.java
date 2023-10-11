@@ -1,7 +1,9 @@
 package cv.api.dao;
 
-import cv.api.entity.LandingHisCriteria;
-import cv.api.entity.LandingHisCriteriaKey;
+import cv.api.entity.LandingHisPrice;
+import cv.api.entity.LandingHisPriceKey;
+import cv.api.entity.LandingHisQty;
+import cv.api.entity.LandingHisQtyKey;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,25 +15,25 @@ import java.util.List;
 @Service
 @Transactional
 @Slf4j
-public class LandingHisCriteriaDaoImpl extends AbstractDao<LandingHisCriteriaKey, LandingHisCriteria> implements LandingHisCriteriaDao {
+public class LandingHisQtyDaoImpl extends AbstractDao<LandingHisQtyKey, LandingHisQty> implements LandingHisQtyDao {
     @Override
-    public LandingHisCriteria save(LandingHisCriteria f) {
+    public LandingHisQty save(LandingHisQty f) {
         saveOrUpdate(f, f.getKey());
         return f;
     }
 
     @Override
-    public boolean delete(LandingHisCriteriaKey key) {
+    public boolean delete(LandingHisQtyKey key) {
         remove(key);
         return true;
     }
 
     @Override
-    public List<LandingHisCriteria> getLandingDetailCriteria(String vouNo, String compCode) {
-        List<LandingHisCriteria> list = new ArrayList<>();
+    public List<LandingHisQty> getLandingQty(String vouNo, String compCode) {
+        List<LandingHisQty> list = new ArrayList<>();
         String sql = """
                 select l.*,sc.criteria_name,sc.user_code
-                from landing_his_criteria l join stock_criteria sc
+                from landing_his_qty l join stock_criteria sc
                 on l.criteria_code = sc.criteria_code
                 and l.comp_code = sc.comp_code
                 where l.vou_no =?
@@ -40,8 +42,8 @@ public class LandingHisCriteriaDaoImpl extends AbstractDao<LandingHisCriteriaKey
         try {
             ResultSet rs = getResult(sql, vouNo, compCode);
             while (rs.next()) {
-                LandingHisCriteria l = new LandingHisCriteria();
-                LandingHisCriteriaKey key = new LandingHisCriteriaKey();
+                LandingHisQty l = new LandingHisQty();
+                LandingHisQtyKey key = new LandingHisQtyKey();
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
                 key.setUniqueId(rs.getInt("unique_id"));
@@ -51,8 +53,9 @@ public class LandingHisCriteriaDaoImpl extends AbstractDao<LandingHisCriteriaKey
                 l.setCriteriaName(rs.getString("criteria_name"));
                 l.setPercent(rs.getDouble("percent"));
                 l.setPercentAllow(rs.getDouble("percent_allow"));
-                l.setPrice(rs.getDouble("price"));
-                l.setAmount(rs.getDouble("amount"));
+                l.setQty(rs.getDouble("qty"));
+                l.setTotalQty(rs.getDouble("total_qty"));
+                l.setUnit(rs.getString("unit"));
                 list.add(l);
             }
         } catch (Exception e) {

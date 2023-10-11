@@ -2,8 +2,6 @@ package cv.api.dao;
 
 import cv.api.entity.GradeDetail;
 import cv.api.entity.GradeDetailKey;
-import cv.api.entity.StockFormulaDetail;
-import cv.api.entity.StockFormulaDetailKey;
 
 import java.util.List;
 

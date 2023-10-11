@@ -1198,46 +1198,18 @@ alter table op_his_detail change column vou_no vou_no varchar(15) not null first
 alter table trader
 add column country_code varchar(15) null after credit_amt;
 
-create table stock_formula (
-  formula_code varchar(15) not null,
-  comp_code varchar(15) not null,
-  user_code varchar(15) null,
-  formula_name varchar(255) not null,
-  created_by varchar(15) not null,
-  created_date timestamp not null,
-  updated_by varchar(15) null,
-  updated_date timestamp not null,
-  active bit(1) not null default 0,
-  deleted bit(1) not null default 0,
-  primary key (formula_code, comp_code));
 
-create table stock_formula_detail (
-  formula_code varchar(15) not null,
-  comp_code varchar(15) not null,
-  unique_id int not null,
-  criteria_code varchar(255) not null,
-  percent double(10,3) not null,
-  price double(20,3) not null,
-  primary key (formula_code, comp_code, unique_id));
 
-create table stock_criteria (
+create table grade_detail (
+  comp_code varchar(15) not null,
+  formula_code varchar(15) not null,
   criteria_code varchar(15) not null,
-  comp_code varchar(15) not null,
-  user_code varchar(15) not null,
-  criteria_name varchar(255) not null,
-  created_by varchar(15) not null,
-  created_date timestamp not null,
-  updated_by varchar(15) default null,
-  updated_date timestamp not null,
-  active bit(1) not null,
-  deleted bit(1) not null,
-  primary key (criteria_code,comp_code)
+  unique_id int(11) not null,
+  min_percent double(6,3) not null,
+  max_percent double(6,3) not null,
+  grade_stock_code varchar(15) default null,
+  primary key (comp_code,formula_code,criteria_code,unique_id)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
-
-alter table stock
-add column formula_code varchar(15) null after sale_qty,
-add column sale_amt double(20,3) not null default 0 after formula_code,
-add column pur_amt double(20,3) not null default 0 after sale_amt;
 
 create table stock_formula (
   formula_code varchar(15) not null,
@@ -1253,6 +1225,17 @@ create table stock_formula (
   primary key (formula_code,comp_code)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
+create table stock_formula_detail (
+  formula_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  unique_id int(11) not null,
+  criteria_code varchar(255) not null,
+  percent double(10,3) not null,
+  price double(20,3) not null,
+  percent_allow double(20,3) not null default 0.000,
+  primary key (formula_code,comp_code,unique_id)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
+
 create table stock_criteria (
   criteria_code varchar(15) not null,
   comp_code varchar(15) not null,
@@ -1267,18 +1250,54 @@ create table stock_criteria (
   primary key (criteria_code,comp_code)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
-create table stock_formula_detail (
-  formula_code varchar(15) not null,
+create table landing_his (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  mac_id int(11) not null,
+  vou_date timestamp not null,
+  trader_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  remark varchar(15) default null,
+  created_by varchar(15) not null,
+  created_date timestamp not null,
+  updated_by varchar(15) default null,
+  updated_date timestamp not null,
+  deleted bit(1) not null,
+  stock_code varchar(15) not null,
+  qty double(20,3) not null,
+  unit varchar(15) not null,
+  weight double(20,3) not null,
+  weight_unit varchar(15) not null,
+  total_weight double(20,3) not null,
+  price double(20,3) not null,
+  amount double(20,3) not null,
+  cargo varchar(255) default null,
+  criteria_amt double(20,3) not null default 0.000,
+  pur_amt double(20,3) not null default 0.000,
+  pur_price double(20,3) not null default 0.000,
+  vou_paid double(20,3) not null default 0.000,
+  vou_balance double(20,3) not null default 0.000,
+  purchase bit(1) default null,
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci comment='				';
+
+create table landing_his_criteria (
+  vou_no varchar(25) not null,
   comp_code varchar(15) not null,
   unique_id int(11) not null,
-  criteria_code varchar(255) not null,
-  percent double(10,3) not null,
+  criteria_code varchar(15) not null,
+  percent double(5,3) not null,
+  percent_allow double(5,3) not null,
   price double(20,3) not null,
-  percent_allow double(20,3) not null default 0.000,
-  min_percent double(6,3) not null,
-  max_percent double(6,3) not null,
-  primary key (formula_code,comp_code,unique_id)
+  amount double(20,3) not null,
+  primary key (vou_no,unique_id,comp_code)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
+
+alter table stock
+add column formula_code varchar(15) null after sale_qty,
+add column sale_amt double(20,3) not null default 0 after formula_code,
+add column pur_amt double(20,3) not null default 0 after sale_amt;
 
 
 #view

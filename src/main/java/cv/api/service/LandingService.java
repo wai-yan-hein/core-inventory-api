@@ -14,7 +14,10 @@ public interface LandingService {
     boolean delete(LandingHisKey key);
 
     boolean restore(LandingHisKey key);
-    List<LandingHisCriteria> getLandingHisCriteria(String vouNo,String compCode);
+    List<LandingHisPrice> getLandingPrice(String vouNo, String compCode);
+    List<LandingHisQty> getLandingQty(String vouNo, String compCode);
+    List<LandingHisGrade> getLandingGrade(String vouNo, String compCode);
+
     List<LandingHis> getLandingHistory(String fromDate, String toDate,String traderCode, String vouNo,
                             String remark, String userCode, String stockCode, String locCode,
                             String compCode, Integer deptId, boolean deleted);

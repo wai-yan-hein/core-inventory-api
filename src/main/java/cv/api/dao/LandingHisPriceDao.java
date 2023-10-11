@@ -5,9 +5,8 @@ import cv.api.entity.LandingHisPriceKey;
 
 import java.util.List;
 
-public interface GRNDetailFormulaDao {
+public interface LandingHisPriceDao {
     LandingHisPrice save(LandingHisPrice f);
     boolean delete(LandingHisPriceKey key);
-
-    List<LandingHisPrice> getGRNDetailFormula(String vouNo, int uniqueId, String compCode);
+    List<LandingHisPrice> getLandingPrice(String vouNo, String compCode);
 }

@@ -425,14 +425,17 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getUpdateStockFormula")
-    public Flux<StockFormula> getUpdateStockFourmula(@RequestParam String updatedDate) {
+    public Flux<StockFormula> getUpdateStockFormula(@RequestParam String updatedDate) {
         List<StockFormula> list = stockFormulaService.getStockFormula(Util1.toLocalDateTime(updatedDate));
         list.forEach(p -> {
             if (!Util1.isNullOrEmpty(p.getKey().getFormulaCode())) {
-                String code = p.getKey().getFormulaCode();
-                if (code != null) {
-                    List<StockFormulaDetail> dtlList = stockFormulaService.getFormulaDetail(code);
-                    p.setListDtl(dtlList);
+                String formulaCode = p.getKey().getFormulaCode();
+                String compCode = p.getKey().getCompCode();
+                if (formulaCode != null) {
+                    List<StockFormulaPrice> dtlList = stockFormulaService.getFormulaPrice(formulaCode, compCode);
+                    p.setListPrice(dtlList);
+                    List<StockFormulaQty> listQty = stockFormulaService.getFormulaQty(formulaCode, compCode);
+                    p.setListQty(listQty);
                 }
             }
         });
@@ -613,10 +616,10 @@ public class SetupController {
                 String type = p.getPriceTypeCode();
                 if (type != null) {
                     General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode, deptId);
-                    p.setPrice(g == null ? 0.0f : Util1.getFloat(g.getAmount()));
+                    p.setPrice(g == null ? 0.0 : Util1.getDouble(g.getAmount()));
                 }
             }
-            p.setAmount(Util1.getFloat(p.getQty()) * Util1.getFloat(p.getPrice()));
+            p.setAmount(Util1.getDouble(p.getQty()) * Util1.getDouble(p.getPrice()));
         });
 
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
@@ -745,9 +748,14 @@ public class SetupController {
         return Mono.just(stockFormulaService.getFormula(compCode));
     }
 
-    @GetMapping(path = "/getStockFormulaDetail")
-    public Flux<?> getStockFormula(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getFormulaDetail(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+    @GetMapping(path = "/getStockFormulaPrice")
+    public Flux<?> getStockFormulaPrice(@RequestParam String formulaCode, @RequestParam String compCode) {
+        return Flux.fromIterable(stockFormulaService.getFormulaPrice(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/getStockFormulaQty")
+    public Flux<?> getStockFormulaQty(@RequestParam String formulaCode, @RequestParam String compCode) {
+        return Flux.fromIterable(stockFormulaService.getFormulaQty(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getGradeDetail")
@@ -760,8 +768,13 @@ public class SetupController {
         return Flux.fromIterable(stockFormulaService.getCriteriaByFormula(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/saveStockFormulaDetail")
-    public Mono<?> saveStockFormulaDetail(@RequestBody StockFormulaDetail f) {
+    @PostMapping(path = "/saveStockFormulaPrice")
+    public Mono<?> saveStockFormulaPrice(@RequestBody StockFormulaPrice f) {
+        return Mono.just(stockFormulaService.save(f));
+    }
+
+    @PostMapping(path = "/saveStockFormulaQty")
+    public Mono<?> saveStockFormulaQty(@RequestBody StockFormulaQty f) {
         return Mono.just(stockFormulaService.save(f));
     }
 
@@ -771,7 +784,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/deleteStockFormulaDetail")
-    public Mono<?> deleteStockFormulaDetail(@RequestBody StockFormulaDetailKey key) {
+    public Mono<?> deleteStockFormulaDetail(@RequestBody StockFormulaPriceKey key) {
         return Mono.justOrEmpty(stockFormulaService.delete(key));
     }
 
