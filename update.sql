@@ -1278,7 +1278,9 @@ create table landing_his (
   pur_price double(20,3) not null default 0.000,
   vou_paid double(20,3) not null default 0.000,
   vou_balance double(20,3) not null default 0.000,
+  grand_total double(20,3) not null default 0.000,
   purchase bit(1) default null,
+  intg_upd_status varchar(15) not null,
   primary key (vou_no,comp_code)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci comment='				';
 
@@ -1298,6 +1300,20 @@ alter table stock
 add column formula_code varchar(15) null after sale_qty,
 add column sale_amt double(20,3) not null default 0 after formula_code,
 add column pur_amt double(20,3) not null default 0 after sale_amt;
+
+drop table if exists tmp_stock_balance;
+create table tmp_stock_balance (
+  stock_code varchar(15) not null,
+  comp_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  mac_id int(11) not null,
+  dept_id varchar(15) default null,
+  unit varchar(15) null,
+  qty double(20,3) default null,
+  smallest_qty double(20,3) default null,
+  weight double(20,3) default null,
+  primary key (stock_code,comp_code,loc_code,mac_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
 
 #view
@@ -1321,3 +1337,8 @@ drop view if exists v_order;
 create view v_order as  select oh.order_status,oh.project_no as project_no,oh.vou_no as vou_no,oh.comp_code as comp_code,oh.dept_id as dept_id,oh.trader_code as trader_code,oh.saleman_code as saleman_code,oh.vou_date as vou_date,oh.credit_term as credit_term,oh.cur_code as cur_code,oh.remark as remark,oh.vou_total as vou_total,oh.created_date as created_date,oh.created_by as created_by,oh.deleted as deleted,oh.updated_by as updated_by,oh.updated_date as updated_date,oh.mac_id as mac_id,oh.intg_upd_status as intg_upd_status,oh.reference as reference,oh.vou_lock as vou_lock,ohd.unique_id as unique_id,ohd.stock_code as stock_code,ohd.order_qty as order_qty,ohd.qty as qty,ohd.unit as unit,ohd.price as price,ohd.amt as amt,ohd.loc_code as loc_code,ohd.weight as weight,ohd.weight_unit as weight_unit,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((order_his oh join order_his_detail ohd on(oh.vou_no = ohd.vou_no and oh.comp_code = ohd.comp_code)) join stock s on(ohd.stock_code = s.stock_code and ohd.comp_code = s.comp_code));
 drop view if exists v_weight_loss;
 create  view v_weight_loss as select wlh.vou_no as vou_no,wlh.comp_code as comp_code,wlh.dept_id as dept_id,wlh.vou_date as vou_date,wlh.ref_no as ref_no,wlh.remark as remark,wlh.created_by as created_by,wlh.updated_by as updated_by,wlh.updated_date as updated_date,wlh.mac_id as mac_id,wlh.deleted as deleted,wlhd.unique_id as unique_id,wlhd.stock_code as stock_code,wlhd.qty as qty,wlhd.unit as unit,wlhd.price as price,wlhd.loss_qty as loss_qty,wlhd.loss_unit as loss_unit,wlhd.loss_price as loss_price,wlhd.loc_code as loc_code,s.user_code as user_code,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from ((weight_loss_his wlh join weight_loss_his_detail wlhd on(wlh.vou_no = wlhd.vou_no and wlh.comp_code = wlhd.comp_code)) join stock s on(wlhd.stock_code = s.stock_code and wlhd.comp_code = s.comp_code));
+
+drop view if exists v_landing_grade;
+create view v_landing_grade as select l.vou_no as vou_no,l.comp_code as comp_code,l.dept_id as dept_id,l.mac_id as mac_id,l.vou_date as vou_date,l.trader_code as trader_code,l.loc_code as loc_code,l.remark as remark,l.created_by as created_by,l.created_date as created_date,l.updated_by as updated_by,l.updated_date as updated_date,l.deleted as deleted,l.stock_code as stock_code,l.qty as qty,l.unit as unit,l.weight as weight,l.weight_unit as weight_unit,l.total_weight as total_weight,l.price as price,l.amount as amount,l.cargo as cargo,l.criteria_amt as criteria_amt,l.pur_amt as pur_amt,l.pur_price as pur_price,l.vou_paid as vou_paid,l.vou_balance as vou_balance,l.purchase as purchase,l.grand_total as grand_total,l.vou_discount as vou_discount,l.gross_qty as gross_qty,g.stock_code as grade_stock_code,g.choose as choose,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from (landing_his l join (landing_his_grade g join stock s)) where l.vou_no = g.vou_no and l.comp_code = g.comp_code and g.stock_code = s.stock_code and g.comp_code = s.comp_code;
+drop view if exists v_stock_io;
+create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.total_weight as total_weight,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no)) join stock s on(iod.stock_code = s.stock_code));

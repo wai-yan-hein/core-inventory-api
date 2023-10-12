@@ -41,7 +41,7 @@ public class ReportController {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         createFilePath(exportPath);
-        List<VSale> listVSale = reportService.getSaleVoucher(vouNo,compCode);
+        List<VSale> listVSale = reportService.getSaleVoucher(vouNo, compCode);
         Util1.writeJsonFile(listVSale, exportPath);
         return new FileInputStream(exportPath).readAllBytes();
     }
@@ -71,7 +71,7 @@ public class ReportController {
                                                @RequestParam Integer macId) throws Exception {
         String reportName = "OrderVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo,compCode);
+        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo, compCode);
         Util1.writeJsonFile(listVSale, exportPath);
         return new FileInputStream(exportPath).readAllBytes();
     }
@@ -463,6 +463,23 @@ public class ReportController {
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
+    @GetMapping(path = "/getStockBalanceByWeight")
+    public Flux<?> getStockBalanceByWeight(@RequestParam String stockCode,
+                                           @RequestParam boolean calSale, @RequestParam boolean calPur,
+                                           @RequestParam boolean calRI, @RequestParam boolean calRO,
+                                           @RequestParam String compCode, @RequestParam Integer deptId,
+                                           @RequestParam Integer macId, @RequestParam boolean summary) {
+        String opDate = reportService.getOpeningDate(compCode, deptId);
+        String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
+        List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO, compCode, macId, summary);
+        if (list.isEmpty()) {
+            VStockBalance b = new VStockBalance();
+            b.setLocationName("No Stock.");
+            b.setUnitName("No Stock.");
+        }
+        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+    }
+
 
     @PostMapping(path = "/getReorderLevel")
     public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) throws Exception {
@@ -505,8 +522,9 @@ public class ReportController {
         String compCode = filter.getCompCode();
         return Flux.fromIterable(reportService.getOrderSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
     }
+
     @GetMapping(path = "/getLandingReport")
     public Mono<?> getLandingReport(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Mono.justOrEmpty(reportService.getLandingReport(vouNo,compCode));
+        return Mono.justOrEmpty(reportService.getLandingReport(vouNo, compCode));
     }
 }

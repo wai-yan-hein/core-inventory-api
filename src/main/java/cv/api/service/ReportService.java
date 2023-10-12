@@ -103,6 +103,10 @@ public interface ReportService {
     List<VStockBalance> getStockBalance(String opDate, String clDate, String typeCode, String catCode, String brandCode, String stockCode,
                                         boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                         String locCode, String compCode, Integer deptId, Integer macId, boolean summary);
+    List<VStockBalance> getStockBalanceByWeight(String opDate, String clDate,String stockCode,
+                                                boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                String compCode,Integer macId, boolean summary);
+
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 

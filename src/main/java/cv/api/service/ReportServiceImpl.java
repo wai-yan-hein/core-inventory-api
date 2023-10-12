@@ -1625,6 +1625,157 @@ public class ReportServiceImpl implements ReportService {
         return balances;
     }
 
+    @Override
+    public List<VStockBalance> getStockBalanceByWeight(String opDate, String clDate, String stockCode,
+                                                       boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                       String compCode, Integer macId, boolean summary) {
+        calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO);
+        String sql = """
+                select t.*,s.user_code,s.stock_name,l.loc_name
+                from tmp_stock_balance t join stock s
+                on t.stock_code = s.stock_code
+                and t.comp_code = s.comp_code
+                join location l on t.loc_code
+                and t.comp_code = l.comp_code
+                where t.mac_id =?""";
+        ResultSet rs = reportDao.getResultSql(sql, macId);
+        List<VStockBalance> list = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                VStockBalance b = new VStockBalance();
+                b.setUserCode(rs.getString("user_code"));
+                b.setStockName(rs.getString("stock_name"));
+                b.setTotalQty(rs.getDouble("qty"));
+                b.setWeight(rs.getDouble("weight"));
+                b.setLocationName(rs.getString("loc_name"));
+                list.add(b);
+            }
+        } catch (Exception e) {
+            log.error("getStockBalanceByWeight : " + e.getMessage());
+        }
+
+        return list;
+    }
+
+    private void calculateStockBalanceByWeight(String opDate, String clDate, String stockCode,
+                                               String compCode, int macId, boolean calSale, boolean calPur,
+                                               boolean calRI, boolean calRo) {
+        String sale = String.valueOf(calSale);
+        String purchase = String.valueOf(calPur);
+        String retIn = String.valueOf(calRI);
+        String retOut = String.valueOf(calRo);
+        String delSql = "delete from tmp_stock_balance where mac_id = " + macId;
+        String sql = "insert into tmp_stock_balance(stock_code, loc_code, weight, qty, comp_code,mac_id)\n" +
+                "select stock_code,loc_code,sum(total_weight) total_weight,sum(ttl_qty) ttl_qty,comp_code," + macId + "\n" +
+                "from (\n" +
+                "select stock_code,loc_code,sum(total_weight) total_weight,sum(qty) ttl_qty,comp_code\n" +
+                "from v_opening\n" +
+                "where deleted = false\n" +
+                "and date(op_date)='" + opDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
+                "from v_sale\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "and (calculate = true and false = " + sale + ")\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight) total_weight,sum(qty) ttl_qty,comp_code\n" +
+                "from v_purchase\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "and (calculate = true and false = " + purchase + ")\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight) total_weight,sum(qty) ttl_qty,comp_code\n" +
+                "from v_return_in\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "and (calculate = true and false = " + retIn + ")\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
+                "from v_return_out\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "and (calculate = true and false = " + retOut + ")\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight) total_weight,sum(in_qty) ttl_qty,comp_code\n" +
+                "from v_stock_io\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "and in_qty>0\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight)*-1 total_weight,sum(out_qty)*-1 ttl_qty,comp_code\n" +
+                "from v_stock_io\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "and out_qty>0\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code_from,sum(total_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
+                "from v_transfer\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "group by loc_code_from\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code_to,sum(total_weight) total_weight,sum(qty)ttl_qty,comp_code\n" +
+                "from v_transfer\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "group by loc_code_to\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(total_weight) total_weight,sum(qty)ttl_qty,comp_code\n" +
+                "from v_landing_grade\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and grade_stock_code ='" + stockCode + "'\n" +
+                "and purchase = true\n" +
+                "and choose = true\n"+
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(tot_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
+                "from v_milling_raw\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "group by loc_code\n" +
+                "\tunion all\n" +
+                "select stock_code,loc_code,sum(tot_weight) total_weight,sum(qty) ttl_qty,comp_code\n" +
+                "from v_milling_output\n" +
+                "where deleted = false\n" +
+                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and stock_code ='" + stockCode + "'\n" +
+                "group by loc_code\n" +
+                ")a\n" +
+                "group by loc_code";
+        reportDao.executeSql(delSql, sql);
+    }
+
     private String getRelStr(String relCode, String compCode, double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
