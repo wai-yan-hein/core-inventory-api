@@ -4049,6 +4049,81 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public VLanding getLandingReport(String vouNo, String compCode) {
+        VLanding header = new VLanding();
+        List<VLanding> list = new ArrayList<>();
+        String sql = """
+                select a.*,t.trader_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name
+                from (
+                select lh.vou_no,vou_date,trader_code,loc_code,gross_qty,qty,unit,weight,
+                total_weight,price,amount,remark,cargo,lh.comp_code,lh.stock_code,lhg.stock_code grade_stock_code
+                from landing_his lh join landing_his_grade lhg
+                where lh.vou_no = lhg.vou_no
+                and lh.comp_code = lhg.comp_code
+                and lhg.choose = true
+                and lh.vou_no=?
+                and lh.comp_code=?
+                )a
+                join trader t on a.trader_code = t.code
+                and t.comp_code = t.comp_code
+                join location l on a.loc_code = l.loc_code
+                and a.comp_code = l.comp_code
+                join stock s on a.stock_code = s.stock_code
+                and a.comp_code = s.comp_code
+                join stock s1 on a.grade_stock_code = s1.stock_code
+                and a.comp_code = s1.comp_code""";
+        try {
+            ResultSet rs = getResult(sql, vouNo, compCode);
+            //vou_no, vou_date, trader_code, loc_code, gross_qty, qty, unit, weight, total_weight, price,
+            // amount, remark, cargo, comp_code, stock_code, trader_name, loc_name, stock_name
+            if (rs.next()) {
+                header.setVouNo(rs.getString("vou_no"));
+                header.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                header.setPurQty(rs.getDouble("qty"));
+                header.setUnit(rs.getString("unit"));
+                header.setWeight(rs.getDouble("weight"));
+                header.setTotalWeight(rs.getDouble("total_weight"));
+                header.setPurPrice(rs.getDouble("price"));
+                header.setPurAmt(rs.getDouble("amount"));
+                header.setRemark(rs.getString("remark"));
+                header.setCargo(rs.getString("cargo"));
+                header.setTraderName(rs.getString("trader_name"));
+                header.setLocName(rs.getString("loc_name"));
+                header.setStockName(rs.getString("stock_name"));
+                header.setGradeStockName(rs.getString("grade_stock_name"));
+            }
+        } catch (Exception e) {
+            log.error("getLandingReport : " + e.getMessage());
+        }
+        String sql2 = """
+                select 1 tran_type,s.criteria_name,percent,percent_allow,price,amount
+                from landing_his_price l join stock_criteria s
+                on l.criteria_code = s.criteria_code
+                and l.comp_code =s.comp_code
+                where l.vou_no=?
+                and l.comp_code=?
+                and l.percent>0
+                order by l.unique_id""";
+        try {
+            ResultSet rs = getResult(sql2, vouNo, compCode, vouNo, compCode);
+            while (rs.next()) {
+                VLanding l = new VLanding();
+                l.setTranType(rs.getString("tran_type"));
+                l.setCriteriaName(rs.getString("criteria_name"));
+                l.setPercent(rs.getDouble("percent"));
+                l.setPercentAllow(rs.getDouble("percent_allow"));
+                l.setPrice(rs.getDouble("price"));
+                l.setAmount(rs.getDouble("amount"));
+                list.add(l);
+            }
+        } catch (Exception e) {
+            log.error("getLandingReport : " + e.getMessage());
+        }
+        header.setListDetail(list);
+        return header;
+    }
+
+    @Override
     public List<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode) {
         List<PaymentHisDetail> list = new ArrayList<>();
         if (tranOption.equals("C") || tranOption.equals("S")) {

@@ -31,7 +31,7 @@ public class LandingHisPriceDaoImpl extends AbstractDao<LandingHisPriceKey, Land
         List<LandingHisPrice> list = new ArrayList<>();
         String sql = """
                 select l.*,sc.criteria_name,sc.user_code
-                from landing_his_criteria l join stock_criteria sc
+                from landing_his_price l join stock_criteria sc
                 on l.criteria_code = sc.criteria_code
                 and l.comp_code = sc.comp_code
                 where l.vou_no =?

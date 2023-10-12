@@ -2,7 +2,6 @@ package cv.api.dao;
 
 import cv.api.entity.LandingHisGrade;
 import cv.api.entity.LandingHisGradeKey;
-import cv.api.entity.LandingHisPriceKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -24,11 +23,12 @@ public class LandingHisGradeDaoImpl extends AbstractDao<LandingHisGradeKey, Land
         List<LandingHisGrade> list = new ArrayList<>();
         String sql = """
                 select g.*,s.stock_name
-                from landing_grade g join stock s
+                from landing_his_grade g join stock s
                 on g.stock_code = s.stock_code
                 and g.comp_code = s.comp_code
                 where g.vou_no =?
                 and g.comp_code =?
+                order by g.unique_id
                 """;
         try {
             ResultSet rs = getResult(sql, vouNo, compCode);

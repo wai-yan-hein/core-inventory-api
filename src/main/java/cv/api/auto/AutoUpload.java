@@ -22,23 +22,16 @@ import java.util.List;
 public class AutoUpload {
     @Value("${sync.date}")
     private String syncDate;
-    @Autowired
-    private SaleHisService saleHisService;
-    @Autowired
-    private PurHisService purHisService;
-    @Autowired
-    private RetInService retInService;
-    @Autowired
-    private RetOutService retOutService;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private PaymentHisService paymentHisService;
+    private final SaleHisService saleHisService;
+    private final PurHisService purHisService;
+    private final RetInService retInService;
+    private final RetOutService retOutService;
+    private final TraderService traderService;
+    private final PaymentHisService paymentHisService;
+    private final LandingService landingService;
     private boolean syncing = false;
-    @Autowired
-    private AccountRepo accountRepo;
-    @Autowired
-    private Environment environment;
+    private final AccountRepo accountRepo;
+    private final Environment environment;
 
     @Scheduled(fixedRate = 5 * 60 * 1000)
     private void autoUpload() {
@@ -61,9 +54,10 @@ public class AutoUpload {
         List<Trader> traders = traderService.unUploadTrader();
         if (!traders.isEmpty()) {
             log.info(String.format("uploadTrader: %s", traders.size()));
-            traders.forEach(vou -> accountRepo.sendTrader(vou));
+            traders.forEach(accountRepo::sendTrader);
         }
     }
+
     private void uploadSaleVoucher() {
         List<SaleHis> vouchers = saleHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
@@ -97,6 +91,22 @@ public class AutoUpload {
                     accountRepo.deleteInvVoucher(vou.getKey());
                 } else {
                     accountRepo.sendPurchase(vou);
+                }
+            });
+        }
+    }
+
+    private void uploadLandingVoucher() {
+        List<LandingHis> vouchers = landingService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        if (!vouchers.isEmpty()) {
+            log.info(String.format("uploadPurchaseVoucher: %s", vouchers.size()));
+            vouchers.forEach(vou -> {
+                if (vou.isDeleted()) {
+                    accountRepo.deleteInvVoucher(vou.getKey());
+                } else if (vou.isPurchase()) {
+                    accountRepo.sendLandingPurchase(vou);
+                } else {
+                    landingService.updateIntgStatus(vou.getKey(),"L");
                 }
             });
         }

@@ -2,6 +2,7 @@ package cv.api.service;
 
 import cv.api.entity.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LandingService {
@@ -21,4 +22,6 @@ public interface LandingService {
     List<LandingHis> getLandingHistory(String fromDate, String toDate,String traderCode, String vouNo,
                             String remark, String userCode, String stockCode, String locCode,
                             String compCode, Integer deptId, boolean deleted);
+    List<LandingHis> unUploadVoucher(LocalDateTime syncDate);
+    boolean updateIntgStatus(LandingHisKey key,String status);
 }

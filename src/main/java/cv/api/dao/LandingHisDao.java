@@ -3,6 +3,7 @@ package cv.api.dao;
 import cv.api.entity.LandingHis;
 import cv.api.entity.LandingHisKey;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LandingHisDao {
@@ -18,6 +19,7 @@ public interface LandingHisDao {
                                        String remark, String userCode, String stockCode, String locCode,
                                        String compCode, Integer deptId, boolean deleted);
 
-
+    List<LandingHis> unUploadVoucher(LocalDateTime syncDate);
+    boolean updateIntgStatus(LandingHisKey key,String status);
 
 }

@@ -4,11 +4,7 @@
  */
 package cv.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Data;
 
 /**
@@ -20,7 +16,7 @@ import lombok.Data;
 @Table(name = "landing_his_grade")
 public class LandingHisGrade {
 
-    @Embedded
+    @EmbeddedId
     private LandingHisGradeKey key;
     @Column(name = "stock_code")
     private String stockCode;

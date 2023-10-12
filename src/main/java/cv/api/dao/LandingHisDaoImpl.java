@@ -66,7 +66,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
         remark += "%";
         String sql = """
                 select a.vou_no,a.comp_code,a.dept_id,a.vou_date,a.created_by,a.deleted,a.remark,
-                a.cargo,t.trader_name,l.loc_name,s.stock_name
+                a.cargo,a.pur_amt,t.trader_name,l.loc_name,s.stock_name
                 from (
                 select *
                 from landing_his
@@ -108,6 +108,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
                 l.setTraderName(rs.getString("trader_name"));
                 l.setLocName(rs.getString("loc_name"));
                 l.setStockName(rs.getString("stock_name"));
+                l.setPurAmt(rs.getDouble("pur_amt"));
                 list.add(l);
             }
 
@@ -115,5 +116,22 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
             log.error("getLandingHistory : " + e.getMessage());
         }
         return list;
+    }
+
+    @Override
+    public List<LandingHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from LandingHis o where o.intgUpdStatus is null and o.vouDate >=: syncDate";
+        return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
+    }
+
+    @Override
+    public boolean updateIntgStatus(LandingHisKey key, String status) {
+        LandingHis h = getByKey(key);
+        if (h != null) {
+            h.setIntgUpdStatus(status);
+            h.setUpdatedDate(LocalDateTime.now());
+            update(h);
+        }
+        return true;
     }
 }

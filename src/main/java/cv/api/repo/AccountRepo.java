@@ -47,6 +47,8 @@ public class AccountRepo {
     private LocationService locationService;
     @Autowired
     private SaleExpenseDao saleExpenseDao;
+    @Autowired
+    private LandingService landingService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -61,6 +63,7 @@ public class AccountRepo {
                             switch (response.getTranSource()) {
                                 case "SALE" -> updateSale(vouNo, compCode);
                                 case "PURCHASE" -> updatePurchase(vouNo, compCode);
+                                case "LAN_PURCHASE" -> updateLanPurchase(vouNo, compCode,ACK);
                                 case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
                                 case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
                                 case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
@@ -74,6 +77,7 @@ public class AccountRepo {
                         switch (tranSource) {
                             case "SALE" -> updateSaleNull(vouNo, compCode);
                             case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
+                            case "LAN_PURCHASE" -> updateLanPurchase(vouNo, compCode,null);
                             case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
                             case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
                             case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
@@ -110,6 +114,13 @@ public class AccountRepo {
         } catch (Exception e) {
             log.error(String.format("updatePurchase: %s", e.getMessage()));
         }
+    }
+
+    private void updateLanPurchase(String vouNo, String compCode,String status) {
+        LandingHisKey key = new LandingHisKey();
+        key.setVouNo(vouNo);
+        key.setCompCode(compCode);
+        landingService.updateIntgStatus(key, status);
     }
 
     private void updatePurchaseNull(String vouNo, String compCode) {
@@ -427,6 +438,118 @@ public class AccountRepo {
                             listGl.add(gl);
                         }
                     }
+                }
+                sendAccount(listGl);
+            }
+        }
+    }
+
+    public void sendLandingPurchase(LandingHis ph) {
+        if (Util1.getBoolean(environment.getProperty("integration"))) {
+            String tranSource = "LAN_PURCHASE";
+            String compCode = ph.getKey().getCompCode();
+            String locCode = ph.getLocCode();
+            AccSetting setting = settingService.findByCode(new AccKey("PURCHASE", compCode));
+            if (setting != null) {
+                LocationSetting ls = getLocationSetting(locCode, compCode);
+                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
+                String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
+                String srcAcc = setting.getSourceAcc();
+                String balAcc = setting.getBalanceAcc();
+                String disAcc = setting.getDiscountAcc();
+                LocalDateTime vouDate = ph.getVouDate();
+                String traderCode = ph.getTraderCode();
+                String curCode = ph.getCurCode();
+                String remark = ph.getRemark();
+                boolean deleted = ph.isDeleted();
+                double vouTotal = Util1.getDouble(ph.getPurAmt());
+                double vouPaid = Util1.getDouble(ph.getVouPaid());
+                double vouDis = Util1.getDouble(ph.getVouDiscount());
+                String vouNo = ph.getKey().getVouNo();
+                Integer deptId = ph.getDeptId();
+                TraderKey k = new TraderKey();
+                k.setCode(traderCode);
+                k.setCompCode(compCode);
+                Trader t = traderService.findById(k);
+                if (t != null) {
+                    balAcc = Util1.isNull(t.getAccount(), balAcc);
+                }
+                List<Gl> listGl = new ArrayList<>();
+                //income
+                if (vouTotal > 0) {
+                    Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    key.setDeptId(deptId);
+                    gl.setKey(key);
+                    gl.setGlDate(vouDate);
+                    gl.setDescription("Purchase Voucher Total");
+                    gl.setSrcAccCode(srcAcc);
+                    gl.setAccCode(balAcc);
+                    gl.setTraderCode(traderCode);
+                    gl.setDrAmt(vouTotal);
+                    gl.setCurCode(curCode);
+                    gl.setReference(remark);
+                    gl.setDeptCode(deptCode);
+                    gl.setCreatedDate(LocalDateTime.now());
+                    gl.setCreatedBy(appName);
+                    gl.setTranSource(tranSource);
+                    gl.setRefNo(vouNo);
+                    gl.setDeleted(deleted);
+                    gl.setMacId(macId);
+                    listGl.add(gl);
+                }
+                //payment
+                if (vouPaid > 0) {
+                    Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    key.setDeptId(deptId);
+                    gl.setKey(key);
+                    gl.setGlDate(vouDate);
+                    if (vouPaid == vouTotal) {
+                        gl.setDescription("Purchase Voucher Full Paid");
+                    } else {
+                        gl.setDescription("Purchase Voucher Partial Paid");
+                    }
+                    gl.setSrcAccCode(payAcc);
+                    gl.setAccCode(balAcc);
+                    gl.setTraderCode(traderCode);
+                    gl.setCrAmt(vouPaid);
+                    gl.setCurCode(curCode);
+                    gl.setReference(remark);
+                    gl.setDeptCode(deptCode);
+                    gl.setCreatedDate(LocalDateTime.now());
+                    gl.setCreatedBy(appName);
+                    gl.setTranSource(tranSource);
+                    gl.setRefNo(vouNo);
+                    gl.setDeleted(deleted);
+                    gl.setMacId(macId);
+                    listGl.add(gl);
+                }
+                //discount
+                if (vouDis > 0) {
+                    Gl gl = new Gl();
+                    GlKey key = new GlKey();
+                    key.setCompCode(compCode);
+                    key.setDeptId(deptId);
+                    gl.setKey(key);
+                    gl.setGlDate(vouDate);
+                    gl.setDescription("Purchase Discount Received");
+                    gl.setSrcAccCode(disAcc);
+                    gl.setAccCode(balAcc);
+                    gl.setTraderCode(traderCode);
+                    gl.setCrAmt(vouDis);
+                    gl.setCurCode(curCode);
+                    gl.setReference(remark);
+                    gl.setDeptCode(deptCode);
+                    gl.setCreatedDate(LocalDateTime.now());
+                    gl.setCreatedBy(appName);
+                    gl.setTranSource(tranSource);
+                    gl.setRefNo(vouNo);
+                    gl.setDeleted(deleted);
+                    gl.setMacId(macId);
+                    listGl.add(gl);
                 }
                 sendAccount(listGl);
             }
@@ -864,6 +987,16 @@ public class AccountRepo {
         glKey.setCompCode(key.getCompCode());
         gl.setKey(glKey);
         gl.setTranSource("SALE");
+        gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+    public void deleteInvVoucher(LandingHisKey key) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(key.getCompCode());
+        gl.setKey(glKey);
+        gl.setTranSource("LAN_PURCHASE");
         gl.setRefNo(key.getVouNo());
         deleteGlByVoucher(gl);
     }

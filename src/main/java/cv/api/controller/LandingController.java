@@ -46,11 +46,11 @@ public class LandingController {
     public Flux<?> getLandingHisPrice(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(landingService.getLandingPrice(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
-    @GetMapping(path = "/getLandingQty")
+    @GetMapping(path = "/getLandingHisQty")
     public Flux<?> getLandingQty(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(landingService.getLandingQty(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
-    @GetMapping(path = "/getLandingGrade")
+    @GetMapping(path = "/getLandingHisGrade")
     public Flux<?> getLandingGrade(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(landingService.getLandingGrade(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }

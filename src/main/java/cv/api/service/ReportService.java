@@ -255,4 +255,6 @@ public interface ReportService {
     List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode);
 
     List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId);
+
+    VLanding getLandingReport(String vouNo, String compCode);
 }

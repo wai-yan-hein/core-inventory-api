@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -162,6 +163,16 @@ public class LandingServiceImpl implements LandingService {
     public List<LandingHis> getLandingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                               String userCode, String stockCode, String locCode, String compCode, Integer deptId, boolean deleted) {
         return dao.getLandingHistory(fromDate, toDate, traderCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted);
+    }
+
+    @Override
+    public List<LandingHis> unUploadVoucher(LocalDateTime syncDate) {
+        return dao.unUploadVoucher(syncDate);
+    }
+
+    @Override
+    public boolean updateIntgStatus(LandingHisKey key, String status) {
+        return dao.updateIntgStatus(key, status);
     }
 
 

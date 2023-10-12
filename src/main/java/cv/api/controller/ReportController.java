@@ -505,4 +505,8 @@ public class ReportController {
         String compCode = filter.getCompCode();
         return Flux.fromIterable(reportService.getOrderSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
     }
+    @GetMapping(path = "/getLandingReport")
+    public Mono<?> getLandingReport(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Mono.justOrEmpty(reportService.getLandingReport(vouNo,compCode));
+    }
 }
