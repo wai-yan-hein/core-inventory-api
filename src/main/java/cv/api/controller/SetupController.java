@@ -738,6 +738,11 @@ public class SetupController {
         return Mono.just(stockFormulaService.delete(key));
     }
 
+    @PostMapping(path = "/deleteGradeDetail")
+    public Mono<?> deleteGradeDetail(@RequestBody GradeDetailKey key) {
+        return Mono.just(stockFormulaService.delete(key));
+    }
+
     @PostMapping(path = "/findStockFormula")
     public Mono<?> findStockFormula(@RequestBody StockFormulaKey key) {
         return Mono.justOrEmpty(stockFormulaService.find(key));
