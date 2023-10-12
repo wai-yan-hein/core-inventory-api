@@ -21,6 +21,8 @@ public interface StockFormulaService {
     boolean delete(StockFormulaPriceKey key);
     boolean delete(StockFormulaQtyKey key);
 
+    boolean delete(GradeDetailKey key);
+
     List<StockFormulaPrice> getFormulaPrice(String formulaCode, String compCode);
     List<StockFormulaQty> getFormulaQty(String formulaCode, String compCode);
 

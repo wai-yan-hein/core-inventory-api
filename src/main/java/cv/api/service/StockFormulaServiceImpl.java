@@ -75,6 +75,11 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     }
 
     @Override
+    public boolean delete(GradeDetailKey key) {
+        return gradeDetailDao.delete(key);
+    }
+
+    @Override
     public List<StockFormulaPrice> getFormulaPrice(String code, String compCode) {
         return formulaPriceDao.getFormulaDetail(code, compCode);
     }
