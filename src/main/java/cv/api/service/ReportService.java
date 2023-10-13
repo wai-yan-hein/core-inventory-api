@@ -88,13 +88,13 @@ public interface ReportService {
 
     List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
-    General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
+    General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
-    General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode, Integer deptId);
+    General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode);
 
-    General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
+    General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
-    General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId);
+    General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode);
 
     General getSaleRecentPrice(String stockCode, String purDate, String unit, String compCode);
 

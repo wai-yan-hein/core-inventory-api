@@ -1207,7 +1207,7 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override
-    public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
+    public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
         General general = new General();
         general.setAmount(0.0f);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
@@ -1233,7 +1233,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode, Integer deptId) {
+    public General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode) {
         General general = new General();
         general.setAmount(0.0f);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select v.loss_price/rel.smallest_qty smallest_price,v.rel_code,v.comp_code,v.dept_id\n" + "from v_weight_loss v\n" + "join v_relation rel\n" + "on v.rel_code = rel.rel_code\n" + "and v.loss_unit = rel.unit\n" + "and v.comp_code = rel.comp_code\n" +
@@ -1256,7 +1256,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
+    public General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode) {
         General general = new General();
         general.setAmount(0.0f);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" +
@@ -1293,7 +1293,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode, Integer deptId) {
+    public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode) {
         General g = new General();
         String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" +
                 "from (\n" +

@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 public class Pattern implements java.io.Serializable {
     @EmbeddedId
     private PatternKey key;
+    @Column(name = "dept_id")
+    private Integer deptId;
     @Column(name = "qty")
     private Double qty;
     @Column(name = "price")

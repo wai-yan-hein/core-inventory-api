@@ -10,7 +10,7 @@ public interface PatternService {
 
     Pattern save(Pattern pattern);
 
-    List<Pattern> search(String stockCode, String compCode, Integer deptId);
+    List<Pattern> search(String stockCode, String compCode);
 
     void delete(Pattern pattern);
 

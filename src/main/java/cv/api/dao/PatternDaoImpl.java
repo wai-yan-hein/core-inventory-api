@@ -35,7 +35,7 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
 
 
     @Override
-    public List<Pattern> search(String stockCode, String compCode, Integer deptId) {
+    public List<Pattern> search(String stockCode, String compCode) {
         List<Pattern> listP = new ArrayList<>();
         String sql = "select p.*,s.user_code,s.stock_name,l.loc_name,po.desp,p.price_type\n" +
                 "from pattern p join stock s\n" +
@@ -55,11 +55,11 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
                     Pattern p = new Pattern();
                     PatternKey key = new PatternKey();
                     key.setCompCode(compCode);
-                    key.setDeptId(deptId);
                     key.setStockCode(rs.getString("stock_code"));
                     key.setMapStockCode(rs.getString("f_stock_code"));
                     key.setUniqueId(rs.getInt("unique_id"));
                     p.setKey(key);
+                    p.setDeptId(rs.getInt("dept_id"));
                     p.setUserCode(rs.getString("user_code"));
                     p.setStockName(rs.getString("stock_name"));
                     p.setLocCode(rs.getString("loc_code"));

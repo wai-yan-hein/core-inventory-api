@@ -415,23 +415,23 @@ public class ReportController {
 
 
     @GetMapping(path = "/getPurchaseRecentPrice")
-    public Mono<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Mono.justOrEmpty(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
+        return Mono.justOrEmpty(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode));
     }
 
     @GetMapping(path = "/getWeightLossRecentPrice")
-    public Mono<General> getWeightLossRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Mono.justOrEmpty(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getWeightLossRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
+        return Mono.justOrEmpty(reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode));
     }
 
     @GetMapping(path = "/getProductionRecentPrice")
-    public Mono<General> getProductionRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Mono.justOrEmpty(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getProductionRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
+        return Mono.justOrEmpty(reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode));
     }
 
     @GetMapping(path = "/getPurAvgPrice")
-    public Mono<General> getPurAvgPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Mono.just(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId));
+    public Mono<General> getPurAvgPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
+        return Mono.just(reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode));
     }
 
     @GetMapping(path = "/getSaleRecentPrice")

@@ -608,14 +608,14 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getPattern")
-    public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam Integer deptId, @RequestParam String vouDate) {
-        List<Pattern> list = patternService.search(stockCode, compCode, deptId);
+    public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam String vouDate) {
+        List<Pattern> list = patternService.search(stockCode, compCode);
         list.forEach(p -> {
             if (!Util1.isNullOrEmpty(vouDate)) {
                 String code = p.getKey().getStockCode();
                 String type = p.getPriceTypeCode();
                 if (type != null) {
-                    General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode, deptId);
+                    General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode);
                     p.setPrice(g == null ? 0.0 : Util1.getDouble(g.getAmount()));
                 }
             }
@@ -625,12 +625,12 @@ public class SetupController {
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
-    public General getPrice(String stockCode, String vouDate, String unit, String type, String compCode, Integer deptId) {
+    public General getPrice(String stockCode, String vouDate, String unit, String type, String compCode) {
         return switch (type) {
-            case "PUR-R" -> reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode, deptId);
-            case "PUR-A" -> reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode, deptId);
-            case "PRO-R" -> reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode, deptId);
-            case "WL-R" -> reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode, deptId);
+            case "PUR-R" -> reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode);
+            case "PUR-A" -> reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode);
+            case "PRO-R" -> reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode);
+            case "WL-R" -> reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode);
             default -> null;
         };
     }
