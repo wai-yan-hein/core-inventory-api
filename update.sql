@@ -1315,6 +1315,17 @@ create table tmp_stock_balance (
   primary key (stock_code,comp_code,loc_code,mac_id)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
+create table milling_usage (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  unique_id int(11) not null,
+  stock_code varchar(15) not null,
+  qty double(20,3) not null,
+  unit varchar(15) not null,
+  loc_code varchar(15) not null,
+  primary key (vou_no,comp_code,unique_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 
 #view
 drop view if exists v_milling_output;

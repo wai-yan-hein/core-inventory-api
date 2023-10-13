@@ -464,12 +464,6 @@ public class SetupController {
     public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
-
-//    @GetMapping(path = "/searchStockCriteria")
-//    public Flux<?> searchStockCriteria(@RequestParam String text, @RequestParam String compCode) {
-//        return Flux.fromIterable(stockCriteriaService.search(Util1.cleanStr(text), compCode)).onErrorResume(throwable -> Flux.empty());
-//    }
-
     @PostMapping(path = "/deleteStock")
     public Flux<?> deleteStock(@RequestBody StockKey key) {
         List<General> str = stockService.delete(key);

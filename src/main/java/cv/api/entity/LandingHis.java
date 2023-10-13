@@ -78,6 +78,8 @@ public class LandingHis {
     private String curCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "over_payment")
+    private Double overPayment;
     @Transient
     private List<LandingHisPrice> listPrice;
     @Transient

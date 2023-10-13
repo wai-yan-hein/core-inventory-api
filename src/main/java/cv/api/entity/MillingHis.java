@@ -91,6 +91,7 @@ public class MillingHis {
     private double percentWeight;
     @Column(name = "percent_qty")
     private double percentQty;
+
     @Transient
     private String localVouNo;
     private transient String status = "STATUS";
@@ -100,6 +101,7 @@ public class MillingHis {
     private transient List<MillingOutDetailKey> listOutputDel;
     private transient List<MillingExpense> listExpense;
     private transient List<MillingExpenseKey> listExpenseDel;
+    private transient List<MillingUsage> listUsage;
     private transient boolean local = false;
     private transient String traderName = "";
     private transient String processType = "";

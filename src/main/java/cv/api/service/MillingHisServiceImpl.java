@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.dao.*;
 import cv.api.entity.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,18 +25,15 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MillingHisServiceImpl implements MillingHisService {
 
-    @Autowired
-    private MillingHisDao hDao;
-    @Autowired
-    private MillingRawDao rDao;
-    @Autowired
-    private MillingOutDao oDao;
-    @Autowired
-    private MillingExpenseDao eDao;
-    @Autowired
-    private SeqTableDao seqDao;
+    private final MillingHisDao hDao;
+    private final MillingRawDao rDao;
+    private final MillingOutDao oDao;
+    private final MillingExpenseDao eDao;
+    private final MillingUsageDao usageDao;
+    private final SeqTableDao seqDao;
 
     @Override
     public MillingHis save(MillingHis milling) {
@@ -51,17 +49,37 @@ public class MillingHisServiceImpl implements MillingHisService {
         List<MillingExpenseKey> listExpDel = milling.getListExpenseDel();
         List<MillingOutDetail> listOut = milling.getListOutput();
         List<MillingOutDetailKey> listOutDel = milling.getListOutputDel();
-        String vouNo = milling.getKey().getVouNo();
+        List<MillingUsage> listUsage = milling.getListUsage();
         //backup
         if (listRawDel != null) {
-            listRawDel.forEach(key -> rDao.delete(key));
+            listRawDel.forEach(rDao::delete);
         }
         if (listOutDel != null) {
-            listOutDel.forEach(key -> oDao.delete(key));
+            listOutDel.forEach(oDao::delete);
         }
         if (listExpDel != null) {
-            listExpDel.forEach(key -> eDao.delete(key));
+            listExpDel.forEach(eDao::delete);
         }
+        //save raw
+        saveMillingRaw(listRaw, milling);
+        //save output
+        saveMillingOut(listOut, milling);
+        //save expense
+        saveExpense(listExp, milling);
+        //save usage
+        saveMillingUsage(listUsage, milling);
+
+        hDao.save(milling);
+        milling.setListRaw(listRaw);
+        milling.setListOutput(listOut);
+        milling.setListExpense(listExp);
+        return milling;
+    }
+
+    private void saveMillingRaw(List<MillingRawDetail> listRaw, MillingHis milling) {
+        String vouNo = milling.getKey().getVouNo();
+        int deptId = milling.getDeptId();
+        String locCode = milling.getLocCode();
         for (int i = 0; i < listRaw.size(); i++) {
             MillingRawDetail cSd = listRaw.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
@@ -81,10 +99,17 @@ public class MillingHisServiceImpl implements MillingHisService {
                     }
                 }
                 cSd.setDeptId(deptId);
-                cSd.setLocCode(Util1.isNull(cSd.getLocCode(),locCode));
+                cSd.setLocCode(Util1.isNull(cSd.getLocCode(), locCode));
                 rDao.save(cSd);
             }
         }
+
+    }
+
+    private void saveMillingOut(List<MillingOutDetail> listOut, MillingHis milling) {
+        String vouNo = milling.getKey().getVouNo();
+        int deptId = milling.getDeptId();
+        String locCode = milling.getLocCode();
         for (int i = 0; i < listOut.size(); i++) {
             MillingOutDetail cSd = listOut.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
@@ -103,20 +128,24 @@ public class MillingHisServiceImpl implements MillingHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                cSd.setLocCode(Util1.isNull(cSd.getLocCode(),locCode));
+                cSd.setLocCode(Util1.isNull(cSd.getLocCode(), locCode));
                 cSd.setDeptId(deptId);
                 oDao.save(cSd);
             }
         }
+    }
+
+    private void saveExpense(List<MillingExpense> listExp, MillingHis milling) {
+        String vouNo = milling.getKey().getVouNo();
         for (int i = 0; i < listExp.size(); i++) {
             MillingExpense cSd = listExp.get(i);
             if (cSd.getKey() != null && cSd.getKey().getExpenseCode() != null) {
-                    MillingExpenseKey key = new MillingExpenseKey();
-                    key.setExpenseCode(cSd.getKey().getExpenseCode());
-                    key.setCompCode(milling.getKey().getCompCode());
-                    key.setVouNo(vouNo);
-                    key.setUniqueId(0);
-                    cSd.setKey(key);
+                MillingExpenseKey key = new MillingExpenseKey();
+                key.setExpenseCode(cSd.getKey().getExpenseCode());
+                key.setCompCode(milling.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(0);
+                cSd.setKey(key);
 
             }
             if (cSd.getKey() != null && cSd.getKey().getExpenseCode() != null) {
@@ -131,11 +160,31 @@ public class MillingHisServiceImpl implements MillingHisService {
                 eDao.save(cSd);
             }
         }
-        hDao.save(milling);
-        milling.setListRaw(listRaw);
-        milling.setListOutput(listOut);
-        milling.setListExpense(listExp);
-        return milling;
+    }
+
+    private void saveMillingUsage(List<MillingUsage> listUsage, MillingHis milling) {
+        String vouNo = milling.getKey().getVouNo();
+        for (int i = 0; i < listUsage.size(); i++) {
+            MillingUsage cSd = listUsage.get(i);
+            if (Util1.isNullOrEmpty(cSd.getKey())) {
+                MillingUsageKey key = new MillingUsageKey();
+                key.setCompCode(milling.getKey().getCompCode());
+                key.setVouNo(vouNo);
+                key.setUniqueId(0);
+                cSd.setKey(key);
+            }
+            if (cSd.getStockCode() != null) {
+                if (cSd.getKey().getUniqueId() == 0) {
+                    if (i == 0) {
+                        cSd.getKey().setUniqueId(1);
+                    } else {
+                        MillingUsage pSd = listUsage.get(i - 1);
+                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                    }
+                }
+                usageDao.save(cSd);
+            }
+        }
     }
 
     @Override

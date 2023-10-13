@@ -17,6 +17,7 @@ public class VLanding {
     private double purAmt;
     private double purWeight;
     private double purWeightTotal;
+    private double overPayment;
 
     private String vouNo;
     private String vouDate;
@@ -31,5 +32,7 @@ public class VLanding {
     private String locName;
     private String stockName;
     private String gradeStockName;
+    private String regionName;
+    private String traderPhoneNo;
     List<VLanding> listDetail;
 }

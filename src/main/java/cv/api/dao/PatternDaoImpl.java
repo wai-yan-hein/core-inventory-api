@@ -69,6 +69,7 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
                     p.setUnitCode(rs.getString("unit"));
                     p.setPriceTypeCode(rs.getString("price_type"));
                     p.setPriceTypeName(rs.getString("desp"));
+                    p.setUserCode(rs.getString("user_code"));
                     listP.add(p);
                 }
             } catch (Exception e) {

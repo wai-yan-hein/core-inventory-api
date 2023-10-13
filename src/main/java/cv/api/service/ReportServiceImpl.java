@@ -1630,30 +1630,57 @@ public class ReportServiceImpl implements ReportService {
                                                        boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                        String compCode, Integer macId, boolean summary) {
         calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO);
-        String sql = """
+        List<VStockBalance> list = new ArrayList<>();
+        if(summary){
+            String sql= """
+                    select a.*,s.stock_name,s.user_code
+                    from (
+                    select stock_code, comp_code,sum(qty) qty, sum(weight) weight
+                    from tmp_stock_balance
+                    where mac_id=?
+                    group by stock_code
+                    )a
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code  
+                    """;
+            ResultSet rs = reportDao.getResultSql(sql, macId);
+            try {
+                while (rs.next()) {
+                    VStockBalance b = new VStockBalance();
+                    b.setUserCode(rs.getString("user_code"));
+                    b.setStockName(rs.getString("stock_name"));
+                    b.setTotalQty(rs.getDouble("qty"));
+                    b.setWeight(rs.getDouble("weight"));
+                    b.setLocationName("All");
+                    list.add(b);
+                }
+            } catch (Exception e) {
+                log.error("getStockBalanceByWeight : " + e.getMessage());
+            }
+        }else {
+            String sql = """
                 select t.*,s.user_code,s.stock_name,l.loc_name
                 from tmp_stock_balance t join stock s
                 on t.stock_code = s.stock_code
                 and t.comp_code = s.comp_code
-                join location l on t.loc_code
+                join location l on t.loc_code= l.loc_code
                 and t.comp_code = l.comp_code
                 where t.mac_id =?""";
-        ResultSet rs = reportDao.getResultSql(sql, macId);
-        List<VStockBalance> list = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                VStockBalance b = new VStockBalance();
-                b.setUserCode(rs.getString("user_code"));
-                b.setStockName(rs.getString("stock_name"));
-                b.setTotalQty(rs.getDouble("qty"));
-                b.setWeight(rs.getDouble("weight"));
-                b.setLocationName(rs.getString("loc_name"));
-                list.add(b);
+            ResultSet rs = reportDao.getResultSql(sql, macId);
+            try {
+                while (rs.next()) {
+                    VStockBalance b = new VStockBalance();
+                    b.setUserCode(rs.getString("user_code"));
+                    b.setStockName(rs.getString("stock_name"));
+                    b.setTotalQty(rs.getDouble("qty"));
+                    b.setWeight(rs.getDouble("weight"));
+                    b.setLocationName(rs.getString("loc_name"));
+                    list.add(b);
+                }
+            } catch (Exception e) {
+                log.error("getStockBalanceByWeight : " + e.getMessage());
             }
-        } catch (Exception e) {
-            log.error("getStockBalanceByWeight : " + e.getMessage());
         }
-
         return list;
     }
 
@@ -4204,10 +4231,10 @@ public class ReportServiceImpl implements ReportService {
         VLanding header = new VLanding();
         List<VLanding> list = new ArrayList<>();
         String sql = """
-                select a.*,t.trader_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name
+                select a.*,t.trader_name,t.phone,r.reg_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name,u.unit_name
                 from (
                 select lh.vou_no,vou_date,trader_code,loc_code,gross_qty,qty,unit,weight,
-                total_weight,price,amount,remark,cargo,lh.comp_code,lh.stock_code,lhg.stock_code grade_stock_code
+                total_weight,price,amount,over_payment,remark,cargo,lh.comp_code,lh.stock_code,lhg.stock_code grade_stock_code
                 from landing_his lh join landing_his_grade lhg
                 where lh.vou_no = lhg.vou_no
                 and lh.comp_code = lhg.comp_code
@@ -4217,12 +4244,16 @@ public class ReportServiceImpl implements ReportService {
                 )a
                 join trader t on a.trader_code = t.code
                 and t.comp_code = t.comp_code
+                left join region r on t.reg_code = r.reg_code
+                and t.comp_code = r.comp_code
                 join location l on a.loc_code = l.loc_code
                 and a.comp_code = l.comp_code
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
                 join stock s1 on a.grade_stock_code = s1.stock_code
-                and a.comp_code = s1.comp_code""";
+                and a.comp_code = s1.comp_code
+                join stock_unit u on a.unit = u.unit_code
+                and a.comp_code = u.comp_code""";
         try {
             ResultSet rs = getResult(sql, vouNo, compCode);
             //vou_no, vou_date, trader_code, loc_code, gross_qty, qty, unit, weight, total_weight, price,
@@ -4239,9 +4270,14 @@ public class ReportServiceImpl implements ReportService {
                 header.setRemark(rs.getString("remark"));
                 header.setCargo(rs.getString("cargo"));
                 header.setTraderName(rs.getString("trader_name"));
+                header.setRegionName(rs.getString("reg_name"));
+                header.setTraderPhoneNo(rs.getString("phone"));
+                header.setRemark(rs.getString("remark"));
                 header.setLocName(rs.getString("loc_name"));
                 header.setStockName(rs.getString("stock_name"));
                 header.setGradeStockName(rs.getString("grade_stock_name"));
+                header.setUnit(rs.getString("unit_name"));
+                header.setOverPayment(rs.getDouble("over_payment"));
             }
         } catch (Exception e) {
             log.error("getLandingReport : " + e.getMessage());

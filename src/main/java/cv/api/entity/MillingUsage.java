@@ -18,6 +18,8 @@ public class MillingUsage {
     private Double qty;
     @Column(name = "unit")
     private String unit;
+    @Column(name = "loc_code")
+    private String locCode;
     private transient String userCode;
     private transient String stockName;
 }
