@@ -23,9 +23,8 @@ public class LabourGroupServiceImpl implements LabourGroupService{
     @Override
     public LabourGroup save(LabourGroup status) {
         if (Objects.isNull(status.getKey().getCode())) {
-            Integer macId = status.getMacId();
             String compCode = status.getKey().getCompCode();
-            status.getKey().setCode(getLabourGroupCode(macId, compCode));
+            status.getKey().setCode(getCode(compCode));
         }
         return dao.save(status);
     }
@@ -65,8 +64,8 @@ public class LabourGroupServiceImpl implements LabourGroupService{
         return dao.getLabourGroup(updatedDate);
     }
 
-    private String getLabourGroupCode(Integer macId, String compCode) {
-        int seqNo = seqService.getSequence(macId, "LabourGroup", "-", compCode);
-        return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 4 + "d", seqNo);
+    private String getCode(String compCode) {
+        int seqNo = seqService.getSequence(0, "LabourGroup", "-", compCode);
+        return String.format("%0" + 3 + "d", seqNo);
     }
 }
