@@ -1326,6 +1326,41 @@ create table milling_usage (
   primary key (vou_no,comp_code,unique_id)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
+ALTER TABLE tmp_stock_opening
+ADD COLUMN ttl_weight FLOAT(20,3) NULL AFTER dept_id;
+
+alter table tmp_stock_io_column
+add column op_weight float(20,3) not null after dept_id,
+add column pur_weight float(20,3) not null after op_weight,
+add column in_weight float(20,3) not null after pur_weight,
+add column sale_weight float(20,3) not null after in_weight,
+add column out_weight float(20,3) not null after sale_weight;
+
+alter table tmp_stock_io_column
+change column op_weight op_weight float(20,3) not null default 0 ,
+change column pur_weight pur_weight float(20,3) not null default 0 ,
+change column in_weight in_weight float(20,3) not null default 0 ,
+change column sale_weight sale_weight float(20,3) not null default 0 ,
+change column out_weight out_weight float(20,3) not null default 0 ;
+
+create table labour_group (
+  code varchar(15) not null,
+  name varchar(255) default null,
+  created_by varchar(15) default null,
+  created_date date default null,
+  updated_by varchar(15) default null,
+  updated_date timestamp not null default current_timestamp() on update current_timestamp(),
+  mac_id int(11) default null,
+  comp_code varchar(15) not null,
+  user_code varchar(15) default null,
+  dept_id int(11) not null default 1,
+  intg_upd_status varchar(15) default null,
+  active bit(1) not null default b'1',
+  member_count int(5) default null,
+  primary key (code,dept_id,comp_code)
+) engine=innodb default charset=utf8mb3;
+
+
 
 #view
 drop view if exists v_milling_output;

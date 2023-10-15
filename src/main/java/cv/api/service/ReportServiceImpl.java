@@ -1631,8 +1631,8 @@ public class ReportServiceImpl implements ReportService {
                                                        String compCode, Integer macId, boolean summary) {
         calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO);
         List<VStockBalance> list = new ArrayList<>();
-        if(summary){
-            String sql= """
+        if (summary) {
+            String sql = """
                     select a.*,s.stock_name,s.user_code
                     from (
                     select stock_code, comp_code,sum(qty) qty, sum(weight) weight
@@ -1657,15 +1657,15 @@ public class ReportServiceImpl implements ReportService {
             } catch (Exception e) {
                 log.error("getStockBalanceByWeight : " + e.getMessage());
             }
-        }else {
+        } else {
             String sql = """
-                select t.*,s.user_code,s.stock_name,l.loc_name
-                from tmp_stock_balance t join stock s
-                on t.stock_code = s.stock_code
-                and t.comp_code = s.comp_code
-                join location l on t.loc_code= l.loc_code
-                and t.comp_code = l.comp_code
-                where t.mac_id =?""";
+                    select t.*,s.user_code,s.stock_name,l.loc_name
+                    from tmp_stock_balance t join stock s
+                    on t.stock_code = s.stock_code
+                    and t.comp_code = s.comp_code
+                    join location l on t.loc_code= l.loc_code
+                    and t.comp_code = l.comp_code
+                    where t.mac_id =?""";
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
                 while (rs.next()) {
@@ -1780,7 +1780,7 @@ public class ReportServiceImpl implements ReportService {
                 "and comp_code ='" + compCode + "'\n" +
                 "and grade_stock_code ='" + stockCode + "'\n" +
                 "and purchase = true\n" +
-                "and choose = true\n"+
+                "and choose = true\n" +
                 "group by loc_code\n" +
                 "\tunion all\n" +
                 "select stock_code,loc_code,sum(tot_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
@@ -4916,13 +4916,13 @@ public class ReportServiceImpl implements ReportService {
                                           String stockCode, boolean calSale, boolean calPur, boolean calRI,
                                           boolean calRO, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
-        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,loc_code,mac_id,'" + compCode + "'," + deptId + "\n" +
+        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,op_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_weight) ttl_weight,loc_code,mac_id,'" + compCode + "'," + deptId + "\n" +
                 "from tmp_stock_opening tmp \n" +
                 "where mac_id =" + macId + "\n" +
                 "group by tran_date,stock_code,mac_id";
-        String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Purchase',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,pur_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Purchase',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_purchase\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4934,8 +4934,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'ReturnIn',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'ReturnIn',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_return_in\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4947,8 +4947,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String retOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String retOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_return_out\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4960,8 +4960,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_sale\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4973,8 +4973,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String tfSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight)*-1 ttl_weight,loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String tfSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_transfer\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4986,8 +4986,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String ttSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Transfer-T',vou_date vou_date,vou_no,remark,stock_code,sum(total_weight)*-1 ttl_weight,loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String ttSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'Transfer-T',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_transfer\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -4999,8 +4999,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'UM-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'UM-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(tot_qty)*-1 ttl_qty,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_milling_raw\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -5012,8 +5012,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,weight_unit";
-        String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'UM-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+        String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'UM-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(tot_qty) ttl_qty,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_milling_output\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -5039,10 +5039,10 @@ public class ReportServiceImpl implements ReportService {
         //delete tmp
         String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
         //opening
-        String opSql = "insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,loc_code,unit,comp_code,dept_id,mac_id)\n" +
-                "select '" + opDate + "' op_date ,stock_code,sum(qty) ttl_qty,loc_code,weight_unit,'" + compCode + "'," + deptId + "," + macId + " \n" +
+        String opSql = "insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,ttl_weight,loc_code,unit,comp_code,dept_id,mac_id)\n" +
+                "select '" + opDate + "' op_date ,stock_code,sum(qty) ttl_qty,sum(weight) ttl_weight,loc_code,weight_unit,'" + compCode + "'," + deptId + "," + macId + " \n" +
                 "from (\n" +
-                "select stock_code,sum(total_weight) qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(total_weight) weight,sum(qty) qty,loc_code, weight_unit\n" +
                 "from v_opening\n" +
                 "where date(op_date) = '" + opDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5053,9 +5053,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight) qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(total_weight) weight,sum(qty) qty,loc_code, weight_unit\n" +
                 "from v_purchase\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5066,9 +5066,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight) qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(total_weight) weight,sum(qty) qty,loc_code, weight_unit\n" +
                 "from v_return_in\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5079,9 +5079,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight)*-1 qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty,loc_code, weight_unit\n" +
                 "from v_return_out\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5092,9 +5092,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight)*-1 qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty,loc_code, weight_unit\n" +
                 "from v_sale\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5105,9 +5105,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight)*-1 qty,loc_code_from, weight_unit\n" +
+                "select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty,loc_code_from, weight_unit\n" +
                 "from v_transfer\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5118,9 +5118,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight) qty,loc_code_to, weight_unit\n" +
+                "select stock_code,sum(total_weight) weight,sum(qty) qty,loc_code_to, weight_unit\n" +
                 "from v_transfer\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5131,9 +5131,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(tot_weight)*-1 qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(tot_weight)*-1 weight,sum(qty)*-1 qty,loc_code, weight_unit\n" +
                 "from v_milling_raw\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5144,9 +5144,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(tot_weight) qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(tot_weight) weight,sum(qty) qty,loc_code, weight_unit\n" +
                 "from v_milling_output\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
@@ -5157,9 +5157,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit\n" +
+                "group by stock_code\n" +
                 ")a\n" +
-                "group by stock_code,weight_unit";
+                "group by stock_code";
         reportDao.executeSql(delSql, opSql);
     }
 
