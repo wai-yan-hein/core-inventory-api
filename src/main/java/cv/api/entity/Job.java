@@ -23,6 +23,8 @@ public class Job {
     private Date endDate;
     @Column(name = "finished")
     private boolean finished;
+    @Column(name = "deleted")
+    private boolean deleted;
     @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
     @Column(name = "updated_by")

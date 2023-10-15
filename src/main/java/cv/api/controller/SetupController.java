@@ -76,6 +76,8 @@ public class SetupController {
     @Autowired
     private LabourGroupService labourGroupService;
     @Autowired
+    private JobService jobService;
+    @Autowired
     private StockFormulaService stockFormulaService;
 
     @GetMapping(path = "/hello")
@@ -516,6 +518,13 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
+    @PostMapping(path = "/saveJob")
+    public Mono<Job> saveJob(@RequestBody Job job) {
+        job.setUpdatedDate(Util1.getTodayLocalDate());
+        Job b = jobService.save(job);
+        return Mono.justOrEmpty(b);
+    }
+
     @GetMapping(path = "/getOrderStatus")
     public Flux<?> getOrderStatus(@RequestParam String compCode) {
         return Flux.fromIterable(orderStatusService.findAll(compCode));
@@ -526,6 +535,10 @@ public class SetupController {
         return Flux.fromIterable(labourGroupService.findAll(compCode));
     }
 
+    @GetMapping(path = "/getJob")
+    public Flux<?> getJob(@RequestParam String compCode) {
+        return Flux.fromIterable(jobService.findAll(compCode));
+    }
     @GetMapping(path = "/getUpdateOrderStatus")
     public Flux<?> getUpdateOrderStatus(@RequestParam String updatedDate) {
         return Flux.fromIterable(orderStatusService.getOrderStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
