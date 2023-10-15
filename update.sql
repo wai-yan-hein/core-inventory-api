@@ -1362,6 +1362,19 @@ create table labour_group (
   primary key (code,dept_id,comp_code)
 ) engine=innodb default charset=utf8mb3;
 
+create table job (
+  job_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  job_name varchar(255) not null,
+  start_date date not null,
+  end_date date null,
+  updated_date timestamp not null default current_timestamp(),
+  created_date timestamp not null,
+  created_by varchar(15) not null,
+  updated_by varchar(15) null default null,
+  deleted bit(1) not null,
+  finished bit(1) not null,
+  primary key (job_no, comp_code));
 
 
 #view
