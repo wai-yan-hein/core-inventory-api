@@ -22,7 +22,7 @@ public class LandingHisGradeDaoImpl extends AbstractDao<LandingHisGradeKey, Land
     public List<LandingHisGrade> getLandingGrade(String vouNo, String compCode) {
         List<LandingHisGrade> list = new ArrayList<>();
         String sql = """
-                select g.*,s.stock_name
+                select g.*,s.stock_name,s.user_code
                 from landing_his_grade g join stock s
                 on g.stock_code = s.stock_code
                 and g.comp_code = s.comp_code
@@ -39,6 +39,7 @@ public class LandingHisGradeDaoImpl extends AbstractDao<LandingHisGradeKey, Land
                 key.setCompCode(rs.getString("comp_code"));
                 key.setUniqueId(rs.getInt("unique_id"));
                 g.setKey(key);
+                g.setUserCode(rs.getString("user_code"));
                 g.setStockName(rs.getString("stock_name"));
                 g.setChoose(rs.getBoolean("choose"));
                 g.setMatchCount(rs.getDouble("match_count"));

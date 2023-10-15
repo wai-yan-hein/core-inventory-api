@@ -40,46 +40,22 @@ public class LandingHis {
     private String locCode;
     @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "gross_qty")
-    private Double grossQty;
-    @Column(name = "qty")
-    private Double qty;
-    @Column(name = "unit")
-    private String unit;
-    @Column(name = "weight")
-    private Double weight;
-    @Column(name = "weight_unit")
-    private String weightUnit;
-    @Column(name = "total_weight")
-    private Double totalWeight;
-    @Column(name = "price")
-    private Double price;
     @Column(name = "amount")
     private Double amount;
-    @Column(name = "criteria_amt")
-    private Double criteriaAmt;
     @Column(name = "pur_amt")
     private Double purAmt;
     @Column(name = "pur_price")
     private Double purPrice;
+    @Column(name = "price")
+    private Double price;
+    @Column(name = "criteria_amt")
+    private Double criteriaAmt;
     @Column(name = "cargo")
     private String cargo;
-    @Column(name = "vou_paid")
-    private Double vouPaid;
-    @Column(name = "vou_balance")
-    private Double vouBalance;
-    @Column(name = "purchase")
-    private boolean purchase;
-    @Column(name = "vou_discount")
-    private Double vouDiscount;
-    @Column(name = "grand_total")
-    private Double grandTotal;
     @Column(name = "cur_code")
     private String curCode;
-    @Column(name = "intg_upd_status")
-    private String intgUpdStatus;
-    @Column(name = "over_payment")
-    private Double overPayment;
+    @Column(name = "gross_qty")
+    private Double grossQty;
     @Transient
     private List<LandingHisPrice> listPrice;
     @Transient

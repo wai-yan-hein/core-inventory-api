@@ -75,11 +75,13 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
                 v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
-                v.paid,v.vou_balance,
-                t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,v.comp_code,c.cat_name
+                v.paid,v.vou_balance,t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,
+                v.comp_code,c.cat_name,r.reg_name
                 from v_sale v join trader t
                 on v.trader_code = t.code
                 and v.comp_code = t.comp_code
+                left join region r on t.reg_code = r.reg_code
+                and t.comp_code = r.comp_code
                 join location l on v.loc_code = l.loc_code
                 and v.comp_code = l.comp_code
                 left join category c on v.cat_code = c.cat_code
@@ -125,6 +127,7 @@ public class ReportServiceImpl implements ReportService {
             sale.setCreatedBy(rs.getString("created_by"));
             sale.setCompCode(rs.getString("comp_code"));
             sale.setCategoryName(rs.getString("cat_name"));
+            sale.setRegionName(rs.getString("reg_name"));
             double weight = rs.getDouble("weight");
             if (weight > 0) {
                 sale.setWeight(weight);
@@ -1631,8 +1634,8 @@ public class ReportServiceImpl implements ReportService {
                                                        String compCode, Integer macId, boolean summary) {
         calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO);
         List<VStockBalance> list = new ArrayList<>();
-        if(summary){
-            String sql= """
+        if (summary) {
+            String sql = """
                     select a.*,s.stock_name,s.user_code
                     from (
                     select stock_code, comp_code,sum(qty) qty, sum(weight) weight
@@ -1641,7 +1644,7 @@ public class ReportServiceImpl implements ReportService {
                     group by stock_code
                     )a
                     join stock s on a.stock_code = s.stock_code
-                    and a.comp_code = s.comp_code  
+                    and a.comp_code = s.comp_code
                     """;
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
@@ -1657,15 +1660,15 @@ public class ReportServiceImpl implements ReportService {
             } catch (Exception e) {
                 log.error("getStockBalanceByWeight : " + e.getMessage());
             }
-        }else {
+        } else {
             String sql = """
-                select t.*,s.user_code,s.stock_name,l.loc_name
-                from tmp_stock_balance t join stock s
-                on t.stock_code = s.stock_code
-                and t.comp_code = s.comp_code
-                join location l on t.loc_code= l.loc_code
-                and t.comp_code = l.comp_code
-                where t.mac_id =?""";
+                    select t.*,s.user_code,s.stock_name,l.loc_name
+                    from tmp_stock_balance t join stock s
+                    on t.stock_code = s.stock_code
+                    and t.comp_code = s.comp_code
+                    join location l on t.loc_code= l.loc_code
+                    and t.comp_code = l.comp_code
+                    where t.mac_id =?""";
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
                 while (rs.next()) {
@@ -1780,7 +1783,7 @@ public class ReportServiceImpl implements ReportService {
                 "and comp_code ='" + compCode + "'\n" +
                 "and grade_stock_code ='" + stockCode + "'\n" +
                 "and purchase = true\n" +
-                "and choose = true\n"+
+                "and choose = true\n" +
                 "group by loc_code\n" +
                 "\tunion all\n" +
                 "select stock_code,loc_code,sum(tot_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
@@ -4229,12 +4232,12 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public VLanding getLandingReport(String vouNo, String compCode) {
         VLanding header = new VLanding();
-        List<VLanding> list = new ArrayList<>();
+        List<VLanding> listPrice = new ArrayList<>();
+        List<VLanding> listQty = new ArrayList<>();
         String sql = """
-                select a.*,t.trader_name,t.phone,r.reg_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name,u.unit_name
-                from (
-                select lh.vou_no,vou_date,trader_code,loc_code,gross_qty,qty,unit,weight,
-                total_weight,price,amount,over_payment,remark,cargo,lh.comp_code,lh.stock_code,lhg.stock_code grade_stock_code
+                select a.*,t.trader_name,t.phone,r.reg_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name                from (
+                select lh.vou_no,vou_date,trader_code,loc_code,gross_qty,
+                price,amount,remark,cargo,lh.comp_code,lh.stock_code,lhg.stock_code grade_stock_code
                 from landing_his lh join landing_his_grade lhg
                 where lh.vou_no = lhg.vou_no
                 and lh.comp_code = lhg.comp_code
@@ -4251,9 +4254,7 @@ public class ReportServiceImpl implements ReportService {
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
                 join stock s1 on a.grade_stock_code = s1.stock_code
-                and a.comp_code = s1.comp_code
-                join stock_unit u on a.unit = u.unit_code
-                and a.comp_code = u.comp_code""";
+                and a.comp_code = s1.comp_code""";
         try {
             ResultSet rs = getResult(sql, vouNo, compCode);
             //vou_no, vou_date, trader_code, loc_code, gross_qty, qty, unit, weight, total_weight, price,
@@ -4261,10 +4262,6 @@ public class ReportServiceImpl implements ReportService {
             if (rs.next()) {
                 header.setVouNo(rs.getString("vou_no"));
                 header.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                header.setPurQty(rs.getDouble("qty"));
-                header.setUnit(rs.getString("unit"));
-                header.setWeight(rs.getDouble("weight"));
-                header.setTotalWeight(rs.getDouble("total_weight"));
                 header.setPurPrice(rs.getDouble("price"));
                 header.setPurAmt(rs.getDouble("amount"));
                 header.setRemark(rs.getString("remark"));
@@ -4276,14 +4273,13 @@ public class ReportServiceImpl implements ReportService {
                 header.setLocName(rs.getString("loc_name"));
                 header.setStockName(rs.getString("stock_name"));
                 header.setGradeStockName(rs.getString("grade_stock_name"));
-                header.setUnit(rs.getString("unit_name"));
-                header.setOverPayment(rs.getDouble("over_payment"));
+                header.setGrossQty(rs.getDouble("gross_qty"));
             }
         } catch (Exception e) {
             log.error("getLandingReport : " + e.getMessage());
         }
         String sql2 = """
-                select 1 tran_type,s.criteria_name,percent,percent_allow,price,amount
+                select s.criteria_name,percent,percent_allow,price,amount
                 from landing_his_price l join stock_criteria s
                 on l.criteria_code = s.criteria_code
                 and l.comp_code =s.comp_code
@@ -4292,21 +4288,46 @@ public class ReportServiceImpl implements ReportService {
                 and l.percent>0
                 order by l.unique_id""";
         try {
-            ResultSet rs = getResult(sql2, vouNo, compCode, vouNo, compCode);
+            ResultSet rs = getResult(sql2, vouNo, compCode);
             while (rs.next()) {
                 VLanding l = new VLanding();
-                l.setTranType(rs.getString("tran_type"));
                 l.setCriteriaName(rs.getString("criteria_name"));
                 l.setPercent(rs.getDouble("percent"));
                 l.setPercentAllow(rs.getDouble("percent_allow"));
                 l.setPrice(rs.getDouble("price"));
                 l.setAmount(rs.getDouble("amount"));
-                list.add(l);
+                listPrice.add(l);
             }
         } catch (Exception e) {
             log.error("getLandingReport : " + e.getMessage());
         }
-        header.setListDetail(list);
+        String sql3 = """
+                select s.criteria_name,percent,percent_allow,qty,total_qty
+                from landing_his_qty l join stock_criteria s
+                on l.criteria_code = s.criteria_code
+                and l.comp_code =s.comp_code
+                where l.vou_no=?
+                and l.comp_code=?
+                and l.percent>0
+                order by l.unique_id""";
+        try {
+            ResultSet rs = getResult(sql3, vouNo, compCode, vouNo, compCode);
+            while (rs.next()) {
+                VLanding l = new VLanding();
+                l.setCriteriaName(rs.getString("criteria_name"));
+                l.setPercent(rs.getDouble("percent"));
+                l.setPercentAllow(rs.getDouble("percent_allow"));
+                l.setQty(rs.getDouble("qty"));
+                l.setTotalQty(rs.getDouble("total_qty"));
+                l.setGrossQty(header.getGrossQty());
+                l.setUnitName(header.getUnitName());
+                listQty.add(l);
+            }
+        } catch (Exception e) {
+            log.error("getLandingReport : " + e.getMessage());
+        }
+        header.setListPrice(listPrice);
+        header.setListQty(listQty);
         return header;
     }
 

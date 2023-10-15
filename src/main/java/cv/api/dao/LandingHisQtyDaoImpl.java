@@ -65,4 +65,5 @@ public class LandingHisQtyDaoImpl extends AbstractDao<LandingHisQtyKey, LandingH
     }
 
 
+
 }

@@ -128,7 +128,6 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
     public boolean updateIntgStatus(LandingHisKey key, String status) {
         LandingHis h = getByKey(key);
         if (h != null) {
-            h.setIntgUpdStatus(status);
             h.setUpdatedDate(LocalDateTime.now());
             update(h);
         }

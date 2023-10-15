@@ -1299,7 +1299,9 @@ create table landing_his_criteria (
 alter table stock
 add column formula_code varchar(15) null after sale_qty,
 add column sale_amt double(20,3) not null default 0 after formula_code,
-add column pur_amt double(20,3) not null default 0 after sale_amt;
+add column pur_amt double(20,3) not null default 0 after sale_amt,
+add column pur_qty double(20,3) null after pur_amt;
+
 
 drop table if exists tmp_stock_balance;
 create table tmp_stock_balance (
