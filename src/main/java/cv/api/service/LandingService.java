@@ -17,11 +17,12 @@ public interface LandingService {
     boolean restore(LandingHisKey key);
     List<LandingHisPrice> getLandingPrice(String vouNo, String compCode);
     List<LandingHisQty> getLandingQty(String vouNo, String compCode);
+    LandingHisGrade getLandingChooseGrade(String vouNo, String compCode);
+
     List<LandingHisGrade> getLandingGrade(String vouNo, String compCode);
 
     List<LandingHis> getLandingHistory(String fromDate, String toDate,String traderCode, String vouNo,
                             String remark, String userCode, String stockCode, String locCode,
                             String compCode, Integer deptId, boolean deleted);
     List<LandingHis> unUploadVoucher(LocalDateTime syncDate);
-    boolean updateIntgStatus(LandingHisKey key,String status);
 }

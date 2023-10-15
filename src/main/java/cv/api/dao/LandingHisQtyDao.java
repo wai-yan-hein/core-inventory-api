@@ -12,4 +12,5 @@ public interface LandingHisQtyDao {
     boolean delete(LandingHisQtyKey key);
 
     List<LandingHisQty> getLandingQty(String vouNo, String compCode);
+
 }

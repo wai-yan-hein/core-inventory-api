@@ -50,6 +50,10 @@ public class LandingController {
     public Flux<?> getLandingQty(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(landingService.getLandingQty(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
+    @GetMapping(path = "/getLandingChooseGrade")
+    public Mono<?> getLandingChooseQty(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Mono.justOrEmpty(landingService.getLandingChooseGrade(vouNo, compCode)).onErrorResume(throwable -> Mono.empty());
+    }
     @GetMapping(path = "/getLandingHisGrade")
     public Flux<?> getLandingGrade(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(landingService.getLandingGrade(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());

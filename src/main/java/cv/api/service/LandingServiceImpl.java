@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -155,6 +156,16 @@ public class LandingServiceImpl implements LandingService {
     }
 
     @Override
+    public LandingHisGrade getLandingChooseGrade(String vouNo, String compCode) {
+        List<LandingHisGrade> list = gradeDao.getLandingGrade(vouNo, compCode);
+        Optional<LandingHisGrade> firstMatchingGrade = list.stream()
+                .filter(LandingHisGrade::isChoose)
+                .findFirst();
+        return firstMatchingGrade.orElse(null);
+
+    }
+
+    @Override
     public List<LandingHisGrade> getLandingGrade(String vouNo, String compCode) {
         return gradeDao.getLandingGrade(vouNo, compCode);
     }
@@ -168,11 +179,6 @@ public class LandingServiceImpl implements LandingService {
     @Override
     public List<LandingHis> unUploadVoucher(LocalDateTime syncDate) {
         return dao.unUploadVoucher(syncDate);
-    }
-
-    @Override
-    public boolean updateIntgStatus(LandingHisKey key, String status) {
-        return dao.updateIntgStatus(key, status);
     }
 
 

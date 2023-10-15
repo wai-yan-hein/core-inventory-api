@@ -102,6 +102,8 @@ public class Stock {
     private double purAmt;
     @Column(name = "sale_amt")
     private double saleAmt;
+    @Column(name = "pur_qty")
+    private Double purQty;
     @Transient
     private String relName;
     @Transient

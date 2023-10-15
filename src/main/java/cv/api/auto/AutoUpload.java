@@ -6,7 +6,6 @@ import cv.api.repo.AccountRepo;
 import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -28,7 +27,6 @@ public class AutoUpload {
     private final RetOutService retOutService;
     private final TraderService traderService;
     private final PaymentHisService paymentHisService;
-    private final LandingService landingService;
     private boolean syncing = false;
     private final AccountRepo accountRepo;
     private final Environment environment;
@@ -96,21 +94,6 @@ public class AutoUpload {
         }
     }
 
-    private void uploadLandingVoucher() {
-        List<LandingHis> vouchers = landingService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
-        if (!vouchers.isEmpty()) {
-            log.info(String.format("uploadPurchaseVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> {
-                if (vou.isDeleted()) {
-                    accountRepo.deleteInvVoucher(vou.getKey());
-                } else if (vou.isPurchase()) {
-                    accountRepo.sendLandingPurchase(vou);
-                } else {
-                    landingService.updateIntgStatus(vou.getKey(),"L");
-                }
-            });
-        }
-    }
 
     private void uploadReturnInVoucher() {
         List<RetInHis> vouchers = retInService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
