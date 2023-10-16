@@ -51,6 +51,10 @@ public class StockInOut implements Serializable {
     private Boolean deleted;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "labour_group_code")
+    private String labourGroupCode;
+    @Column(name = "job_code")
+    private String jobCode;
     @Transient
     private String status = "STATUS";
     @Transient

@@ -468,6 +468,7 @@ public class SetupController {
     public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
+
     @PostMapping(path = "/deleteStock")
     public Flux<?> deleteStock(@RequestBody StockKey key) {
         List<General> str = stockService.delete(key);
@@ -539,6 +540,7 @@ public class SetupController {
     public Flux<?> getJob(@RequestParam String compCode) {
         return Flux.fromIterable(jobService.findAll(compCode));
     }
+
     @GetMapping(path = "/getUpdateOrderStatus")
     public Flux<?> getUpdateOrderStatus(@RequestParam String updatedDate) {
         return Flux.fromIterable(orderStatusService.getOrderStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
@@ -547,6 +549,18 @@ public class SetupController {
     @PostMapping(path = "/findOrderStatus")
     public Mono<OrderStatus> findOrderStatus(@RequestBody OrderStatusKey key) {
         OrderStatus b = orderStatusService.findById(key);
+        return Mono.justOrEmpty(b);
+    }
+
+    @PostMapping(path = "/findLabourGroup")
+    public Mono<LabourGroup> findOrderStatus(@RequestBody LabourGroupKey key) {
+        LabourGroup b = labourGroupService.findById(key);
+        return Mono.justOrEmpty(b);
+    }
+
+    @PostMapping(path = "/findJob")
+    public Mono<Job> findOrderStatus(@RequestBody JobKey key) {
+        Job b = jobService.findById(key);
         return Mono.justOrEmpty(b);
     }
 

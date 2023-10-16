@@ -3117,7 +3117,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";
         }
         String sql = "select v.vou_date,v.vou_no,v.remark,v.ref_no,v.created_by," +
-                "v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name,t.trader_name\n" +
+                "v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name,t.trader_name, v.labour_group_code, v.job_code\n" +
                 "from v_transfer v join location l\n" +
                 "on v.loc_code_from = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
