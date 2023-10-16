@@ -6,9 +6,11 @@
 package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cv.api.entity.VouDiscount;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * @author wai yan
@@ -91,5 +93,8 @@ public class VSale {
     private String payDate;
     private Integer vouCount;
     private Double totalQty;
+    private String saleUnitName;
+    private String weightUnitName;
+    List<VouDiscount> listDiscount;
 
 }

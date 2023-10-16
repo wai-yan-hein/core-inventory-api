@@ -10,6 +10,7 @@ import cv.api.dao.ReportDao;
 import cv.api.dao.UnitRelationDetailDao;
 import cv.api.entity.*;
 import cv.api.model.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,13 @@ import java.util.*;
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
     private final DecimalFormat formatter = new DecimalFormat("###.##");
     private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
-    @Autowired
-    private ReportDao reportDao;
-    @Autowired
-    private UnitRelationDetailDao detailDao;
+    private final ReportDao reportDao;
+    private final UnitRelationDetailDao detailDao;
+    private final SaleHisService saleHisService;
 
     @Override
     public void executeSql(String... sql) {
@@ -76,7 +77,7 @@ public class ReportServiceImpl implements ReportService {
                 select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
                 v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
                 v.paid,v.vou_balance,t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,
-                v.comp_code,c.cat_name,r.reg_name
+                v.comp_code,c.cat_name,r.reg_name,u1.unit_name sale_unit_name,u2.unit_name weight_unit_name
                 from v_sale v join trader t
                 on v.trader_code = t.code
                 and v.comp_code = t.comp_code
@@ -86,6 +87,10 @@ public class ReportServiceImpl implements ReportService {
                 and v.comp_code = l.comp_code
                 left join category c on v.cat_code = c.cat_code
                 and v.comp_code = c.comp_code
+                join stock_unit u1 on v.sale_unit = u1.unit_code
+                and v.comp_code = u1.comp_code
+                join stock_unit u2 on v.weight_unit = u2.unit_code
+                and v.comp_code = u2.comp_code
                 where v.vou_no =?
                 and v.comp_code =?""";
         ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
@@ -93,7 +98,6 @@ public class ReportServiceImpl implements ReportService {
             VSale sale = new VSale();
             String remark = rs.getString("remark");
             String refNo = "-";
-
             if (remark != null) {
                 if (remark.contains("/")) {
                     try {
@@ -128,12 +132,18 @@ public class ReportServiceImpl implements ReportService {
             sale.setCompCode(rs.getString("comp_code"));
             sale.setCategoryName(rs.getString("cat_name"));
             sale.setRegionName(rs.getString("reg_name"));
+            sale.setSaleUnitName(rs.getString("sale_unit_name"));
+            sale.setWeightUnitName(rs.getString("weight_unit_name"));
             double weight = rs.getDouble("weight");
             if (weight > 0) {
                 sale.setWeight(weight);
                 sale.setWeightUnit(rs.getString("weight_unit"));
             }
             saleList.add(sale);
+        }
+        if (!saleList.isEmpty()) {
+            List<VouDiscount> listDis = saleHisService.getVoucherDiscount(vouNo, compCode);
+            saleList.get(0).setListDiscount(listDis);
         }
         return saleList;
     }

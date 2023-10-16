@@ -7,11 +7,9 @@ package cv.api.service;
 
 import cv.api.common.General;
 import cv.api.common.Util1;
-import cv.api.dao.SaleExpenseDao;
-import cv.api.dao.SaleHisDao;
-import cv.api.dao.SaleHisDetailDao;
-import cv.api.dao.SeqTableDao;
+import cv.api.dao.*;
 import cv.api.entity.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +26,14 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SaleHisServiceImpl implements SaleHisService {
 
-    @Autowired
-    private SaleHisDao shDao;
-    @Autowired
-    private SaleHisDetailDao sdDao;
-    @Autowired
-    private SeqTableDao seqDao;
-    @Autowired
-    private SaleExpenseDao saleExpenseDao;
+    private final SaleHisDao shDao;
+    private final SaleHisDetailDao sdDao;
+    private final SeqTableDao seqDao;
+    private final SaleExpenseDao saleExpenseDao;
+    private final VouDiscountDao vouDiscountDao;
 
     @Override
     public SaleHis save(@NotNull SaleHis saleHis) {
@@ -48,15 +44,32 @@ public class SaleHisServiceImpl implements SaleHisService {
         List<SaleHisDetail> listSD = saleHis.getListSH();
         List<SaleDetailKey> listDel = saleHis.getListDel();
         List<SaleExpenseKey> listDelExp = saleHis.getListDelExpense();
-        String vouNo = saleHis.getKey().getVouNo();
+        List<VouDiscountKey> listDelVouDiscount = saleHis.getListDelVouDiscount();
         //backup
         if (listDel != null) {
-            listDel.forEach(key -> sdDao.delete(key));
+            listDel.forEach(sdDao::delete);
         }
         if (listDelExp != null) {
-            listDelExp.forEach(key -> saleExpenseDao.delete(key));
+            listDelExp.forEach(saleExpenseDao::delete);
+        }
+        if (listDelVouDiscount != null) {
+            listDelVouDiscount.forEach(vouDiscountDao::delete);
         }
         List<SaleExpense> listExp = saleHis.getListExpense();
+        List<VouDiscount> listDiscount = saleHis.getListVouDiscount();
+        //save expense
+        saveSaleExpense(listExp, saleHis);
+        //save detail
+        saveDetail(listSD, saleHis);
+        //save vou discount
+        saveVouDiscount(listDiscount, saleHis);
+        shDao.save(saleHis);
+        saleHis.setListSH(listSD);
+        return saleHis;
+    }
+
+    private void saveSaleExpense(List<SaleExpense> listExp, SaleHis sh) {
+        String vouNo = sh.getKey().getVouNo();
         if (listExp != null) {
             for (int i = 0; i < listExp.size(); i++) {
                 SaleExpense e = listExp.get(i);
@@ -76,14 +89,20 @@ public class SaleHisServiceImpl implements SaleHisService {
                 }
             }
         }
+    }
+
+    private void saveDetail(List<SaleHisDetail> listSD, SaleHis sh) {
+        String compCode = sh.getKey().getCompCode();
+        String vouNo = sh.getKey().getVouNo();
+        int depId = sh.getDeptId();
         for (int i = 0; i < listSD.size(); i++) {
             SaleHisDetail cSd = listSD.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
                 SaleDetailKey key = new SaleDetailKey();
-                key.setCompCode(saleHis.getKey().getCompCode());
+                key.setCompCode(compCode);
                 key.setVouNo(vouNo);
                 key.setUniqueId(0);
-                cSd.setDeptId(saleHis.getDeptId());
+                cSd.setDeptId(depId);
                 cSd.setKey(key);
             }
             if (cSd.getStockCode() != null) {
@@ -99,9 +118,30 @@ public class SaleHisServiceImpl implements SaleHisService {
                 sdDao.save(cSd);
             }
         }
-        shDao.save(saleHis);
-        saleHis.setListSH(listSD);
-        return saleHis;
+    }
+
+    private void saveVouDiscount(List<VouDiscount> list, SaleHis sh) {
+        String vouNo = sh.getKey().getVouNo();
+        String compCode = sh.getKey().getCompCode();
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                VouDiscount e = list.get(i);
+                if (Util1.getDouble(e.getAmount()) > 0) {
+                    if (e.getKey().getUniqueId() == 0) {
+                        if (i == 0) {
+                            e.getKey().setUniqueId(1);
+                        } else {
+                            VouDiscount pe = list.get(i - 1);
+                            e.getKey().setUniqueId(pe.getKey().getUniqueId() + 1);
+                        }
+                    }
+                    e.getKey().setVouNo(vouNo);
+                    e.getKey().setCompCode(compCode);
+                    vouDiscountDao.save(e);
+
+                }
+            }
+        }
     }
 
     @Override
@@ -161,6 +201,16 @@ public class SaleHisServiceImpl implements SaleHisService {
     @Override
     public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
         return shDao.getVoucherInfo(vouDate, compCode, depId);
+    }
+
+    @Override
+    public List<VouDiscount> getVoucherDiscount(String vouNo, String compCode) {
+        return vouDiscountDao.getVoucherDiscount(vouNo,compCode);
+    }
+
+    @Override
+    public List<VouDiscount> searchDiscountDescription(String str, String compCode) {
+        return vouDiscountDao.getDescription(str,compCode);
     }
 
 

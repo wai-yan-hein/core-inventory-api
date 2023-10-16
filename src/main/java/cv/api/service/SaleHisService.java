@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.common.General;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
+import cv.api.entity.VouDiscount;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -41,6 +42,10 @@ public interface SaleHisService {
     void truncate(SaleHisKey key);
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);
+
+    List<VouDiscount> getVoucherDiscount(String vouNo, String compCode);
+
+    List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
 
 }

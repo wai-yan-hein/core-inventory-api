@@ -47,7 +47,7 @@ public class SaleController {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
-            if(sale.getExpense() == null) {
+            if (sale.getExpense() == null) {
                 sale.setExpense(0.0);
             }
             sale = shService.save(sale);
@@ -107,7 +107,7 @@ public class SaleController {
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
         List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
-                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo,curCode);
+                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo, curCode);
         return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -141,19 +141,33 @@ public class SaleController {
 
     @GetMapping(path = "/getSaleVoucherInfo")
     public Mono<?> getSaleVoucherInfo(@RequestParam String vouDate,
-                                                 @RequestParam String compCode,
-                                                 @RequestParam Integer deptId) {
-        return  Mono.justOrEmpty(shService.getVoucherInfo(vouDate, compCode, deptId));
+                                      @RequestParam String compCode,
+                                      @RequestParam Integer deptId) {
+        return Mono.justOrEmpty(shService.getVoucherInfo(vouDate, compCode, deptId));
     }
 
     @GetMapping(path = "/getSaleByBatch")
     public Flux<?> getSaleByBatch(@RequestParam String batchNo,
-                                            @RequestParam String compCode,
-                                            @RequestParam Integer deptId,
-                                            @RequestParam boolean detail) {
+                                  @RequestParam String compCode,
+                                  @RequestParam Integer deptId,
+                                  @RequestParam boolean detail) {
         if (detail) {
             return Flux.fromIterable(sdService.getSaleByBatchDetail(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
         }
         return Flux.fromIterable(sdService.getSaleByBatch(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
+
+    @GetMapping(path = "/getVoucherDiscount")
+    public Flux<?> getVoucherDiscount(@RequestParam String vouNo,
+                                      @RequestParam String compCode) {
+        return Flux.fromIterable(shService.getVoucherDiscount(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/searchDiscountDescription")
+    public Flux<?> searchDiscountDescription(@RequestParam String str,
+                                             @RequestParam String compCode) {
+        return Flux.fromIterable(shService.searchDiscountDescription(str, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+
 }

@@ -1374,6 +1374,16 @@ create table job (
   finished bit(1) not null,
   primary key (job_no, comp_code));
 
+create table vou_discount (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  unique_id int not null,
+  description varchar(255) null,
+  qty double(20,3) not null,
+  price double(20,3) not null,
+  amount double(20,3) not null,
+  primary key (vou_no, comp_code, unique_id));
+
 
 
 #view

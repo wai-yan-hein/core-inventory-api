@@ -109,7 +109,11 @@ public class SaleHis {
     @Transient
     private List<SaleExpense> listExpense;
     @Transient
-    private transient List<SaleExpenseKey> listDelExpense;
+    private  List<SaleExpenseKey> listDelExpense;
+    @Transient
+    private List<VouDiscount> listVouDiscount;
+    @Transient
+    private List<VouDiscountKey> listDelVouDiscount;
     @Transient
     private ZonedDateTime vouDateTime;
 
