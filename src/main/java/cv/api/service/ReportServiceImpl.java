@@ -1776,16 +1776,6 @@ public class ReportServiceImpl implements ReportService {
                 "and stock_code ='" + stockCode + "'\n" +
                 "group by loc_code_to\n" +
                 "\tunion all\n" +
-                "select stock_code,loc_code,sum(total_weight) total_weight,sum(qty)ttl_qty,comp_code\n" +
-                "from v_landing_grade\n" +
-                "where deleted = false\n" +
-                "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and grade_stock_code ='" + stockCode + "'\n" +
-                "and purchase = true\n" +
-                "and choose = true\n" +
-                "group by loc_code\n" +
-                "\tunion all\n" +
                 "select stock_code,loc_code,sum(tot_weight)*-1 total_weight,sum(qty)*-1 ttl_qty,comp_code\n" +
                 "from v_milling_raw\n" +
                 "where deleted = false\n" +
