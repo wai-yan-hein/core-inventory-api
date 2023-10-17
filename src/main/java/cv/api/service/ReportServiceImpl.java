@@ -1223,16 +1223,26 @@ public class ReportServiceImpl implements ReportService {
     public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
         General general = new General();
         general.setAmount(0.0f);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
+        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
+                "from (\n" +
+                "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
                 "from v_purchase pd\n" +
                 "join v_relation rel on pd.rel_code = rel.rel_code\n" +
                 "and pd.pur_unit =  rel.unit\n" +
                 "and pd.comp_code = rel.comp_code\n" +
-                "where pd.stock_code = '" + stockCode + "' and vou_no = (\n" + "select ph.vou_no\n" +
-                "from pur_his ph, pur_his_detail pd\n" + "where date(ph.vou_date)<= '" + purDate + "' \n" +
-                "and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
+                "where pd.stock_code = '" + stockCode + "' and vou_no = (\n" +
+                "select ph.vou_no\n" +
+                "from pur_his ph, pur_his_detail pd\n" +
+                "where date(ph.vou_date)<= '" + purDate + "' \n" +
+                "and deleted = 0\n" +
+                "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
                 "and pd.stock_code = '" + stockCode + "'\n" +
-                "group by ph.vou_no\n" + "order by ph.vou_date desc\n" + "limit 1\n" + "))a\n" + "join v_relation rel\n" + "on a.rel_code =rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" +
+                "group by ph.vou_no\n" +
+                "order by ph.vou_date desc\n" +
+                "limit 1\n" + "))a\n" +
+                "join v_relation rel\n" +
+                "on a.rel_code =rel.rel_code\n" +
+                "and a.comp_code = rel.comp_code\n" +
                 "and rel.unit = '" + unit + "'";
         try {
             ResultSet rs = reportDao.executeSql(sql);
@@ -2496,7 +2506,7 @@ public class ReportServiceImpl implements ReportService {
         List<VOpening> openings = new ArrayList<>();
         String sql = "select a.*,t.stock_type_name\n" +
                 "from (select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,\n" +
-                "unit,qty,price,amount,comp_code\n" +
+                "unit,qty,price,amount,v.comp_code\n" +
                 "from v_opening v join location l \n" +
                 "on v.loc_code = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
@@ -2508,7 +2518,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "'))a\n" +
                 "join stock_type t on a.stock_type_code = t.stock_type_code\n" +
-                "a.comp_code = t.comp_code\n" +
+                "and a.comp_code = t.comp_code\n" +
                 "order by t.stock_type_name,a.stock_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {

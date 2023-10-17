@@ -414,7 +414,8 @@ public class ReportController {
 
 
     @GetMapping(path = "/getPurchaseRecentPrice")
-    public Mono<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate, @RequestParam String unit, @RequestParam String compCode) {
+    public Mono<General> getPurchaseRecentPrice(@RequestParam String stockCode, @RequestParam String vouDate,
+                                                @RequestParam String unit, @RequestParam String compCode) {
         return Mono.justOrEmpty(reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode));
     }
 
