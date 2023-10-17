@@ -91,4 +91,57 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
         }
         return listOP;
     }
+
+    @Override
+    public List<StockInOutDetail> searchByJob(String jobId, String compCode) {
+        List<StockInOutDetail> listOP = new ArrayList<>();
+        String sql = """
+                select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,op.*,s.user_code,s.stock_name
+                                from stock_in_out_detail op
+                                join stock_in_out l on op.vou_no = l.vou_no
+                                and op.comp_code = l.comp_code
+                                join stock s on op.stock_code = s.stock_code
+                                and op.comp_code = s.comp_code
+                                where l.job_code =?
+                                and l.comp_code =?
+                                group by op.stock_code,weight_unit,in_unit,out_unit
+                                order by unique_id;
+                """;
+        ResultSet rs = getResult(sql,jobId,compCode);
+        if (rs != null) {
+            try {
+                //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
+                while (rs.next()) {
+                    StockInOutDetail op = new StockInOutDetail();
+                    StockInOutKey key = new StockInOutKey();
+                    key.setVouNo(rs.getString("vou_no"));
+                    key.setUniqueId(rs.getInt("unique_id"));
+                    key.setCompCode(rs.getString("comp_code"));
+                    op.setKey(key);
+                    op.setDeptId(rs.getInt("dept_id"));
+                    op.setStockCode(rs.getString("stock_code"));
+                    op.setInQty(rs.getDouble("in_tot_qty"));
+                    op.setInUnitCode(rs.getString("in_unit"));
+                    op.setOutQty(rs.getDouble("out_tot_qty"));
+                    op.setOutUnitCode(rs.getString("out_unit"));
+//                    op.setLocCode(rs.getString("loc_code"));
+//                    op.setLocName(rs.getString("loc_name"));
+                    op.setUserCode(rs.getString("user_code"));
+                    op.setStockName(rs.getString("stock_name"));
+//                    op.setCatName(rs.getString("cat_name"));
+//                    op.setGroupName(rs.getString("stock_type_name"));
+//                    op.setBrandName(rs.getString("brand_name"));
+//                    op.setRelName(rs.getString("rel_name"));
+                    op.setCostPrice(rs.getDouble("cost_price"));
+                    op.setWeight(rs.getDouble("weight"));
+                    op.setWeightUnit(rs.getString("weight_unit"));
+                    op.setTotalWeight(rs.getDouble("total_weight"));
+                    listOP.add(op);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+        return listOP;
+    }
 }

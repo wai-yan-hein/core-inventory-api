@@ -67,7 +67,10 @@ public class MillingHisServiceImpl implements MillingHisService {
         //save expense
         saveExpense(listExp, milling);
         //save usage
-        saveMillingUsage(listUsage, milling);
+        if(listUsage != null) {
+            saveMillingUsage(listUsage, milling);
+        }
+
 
         hDao.save(milling);
         milling.setListRaw(listRaw);
