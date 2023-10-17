@@ -1377,6 +1377,17 @@ create table job (
 alter table stock_in_out
 add column labour_group_code varchar(45) null after intg_upd_status,
 add column job_code varchar(45) null after labour_group_code;
+
+alter table transfer_his
+add column labour_group_code varchar(45) null after intg_upd_status,
+add column job_code varchar(45) null after labour_group_code;
+
+alter table sale_his
+add column labour_group_code varchar(15) null after account;
+
+alter table pur_his
+add column labour_group_code varchar(15) null after car_no;
+
 create table vou_discount (
   vou_no varchar(25) not null,
   comp_code varchar(15) not null,
@@ -1386,11 +1397,6 @@ create table vou_discount (
   price double(20,3) not null,
   amount double(20,3) not null,
   primary key (vou_no, comp_code, unique_id));
-
-
-alter table transfer_his
-add column labour_group_code varchar(45) null after intg_upd_status,
-add column job_code varchar(45) null after labour_group_code;
 
 #view
 drop view if exists v_milling_output;

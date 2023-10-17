@@ -87,6 +87,8 @@ public class PurHis {
     private String projectNo;
     @Column(name = "car_no")
     private String carNo;
+    @Column(name = "labour_group_code")
+    private String labourGroupCode;
     @Transient
     private String status = "STATUS";
     @Transient

@@ -4326,6 +4326,9 @@ public class ReportServiceImpl implements ReportService {
         } catch (Exception e) {
             log.error("getLandingReport : " + e.getMessage());
         }
+        if(!listQty.isEmpty()){
+            header.setWetPercent(listQty.get(0).getPercent());
+        }
         header.setListPrice(listPrice);
         header.setListQty(listQty);
         return header;

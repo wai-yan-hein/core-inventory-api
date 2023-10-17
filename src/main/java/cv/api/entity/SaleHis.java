@@ -96,6 +96,8 @@ public class SaleHis {
     private Double expense;
     @Column(name = "account")
     private String account;
+    @Column(name = "labour_group_code")
+    private String labourGroupCode;
     @Transient
     private String status = "STATUS";
     @Transient

@@ -40,6 +40,7 @@ public class VLanding {
     private String gradeStockName;
     private String regionName;
     private String traderPhoneNo;
+    private double wetPercent;
     List<VLanding> listPrice;
     List<VLanding> listQty;
 }
