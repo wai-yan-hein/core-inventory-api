@@ -1,10 +1,13 @@
 package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cv.api.entity.LandingHisPrice;
+import cv.api.entity.LandingHisQty;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
@@ -40,6 +43,7 @@ public class VPurchase {
     private Double stdWt;
     private Double avgPrice;
     private String purUnit;
+    private String purUnitName;
     private Double avgWt;
     private Double purPrice;
     private Double purAmount;
@@ -61,8 +65,13 @@ public class VPurchase {
     private String groupName;
     private Double weight;
     private String weightUnit;
+    private String weightUnitName;
     private Double totalQty;
     private String batchNo;
     private String projectNo;
     private String address;
+    private String labourGroupName;
+    private String landVouNo;
+    private String phoneNo;
+    private List<LandingHisPrice> listPrice;
 }

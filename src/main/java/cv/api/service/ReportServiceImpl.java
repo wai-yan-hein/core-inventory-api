@@ -6,6 +6,7 @@
 package cv.api.service;
 
 import cv.api.common.*;
+import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.ReportDao;
 import cv.api.dao.UnitRelationDetailDao;
 import cv.api.entity.*;
@@ -33,6 +34,7 @@ public class ReportServiceImpl implements ReportService {
     private final ReportDao reportDao;
     private final UnitRelationDetailDao detailDao;
     private final SaleHisService saleHisService;
+    private final LandingHisPriceDao landingHisPriceDao;
 
     @Override
     public void executeSql(String... sql) {
@@ -202,10 +204,12 @@ public class ReportServiceImpl implements ReportService {
                 select t.trader_name,p.remark,p.vou_no,
                 p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,
                 p.vou_total,p.discount,p.paid,p.balance,
-                p.weight,p.weight_unit
+                p.weight,p.weight_unit,l.labour_name,p.land_vou_no
                 from v_purchase p join trader t
                 on p.trader_code = t.code
                 and p.comp_code = t.comp_code
+                left join labour_group l on p.labour_group_code = l.code
+                and p.comp_code = l.comp_code
                 where p.vou_no =?
                 and p.comp_code =?""";
         ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
@@ -228,7 +232,15 @@ public class ReportServiceImpl implements ReportService {
                 p.setBatchNo(rs.getString("batch_no"));
                 p.setWeight(rs.getDouble("weight"));
                 p.setWeightUnit(rs.getString("weight_unit"));
+                p.setLabourGroupName(rs.getString("labour_name"));
+                p.setLandVouNo(rs.getString("land_vou_no"));
                 list.add(p);
+            }
+            if (!list.isEmpty()) {
+                String landVouNo = list.get(0).getLandVouNo();
+                if (!Util1.isNullOrEmpty(landVouNo)) {
+                    list.get(0).setListPrice(landingHisPriceDao.getLandingPrice(landVouNo, compCode));
+                }
             }
         }
         return list;
@@ -4336,7 +4348,7 @@ public class ReportServiceImpl implements ReportService {
         } catch (Exception e) {
             log.error("getLandingReport : " + e.getMessage());
         }
-        if(!listQty.isEmpty()){
+        if (!listQty.isEmpty()) {
             header.setWetPercent(listQty.get(0).getPercent());
         }
         header.setListPrice(listPrice);
