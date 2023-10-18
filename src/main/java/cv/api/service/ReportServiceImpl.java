@@ -2316,10 +2316,13 @@ public class ReportServiceImpl implements ReportService {
     public List<ClosingBalance> getStockInOutDetailByWeight(String typeCode, String compCode, Integer deptId, Integer macId) {
         String getSql = """
                 select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,
+                sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight+a.sale_weight) bal_weight,
                 s.weight_unit,s.user_code s_user_code,a.stock_code,s.stock_name
                 from (
                 select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,
-                sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id
+                sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id,
+                sum(op_weight) op_weight,sum(pur_weight) pur_weight,
+                sum(in_weight) in_weight,sum(out_weight) out_weight,sum(sale_weight) sale_weight
                 from tmp_stock_io_column
                 where mac_id = ?
                 and comp_code = ?
@@ -2340,12 +2343,27 @@ public class ReportServiceImpl implements ReportService {
                     float saleQty = rs.getFloat("sale_qty");
                     float outQty = rs.getFloat("out_qty");
                     float balQty = rs.getFloat("bal_qty");
+
+                    float opWeight = rs.getFloat("op_Weight");
+                    float purWeight = rs.getFloat("pur_Weight");
+                    float inWeight = rs.getFloat("in_Weight");
+                    float saleWeight = rs.getFloat("sale_Weight");
+                    float outWeight = rs.getFloat("out_Weight");
+                    float balWeight = rs.getFloat("bal_Weight");
                     b.setOpenQty(opQty);
                     b.setPurQty(purQty);
                     b.setInQty(inQty);
                     b.setSaleQty(saleQty);
                     b.setOutQty(outQty);
                     b.setBalQty(balQty);
+
+                    b.setOpenWeight(opWeight);
+                    b.setPurWeight(purWeight);
+                    b.setInWeight(inWeight);
+                    b.setSaleWeight(saleWeight);
+                    b.setOutWeight(outWeight);
+                    b.setBalWeight(balWeight);
+
                     b.setCompCode(compCode);
                     b.setDeptId(deptId);
                     b.setVouDate(Util1.toDateStr(rs.getDate("tran_date"), "dd/MM/yyyy"));
@@ -2360,14 +2378,23 @@ public class ReportServiceImpl implements ReportService {
                 if (i > 0) {
                     ClosingBalance prv = balances.get(i - 1);
                     float prvCl = prv.getBalQty();
+                    float prvWCl = prv.getBalWeight();
                     ClosingBalance c = balances.get(i);
                     c.setOpenQty(prvCl);
+                    c.setOpenWeight(prvWCl);
                     float opQty = c.getOpenQty();
                     float purQty = c.getPurQty();
                     float inQty = c.getInQty();
                     float outQty = c.getOutQty();
                     float saleQty = c.getSaleQty();
                     float clQty = opQty + purQty + inQty + outQty + saleQty;
+
+                    float opWeight = c.getOpenWeight();
+                    float purWeight = c.getPurWeight();
+                    float inWeight = c.getInWeight();
+                    float outWeight = c.getOutWeight();
+                    float saleWeight = c.getSaleWeight();
+                    float clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
                     String unit = c.getWeightUnit();
                     c.setOpenQty(opQty);
                     c.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
@@ -2381,6 +2408,19 @@ public class ReportServiceImpl implements ReportService {
                     c.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
                     c.setBalQty(clQty);
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty) + " " + unit);
+
+                    c.setOpenWeight(opWeight);
+                    c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight) + " " + unit);
+                    c.setPurWeight(purWeight);
+                    c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight) + " " + unit);
+                    c.setInWeight(inWeight);
+                    c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight) + " " + unit);
+                    c.setSaleWeight(saleWeight);
+                    c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight) + " " + unit);
+                    c.setOutWeight(outWeight);
+                    c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight) + " " + unit);
+                    c.setBalWeight(clWeight);
+                    c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight) + " " + unit);
                 } else {
                     ClosingBalance c = balances.get(i);
                     float opQty = c.getOpenQty();
@@ -2389,6 +2429,13 @@ public class ReportServiceImpl implements ReportService {
                     float outQty = c.getOutQty();
                     float saleQty = c.getSaleQty();
                     float clQty = opQty + purQty + inQty + outQty + saleQty;
+
+                    float opWeight = c.getOpenWeight();
+                    float purWeight = c.getPurWeight();
+                    float inWeight = c.getInWeight();
+                    float outWeight = c.getOutWeight();
+                    float saleWeight = c.getSaleWeight();
+                    float clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
                     String unit = c.getWeightUnit();
                     c.setOpenQty(opQty);
                     c.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
@@ -2402,6 +2449,19 @@ public class ReportServiceImpl implements ReportService {
                     c.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
                     c.setBalQty(clQty);
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty) + " " + unit);
+
+                    c.setOpenWeight(opWeight);
+                    c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight) + " " + unit);
+                    c.setPurWeight(purWeight);
+                    c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight) + " " + unit);
+                    c.setInWeight(inWeight);
+                    c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight) + " " + unit);
+                    c.setSaleWeight(saleWeight);
+                    c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight) + " " + unit);
+                    c.setOutWeight(outWeight);
+                    c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight) + " " + unit);
+                    c.setBalWeight(clWeight);
+                    c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight) + " " + unit);
                 }
             }
         } catch (Exception e) {

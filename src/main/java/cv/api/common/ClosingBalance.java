@@ -31,6 +31,20 @@ public class ClosingBalance {
     private float balQty;
     private float closingAmt;
     private String balRel;
+
+    private float openWeight;
+    private String openWeightRel;
+    private float purWeight;
+    private String purWeightRel;
+    private float inWeight;
+    private String inWeightRel;
+    private float outWeight;
+    private String outWeightRel;
+    private float saleWeight;
+    private String saleWeightRel;
+    private float balWeight;
+    private String balWeightRel;
+
     private String groupName;
     private String remark;
     private String compCode;
