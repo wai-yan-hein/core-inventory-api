@@ -60,6 +60,4 @@ public class LandingHisPriceDaoImpl extends AbstractDao<LandingHisPriceKey, Land
         }
         return list;
     }
-
-
 }

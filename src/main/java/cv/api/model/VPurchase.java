@@ -73,5 +73,6 @@ public class VPurchase {
     private String labourGroupName;
     private String landVouNo;
     private String phoneNo;
+    private String regionName;
     private List<LandingHisPrice> listPrice;
 }
