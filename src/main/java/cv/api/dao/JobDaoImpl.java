@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @Repository
-public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao{
+public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
     @Override
     public Job save(Job Job) {
         saveOrUpdate(Job, Job.getKey());
@@ -21,8 +21,11 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao{
     }
 
     @Override
-    public List<Job> findAll(String compCode) {
+    public List<Job> findAll(String compCode, Boolean isFinished) {
         String hsql = "select o from Job o where o.key.compCode = '" + compCode + "'";
+        if (!isFinished) {
+            hsql += " and o.finished = false";
+        }
         return findHSQL(hsql);
     }
 

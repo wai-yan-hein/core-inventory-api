@@ -31,8 +31,8 @@ public class JobServiceImpl implements JobService{
     }
 
     @Override
-    public List<Job> findAll(String compCode) {
-        return dao.findAll(compCode);
+    public List<Job> findAll(String compCode, Boolean isFinished) {
+        return dao.findAll(compCode, isFinished);
     }
 
     @Override
