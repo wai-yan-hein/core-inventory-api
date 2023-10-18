@@ -201,15 +201,24 @@ public class ReportServiceImpl implements ReportService {
     public List<VPurchase> getPurchaseVoucher(String vouNo, String compCode) throws Exception {
         List<VPurchase> list = new ArrayList<>();
         String sql = """
-                select t.trader_name,p.remark,p.vou_no,
+                select t.trader_name,t.phone,p.remark,p.vou_no,
                 p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,
                 p.vou_total,p.discount,p.paid,p.balance,
-                p.weight,p.weight_unit,l.labour_name,p.land_vou_no
+                p.weight,p.weight_unit,l.labour_name,p.land_vou_no,u1.unit_name weight_unit_name,
+                u2.unit_name pur_unit_name,loc.loc_name,r.reg_name
                 from v_purchase p join trader t
                 on p.trader_code = t.code
                 and p.comp_code = t.comp_code
+                join location loc on p.loc_code = loc.loc_code
+                and p.comp_code =loc.comp_code
                 left join labour_group l on p.labour_group_code = l.code
                 and p.comp_code = l.comp_code
+                join stock_unit u1 on p.weight_unit = u1.unit_code
+                and p.comp_code = u1.comp_code
+                join stock_unit u2 on p.pur_unit = u2.unit_code
+                and p.comp_code = u2.comp_code
+                left join region r on t.reg_code = r.reg_code
+                and t.comp_code = r.comp_code
                 where p.vou_no =?
                 and p.comp_code =?""";
         ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
@@ -234,6 +243,11 @@ public class ReportServiceImpl implements ReportService {
                 p.setWeightUnit(rs.getString("weight_unit"));
                 p.setLabourGroupName(rs.getString("labour_name"));
                 p.setLandVouNo(rs.getString("land_vou_no"));
+                p.setWeightUnitName(rs.getString("weight_unit_name"));
+                p.setPurUnitName(rs.getString("pur_unit_name"));
+                p.setLocationName(rs.getString("loc_name"));
+                p.setPhoneNo(rs.getString("phone"));
+                p.setRegionName(rs.getString("reg_name"));
                 list.add(p);
             }
             if (!list.isEmpty()) {
