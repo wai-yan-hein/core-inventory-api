@@ -85,4 +85,10 @@ public class StockInOutController {
         List<StockInOutDetail> listSD = iodService.search(vouNo, compCode);
         return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
     }
+
+    @GetMapping(path = "/getStockIODetailByJob")
+    public Flux<?> getStockIODetailByJob(@RequestParam String jobId, @RequestParam String compCode) {
+        List<StockInOutDetail> listSD = iodService.searchByJob(jobId, compCode);
+        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
+    }
 }

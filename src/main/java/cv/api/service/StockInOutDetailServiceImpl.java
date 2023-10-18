@@ -39,4 +39,9 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
         return dao.search(vouNo, compCode);
     }
 
+    @Override
+    public List<StockInOutDetail> searchByJob(String jobId, String compCode) {
+        return dao.searchByJob(jobId, compCode);
+    }
+
 }

@@ -19,5 +19,7 @@ public interface StockInOutDetailService {
 
     List<StockInOutDetail> search(String vouNo, String compCode);
 
+    List<StockInOutDetail> searchByJob(String jobId, String compCode);
+
     int delete(StockInOutKey key);
 }
