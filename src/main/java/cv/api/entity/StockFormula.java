@@ -32,4 +32,5 @@ public class StockFormula {
     private boolean active;
     private transient List<StockFormulaQty> listQty;
     private transient List<StockFormulaPrice> listPrice;
+
 }

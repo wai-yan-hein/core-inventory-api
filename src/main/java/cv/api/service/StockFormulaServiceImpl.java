@@ -105,7 +105,7 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     }
 
     @Override
-    public List<GradeDetail> getCriteriaByFormula(String formulaCode, String compCode) {
-        return gradeDetailDao.getCriteriaByFormula(formulaCode, compCode);
+    public List<GradeDetail> getStockFormulaGrade(String formulaCode, String compCode) {
+        return gradeDetailDao.getStockFormulaGrade(formulaCode, compCode);
     }
 }

@@ -16,9 +16,6 @@ public interface LabourGroupDao {
 
     LabourGroup findById(LabourGroupKey id);
 
-    List<LabourGroup> search(String des);
-
-    List<LabourGroup> unUpload();
 
     Date getMaxDate();
 

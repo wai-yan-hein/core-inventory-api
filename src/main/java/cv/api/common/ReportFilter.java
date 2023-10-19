@@ -1,7 +1,6 @@
 package cv.api.common;
 
 import lombok.Data;
-import lombok.NonNull;
 
 import java.util.List;
 
@@ -35,9 +34,7 @@ public class ReportFilter {
     private boolean calPur;
     private boolean calRI;
     private boolean calRO;
-    @NonNull
     private Integer macId;
-    @NonNull
     private String compCode;
     private Integer deptId;
     private String status;

@@ -13,8 +13,6 @@ public interface LabourGroupService {
     List<LabourGroup> findAll(String compCode);
     int delete(LabourGroupKey key);
     LabourGroup findById(LabourGroupKey key);
-    List<LabourGroup> search(String description);
-    List<LabourGroup> unUpload();
 
     Date getMaxDate();
 

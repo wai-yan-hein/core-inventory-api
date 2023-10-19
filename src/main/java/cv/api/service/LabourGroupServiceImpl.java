@@ -17,7 +17,7 @@ import java.util.Objects;
 public class LabourGroupServiceImpl implements LabourGroupService{
 
     @Autowired
-    LabourGroupDao dao;
+    private LabourGroupDao dao;
     @Autowired
     private SeqTableService seqService;
     @Override
@@ -43,17 +43,6 @@ public class LabourGroupServiceImpl implements LabourGroupService{
     public LabourGroup findById(LabourGroupKey key) {
         return dao.findById(key);
     }
-
-    @Override
-    public List<LabourGroup> search(String description) {
-        return dao.search(description);
-    }
-
-    @Override
-    public List<LabourGroup> unUpload() {
-        return dao.unUpload();
-    }
-
     @Override
     public Date getMaxDate() {
         return dao.getMaxDate();

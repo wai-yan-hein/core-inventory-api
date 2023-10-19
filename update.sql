@@ -1361,18 +1361,20 @@ create table labour_group (
 ) engine=innodb default charset=utf8mb3;
 
 create table job (
-  job_no varchar(15) not null,
-  comp_code varchar(15) not null,
-  job_name varchar(255) not null,
+  job_no varchar(15)  not null,
+  comp_code varchar(15)  not null,
+  job_name varchar(255)  not null,
   start_date date not null,
-  end_date date null,
+  end_date date default null,
   updated_date timestamp not null default current_timestamp(),
   created_date timestamp not null,
-  created_by varchar(15) not null,
-  updated_by varchar(15) null default null,
+  created_by varchar(15)  not null,
+  updated_by varchar(15)  default null,
   deleted bit(1) not null,
   finished bit(1) not null,
-  primary key (job_no, comp_code));
+  primary key (job_no,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 
 alter table stock_in_out
 add column labour_group_code varchar(45) null after intg_upd_status,

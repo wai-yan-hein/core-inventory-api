@@ -37,28 +37,6 @@ public class LabourGroupDaoImpl extends AbstractDao<LabourGroupKey, LabourGroup>
         return getByKey(id);
     }
 
-    @Override
-    public List<LabourGroup> search(String des) {
-        String strSql = "";
-
-        if (!des.equals("-")) {
-            strSql = "o.name like '%" + des + "%'";
-        }
-
-        if (strSql.isEmpty()) {
-            strSql = "select o from LabourGroup o";
-        } else {
-            strSql = "select o from LabourGroup o where " + strSql;
-        }
-
-        return findHSQL(strSql);
-    }
-
-    @Override
-    public List<LabourGroup> unUpload() {
-        String hsql = "select o from LabourGroup o where o.intgUpdStatus is null";
-        return findHSQL(hsql);
-    }
 
     @Override
     public Date getMaxDate() {

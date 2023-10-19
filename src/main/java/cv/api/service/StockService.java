@@ -21,10 +21,10 @@ public interface StockService {
     Stock save(Stock stock);
 
     Stock findById(StockKey key);
+    List<General> delete(StockKey key);
 
     List<Stock> findAll(String compCode, Integer deptId);
 
-    List<General> delete(StockKey key);
 
     List<Stock> findActiveStock(String compCode, Integer deptId);
 

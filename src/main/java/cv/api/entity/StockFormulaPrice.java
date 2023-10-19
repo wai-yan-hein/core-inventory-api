@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "stock_formula_price")
@@ -22,4 +24,6 @@ public class StockFormulaPrice {
     private double percentAllow;
     private transient String criteriaName;
     private transient String userCode;
+    private transient List<GradeDetail> listGrade;
+
 }

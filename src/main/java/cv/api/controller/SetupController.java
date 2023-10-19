@@ -172,6 +172,11 @@ public class SetupController {
         return Flux.fromIterable(locationService.getLocation(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
+    @GetMapping(path = "/getUpdateLabourGroup")
+    public Flux<?> getUpdateLabourGroup(@RequestParam String updatedDate) {
+        return Flux.fromIterable(labourGroupService.getLabourGroup(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
     @DeleteMapping(path = "/deleteLocation")
     public Mono<ReturnObject> deleteLocation(@RequestParam String code) {
         locationService.delete(code);
@@ -436,10 +441,16 @@ public class SetupController {
                 String formulaCode = p.getKey().getFormulaCode();
                 String compCode = p.getKey().getCompCode();
                 if (formulaCode != null) {
-                    List<StockFormulaPrice> dtlList = stockFormulaService.getFormulaPrice(formulaCode, compCode);
-                    p.setListPrice(dtlList);
+                    List<StockFormulaPrice> listPrice = stockFormulaService.getFormulaPrice(formulaCode, compCode);
+                    p.setListPrice(listPrice);
+                    listPrice.forEach(price -> {
+                        String criteriaCode = price.getCriteriaCode();
+                        List<GradeDetail> listGrade =stockFormulaService.getGradeDetail(formulaCode,criteriaCode,compCode);
+                        price.setListGrade(listGrade);
+                    });
                     List<StockFormulaQty> listQty = stockFormulaService.getFormulaQty(formulaCode, compCode);
                     p.setListQty(listQty);
+
                 }
             }
         });
@@ -803,9 +814,9 @@ public class SetupController {
         return Flux.fromIterable(stockFormulaService.getGradeDetail(formulaCode, criteriaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/getCriteriaByFormula")
-    public Flux<?> getCriteriaByFormula(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getCriteriaByFormula(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+    @GetMapping(path = "/getStockFormulaGrade")
+    public Flux<?> getStockFormulaGrade(@RequestParam String formulaCode, @RequestParam String compCode) {
+        return Flux.fromIterable(stockFormulaService.getStockFormulaGrade(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/saveStockFormulaPrice")

@@ -59,7 +59,7 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
     }
 
     @Override
-    public List<GradeDetail> getCriteriaByFormula(String formulaCode, String compCode) {
+    public List<GradeDetail> getStockFormulaGrade(String formulaCode, String compCode) {
         List<GradeDetail> list = new ArrayList<>();
         String sql = """
                 select g.*,s.stock_name
