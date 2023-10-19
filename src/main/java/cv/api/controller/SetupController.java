@@ -436,25 +436,6 @@ public class SetupController {
     @GetMapping(path = "/getUpdateStockFormula")
     public Flux<StockFormula> getUpdateStockFormula(@RequestParam String updatedDate) {
         List<StockFormula> list = stockFormulaService.getStockFormula(Util1.toLocalDateTime(updatedDate));
-        list.forEach(p -> {
-            if (!Util1.isNullOrEmpty(p.getKey().getFormulaCode())) {
-                String formulaCode = p.getKey().getFormulaCode();
-                String compCode = p.getKey().getCompCode();
-                if (formulaCode != null) {
-                    List<StockFormulaPrice> listPrice = stockFormulaService.getFormulaPrice(formulaCode, compCode);
-                    p.setListPrice(listPrice);
-                    listPrice.forEach(price -> {
-                        String criteriaCode = price.getCriteriaCode();
-                        List<GradeDetail> listGrade =stockFormulaService.getGradeDetail(formulaCode,criteriaCode,compCode);
-                        price.setListGrade(listGrade);
-                    });
-                    List<StockFormulaQty> listQty = stockFormulaService.getFormulaQty(formulaCode, compCode);
-                    p.setListQty(listQty);
-
-                }
-            }
-        });
-
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
