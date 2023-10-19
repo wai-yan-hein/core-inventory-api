@@ -2330,10 +2330,13 @@ public class ReportServiceImpl implements ReportService {
     public List<ClosingBalance> getStockInOutDetailByWeight(String typeCode, String compCode, Integer deptId, Integer macId) {
         String getSql = """
                 select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,
+                sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight+a.sale_weight) bal_weight,
                 s.weight_unit,s.user_code s_user_code,a.stock_code,s.stock_name
                 from (
                 select tran_option,tran_date,stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,
-                sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id
+                sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,remark,vou_no,comp_code,dept_id,
+                sum(op_weight) op_weight,sum(pur_weight) pur_weight,
+                sum(in_weight) in_weight,sum(out_weight) out_weight,sum(sale_weight) sale_weight
                 from tmp_stock_io_column
                 where mac_id = ?
                 and comp_code = ?
@@ -2354,12 +2357,27 @@ public class ReportServiceImpl implements ReportService {
                     float saleQty = rs.getFloat("sale_qty");
                     float outQty = rs.getFloat("out_qty");
                     float balQty = rs.getFloat("bal_qty");
+
+                    float opWeight = rs.getFloat("op_Weight");
+                    float purWeight = rs.getFloat("pur_Weight");
+                    float inWeight = rs.getFloat("in_Weight");
+                    float saleWeight = rs.getFloat("sale_Weight");
+                    float outWeight = rs.getFloat("out_Weight");
+                    float balWeight = rs.getFloat("bal_Weight");
                     b.setOpenQty(opQty);
                     b.setPurQty(purQty);
                     b.setInQty(inQty);
                     b.setSaleQty(saleQty);
                     b.setOutQty(outQty);
                     b.setBalQty(balQty);
+
+                    b.setOpenWeight(opWeight);
+                    b.setPurWeight(purWeight);
+                    b.setInWeight(inWeight);
+                    b.setSaleWeight(saleWeight);
+                    b.setOutWeight(outWeight);
+                    b.setBalWeight(balWeight);
+
                     b.setCompCode(compCode);
                     b.setDeptId(deptId);
                     b.setVouDate(Util1.toDateStr(rs.getDate("tran_date"), "dd/MM/yyyy"));
@@ -2374,14 +2392,23 @@ public class ReportServiceImpl implements ReportService {
                 if (i > 0) {
                     ClosingBalance prv = balances.get(i - 1);
                     float prvCl = prv.getBalQty();
+                    float prvWCl = prv.getBalWeight();
                     ClosingBalance c = balances.get(i);
                     c.setOpenQty(prvCl);
+                    c.setOpenWeight(prvWCl);
                     float opQty = c.getOpenQty();
                     float purQty = c.getPurQty();
                     float inQty = c.getInQty();
                     float outQty = c.getOutQty();
                     float saleQty = c.getSaleQty();
                     float clQty = opQty + purQty + inQty + outQty + saleQty;
+
+                    float opWeight = c.getOpenWeight();
+                    float purWeight = c.getPurWeight();
+                    float inWeight = c.getInWeight();
+                    float outWeight = c.getOutWeight();
+                    float saleWeight = c.getSaleWeight();
+                    float clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
                     String unit = c.getWeightUnit();
                     c.setOpenQty(opQty);
                     c.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
@@ -2395,6 +2422,19 @@ public class ReportServiceImpl implements ReportService {
                     c.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
                     c.setBalQty(clQty);
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty) + " " + unit);
+
+                    c.setOpenWeight(opWeight);
+                    c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight) + " " + unit);
+                    c.setPurWeight(purWeight);
+                    c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight) + " " + unit);
+                    c.setInWeight(inWeight);
+                    c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight) + " " + unit);
+                    c.setSaleWeight(saleWeight);
+                    c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight) + " " + unit);
+                    c.setOutWeight(outWeight);
+                    c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight) + " " + unit);
+                    c.setBalWeight(clWeight);
+                    c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight) + " " + unit);
                 } else {
                     ClosingBalance c = balances.get(i);
                     float opQty = c.getOpenQty();
@@ -2403,6 +2443,13 @@ public class ReportServiceImpl implements ReportService {
                     float outQty = c.getOutQty();
                     float saleQty = c.getSaleQty();
                     float clQty = opQty + purQty + inQty + outQty + saleQty;
+
+                    float opWeight = c.getOpenWeight();
+                    float purWeight = c.getPurWeight();
+                    float inWeight = c.getInWeight();
+                    float outWeight = c.getOutWeight();
+                    float saleWeight = c.getSaleWeight();
+                    float clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
                     String unit = c.getWeightUnit();
                     c.setOpenQty(opQty);
                     c.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
@@ -2416,6 +2463,19 @@ public class ReportServiceImpl implements ReportService {
                     c.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
                     c.setBalQty(clQty);
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty) + " " + unit);
+
+                    c.setOpenWeight(opWeight);
+                    c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight) + " " + unit);
+                    c.setPurWeight(purWeight);
+                    c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight) + " " + unit);
+                    c.setInWeight(inWeight);
+                    c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight) + " " + unit);
+                    c.setSaleWeight(saleWeight);
+                    c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight) + " " + unit);
+                    c.setOutWeight(outWeight);
+                    c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight) + " " + unit);
+                    c.setBalWeight(clWeight);
+                    c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight) + " " + unit);
                 }
             }
         } catch (Exception e) {
@@ -4217,9 +4277,12 @@ public class ReportServiceImpl implements ReportService {
         calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
+                "sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight+a.sale_weight) bal_weight, \n" +
                 "s.weight_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
                 "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
-                "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,comp_code\n" +
+                "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,comp_code,\n" +
+                "sum(op_weight) op_weight,sum(pur_weight) pur_weight,\n" +
+                "sum(in_weight) in_weight,sum(out_weight) out_weight,sum(sale_weight) sale_weight \n" +
                 "from tmp_stock_io_column\n" +
                 "where mac_id = " + macId + "\n" +
                 "group by stock_code)a\n" +
@@ -4241,6 +4304,14 @@ public class ReportServiceImpl implements ReportService {
                     float saleQty = rs.getFloat("sale_qty");
                     float outQty = rs.getFloat("out_qty");
                     float balQty = rs.getFloat("bal_qty");
+
+                    float opWeight = rs.getFloat("op_Weight");
+                    float purWeight = rs.getFloat("pur_Weight");
+                    float inWeight = rs.getFloat("in_Weight");
+                    float saleWeight = rs.getFloat("sale_Weight");
+                    float outWeight = rs.getFloat("out_Weight");
+                    float balWeight = rs.getFloat("bal_Weight");
+
                     String unit = rs.getString("weight_unit");
                     b.setOpenQty(opQty);
                     b.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
@@ -4254,6 +4325,20 @@ public class ReportServiceImpl implements ReportService {
                     b.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
                     b.setBalQty(balQty);
                     b.setBalRel(balQty == 0 ? null : Util1.format(balQty) + " " + unit);
+
+                    b.setOpenWeight(opWeight);
+                    b.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight) + " " + unit);
+                    b.setPurWeight(purWeight);
+                    b.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight) + " " + unit);
+                    b.setInWeight(inWeight);
+                    b.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight) + " " + unit);
+                    b.setSaleWeight(saleWeight);
+                    b.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight) + " " + unit);
+                    b.setOutWeight(outWeight);
+                    b.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight) + " " + unit);
+                    b.setBalWeight(balWeight);
+                    b.setBalWeightRel(balWeight == 0 ? null : Util1.format(balWeight) + " " + unit);
+
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
                     balances.add(b);
@@ -4993,7 +5078,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'ReturnIn',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_return_in\n" +
@@ -5006,7 +5091,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String retOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_return_out\n" +
@@ -5019,7 +5104,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_sale\n" +
@@ -5032,7 +5117,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String tfSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code_from," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_transfer\n" +
@@ -5045,7 +5130,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String ttSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'Transfer-T',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_transfer\n" +
@@ -5058,9 +5143,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String mRawSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'UM-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(tot_qty)*-1 ttl_qty,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "select 'UM-RAW',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(tot_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_milling_raw\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -5071,9 +5156,9 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         String mOutSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'UM-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(tot_qty) ttl_qty,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "select 'UM-OUTPUT',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(tot_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_milling_output\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -5084,7 +5169,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by date(vou_date),vou_no,stock_code,weight_unit";
+                "group by date(vou_date),vou_no,stock_code";
         try {
             reportDao.executeSql(delSql, opSql, purSql, retInSql, saleSql, retOutSql, tfSql, ttSql, mRawSql, mOutSql);
         } catch (Exception e) {
