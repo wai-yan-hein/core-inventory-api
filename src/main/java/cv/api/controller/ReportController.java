@@ -152,6 +152,7 @@ public class ReportController {
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
                 boolean calRO = filter.isCalRO();
+                boolean calMill = filter.isCalMill();
                 String fromDueDate = filter.getFromDueDate();
                 String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
@@ -284,11 +285,11 @@ public class ReportController {
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutSummaryByWeight" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO,calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetailByWeight" -> {
-                        reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                        reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO,calMill, compCode, deptId, macId);
                         List<ClosingBalance> listBalance = reportService.getStockInOutDetailByWeight(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
@@ -467,11 +468,12 @@ public class ReportController {
     public Flux<?> getStockBalanceByWeight(@RequestParam String stockCode,
                                            @RequestParam boolean calSale, @RequestParam boolean calPur,
                                            @RequestParam boolean calRI, @RequestParam boolean calRO,
+                                           @RequestParam boolean calMill,
                                            @RequestParam String compCode, @RequestParam Integer deptId,
                                            @RequestParam Integer macId, @RequestParam boolean summary) {
         String opDate = reportService.getOpeningDate(compCode, deptId);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO, compCode, macId, summary);
+        List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO,calMill, compCode, macId, summary);
         if (list.isEmpty()) {
             VStockBalance b = new VStockBalance();
             b.setLocationName("No Stock.");

@@ -5,7 +5,10 @@
  */
 package cv.api.service;
 
-import cv.api.common.*;
+import cv.api.common.ClosingBalance;
+import cv.api.common.General;
+import cv.api.common.StockValue;
+import cv.api.common.Util1;
 import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.ReportDao;
 import cv.api.dao.UnitRelationDetailDao;
@@ -13,7 +16,6 @@ import cv.api.entity.*;
 import cv.api.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -1677,8 +1679,9 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VStockBalance> getStockBalanceByWeight(String opDate, String clDate, String stockCode,
                                                        boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                       boolean calMill,
                                                        String compCode, Integer macId, boolean summary) {
-        calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO);
+        calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO,calMill);
         List<VStockBalance> list = new ArrayList<>();
         if (summary) {
             String sql = """
@@ -1735,11 +1738,12 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateStockBalanceByWeight(String opDate, String clDate, String stockCode,
                                                String compCode, int macId, boolean calSale, boolean calPur,
-                                               boolean calRI, boolean calRo) {
+                                               boolean calRI, boolean calRo,boolean calMill) {
         String sale = String.valueOf(calSale);
         String purchase = String.valueOf(calPur);
         String retIn = String.valueOf(calRI);
         String retOut = String.valueOf(calRo);
+        String milling =String.valueOf(calMill);
         String delSql = "delete from tmp_stock_balance where mac_id = " + macId;
         String sql = "insert into tmp_stock_balance(stock_code, loc_code, weight, qty, comp_code,mac_id)\n" +
                 "select stock_code,loc_code,sum(total_weight) total_weight,sum(ttl_qty) ttl_qty,comp_code," + macId + "\n" +
@@ -1828,6 +1832,7 @@ public class ReportServiceImpl implements ReportService {
                 "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and stock_code ='" + stockCode + "'\n" +
+                "and (calculate = true and false = " + milling + ")\n" +
                 "group by loc_code\n" +
                 "\tunion all\n" +
                 "select stock_code,loc_code,sum(tot_weight) total_weight,sum(qty) ttl_qty,comp_code\n" +
@@ -1836,6 +1841,7 @@ public class ReportServiceImpl implements ReportService {
                 "and date(vou_date) between '" + opDate + "' and '" + clDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and stock_code ='" + stockCode + "'\n" +
+                "and (calculate = true and false = " + milling + ")\n" +
                 "group by loc_code\n" +
                 ")a\n" +
                 "group by loc_code";
@@ -2233,9 +2239,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
-        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+    public void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode,
+                                                  String catCode, String brandCode, String stockCode, String vouStatus,
+                                                  boolean calSale, boolean calPur, boolean calRI, boolean calRO, boolean calMill,
+                                                  String compCode, Integer deptId, Integer macId) {
+        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
+        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
     }
 
     @Override
@@ -4273,12 +4282,12 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
                                                              String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                                             String compCode, Integer deptId, Integer macId) {
-        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                                             boolean calMill, String compCode, Integer deptId, Integer macId) {
+        calculateOpeningByWeight(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
+        calculateClosingByWeight(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
                 "sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight+a.sale_weight) bal_weight, \n" +
-                "s.weight_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
+                "s.weight_unit,s.pur_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name\n" +
                 "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
                 "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,comp_code,\n" +
                 "sum(op_weight) op_weight,sum(pur_weight) pur_weight,\n" +
@@ -4312,32 +4321,31 @@ public class ReportServiceImpl implements ReportService {
                     float outWeight = rs.getFloat("out_Weight");
                     float balWeight = rs.getFloat("bal_Weight");
 
-                    String unit = rs.getString("weight_unit");
                     b.setOpenQty(opQty);
-                    b.setOpenRel(opQty == 0 ? null : Util1.format(opQty) + " " + unit);
+                    b.setOpenRel(opQty == 0 ? null : Util1.format(opQty));
                     b.setPurQty(purQty);
-                    b.setPurRel(purQty == 0 ? null : Util1.format(purQty) + " " + unit);
+                    b.setPurRel(purQty == 0 ? null : Util1.format(purQty));
                     b.setInQty(inQty);
-                    b.setInRel(inQty == 0 ? null : Util1.format(inQty) + " " + unit);
+                    b.setInRel(inQty == 0 ? null : Util1.format(inQty));
                     b.setSaleQty(saleQty);
-                    b.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty) + " " + unit);
+                    b.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty));
                     b.setOutQty(outQty);
-                    b.setOutRel(outQty == 0 ? null : Util1.format(outQty) + " " + unit);
+                    b.setOutRel(outQty == 0 ? null : Util1.format(outQty));
                     b.setBalQty(balQty);
-                    b.setBalRel(balQty == 0 ? null : Util1.format(balQty) + " " + unit);
+                    b.setBalRel(balQty == 0 ? null : Util1.format(balQty));
 
                     b.setOpenWeight(opWeight);
-                    b.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight) + " " + unit);
+                    b.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     b.setPurWeight(purWeight);
-                    b.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight) + " " + unit);
+                    b.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     b.setInWeight(inWeight);
-                    b.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight) + " " + unit);
+                    b.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     b.setSaleWeight(saleWeight);
-                    b.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight) + " " + unit);
+                    b.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     b.setOutWeight(outWeight);
-                    b.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight) + " " + unit);
+                    b.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     b.setBalWeight(balWeight);
-                    b.setBalWeightRel(balWeight == 0 ? null : Util1.format(balWeight) + " " + unit);
+                    b.setBalWeightRel(balWeight == 0 ? null : Util1.format(balWeight));
 
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
@@ -5059,7 +5067,7 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateClosingByWeight(String fromDate, String toDate, String typeCode, String catCode, String brandCode,
                                           String stockCode, boolean calSale, boolean calPur, boolean calRI,
-                                          boolean calRO, String compCode, Integer deptId, Integer macId) {
+                                          boolean calRO, boolean calMill, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
         String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,op_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_weight) ttl_weight,loc_code,mac_id,'" + compCode + "'," + deptId + "\n" +
@@ -5071,7 +5079,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_purchase\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
-                "and (calculate = true and " + calPur + " = 0)\n" +
+                "and (calculate = true and " + calPur + " = false)\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -5132,7 +5140,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code";
         String ttSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Transfer-T',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" +
+                "select 'Transfer-T',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code_to," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_transfer\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
@@ -5149,7 +5157,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_milling_raw\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
-                "and calculate = true\n" +
+                "and (calculate = true and " + calMill + " = false)\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -5162,7 +5170,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_milling_output\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
-                "and calculate = true\n" +
+                "and (calculate = true and " + calMill + " = false)\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -5170,8 +5178,37 @@ public class ReportServiceImpl implements ReportService {
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code";
+        String stockIn ="insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'StockIn',vou_date vou_date,vou_no,remark,stock_code,sum(in_qty) ttl_qty,sum(total_weight) ttl_weight,loc_code,"+macId+",'"+compCode+"',"+deptId+"\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n"+
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and in_qty>0\n" +
+                "group by date(vou_date),vou_no,stock_code";
+        String stockOut ="insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'StockOut',vou_date vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code,"+macId+",'"+compCode+"',"+deptId+"\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and deleted = false \n" +
+                "and calculate = true\n"+
+                "and comp_code ='" + compCode + "'\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and out_qty>0\n" +
+                "group by date(vou_date),vou_no,stock_code";
         try {
-            reportDao.executeSql(delSql, opSql, purSql, retInSql, saleSql, retOutSql, tfSql, ttSql, mRawSql, mOutSql);
+            reportDao.executeSql(delSql, opSql, purSql, retInSql, saleSql,
+                    retOutSql, tfSql, ttSql, mRawSql, mOutSql,stockIn,stockOut);
         } catch (Exception e) {
             log.error(String.format("calculateClosingByWeight: %s", e.getMessage()));
         }
@@ -5179,8 +5216,8 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateOpeningByWeight(String opDate, String fromDate, String typeCode, String catCode, String brandCode,
                                           String stockCode, boolean calSale,
-                                          boolean calPur, boolean calRI, boolean calRO, String compCode,
-                                          Integer deptId, Integer macId) {
+                                          boolean calPur, boolean calRI, boolean calRO, boolean calMill,
+                                          String compCode, Integer deptId, Integer macId) {
         //delete tmp
         String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
         //opening
@@ -5283,7 +5320,7 @@ public class ReportServiceImpl implements ReportService {
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and deleted = false \n" +
-                "and calculate = true\n" +
+                "and (calculate = true and " + calMill + "=false) \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
@@ -5296,12 +5333,38 @@ public class ReportServiceImpl implements ReportService {
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and deleted = false \n" +
-                "and calculate = true\n" +
+                "and (calculate = true and " + calMill + "=false) \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(total_weight)*-1 weight,sum(in_qty) qty,loc_code, weight_unit\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and in_qty>0\n"+
+                "group by stock_code\n" +
+                "\tunion all\n" +
+                "select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty,loc_code, weight_unit\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and deleted = false \n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and out_qty>0\n"+
                 "group by stock_code\n" +
                 ")a\n" +
                 "group by stock_code";
