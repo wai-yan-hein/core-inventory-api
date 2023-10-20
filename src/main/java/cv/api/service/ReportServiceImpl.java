@@ -2100,7 +2100,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_sale\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and comp_code = '" + compCode + "'\n" +
-                "and deleted = 0\n" +
+                "and deleted = false\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
@@ -2119,7 +2119,6 @@ public class ReportServiceImpl implements ReportService {
                 float smallQty = rs.getFloat("smallest_qty");
                 g.setQtyRel(getRelStr(relCode, compCode, smallQty));
                 g.setAmount(rs.getFloat("ttl_amt"));
-                g.setRelation(rs.getString("rel_name"));
                 g.setSmallQty(smallQty);
                 generals.add(g);
             }
