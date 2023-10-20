@@ -105,6 +105,7 @@ public interface ReportService {
                                         String locCode, String compCode, Integer deptId, Integer macId, boolean summary);
     List<VStockBalance> getStockBalanceByWeight(String opDate, String clDate,String stockCode,
                                                 boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                boolean calMill,
                                                 String compCode,Integer macId, boolean summary);
 
 
@@ -131,7 +132,7 @@ public interface ReportService {
                                    boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
     void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus,
-                                           boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
+                                           boolean calSale, boolean calPur, boolean calRI, boolean calRO, boolean calMill,String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
@@ -258,7 +259,12 @@ public interface ReportService {
 
     List<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode);
 
-    List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId);
+    List<ClosingBalance> getStockInOutSummaryByWeight(String opDate, String fromDate, String toDate,
+                                                      String typeCode, String catCode, String brandCode,
+                                                      String stockCode, String vouTypeCode,
+                                                      boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                      boolean calMill,
+                                                      String compCode, Integer deptId, Integer macId);
 
     VLanding getLandingReport(String vouNo, String compCode);
 }

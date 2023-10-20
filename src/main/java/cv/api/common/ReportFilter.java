@@ -34,6 +34,7 @@ public class ReportFilter {
     private boolean calPur;
     private boolean calRI;
     private boolean calRO;
+    private boolean calMill;
     private Integer macId;
     private String compCode;
     private Integer deptId;
