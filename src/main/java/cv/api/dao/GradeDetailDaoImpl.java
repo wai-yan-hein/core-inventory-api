@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,5 +89,11 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
             log.error("getCriteriaByFormula : " + e.getMessage());
         }
         return list;
+    }
+
+    @Override
+    public List<GradeDetail> getGradeDetail(LocalDateTime updatedDate) {
+        String hsql = "select o from GradeDetail o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 }

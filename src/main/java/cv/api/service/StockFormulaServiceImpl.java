@@ -105,6 +105,11 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     }
 
     @Override
+    public List<GradeDetail> getGradeDetail(LocalDateTime updatedDate) {
+        return gradeDetailDao.getGradeDetail(updatedDate);
+    }
+
+    @Override
     public GradeDetail save(GradeDetail g) {
         return gradeDetailDao.save(g);
     }

@@ -32,7 +32,7 @@ public interface StockFormulaService {
     List<StockFormulaPrice> getStockFormulaPrice(LocalDateTime updatedDate);
 
     List<StockFormulaQty> getStockFormulaQty(LocalDateTime updatedDate);
-
+    List<GradeDetail> getGradeDetail(LocalDateTime updatedDate);
     GradeDetail save(GradeDetail g);
 
     List<GradeDetail> getGradeDetail(String formulaCode, String criteriaCode, String compCode);

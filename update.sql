@@ -1420,6 +1420,14 @@ create table grade_detail (
   primary key (comp_code,formula_code,criteria_code,unique_id)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
+alter table stock_formula_qty
+add column updated_date timestamp not null;
+
+alter table stock_formula_price
+add column updated_date timestamp not null;
+
+alter table grade_detail
+add column updated_date timestamp not null after grade_stock_code;
 
 #view
 drop view if exists v_milling_output;
