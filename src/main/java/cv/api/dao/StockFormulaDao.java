@@ -2,6 +2,8 @@ package cv.api.dao;
 
 import cv.api.entity.StockFormula;
 import cv.api.entity.StockFormulaKey;
+import cv.api.entity.StockFormulaPrice;
+import cv.api.entity.StockFormulaQty;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,4 +17,6 @@ public interface StockFormulaDao {
     List<StockFormula> getFormula(String compCode);
 
     List<StockFormula> getStockFormula(LocalDateTime updatedDate);
+
+
 }

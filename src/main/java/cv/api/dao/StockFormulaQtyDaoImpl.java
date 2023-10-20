@@ -5,6 +5,7 @@ import cv.api.entity.StockFormulaQtyKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,5 +61,9 @@ public class StockFormulaQtyDaoImpl extends AbstractDao<StockFormulaQtyKey, Stoc
         return list;
     }
 
-
+    @Override
+    public List<StockFormulaQty> getStockFormulaQty(LocalDateTime updatedDate) {
+        String hsql = "select o from StockFormulaQty o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
+    }
 }

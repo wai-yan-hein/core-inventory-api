@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,6 +23,8 @@ public class StockFormulaPrice {
     private Double price;
     @Column(name = "percent_allow")
     private double percentAllow;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     private transient String criteriaName;
     private transient String userCode;
     private transient List<GradeDetail> listGrade;
