@@ -14,6 +14,7 @@ import java.util.List;
 public class StockFormulaQtyDaoImpl extends AbstractDao<StockFormulaQtyKey, StockFormulaQty> implements StockFormulaQtyDao {
     @Override
     public StockFormulaQty save(StockFormulaQty s) {
+        s.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(s, s.getKey());
         return s;
     }
@@ -25,7 +26,7 @@ public class StockFormulaQtyDaoImpl extends AbstractDao<StockFormulaQtyKey, Stoc
     }
 
     @Override
-    public List<StockFormulaQty> getFormulaDetail(String code, String compCode) {
+    public List<StockFormulaQty> getStockFormulaQty(String code, String compCode) {
         String sql = """
                 select s.*,sc.criteria_name,sc.user_code
                 from stock_formula_qty s
@@ -56,7 +57,7 @@ public class StockFormulaQtyDaoImpl extends AbstractDao<StockFormulaQtyKey, Stoc
                 list.add(d);
             }
         } catch (Exception e) {
-            log.error("getFormulaDetail : "+e.getMessage());
+            log.error("getStockFormulaQty : "+e.getMessage());
         }
         return list;
     }

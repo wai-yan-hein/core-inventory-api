@@ -15,14 +15,15 @@ import java.util.List;
 @Repository
 public class LabourGroupDaoImpl extends AbstractDao<LabourGroupKey, LabourGroup> implements LabourGroupDao{
     @Override
-    public LabourGroup save(LabourGroup LabourGroup) {
-        saveOrUpdate(LabourGroup, LabourGroup.getKey());
-        return LabourGroup;
+    public LabourGroup save(LabourGroup g) {
+        g.setUpdatedDate(LocalDateTime.now());
+        saveOrUpdate(g, g.getKey());
+        return g;
     }
 
     @Override
     public List<LabourGroup> findAll(String compCode) {
-        String hsql = "select o from LabourGroup o where o.key.compCode = '" + compCode + "'";
+        String hsql = "select o from LabourGroup o where o.key.compCode = '" + compCode + "' and o.deleted =false";
         return findHSQL(hsql);
     }
 

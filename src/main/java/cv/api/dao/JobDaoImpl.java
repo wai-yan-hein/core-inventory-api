@@ -15,14 +15,15 @@ import java.util.List;
 @Repository
 public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
     @Override
-    public Job save(Job Job) {
-        saveOrUpdate(Job, Job.getKey());
-        return Job;
+    public Job save(Job job) {
+        job.setUpdatedDate(LocalDateTime.now());
+        saveOrUpdate(job, job.getKey());
+        return job;
     }
 
     @Override
     public List<Job> findAll(String compCode, Boolean isFinished) {
-        String hsql = "select o from Job o where o.key.compCode = '" + compCode + "'";
+        String hsql = "select o from Job o where o.key.compCode = '" + compCode + "' and o.deleted =false";
         if (!isFinished) {
             hsql += " and o.finished = false";
         }

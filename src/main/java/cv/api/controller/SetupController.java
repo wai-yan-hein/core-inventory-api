@@ -800,12 +800,12 @@ public class SetupController {
 
     @GetMapping(path = "/getStockFormulaPrice")
     public Flux<?> getStockFormulaPrice(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getFormulaPrice(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(stockFormulaService.getStockFormulaPrice(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getStockFormulaQty")
     public Flux<?> getStockFormulaQty(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getFormulaQty(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(stockFormulaService.getStockFormulaQty(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getGradeDetail")
@@ -837,5 +837,11 @@ public class SetupController {
     public Mono<?> deleteStockFormulaDetail(@RequestBody StockFormulaPriceKey key) {
         return Mono.justOrEmpty(stockFormulaService.delete(key));
     }
+
+    @PostMapping(path = "/deleteFormula")
+    public Mono<?> deleteFormula(@RequestBody StockFormulaKey key) {
+        return Mono.just(stockFormulaService.delete(key));
+    }
+
 
 }

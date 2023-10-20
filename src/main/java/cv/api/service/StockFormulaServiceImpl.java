@@ -27,8 +27,6 @@ public class StockFormulaServiceImpl implements StockFormulaService {
         if (Util1.isNullOrEmpty(s.getKey().getFormulaCode())) {
             s.getKey().setFormulaCode(getCode(s.getKey().getCompCode()));
             s.setCreatedDate(Util1.getTodayLocalDate());
-        } else {
-            s.setUpdatedDate(Util1.getTodayLocalDate());
         }
         formulaDao.save(s);
         return s;
@@ -80,13 +78,13 @@ public class StockFormulaServiceImpl implements StockFormulaService {
     }
 
     @Override
-    public List<StockFormulaPrice> getFormulaPrice(String code, String compCode) {
-        return formulaPriceDao.getFormulaDetail(code, compCode);
+    public List<StockFormulaPrice> getStockFormulaPrice(String code, String compCode) {
+        return formulaPriceDao.getStockFormulaPrice(code, compCode);
     }
 
     @Override
-    public List<StockFormulaQty> getFormulaQty(String code, String compCode) {
-        return formulaQtyDao.getFormulaDetail(code, compCode);
+    public List<StockFormulaQty> getStockFormulaQty(String code, String compCode) {
+        return formulaQtyDao.getStockFormulaQty(code, compCode);
     }
 
     @Override

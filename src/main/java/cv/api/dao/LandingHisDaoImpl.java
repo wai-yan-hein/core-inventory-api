@@ -25,6 +25,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
 
     @Override
     public LandingHis save(LandingHis b) {
+        b.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(b, b.getKey());
         return b;
     }

@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
             cat.getKey().setCatCode(catCode);
 
         }
-        cat.setUpdatedDate(LocalDateTime.now());
+
         return dao.save(cat);
     }
 

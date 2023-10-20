@@ -17,6 +17,7 @@ import java.util.List;
 public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> implements PaymentHisDao {
     @Override
     public PaymentHis save(PaymentHis obj) {
+        obj.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(obj, obj.getKey());
         return obj;
     }

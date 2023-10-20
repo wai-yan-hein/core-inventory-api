@@ -22,6 +22,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
 
     @Override
     public OPHis save(OPHis op) {
+        op.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(op, op.getKey());
         return op;
     }

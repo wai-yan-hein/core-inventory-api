@@ -25,6 +25,7 @@ public class VouStatusDaoImpl extends AbstractDao<VouStatusKey, VouStatus> imple
 
     @Override
     public VouStatus save(VouStatus vouStatus) {
+        vouStatus.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(vouStatus,vouStatus.getKey());
         return vouStatus;
     }

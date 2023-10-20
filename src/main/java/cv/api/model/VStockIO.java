@@ -36,4 +36,10 @@ public class VStockIO {
     private String relName;
     private Float smallPrice;
     private ZonedDateTime vouDateTime;
+    private String jobName;
+    private String labourGroupName;
+    private String traderName;
+    private String receivedName;
+    private String receivedPhone;
+    private String carNo;
 }

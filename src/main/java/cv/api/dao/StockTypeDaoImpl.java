@@ -25,6 +25,7 @@ public class StockTypeDaoImpl extends AbstractDao<StockTypeKey, StockType> imple
 
     @Override
     public StockType save(StockType item) {
+        item.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(item,item.getKey());
         return item;
     }

@@ -25,6 +25,7 @@ public class CategoryDaoImpl extends AbstractDao<CategoryKey, Category> implemen
 
     @Override
     public Category save(Category item) {
+        item.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(item, item.getKey());
         return item;
     }

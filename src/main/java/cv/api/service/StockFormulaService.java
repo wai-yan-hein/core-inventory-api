@@ -23,8 +23,9 @@ public interface StockFormulaService {
 
     boolean delete(GradeDetailKey key);
 
-    List<StockFormulaPrice> getFormulaPrice(String formulaCode, String compCode);
-    List<StockFormulaQty> getFormulaQty(String formulaCode, String compCode);
+    List<StockFormulaPrice> getStockFormulaPrice(String formulaCode, String compCode);
+    List<StockFormulaQty> getStockFormulaQty(String formulaCode, String compCode);
+    List<GradeDetail> getGradeDetail(String formulaCode, String criteriaCode, String compCode);
 
 
     List<StockFormula> getStockFormula(LocalDateTime updatedDate);
@@ -35,7 +36,6 @@ public interface StockFormulaService {
     List<GradeDetail> getGradeDetail(LocalDateTime updatedDate);
     GradeDetail save(GradeDetail g);
 
-    List<GradeDetail> getGradeDetail(String formulaCode, String criteriaCode, String compCode);
 
     List<GradeDetail> getStockFormulaGrade(String formulaCode, String compCode);
 }

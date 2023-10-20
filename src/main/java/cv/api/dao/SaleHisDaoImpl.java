@@ -32,6 +32,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
 
     @Override
     public SaleHis save(SaleHis sh) {
+        sh.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(sh, sh.getKey());
         return sh;
     }

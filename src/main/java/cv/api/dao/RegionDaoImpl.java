@@ -26,6 +26,7 @@ public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements Reg
 
     @Override
     public Region save(Region region) {
+        region.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(region, region.getKey());
         return region;
     }

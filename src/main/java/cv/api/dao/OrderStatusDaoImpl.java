@@ -15,9 +15,10 @@ import java.util.List;
 @Repository
 public class OrderStatusDaoImpl extends AbstractDao<OrderStatusKey, OrderStatus> implements OrderStatusDao{
     @Override
-    public OrderStatus save(OrderStatus orderStatus) {
-        saveOrUpdate(orderStatus, orderStatus.getKey());
-        return orderStatus;
+    public OrderStatus save(OrderStatus s) {
+        s.setUpdatedDate(LocalDateTime.now());
+        saveOrUpdate(s, s.getKey());
+        return s;
     }
 
     @Override

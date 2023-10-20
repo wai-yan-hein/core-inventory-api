@@ -13,7 +13,7 @@ public interface StockFormulaQtyDao {
 
     boolean delete(StockFormulaQtyKey key);
 
-    List<StockFormulaQty> getFormulaDetail(String code, String compCode);
+    List<StockFormulaQty> getStockFormulaQty(String code, String compCode);
     List<StockFormulaQty> getStockFormulaQty(LocalDateTime updatedDate);
 
 }

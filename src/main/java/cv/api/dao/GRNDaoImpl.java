@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class GRNDaoImpl extends AbstractDao<GRNKey, GRN> implements GRNDao {
     @Override
     public GRN save(GRN b) {
         saveOrUpdate(b, b.getKey());
+        b.setUpdatedDate(LocalDateTime.now());
         return b;
     }
 

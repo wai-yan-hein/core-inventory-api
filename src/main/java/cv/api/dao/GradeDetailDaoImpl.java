@@ -68,7 +68,8 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
                 on g.grade_stock_code = s.stock_code
                 and g.comp_code = s.comp_code
                 where g.formula_code =?
-                and g.comp_code =?""";
+                and g.comp_code =?
+                order by g.uniqueId""";
         try {
             ResultSet rs = getResult(sql, formulaCode, compCode);
             while (rs.next()) {
@@ -86,7 +87,7 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
                 list.add(d);
             }
         } catch (Exception e) {
-            log.error("getCriteriaByFormula : " + e.getMessage());
+            log.error("getStockFormulaGrade : " + e.getMessage());
         }
         return list;
     }

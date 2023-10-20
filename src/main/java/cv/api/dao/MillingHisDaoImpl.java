@@ -27,6 +27,7 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
 
     @Override
     public MillingHis save(MillingHis sh) {
+        sh.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(sh, sh.getKey());
         return sh;
     }

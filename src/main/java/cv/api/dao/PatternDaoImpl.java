@@ -20,7 +20,7 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
 
     @Override
     public Pattern save(Pattern pattern) {
-        saveOrUpdate(pattern,pattern.getKey());
+        saveOrUpdate(pattern, pattern.getKey());
         return pattern;
     }
 

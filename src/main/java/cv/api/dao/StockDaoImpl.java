@@ -26,6 +26,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
 
     @Override
     public Stock save(Stock stock) {
+        stock.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(stock, stock.getKey());
         return stock;
     }

@@ -41,7 +41,6 @@ public class OrderHisServiceImpl implements OrderHisService {
     @Override
     public OrderHis save(OrderHis orderHis) {
         orderHis.setVouDate(Util1.toDateTime(orderHis.getVouDate()));
-        orderHis.setUpdatedDate(LocalDateTime.now());
         if (Util1.isNullOrEmpty(orderHis.getKey().getVouNo())) {
             orderHis.getKey().setVouNo(getVoucherNo(orderHis.getDeptId(), orderHis.getMacId(), orderHis.getKey().getCompCode()));
         }

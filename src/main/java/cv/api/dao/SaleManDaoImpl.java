@@ -25,6 +25,7 @@ public class SaleManDaoImpl extends AbstractDao<SaleManKey, SaleMan> implements 
 
     @Override
     public SaleMan save(SaleMan saleMan) {
+        saleMan.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(saleMan, saleMan.getKey());
         return saleMan;
     }

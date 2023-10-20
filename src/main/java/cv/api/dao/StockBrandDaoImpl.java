@@ -25,6 +25,7 @@ public class StockBrandDaoImpl extends AbstractDao<StockBrandKey, StockBrand> im
 
     @Override
     public StockBrand save(StockBrand item) {
+        item.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(item, item.getKey());
         return item;
     }

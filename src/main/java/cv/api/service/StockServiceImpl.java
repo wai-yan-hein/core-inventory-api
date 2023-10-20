@@ -45,7 +45,6 @@ public class StockServiceImpl implements StockService {
                 throw new IllegalStateException("Duplicate Stock Code");
             }
         }
-        stock.setUpdatedDate(LocalDateTime.now());
         return dao.save(stock);
     }
 

@@ -11,7 +11,7 @@ public interface StockFormulaPriceDao {
 
     boolean delete(StockFormulaPriceKey key);
 
-    List<StockFormulaPrice> getFormulaDetail(String code, String compCode);
+    List<StockFormulaPrice> getStockFormulaPrice(String code, String compCode);
 
     List<StockFormulaPrice> getFormulaDetail(String code);
     List<StockFormulaPrice> getStockFormulaPrice(LocalDateTime updatedDate);

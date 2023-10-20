@@ -9,6 +9,7 @@ import cv.api.common.Util1;
 import cv.api.entity.Trader;
 import cv.api.entity.TraderKey;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -58,20 +59,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     public List<Trader> searchTrader(String str, String type, String compCode, Integer deptId) {
         str = Util1.cleanStr(str);
         str = str + "%";
-        String filter = """
-                where active = true
-                and deleted = false
-                and comp_code =?
-                and (dept_id =? or 0 =?)
-                and (LOWER(REPLACE(user_code, ' ', '')) like ? or LOWER(REPLACE(trader_name, ' ', '')) like ?)
-                """;
-        if (!type.equals("-")) {
-            filter += "and (multi =1 or type ='" + type + "')";
-        }
-        String sql = "select code,user_code,trader_name,price_type,type,address,credit_amt,credit_days\n" +
-                "from trader\n" + filter + "\n" +
-                "order by user_code,trader_name\n" +
-                "limit 100\n";
+        String sql = getString(type);
         ResultSet rs = getResult(sql, compCode, deptId, deptId, str, str);
         List<Trader> list = new ArrayList<>();
         try {
@@ -99,8 +87,27 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
         return list;
     }
 
+    @NotNull
+    private static String getString(String type) {
+        String filter = """
+                where active = true
+                and deleted = false
+                and comp_code =?
+                and (dept_id =? or 0 =?)
+                and (LOWER(REPLACE(user_code, ' ', '')) like ? or LOWER(REPLACE(trader_name, ' ', '')) like ?)
+                """;
+        if (!type.equals("-")) {
+            filter += "and (multi =1 or type ='" + type + "')";
+        }
+        return "select code,user_code,trader_name,price_type,type,address,credit_amt,credit_days\n" +
+                "from trader\n" + filter + "\n" +
+                "order by user_code,trader_name\n" +
+                "limit 100\n";
+    }
+
     @Override
     public Trader saveTrader(Trader trader) {
+        trader.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(trader, trader.getKey());
         return trader;
     }

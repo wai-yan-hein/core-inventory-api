@@ -1681,7 +1681,7 @@ public class ReportServiceImpl implements ReportService {
                                                        boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                        boolean calMill,
                                                        String compCode, Integer macId, boolean summary) {
-        calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO,calMill);
+        calculateStockBalanceByWeight(opDate, clDate, stockCode, compCode, macId, calSale, calPur, calRI, calRO, calMill);
         List<VStockBalance> list = new ArrayList<>();
         if (summary) {
             String sql = """
@@ -1738,12 +1738,12 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateStockBalanceByWeight(String opDate, String clDate, String stockCode,
                                                String compCode, int macId, boolean calSale, boolean calPur,
-                                               boolean calRI, boolean calRo,boolean calMill) {
+                                               boolean calRI, boolean calRo, boolean calMill) {
         String sale = String.valueOf(calSale);
         String purchase = String.valueOf(calPur);
         String retIn = String.valueOf(calRI);
         String retOut = String.valueOf(calRo);
-        String milling =String.valueOf(calMill);
+        String milling = String.valueOf(calMill);
         String delSql = "delete from tmp_stock_balance where mac_id = " + macId;
         String sql = "insert into tmp_stock_balance(stock_code, loc_code, weight, qty, comp_code,mac_id)\n" +
                 "select stock_code,loc_code,sum(total_weight) total_weight,sum(ttl_qty) ttl_qty,comp_code," + macId + "\n" +
@@ -3504,10 +3504,17 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
         String sql = """
                 select vou_no,vou_date,remark,description,s_user_code,stock_name,in_qty,
-                in_unit,out_qty,out_unit,l.loc_name
+                in_unit,out_qty,out_unit,received_name, received_phone, car_no,
+                l.loc_name,g.labour_group_name,t.trader_name,j.job_name
                 from v_stock_io v join location l
                 on v.loc_code = l.loc_code
                 and v.comp_code =l.comp_code
+                left join labour_group g on v.labour_group_code = g.code
+                and v.comp_code = g.comp_code
+                left join trader t on v.trader_code = t.code
+                and v.comp_code = t.comp_code
+                left join job j on v.job_code = j.job_no
+                and v.comp_code = j.comp_code
                 where v.vou_no =?
                 and v.comp_code=?
                 order by unique_id;
@@ -3530,6 +3537,12 @@ public class ReportServiceImpl implements ReportService {
                     in.setStockCode(rs.getString("s_user_code"));
                     in.setRemark(rs.getString("remark"));
                     in.setDescription(rs.getString("description"));
+                    in.setJobName(rs.getString("job_name"));
+                    in.setLabourGroupName(rs.getString("labour_group_name"));
+                    in.setTraderName(rs.getString("trader_name"));
+                    in.setReceivedName(rs.getString("received_name"));
+                    in.setReceivedPhone(rs.getString("received_phone"));
+                    in.setCarNo(rs.getString("car_no"));
                     in.setUnit(Util1.isNull(in.getInUnit(), in.getOutUnit()));
                     riList.add(in);
                 }
@@ -5176,12 +5189,12 @@ public class ReportServiceImpl implements ReportService {
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code";
-        String stockIn ="insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'StockIn',vou_date vou_date,vou_no,remark,stock_code,sum(in_qty) ttl_qty,sum(total_weight) ttl_weight,loc_code,"+macId+",'"+compCode+"',"+deptId+"\n" +
+        String stockIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'StockIn',vou_date vou_date,vou_no,remark,stock_code,sum(in_qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_stock_io\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
-                "and calculate = true\n"+
+                "and calculate = true\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -5190,12 +5203,12 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and in_qty>0\n" +
                 "group by date(vou_date),vou_no,stock_code";
-        String stockOut ="insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'StockOut',vou_date vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code,"+macId+",'"+compCode+"',"+deptId+"\n" +
+        String stockOut = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'StockOut',vou_date vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_stock_io\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and deleted = false \n" +
-                "and calculate = true\n"+
+                "and calculate = true\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + ")\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -5206,7 +5219,7 @@ public class ReportServiceImpl implements ReportService {
                 "group by date(vou_date),vou_no,stock_code";
         try {
             reportDao.executeSql(delSql, opSql, purSql, retInSql, saleSql,
-                    retOutSql, tfSql, ttSql, mRawSql, mOutSql,stockIn,stockOut);
+                    retOutSql, tfSql, ttSql, mRawSql, mOutSql, stockIn, stockOut);
         } catch (Exception e) {
             log.error(String.format("calculateClosingByWeight: %s", e.getMessage()));
         }
@@ -5349,7 +5362,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and in_qty>0\n"+
+                "and in_qty>0\n" +
                 "group by stock_code\n" +
                 "\tunion all\n" +
                 "select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty,loc_code, weight_unit\n" +
@@ -5362,7 +5375,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and out_qty>0\n"+
+                "and out_qty>0\n" +
                 "group by stock_code\n" +
                 ")a\n" +
                 "group by stock_code";

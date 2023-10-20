@@ -39,6 +39,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
 
     @Override
     public StockInOut save(StockInOut stock) {
+        stock.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(stock, stock.getKey());
         return stock;
     }

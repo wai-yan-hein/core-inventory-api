@@ -32,6 +32,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
 
     @Override
     public PurHis save(PurHis sh) {
+        sh.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(sh, sh.getKey());
         return sh;
     }

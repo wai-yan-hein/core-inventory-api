@@ -27,6 +27,7 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
 
     @Override
     public Location save(Location ch) {
+        ch.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(ch, ch.getKey());
         return ch;
     }

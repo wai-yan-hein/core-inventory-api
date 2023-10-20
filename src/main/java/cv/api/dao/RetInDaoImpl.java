@@ -30,6 +30,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
 
     @Override
     public RetInHis save(RetInHis sh) {
+        sh.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(sh, sh.getKey());
         return sh;
     }

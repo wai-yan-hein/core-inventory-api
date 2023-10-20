@@ -31,6 +31,7 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
 
     @Override
     public OrderHis save(OrderHis sh) {
+        sh.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(sh, sh.getKey());
         return sh;
     }

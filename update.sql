@@ -1427,14 +1427,13 @@ add column car_no varchar(255) null after received_phone,
 add column trader_code varchar(15) null after car_no;
 
 alter table stock_formula_qty
-add column updated_date timestamp not null;
+add column updated_date timestamp default current_timestamp;
 
 alter table stock_formula_price
-add column updated_date timestamp not null;
+add column updated_date timestamp not null default current_timestamp;
 
 alter table grade_detail
-add column updated_date timestamp not null after grade_stock_code;
->>>>>>> 3499cc34c1eaa59990738cb59b3ce1a0e4b65dc5
+add column updated_date timestamp not null default current_timestamp;
 
 #view
 drop view if exists v_milling_output;
@@ -1458,4 +1457,4 @@ create  view v_purchase as select ph.project_no as project_no,ph.vou_date as vou
 drop view if exists v_transfer;
 create  view v_transfer as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.ref_no as ref_no,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code_from as loc_code_from,th.loc_code_to as loc_code_to,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.labour_group_code as labour_group_code,td.stock_code as stock_code,td.qty as qty,td.unit as unit,td.unique_id as unique_id,td.weight as weight,td.weight_unit as weight_unit,td.total_weight as total_weight,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((transfer_his th join transfer_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
 drop view if exists v_stock_io;
-create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,i.labour_group_code as labour_group_code,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.total_weight as total_weight,iod.weight_unit as weight_unit,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no)) join stock s on(iod.stock_code = s.stock_code));
+create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,i.labour_group_code as labour_group_code,i.job_code as job_code,i.received_name as received_name,i.received_phone as received_phone,i.car_no as car_no,i.trader_code as trader_code,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.total_weight as total_weight,iod.weight_unit as weight_unit,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no)) join stock s on(iod.stock_code = s.stock_code));
