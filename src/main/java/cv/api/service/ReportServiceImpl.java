@@ -2094,8 +2094,9 @@ public class ReportServiceImpl implements ReportService {
     public List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode,
                                            String brandCode, String catCode, String compCode,
                                            Integer deptId) throws Exception {
-        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty*rel.smallest_qty) smallest_qty, rel.rel_name\n" +
-                "from (select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code\n" +
+        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty) smallest_qty\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code\n" +
                 "from v_sale\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and comp_code = '" + compCode + "'\n" +
@@ -2103,10 +2104,8 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "group by stock_code,sale_unit\n" + ")a\n" +
-                "join v_relation rel on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code = rel.comp_code\n" +
+                "group by stock_code,sale_unit\n" +
+                ")a\n" +
                 "group by stock_code\n" +
                 "order by smallest_qty desc";
         ResultSet rs = reportDao.executeSql(sql);
