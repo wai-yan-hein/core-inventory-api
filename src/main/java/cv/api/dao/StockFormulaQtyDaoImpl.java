@@ -63,7 +63,7 @@ public class StockFormulaQtyDaoImpl extends AbstractDao<StockFormulaQtyKey, Stoc
 
     @Override
     public List<StockFormulaQty> getStockFormulaQty(LocalDateTime updatedDate) {
-        String hsql = "select o from getStockFormulaQty o where o.updatedDate > :updatedDate";
+        String hsql = "select o from StockFormulaQty o where o.updatedDate > :updatedDate";
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 }

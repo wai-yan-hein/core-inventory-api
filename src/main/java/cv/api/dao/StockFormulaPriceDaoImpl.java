@@ -95,7 +95,7 @@ public class StockFormulaPriceDaoImpl extends AbstractDao<StockFormulaPriceKey, 
 
     @Override
     public List<StockFormulaPrice> getStockFormulaPrice(LocalDateTime updatedDate) {
-        String hsql = "select o from getStockFormulaPrice o where o.updatedDate > :updatedDate";
+        String hsql = "select o from StockFormulaPrice o where o.updatedDate > :updatedDate";
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 }
