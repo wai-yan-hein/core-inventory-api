@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "stock_formula_qty")
@@ -22,6 +24,8 @@ public class StockFormulaQty {
     private String unit;
     @Column(name = "percent_allow")
     private double percentAllow;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     private transient String criteriaName;
     private transient String userCode;
 }
