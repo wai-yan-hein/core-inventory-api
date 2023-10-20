@@ -1420,6 +1420,11 @@ create table grade_detail (
   primary key (comp_code,formula_code,criteria_code,unique_id)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
+alter table stock_in_out
+add column received_name varchar(255) null after job_code,
+add column received_phone varchar(255) null after received_name,
+add column car_no varchar(255) null after received_phone,
+add column trader_code varchar(15) null after car_no;
 
 #view
 drop view if exists v_milling_output;

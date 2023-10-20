@@ -35,6 +35,7 @@ public class StockTypeServiceImpl implements StockTypeService {
             String code = getCode(s.getMacId(), s.getKey().getCompCode());
             s.getKey().setStockTypeCode(code);
         }
+        s.setUpdatedDate(LocalDateTime.now());
         return dao.save(s);
     }
 
