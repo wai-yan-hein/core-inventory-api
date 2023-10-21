@@ -42,4 +42,9 @@ public class VStockIO {
     private String receivedName;
     private String receivedPhone;
     private String carNo;
+    private String phoneNo;
+    private String regionName;
+    private String inUnitName;
+    private String outUnitName;
+    private String weightUnitName;
 }

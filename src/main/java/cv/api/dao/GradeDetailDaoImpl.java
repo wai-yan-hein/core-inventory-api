@@ -69,7 +69,7 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
                 and g.comp_code = s.comp_code
                 where g.formula_code =?
                 and g.comp_code =?
-                order by g.uniqueId""";
+                order by g.unique_id""";
         try {
             ResultSet rs = getResult(sql, formulaCode, compCode);
             while (rs.next()) {

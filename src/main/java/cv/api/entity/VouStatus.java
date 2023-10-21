@@ -48,4 +48,6 @@ public class VouStatus {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
+    @Column(name = "report_name")
+    private String reportName;
 }

@@ -3505,7 +3505,8 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select vou_no,vou_date,remark,description,s_user_code,stock_name,in_qty,
                 in_unit,out_qty,out_unit,received_name, received_phone, car_no,
-                l.loc_name,g.labour_group_name,t.trader_name,j.job_name
+                l.loc_name,g.labour_group_name,t.trader_name,t.phone,r.reg_name,j.job_name,
+                s1.unit_name weight_unit_name,s2.unit_name in_unit_name,s3.unit_name out_unit_name
                 from v_stock_io v join location l
                 on v.loc_code = l.loc_code
                 and v.comp_code =l.comp_code
@@ -3513,8 +3514,16 @@ public class ReportServiceImpl implements ReportService {
                 and v.comp_code = g.comp_code
                 left join trader t on v.trader_code = t.code
                 and v.comp_code = t.comp_code
+                left join region r on t.reg_code = r.reg_code
+                and t.comp_code = r.comp_code
                 left join job j on v.job_code = j.job_no
                 and v.comp_code = j.comp_code
+                left join stock_unit s1 on v.weight_unit = s1.unit_code
+                and v.comp_code = s1.comp_code
+                left join stock_unit s2 on v.in_unit = s2.unit_code
+                and v.comp_code = s2.comp_code
+                left join stock_unit s3 on v.out_unit = s3.unit_code
+                and v.comp_code  = s3.comp_code
                 where v.vou_no =?
                 and v.comp_code=?
                 order by unique_id;
@@ -3543,7 +3552,11 @@ public class ReportServiceImpl implements ReportService {
                     in.setReceivedName(rs.getString("received_name"));
                     in.setReceivedPhone(rs.getString("received_phone"));
                     in.setCarNo(rs.getString("car_no"));
+                    in.setRegionName(rs.getString("region_name"));
                     in.setUnit(Util1.isNull(in.getInUnit(), in.getOutUnit()));
+                    in.setInUnitName(rs.getString("in_unit_name"));
+                    in.setOutUnitName(rs.getString("out_unit_name"));
+                    in.setWeightUnitName(rs.getString("weight_unit_name"));
                     riList.add(in);
                 }
             }
