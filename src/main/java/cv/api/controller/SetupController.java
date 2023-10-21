@@ -551,6 +551,11 @@ public class SetupController {
         return Flux.fromIterable(jobService.findAll(compCode, finished));
     }
 
+    @GetMapping(path = "/getUpdateJob")
+    public Flux<?> getUpdateJob(@RequestParam String updatedDate) {
+        return Flux.fromIterable(jobService.getJob(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
     @GetMapping(path = "/getUpdateOrderStatus")
     public Flux<?> getUpdateOrderStatus(@RequestParam String updatedDate) {
         return Flux.fromIterable(orderStatusService.getOrderStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
@@ -668,6 +673,11 @@ public class SetupController {
         });
 
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/getUpdatePattern")
+    public Flux<?> getUpdatePattern(@RequestParam String updatedDate) {
+        return Flux.fromIterable(patternService.getPattern(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     public General getPrice(String stockCode, String vouDate, String unit, String type, String compCode) {

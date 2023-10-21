@@ -1,11 +1,13 @@
 package cv.api.dao;
 
+import cv.api.entity.Job;
 import cv.api.entity.Pattern;
 import cv.api.entity.PatternKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,5 +85,11 @@ public class PatternDaoImpl extends AbstractDao<PatternKey, Pattern> implements 
     public List<Pattern> unUpload() {
         String hsql = "select o from Pattern o where o.intgUpdStatus is null";
         return findHSQL(hsql);
+    }
+
+    @Override
+    public List<Pattern> getPattern(LocalDateTime updatedDate) {
+        String hsql = "select o from Pattern o where o.updatedDate > :updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 }
