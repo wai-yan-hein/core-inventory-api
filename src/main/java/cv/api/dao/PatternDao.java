@@ -1,8 +1,10 @@
 package cv.api.dao;
 
+import cv.api.entity.Job;
 import cv.api.entity.Pattern;
 import cv.api.entity.PatternKey;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PatternDao {
@@ -15,6 +17,6 @@ public interface PatternDao {
     List<Pattern> search(String stockCode, String compCode);
 
     List<Pattern> unUpload();
-
+    List<Pattern> getPattern(LocalDateTime updatedDate);
 
 }

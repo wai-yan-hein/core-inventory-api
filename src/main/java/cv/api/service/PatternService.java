@@ -1,8 +1,10 @@
 package cv.api.service;
 
+import cv.api.entity.Job;
 import cv.api.entity.Pattern;
 import cv.api.entity.PatternKey;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PatternService {
@@ -15,5 +17,6 @@ public interface PatternService {
     void delete(Pattern pattern);
 
     List<Pattern> unUpload();
+    List<Pattern> getPattern(LocalDateTime updatedDate);
 
 }

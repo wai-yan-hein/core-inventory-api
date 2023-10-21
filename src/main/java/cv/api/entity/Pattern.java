@@ -5,6 +5,8 @@ import lombok.Data;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "pattern")
@@ -26,6 +28,8 @@ public class Pattern implements java.io.Serializable {
     private String priceTypeCode;
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
     @Transient
     private String priceTypeName;
     @Transient
