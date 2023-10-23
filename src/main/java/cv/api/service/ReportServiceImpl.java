@@ -3220,7 +3220,7 @@ public class ReportServiceImpl implements ReportService {
             filter += "and (loc_code_from ='" + locCode + "' or loc_code_to ='" + locCode + "')\n";
         }
         String sql = "select v.vou_date,v.vou_no,v.remark,v.ref_no,v.created_by," +
-                "v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name,t.trader_name, v.labour_group_code, v.job_code\n" +
+                "v.deleted,v.dept_id,l.loc_name from_loc_name,ll.loc_name to_loc_name,t.trader_name, v.labour_group_code\n" +
                 "from v_transfer v join location l\n" +
                 "on v.loc_code_from = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
@@ -3503,9 +3503,9 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
         String sql = """
-                select vou_no,vou_date,remark,description,s_user_code,stock_name,in_qty,
+                select vou_no,vou_date,v.remark,description,s_user_code,stock_name,weight,in_qty,
                 in_unit,out_qty,out_unit,received_name, received_phone, car_no,
-                l.loc_name,g.labour_group_name,t.trader_name,t.phone,r.reg_name,j.job_name,
+                l.loc_name,g.labour_name,t.trader_name,t.phone,r.reg_name,j.job_name,
                 s1.unit_name weight_unit_name,s2.unit_name in_unit_name,s3.unit_name out_unit_name
                 from v_stock_io v join location l
                 on v.loc_code = l.loc_code
@@ -3537,26 +3537,28 @@ public class ReportServiceImpl implements ReportService {
                     //vou_no, vou_date, remark, description, s_user_code, stock_name, in_qty, in_unit, out_qty, out_unit, loc_name
                     in.setStockName(rs.getString("stock_name"));
                     in.setInUnit(rs.getString("in_unit"));
-                    in.setInQty(Util1.toNull(rs.getFloat("in_qty")));
+                    in.setInQty(rs.getDouble("in_qty"));
                     in.setOutUnit(rs.getString("out_unit"));
-                    in.setOutQty(Util1.toNull(rs.getFloat("out_qty")));
+                    in.setOutQty(rs.getDouble("out_qty"));
                     in.setVouNo(rs.getString("vou_no"));
-                    in.setVouDate(rs.getString("vou_date"));
+                    in.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     in.setLocName(rs.getString("loc_name"));
                     in.setStockCode(rs.getString("s_user_code"));
                     in.setRemark(rs.getString("remark"));
                     in.setDescription(rs.getString("description"));
                     in.setJobName(rs.getString("job_name"));
-                    in.setLabourGroupName(rs.getString("labour_group_name"));
+                    in.setLabourGroupName(rs.getString("labour_name"));
                     in.setTraderName(rs.getString("trader_name"));
+                    in.setPhoneNo(rs.getString("phone"));
                     in.setReceivedName(rs.getString("received_name"));
                     in.setReceivedPhone(rs.getString("received_phone"));
                     in.setCarNo(rs.getString("car_no"));
-                    in.setRegionName(rs.getString("region_name"));
+                    in.setRegionName(rs.getString("reg_name"));
                     in.setUnit(Util1.isNull(in.getInUnit(), in.getOutUnit()));
                     in.setInUnitName(rs.getString("in_unit_name"));
                     in.setOutUnitName(rs.getString("out_unit_name"));
                     in.setWeightUnitName(rs.getString("weight_unit_name"));
+                    in.setWeight(rs.getDouble("weight"));
                     riList.add(in);
                 }
             }

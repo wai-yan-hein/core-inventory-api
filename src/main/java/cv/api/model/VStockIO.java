@@ -18,23 +18,23 @@ public class VStockIO {
     private String stockName;
     private String locName;
     private String curCode;
-    private Float inQty;
+    private double inQty;
     private String inUnit;
-    private Float outQty;
+    private double outQty;
     private String outUnit;
-    private Float costPrice;
-    private Float inAmt;
-    private Float outAmt;
+    private double costPrice;
+    private double inAmt;
+    private double outAmt;
     private String createdBy;
     private boolean deleted;
     private String unit;
-    private Float price;
-    private Float qty;
+    private double price;
+    private double qty;
     private String stockCode;
     private String processNo;
     private Integer deptId;
     private String relName;
-    private Float smallPrice;
+    private double smallPrice;
     private ZonedDateTime vouDateTime;
     private String jobName;
     private String labourGroupName;
@@ -47,4 +47,5 @@ public class VStockIO {
     private String inUnitName;
     private String outUnitName;
     private String weightUnitName;
+    private double weight;
 }
