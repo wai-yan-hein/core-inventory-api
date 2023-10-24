@@ -91,9 +91,9 @@ public class ReportServiceImpl implements ReportService {
                 and v.comp_code = l.comp_code
                 left join category c on v.cat_code = c.cat_code
                 and v.comp_code = c.comp_code
-                join stock_unit u1 on v.sale_unit = u1.unit_code
+                left join stock_unit u1 on v.sale_unit = u1.unit_code
                 and v.comp_code = u1.comp_code
-                join stock_unit u2 on v.weight_unit = u2.unit_code
+                left join stock_unit u2 on v.weight_unit = u2.unit_code
                 and v.comp_code = u2.comp_code
                 where v.vou_no =?
                 and v.comp_code =?""";
@@ -215,7 +215,7 @@ public class ReportServiceImpl implements ReportService {
                 and p.comp_code =loc.comp_code
                 left join labour_group l on p.labour_group_code = l.code
                 and p.comp_code = l.comp_code
-                join stock_unit u1 on p.weight_unit = u1.unit_code
+                left join stock_unit u1 on p.weight_unit = u1.unit_code
                 and p.comp_code = u1.comp_code
                 join stock_unit u2 on p.pur_unit = u2.unit_code
                 and p.comp_code = u2.comp_code
