@@ -97,15 +97,15 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
         List<StockInOutDetail> listOP = new ArrayList<>();
         String sql = """
                 select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,op.*,s.user_code,s.stock_name
-                                from stock_in_out_detail op
-                                join stock_in_out l on op.vou_no = l.vou_no
-                                and op.comp_code = l.comp_code
-                                join stock s on op.stock_code = s.stock_code
-                                and op.comp_code = s.comp_code
-                                where l.job_code =?
-                                and l.comp_code =?
-                                group by op.stock_code,weight_unit,in_unit,out_unit
-                                order by unique_id;
+                from stock_in_out_detail op
+                join stock_in_out l on op.vou_no = l.vou_no
+                and op.comp_code = l.comp_code
+                join stock s on op.stock_code = s.stock_code
+                and op.comp_code = s.comp_code
+                where l.job_code =?
+                and l.comp_code =?
+                group by op.stock_code,weight_unit,in_unit,out_unit
+                order by vou_no,unique_id;
                 """;
         ResultSet rs = getResult(sql,jobId,compCode);
         if (rs != null) {
@@ -124,14 +124,8 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setInUnitCode(rs.getString("in_unit"));
                     op.setOutQty(rs.getDouble("out_tot_qty"));
                     op.setOutUnitCode(rs.getString("out_unit"));
-//                    op.setLocCode(rs.getString("loc_code"));
-//                    op.setLocName(rs.getString("loc_name"));
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
-//                    op.setCatName(rs.getString("cat_name"));
-//                    op.setGroupName(rs.getString("stock_type_name"));
-//                    op.setBrandName(rs.getString("brand_name"));
-//                    op.setRelName(rs.getString("rel_name"));
                     op.setCostPrice(rs.getDouble("cost_price"));
                     op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));

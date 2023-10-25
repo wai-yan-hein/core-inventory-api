@@ -19,7 +19,6 @@ public interface MillingUsageDao {
 
     MillingUsage save(MillingUsage sdh);
 
-    List<MillingUsage> search(String vouNo, String compCode);
-
+    List<MillingUsage> getMillingUsage(String vouNo, String compCode);
     int delete(MillingUsageKey key);
 }
