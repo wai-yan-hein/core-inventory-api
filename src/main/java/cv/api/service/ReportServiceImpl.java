@@ -1246,6 +1246,36 @@ public class ReportServiceImpl implements ReportService {
         return list;
     }
 
+    @Override
+    public List<VPurchase> getPurchaseByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+        List<VPurchase> list = new ArrayList<>();
+        String sql = "select stock_code,s_user_code,stock_name,COALESCE(SUM(total_weight), 0) AS ttl_weight,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
+                "and deleted = 0\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,pur_unit";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VPurchase p = new VPurchase();
+//                String relCode = rs.getString("rel_code");
+                double smallQty = rs.getDouble("ttl_qty");
+                p.setStockCode(rs.getString("s_user_code"));
+                p.setStockName(rs.getString("stock_name"));
+//                p.setRelName(rs.getString("rel_name"));
+                p.setPurAmount(rs.getDouble("ttl_amt"));
+//                p.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                p.setTotalQty(smallQty);
+                p.setTotalWeight(rs.getDouble("ttl_weight"));
+//                p.setPurUnit(rs.getString("unit"));
+                list.add(p);
+            }
+        }
+        return list;
+    }
+
 
     @Override
     public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
