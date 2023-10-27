@@ -8,11 +8,12 @@ package cv.api.controller;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
-import cv.api.entity.*;
-import cv.api.repo.AccountRepo;
-import cv.api.service.*;
+import cv.api.entity.MillingHis;
+import cv.api.entity.MillingHisKey;
+import cv.api.service.MillingHisService;
+import cv.api.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,26 +26,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/milling")
 @Slf4j
+@RequiredArgsConstructor
 public class MillingController {
 
     private final ReturnObject ro = new ReturnObject();
-    @Autowired
-    private MillingHisService hService;
-    @Autowired
-    private MillingRawService rawService;
-    @Autowired
-    private MillingOutService outService;
-    @Autowired
-    private MillingExpenseService expService;
-    @Autowired
-    private ReportService reportService;
+    private final MillingHisService millingHisService;
+    private final ReportService reportService;
 
     @PostMapping(path = "/saveMilling")
     public Mono<?> saveMilling(@RequestBody MillingHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
-            sale = hService.save(sale);
+            sale = millingHisService.save(sale);
         } else {
             return Mono.justOrEmpty(ro);
         }
@@ -95,7 +89,7 @@ public class MillingController {
 
     @PostMapping(path = "/deleteMilling")
     public Mono<?> deleteSale(@RequestBody MillingHisKey key) throws Exception {
-        hService.delete(key);
+        millingHisService.delete(key);
         //delete in account
 //        accountRepo.deleteInvVoucher(key);
         //delete in cloud
@@ -104,13 +98,13 @@ public class MillingController {
 
     @PostMapping(path = "/restoreMilling")
     public Mono<?> restoreMilling(@RequestBody MillingHisKey key) throws Exception {
-        hService.restore(key);
+        millingHisService.restore(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/findMilling")
     public Mono<MillingHis> findMilling(@RequestBody MillingHisKey key) {
-        MillingHis sh = hService.findById(key);
+        MillingHis sh = millingHisService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 
@@ -118,20 +112,25 @@ public class MillingController {
     public Flux<?> getRawDetail(@RequestParam String vouNo,
                                  @RequestParam String compCode,
                                  @RequestParam Integer deptId) {
-        return Flux.fromIterable(rawService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(millingHisService.getMillingRaw(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(path = "/getExpenseDetail")
+    @GetMapping(path = "/getMillingExpense")
     public Flux<?> getExpenseDetail(@RequestParam String vouNo,
                                     @RequestParam String compCode,
                                     @RequestParam Integer deptId) {
-        return Flux.fromIterable(expService.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(millingHisService.getMillingExpense(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getOutputDetail")
     public Flux<?> getOutputDetail(@RequestParam String vouNo,
                                     @RequestParam String compCode,
                                     @RequestParam Integer deptId) {
-        return Flux.fromIterable(outService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+        return Flux.fromIterable(millingHisService.getMillingOut(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    }
+    @GetMapping(path = "/getUsageDetail")
+    public Flux<?> getUsageDetail(@RequestParam String vouNo,
+                                   @RequestParam String compCode) {
+        return Flux.fromIterable(millingHisService.getMillingUsage(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 }

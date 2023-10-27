@@ -11,7 +11,6 @@ import cv.api.dao.*;
 import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,6 @@ public class MillingHisServiceImpl implements MillingHisService {
     public MillingHis save(MillingHis milling) {
         milling.setVouDate(Util1.toDateTime(milling.getVouDate()));
         Integer deptId = milling.getDeptId();
-        String locCode = milling.getLocCode();
         if (Util1.isNullOrEmpty(milling.getKey().getVouNo())) {
             milling.getKey().setVouNo(getVoucherNo(deptId, milling.getMacId(), milling.getKey().getCompCode()));
         }
@@ -67,7 +65,7 @@ public class MillingHisServiceImpl implements MillingHisService {
         //save expense
         saveExpense(listExp, milling);
         //save usage
-        if(listUsage != null) {
+        if (listUsage != null) {
             saveMillingUsage(listUsage, milling);
         }
 
@@ -247,6 +245,56 @@ public class MillingHisServiceImpl implements MillingHisService {
     @Override
     public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
         return hDao.getVoucherInfo(vouDate, compCode, depId);
+    }
+
+    @Override
+    public List<MillingUsage> getMillingUsage(String vouNo, String compCode) {
+        return usageDao.getMillingUsage(vouNo, compCode);
+    }
+
+    @Override
+    public MillingOutDetail save(MillingOutDetail sdh) {
+        return oDao.save(sdh);
+    }
+
+    @Override
+    public List<MillingOutDetail> getMillingOut(String vouNo, String compCode, Integer deptId) {
+        return oDao.search(vouNo, compCode, deptId);
+    }
+
+    @Override
+    public int delete(MillingOutDetailKey key) {
+        return oDao.delete(key);
+    }
+
+    @Override
+    public MillingRawDetail save(MillingRawDetail sdh) {
+        return rDao.save(sdh);
+    }
+
+    @Override
+    public List<MillingRawDetail> getMillingRaw(String vouNo, String compCode, Integer deptId) {
+        return rDao.search(vouNo, compCode, deptId);
+    }
+
+    @Override
+    public int delete(MillingRawDetailKey key) {
+        return rDao.delete(key);
+    }
+
+    @Override
+    public MillingExpense save(MillingExpense p) {
+        return eDao.save(p);
+    }
+
+    @Override
+    public List<MillingExpense> getMillingExpense(String vouNo, String compCode) {
+        return eDao.search(vouNo, compCode);
+    }
+
+    @Override
+    public void delete(MillingExpenseKey key) {
+        eDao.delete(key);
     }
 
 

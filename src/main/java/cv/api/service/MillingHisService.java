@@ -6,8 +6,7 @@
 package cv.api.service;
 
 import cv.api.common.General;
-import cv.api.entity.MillingHis;
-import cv.api.entity.MillingHisKey;
+import cv.api.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -41,6 +40,26 @@ public interface MillingHisService {
     void truncate(MillingHisKey key);
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);
+
+    List<MillingUsage> getMillingUsage(String vouNo, String compCode);
+
+    MillingOutDetail save(MillingOutDetail sdh);
+
+    List<MillingOutDetail> getMillingOut(String vouNo, String compCode, Integer deptId);
+
+    int delete(MillingOutDetailKey key);
+
+    MillingRawDetail save(MillingRawDetail sdh);
+
+    List<MillingRawDetail> getMillingRaw(String vouNo, String compCode, Integer deptId);
+
+    int delete(MillingRawDetailKey key);
+
+    MillingExpense save(MillingExpense p);
+
+    List<MillingExpense> getMillingExpense(String vouNo, String compCode);
+
+    void delete(MillingExpenseKey key);
 
 
 }

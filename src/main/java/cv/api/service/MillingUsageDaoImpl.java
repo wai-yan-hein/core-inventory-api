@@ -20,7 +20,7 @@ public class MillingUsageDaoImpl extends AbstractDao<MillingUsageKey, MillingUsa
     }
 
     @Override
-    public List<MillingUsage> search(String vouNo, String compCode) {
+    public List<MillingUsage> getMillingUsage(String vouNo, String compCode) {
         String sql = """
                 select u.*,s.user_code,s.stock_name
                 from milling_usage u join stock s
