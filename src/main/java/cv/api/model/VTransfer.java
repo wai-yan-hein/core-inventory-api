@@ -19,14 +19,17 @@ public class VTransfer {
     private String stockUserCode;
     private String stockName;
     private String unit;
-    private Float qty;
-    private Float price;
-    private Float amount;
+    private String unitName;
+    private Double qty;
+    private Double price;
+    private Double amount;
     private String stockTypeName;
     private String createdBy;
     private boolean deleted;
     private Integer deptId;
-    private Float weight;
+    private Double weight;
     private String weightUnit;
+    private String weightUnitName;
+    private String labourGroupName;
     private String traderName;
 }

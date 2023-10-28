@@ -48,4 +48,6 @@ public class StockType {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
+    @Column(name = "finished_group")
+    private boolean finishedGroup;
 }

@@ -72,4 +72,8 @@ public class MillingOutDetail {
     private String traderName;
     @Transient
     private Stock stock;
+    @Transient
+    private String unitName;
+    @Transient
+    private String weightUnitName;
 }

@@ -30,16 +30,21 @@ public class MillingRawDaoImpl extends AbstractDao<MillingRawDetailKey, MillingR
     @Override
     public List<MillingRawDetail> search(String vouNo, String compCode, Integer deptId) {
         List<MillingRawDetail> listOP = new ArrayList<>();
-        String sql = "select op.*,s.user_code,s.stock_name,l.loc_name\n" +
-                "from milling_raw op\n" +
-                "join location l on op.loc_code = l.loc_code\n" +
-                "and op.comp_code = l.comp_code\n" +
-                "join stock s on op.stock_code = s.stock_code\n" +
-                "and op.comp_code = s.comp_code\n" +
-                "where op.vou_no ='" + vouNo + "'\n" +
-                "and op.comp_code ='" + compCode + "'\n" +
-                "order by unique_id";
-        ResultSet rs = getResult(sql);
+        String sql = """
+                select op.*,s.user_code,s.stock_name,l.loc_name,u1.unit_name,u2.unit_name weight_unit_name
+                from milling_raw op
+                join location l on op.loc_code = l.loc_code
+                and op.comp_code = l.comp_code
+                join stock s on op.stock_code = s.stock_code
+                and op.comp_code = s.comp_code
+                left join stock_unit u1 on op.unit = u1.unit_code
+                and op.comp_code = u1.comp_code
+                left join stock_unit u2 on op.weight_unit= u2.unit_code
+                and op.comp_code = u2.comp_code
+                where op.vou_no =?
+                and op.comp_code =?
+                order by unique_id""";
+        ResultSet rs = getResult(sql, vouNo, compCode);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -63,11 +68,8 @@ public class MillingRawDaoImpl extends AbstractDao<MillingRawDetailKey, MillingR
                     op.setUserCode(rs.getString("user_code"));
                     op.setStockName(rs.getString("stock_name"));
                     op.setTotalWeight(rs.getFloat("tot_weight"));
-//                    op.setCatName(rs.getString("cat_name"));
-//                    op.setGroupName(rs.getString("stock_type_name"));
-//                    op.setBrandName(rs.getString("brand_name"));
-//                    op.setRelName(rs.getString("rel_name"));
-//                    op.setTraderName(rs.getString("trader_name"));
+                    op.setUnitName(rs.getString("unit_name"));
+                    op.setWeightUnitName(rs.getString("weight_unit_name"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

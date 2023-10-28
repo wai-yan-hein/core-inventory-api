@@ -3458,7 +3458,8 @@ public class ReportServiceImpl implements ReportService {
     public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
         String sql = """
                 select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
-                t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit
+                t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
+                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name
                 from v_transfer t
                 join location ft
                 on t.loc_code_from =ft.loc_code
@@ -3466,6 +3467,12 @@ public class ReportServiceImpl implements ReportService {
                 join location tt
                 on t.loc_code_to = tt.loc_code
                 and t.comp_code = tt.comp_code
+                left join stock_unit u1 on t.unit = u1.unit_code
+                and t.comp_code = u1.comp_code
+                left join stock_unit u2 on t.weight_unit = u2.unit_code
+                and t.comp_code = u2.comp_code
+                left join labour_group g on t.labour_group_code = g.code
+                and t.comp_code = g.comp_code
                 where t.comp_code =?
                 and t.vou_no =?
                 order by unique_id
@@ -3478,7 +3485,7 @@ public class ReportServiceImpl implements ReportService {
                     VTransfer in = new VTransfer();
                     in.setStockName(rs.getString("stock_name"));
                     in.setUnit(rs.getString("unit"));
-                    in.setQty(rs.getFloat("qty"));
+                    in.setQty(rs.getDouble("qty"));
                     in.setVouNo(rs.getString("vou_no"));
                     in.setVouDate(rs.getString("vou_date"));
                     in.setFromLocationName(rs.getString("fLocName"));
@@ -3486,10 +3493,13 @@ public class ReportServiceImpl implements ReportService {
                     in.setStockCode(rs.getString("user_code"));
                     in.setRemark(rs.getString("remark"));
                     in.setRefNo(rs.getString("ref_no"));
-                    float weight = rs.getFloat("weight");
+                    in.setUnitName(rs.getString("unit_name"));
+                    in.setLabourGroupName(rs.getString("labour_name"));
+                    double weight = rs.getFloat("weight");
                     if (weight > 0) {
                         in.setWeight(weight);
                         in.setWeightUnit(rs.getString("weight_unit"));
+                        in.setWeightUnitName(rs.getString("weight_unit_name"));
                     }
                     riList.add(in);
                 }

@@ -117,8 +117,7 @@ public class MillingController {
 
     @GetMapping(path = "/getMillingExpense")
     public Flux<?> getExpenseDetail(@RequestParam String vouNo,
-                                    @RequestParam String compCode,
-                                    @RequestParam Integer deptId) {
+                                    @RequestParam String compCode) {
         return Flux.fromIterable(millingHisService.getMillingExpense(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 

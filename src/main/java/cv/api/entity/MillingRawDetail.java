@@ -68,4 +68,8 @@ public class MillingRawDetail {
     private String traderName;
     @Transient
     private Stock stock;
+    @Transient
+    private String unitName;
+    @Transient
+    private String weightUnitName;
 }

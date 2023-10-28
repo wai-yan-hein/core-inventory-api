@@ -96,16 +96,18 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
     public List<StockInOutDetail> searchByJob(String jobId, String compCode) {
         List<StockInOutDetail> listOP = new ArrayList<>();
         String sql = """
-                select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,op.*,s.user_code,s.stock_name
+                select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,op.*,s.user_code,s.stock_name,st.finished_group
                 from stock_in_out_detail op
                 join stock_in_out l on op.vou_no = l.vou_no
                 and op.comp_code = l.comp_code
                 join stock s on op.stock_code = s.stock_code
                 and op.comp_code = s.comp_code
+                join stock_type st on s.stock_type_code = st.stock_type_code
+                and s.comp_code = st.comp_code
                 where l.job_code =?
                 and l.comp_code =?
                 group by op.stock_code,weight_unit,in_unit,out_unit
-                order by vou_no,unique_id;
+                order by st.finished_group desc,vou_no,unique_id;
                 """;
         ResultSet rs = getResult(sql,jobId,compCode);
         if (rs != null) {
