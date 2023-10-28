@@ -67,6 +67,7 @@ public class VPurchase {
     private String weightUnit;
     private String weightUnitName;
     private Double totalQty;
+    private Double totalWeight;
     private String batchNo;
     private String projectNo;
     private String address;
