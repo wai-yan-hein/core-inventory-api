@@ -174,9 +174,7 @@ public class Util1 {
         return value;
     }
 
-    public static int getInteger(Integer number) {
-        return (number != null) ? number : 0;
-    }
+
 
 
     public static void writeJsonFile(Object data, String exportPath) throws IOException {
@@ -184,43 +182,6 @@ public class Util1 {
             gson.toJson(data, writer);
         }
     }
-
-    /*public static void extractZipToJson(byte[] zipData, String exportPath) {
-        try {
-            File file = new File(exportPath.concat(".zip"));
-            try (FileOutputStream stream = new FileOutputStream(file)) {
-                stream.write(zipData);
-            }
-            try (ZipFile zf = new ZipFile(exportPath.concat(".zip"))) {
-                if (zf.isEncrypted()) {
-                    zf.setPassword(password);
-                }
-                zf.extractAll("temp");
-            }
-        } catch (IOException ex) {
-            log.error("extractZipToJson : " + ex.getMessage());
-        }
-    }
-
-    public static byte[] zipJsonFile(String exportPath) throws IOException {
-        String zipPath = exportPath.replace(".json", ".zip");
-        File file = new File(exportPath);
-        try (ZipFile fr = new ZipFile(zipPath, password)) {
-            fr.addFile(file, zipParameters());
-        }
-        FileInputStream stream = new FileInputStream(zipPath);
-        byte[] data = stream.readAllBytes();
-        stream.close();
-        return data;
-    }
-
-    public static ZipParameters zipParameters() {
-        ZipParameters p = new ZipParameters();
-        p.setEncryptFiles(true);
-        p.setCompressionLevel(CompressionLevel.HIGHER);
-        p.setEncryptionMethod(EncryptionMethod.AES);
-        return p;
-    }*/
 
     public static Date getOldDate() {
         return Util1.toDate("1998-10-07");
@@ -248,9 +209,6 @@ public class Util1 {
         return str;
     }
 
-    public static Float toNull(float value) {
-        return value == 0 ? null : value;
-    }
 
     public static Double toNull(double value) {
         return value == 0 ? null : value;
@@ -273,6 +231,12 @@ public class Util1 {
     }
 
     public static String format(float opQty) {
+        String pattern = "#,###.##;(#,###.##)";
+        DecimalFormat decimalFormat = new DecimalFormat(pattern);
+        // Format the float number
+        return decimalFormat.format(opQty);
+    }
+    public static String format(double opQty) {
         String pattern = "#,###.##;(#,###.##)";
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
         // Format the float number

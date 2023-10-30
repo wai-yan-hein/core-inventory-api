@@ -87,6 +87,7 @@ public interface ReportService {
     List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
+
     List<VPurchase> getPurchaseByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
     General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode);
@@ -104,10 +105,11 @@ public interface ReportService {
     List<VStockBalance> getStockBalance(String opDate, String clDate, String typeCode, String catCode, String brandCode, String stockCode,
                                         boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                         String locCode, String compCode, Integer deptId, Integer macId, boolean summary);
-    List<VStockBalance> getStockBalanceByWeight(String opDate, String clDate,String stockCode,
+
+    List<VStockBalance> getStockBalanceByWeight(String opDate, String clDate, String stockCode,
                                                 boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                 boolean calMill,
-                                                String compCode,Integer macId, boolean summary);
+                                                String compCode, Integer macId, boolean summary);
 
 
     List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
@@ -133,7 +135,7 @@ public interface ReportService {
                                    boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) throws Exception;
 
     void calculateStockInOutDetailByWeight(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus,
-                                           boolean calSale, boolean calPur, boolean calRI, boolean calRO, boolean calMill,String compCode, Integer deptId, Integer macId) throws Exception;
+                                           boolean calSale, boolean calPur, boolean calRI, boolean calRO, boolean calMill, String compCode, Integer deptId, Integer macId) throws Exception;
 
     List<ClosingBalance> getStockInOutDetail(String typeCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
@@ -268,4 +270,9 @@ public interface ReportService {
                                                       String compCode, Integer deptId, Integer macId);
 
     VLanding getLandingReport(String vouNo, String compCode);
+
+    List<ClosingBalance> getStockBalanceByTraderSummary(String opDate, String fromDate, String toDate,
+                                                        String traderCode, String compCode,int macId,boolean summary);
+
+
 }

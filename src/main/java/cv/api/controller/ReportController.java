@@ -386,9 +386,6 @@ public class ReportController {
         boolean status = true;
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
-        String fromDueDate = filter.getFromDueDate();
-        String toDueDate = filter.getToDueDate();
-        String curCode = filter.getCurCode();
         String compCode = filter.getCompCode();
         Integer macId = filter.getMacId();
         //String vouNo = filter.getVouNo();
@@ -398,21 +395,12 @@ public class ReportController {
         } else if (Util1.isNullOrEmpty(toDate)) {
             status = false;
             ro.setMessage("Invalid To Date.");
-        } else if (Util1.isNullOrEmpty(curCode)) {
-            status = false;
-            ro.setMessage("Invalid Currency.");
-        } else if (Util1.isNullOrEmpty(compCode)) {
+        }  else if (Util1.isNullOrEmpty(compCode)) {
             status = false;
             ro.setMessage("Invalid Company Id.");
         } else if (Util1.isNullOrEmpty(macId)) {
             status = false;
             ro.setMessage("Invalid Machine Id.");
-        } else if (Util1.isNullOrEmpty(fromDueDate)) {
-            status = false;
-            ro.setMessage("Invalid From Due Date.");
-        } else if (Util1.isNullOrEmpty(toDueDate)) {
-            status = false;
-            ro.setMessage("Invalid To Due Date.");
         }
         return status;
     }

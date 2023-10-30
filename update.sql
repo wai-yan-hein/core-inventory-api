@@ -395,14 +395,18 @@ drop table if exists tmp_stock_opening;
 create table tmp_stock_opening (
   tran_date date not null,
   stock_code varchar(15) not null,
-  ttl_qty float(20,3) default null,
   loc_code varchar(15) not null,
   unit varchar(15) not null,
   mac_id int(11) not null,
   comp_code varchar(15) not null,
   dept_id int(11) not null,
-  primary key (tran_date,stock_code,loc_code,unit,mac_id,comp_code,dept_id)
-) engine=innodb default charset=utf8mb3 comment='	';
+  trader_code varchar(15) not null default '-',
+  ttl_weight double(20,3) default null,
+  ttl_qty double(20,3) default null,
+  primary key (tran_date,stock_code,loc_code,unit,mac_id,comp_code,dept_id,trader_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci comment='	';
+
+
 
 drop table if exists tmp_stock_io_column;
 create table tmp_stock_io_column (
@@ -410,18 +414,25 @@ create table tmp_stock_io_column (
   tran_date date not null,
   stock_code varchar(15) not null,
   loc_code varchar(15) not null,
-  op_qty float(20,3) not null default 0.000,
-  pur_qty float(20,3) not null default 0.000,
-  in_qty float(20,3) not null default 0.000,
-  sale_qty float(20,3) not null default 0.000,
-  out_qty float(20,3) not null default 0.000,
   mac_id int(11) not null,
-  remark varchar(255) default null,
   vou_no varchar(15) not null,
   comp_code varchar(15) not null,
   dept_id int(11) not null,
-  primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,dept_id,comp_code)
-) engine=innodb default charset=utf8mb3;
+  op_qty double(20,3) not null default 0.000,
+  pur_qty double(20,3) not null default 0.000,
+  in_qty double(20,3) not null default 0.000,
+  sale_qty double(20,3) not null default 0.000,
+  out_qty double(20,3) not null default 0.000,
+  remark varchar(255) default null,
+  trader_code varchar(15) not null default '-',
+  op_weight double(20,3) not null default 0.000,
+  pur_weight double(20,3) not null default 0.000,
+  in_weight double(20,3) not null default 0.000,
+  sale_weight double(20,3) not null default 0.000,
+  out_weight double(20,3) not null default 0.000,
+  primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 
 drop table if exists tmp_stock_opening;
 create table tmp_stock_opening (
@@ -1293,19 +1304,6 @@ create table milling_usage (
 ALTER TABLE tmp_stock_opening
 ADD COLUMN ttl_weight FLOAT(20,3) NULL AFTER dept_id;
 
-alter table tmp_stock_io_column
-add column op_weight float(20,3) not null after dept_id,
-add column pur_weight float(20,3) not null after op_weight,
-add column in_weight float(20,3) not null after pur_weight,
-add column sale_weight float(20,3) not null after in_weight,
-add column out_weight float(20,3) not null after sale_weight;
-
-alter table tmp_stock_io_column
-change column op_weight op_weight float(20,3) not null default 0 ,
-change column pur_weight pur_weight float(20,3) not null default 0 ,
-change column in_weight in_weight float(20,3) not null default 0 ,
-change column sale_weight sale_weight float(20,3) not null default 0 ,
-change column out_weight out_weight float(20,3) not null default 0 ;
 
 create table labour_group (
   code varchar(15) not null,
@@ -1468,3 +1466,5 @@ drop view if exists v_transfer;
 create  view v_transfer as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.ref_no as ref_no,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code_from as loc_code_from,th.loc_code_to as loc_code_to,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.labour_group_code as labour_group_code,td.stock_code as stock_code,td.qty as qty,td.unit as unit,td.unique_id as unique_id,td.weight as weight,td.weight_unit as weight_unit,td.total_weight as total_weight,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((transfer_his th join transfer_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
 drop view if exists v_stock_io;
 create view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,i.labour_group_code as labour_group_code,i.job_code as job_code,i.received_name as received_name,i.received_phone as received_phone,i.car_no as car_no,i.trader_code as trader_code,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.weight as weight,iod.total_weight as total_weight,iod.weight_unit as weight_unit,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no)) join stock s on(iod.stock_code = s.stock_code));
+drop view if exists v_milling_usage;
+create  view v_milling_usage as select mh.vou_no as vou_no,mh.comp_code as comp_code,mh.trader_code as trader_code,mh.vou_date as vou_date,mh.remark as remark,mh.deleted as deleted,mh.job_no as job_no,mu.stock_code as stock_code,mu.qty as qty,mu.unit as unit,mu.loc_code as loc_code,s.user_code as user_code,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from ((milling_his mh join milling_usage mu on(mh.vou_no = mu.vou_no and mh.comp_code = mu.comp_code)) join stock s on(mu.stock_code = s.stock_code and mu.comp_code = s.comp_code));
