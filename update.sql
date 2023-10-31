@@ -1442,6 +1442,10 @@ add column updated_date timestamp not null default current_timestamp;
 alter table stock_type
 add column finished_group bit(1) not null default 0 after active;
 
+alter table op_his
+add column trader_code varchar(15) null after intg_upd_status,
+add column tran_source int not null default 1 after trader_code,
+change column op_amt op_amt double(10,3) not null default 0.000 ;
 
 #view
 drop view if exists v_milling_output;
