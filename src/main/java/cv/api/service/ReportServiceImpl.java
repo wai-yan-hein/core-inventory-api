@@ -1487,7 +1487,8 @@ public class ReportServiceImpl implements ReportService {
                 "\tselect a.stock_code,sum(a.qty) qty,a.unit,a.loc_code,sum(a.qty)*rel.smallest_qty smallest_qty,a.comp_code,a.dept_id\n" +
                 "\tfrom(\n" + "\t\tselect stock_code,sum(qty) as qty,unit,loc_code,comp_code,dept_id\n" +
                 "\t\tfrom v_opening\n" +
-                "\t\twhere deleted = 0\n" +
+                "\t\twhere deleted = false\n" +
+                "\t\tand tran_source =1\n" +
                 "\t\tand date(op_date) ='" + opDate + "'\n" +
                 "\t\tand comp_code = '" + compCode + "'\n" +
                 "\t\tand (stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
@@ -1495,7 +1496,7 @@ public class ReportServiceImpl implements ReportService {
                 "\t\tand (category_code = '" + cateCode + "' or '-' ='" + cateCode + "')\n" +
                 "\t\tand (brand_code = '" + brandCode + "' or '-' ='" + brandCode + "')\n" +
                 "\t\tand (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "\t\tand calculate =1\n" +
+                "\t\tand calculate =true\n" +
                 "\t\tgroup by stock_code, unit , loc_code \n" +
                 "\t\t\tunion all \n" +
                 "\t\tselect stock_code,sum(qty) * - 1 as qty,sale_unit,loc_code,comp_code,dept_id\n" +
@@ -1781,6 +1782,7 @@ public class ReportServiceImpl implements ReportService {
                 "select stock_code,loc_code,sum(total_weight) total_weight,sum(qty) ttl_qty,comp_code\n" +
                 "from v_opening\n" +
                 "where deleted = false\n" +
+                "and tran_source = 1\n" +
                 "and date(op_date)='" + opDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and stock_code ='" + stockCode + "'\n" +
@@ -2594,6 +2596,7 @@ public class ReportServiceImpl implements ReportService {
                 "on v.loc_code = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
                 "where v.deleted = false\n" +
+                "and v.tran_source = 1\n" +
                 "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (v.category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
@@ -2632,6 +2635,7 @@ public class ReportServiceImpl implements ReportService {
                 "on v.loc_code = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
                 "where v.deleted = false \n" +
+                "and v.tran_source = 1 \n" +
                 "and v.comp_code = '" + compCode + "'\n" +
                 "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
                 "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
@@ -5178,6 +5182,7 @@ public class ReportServiceImpl implements ReportService {
                 "from v_opening\n" +
                 "where date(op_date) = '" + opDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
+                "and tran_source =1\n" +
                 "and deleted = 0 \n" + "and calculate = 1 \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -5515,6 +5520,7 @@ public class ReportServiceImpl implements ReportService {
                 "and comp_code ='" + compCode + "'\n" +
                 "and deleted = false \n" +
                 "and calculate = true \n" +
+                "and tran_source = 1 \n" +
                 "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
