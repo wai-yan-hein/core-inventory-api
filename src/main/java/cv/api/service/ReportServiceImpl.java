@@ -2792,7 +2792,10 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo, String remark, String desp, String userCode, String stockCode, String locCode, String compCode, Integer deptId, String deleted) throws Exception {
         String sql = "select a.*,v.description vou_status_name\n" +
                 "from (\n" +
-                "select vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n" + "from v_stock_io \n" + "where comp_code = '" + compCode + "'\n" + "and deleted = " + deleted + "\n" +
+                "select vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n" +
+                "from v_stock_io \n" +
+                "where comp_code = '" + compCode + "'\n" +
+                "and deleted = " + deleted + "\n" +
                 "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
                 "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
                 "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
@@ -5101,7 +5104,7 @@ public class ReportServiceImpl implements ReportService {
         String delSql = "delete from tmp_closing_column where mac_id = " + macId;
         executeSql(delSql);
         //opening
-        String opSql = "insert into tmp_closing_column(tran_option,vou_no, tran_date,stock_code,loc_code,op_qty,op_price,op_amt,op_unit,mac_id,comp_code)\n" + "select tran_option,vou_no,tran_date, stock_code,loc_code,sum(qty) ttl_qty,sum(price) ttl_price,\n" + "sum(qty)*sum(price) ttl_amt,unit,mac_id,comp_code\n" + "from tmp_inv_closing\n" + "where tran_option ='Opening' and mac_id = " + macId + "\n" + "group by tran_option,vou_no,tran_date,stock_code,loc_code,mac_id\n";
+        String opSql = "insert into tmp_closing_column(tran_option,vou_no, tran_date,stock_code,loc_code,op_qty,op_price,op_amt,op_unit,mac_id,comp_code)\n" + "select tran_option,vou_no,tran_date, stock_code,loc_code,sum(qty) ttl_qty,sum(price) ttl_price,\n" + "sum(qty)*sum(price) ttl_amt,unit,mac_id,comp_code\n" + "from tmp_inv_closing\n" + "where tran_option ='A-Opening' and mac_id = " + macId + "\n" + "group by tran_option,vou_no,tran_date,stock_code,loc_code,mac_id\n";
         executeSql(opSql);
         //purchase
         String purSql = "insert into tmp_closing_column(tran_option,vou_no,tran_date,stock_code,loc_code,pur_qty,pur_price,pur_amt,pur_unit,mac_id,comp_code)\n" + "select tran_option,vou_no,tran_date, stock_code,loc_code,sum(qty) ttl_qty,sum(price) ttl_price,\n" + "sum(qty)*sum(price) ttl_amt,unit,mac_id,comp_code\n" + "from tmp_inv_closing\n" + "where tran_option ='Purchase' and mac_id = " + macId + "\n" + "group by tran_option,vou_no, tran_date,stock_code,loc_code,mac_id\n";
@@ -5149,7 +5152,7 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateClosing(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
-        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Opening',a.tran_date,'-','Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,'" + compCode + "'," + deptId + "\n" + "from (\n" + "select tmp.tran_date,tmp.stock_code,tmp.ttl_qty * rel.smallest_qty smallest_qty,tmp.loc_code,tmp.mac_id\n" + "from tmp_stock_opening tmp \n" + "join stock s on tmp.stock_code = s.stock_code\n" + "and tmp.comp_code = s.comp_code\n" + "join v_relation rel on s.rel_code = rel.rel_code\n" + "and tmp.comp_code = rel.comp_code\n" + "and tmp.unit = rel.unit\n" + "where tmp.mac_id =" + macId + ")a\n" + "group by tran_date,stock_code,mac_id";
+        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'A-Opening',a.tran_date,'-','A-Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,'" + compCode + "'," + deptId + "\n" + "from (\n" + "select tmp.tran_date,tmp.stock_code,tmp.ttl_qty * rel.smallest_qty smallest_qty,tmp.loc_code,tmp.mac_id\n" + "from tmp_stock_opening tmp \n" + "join stock s on tmp.stock_code = s.stock_code\n" + "and tmp.comp_code = s.comp_code\n" + "join v_relation rel on s.rel_code = rel.rel_code\n" + "and tmp.comp_code = rel.comp_code\n" + "and tmp.unit = rel.unit\n" + "where tmp.mac_id =" + macId + ")a\n" + "group by tran_date,stock_code,mac_id";
         String purSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)\n" + "select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" + "from (\n" + "select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and deleted = 0 \n" + "and (calculate = 1 and " + calPur + " = 0)\n" + "and comp_code ='" + compCode + "'\n" + "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" + "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "group by date(vou_date),vou_no,stock_code,pur_unit)a\n" + "join v_relation rel on a.rel_code = rel.rel_code\n" + "and a.comp_code = rel.comp_code\n" + "and a.pur_unit = rel.unit\n" + "group by a.vou_date ,a.stock_code,a.vou_no";
         //ret in
         String retInSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)\n" +
@@ -5348,7 +5351,7 @@ public class ReportServiceImpl implements ReportService {
                                           boolean calRO, boolean calMill, String compCode, Integer deptId, Integer macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
         String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,op_weight,loc_code,mac_id,comp_code,dept_id)\n" +
-                "select 'Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_weight) ttl_weight,loc_code,mac_id,'" + compCode + "'," + deptId + "\n" +
+                "select 'A-Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_weight) ttl_weight,loc_code,mac_id,'" + compCode + "'," + deptId + "\n" +
                 "from tmp_stock_opening tmp \n" +
                 "where mac_id =" + macId + "\n" +
                 "group by tran_date,stock_code,mac_id";

@@ -93,7 +93,8 @@ public class MillingHis {
     private double percentQty;
     @Column(name = "job_no")
     private String jobNo;
-
+    @Column(name = "print_count")
+    private Integer printCount;
     @Transient
     private String localVouNo;
     private transient String status = "STATUS";

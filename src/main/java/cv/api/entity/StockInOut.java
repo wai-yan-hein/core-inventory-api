@@ -63,6 +63,8 @@ public class StockInOut implements Serializable {
     private String carNo;
     @Column(name = "trader_code")
     private String traderCode;
+    @Column(name = "print_count")
+    private Integer printCount;
     @Transient
     private String status = "STATUS";
     @Transient

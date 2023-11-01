@@ -98,6 +98,8 @@ public class SaleHis {
     private String account;
     @Column(name = "labour_group_code")
     private String labourGroupCode;
+    @Column(name = "print_count")
+    private Integer printCount;
     @Transient
     private String status = "STATUS";
     @Transient

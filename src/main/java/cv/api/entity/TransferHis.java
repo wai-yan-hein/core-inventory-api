@@ -1,13 +1,11 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -51,6 +49,8 @@ public class TransferHis {
     private String labourGroupCode;
     @Column(name = "job_code")
     private String jobCode;
+    @Column(name = "print_count")
+    private Integer printCount;
     @Transient
     private List<TransferHisDetail> listTD;
     @Transient
