@@ -895,6 +895,7 @@ add column user_code varchar(15) null after percent;
 drop table if exists milling_his;
 create table milling_his (
   vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
   trader_code varchar(15) not null,
   vou_date datetime not null,
   cur_code varchar(15) not null,
@@ -904,7 +905,6 @@ create table milling_his (
   deleted bit(1) default null,
   updated_by varchar(15) default null,
   updated_date timestamp not null default current_timestamp(),
-  comp_code varchar(15) not null,
   mac_id varchar(15) not null,
   intg_upd_status varchar(5) default null,
   reference varchar(255) default null,
@@ -912,18 +912,25 @@ create table milling_his (
   vou_lock bit(1) not null default b'0',
   project_no varchar(15) default null,
   car_no varchar(255) default null,
-  vou_status_id varchar(255) default null,
-  load_qty float(20,3) default null,
-  load_weight float(20,3) default null,
-  load_amount float(20,3) default null,
-  load_expense float(20,3) default null,
-  load_cost float(20,3) default null,
-  output_qty float(20,3) default null,
-  output_weight float(20,3) default null,
-  output_amount float(20,3) default null,
-  diff_weight float(20,3) default null,
+  vou_status_id varchar(255) not null,
+  load_qty double(20,3) not null,
+  load_weight double(20,3) not null,
+  load_amount double(20,3) not null,
+  load_expense double(20,3) not null,
+  load_cost double(20,3) not null,
+  output_qty double(20,3) not null,
+  output_weight double(20,3) not null,
+  output_amount double(20,3) not null,
+  diff_weight double(20,3) not null,
+  loc_code varchar(15) default null,
+  diff_qty double(20,3) not null,
+  percent_weight double(20,3) not null,
+  percent_qty double(20,3) not null,
+  job_no varchar(15) default null,
+  print_count int(11) default null,
   primary key (vou_no,comp_code)
-) engine=innodb default charset=utf8mb3;
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 
 drop table if exists milling_output;
 create table milling_output (
@@ -990,12 +997,6 @@ add primary key (vou_no, comp_code, unique_id);
 alter table payment_his_detail
 change column vou_no vou_no varchar(25) not null ;
 
-set sql_safe_updates =0;
-update payment_his
-set vou_no=concat('C-',vou_no);
-
-update payment_his_detail
-set vou_no=concat('C-',vou_no);
 
 create table sale_expense (
   expense_code varchar(15) not null,

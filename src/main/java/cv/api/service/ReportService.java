@@ -271,7 +271,7 @@ public interface ReportService {
 
     VLanding getLandingReport(String vouNo, String compCode);
 
-    List<ClosingBalance> getStockBalanceByTraderSummary(String opDate, String fromDate, String toDate,
+    List<ClosingBalance> getStockBalanceByTrader(String opDate, String fromDate, String toDate,
                                                         String traderCode, String compCode,int macId,boolean summary);
 
 

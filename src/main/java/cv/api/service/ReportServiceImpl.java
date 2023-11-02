@@ -56,9 +56,15 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public String getOpeningDate(String compCode, Integer deptId) {
         String opDate = null;
-        String sql = "select max(op_date) op_date\n" + "from op_his \n" + "where deleted = false and comp_code ='" + compCode + "'\n" + "and (dept_id =" + deptId + " or 0 =" + deptId + ")";
+        String sql = """
+                select max(op_date) op_date
+                from op_his\s
+                where deleted = false 
+                and comp_code =?
+                and tran_source =1
+                """;
         try {
-            ResultSet rs = reportDao.executeSql(sql);
+            ResultSet rs = reportDao.getResultSql(sql,compCode);
             if (rs != null) {
                 while (rs.next()) {
                     Date date = rs.getDate("op_date");
@@ -4535,8 +4541,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ClosingBalance> getStockBalanceByTraderSummary(String opDate, String fromDate, String toDate,
-                                                               String traderCode, String compCode, int macId, boolean summary) {
+    public List<ClosingBalance> getStockBalanceByTrader(String opDate, String fromDate, String toDate,
+                                                        String traderCode, String compCode,
+                                                        int macId, boolean summary) {
         calculateOpeningByTrader(opDate, fromDate, traderCode, compCode, macId);
         calculateClosingByTrader(fromDate, toDate, traderCode, compCode, macId);
         List<ClosingBalance> list = new ArrayList<>();
@@ -4581,7 +4588,7 @@ public class ReportServiceImpl implements ReportService {
                     list.add(b);
                 }
             } catch (Exception e) {
-                log.error("getStockBalanceByTraderSummary : "+e.getMessage());
+                log.error("getStockBalanceByTraderSummary : " + e.getMessage());
             }
         } else {
             String sql = """
