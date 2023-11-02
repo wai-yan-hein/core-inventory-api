@@ -67,6 +67,8 @@ public class RetInHis implements java.io.Serializable {
     private boolean vouLock;
     @Column(name = "project_no")
     private String projectNo;
+    @Column(name = "print_count")
+    private Integer printCount;
     @Transient
     private String status = "STATUS";
     @Transient

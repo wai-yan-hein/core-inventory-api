@@ -56,6 +56,8 @@ public class LandingHis {
     private String curCode;
     @Column(name = "gross_qty")
     private Double grossQty;
+    @Column(name = "print_count")
+    private Integer printCount;
     @Transient
     private List<LandingHisPrice> listPrice;
     @Transient
