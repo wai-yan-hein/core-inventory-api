@@ -1455,7 +1455,8 @@ add column print_count int null;
 alter table sale_his
 add column print_count int null;
 alter table pur_his
-add column print_count int null;
+add column print_count int null,
+add column payable_acc varchar(15);
 alter table ret_in_his
 add column print_count int null;
 alter table ret_out_his

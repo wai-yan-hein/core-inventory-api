@@ -274,5 +274,6 @@ public interface ReportService {
     List<ClosingBalance> getStockBalanceByTrader(String opDate, String fromDate, String toDate,
                                                         String traderCode, String compCode,int macId,boolean summary);
 
+    List<VSale> getSaleByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
 }
