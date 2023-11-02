@@ -3182,7 +3182,12 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode,
-                                         String locCode, String compCode, Integer deptId, String curCode, String deleted) throws Exception {
+                                         String locCode, String compCode, Integer deptId, String curCode, String deleted, int type, String traderCode) throws Exception {
+        String filter = "";
+        if (type == 2) {
+            filter = "and (v.trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n";
+        }
+
         String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
@@ -3197,6 +3202,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
                 "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
                 "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
+                "and v.tran_source = " + type + "\n" + filter +
                 "group by v.vou_no\n" +
                 "order by v.op_date,v.vou_no desc\n";
         ResultSet rs = reportDao.executeSql(sql);
@@ -4574,7 +4580,7 @@ public class ReportServiceImpl implements ReportService {
                     list.add(b);
                 }
             } catch (Exception e) {
-                log.error("getStockBalanceByTraderSummary : "+e.getMessage());
+                log.error("getStockBalanceByTraderSummary : " + e.getMessage());
             }
         } else {
             String sql = """

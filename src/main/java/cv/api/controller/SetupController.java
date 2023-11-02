@@ -614,8 +614,10 @@ public class SetupController {
         Integer deptId = filter.getDeptId();
         String curCode = Util1.isAll(filter.getCurCode());
         String deleted = String.valueOf(filter.isDeleted());
+        int type = filter.getTranSource();
+        String traderCode = String.valueOf(filter.getTraderCode());
         List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode,
-                stockCode, locCode, compCode, deptId, curCode, deleted);
+                stockCode, locCode, compCode, deptId, curCode, deleted, type, traderCode);
         return Flux.fromIterable(opHisList).onErrorResume(throwable -> Flux.empty());
     }
 
