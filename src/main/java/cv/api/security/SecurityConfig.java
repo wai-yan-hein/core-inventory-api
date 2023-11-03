@@ -30,7 +30,9 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         log.info("security configured.");
-        return http.authorizeExchange((auth) -> auth
+        return http
+                .cors(corsSpec -> corsConfigurationSource())
+                .authorizeExchange((auth) -> auth
                         .pathMatchers("/auth/**",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
