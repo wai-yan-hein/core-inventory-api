@@ -1255,27 +1255,38 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select stock_code,s_user_code,stock_name,COALESCE(SUM(total_weight), 0) AS ttl_weight,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and deleted = 0\n" +
+        String sql = "select a.*,u1.unit_name,u2.unit_name weight_unit_name\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) qty,sum(ifnull(total_weight,0)) total_weight,\n" +
+                "sum(pur_amt) pur_amt,pur_unit,weight_unit,comp_code\n" +
+                "from v_purchase\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code = '" + compCode + "'\n" +
+                "and deleted = false\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,pur_unit";
+                "group by stock_code,weight_unit,pur_unit\n" +
+                ")a\n" +
+                "join stock_unit u1 on a.pur_unit = u1.unit_code\n" +
+                "and a.comp_code = u1.comp_code\n" +
+                "join stock_unit u2 on a.weight_unit = u2.unit_code\n" +
+                "and a.comp_code = u2.comp_code\n" +
+                "order by s_user_code";
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
                 VPurchase p = new VPurchase();
-//                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("ttl_qty");
-                p.setStockCode(rs.getString("s_user_code"));
+                //s_user_code, stock_name, qty, total_weight, pur_unit, weight_unit, comp_code, unit_name, weight_unit_name
+                p.setStockCode(rs.getString("stock_code"));
+                p.setStockUserCode(rs.getString("s_user_code"));
                 p.setStockName(rs.getString("stock_name"));
-//                p.setRelName(rs.getString("rel_name"));
-                p.setPurAmount(rs.getDouble("ttl_amt"));
-//                p.setQtyStr(getRelStr(relCode, compCode, smallQty));
-                p.setTotalQty(smallQty);
-                p.setTotalWeight(rs.getDouble("ttl_weight"));
-//                p.setPurUnit(rs.getString("unit"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
+                p.setTotalQty(rs.getDouble("qty"));
+                p.setTotalWeight(rs.getDouble("total_weight"));
+                p.setPurUnitName(rs.getString("unit_name"));
+                p.setWeightUnitName(rs.getString("weight_unit_name"));
                 list.add(p);
             }
         }
@@ -4699,6 +4710,47 @@ public class ReportServiceImpl implements ReportService {
                 }
             } catch (Exception e) {
                 log.error(String.format("getStockInOutDetailByWeight: %s", e.getMessage()));
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<VSale> getSaleByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+        List<VSale> list = new ArrayList<>();
+        String sql = "select a.*,u1.unit_name,u2.unit_name weight_unit_name\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) qty,sum(ifnull(total_weight,0)) total_weight,\n" +
+                "sum(sale_amt) sale_amt,sale_unit,weight_unit,comp_code\n" +
+                "from v_sale\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code = '" + compCode + "'\n" +
+                "and deleted = false\n" +
+                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
+                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
+                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by stock_code,weight_unit,sale_unit\n" +
+                ")a\n" +
+                "join stock_unit u1 on a.sale_unit = u1.unit_code\n" +
+                "and a.comp_code = u1.comp_code\n" +
+                "join stock_unit u2 on a.weight_unit = u2.unit_code\n" +
+                "and a.comp_code = u2.comp_code\n" +
+                "order by s_user_code";
+        ResultSet rs = reportDao.executeSql(sql);
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VSale p = new VSale();
+                //s_user_code, stock_name, qty, total_weight, pur_unit, weight_unit, comp_code, unit_name, weight_unit_name
+                p.setStockCode(rs.getString("stock_code"));
+                p.setStockUserCode(rs.getString("s_user_code"));
+                p.setStockName(rs.getString("stock_name"));
+                p.setSaleAmount(rs.getDouble("sale_amt"));
+                p.setTotalQty(rs.getDouble("qty"));
+                p.setTotalWeight(rs.getDouble("total_weight"));
+                p.setSaleUnitName(rs.getString("unit_name"));
+                p.setWeightUnitName(rs.getString("weight_unit_name"));
+                list.add(p);
             }
         }
         return list;

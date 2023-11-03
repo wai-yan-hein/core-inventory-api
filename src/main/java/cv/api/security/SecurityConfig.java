@@ -15,6 +15,9 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Slf4j
 @Configuration
@@ -27,7 +30,9 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         log.info("security configured.");
-        return http.authorizeExchange((auth) -> auth
+        return http
+                .cors(corsSpec -> corsConfigurationSource())
+                .authorizeExchange((auth) -> auth
                         .pathMatchers("/auth/**",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
@@ -61,6 +66,18 @@ public class SecurityConfig {
         NoOpServerSecurityContextRepository sessionConfig = NoOpServerSecurityContextRepository.getInstance();
         authenticationWebFilter.setSecurityContextRepository(sessionConfig);
         return authenticationWebFilter;
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true); // allow cookies
+        //this is fucking shit pattern
+        config.addAllowedOriginPattern("*"); // allow any origin that matches the pattern "*"
+        config.addAllowedHeader("*"); // allow any header
+        config.addAllowedMethod("*"); // allow any method
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // apply CORS configuration to all paths
+        return source;
     }
 
     @Bean

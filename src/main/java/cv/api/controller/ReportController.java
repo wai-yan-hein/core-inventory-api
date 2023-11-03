@@ -180,6 +180,10 @@ public class ReportController {
                         List<VSale> saleByStock = reportService.getSaleByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);
                     }
+                    case "SaleByStockWeightSummary" -> {
+                        List<VSale> data = reportService.getSaleByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                        Util1.writeJsonFile(data, exportPath);
+                    }
                     case "SaleByStockDetail" -> {
                         List<VSale> saleByStock = reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                         Util1.writeJsonFile(saleByStock, exportPath);

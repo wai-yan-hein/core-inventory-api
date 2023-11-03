@@ -470,6 +470,7 @@ public class AccountRepo {
                 if (t != null) {
                     balAcc = Util1.isNull(t.getAccount(), balAcc);
                 }
+                balAcc = Util1.isNull(ph.getPayableAcc(), balAcc);
                 List<Gl> listGl = new ArrayList<>();
                 //income
                 if (vouTotal > 0) {
@@ -869,7 +870,6 @@ public class AccountRepo {
         gl.setRefNo(key.getVouNo());
         deleteGlByVoucher(gl);
     }
-
 
 
     public void deleteInvVoucher(PurHisKey key) {

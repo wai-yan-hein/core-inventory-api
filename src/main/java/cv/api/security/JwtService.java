@@ -69,7 +69,8 @@ public class JwtService {
 
     public Authentication getAuthentication(String token) {
         if (Util1.isNullOrEmpty(token) || !isTokenValid(token)) {
-            throw new BadCredentialsException("Invalid token");
+            log.info("token invalid.");
+            return null;
         }
         Claims claims = Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
