@@ -27,7 +27,7 @@ public interface ReportService {
 
     ResultSet getResult(String sql, Object... params) throws Exception;
 
-    String getOpeningDate(String compCode, Integer deptIdF);
+    String getOpeningDate(String compCode, int tranSource);
 
     List<VSale> getSaleVoucher(String vouNo, String compCode) throws Exception;
 
@@ -271,7 +271,7 @@ public interface ReportService {
 
     VLanding getLandingReport(String vouNo, String compCode);
 
-    List<ClosingBalance> getStockBalanceByTrader(String opDate, String fromDate, String toDate,
+    List<ClosingBalance> getStockPayableByTrader(String opDate, String fromDate, String toDate,
                                                         String traderCode, String compCode,int macId,boolean summary);
 
 
