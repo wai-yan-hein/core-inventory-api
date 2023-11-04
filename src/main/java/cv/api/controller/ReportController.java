@@ -376,11 +376,11 @@ public class ReportController {
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "StockPayableSummary" -> {
-                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, compCode, macId, true);
+                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "StockPayableDetail" -> {
-                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, compCode, macId, false);
+                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");

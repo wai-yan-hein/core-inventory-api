@@ -4559,10 +4559,10 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ClosingBalance> getStockPayableByTrader(String opDate, String fromDate, String toDate,
-                                                        String traderCode, String compCode,
+                                                        String traderCode, String stockCode, String compCode,
                                                         int macId, boolean summary) {
-        calculateOpeningByTrader(opDate, fromDate, traderCode, compCode, macId);
-        calculateClosingByTrader(fromDate, toDate, traderCode, compCode, macId);
+        calculateOpeningByTrader(opDate, fromDate, traderCode, stockCode, compCode, macId);
+        calculateClosingByTrader(fromDate, toDate, traderCode, stockCode, compCode, macId);
         List<ClosingBalance> list = new ArrayList<>();
         if (summary) {
             String sql = """
@@ -4578,7 +4578,7 @@ public class ReportServiceImpl implements ReportService {
                     from tmp_stock_io_column
                     where mac_id = ?
                     and comp_code = ?
-                    group by tran_date,stock_code,trader_code,tran_option,vou_no)a
+                    group by stock_code,trader_code)a
                     join stock s on a.stock_code = s.stock_code
                     and a.comp_code = s.comp_code
                     join trader t on a.trader_code = t.code
@@ -4652,7 +4652,6 @@ public class ReportServiceImpl implements ReportService {
                         b.setSaleWeight(saleWeight);
                         b.setOutWeight(outWeight);
                         b.setBalWeight(balWeight);
-
                         b.setCompCode(compCode);
                         b.setVouDate(Util1.toDateStr(rs.getDate("tran_date"), "dd/MM/yyyy"));
                         b.setStockUsrCode(Util1.isNull(rs.getString("s_user_code"), rs.getString("stock_code")));
@@ -4701,9 +4700,11 @@ public class ReportServiceImpl implements ReportService {
                         double outWeight = c.getOutWeight();
                         double saleWeight = c.getSaleWeight();
                         double clWeight = opWeight + outWeight + saleWeight;
+                        double clQty =opQty+outQty+saleQty;
                         c.setOpenQty(opQty);
                         c.setSaleQty(saleQty);
                         c.setOutQty(outQty);
+                        c.setBalQty(clQty);
                         c.setOpenWeight(opWeight);
                         c.setSaleWeight(saleWeight);
                         c.setOutWeight(outWeight);
@@ -4759,7 +4760,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void calculateOpeningByTrader(String opDate, String fromDate,
-                                          String traderCode, String compCode, int macId) {
+                                          String traderCode, String stockCode, String compCode, int macId) {
         String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
         String sql = "insert into tmp_stock_opening(tran_date,trader_code,stock_code,ttl_qty,ttl_weight,loc_code,unit,comp_code,dept_id,mac_id)\n" +
                 "select '" + opDate + "' op_date ,trader_code,stock_code,sum(qty) ttl_qty,sum(weight) ttl_weight,loc_code,ifnull(weight_unit,'-') weight_unit,comp_code,1," + macId + " \n" +
@@ -4770,6 +4771,7 @@ public class ReportServiceImpl implements ReportService {
                 "and comp_code ='" + compCode + "'\n" +
                 "and deleted = false \n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by stock_code,trader_code\n" +
                 "\tunion all\n" +
                 "select trader_code,stock_code,sum(total_weight) weight,sum(qty) qty,loc_code, weight_unit,comp_code\n" +
@@ -4779,6 +4781,7 @@ public class ReportServiceImpl implements ReportService {
                 "and deleted = false \n" +
                 "and tran_source = 2 \n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by stock_code,trader_code\n" +
                 "\tunion all\n" +
                 "select trader_code,stock_code,sum(total_weight)*-1 weight,sum(in_qty) qty,loc_code, weight_unit,comp_code\n" +
@@ -4789,6 +4792,7 @@ public class ReportServiceImpl implements ReportService {
                 "and in_qty>0\n" +
                 "and trader_code is not null\n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by stock_code,trader_code\n" +
                 ")a\n" +
                 "group by stock_code,trader_code";
@@ -4796,7 +4800,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void calculateClosingByTrader(String fromDate, String toDate,
-                                          String traderCode, String compCode, int macId) {
+                                          String traderCode, String stockCode, String compCode, int macId) {
         String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
         String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,trader_code,vou_no,remark,stock_code,sale_qty,sale_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'Sale',date(vou_date) vou_date,trader_code,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",comp_code,1\n" +
@@ -4805,12 +4809,16 @@ public class ReportServiceImpl implements ReportService {
                 "and deleted = false \n" +
                 "and comp_code ='" + compCode + "'\n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,trader_code";
         String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,trader_code,vou_no,remark,stock_code,op_qty,op_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'A-Opening',tran_date,trader_code,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_weight) ttl_weight,loc_code,mac_id,'" + compCode + "', 1 \n" +
                 "from tmp_stock_opening tmp \n" +
                 "where mac_id =" + macId + "\n" +
-                "group by tran_date,stock_code,mac_id";
+                "and comp_code ='" + compCode + "'\n" +
+                "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "group by tran_date,stock_code,trader_code,mac_id";
         String outSql = "insert into tmp_stock_io_column(tran_option,trader_code,tran_date,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'StockOut',trader_code,date(vou_date) vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(total_weight)*-1 ttl_weight,loc_code," + macId + ",comp_code,1\n" +
                 "from v_stock_io\n" +
@@ -4820,6 +4828,7 @@ public class ReportServiceImpl implements ReportService {
                 "and out_qty>0\n" +
                 "and trader_code is not null\n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code,trader_code";
         executeSql(delSql, saleSql, opSql, outSql);
     }

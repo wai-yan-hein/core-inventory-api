@@ -114,7 +114,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                cSd.setTotalWeight(Util1.getFloat(cSd.getWeight()) * cSd.getQty());
+                cSd.setTotalWeight(Util1.getDouble(cSd.getWeight()) * cSd.getQty());
                 sdDao.save(cSd);
             }
         }
