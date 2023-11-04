@@ -33,4 +33,6 @@ public class Job {
     private LocalDateTime createdDate;
     @Column(name = "created_by")
     private String createdBy;
+    @Column(name = "dept_id")
+    private int deptId;
 }

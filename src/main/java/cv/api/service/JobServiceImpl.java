@@ -15,24 +15,25 @@ import java.util.Objects;
 
 @Service
 @Transactional
-public class JobServiceImpl implements JobService{
+public class JobServiceImpl implements JobService {
 
     @Autowired
     JobDao dao;
     @Autowired
     private SeqTableService seqService;
+
     @Override
     public Job save(Job status) {
         if (Objects.isNull(status.getKey().getJobNo())) {
             String compCode = status.getKey().getCompCode();
-            status.getKey().setJobNo(getCode(compCode));
+            status.getKey().setJobNo(getCode(compCode, status.getDeptId()));
         }
         return dao.save(status);
     }
 
     @Override
-    public List<Job> findAll(String compCode, Boolean isFinished) {
-        return dao.findAll(compCode, isFinished);
+    public List<Job> findAll(String compCode, Boolean isFinished, int deptId) {
+        return dao.findAll(compCode, isFinished, deptId);
     }
 
     @Override
@@ -65,9 +66,10 @@ public class JobServiceImpl implements JobService{
         return dao.getJob(updatedDate);
     }
 
-    private String getCode(String compCode) {
+    private String getCode(String compCode, int deptId) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
+        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
         int seqNo = seqService.getSequence(0, "Job", period, compCode);
-        return period + "-" + String.format("%0" + 5 + "d", seqNo);
+        return deptCode + period + "-" + String.format("%0" + 5 + "d", seqNo);
     }
 }

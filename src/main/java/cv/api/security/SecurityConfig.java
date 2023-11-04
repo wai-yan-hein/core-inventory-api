@@ -16,7 +16,6 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Slf4j
@@ -68,7 +67,7 @@ public class SecurityConfig {
         return authenticationWebFilter;
     }
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public void corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // allow cookies
         //this is fucking shit pattern
@@ -77,7 +76,6 @@ public class SecurityConfig {
         config.addAllowedMethod("*"); // allow any method
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config); // apply CORS configuration to all paths
-        return source;
     }
 
     @Bean

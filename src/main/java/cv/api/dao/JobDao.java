@@ -10,7 +10,7 @@ import java.util.List;
 public interface JobDao {
     Job save(Job Job);
 
-    List<Job> findAll(String compCode, Boolean isFinished);
+    List<Job> findAll(String compCode, Boolean isFinished,int deptId);
 
     int delete(JobKey key);
 
