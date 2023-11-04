@@ -26,14 +26,14 @@ public class JobServiceImpl implements JobService {
     public Job save(Job status) {
         if (Objects.isNull(status.getKey().getJobNo())) {
             String compCode = status.getKey().getCompCode();
-            status.getKey().setJobNo(getCode(compCode,status.getDeptId()));
+            status.getKey().setJobNo(getCode(compCode, status.getDeptId()));
         }
         return dao.save(status);
     }
 
     @Override
-    public List<Job> findAll(String compCode, Boolean isFinished,int deptId) {
-        return dao.findAll(compCode, isFinished,deptId);
+    public List<Job> findAll(String compCode, Boolean isFinished, int deptId) {
+        return dao.findAll(compCode, isFinished, deptId);
     }
 
     @Override
@@ -70,6 +70,6 @@ public class JobServiceImpl implements JobService {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
         String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
         int seqNo = seqService.getSequence(0, "Job", period, compCode);
-        return deptCode + "-" + period + "-" + String.format("%0" + 5 + "d", seqNo);
+        return deptCode + period + "-" + String.format("%0" + 5 + "d", seqNo);
     }
 }
