@@ -6,6 +6,7 @@
 package cv.api.controller;
 
 import cv.api.common.*;
+import cv.api.entity.OPHis;
 import cv.api.entity.ReorderLevel;
 import cv.api.entity.VStockBalance;
 import cv.api.model.*;
@@ -36,8 +37,8 @@ public class ReportController {
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getSaleReport(@RequestParam String vouNo,
-                                              @RequestParam String compCode,
-                                              @RequestParam Integer macId) throws Exception {
+                                 @RequestParam String compCode,
+                                 @RequestParam Integer macId) throws Exception {
         String reportName = "SaleVoucher";
         String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
         createFilePath(exportPath);
@@ -132,7 +133,8 @@ public class ReportController {
             if (isValidReportFilter(filter, ro)) {
                 String compCode = filter.getCompCode();
                 Integer deptId = filter.getDeptId();
-                String opDate = reportService.getOpeningDate(compCode, deptId);
+                String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
+                String opPayableDate = reportService.getOpeningDate(compCode, OPHis.STOCK_PAYABLE);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
@@ -293,11 +295,11 @@ public class ReportController {
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutSummaryByWeight" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO,calMill, compCode, deptId, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetailByWeight" -> {
-                        reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO,calMill, compCode, deptId, macId);
+                        reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         List<ClosingBalance> listBalance = reportService.getStockInOutDetailByWeight(typeCode, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
@@ -373,6 +375,14 @@ public class ReportController {
                         List<VOrder> list = reportService.getOrderByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
                     }
+                    case "StockPayableSummary" -> {
+                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, compCode, macId, true);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "StockPayableDetail" -> {
+                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, compCode, macId, false);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
                     default -> ro.setMessage("Report Not Exists.");
                 }
                 byte[] bytes = new FileInputStream(exportPath).readAllBytes();
@@ -399,7 +409,7 @@ public class ReportController {
         } else if (Util1.isNullOrEmpty(toDate)) {
             status = false;
             ro.setMessage("Invalid To Date.");
-        }  else if (Util1.isNullOrEmpty(compCode)) {
+        } else if (Util1.isNullOrEmpty(compCode)) {
             status = false;
             ro.setMessage("Invalid Company Id.");
         } else if (Util1.isNullOrEmpty(macId)) {
@@ -448,7 +458,7 @@ public class ReportController {
                                    @RequestParam boolean calRI, @RequestParam boolean calRO,
                                    @RequestParam String compCode, @RequestParam Integer deptId,
                                    @RequestParam Integer macId, @RequestParam boolean summary) {
-        String opDate = reportService.getOpeningDate(compCode, deptId);
+        String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
         List<VStockBalance> list = reportService.getStockBalance(opDate, clDate, "-", "-", "-",
                 stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
@@ -467,9 +477,9 @@ public class ReportController {
                                            @RequestParam boolean calMill,
                                            @RequestParam String compCode, @RequestParam Integer deptId,
                                            @RequestParam Integer macId, @RequestParam boolean summary) {
-        String opDate = reportService.getOpeningDate(compCode, deptId);
+        String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO,calMill, compCode, macId, summary);
+        List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, macId, summary);
         if (list.isEmpty()) {
             VStockBalance b = new VStockBalance();
             b.setLocationName("No Stock.");
@@ -493,7 +503,7 @@ public class ReportController {
         boolean calRI = filter.isCalRI();
         boolean calRO = filter.isCalRO();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String opDate = reportService.getOpeningDate(compCode, deptId);
+        String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
         List<ReorderLevel> reorderLevels = reportService.getReorderLevel(opDate, clDate, typeCode, catCode,
                 brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);

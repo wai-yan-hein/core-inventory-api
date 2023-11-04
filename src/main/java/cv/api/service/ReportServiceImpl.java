@@ -54,17 +54,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public String getOpeningDate(String compCode, Integer deptId) {
+    public String getOpeningDate(String compCode, int tranSource) {
         String opDate = null;
         String sql = """
                 select max(op_date) op_date
-                from op_his\s
-                where deleted = false 
+                from op_his
+                where deleted = false
                 and comp_code =?
-                and tran_source =1
+                and tran_source =?
                 """;
         try {
-            ResultSet rs = reportDao.getResultSql(sql, compCode);
+            ResultSet rs = reportDao.getResultSql(sql,compCode,tranSource);
             if (rs != null) {
                 while (rs.next()) {
                     Date date = rs.getDate("op_date");
@@ -4558,7 +4558,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ClosingBalance> getStockBalanceByTrader(String opDate, String fromDate, String toDate,
+    public List<ClosingBalance> getStockPayableByTrader(String opDate, String fromDate, String toDate,
                                                         String traderCode, String compCode,
                                                         int macId, boolean summary) {
         calculateOpeningByTrader(opDate, fromDate, traderCode, compCode, macId);
@@ -4592,7 +4592,7 @@ public class ReportServiceImpl implements ReportService {
                     ClosingBalance b = new ClosingBalance();
                     b.setStockCode(rs.getString("stock_code"));
                     b.setStockName(rs.getString("stock_name"));
-                    b.setStockUsrCode(rs.getString("s-user_code"));
+                    b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setTraderUserCode(rs.getString("t_user_code"));
                     b.setTraderCode(rs.getString("trader_code"));
                     b.setTraderName(rs.getString("trader_name"));
@@ -4758,6 +4758,7 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateOpeningByTrader(String opDate, String fromDate,
                                           String traderCode, String compCode, int macId) {
+//        String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
         String sql = "insert into tmp_stock_opening(tran_date,trader_code,stock_code,ttl_qty,ttl_weight,loc_code,unit,comp_code,dept_id,mac_id)\n" +
                 "select '" + opDate + "' op_date ,trader_code,stock_code,sum(qty) ttl_qty,sum(weight) ttl_weight,loc_code,ifnull(weight_unit,'-') weight_unit,comp_code,1," + macId + " \n" +
                 "from (\n" +
@@ -4785,7 +4786,7 @@ public class ReportServiceImpl implements ReportService {
 
     private void calculateClosingByTrader(String fromDate, String toDate,
                                           String traderCode, String compCode, int macId) {
-        String delSql = "delete from tmp_closing_column where mac_id = " + macId;
+        String delSql = "delete from tmp_stock_io_column where mac_id = " + macId;
         String saleSql = "insert into tmp_stock_io_column(tran_option,tran_date,trader_code,vou_no,remark,stock_code,sale_qty,sale_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'Sale',date(vou_date) vou_date,trader_code,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",comp_code,1\n" +
                 "from v_sale\n" +

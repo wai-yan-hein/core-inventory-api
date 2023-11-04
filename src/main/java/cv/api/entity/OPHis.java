@@ -62,4 +62,7 @@ public class OPHis {
     private String locName;
     @Transient
     private String vouDateStr;
+    public static final int STOCK_OP = 1;
+    public static final int STOCK_PAYABLE = 2;
+
 }
