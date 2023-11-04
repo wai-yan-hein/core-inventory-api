@@ -4601,7 +4601,7 @@ public class ReportServiceImpl implements ReportService {
                     b.setSaleQty(rs.getDouble("sale_qty"));
                     b.setSaleWeight(rs.getDouble("sale_weight"));
                     b.setOutQty(rs.getDouble("out_qty"));
-                    b.setOutWeight(rs.getByte("out_weight"));
+                    b.setOutWeight(rs.getDouble("out_weight"));
                     b.setBalQty(rs.getDouble("bal_qty"));
                     b.setBalWeight(rs.getDouble("bal_weight"));
                     list.add(b);
