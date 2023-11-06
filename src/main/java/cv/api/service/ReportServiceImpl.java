@@ -1914,13 +1914,13 @@ public class ReportServiceImpl implements ReportService {
                     if (smallQty == 1) {
                         if (divider != 0) {
                             str = formatter.format(divider);
-                            relStr.append(String.format("%s%s%s", str, unitRelationDetail.getUnit(), "*"));
+                            relStr.append(String.format("%s %s%s", str, unitRelationDetail.getUnit(), "*"));
                         }
                     } else {
                         int first = (int) divider;
                         if (first != 0) {
                             str = formatter.format(first);
-                            relStr.append(String.format("%s%s%s", str, unitRelationDetail.getUnit(), "*"));
+                            relStr.append(String.format("%s %s%s", str, unitRelationDetail.getUnit(), "*"));
                         }
                     }
                 }
@@ -2270,6 +2270,7 @@ public class ReportServiceImpl implements ReportService {
                     b.setBalRel(getRelStr(relCode, compCode, balQty));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
+                    b.setStockCode(rs.getString("stock_code"));
                     balances.add(b);
                 }
             }
