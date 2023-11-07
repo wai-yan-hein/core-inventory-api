@@ -53,9 +53,10 @@ public class GRNDetailDaoImpl extends AbstractDao<GRNDetailKey, GRNDetail> imple
                     g.setStockCode(rs.getString("stock_code"));
                     g.setUserCode(rs.getString("user_code"));
                     g.setStockName(rs.getString("stock_name"));
-                    g.setStdWeight(rs.getFloat("std_weight"));
+                    g.setStdWeight(rs.getDouble("std_weight"));
+                    g.setTotalWeight(rs.getDouble("total_weight"));
                     g.setRelName(rs.getString("rel_name"));
-                    g.setQty(rs.getFloat("qty"));
+                    g.setQty(rs.getDouble("qty"));
                     g.setUnit(rs.getString("unit"));
                     g.setLocCode(rs.getString("loc_code"));
                     g.setLocName(rs.getString("loc_name"));

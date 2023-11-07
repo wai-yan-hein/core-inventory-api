@@ -66,6 +66,7 @@ public class PurHisDetailDaoImpl extends AbstractDao<PurDetailKey, PurHisDetail>
                     op.setWeight(rs.getDouble("weight"));
                     op.setStdWeight(rs.getDouble("std_weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
+                    op.setTotalWeight(rs.getDouble("total_weight"));
                     op.setPrice(rs.getDouble("pur_price"));
                     op.setAmount(rs.getDouble("pur_amt"));
                     op.setLocCode(rs.getString("loc_code"));
