@@ -931,7 +931,6 @@ create table milling_his (
   primary key (vou_no,comp_code)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
-
 drop table if exists milling_output;
 create table milling_output (
   vou_no varchar(20) not null,
@@ -1365,6 +1364,7 @@ create table vou_discount (
   primary key (vou_no, comp_code, unique_id));
 
 alter table milling_his
+add column percent_qty double(20,3) not null,
 add column job_no varchar(15) null after percent_qty;
 
 alter table stock
