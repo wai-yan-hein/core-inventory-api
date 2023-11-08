@@ -2337,6 +2337,7 @@ public class ReportServiceImpl implements ReportService {
                     b.setStockUsrCode(Util1.isNull(rs.getString("s_user_code"), rs.getString("stock_code")));
                     b.setStockName(rs.getString("stock_name"));
                     b.setRemark(rs.getString("remark"));
+                    b.setVouNo(rs.getString("vou_no"));
                     balances.add(b);
                 }
             }

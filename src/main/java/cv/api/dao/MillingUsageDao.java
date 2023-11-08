@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cv.api.service;
+package cv.api.dao;
 
 import cv.api.entity.MillingRawDetail;
 import cv.api.entity.MillingRawDetailKey;

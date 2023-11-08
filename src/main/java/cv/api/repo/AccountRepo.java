@@ -212,7 +212,10 @@ public class AccountRepo {
                     case "SUP" -> accTrader.setTraderType("S");
                     default -> accTrader.setTraderType("D");
                 }
-                accountApi.post().uri("/account/saveTrader").body(Mono.just(accTrader), AccTrader.class).retrieve().bodyToMono(AccTrader.class).subscribe((response) -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()), (e) -> log.error("send Trader : " + e.getMessage()));
+                accountApi.post().uri("/account/saveTrader")
+                        .body(Mono.just(accTrader), AccTrader.class)
+                        .retrieve().bodyToMono(AccTrader.class)
+                        .doOnSuccess(response -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode())).block();
             }
         }
     }

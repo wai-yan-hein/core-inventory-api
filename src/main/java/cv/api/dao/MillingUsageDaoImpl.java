@@ -1,6 +1,5 @@
-package cv.api.service;
+package cv.api.dao;
 
-import cv.api.dao.AbstractDao;
 import cv.api.entity.MillingUsage;
 import cv.api.entity.MillingUsageKey;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,7 @@ public class MillingUsageDaoImpl extends AbstractDao<MillingUsageKey, MillingUsa
                 """;
         List<MillingUsage> list = new ArrayList<>();
         try {
-            ResultSet rs = getResult(sql);
+            ResultSet rs = getResult(sql,vouNo,compCode);
             while (rs.next()) {
                 MillingUsage u = new MillingUsage();
                 MillingUsageKey key = new MillingUsageKey();
