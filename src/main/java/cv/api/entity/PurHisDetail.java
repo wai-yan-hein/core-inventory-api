@@ -29,7 +29,7 @@ public class PurHisDetail implements Serializable {
     @Column(name = "qty")
     private Double qty;
     @Column(name = "avg_qty")
-    private Double avgQty;
+    private Double weightLoss;
     @Column(name = "pur_unit")
     private String unitCode;
     @Column(name = "org_price")

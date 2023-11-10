@@ -81,6 +81,8 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                     op.setRelName(rs.getString("rel_name"));
                     op.setBatchNo(rs.getString("batch_no"));
                     op.setTraderName(rs.getString("trader_name"));
+                    op.setOrgPrice(rs.getDouble("org_price"));
+                    op.setWeightLoss(rs.getDouble("weight_loss"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
