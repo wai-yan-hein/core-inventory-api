@@ -64,7 +64,7 @@ public class ReportServiceImpl implements ReportService {
                 and tran_source =?
                 """;
         try {
-            ResultSet rs = reportDao.getResultSql(sql,compCode,tranSource);
+            ResultSet rs = reportDao.getResultSql(sql, compCode, tranSource);
             if (rs != null) {
                 while (rs.next()) {
                     Date date = rs.getDate("op_date");
@@ -4586,7 +4586,7 @@ public class ReportServiceImpl implements ReportService {
                     join trader t on a.trader_code = t.code
                     and a.comp_code = t.comp_code
                     group by stock_code,trader_code
-                    order by a.tran_option,a.tran_date,a.vou_no
+                    order by t.user_code,a.tran_option,a.tran_date,a.vou_no
                     """;
             ResultSet rs = reportDao.getResultSql(sql, macId, compCode);
             try {
@@ -4702,7 +4702,7 @@ public class ReportServiceImpl implements ReportService {
                         double outWeight = c.getOutWeight();
                         double saleWeight = c.getSaleWeight();
                         double clWeight = opWeight + outWeight + saleWeight;
-                        double clQty =opQty+outQty+saleQty;
+                        double clQty = opQty + outQty + saleQty;
                         c.setOpenQty(opQty);
                         c.setSaleQty(saleQty);
                         c.setOutQty(outQty);
@@ -4759,6 +4759,220 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<ClosingBalance> getStockPayableConsignor(String opDate, String fromDate, String toDate,String traderCode,
+                                                          String compCode, int macId,boolean summary) {
+        calculateStockIOOpeningByTrader(opDate, fromDate, traderCode,compCode, macId);
+        calculateStockIOClosingByTrader(fromDate,toDate,traderCode,compCode,macId);
+        List<ClosingBalance> list = new ArrayList<>();
+        if (summary) {
+            String sql ="""
+                    select a.*,t.user_code t_user_code,t.trader_name,s.user_code s_user_code,s.stock_name
+                    from (
+                    select trader_code,stock_code,sum(op_qty)op_qty,sum(op_weight) op_weight,
+                    sum(in_qty) in_qty,sum(in_weight) in_weight,sum(out_qty) out_qty,sum(out_weight) out_weight,
+                    sum(op_qty+out_qty+sale_qty) bal_qty,
+                    sum(op_weight+out_weight+in_weight) bal_weight,comp_code
+                    from tmp_stock_io_column
+                    where mac_id =?
+                    and comp_code =?
+                    group by trader_code,stock_code
+                    )a
+                    join trader t on a.trader_code = t.code
+                    and a.comp_code =t.comp_code
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = t.comp_code
+                    """;
+            ResultSet rs = reportDao.getResultSql(sql, macId, compCode);
+            try {
+                while (rs.next()) {
+                    ClosingBalance b = new ClosingBalance();
+                    b.setStockCode(rs.getString("stock_code"));
+                    b.setStockName(rs.getString("stock_name"));
+                    b.setStockUsrCode(rs.getString("s_user_code"));
+                    b.setTraderUserCode(rs.getString("t_user_code"));
+                    b.setTraderCode(rs.getString("trader_code"));
+                    b.setTraderName(rs.getString("trader_name"));
+                    b.setOpenQty(rs.getDouble("op_qty"));
+                    b.setOpenWeight(rs.getDouble("op_weight"));
+                    b.setInQty(rs.getDouble("in_qty"));
+                    b.setInWeight(rs.getDouble("in_weight"));
+                    b.setOutQty(rs.getDouble("out_qty"));
+                    b.setOutWeight(rs.getDouble("out_weight"));
+                    b.setBalQty(rs.getDouble("bal_qty"));
+                    b.setBalWeight(rs.getDouble("bal_weight"));
+                    list.add(b);
+                }
+            } catch (Exception e) {
+                log.error("getStockPayableConsignorSummary : " + e.getMessage());
+            }
+        } else {
+            String sql = """
+                    select a.*,sum(a.op_qty+a.out_qty+a.in_qty) bal_qty,
+                    sum(a.op_weight+a.out_weight+a.in_weight) bal_weight,
+                    s.weight_unit,s.user_code s_user_code,a.stock_code,s.stock_name,
+                    t.user_code t_user_code,t.trader_name
+                    from (
+                    select tran_option,tran_date,stock_code,trader_code,
+                    remark,vou_no,comp_code,dept_id,
+                    sum(op_qty) op_qty,sum(op_weight) op_weight,
+                    sum(out_qty) out_qty,sum(out_weight) out_weight,
+                    sum(in_qty) in_qty,sum(in_weight) in_weight
+                    from tmp_stock_io_column
+                    where mac_id = ?
+                    and comp_code = ?
+                    group by tran_date,stock_code,trader_code,tran_option,vou_no)a
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code
+                    join trader t on a.trader_code = t.code
+                    and a.comp_code = t.comp_code
+                    group by tran_date,stock_code,trader_code,vou_no,tran_option
+                    order by a.tran_option,a.tran_date,a.vou_no
+                    """;
+            try {
+                ResultSet rs = reportDao.getResultSql(sql, macId, compCode);
+                if (!Objects.isNull(rs)) {
+                    while (rs.next()) {
+                        ClosingBalance b = new ClosingBalance();
+                        double opQty = rs.getDouble("op_qty");
+                        double outQty = rs.getDouble("out_qty");
+                        double balQty = rs.getDouble("bal_qty");
+                        double inQty = rs.getDouble("in_qty");
+                        double opWeight = rs.getDouble("op_weight");
+                        double inWeight = rs.getDouble("in_weight");
+                        double outWeight = rs.getDouble("out_weight");
+                        double balWeight = rs.getDouble("bal_Weight");
+                        b.setOpenQty(opQty);
+                        b.setInQty(inQty);
+                        b.setOutQty(outQty);
+                        b.setBalQty(balQty);
+                        b.setOpenWeight(opWeight);
+                        b.setInWeight(inWeight);
+                        b.setOutWeight(outWeight);
+                        b.setBalWeight(balWeight);
+                        b.setCompCode(compCode);
+                        b.setVouDate(Util1.toDateStr(rs.getDate("tran_date"), "dd/MM/yyyy"));
+                        b.setStockUsrCode(Util1.isNull(rs.getString("s_user_code"), rs.getString("stock_code")));
+                        b.setStockName(rs.getString("stock_name"));
+                        b.setRemark(rs.getString("remark"));
+                        b.setWeightUnit(rs.getString("weight_unit"));
+                        b.setVouNo(rs.getString("vou_no"));
+                        list.add(b);
+                    }
+                }
+                for (int i = 0; i < list.size(); i++) {
+                    if (i > 0) {
+                        ClosingBalance prv = list.get(i - 1);
+                        double prvCl = prv.getBalQty();
+                        double prvWCl = prv.getBalWeight();
+                        ClosingBalance c = list.get(i);
+                        c.setOpenQty(prvCl);
+                        c.setOpenWeight(prvWCl);
+                        double opQty = c.getOpenQty();
+                        double inQty = c.getInQty();
+                        double outQty = c.getOutQty();
+                        double clQty = opQty + inQty + outQty;
+                        double opWeight = c.getOpenWeight();
+                        double outWeight = c.getOutWeight();
+                        double inWeight =c.getInWeight();
+                        double clWeight = opWeight + outWeight + inWeight;
+                        c.setOpenQty(opQty);
+                        c.setInQty(inQty);
+                        c.setOutQty(outQty);
+                        c.setBalQty(clQty);
+                        c.setOpenWeight(opWeight);
+                        c.setOutWeight(outWeight);
+                        c.setBalWeight(clWeight);
+                    } else {
+                        ClosingBalance c = list.get(i);
+                        double opQty = c.getOpenQty();
+                        double outQty = c.getOutQty();
+                        double inQty = c.getInQty();
+                        double opWeight = c.getOpenWeight();
+                        double outWeight = c.getOutWeight();
+                        double inWeight =c.getInWeight();
+                        double clWeight = opWeight + outWeight + inWeight;
+                        double clQty = opQty + outQty + inQty;
+                        c.setOpenQty(opQty);
+                        c.setOutQty(outQty);
+                        c.setBalQty(clQty);
+                        c.setOpenWeight(opWeight);
+                        c.setInWeight(inWeight);
+                        c.setOutWeight(outWeight);
+                        c.setBalWeight(clWeight);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(String.format("getStockPayableConsignorDetail: %s", e.getMessage()));
+            }
+        }
+        return list;
+
+    }
+
+    private void calculateStockIOOpeningByTrader(String opDate, String fromDate,String traderCode, String compCode, int macId) {
+        String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
+        String sql = "insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_qty,ttl_weight,comp_code,dept_id,mac_id)\n" +
+                "select '" + opDate + "',trader_code,stock_code,loc_code,sum(qty) qty,sum(total_weight) total_weight,comp_code,1," + macId + "\n" +
+                "from(\n" +
+                "select trader_code,stock_code,loc_code,in_qty qty,total_weight,weight_unit,comp_code\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) >= '" + opDate + "' \n" +
+                "and date(vou_date) <'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and coalesce(in_qty,0) <>0\n" +
+                "and trader_code is not null\n" +
+                "and (trader_code ='"+traderCode+"' or '-'='"+traderCode+"')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  "+macId+")\n" +
+                "group by trader_code,stock_code\n" +
+                "\tunion all\n" +
+                "select trader_code,stock_code,loc_code,out_qty*-1,total_weight*-1,weight_unit,comp_code\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) >= '" + opDate + "' \n" +
+                "and date(vou_date) <'" + fromDate + "'\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and coalesce(out_qty,0) <>0\n" +
+                "and trader_code is not null\n" +
+                "and (trader_code ='"+traderCode+"' or '-'='"+traderCode+"')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  "+macId+")\n" +
+                "group by trader_code,stock_code\n" +
+                ")a\n" +
+                "group by trader_code,stock_code\n";
+        executeSql(delSql, sql);
+    }
+    private  void calculateStockIOClosingByTrader(String fromDate,String toDate,String traderCode,String compCode,int macId){
+        String delSql = "delete from tmp_stock_io_column where mac_id ="+macId;
+        String opSql = "insert into tmp_stock_io_column(tran_option,tran_date,trader_code,vou_no,remark,stock_code,op_qty,op_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'A-Opening',tran_date,trader_code,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_weight) ttl_weight,loc_code,mac_id,'" + compCode + "', 1 \n" +
+                "from tmp_stock_opening tmp \n" +
+                "where mac_id =" + macId + "\n" +
+                "and comp_code ='" + compCode + "'\n" +
+                "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  "+macId+")\n" +
+                "group by tran_date,stock_code,trader_code,mac_id";
+        String inSql="insert into tmp_stock_io_column(tran_option,tran_date,trader_code,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'StockIn',date(vou_date) vou_date,trader_code,vou_no,remark,stock_code,sum(in_qty) qty,total_weight,loc_code,"+macId+",comp_code,1\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) between '"+fromDate+"' and '"+toDate+"'\n" +
+                "and comp_code ='"+compCode+"'\n" +
+                "and coalesce(in_qty,0) <>0\n" +
+                "and trader_code is not null\n" +
+                "and (trader_code ='"+traderCode+"' or '-'='"+traderCode+"')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  "+macId+")\n" +
+                "group by trader_code,stock_code,in_unit,vou_no";
+        String outSql="insert into tmp_stock_io_column(tran_option,tran_date,trader_code,vou_no,remark,stock_code,out_qty,out_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+                "select 'StockOut',date(vou_date) vou_date,trader_code,vou_no,remark,stock_code,sum(out_qty)*-1 qty,total_weight*-1,loc_code,"+macId+",comp_code,1\n" +
+                "from v_stock_io\n" +
+                "where date(vou_date) between '"+fromDate+"' and '"+toDate+"'\n" +
+                "and comp_code ='"+compCode+"'\n" +
+                "and coalesce(out_qty,0) <>0\n" +
+                "and trader_code is not null\n" +
+                "and (trader_code ='"+traderCode+"' or '-'='"+traderCode+"')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  "+macId+")\n" +
+                "group by trader_code,stock_code,out_unit,vou_no";
+        executeSql(delSql,opSql,inSql,outSql);
     }
 
     private void calculateOpeningByTrader(String opDate, String fromDate,

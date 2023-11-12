@@ -375,12 +375,20 @@ public class ReportController {
                         List<VOrder> list = reportService.getOrderByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                         Util1.writeJsonFile(list, exportPath);
                     }
-                    case "StockPayableSummary" -> {
+                    case "StockPayableCustomerSummary" -> {
                         List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
                         Util1.writeJsonFile(list, exportPath);
                     }
-                    case "StockPayableDetail" -> {
+                    case "StockPayableCustomerDetail" -> {
                         List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "StockPayableConsignorSummary"->{
+                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate,fromDate,toDate,traderCode,compCode,macId,true);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "StockPayableConsignorDetail"->{
+                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate,fromDate,toDate,traderCode,compCode,macId,false);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");
