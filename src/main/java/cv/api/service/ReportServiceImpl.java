@@ -5948,7 +5948,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by stock_code\n" +
                 "\tunion all\n" +
-                "select stock_code,sum(total_weight)*-1 weight,sum(in_qty) qty,loc_code, weight_unit\n" +
+                "select stock_code,sum(total_weight) weight,sum(in_qty) qty,loc_code, weight_unit\n" +
                 "from v_stock_io\n" +
                 "where date(vou_date) >= '" + opDate + "' and date(vou_date)<'" + fromDate + "'\n" +
                 "and comp_code ='" + compCode + "'\n" +
