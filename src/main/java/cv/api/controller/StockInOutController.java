@@ -58,7 +58,9 @@ public class StockInOutController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus, vouNo, remark, description, userCode, stockCode, locCode, compCode, deptId, deleted);
+        String traderCode = Util1.isNull(filter.getTraderCode(),"-");
+        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus,
+                vouNo, remark, description, userCode, stockCode, locCode, compCode, deptId, deleted,traderCode);
         return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
     }
 
