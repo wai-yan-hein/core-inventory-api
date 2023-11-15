@@ -13,6 +13,8 @@ import java.util.List;
 public class WeightHis {
     @EmbeddedId
     private WeightHisKey key;
+    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime vouDate;
     @Column(name = "dept_id")
     private int deptId;
     @Column(name = "trader_code")
@@ -40,7 +42,7 @@ public class WeightHis {
     @Column(name = "deleted")
     private boolean deleted;
     @Column(name = "mac_id")
-    private Integer macId;
+    private int macId;
     @Column(name = "tran_source")
     private String tranSource;
     @Transient
