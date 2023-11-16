@@ -215,7 +215,7 @@ public class AccountRepo {
                 accountApi.post().uri("/account/saveTrader")
                         .body(Mono.just(accTrader), AccTrader.class)
                         .retrieve().bodyToMono(AccTrader.class)
-                        .doOnSuccess(response -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode())).block();
+                        .doOnSuccess(response -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode())).subscribe();
             }
         }
     }
