@@ -30,9 +30,12 @@ public interface TraderService {
     Trader saveTrader(Trader trader);
 
     List<Trader> findAll(String compCode);
+
     List<Trader> findAll();
 
     List<Trader> findCustomer(String compCode, Integer deptId);
+
+    List<Trader> findEmployee(String compCode, Integer deptId);
 
     List<Trader> findSupplier(String compCode, Integer deptId);
 

@@ -376,6 +376,11 @@ public class SetupController {
         return Flux.fromIterable(traderService.findCustomer(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
+    @GetMapping(path = "/getEmployee")
+    public Flux<Trader> getEmployee(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return Flux.fromIterable(traderService.findEmployee(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    }
+
     @GetMapping(path = "/getTraderList")
     public Flux<?> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId)).onErrorResume(throwable -> Flux.empty());

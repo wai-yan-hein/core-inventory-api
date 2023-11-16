@@ -34,6 +34,8 @@ public interface TraderDao {
 
     List<Trader> findSupplier(String compCode, Integer deptId);
 
+    List<Trader> findEmployee(String compCode, Integer deptId);
+
     List<Trader> unUploadTrader();
 
     Date getMaxDate();
