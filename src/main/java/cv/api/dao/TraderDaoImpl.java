@@ -152,6 +152,12 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
     }
 
     @Override
+    public List<Trader> findEmployee(String compCode, Integer deptId) {
+        String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and (o.type = 'EMP') order by o.userCode";
+        return findHSQL(hsql);
+    }
+
+    @Override
     public List<Trader> findSupplier(String compCode, Integer deptId) {
         String hsql = "select o from Trader o where o.key.compCode = '" + compCode + "' and (o.deptId =" + deptId + " or 0 =" + deptId + ") and o.deleted =false and (o.type = 'SUP' or o.multi = true) order by o.userCode";
         return findHSQL(hsql);
