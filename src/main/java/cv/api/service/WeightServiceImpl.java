@@ -31,8 +31,11 @@ public class WeightServiceImpl implements WeightService {
         if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
             obj.getKey().setVouNo(getVoucherNo(obj.getDeptId(), obj.getMacId(), obj.getKey().getCompCode()));
         }
-        List<WeightHisDetail> listDetail = obj.getListDetail();
         String vouNo = obj.getKey().getVouNo();
+        String compCode = obj.getKey().getCompCode();
+        //delete detail
+        detailDao.deleteWeightHisDetail(vouNo, compCode);
+        List<WeightHisDetail> listDetail = obj.getListDetail();
         for (int i = 0; i < listDetail.size(); i++) {
             WeightHisDetail cSd = listDetail.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
@@ -89,8 +92,8 @@ public class WeightServiceImpl implements WeightService {
     @Override
     public List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
                                             String stockCode, String vouNo, String remark,
-                                            boolean deleted, String compCode,String tranSource) {
-        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode,tranSource);
+                                            boolean deleted, String compCode, String tranSource) {
+        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode, tranSource);
     }
 
     @Override

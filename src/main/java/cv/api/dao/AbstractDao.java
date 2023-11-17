@@ -94,6 +94,21 @@ public abstract class AbstractDao<PK extends Serializable, T> {
             return stmt.executeQuery();
         });
     }
+    @Transactional
+    public void deleteRecords(String sql, Object... params) {
+        jdbcTemplate.execute((ConnectionCallback<Void>) con -> {
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                for (int i = 0; i < params.length; i++) {
+                    stmt.setObject(i + 1, params[i]);
+                }
+                String formattedSql = formatSqlWithParams(sql, params);
+                // log.info("Executing SQL query: {}", formattedSql);
+                stmt.executeUpdate();
+            }
+            return null;
+        });
+    }
+
     private String formatSqlWithParams(String sql, Object[] params) {
         sql = "\n" + sql;
         for (Object param : params) {

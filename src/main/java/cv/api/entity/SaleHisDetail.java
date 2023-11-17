@@ -50,9 +50,9 @@ public class SaleHisDetail {
     @Column(name = "total_weight")
     private Double totalWeight;
     @Column(name = "org_price")
-    private double orgPrice;
+    private Double orgPrice;
     @Column(name = "weight_loss")
-    private double weightLoss;
+    private Double weightLoss;
     @Transient
     private String userCode;
     @Transient

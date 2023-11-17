@@ -47,6 +47,8 @@ public class WeightHis {
     private int macId;
     @Column(name = "tran_source")
     private String tranSource;
+    @Column(name = "draft")
+    private boolean draft;
     @Transient
     private List<WeightHisDetail> listDetail;
     @Transient

@@ -9,5 +9,6 @@ public interface WeightDetailDao {
     WeightHisDetail save(WeightHisDetail obj);
 
     boolean delete(WeightHisDetailKey key);
+    boolean deleteWeightHisDetail(String vouNo,String compCode);
 
 }

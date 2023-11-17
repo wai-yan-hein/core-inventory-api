@@ -53,7 +53,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
     @Override
     public List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
                                             String stockCode, String vouNo, String remark,
-                                            boolean deleted, String compCode,String tranSource) {
+                                            boolean deleted, String compCode, String tranSource) {
         remark = remark + "%";
         List<WeightHis> list = new ArrayList<>();
         String sql = """
@@ -79,7 +79,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
             ResultSet rs = getResult(sql, compCode, deleted,
                     traderCode, traderCode,
                     stockCode, stockCode,
-                    vouNo, vouNo, remark, remark,tranSource,tranSource);
+                    vouNo, vouNo, remark, remark, tranSource, tranSource);
             while (rs.next()) {
                 WeightHis h = new WeightHis();
                 WeightHisKey key = new WeightHisKey();
@@ -120,7 +120,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
                 where vou_no =?
                 and comp_code =?
                 """;
-        ResultSet rs = getResult(sql,vouNo,compCode);
+        ResultSet rs = getResult(sql, vouNo, compCode);
         try {
             while (rs.next()) {
                 WeightHisDetail d = new WeightHisDetail();
@@ -137,4 +137,6 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
         }
         return list;
     }
+
+
 }
