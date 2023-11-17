@@ -28,6 +28,7 @@ public interface WeightService {
     boolean delete(WeightHisDetailKey key);
     List<WeightHis> getWeightHistory(String fromDate,String toDate,String traderCode,String stockCode,
                                      String vouNo,String remark,
-                                     boolean deleted,String compCode);
+                                     boolean deleted,String compCode,String transSource);
+    List<WeightHisDetail> getWeightDetail(String vouNo,String compCode);
 
 }

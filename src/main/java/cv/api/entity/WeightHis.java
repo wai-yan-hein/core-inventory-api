@@ -15,6 +15,8 @@ public class WeightHis {
     private WeightHisKey key;
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
+    @Column(name = "description")
+    private String description;
     @Column(name = "dept_id")
     private int deptId;
     @Column(name = "trader_code")

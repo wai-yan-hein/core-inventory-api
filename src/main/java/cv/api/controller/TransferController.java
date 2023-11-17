@@ -58,7 +58,7 @@ public class TransferController {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         String deleted = String.valueOf(filter.isDeleted());
-        String traderCode = Util1.isNull(filter.getCusCode(), "-");
+        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
         List<VTransfer> listStockIO = reportService.getTransferHistory(fromDate, toDate, refNo,
                 vouNo, remark, userCode,
                 stockCode, locCode, compCode, deptId, deleted, traderCode);
