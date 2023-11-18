@@ -45,6 +45,10 @@ public class WeightController {
     public Flux<?> getWeightDetail(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(weightService.getWeightDetail(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
+    @GetMapping(path = "/getWeightColumn")
+    public Flux<?> getWeightColumn(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(weightService.getWeightColumn(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
 
     @PostMapping(path = "/getWeightHistory")
     public Flux<?> getWeightHistory(@RequestBody FilterObject filter) {

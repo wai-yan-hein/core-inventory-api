@@ -111,32 +111,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
         return list;
     }
 
-    @Override
-    public List<WeightHisDetail> getWeightDetail(String vouNo, String compCode) {
-        List<WeightHisDetail> list = new ArrayList<>();
-        String sql = """
-                select *
-                from weight_his_detail
-                where vou_no =?
-                and comp_code =?
-                """;
-        ResultSet rs = getResult(sql, vouNo, compCode);
-        try {
-            while (rs.next()) {
-                WeightHisDetail d = new WeightHisDetail();
-                WeightHisDetailKey key = new WeightHisDetailKey();
-                key.setCompCode(rs.getString("comp_code"));
-                key.setVouNo(rs.getString("vou_no"));
-                key.setUniqueId(rs.getInt("unique_id"));
-                d.setWeight(rs.getDouble("weight"));
-                d.setKey(key);
-                list.add(d);
-            }
-        } catch (Exception e) {
-            log.error("getWeightDetail : " + e.getMessage());
-        }
-        return list;
-    }
+
 
 
 }

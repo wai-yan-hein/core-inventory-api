@@ -93,8 +93,16 @@ public class PurHis {
     private String landVouNo;
     @Column(name = "print_count")
     private Integer printCount;
+    @Column(name = "weight_vou_no")
+    private String weightVouNo;
     @Column(name = "payable_acc")
     private String payableAcc;
+    @Column(name = "cash_acc")
+    private String cashAcc;
+    @Column(name = "purchase_acc")
+    private String purchaseAcc;
+    @Column(name = "dept_code")
+    private String deptCode;
     @Transient
     private String status = "STATUS";
     @Transient
