@@ -9,8 +9,6 @@ import java.util.List;
 public interface WeightDao {
     WeightHis save(WeightHis obj);
 
-
-
     WeightHis findById(WeightHisKey key);
 
     boolean delete(WeightHisKey key);
@@ -18,7 +16,7 @@ public interface WeightDao {
     boolean restore(WeightHisKey key);
     List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
                                      String stockCode,String vouNo,String remark,
-                                     boolean deleted,String compCode,String tranSource);
+                                     boolean deleted,String compCode,String tranSource,boolean draft);
 
 
 }

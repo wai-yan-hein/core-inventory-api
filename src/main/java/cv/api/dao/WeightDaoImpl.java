@@ -2,8 +2,6 @@ package cv.api.dao;
 
 import cv.api.common.Util1;
 import cv.api.entity.WeightHis;
-import cv.api.entity.WeightHisDetail;
-import cv.api.entity.WeightHisDetailKey;
 import cv.api.entity.WeightHisKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -53,7 +51,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
     @Override
     public List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
                                             String stockCode, String vouNo, String remark,
-                                            boolean deleted, String compCode, String tranSource) {
+                                            boolean deleted, String compCode, String tranSource, boolean draft) {
         remark = remark + "%";
         List<WeightHis> list = new ArrayList<>();
         String sql = """
@@ -63,6 +61,8 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
                 from weight_his
                 where comp_code =?
                 and deleted = ?
+                and draft =?
+                and date(vou_date) between ? and ?
                 and (trader_code=? or '-'=?)
                 and (stock_code = ? or '-' = ?)
                 and (vou_no = ? or '-' = ?)
@@ -76,7 +76,8 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
                 order by a.vou_date desc
                 """;
         try {
-            ResultSet rs = getResult(sql, compCode, deleted,
+            ResultSet rs = getResult(sql, compCode, deleted, draft,
+                    fromDate,toDate,
                     traderCode, traderCode,
                     stockCode, stockCode,
                     vouNo, vouNo, remark, remark, tranSource, tranSource);
@@ -103,6 +104,8 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
                 h.setTranSource(rs.getString("tran_source"));
                 h.setDescription(rs.getString("description"));
                 h.setRemark(rs.getString("remark"));
+                h.setPost(rs.getBoolean("post"));
+                h.setDraft(rs.getBoolean("draft"));
                 list.add(h);
             }
         } catch (Exception e) {
@@ -110,8 +113,6 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
         }
         return list;
     }
-
-
 
 
 }

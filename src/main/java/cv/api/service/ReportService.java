@@ -156,7 +156,7 @@ public interface ReportService {
 
     List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo,
                                      String remark, String desp, String userCode, String stockCode,
-                                     String locCode, String compCode, Integer deptId, String deleted,String traderCode) throws Exception;
+                                     String locCode, String compCode, Integer deptId, String deleted, String traderCode) throws Exception;
 
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
@@ -272,8 +272,11 @@ public interface ReportService {
     VLanding getLandingReport(String vouNo, String compCode);
 
     List<ClosingBalance> getStockPayableByTrader(String opDate, String fromDate, String toDate,
-                                                        String traderCode, String stockCode, String compCode,int macId,boolean summary);
+                                                 String traderCode, String stockCode, String compCode, int macId, boolean summary);
 
     List<VSale> getSaleByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
-    List<ClosingBalance> getStockPayableConsignor(String opDate,String fromDate,String toDate,String traderCode,String stockCode,String compCode,int macId,boolean summary);
+
+    List<ClosingBalance> getStockPayableConsignor(String opDate, String fromDate, String toDate, String traderCode, String stockCode, String compCode, int macId, boolean summary);
+
+    List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode);
 }

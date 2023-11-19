@@ -3027,7 +3027,7 @@ public class ReportServiceImpl implements ReportService {
                 select a.*,t.trader_name
                 from (
                 select vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id
-                from v_purchase\s
+                from v_purchase
                 where comp_code = ?
                 and (dept_id = ? or 0 = ?)
                 and deleted =?
@@ -3061,6 +3061,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
                 s.setCreatedBy(rs.getString("created_by"));
                 s.setPaid(rs.getDouble("paid"));
                 s.setVouTotal(rs.getDouble("vou_total"));
@@ -4919,6 +4920,57 @@ public class ReportServiceImpl implements ReportService {
         }
         return list;
 
+    }
+
+    @Override
+    public List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode) {
+        List<VPurchase> list =new ArrayList<>();
+        String sql= """
+                select a.*,t.trader_name,l.loc_name
+                from (
+                select date(vou_date)vou_date,vou_no,trader_code,stock_code,
+                loc_code,pur_price,qty,bag,wet,rice,
+                pur_amt,grand_total,paid,balance,comp_code
+                from v_purchase
+                where date(vou_date) between ? and ?
+                and deleted = false
+                and comp_code =?
+                )a
+                join trader t on a.trader_code = t.code
+                and a.comp_code =t.comp_code
+                join location l on a.loc_code = l.loc_code
+                and a.comp_code = l.comp_code
+                order by vou_date
+                """;
+        try {
+            ResultSet rs = getResult(sql,fromDate,toDate,compCode);
+            while (rs.next()){
+                VPurchase p = new VPurchase();
+                p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"),"dd/MM/yyyy"));
+                p.setVouNo(rs.getString("vou_no"));
+                p.setTraderCode(rs.getString("trader_code"));
+                p.setStockCode(rs.getString("stock_code"));
+                p.setLocationCode(rs.getString("loc_code"));
+                p.setPurPrice(rs.getDouble("pur_price"));
+                p.setQty(rs.getDouble("qty"));
+                p.setBag(rs.getDouble("bag"));
+                p.setWet(rs.getDouble("wet"));
+                p.setRice(rs.getDouble("rice"));
+                p.setPurAmount(rs.getDouble("pur_amt"));
+                p.setGrandTotal(rs.getDouble("grand_total"));
+                p.setPaid(rs.getDouble("paid"));
+                p.setBalance(rs.getDouble("balance"));
+                p.setTraderName(rs.getString("trader_name"));
+                p.setLocationName(rs.getString("loc_name"));
+                list.add(p);
+                //vou_date, vou_no, trader_code, stock_code, loc_code,
+                // pur_price, qty, bag, wet, rice, pur_amt, grand_total,
+                // paid, balance, comp_code, trader_name, loc_name
+            }
+        }catch (Exception e){
+            log.error("getPurchaseList : "+e.getMessage());
+        }
+        return list;
     }
 
     private void calculateStockIOOpeningByTrader(String opDate, String fromDate, String traderCode, String compCode, int macId) {

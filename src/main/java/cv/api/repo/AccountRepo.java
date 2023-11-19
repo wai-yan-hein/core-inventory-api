@@ -446,10 +446,10 @@ public class AccountRepo {
             AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
             if (setting != null) {
                 LocationSetting ls = getLocationSetting(locCode, compCode);
-                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
+                String payAcc = Util1.isNull(ph.getCashAcc(), Util1.isNull(ls.getCashAcc(), setting.getPayAcc()));
                 String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
-                String srcAcc = setting.getSourceAcc();
-                String balAcc = setting.getBalanceAcc();
+                String srcAcc = Util1.isNull(ph.getPurchaseAcc(), setting.getSourceAcc());
+                String balAcc = Util1.isNull(ph.getPayableAcc(), setting.getBalanceAcc());
                 String commAcc = setting.getCommAcc();
                 String disAcc = setting.getDiscountAcc();
                 LocalDateTime vouDate = ph.getVouDate();

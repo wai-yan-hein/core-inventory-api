@@ -103,6 +103,8 @@ public class PurHis {
     private String purchaseAcc;
     @Column(name = "dept_code")
     private String deptCode;
+    @Column(name = "grand_total")
+    private double grandTotal;
     @Transient
     private String status = "STATUS";
     @Transient

@@ -252,7 +252,10 @@ public class ReportController {
                         List<VPurchase> purchaseByStock = reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(purchaseByStock, exportPath);
                     }
-
+                    case "PurchaseList" -> {
+                        List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
                     case "InventoryClosingSummary" -> {
                         List<ClosingBalance> balances = reportService.getClosingStock(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(balances, exportPath);
@@ -383,12 +386,12 @@ public class ReportController {
                         List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
                         Util1.writeJsonFile(list, exportPath);
                     }
-                    case "StockPayableConsignorSummary"->{
-                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate,fromDate,toDate,traderCode,stockCode,compCode,macId,true);
+                    case "StockPayableConsignorSummary" -> {
+                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
                         Util1.writeJsonFile(list, exportPath);
                     }
-                    case "StockPayableConsignorDetail"->{
-                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate,fromDate,toDate,traderCode,stockCode,compCode,macId,false);
+                    case "StockPayableConsignorDetail" -> {
+                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");

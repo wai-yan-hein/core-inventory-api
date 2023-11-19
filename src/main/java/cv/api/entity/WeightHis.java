@@ -49,6 +49,8 @@ public class WeightHis {
     private String tranSource;
     @Column(name = "draft")
     private boolean draft;
+    @Column(name = "post")
+    private boolean post;
     @Transient
     private List<WeightHisDetail> listDetail;
     @Transient

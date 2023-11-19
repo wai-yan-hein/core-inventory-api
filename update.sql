@@ -1465,7 +1465,8 @@ alter table pur_his
 add column weight_vou_no varchar(25) null after print_count,
 add column cash_acc varchar(15) null after weight_vou_no,
 add column purchase_acc varchar(15) null after cash_acc,
-add column dept_code varchar(15) null after purchase_acc;
+add column dept_code varchar(15) null after purchase_acc,
+add column grand_total double(20,3) null after payable_acc;
 
 #view
 drop view if exists v_milling_output;

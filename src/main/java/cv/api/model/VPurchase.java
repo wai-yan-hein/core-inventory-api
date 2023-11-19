@@ -75,5 +75,10 @@ public class VPurchase {
     private String landVouNo;
     private String phoneNo;
     private String regionName;
+    private String reference;
+    private Double bag;
+    private Double wet;
+    private Double rice;
+    private Double grandTotal;
     private List<LandingHisPrice> listPrice;
 }

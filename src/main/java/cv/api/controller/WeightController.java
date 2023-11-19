@@ -45,6 +45,7 @@ public class WeightController {
     public Flux<?> getWeightDetail(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(weightService.getWeightDetail(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
+
     @GetMapping(path = "/getWeightColumn")
     public Flux<?> getWeightColumn(@RequestParam String vouNo, @RequestParam String compCode) {
         return Flux.fromIterable(weightService.getWeightColumn(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
@@ -60,9 +61,10 @@ public class WeightController {
         String compCode = filter.getCompCode();
         boolean deleted = filter.isDeleted();
         String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        String tranSource = Util1.isNull(filter.getTranSource(),"-");
+        String tranSource = Util1.isNull(filter.getTranSource(), "-");
+        boolean draft = filter.isDraft();
         return Flux.fromIterable(weightService.getWeightHistory(fromDate, toDate, traderCode,
-                        stockCode, vouNo, remark, deleted, compCode,tranSource))
+                        stockCode, vouNo, remark, deleted, compCode, tranSource, draft))
                 .onErrorResume(throwable -> Flux.empty());
     }
 

@@ -43,4 +43,6 @@ public class FilterObject {
     private String tranOption;
     private String orderStatus;
     private String tranSource;
+    private boolean draft;
+
 }

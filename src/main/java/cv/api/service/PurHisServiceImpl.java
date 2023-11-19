@@ -9,8 +9,10 @@ import cv.api.common.Util1;
 import cv.api.dao.PurExpenseDao;
 import cv.api.dao.PurHisDao;
 import cv.api.dao.SeqTableDao;
+import cv.api.dao.WeightDao;
 import cv.api.entity.*;
 import cv.api.model.VDescription;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,17 +28,14 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PurHisServiceImpl implements PurHisService {
 
-    @Autowired
-    private PurHisDao phDao;
-    @Autowired
-    private PurHisDetailService pdDao;
-    @Autowired
-    private SeqTableDao seqDao;
-    @Autowired
-    private PurExpenseDao purExpenseDao;
-
+    private final PurHisDao phDao;
+    private final PurHisDetailService pdDao;
+    private final SeqTableDao seqDao;
+    private final PurExpenseDao purExpenseDao;
+    private final WeightDao weightDao;
 
     @Override
     public PurHis save(PurHis ph) {
@@ -48,7 +47,7 @@ public class PurHisServiceImpl implements PurHisService {
         List<PurDetailKey> listDel = ph.getListDel();
         String vouNo = ph.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(key -> pdDao.delete(key));
+            listDel.forEach(pdDao::delete);
         }
         List<PurExpense> listExp = ph.getListExpense();
         if (listExp != null) {
@@ -95,7 +94,22 @@ public class PurHisServiceImpl implements PurHisService {
             phDao.save(ph);
             ph.setListPD(listSD);
         }
+        updateWeight(ph, true);
         return ph;
+    }
+
+    private void updateWeight(PurHis ph, boolean status) {
+        String weightVouNo = ph.getWeightVouNo();
+        if (!Util1.isNullOrEmpty(weightVouNo)) {
+            WeightHisKey key = new WeightHisKey();
+            key.setVouNo(weightVouNo);
+            key.setCompCode(ph.getKey().getCompCode());
+            WeightHis wh = weightDao.findById(key);
+            if (wh != null) {
+                wh.setPost(status);
+                weightDao.save(wh);
+            }
+        }
     }
 
     @Override
@@ -115,6 +129,10 @@ public class PurHisServiceImpl implements PurHisService {
 
     @Override
     public void delete(PurHisKey key) throws Exception {
+        PurHis ph = phDao.findById(key);
+        if (ph != null) {
+            updateWeight(ph, false);
+        }
         phDao.delete(key);
     }
 
@@ -149,6 +167,7 @@ public class PurHisServiceImpl implements PurHisService {
         String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
         return deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
     }
+
     @Override
     public List<VDescription> getDescription(String str, String compCode, String tranType) {
         return phDao.getDescription(str, compCode, tranType);

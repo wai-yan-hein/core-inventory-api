@@ -95,8 +95,8 @@ public class WeightServiceImpl implements WeightService {
     @Override
     public List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
                                             String stockCode, String vouNo, String remark,
-                                            boolean deleted, String compCode, String tranSource) {
-        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode, tranSource);
+                                            boolean deleted, String compCode, String tranSource,boolean draft) {
+        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode, tranSource,draft);
     }
 
     @Override
