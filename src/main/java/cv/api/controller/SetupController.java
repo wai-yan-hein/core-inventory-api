@@ -79,6 +79,8 @@ public class SetupController {
     private JobService jobService;
     @Autowired
     private StockFormulaService stockFormulaService;
+    @Autowired
+    private OutputCostService outputCostService;
 
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
@@ -860,5 +862,32 @@ public class SetupController {
         return Mono.just(stockFormulaService.delete(key));
     }
 
+    @PostMapping(path = "/saveOutputCost")
+    public Mono<OutputCost> saveOutputCost(@RequestBody OutputCost outputCost) throws Exception {
+        outputCost.setUpdatedDate(Util1.getTodayLocalDate());
+        OutputCost b = outputCostService.save(outputCost);
+        return Mono.justOrEmpty(b);
+    }
+
+    @GetMapping(path = "/getOutputCost")
+    public Flux<?> getOutputCost(@RequestParam String compCode) {
+        return Flux.fromIterable(outputCostService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @PostMapping(path = "/deleteOutputCost")
+    public Mono<?> deleteOutputCost(@RequestBody OutputCostKey key) {
+        return Mono.just(outputCostService.delete(key));
+    }
+
+    @PostMapping(path = "/findOutputCost")
+    public Mono<OutputCost> findOutputCost(@RequestBody OutputCostKey key) {
+        OutputCost b = outputCostService.findByCode(key);
+        return Mono.justOrEmpty(b);
+    }
+
+    @GetMapping(path = "/getUpdateOutputCost")
+    public Flux<?> getUpdateOutputCost(@RequestParam String updatedDate) {
+        return Flux.fromIterable(outputCostService.getOutputCost(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
 
 }
