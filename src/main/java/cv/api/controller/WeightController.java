@@ -2,21 +2,14 @@ package cv.api.controller;
 
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
-import cv.api.entity.TransferHis;
 import cv.api.entity.WeightHis;
 import cv.api.entity.WeightHisKey;
-import cv.api.model.VTransfer;
 import cv.api.service.WeightService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/weight")
@@ -47,21 +40,30 @@ public class WeightController {
         weightService.restore(key);
         return Mono.just(true);
     }
+
+    @GetMapping(path = "/getWeightDetail")
+    public Flux<?> getWeightDetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(weightService.getWeightDetail(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+    @GetMapping(path = "/getWeightColumn")
+    public Flux<?> getWeightColumn(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(weightService.getWeightColumn(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
     @PostMapping(path = "/getWeightHistory")
-    public Flux<?> getWeightHistory(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getWeightHistory(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
-        String refNo = Util1.isNull(filter.getRefNo(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        Integer deptId = filter.getDeptId();
-        String deleted = String.valueOf(filter.isDeleted());
-        String traderCode = Util1.isNull(filter.getCusCode(), "-");
-        return Flux.empty();
+        boolean deleted = filter.isDeleted();
+        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
+        String tranSource = Util1.isNull(filter.getTranSource(),"-");
+        return Flux.fromIterable(weightService.getWeightHistory(fromDate, toDate, traderCode,
+                        stockCode, vouNo, remark, deleted, compCode,tranSource))
+                .onErrorResume(throwable -> Flux.empty());
     }
 
 }

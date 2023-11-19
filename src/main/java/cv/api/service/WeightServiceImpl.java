@@ -8,10 +8,12 @@ import cv.api.entity.WeightHis;
 import cv.api.entity.WeightHisDetail;
 import cv.api.entity.WeightHisDetailKey;
 import cv.api.entity.WeightHisKey;
+import cv.api.model.WeightColumn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Slf4j
@@ -26,31 +28,40 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public WeightHis save(WeightHis obj) {
+        obj.setVouDate(Util1.toDateTime(obj.getVouDate()));
         if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
             obj.getKey().setVouNo(getVoucherNo(obj.getDeptId(), obj.getMacId(), obj.getKey().getCompCode()));
         }
-        List<WeightHisDetail> listDetail = obj.getListDetail();
         String vouNo = obj.getKey().getVouNo();
-        for (int i = 0; i < listDetail.size(); i++) {
-            WeightHisDetail cSd = listDetail.get(i);
-            if (Util1.isNullOrEmpty(cSd.getKey())) {
-                WeightHisDetailKey key = new WeightHisDetailKey();
-                key.setCompCode(obj.getKey().getCompCode());
-                key.setVouNo(vouNo);
-                key.setUniqueId(0);
-                cSd.setKey(key);
-            }
-            if (cSd.getKey().getUniqueId() == 0) {
-                if (i == 0) {
-                    cSd.getKey().setUniqueId(1);
-                } else {
-                    WeightHisDetail pSd = listDetail.get(i - 1);
-                    cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+        String compCode = obj.getKey().getCompCode();
+        //delete detail
+        boolean delete = detailDao.deleteWeightHisDetail(vouNo, compCode);
+        if (delete) {
+            List<WeightHisDetail> listDetail = obj.getListDetail();
+            for (int i = 0; i < listDetail.size(); i++) {
+                WeightHisDetail cSd = listDetail.get(i);
+                if (Util1.isNullOrEmpty(cSd.getKey())) {
+                    WeightHisDetailKey key = new WeightHisDetailKey();
+                    key.setCompCode(obj.getKey().getCompCode());
+                    key.setVouNo(vouNo);
+                    key.setUniqueId(0);
+                    cSd.setKey(key);
                 }
+                double weight = cSd.getWeight();
+                if (weight > 0) {
+                    if (cSd.getKey().getUniqueId() == 0) {
+                        if (i == 0) {
+                            cSd.getKey().setUniqueId(1);
+                        } else {
+                            WeightHisDetail pSd = listDetail.get(i - 1);
+                            cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                        }
+                    }
+                }
+                detailDao.save(cSd);
+                dao.save(obj);
+                obj.setListDetail(listDetail);
             }
-            detailDao.save(cSd);
-            dao.save(obj);
-            obj.setListDetail(listDetail);
         }
         return obj;
     }
@@ -83,8 +94,19 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
-                                            String stockCode,String vouNo,String remark, boolean deleted,String compCode) {
-        return dao.getWeightHistory(fromDate,toDate,traderCode,stockCode,vouNo,remark,deleted,compCode);
+                                            String stockCode, String vouNo, String remark,
+                                            boolean deleted, String compCode, String tranSource) {
+        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode, tranSource);
+    }
+
+    @Override
+    public List<WeightHisDetail> getWeightDetail(String vouNo, String compCode) {
+        return detailDao.getWeightDetail(vouNo, compCode);
+    }
+
+    @Override
+    public List<WeightColumn> getWeightColumn(String vouNo, String compCode) {
+        return detailDao.getWeightColumn(vouNo,compCode);
     }
 
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {

@@ -15,6 +15,8 @@ public class WeightHis {
     private WeightHisKey key;
     @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
+    @Column(name = "description")
+    private String description;
     @Column(name = "dept_id")
     private int deptId;
     @Column(name = "trader_code")
@@ -45,6 +47,8 @@ public class WeightHis {
     private int macId;
     @Column(name = "tran_source")
     private String tranSource;
+    @Column(name = "draft")
+    private boolean draft;
     @Transient
     private List<WeightHisDetail> listDetail;
     @Transient
