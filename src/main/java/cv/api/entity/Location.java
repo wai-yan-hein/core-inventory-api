@@ -55,4 +55,8 @@ public class Location {
     private boolean deleted;
     @Column(name = "active")
     private boolean active;
+    @Column(name = "warehouse_code")
+    private String wareHouseCode;
+    @Transient
+    private String wareHouseName;
 }

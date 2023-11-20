@@ -80,8 +80,10 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId, boolean orderFavorite) {
-        return dao.search(stockCode, stockType, cat, brand, compCode, deptId, orderFavorite);
+    public List<Stock> search(String stockCode, String stockType,
+                              String cat, String brand, String compCode,
+                              Integer deptId, boolean active, boolean deleted) {
+        return dao.search(stockCode, stockType, cat, brand, compCode, deptId, active,deleted);
     }
 
 

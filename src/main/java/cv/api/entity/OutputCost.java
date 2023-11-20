@@ -30,5 +30,5 @@ public class OutputCost {
     @Column(name = "intg_upd_status")
     private String intgUpdStatus;
     @Column(name = "active")
-    private Boolean active;
+    private boolean active;
 }

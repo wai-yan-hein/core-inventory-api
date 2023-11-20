@@ -477,8 +477,9 @@ public class SetupController {
         String brandCode = Util1.isAll(filter.getBrandCode());
         Integer deptId = filter.getDeptId();
         String compCode = filter.getCompCode();
-        boolean orderFav = filter.isOrderFavorite();
-        return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, orderFav)).onErrorResume(throwable -> Flux.empty());
+        boolean deleted = filter.isDeleted();
+        boolean active = filter.isActive();
+        return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, active, deleted)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getStockList")
@@ -554,8 +555,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getJob")
-    public Flux<?> getJob(@RequestParam String compCode, @RequestParam boolean finished,@RequestParam int deptId) {
-        return Flux.fromIterable(jobService.findAll(compCode, finished,deptId));
+    public Flux<?> getJob(@RequestParam String compCode, @RequestParam boolean finished, @RequestParam int deptId) {
+        return Flux.fromIterable(jobService.findAll(compCode, finished, deptId));
     }
 
     @GetMapping(path = "/getUpdateJob")
@@ -575,7 +576,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/findLabourGroup")
-    public Mono<LabourGroup> findOrderStatus(@RequestBody LabourGroupKey key) {
+    public Mono<LabourGroup> findLabourGroup(@RequestBody LabourGroupKey key) {
         LabourGroup b = labourGroupService.findById(key);
         return Mono.justOrEmpty(b);
     }

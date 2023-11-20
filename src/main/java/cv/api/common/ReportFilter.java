@@ -45,6 +45,8 @@ public class ReportFilter {
 
     private String fromDueDate;
     private String toDueDate;
+    private boolean deleted;
+    private boolean active;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

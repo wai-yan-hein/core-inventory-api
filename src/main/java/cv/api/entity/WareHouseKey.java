@@ -9,6 +9,8 @@ import java.io.Serializable;
 @Data
 @Embeddable
 public class WareHouseKey implements Serializable {
+    @Column(name = "code")
     private String code;
+    @Column(name = "comp_code")
     private String compCode;
 }

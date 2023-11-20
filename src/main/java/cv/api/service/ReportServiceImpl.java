@@ -3026,7 +3026,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select a.*,t.trader_name
                 from (
-                select vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id
+                select vou_date,vou_no,remark,reference,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id
                 from v_purchase
                 where comp_code = ?
                 and (dept_id = ? or 0 = ?)
@@ -4928,7 +4928,7 @@ public class ReportServiceImpl implements ReportService {
         String sql= """
                 select a.*,t.trader_name,l.loc_name
                 from (
-                select date(vou_date)vou_date,vou_no,trader_code,stock_code,
+                select date(vou_date)vou_date,vou_no,trader_code,stock_code,stock_name,
                 loc_code,pur_price,qty,bag,wet,rice,
                 pur_amt,grand_total,paid,balance,comp_code
                 from v_purchase
@@ -4962,6 +4962,8 @@ public class ReportServiceImpl implements ReportService {
                 p.setBalance(rs.getDouble("balance"));
                 p.setTraderName(rs.getString("trader_name"));
                 p.setLocationName(rs.getString("loc_name"));
+                p.setStockName(rs.getString("stock_name"));
+                p.setPurPrice(rs.getDouble("pur_price"));
                 list.add(p);
                 //vou_date, vou_no, trader_code, stock_code, loc_code,
                 // pur_price, qty, bag, wet, rice, pur_amt, grand_total,

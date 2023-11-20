@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "ware_house")
+@Table(name = "warehouse")
 public class WareHouse {
     @EmbeddedId
     private WareHouseKey key;
