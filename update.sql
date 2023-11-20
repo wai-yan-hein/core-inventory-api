@@ -1482,9 +1482,44 @@ create table warehouse (
   primary key (code,comp_code)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
+create table weight_his (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  vou_date datetime not null,
+  trader_code varchar(15) not null,
+  stock_code varchar(415) not null,
+  weight double(20,3) not null default 0.000,
+  total_weight double(20,3) not null default 0.000,
+  total_qty double(20,3) not null default 0.000,
+  total_bag double(20,3) not null default 0.000,
+  created_by varchar(15) not null,
+  created_date timestamp not null default current_timestamp() on update current_timestamp(),
+  updated_by varchar(15) default null,
+  updated_date timestamp not null default current_timestamp() on update current_timestamp(),
+  deleted bit(1) not null default b'0',
+  mac_id int(11) not null default 0,
+  tran_source varchar(15) not null,
+  remark varchar(255) default null,
+  description varchar(255) default null,
+  draft bit(1) not null default b'0',
+  post bit(1) not null default b'0',
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+create table weight_his_detail (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  unique_id int(11) not null default 0,
+  weight double(20,3) not null default 0.000,
+  primary key (vou_no,comp_code,unique_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 alter table location
 add column warehouse_code varchar(15) null after active;
 
+alter table landing_his
+post bit(1) not null default b'0';
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;
