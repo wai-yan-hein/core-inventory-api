@@ -111,7 +111,7 @@ public class WeightServiceImpl implements WeightService {
 
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
-        int seqNo = seqDao.getSequence(macId, "SALE", period, compCode);
+        int seqNo = seqDao.getSequence(macId, "WEIGHT", period, compCode);
         String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
         return deptCode + String.format("%0" + 2 + "d", macId) + period + "-" + String.format("%0" + 5 + "d", seqNo);
     }

@@ -2066,7 +2066,7 @@ public class ReportServiceImpl implements ReportService {
                 "and s.comp_code = b.comp_code\n" +
                 "left join category c on s.category_code = c.cat_code\n" +
                 "and s.comp_code = c.comp_code\n" +
-                "left join unit_relation rel on s.rel_code = rel.rel_code\n" +
+                "left left join unit_relation rel on s.rel_code = rel.rel_code\n" +
                 "and s.comp_code = rel.comp_code\n" +
                 "where s.active = true and s.comp_code = '" + compCode + "' \n" +
                 "and (s.stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
@@ -2567,7 +2567,7 @@ public class ReportServiceImpl implements ReportService {
                 and a.mac_id = tmp.mac_id
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
-                join unit_relation rel on s.rel_code = rel.rel_code
+                left join unit_relation rel on s.rel_code = rel.rel_code
                 and a.comp_code = rel.comp_code
                 join stock_type st on s.stock_type_code = st.stock_type_code
                 and a.comp_code = st.comp_code

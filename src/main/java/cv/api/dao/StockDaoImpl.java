@@ -198,7 +198,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         String sql = """
                 select s.*,rel.rel_name,st.stock_type_name,cat.cat_name,b.brand_name
                 from stock s
-                left join unit_relation rel on s.rel_code= rel.rel_code
+                left left join unit_relation rel on s.rel_code= rel.rel_code
                 and s.comp_code = rel.comp_code
                 left join stock_type st on s.stock_type_code = st.stock_type_code
                 and s.comp_code = st.comp_code
