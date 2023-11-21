@@ -104,7 +104,7 @@ public class PurHis {
     @Column(name = "dept_code")
     private String deptCode;
     @Column(name = "grand_total")
-    private double grandTotal;
+    private Double grandTotal;
     @Transient
     private String status = "STATUS";
     @Transient
