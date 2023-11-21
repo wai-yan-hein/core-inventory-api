@@ -492,6 +492,10 @@ public class SetupController {
         List<General> str = stockService.delete(key);
         return Flux.fromIterable(str);
     }
+    @PostMapping(path = "/restoreStock")
+    public Mono<?> restoreStock(@RequestBody StockKey key) {
+        return Mono.just(stockService.restore(key));
+    }
 
     @PostMapping(path = "/findStock")
     public Mono<Stock> findStock(@RequestBody StockKey key) {
@@ -864,7 +868,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveOutputCost")
-    public Mono<OutputCost> saveOutputCost(@RequestBody OutputCost outputCost) throws Exception {
+    public Mono<OutputCost> saveOutputCost(@RequestBody OutputCost outputCost) {
         outputCost.setUpdatedDate(Util1.getTodayLocalDate());
         OutputCost b = outputCostService.save(outputCost);
         return Mono.justOrEmpty(b);

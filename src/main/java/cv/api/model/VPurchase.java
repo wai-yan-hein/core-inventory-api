@@ -40,6 +40,7 @@ public class VPurchase {
     private String stockCode;
     private String expDate;
     private Double qty;
+    private double qtyPercent;
     private Double stdWt;
     private Double avgPrice;
     private String purUnit;
@@ -80,5 +81,7 @@ public class VPurchase {
     private Double wet;
     private Double rice;
     private Double grandTotal;
+    private Double avgWet;
+    private Double avgRice;
     private List<LandingHisPrice> listPrice;
 }
