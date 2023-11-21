@@ -278,7 +278,8 @@ public interface ReportService {
 
     List<ClosingBalance> getStockPayableConsignor(String opDate, String fromDate, String toDate, String traderCode, String stockCode, String compCode, int macId, boolean summary);
 
-    List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode);
+    List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode, String stockCode,
+                                    String groupCode, String catCode, String brandCode, String locCode);
     List<VPurchase> getTopPurchasePaddy(String fromDate,String toDate,String compCode,
                                         String stockCode,String groupCode,String catCode,
                                         String brandCode,String locCode);

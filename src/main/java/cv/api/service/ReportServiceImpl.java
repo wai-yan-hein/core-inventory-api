@@ -4923,27 +4923,32 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode) {
+    public List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode, String stockCode,
+                                           String groupCode, String catCode, String brandCode, String locCode) {
         List<VPurchase> list = new ArrayList<>();
         String sql = """
                 select a.*,t.trader_name,l.loc_name
                 from (
-                select date(vou_date)vou_date,vou_no,trader_code,stock_code,stock_name,
-                loc_code,pur_price,qty,bag,wet,rice,
-                pur_amt,grand_total,paid,balance,comp_code
+                select date(vou_date) vou_date,trader_code,stock_code,stock_name,loc_code,wet,rice, qty,bag,pur_price,
+                wet*qty total_wet,rice*qty total_rice, pur_amt,grand_total,paid,balance,comp_code,vou_no\s
                 from v_purchase
                 where date(vou_date) between ? and ?
-                and deleted = false
-                and comp_code =?
+                and deleted =false
+                and comp_code = ?
+                and (stock_type_code= ? or '-'=?)
+                and (brand_code= ? or '-'=?)
+                and (category_code=? or '-'=?)
+                and (loc_code= ? or '-'=?)
+                and (stock_code= ? or '-'=?)
                 )a
-                join trader t on a.trader_code = t.code
-                and a.comp_code =t.comp_code
                 join location l on a.loc_code = l.loc_code
                 and a.comp_code = l.comp_code
-                order by vou_date
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
                 """;
         try {
-            ResultSet rs = getResult(sql, fromDate, toDate, compCode);
+            ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
+                    catCode, catCode, locCode, locCode, stockCode, stockCode);
             while (rs.next()) {
                 VPurchase p = new VPurchase();
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
@@ -4955,7 +4960,9 @@ public class ReportServiceImpl implements ReportService {
                 p.setQty(rs.getDouble("qty"));
                 p.setBag(rs.getDouble("bag"));
                 p.setWet(rs.getDouble("wet"));
+                p.setTotalWet(rs.getDouble("total_wet"));
                 p.setRice(rs.getDouble("rice"));
+                p.setTotalRice(rs.getDouble("total_rice"));
                 p.setPurAmount(rs.getDouble("pur_amt"));
                 p.setGrandTotal(rs.getDouble("grand_total"));
                 p.setPaid(rs.getDouble("paid"));
@@ -4980,26 +4987,26 @@ public class ReportServiceImpl implements ReportService {
                                                String groupCode, String catCode, String brandCode, String locCode) {
         List<VPurchase> list = new ArrayList<>();
         String sql = """
-                select a.*,st.stock_type_name,round(wet/qty,2) avg_wet,round(rice/qty,2) avg_rice,round(vou_total/qty,2) avg_price
+                select a.*,c.cat_name,round(sum(total_wet)/sum(qty),2) avg_wet,
+                round(sum(total_rice)/sum(qty),2) avg_rice,
+                round(sum(pur_amt)/sum(qty),2) avg_price,vou_total
                 from (
-                select stock_type_code,stock_code,stock_name,
-                sum(ifnull(wet,0)) wet,sum(ifnull(rice,0)) rice,
-                sum(ifnull(qty,0)) qty,sum(ifnull(bag,0)) bag,sum(ifnull(vou_total,0)) vou_total,comp_code
+                select category_code,stock_code,stock_name,wet,rice, qty,bag,pur_price,
+                wet*qty total_wet,rice*qty total_rice, pur_amt,comp_code,vou_no,vou_total
                 from v_purchase
                 where date(vou_date) between ? and ?
                 and deleted =false
                 and comp_code = ?
                 and (stock_type_code= ? or '-'=?)
                 and (brand_code= ? or '-'=?)
-                and (category_code= ? or '-'=?)
+                and (category_code=? or '-'=?)
                 and (loc_code= ? or '-'=?)
                 and (stock_code= ? or '-'=?)
-                group by stock_code
                 )a
-                join stock_type st on a.stock_type_code = st.stock_type_code
-                and a.comp_code = st.comp_code
+                left join category c on a.category_code = c.cat_code
+                and a.comp_code = c.comp_code
                 group by stock_code
-                order by qty;
+                order by qty
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
@@ -5011,7 +5018,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setAvgWet(rs.getDouble("avg_wet"));
                 p.setAvgPrice(rs.getDouble("avg_price"));
                 p.setAvgRice(rs.getDouble("avg_rice"));
-                p.setGroupName(rs.getString("stock_type_name"));
+                p.setGroupName(rs.getString("cat_name"));
                 p.setVouTotal(rs.getDouble("vou_total"));
                 p.setQty(rs.getDouble("qty"));
                 list.add(p);
@@ -5023,7 +5030,7 @@ public class ReportServiceImpl implements ReportService {
                     .mapToDouble(VPurchase::getQty) // Map to double
                     .sum(); // Perform the sum operation
             if (!list.isEmpty()) {
-                list.forEach(t -> t.setQtyPercent((t.getQty()/totalQty)*100));
+                list.forEach(t -> t.setQtyPercent((t.getQty() / totalQty) * 100));
             }
         } catch (Exception e) {
             log.error("TopPurchasePaddy : " + e.getMessage());

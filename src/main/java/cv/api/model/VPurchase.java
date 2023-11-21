@@ -79,7 +79,9 @@ public class VPurchase {
     private String reference;
     private Double bag;
     private Double wet;
+    private Double totalWet;
     private Double rice;
+    private Double totalRice;
     private Double grandTotal;
     private Double avgWet;
     private Double avgRice;
