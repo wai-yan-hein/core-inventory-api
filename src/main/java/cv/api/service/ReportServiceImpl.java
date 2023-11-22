@@ -4465,7 +4465,8 @@ public class ReportServiceImpl implements ReportService {
         List<VLanding> listPrice = new ArrayList<>();
         List<VLanding> listQty = new ArrayList<>();
         String sql = """
-                select a.*,t.trader_name,t.phone,r.reg_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name                from (
+                select a.*,t.trader_name,t.phone,r.reg_name,l.loc_name,s.stock_name,s1.stock_name grade_stock_name,u.unit_name pur_unit_name
+                from (
                 select lh.vou_no,vou_date,trader_code,loc_code,gross_qty,
                 price,amount,remark,cargo,lh.comp_code,lh.stock_code,lhg.stock_code grade_stock_code
                 from landing_his lh join landing_his_grade lhg
@@ -4483,6 +4484,8 @@ public class ReportServiceImpl implements ReportService {
                 and a.comp_code = l.comp_code
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
+                left join stock_unit u on s.pur_unit = u.unit_code
+                and s.comp_code = u.comp_code
                 join stock s1 on a.grade_stock_code = s1.stock_code
                 and a.comp_code = s1.comp_code""";
         try {
@@ -4504,6 +4507,7 @@ public class ReportServiceImpl implements ReportService {
                 header.setStockName(rs.getString("stock_name"));
                 header.setGradeStockName(rs.getString("grade_stock_name"));
                 header.setGrossQty(rs.getDouble("gross_qty"));
+                header.setPurUnitName(rs.getString("pur_unit_name"));
             }
         } catch (Exception e) {
             log.error("getLandingReport : " + e.getMessage());
