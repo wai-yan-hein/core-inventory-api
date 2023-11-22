@@ -792,6 +792,11 @@ public class SetupController {
         return Mono.just(accSettingService.save(setting));
     }
 
+    @GetMapping(path = "/getUpdatedAccSetting")
+    public Flux<?> getUpdatedAccSetting(@RequestParam String updatedDate) {
+        return Flux.fromIterable(accSettingService.getAccSetting(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
     @PostMapping(path = "/saveStockFormula")
     public Mono<?> saveStockFormula(@RequestBody StockFormula f) {
         return Mono.just(stockFormulaService.save(f));

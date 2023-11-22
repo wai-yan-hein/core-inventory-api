@@ -7,7 +7,9 @@ package cv.api.service;
 
 import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
+import cv.api.entity.OutputCost;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,5 +22,7 @@ public interface AccSettingService {
     AccSetting save(AccSetting setting);
 
     AccSetting findByCode(AccKey key);
+
+    List<AccSetting> getAccSetting(LocalDateTime updatedDate);
 
 }

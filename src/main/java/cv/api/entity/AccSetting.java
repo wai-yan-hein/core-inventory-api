@@ -11,6 +11,7 @@ import lombok.Data;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author wai yan
@@ -37,4 +38,6 @@ public class AccSetting {
     private String commAcc;
     @Column(name = "dep_code")
     private String deptCode;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
 }
