@@ -42,4 +42,6 @@ public interface StockDao {
 
     Stock updateStock(Stock stock);
 
+    boolean restore(StockKey key);
+
 }

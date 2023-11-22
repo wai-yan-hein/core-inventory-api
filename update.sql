@@ -1550,3 +1550,24 @@ drop view if exists v_sale;
 create  view v_sale as select sh.order_no as order_no,sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.saleman_code as saleman_code,sh.vou_date as vou_date,sh.credit_term as credit_term,sh.cur_code as cur_code,sh.remark as remark,sh.vou_total as vou_total,sh.grand_total as grand_total,sh.discount as discount,sh.disc_p as disc_p,sh.tax_amt as tax_amt,sh.tax_p as tax_p,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.paid as paid,sh.vou_balance as vou_balance,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.address as address,sh.order_code as order_code,sh.mac_id as mac_id,sh.session_id as session_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.expire_date as expire_date,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.sale_unit as sale_unit,sd.sale_price as sale_price,sd.sale_amt as sale_amt,sd.loc_code as loc_code,sd.batch_no as batch_no,sd.unique_id as unique_id,if(coalesce(sd.total_weight,0) = 0,sd.qty * s.weight,sd.total_weight) as total_weight,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((sale_his sh join sale_his_detail sd on(sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code)) join stock s on(sd.stock_code = s.stock_code and sd.comp_code = s.comp_code));
 drop view if exists v_stock_io;
 create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,i.labour_group_code as labour_group_code,i.job_code as job_code,i.received_name as received_name,i.received_phone as received_phone,i.car_no as car_no,i.trader_code as trader_code,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.weight as weight,if(ifnull(iod.total_weight,0) = 0,if(coalesce(iod.in_qty,0) = 0,coalesce(iod.out_qty,0),coalesce(iod.in_qty,0)) * s.weight,0) as total_weight,coalesce(iod.weight_unit,s.weight_unit) as weight_unit,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no and i.comp_code = iod.comp_code)) join stock s on(iod.stock_code = s.stock_code and iod.comp_code = s.comp_code));
+
+CREATE TABLE output_cost (
+  code VARCHAR(15) NOT NULL,
+  comp_code VARCHAR(15) NOT NULL,
+  user_code NVARCHAR(15) NOT NULL,
+  name VARCHAR(20) NULL,
+  price DOUBLE NULL,
+  updated_date TIMESTAMP NULL,
+  updated_by VARCHAR(15) NULL,
+  created_date TIMESTAMP NULL,
+  created_by VARCHAR(15) NULL,
+  intg_upd_status VARCHAR(15) NULL,
+  active BIT(1) NULL,
+  PRIMARY KEY (code, comp_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+alter table acc_setting
+add column updated_date timestamp null after comm_acc;
+

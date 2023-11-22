@@ -302,4 +302,16 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         update(obj);
         return obj;
     }
+
+    @Override
+    public boolean restore(StockKey key) {
+        Stock s =getByKey(key);
+        if(s!=null){
+            s.setDeleted(false);
+            s.setUpdatedDate(LocalDateTime.now());
+            update(s);
+            return true;
+        }
+        return false;
+    }
 }

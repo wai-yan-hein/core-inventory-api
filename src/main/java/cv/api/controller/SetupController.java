@@ -492,6 +492,10 @@ public class SetupController {
         List<General> str = stockService.delete(key);
         return Flux.fromIterable(str);
     }
+    @PostMapping(path = "/restoreStock")
+    public Mono<?> restoreStock(@RequestBody StockKey key) {
+        return Mono.just(stockService.restore(key));
+    }
 
     @PostMapping(path = "/findStock")
     public Mono<Stock> findStock(@RequestBody StockKey key) {
@@ -793,6 +797,11 @@ public class SetupController {
         return Mono.just(accSettingService.save(setting));
     }
 
+    @GetMapping(path = "/getUpdatedAccSetting")
+    public Flux<?> getUpdatedAccSetting(@RequestParam String updatedDate) {
+        return Flux.fromIterable(accSettingService.getAccSetting(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
     @PostMapping(path = "/saveStockFormula")
     public Mono<?> saveStockFormula(@RequestBody StockFormula f) {
         return Mono.just(stockFormulaService.save(f));
@@ -864,7 +873,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveOutputCost")
-    public Mono<OutputCost> saveOutputCost(@RequestBody OutputCost outputCost) throws Exception {
+    public Mono<OutputCost> saveOutputCost(@RequestBody OutputCost outputCost) {
         outputCost.setUpdatedDate(Util1.getTodayLocalDate());
         OutputCost b = outputCostService.save(outputCost);
         return Mono.justOrEmpty(b);

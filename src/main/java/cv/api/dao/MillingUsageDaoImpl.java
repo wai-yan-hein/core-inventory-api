@@ -21,10 +21,13 @@ public class MillingUsageDaoImpl extends AbstractDao<MillingUsageKey, MillingUsa
     @Override
     public List<MillingUsage> getMillingUsage(String vouNo, String compCode) {
         String sql = """
-                select u.*,s.user_code,s.stock_name
+                select u.*,s.user_code,s.stock_name,l.loc_name
                 from milling_usage u join stock s
                 on u.stock_code = s.stock_code
                 and u.comp_code = s.comp_code
+                join location l
+                on u.loc_code = l.loc_code
+                and u.comp_code = l.comp_code
                 where u.vou_no=?
                 and u.comp_code =?
                 """;
@@ -43,6 +46,8 @@ public class MillingUsageDaoImpl extends AbstractDao<MillingUsageKey, MillingUsa
                 u.setStockCode(rs.getString("stock_code"));
                 u.setUserCode(rs.getString("user_code"));
                 u.setStockName(rs.getString("stock_name"));
+                u.setLocCode(rs.getString("loc_code"));
+                u.setLocName(rs.getString("loc_name"));
                 list.add(u);
             }
         } catch (Exception e) {

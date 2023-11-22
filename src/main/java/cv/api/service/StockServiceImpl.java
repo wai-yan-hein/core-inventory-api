@@ -74,6 +74,11 @@ public class StockServiceImpl implements StockService {
         return str;
     }
 
+    @Override
+    public boolean restore(StockKey key) {
+        return dao.restore(key);
+    }
+
     private String getStockCode(Integer macId, String compCode) {
         int seqNo = seqService.getSequence(macId, "Stock", "-", compCode);
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 5 + "d", seqNo);
