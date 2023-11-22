@@ -42,7 +42,7 @@ public class WareHouseDaoImpl extends AbstractDao<WareHouseKey, WareHouse> imple
 
     @Override
     public Date getMaxDate() {
-        String sql = "select max(updated_date) date from labour_group";
+        String sql = "select max(updated_date) date from WareHouse";
         ResultSet rs = getResult(sql);
         try {
             if (rs.next()) {

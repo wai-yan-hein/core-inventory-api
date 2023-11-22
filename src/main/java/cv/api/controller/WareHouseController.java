@@ -31,5 +31,9 @@ public class WareHouseController {
     public Mono<?> findWareHouse(@RequestBody WareHouseKey key) {
         return Mono.justOrEmpty(wareHouseService.findById(key));
     }
+    @GetMapping(path = "/getUpdatedWarehouse")
+    public Flux<?> getUpdateOutputCost(@RequestParam String updatedDate) {
+        return Flux.fromIterable(wareHouseService.getWarehouse(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
 
 }
