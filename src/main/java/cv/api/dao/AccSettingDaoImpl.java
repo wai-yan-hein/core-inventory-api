@@ -7,8 +7,10 @@ package cv.api.dao;
 
 import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
+import cv.api.entity.OutputCost;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -33,6 +35,12 @@ public class AccSettingDaoImpl extends AbstractDao<AccKey, AccSetting> implement
     @Override
     public AccSetting findByCode(AccKey key) {
         return getByKey(key);
+    }
+
+    @Override
+    public List<AccSetting> getAccSetting(LocalDateTime updatedDate) {
+        String hsql = "select o from AccSetting o where o.updatedDate >: updatedDate";
+        return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
 }
