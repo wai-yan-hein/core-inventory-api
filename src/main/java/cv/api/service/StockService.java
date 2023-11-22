@@ -21,14 +21,20 @@ public interface StockService {
     Stock save(Stock stock);
 
     Stock findById(StockKey key);
+
     List<General> delete(StockKey key);
+
+    boolean restore(StockKey key);
+
 
     List<Stock> findAll(String compCode, Integer deptId);
 
 
     List<Stock> findActiveStock(String compCode, Integer deptId);
 
-    List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId,boolean orderFavorite);
+    List<Stock> search(String stockCode, String stockType, String cat,
+                       String brand, String compCode,
+                       Integer deptId, boolean active, boolean deleted);
 
     List<Stock> getStock(String str, String compCode, Integer deptId);
 

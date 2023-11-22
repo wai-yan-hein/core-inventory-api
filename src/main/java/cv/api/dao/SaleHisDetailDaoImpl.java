@@ -35,7 +35,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "and op.comp_code = l.comp_code\n" +
                 "join stock s on op.stock_code = s.stock_code\n" +
                 "and op.comp_code = s.comp_code\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
+                "left join unit_relation rel on s.rel_code = rel.rel_code\n" +
                 "and op.comp_code = rel.comp_code\n" +
                 "left join stock_type st  on s.stock_type_code = st.stock_type_code\n" +
                 "and op.comp_code = st.comp_code\n" +
@@ -135,7 +135,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
         List<SaleHisDetail> listOP = new ArrayList<>();
         String sql = "select a.*,a.qty*a.sale_price sale_amt,s.user_code s_user_code,s.stock_name,rel.rel_name,l.loc_name\n" + "from (\n" + "select stock_code,sum(qty) qty,sale_unit,sale_price,loc_code,comp_code,dept_id\n" + "from v_sale\n" + "where batch_no ='" + batchNo + "'\n" + "and comp_code ='" + compCode + "'\n" +
                 "and deleted = 0\n" +
-                "group by stock_code,sale_unit,sale_price,loc_code\n" + ")a\n" + "join stock s on a.stock_code = s.stock_code\n" + "and a.comp_code = s.comp_code\n" + "and a.dept_id = s.dept_id\n" + "join unit_relation rel on s.rel_code = rel.rel_code\n" + "and s.comp_code =rel.comp_code\n" + "and s.dept_id = rel.dept_id\n" + "join location l on a.loc_code = l.loc_code\n" + "and a.comp_code = l.comp_code\n" + "and a.dept_id = l.dept_id\n" + "order by s_user_code";
+                "group by stock_code,sale_unit,sale_price,loc_code\n" + ")a\n" + "join stock s on a.stock_code = s.stock_code\n" + "and a.comp_code = s.comp_code\n" + "and a.dept_id = s.dept_id\n" + "left join unit_relation rel on s.rel_code = rel.rel_code\n" + "and s.comp_code =rel.comp_code\n" + "and s.dept_id = rel.dept_id\n" + "join location l on a.loc_code = l.loc_code\n" + "and a.comp_code = l.comp_code\n" + "and a.dept_id = l.dept_id\n" + "order by s_user_code";
         ResultSet rs = getResult(sql);
         if (rs != null) {
             try {
@@ -174,7 +174,7 @@ public class SaleHisDetailDaoImpl extends AbstractDao<SaleDetailKey, SaleHisDeta
                 "join stock s on a.stock_code = s.stock_code\n" +
                 "and a.comp_code = s.comp_code\n" +
                 "and a.dept_id = s.dept_id\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
+                "left join unit_relation rel on s.rel_code = rel.rel_code\n" +
                 "and s.comp_code =rel.comp_code\n" +
                 "join location l on a.loc_code = l.loc_code\n" +
                 "and a.comp_code = l.comp_code\n" +

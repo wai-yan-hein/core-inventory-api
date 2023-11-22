@@ -36,7 +36,7 @@ public class RetInDetailDaoImpl extends AbstractDao<RetInKey, RetInHisDetail> im
                 "and op.comp_code =l.comp_code\n" +
                 "join stock s on op.stock_code = s.stock_code\n" +
                 "and op.comp_code =s.comp_code\n" +
-                "join unit_relation rel on s.rel_code = rel.rel_code\n" +
+                "left join unit_relation rel on s.rel_code = rel.rel_code\n" +
                 "and op.comp_code =rel.comp_code\n" +
                 "left join stock_type st  on s.stock_type_code = st.stock_type_code\n" +
                 "and op.comp_code =st.comp_code\n" +

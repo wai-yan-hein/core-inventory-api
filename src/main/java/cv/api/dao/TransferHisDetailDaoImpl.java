@@ -34,7 +34,7 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
                 and td.comp_code = s.comp_code
                 join stock_type st on s.stock_type_code = st.stock_type_code
                 and s.comp_code = st.comp_code
-                join unit_relation rel on s.rel_code = rel.rel_code
+                left join unit_relation rel on s.rel_code = rel.rel_code
                 and td.comp_code = rel.comp_code
                 where td.vou_no =?
                 and td.comp_code =?

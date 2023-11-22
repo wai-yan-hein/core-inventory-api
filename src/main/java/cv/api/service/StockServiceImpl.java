@@ -74,14 +74,21 @@ public class StockServiceImpl implements StockService {
         return str;
     }
 
+    @Override
+    public boolean restore(StockKey key) {
+        return dao.restore(key);
+    }
+
     private String getStockCode(Integer macId, String compCode) {
         int seqNo = seqService.getSequence(macId, "Stock", "-", compCode);
         return String.format("%0" + 3 + "d", macId) + "-" + String.format("%0" + 5 + "d", seqNo);
     }
 
     @Override
-    public List<Stock> search(String stockCode, String stockType, String cat, String brand, String compCode, Integer deptId, boolean orderFavorite) {
-        return dao.search(stockCode, stockType, cat, brand, compCode, deptId, orderFavorite);
+    public List<Stock> search(String stockCode, String stockType,
+                              String cat, String brand, String compCode,
+                              Integer deptId, boolean active, boolean deleted) {
+        return dao.search(stockCode, stockType, cat, brand, compCode, deptId, active,deleted);
     }
 
 

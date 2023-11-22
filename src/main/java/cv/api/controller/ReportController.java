@@ -253,7 +253,7 @@ public class ReportController {
                         Util1.writeJsonFile(purchaseByStock, exportPath);
                     }
                     case "PurchaseList" -> {
-                        List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode);
+                        List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "InventoryClosingSummary" -> {
@@ -392,6 +392,10 @@ public class ReportController {
                     }
                     case "StockPayableConsignorDetail" -> {
                         List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
+                        Util1.writeJsonFile(list, exportPath);
+                    }
+                    case "TopPurchasePaddy" -> {
+                        List<VPurchase> list = reportService.getTopPurchasePaddy(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     default -> ro.setMessage("Report Not Exists.");

@@ -6,10 +6,7 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.dao.PurExpenseDao;
-import cv.api.dao.PurHisDao;
-import cv.api.dao.SeqTableDao;
-import cv.api.dao.WeightDao;
+import cv.api.dao.*;
 import cv.api.entity.*;
 import cv.api.model.VDescription;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +33,7 @@ public class PurHisServiceImpl implements PurHisService {
     private final SeqTableDao seqDao;
     private final PurExpenseDao purExpenseDao;
     private final WeightDao weightDao;
+    private final LandingHisDao landingDao;
 
     @Override
     public PurHis save(PurHis ph) {
@@ -95,6 +93,7 @@ public class PurHisServiceImpl implements PurHisService {
             ph.setListPD(listSD);
         }
         updateWeight(ph, true);
+        updateLanding(ph, true);
         return ph;
     }
 
@@ -108,6 +107,20 @@ public class PurHisServiceImpl implements PurHisService {
             if (wh != null) {
                 wh.setPost(status);
                 weightDao.save(wh);
+            }
+        }
+    }
+
+    private void updateLanding(PurHis ph, boolean status) {
+        String landVouNo = ph.getLandVouNo();
+        if (!Util1.isNullOrEmpty(landVouNo)) {
+            LandingHisKey key = new LandingHisKey();
+            key.setVouNo(landVouNo);
+            key.setCompCode(ph.getKey().getCompCode());
+            LandingHis wh = landingDao.findByCode(key);
+            if (wh != null) {
+                wh.setPost(status);
+                landingDao.save(wh);
             }
         }
     }
@@ -132,6 +145,7 @@ public class PurHisServiceImpl implements PurHisService {
         PurHis ph = phDao.findById(key);
         if (ph != null) {
             updateWeight(ph, false);
+            updateLanding(ph, false);
         }
         phDao.delete(key);
     }
