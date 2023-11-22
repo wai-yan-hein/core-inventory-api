@@ -4934,7 +4934,7 @@ public class ReportServiceImpl implements ReportService {
                 select a.*,t.trader_name,l.loc_name
                 from (
                 select date(vou_date) vou_date,trader_code,stock_code,stock_name,loc_code,wet,rice, qty,bag,pur_price,
-                wet*qty total_wet,rice*qty total_rice, pur_amt,grand_total,paid,balance,comp_code,vou_no\s
+                wet*qty total_wet,rice*qty total_rice, vou_total,grand_total,paid,balance,comp_code,vou_no,reference
                 from v_purchase
                 where date(vou_date) between ? and ?
                 and deleted =false
@@ -4967,11 +4967,13 @@ public class ReportServiceImpl implements ReportService {
                 p.setTotalWet(rs.getDouble("total_wet"));
                 p.setRice(rs.getDouble("rice"));
                 p.setTotalRice(rs.getDouble("total_rice"));
-                p.setPurAmount(rs.getDouble("pur_amt"));
+                p.setVouTotal(rs.getDouble("vou_total"));
                 p.setGrandTotal(rs.getDouble("grand_total"));
                 p.setPaid(rs.getDouble("paid"));
                 p.setBalance(rs.getDouble("balance"));
-                p.setTraderName(rs.getString("trader_name"));
+                String reference = rs.getString("reference");
+                String traderName = rs.getString("trader_name");
+                p.setTraderName(Util1.isNull(reference, traderName));
                 p.setLocationName(rs.getString("loc_name"));
                 p.setStockName(rs.getString("stock_name"));
                 p.setPurPrice(rs.getDouble("pur_price"));
@@ -4993,7 +4995,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select a.*,c.cat_name,round(sum(total_wet)/sum(qty),2) avg_wet,
                 round(sum(total_rice)/sum(qty),2) avg_rice,
-                round(sum(pur_amt)/sum(qty),2) avg_price,vou_total
+                round(sum(vou_total)/sum(qty),2) avg_price,vou_total,sum(qty) total_qty
                 from (
                 select category_code,stock_code,stock_name,wet,rice, qty,bag,pur_price,
                 wet*qty total_wet,rice*qty total_rice, pur_amt,comp_code,vou_no,vou_total
@@ -5024,7 +5026,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setAvgRice(rs.getDouble("avg_rice"));
                 p.setGroupName(rs.getString("cat_name"));
                 p.setVouTotal(rs.getDouble("vou_total"));
-                p.setQty(rs.getDouble("qty"));
+                p.setQty(rs.getDouble("total_qty"));
                 list.add(p);
                 //stock_type_code, stock_code, stock_name, wet, rice, qty,
                 // bag, vou_total, comp_code, stock_type_name, avg_wet, avg_rice, avg_price

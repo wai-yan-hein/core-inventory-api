@@ -164,6 +164,7 @@ public class MillingHisServiceImpl implements MillingHisService {
     }
 
     private void saveMillingUsage(List<MillingUsage> listUsage, MillingHis milling) {
+        String locCode = milling.getLocCode();
         String vouNo = milling.getKey().getVouNo();
         for (int i = 0; i < listUsage.size(); i++) {
             MillingUsage cSd = listUsage.get(i);
@@ -183,6 +184,7 @@ public class MillingHisServiceImpl implements MillingHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
+                cSd.setLocCode(Util1.isNull(cSd.getLocCode(), locCode));
                 usageDao.save(cSd);
             }
         }
