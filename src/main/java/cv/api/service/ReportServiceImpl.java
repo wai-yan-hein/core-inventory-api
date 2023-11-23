@@ -4951,6 +4951,7 @@ public class ReportServiceImpl implements ReportService {
                 and a.comp_code = l.comp_code
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code
+                order by vou_date,qty desc
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
@@ -5014,7 +5015,7 @@ public class ReportServiceImpl implements ReportService {
                 left join category c on a.category_code = c.cat_code
                 and a.comp_code = c.comp_code
                 group by stock_code
-                order by qty
+                order by qty desc
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,

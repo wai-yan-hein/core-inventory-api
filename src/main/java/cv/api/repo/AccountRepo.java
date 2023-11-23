@@ -458,6 +458,7 @@ public class AccountRepo {
                 String remark = ph.getRemark();
                 boolean deleted = ph.isDeleted();
                 double vouTotal = Util1.getDouble(ph.getVouTotal());
+                double grandTotal = Util1.getDouble(ph.getGrandTotal());
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouComm = Util1.getDouble(ph.getCommAmt());
                 double vouCommP = Util1.getDouble(ph.getCommP());
@@ -509,7 +510,7 @@ public class AccountRepo {
                     key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    if (vouPaid == vouTotal) {
+                    if (vouPaid == grandTotal) {
                         gl.setDescription("Purchase Voucher Full Paid");
                     } else {
                         gl.setDescription("Purchase Voucher Partial Paid");
