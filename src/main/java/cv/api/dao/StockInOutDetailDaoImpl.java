@@ -106,6 +106,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                 and s.comp_code = st.comp_code
                 where l.job_code =?
                 and l.comp_code =?
+                and l.deleted = false
                 group by op.stock_code,weight_unit,in_unit,out_unit
                 order by st.finished_group desc,vou_no,unique_id;
                 """;

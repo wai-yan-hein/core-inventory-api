@@ -44,5 +44,5 @@ public class FilterObject {
     private String orderStatus;
     private String tranSource;
     private boolean draft;
-
+    private String jobNo;
 }

@@ -250,7 +250,7 @@ public class ReportController {
                         Util1.writeJsonFile(data, exportPath);
                     }
                     case "PurchaseByStockDetail" -> {
-                        List<VPurchase> purchaseByStock = reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                        List<VPurchase> purchaseByStock = reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId, locCode);
                         Util1.writeJsonFile(purchaseByStock, exportPath);
                     }
                     case "PurchaseList" -> {
