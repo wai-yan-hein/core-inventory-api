@@ -1184,7 +1184,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
+    public List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId, String locCode) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
                 "v.s_user_code,v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
@@ -1194,6 +1194,7 @@ public class ReportServiceImpl implements ReportService {
                 "where (v.stock_code = '" + stockCode + "' or '-'='" + stockCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-'='" + typeCode + "')\n" +
                 "and (v.brand_code = '" + brandCode + "' or '-'='" + brandCode + "')\n" +
+                "and (v.loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" +
                 "and (v.category_code = '" + catCode + "' or '-'='" + catCode + "')\n" +
                 "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
                 "and v.cur_code = '" + curCode + "'\n" +
@@ -1228,6 +1229,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" +
                 "group by stock_code,pur_unit\n" + ")a\n" +
                 "join v_relation rel \n" +
                 "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" +
