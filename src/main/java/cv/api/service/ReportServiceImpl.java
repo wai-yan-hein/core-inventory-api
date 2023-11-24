@@ -1194,7 +1194,7 @@ public class ReportServiceImpl implements ReportService {
                 "where (v.stock_code = '" + stockCode + "' or '-'='" + stockCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-'='" + typeCode + "')\n" +
                 "and (v.brand_code = '" + brandCode + "' or '-'='" + brandCode + "')\n" +
-                "and (v.loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" +
+                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (v.category_code = '" + catCode + "' or '-'='" + catCode + "')\n" +
                 "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
                 "and v.cur_code = '" + curCode + "'\n" +
@@ -1223,13 +1223,18 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and deleted = 0\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" +
+                "from v_purchase\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code = '" + compCode + "'\n" +
+                "and deleted = false\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (loc_code = '" + locCode + "' or '-' ='" + locCode + "')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "group by stock_code,pur_unit\n" + ")a\n" +
                 "join v_relation rel \n" +
                 "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" +
