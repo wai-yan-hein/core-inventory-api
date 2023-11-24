@@ -2,6 +2,7 @@ package cv.api.service;
 
 import cv.api.dao.LabourGroupDao;
 import cv.api.dao.WareHouseDao;
+import cv.api.entity.OutputCost;
 import cv.api.entity.WareHouse;
 import cv.api.entity.LabourGroupKey;
 import cv.api.entity.WareHouseKey;
@@ -51,7 +52,7 @@ public class WareHouseServiceImpl implements WareHouseService{
     }
 
     @Override
-    public List<WareHouse> getWareHouse(LocalDateTime updatedDate) {
+    public List<WareHouse> getWarehouse(LocalDateTime updatedDate) {
         return dao.getWareHouse(updatedDate);
     }
 

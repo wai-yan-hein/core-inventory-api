@@ -1,6 +1,7 @@
 package cv.api.service;
 
 
+import cv.api.entity.OutputCost;
 import cv.api.entity.WareHouse;
 import cv.api.entity.WareHouseKey;
 
@@ -15,6 +16,5 @@ public interface WareHouseService {
     WareHouse findById(WareHouseKey key);
 
     Date getMaxDate();
-
-    List<WareHouse> getWareHouse(LocalDateTime updatedDate);
+    List<WareHouse> getWarehouse(LocalDateTime updatedDate);
 }

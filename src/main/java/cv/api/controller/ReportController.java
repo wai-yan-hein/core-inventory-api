@@ -149,6 +149,7 @@ public class ReportController {
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 String projectNo = Util1.isAll(filter.getProjectNo());
+                String labourGroupCode = Util1.isAll(filter.getLabourGroupCode());
                 float creditAmt = filter.getCreditAmt();
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
@@ -253,7 +254,8 @@ public class ReportController {
                         Util1.writeJsonFile(purchaseByStock, exportPath);
                     }
                     case "PurchaseList" -> {
-                        List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
+                        List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
+                                typeCode, catCode, brandCode, locCode,labourGroupCode);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "InventoryClosingSummary" -> {

@@ -4929,7 +4929,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode, String stockCode,
-                                           String groupCode, String catCode, String brandCode, String locCode) {
+                                           String groupCode, String catCode, String brandCode, String locCode,
+                                           String labourGroupCode) {
         List<VPurchase> list = new ArrayList<>();
         String sql = """
                 select a.*,t.trader_name,l.loc_name
@@ -4945,15 +4946,17 @@ public class ReportServiceImpl implements ReportService {
                 and (category_code=? or '-'=?)
                 and (loc_code= ? or '-'=?)
                 and (stock_code= ? or '-'=?)
+                and (labour_group_code= ? or '-'=?)
                 )a
                 join location l on a.loc_code = l.loc_code
                 and a.comp_code = l.comp_code
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code
+                order by vou_date,qty desc
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
-                    catCode, catCode, locCode, locCode, stockCode, stockCode);
+                    catCode, catCode, locCode, locCode, stockCode, stockCode,labourGroupCode,labourGroupCode);
             while (rs.next()) {
                 VPurchase p = new VPurchase();
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
@@ -4996,7 +4999,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select a.*,c.cat_name,round(sum(total_wet)/sum(qty),2) avg_wet,
                 round(sum(total_rice)/sum(qty),2) avg_rice,
-                round(sum(vou_total)/sum(qty),2) avg_price,vou_total,sum(qty) total_qty
+                round(sum(vou_total)/sum(qty),2) avg_price,sum(vou_total) ttl_vou_total,sum(qty) total_qty
                 from (
                 select category_code,stock_code,stock_name,wet,rice, qty,bag,pur_price,
                 wet*qty total_wet,rice*qty total_rice, pur_amt,comp_code,vou_no,vou_total
@@ -5013,7 +5016,7 @@ public class ReportServiceImpl implements ReportService {
                 left join category c on a.category_code = c.cat_code
                 and a.comp_code = c.comp_code
                 group by stock_code
-                order by qty
+                order by qty desc
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
@@ -5026,7 +5029,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setAvgPrice(rs.getDouble("avg_price"));
                 p.setAvgRice(rs.getDouble("avg_rice"));
                 p.setGroupName(rs.getString("cat_name"));
-                p.setVouTotal(rs.getDouble("vou_total"));
+                p.setVouTotal(rs.getDouble("ttl_vou_total"));
                 p.setQty(rs.getDouble("total_qty"));
                 list.add(p);
                 //stock_type_code, stock_code, stock_name, wet, rice, qty,
