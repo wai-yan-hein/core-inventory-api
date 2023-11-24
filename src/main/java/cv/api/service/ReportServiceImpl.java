@@ -2811,7 +2811,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus,
                                             String vouNo, String remark, String desp,
                                             String userCode, String stockCode, String locCode,
-                                            String compCode, Integer deptId, String deleted, String traderCode) throws Exception {
+                                            String compCode, Integer deptId, String deleted, String traderCode, String jobNo) throws Exception {
         String sql = "select a.*,v.description vou_status_name\n" +
                 "from (\n" +
                 "select vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n" +
@@ -2828,6 +2828,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
                 "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (job_code ='" + jobNo + "' or '-' ='" + jobNo + "')\n" +
                 "group by vou_no\n" + ")a\n" +
                 "join vou_status v on a.vou_status = v.code\n" +
                 "and a.comp_code = v.comp_code\n" +

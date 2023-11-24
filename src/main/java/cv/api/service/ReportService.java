@@ -156,7 +156,7 @@ public interface ReportService {
 
     List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo,
                                      String remark, String desp, String userCode, String stockCode,
-                                     String locCode, String compCode, Integer deptId, String deleted, String traderCode) throws Exception;
+                                     String locCode, String compCode, Integer deptId, String deleted, String traderCode, String jobNo) throws Exception;
 
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,

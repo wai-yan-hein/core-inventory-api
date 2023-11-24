@@ -620,9 +620,7 @@ add column comp_code varchar(15) not null after type,
 drop primary key,
 add primary key (type, comp_code);
 
-set sql_safe_updates =0;
-update acc_setting
-set comp_code ='0010010';
+
 
 alter table pur_his_detail
 change column avg_qty avg_qty float(20,3) null default 0.000 ;
