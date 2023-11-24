@@ -1521,6 +1521,27 @@ add column warehouse_code varchar(15) null after active;
 alter table landing_his
 add column post bit(1) not null default b'0';
 
+
+CREATE TABLE output_cost (
+  code VARCHAR(15) NOT NULL,
+  comp_code VARCHAR(15) NOT NULL,
+  user_code NVARCHAR(15) NOT NULL,
+  name VARCHAR(20) NULL,
+  price DOUBLE NULL,
+  updated_date TIMESTAMP NULL,
+  updated_by VARCHAR(15) NULL,
+  created_date TIMESTAMP NULL,
+  created_by VARCHAR(15) NULL,
+  intg_upd_status VARCHAR(15) NULL,
+  active BIT(1) NULL,
+  PRIMARY KEY (code, comp_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+alter table acc_setting
+add column updated_date timestamp not null default current_timestamp;
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;
@@ -1551,23 +1572,4 @@ create  view v_sale as select sh.order_no as order_no,sh.project_no as project_n
 drop view if exists v_stock_io;
 create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,i.labour_group_code as labour_group_code,i.job_code as job_code,i.received_name as received_name,i.received_phone as received_phone,i.car_no as car_no,i.trader_code as trader_code,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.weight as weight,if(ifnull(iod.total_weight,0) = 0,if(coalesce(iod.in_qty,0) = 0,coalesce(iod.out_qty,0),coalesce(iod.in_qty,0)) * s.weight,0) as total_weight,coalesce(iod.weight_unit,s.weight_unit) as weight_unit,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no and i.comp_code = iod.comp_code)) join stock s on(iod.stock_code = s.stock_code and iod.comp_code = s.comp_code));
 
-CREATE TABLE output_cost (
-  code VARCHAR(15) NOT NULL,
-  comp_code VARCHAR(15) NOT NULL,
-  user_code NVARCHAR(15) NOT NULL,
-  name VARCHAR(20) NULL,
-  price DOUBLE NULL,
-  updated_date TIMESTAMP NULL,
-  updated_by VARCHAR(15) NULL,
-  created_date TIMESTAMP NULL,
-  created_by VARCHAR(15) NULL,
-  intg_upd_status VARCHAR(15) NULL,
-  active BIT(1) NULL,
-  PRIMARY KEY (code, comp_code))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
-alter table acc_setting
-add column updated_date timestamp null after comm_acc;
 
