@@ -67,7 +67,8 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
         remark += "%";
         String sql = """
                 select a.vou_no,a.comp_code,a.dept_id,a.vou_date,a.created_by,a.deleted,a.remark,
-                a.cargo,a.pur_price,a.pur_amt,a.post,t.trader_name,l.loc_name,s.stock_name
+                a.cargo,a.pur_price,a.pur_amt,a.post,a.loc_code,a.stock_code,a.trader_code,
+                t.trader_name,l.loc_name,s.stock_name
                 from (
                 select *
                 from landing_his
@@ -106,8 +107,11 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
                 l.setDeleted(rs.getBoolean("deleted"));
                 l.setRemark(rs.getString("remark"));
                 l.setCargo(rs.getString("cargo"));
+                l.setTraderCode(rs.getString("trader_code"));
                 l.setTraderName(rs.getString("trader_name"));
+                l.setLocCode(rs.getString("loc_code"));
                 l.setLocName(rs.getString("loc_name"));
+                l.setStockCode(rs.getString("stock_code"));
                 l.setStockName(rs.getString("stock_name"));
                 l.setPurPrice(rs.getDouble("pur_price"));
                 l.setPurAmt(rs.getDouble("pur_amt"));
