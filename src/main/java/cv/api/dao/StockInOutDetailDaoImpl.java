@@ -54,7 +54,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                 where op.vou_no =?
                 and op.comp_code =?
                 order by unique_id""";
-        ResultSet rs = getResult(sql,vouNo,compCode);
+        ResultSet rs = getResult(sql, vouNo, compCode);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
@@ -83,6 +83,9 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
                     op.setTotalWeight(rs.getDouble("total_weight"));
+                    op.setWet(rs.getDouble("wet"));
+                    op.setRice(rs.getDouble("rice"));
+                    op.setBag(rs.getDouble("bag"));
                     listOP.add(op);
                 }
             } catch (Exception e) {
@@ -110,7 +113,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                 group by op.stock_code,weight_unit,in_unit,out_unit
                 order by st.finished_group desc,vou_no,unique_id;
                 """;
-        ResultSet rs = getResult(sql,jobId,compCode);
+        ResultSet rs = getResult(sql, jobId, compCode);
         if (rs != null) {
             try {
                 //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
