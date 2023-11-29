@@ -1,5 +1,6 @@
 package cv.api.dao;
 
+import cv.api.common.FilterObject;
 import cv.api.common.Util1;
 import cv.api.entity.Job;
 import cv.api.entity.JobKey;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,15 +24,41 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
     }
 
     @Override
-    public List<Job> findAll(String compCode, Boolean isFinished, int deptId) {
-        String hsql = "select o from Job o where o.key.compCode = '" + compCode + "' and o.deleted =false";
-        if (!isFinished) {
-            hsql += " and o.finished = false";
+    public List<Job> findAll(FilterObject filterObject) {
+        String compCode = filterObject.getCompCode();
+        Integer deptId = filterObject.getDeptId();
+        String fromDate = filterObject.getFromDate();
+        String toDate = filterObject.getToDate();
+        boolean finished = filterObject.isFinished();
+        List<Job> jList = new ArrayList<>();
+        String sql = """ 
+                select * from Job
+                where comp_code = ?
+                and finished = ?
+                and dept_id = ?
+                and date(start_date) between ? and ?
+                and date(end_date) between ? and ?
+                and deleted = false
+                """;
+        ResultSet rs = getResult(sql, compCode, finished, deptId, fromDate, toDate, fromDate, toDate);
+        if (rs != null) {
+            try {
+                while (rs.next()) {
+                    Job job = new Job();
+                    JobKey jKey = new JobKey();
+                    jKey.setJobNo(rs.getString("job_no"));
+                    jKey.setCompCode(rs.getString("comp_code"));
+                    job.setKey(jKey);
+                    job.setJobName(rs.getString("job_name"));
+                    job.setStartDate(rs.getDate("start_date"));
+                    job.setEndDate(rs.getDate("end_date"));
+                    jList.add(job);
+                }
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
         }
-        if (deptId != 0) {
-            hsql += " and o.deptId =" + deptId;
-        }
-        return findHSQL(hsql);
+        return jList;
     }
 
     @Override
