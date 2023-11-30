@@ -44,11 +44,11 @@ public class StockInOutDetail {
     @Column(name = "total_weight")
     private double totalWeight;
     @Column(name = "wet")
-    private double wet;
+    private Double wet;
     @Column(name = "rice")
-    private double rice;
+    private Double rice;
     @Column(name = "bag")
-    private double bag;
+    private Double bag;
     @Transient
     private String userCode;
     @Transient
