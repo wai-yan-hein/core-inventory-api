@@ -29,18 +29,24 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
         Integer deptId = filterObject.getDeptId();
         String fromDate = filterObject.getFromDate();
         String toDate = filterObject.getToDate();
-        boolean finished = filterObject.isFinished();
+        Boolean finished = filterObject.getFinished();
         List<Job> jList = new ArrayList<>();
+        String whereClause = "";
+        if (finished != null) {
+            whereClause += " and finished = " + finished;
+        }
+        if (!fromDate.isEmpty() && !toDate.isEmpty()) {
+            whereClause += " and date(start_date) between '" + fromDate + "' and '" + toDate + "'" +
+                    "and date(end_date) between '" + fromDate + "' and '" + toDate + "'";
+        }
         String sql = """ 
                 select * from Job
-                where comp_code = ?
-                and finished = ?
+                where deleted = false
                 and dept_id = ?
-                and date(start_date) between ? and ?
-                and date(end_date) between ? and ?
-                and deleted = false
-                """;
-        ResultSet rs = getResult(sql, compCode, finished, deptId, fromDate, toDate, fromDate, toDate);
+                and comp_code = ?
+                """ + whereClause;
+        ResultSet rs = getResult(sql, deptId, compCode);
+
         if (rs != null) {
             try {
                 while (rs.next()) {
