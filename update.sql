@@ -1548,6 +1548,15 @@ change column qty qty double(20,3) not null ,
 change column weight weight double(20,3) null default null ,
 change column total_weight total_weight double(20,3) null default null ;
 
+alter table op_his_detail
+add column wet double(20,3) null after total_weight,
+add column rice double(20,3) null after wet,
+add column bag double(20,3) null after rice,
+change column qty qty double(20,3) not null ,
+change column price price double(20,3) not null ,
+change column amount amount double(20,3) not null ,
+change column weight weight double(20,3) null default null ,
+change column total_weight total_weight double(20,3) null default null ;
 
 #view
 drop view if exists v_milling_output;
