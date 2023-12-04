@@ -558,9 +558,9 @@ public class SetupController {
         return Flux.fromIterable(labourGroupService.findAll(compCode));
     }
 
-    @GetMapping(path = "/getJob")
-    public Flux<?> getJob(@RequestParam String compCode, @RequestParam boolean finished, @RequestParam int deptId) {
-        return Flux.fromIterable(jobService.findAll(compCode, finished, deptId));
+    @PostMapping(path = "/getJob")
+    public Flux<?> getJob(@RequestBody FilterObject filterObject) {
+        return Flux.fromIterable(jobService.findAll(filterObject));
     }
 
     @GetMapping(path = "/getUpdateJob")

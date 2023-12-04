@@ -68,7 +68,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     }
 
     @Transactional
-    public void execSql(String... sql) {
+    public void   execSql(String... sql) {
         for (String s : sql) {
             jdbcTemplate.execute(s);
         }
@@ -90,7 +90,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
                 stmt.setObject(i + 1, params[i]);
             }
             String formattedSql = formatSqlWithParams(sql, params);
-            //log.info("Executing SQL query: {}", formattedSql);
+            log.info("Executing SQL query: {}", formattedSql);
             return stmt.executeQuery();
         });
     }

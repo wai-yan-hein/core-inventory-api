@@ -55,12 +55,15 @@ public class TransferHisDetailDaoImpl extends AbstractDao<THDetailKey, TransferH
                     td.setStockCode(rs.getString("stock_code"));
                     td.setStockName(rs.getString("stock_name"));
                     td.setGroupName(rs.getString("stock_type_name"));
-                    td.setQty(rs.getFloat("qty"));
+                    td.setQty(rs.getDouble("qty"));
                     td.setUnitCode(rs.getString("unit"));
                     td.setRelName(rs.getString("rel_name"));
-                    td.setWeight(rs.getFloat("weight"));
+                    td.setWeight(rs.getDouble("weight"));
                     td.setWeightUnit(rs.getString("weight_unit"));
-                    td.setTotalWeight(rs.getFloat("total_weight"));
+                    td.setTotalWeight(rs.getDouble("total_weight"));
+                    td.setWet(rs.getDouble("wet"));
+                    td.setRice(rs.getDouble("rice"));
+                    td.setBag(rs.getDouble("bag"));
                     list.add(td);
                 }
             } catch (Exception e) {

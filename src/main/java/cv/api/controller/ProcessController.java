@@ -59,7 +59,7 @@ public class ProcessController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         boolean deleted = filter.isDeleted();
-        boolean finished = filter.isFinished();
+        boolean finished = filter.getFinished();
         String processNo = Util1.isNull(filter.getProcessNo(), "-");
         String pt = filter.getVouStatus();
         return Flux.fromIterable(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode,
@@ -80,8 +80,8 @@ public class ProcessController {
 
     @GetMapping(path = "/getProcessDetail")
     public Flux<?> getProcessDetail(@RequestParam String vouNo,
-                                              @RequestParam String compCode,
-                                              @RequestParam Integer deptId) {
+                                    @RequestParam String compCode,
+                                    @RequestParam Integer deptId) {
         return Flux.fromIterable(processHisDetailService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 }

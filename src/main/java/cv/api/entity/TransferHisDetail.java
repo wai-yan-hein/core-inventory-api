@@ -17,15 +17,21 @@ public class TransferHisDetail {
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty")
-    private Float qty;
+    private double qty;
     @Column(name = "unit")
     private String unitCode;
     @Column(name = "weight")
-    private Float weight;
+    private double weight;
     @Column(name = "weight_unit")
     private String weightUnit;
     @Column(name = "total_weight")
-    private Float totalWeight;
+    private double totalWeight;
+    @Column(name = "wet")
+    private Double wet;
+    @Column(name = "rice")
+    private Double rice;
+    @Column(name = "bag")
+    private Double bag;
     @Transient
     private String userCode;
     @Transient
