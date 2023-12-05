@@ -18,6 +18,7 @@ target/
 *.iws
 *.iml
 *.ipr
+*.zip
 
 ### NetBeans ###
 /nbproject/private/
@@ -33,3 +34,4 @@ build/
 /config/
 .vscode/
 /temp/
+log.txt
