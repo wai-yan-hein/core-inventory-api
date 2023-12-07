@@ -172,9 +172,7 @@ public interface ReportService {
                                        String userCode, String stockCode, String locCode, String compCode,
                                        Integer deptId, String deleted, String projectNo, String curCode) throws Exception;
 
-    List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
-                                       String userCode, String stockCode, String locCode, String compCode,
-                                       Integer deptId, boolean deleted, String projectNo, String curCode) throws Exception;
+
 
     List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode,

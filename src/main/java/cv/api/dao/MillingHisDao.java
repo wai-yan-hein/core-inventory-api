@@ -20,8 +20,9 @@ public interface MillingHisDao {
 
     MillingHis save(MillingHis sh);
 
-    List<MillingHis> search(String fromDate, String toDate, String cusCode,
-                            String vouNo, String remark, String userCode);
+    List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
+                                       String userCode, String stockCode, String locCode, String compCode,
+                                       Integer deptId, boolean deleted, String projectNo, String curCode);
 
     MillingHis findById(MillingHisKey id);
 

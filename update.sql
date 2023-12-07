@@ -1564,6 +1564,8 @@ add column bag double(20,3) null after wet;
 
 alter table vou_status
 add column mill_report_name varchar(255) null after report_name;
+alter table milling_output
+add column sort_id int null after percent_qty;
 
 
 #view

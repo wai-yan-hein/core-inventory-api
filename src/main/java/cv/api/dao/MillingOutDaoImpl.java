@@ -43,7 +43,7 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
                 and op.comp_code = u2.comp_code
                 where op.vou_no =?
                 and op.comp_code =?
-                order by unique_id""";
+                order by sort_id,unique_id""";
         ResultSet rs = getResult(sql,vouNo,compCode);
         if (rs != null) {
             try {
