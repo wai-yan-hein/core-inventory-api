@@ -24,7 +24,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     private SeqTableDao seqDao;
 
     @Override
-    public LabourPayment save(LabourPayment obj) {
+    public PaymentHis save(PaymentHis obj) {
         obj.setVouDate(Util1.toDateTime(obj.getVouDate()));
         if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
             obj.getKey().setVouNo(getVoucherNo(obj.getMacId(), obj.getKey().getCompCode(), obj.getDeptId(), obj.getTranOption()));
@@ -64,7 +64,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     }
 
     @Override
-    public LabourPayment find(PaymentHisKey key) {
+    public PaymentHis find(PaymentHisKey key) {
         return dao.find(key);
     }
 
@@ -79,7 +79,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     }
 
     @Override
-    public List<LabourPayment> search(String startDate, String endDate, String traderCode, String curCode, String vouNo,
+    public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode, String vouNo,
                                    String saleVouNo, String userCode, String account, String projectNo, String remark,
                                    boolean deleted, String compCode, String tranOption) {
         return dao.search(startDate, endDate, traderCode, curCode, vouNo, saleVouNo, userCode, account,
@@ -87,7 +87,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     }
 
     @Override
-    public List<LabourPayment> unUploadVoucher(LocalDateTime syncDate) {
+    public List<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
         return dao.unUploadVoucher(syncDate);
     }
 

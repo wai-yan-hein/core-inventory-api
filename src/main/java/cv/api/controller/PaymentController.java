@@ -3,7 +3,7 @@ package cv.api.controller;
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
 import cv.api.dao.PaymentHisDetailDao;
-import cv.api.entity.LabourPayment;
+import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisKey;
 import cv.api.repo.AccountRepo;
 import cv.api.service.PaymentHisService;
@@ -48,7 +48,7 @@ public class PaymentController {
 
 
     @PostMapping(path = "/savePayment")
-    public Mono<?> savePayment(@RequestBody LabourPayment ph) {
+    public Mono<?> savePayment(@RequestBody PaymentHis ph) {
         ph = paymentHisService.save(ph);
         accountRepo.sendPayment(ph);
         return Mono.justOrEmpty(ph);

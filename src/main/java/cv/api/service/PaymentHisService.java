@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.entity.LabourPayment;
+import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisKey;
 import cv.api.model.VSale;
 
@@ -8,19 +8,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PaymentHisService {
-    LabourPayment save(LabourPayment obj);
+    PaymentHis save(PaymentHis obj);
 
-    LabourPayment find(PaymentHisKey key);
+    PaymentHis find(PaymentHisKey key);
 
     void delete(PaymentHisKey key);
 
     void restore(PaymentHisKey key);
 
-    List<LabourPayment> search(String startDate, String endDate, String traderCode, String curCode,
+    List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode,
                             String vouNo, String saleVouNo, String userCode, String account,
                             String projectNo, String remark, boolean deleted, String compCode, String tranOption);
 
-    List<LabourPayment> unUploadVoucher(LocalDateTime syncDate);
+    List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<VSale> getPaymentVoucher(String vouNo, String compCode);
 

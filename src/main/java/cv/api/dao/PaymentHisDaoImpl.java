@@ -1,7 +1,7 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.LabourPayment;
+import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisKey;
 import cv.api.model.VSale;
 import lombok.extern.slf4j.Slf4j;
@@ -14,17 +14,17 @@ import java.util.List;
 
 @Slf4j
 @Repository
-public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, LabourPayment> implements PaymentHisDao {
+public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> implements PaymentHisDao {
     @Override
-    public LabourPayment save(LabourPayment obj) {
+    public PaymentHis save(PaymentHis obj) {
         obj.setUpdatedDate(LocalDateTime.now());
         saveOrUpdate(obj, obj.getKey());
         return obj;
     }
 
     @Override
-    public LabourPayment find(PaymentHisKey key) {
-        LabourPayment byKey = getByKey(key);
+    public PaymentHis find(PaymentHisKey key) {
+        PaymentHis byKey = getByKey(key);
         if (byKey != null) {
             byKey.setVouDateTime(Util1.toZonedDateTime(byKey.getVouDate()));
         }
@@ -33,20 +33,20 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, LabourPayment>
 
     @Override
     public void restore(PaymentHisKey key) {
-        LabourPayment ph = getByKey(key);
+        PaymentHis ph = getByKey(key);
         ph.setDeleted(false);
         update(ph);
     }
 
     @Override
     public void delete(PaymentHisKey key) {
-        LabourPayment ph = getByKey(key);
+        PaymentHis ph = getByKey(key);
         ph.setDeleted(true);
         update(ph);
     }
 
     @Override
-    public List<LabourPayment> search(String startDate, String endDate, String traderCode, String curCode,
+    public List<PaymentHis> search(String startDate, String endDate, String traderCode, String curCode,
                                    String vouNo, String saleVouNo, String userCode, String account, String projectNo,
                                    String remark, boolean deleted, String compCode, String tranOption) {
         String filter = "";
@@ -86,12 +86,12 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, LabourPayment>
                 "and a.comp_code = t.comp_code\n" +
                 "group by a.vou_no\n" +
                 "order by a.vou_date desc";
-        List<LabourPayment> list = new ArrayList<>();
+        List<PaymentHis> list = new ArrayList<>();
         try {
             ResultSet rs = getResult(sql, deleted, compCode, curCode, tranOption, startDate, endDate,
                     traderCode, projectNo, vouNo, account, userCode, remark + "%", saleVouNo);
             while (rs.next()) {
-                LabourPayment p = new LabourPayment();
+                PaymentHis p = new PaymentHis();
                 PaymentHisKey key = new PaymentHisKey();
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
@@ -117,8 +117,8 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, LabourPayment>
     }
 
     @Override
-    public List<LabourPayment> unUploadVoucher(LocalDateTime syncDate) {
-        String hsql = "select o from LabourPayment o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
+    public List<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
+        String hsql = "select o from PaymentHis o where o.intgUpdStatus is null and o.vouDate >= :syncDate";
         return createQuery(hsql).setParameter("syncDate", syncDate).getResultList();
     }
 
