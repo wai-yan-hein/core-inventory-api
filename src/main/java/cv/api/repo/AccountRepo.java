@@ -801,7 +801,7 @@ public class AccountRepo {
         }
     }
 
-    public void sendPayment(PaymentHis ph) {
+    public void sendPayment(LabourPayment ph) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             if (ph != null) {
                 String account = ph.getAccount();

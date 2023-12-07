@@ -124,7 +124,7 @@ public class AutoUpload {
     }
 
     private void uploadPayment() {
-        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        List<LabourPayment> vouchers = paymentHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
         if (!vouchers.isEmpty()) {
             log.info("uploadPayment : " + vouchers.size());
             vouchers.forEach(vou -> {

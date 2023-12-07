@@ -7,7 +7,7 @@ import cv.api.model.VSale;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface PaymentHisService {
+public interface LabourPaymentService {
     LabourPayment save(LabourPayment obj);
 
     LabourPayment find(PaymentHisKey key);
