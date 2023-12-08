@@ -1567,6 +1567,12 @@ add column mill_report_name varchar(255) null after report_name;
 alter table milling_output
 add column sort_id int null after percent_qty;
 
+alter table sale_his
+add column dept_code varchar(15) null after print_count,
+add column cash_acc varchar(15) null after dept_code,
+add column debtor_acc varchar(15) null after cash_acc;
+
+
 
 #view
 drop view if exists v_milling_output;
