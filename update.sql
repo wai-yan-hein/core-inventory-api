@@ -628,7 +628,7 @@ alter table pur_his_detail
 change column avg_qty avg_qty float(20,3) null default 0.000 ;
 
 ALTER TABLE trader
-ADD COLUMN `deleted` BIT(1) NOT NULL DEFAULT 0 AFTER `nrc`;
+ADD COLUMN deleted BIT(1) NOT NULL DEFAULT 0 AFTER nrc;
 
 
 drop table if exists order_his;
@@ -1521,6 +1521,67 @@ add column warehouse_code varchar(15) null after active;
 alter table landing_his
 add column post bit(1) not null default b'0';
 
+CREATE TABLE output_cost (
+  code VARCHAR(15) NOT NULL,
+  comp_code VARCHAR(15) NOT NULL,
+  user_code NVARCHAR(15) NOT NULL,
+  name VARCHAR(20) NULL,
+  price DOUBLE NULL,
+  updated_date TIMESTAMP NULL,
+  updated_by VARCHAR(15) NULL,
+  created_date TIMESTAMP NULL,
+  created_by VARCHAR(15) NULL,
+  intg_upd_status VARCHAR(15) NULL,
+  active BIT(1) NULL,
+  PRIMARY KEY (code, comp_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+alter table acc_setting
+add column updated_date timestamp null after comm_acc;
+
+create table iss_rec_his (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null default 1,
+  location varchar(20) not null,
+  description varchar(255) default null,
+  vou_date datetime not null,
+  remark varchar(255) default null,
+  mac_id int(11) not null,
+  created_date datetime not null,
+  created_by varchar(15) default null,
+  updated_date timestamp not null default current_timestamp(),
+  updated_by varchar(15) default null,
+  deleted bit(1) default null,
+  intg_upd_status varchar(15) default null,
+  labour_group_code varchar(45) default null,
+  received_name varchar(255) default null,
+  received_phone varchar(255) default null,
+  car_no varchar(255) default null,
+  trader_code varchar(15) not null,
+  print_count int(11) default null,
+  tran_source int(11) not null default 0,
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+create table iss_rec_his_detail (
+  vou_no varchar(25) not null,
+  unique_id int(11) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null default 1,
+  stock_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  wet double(20,3) default 0.000,
+  bag double(20,3) default 0.000,
+  qty double(20,3) not null default 0.000,
+  weight double(20,3) default 0.000,
+  rice double(20,3) default 0.000,
+  price double(20,3) not null default 0.000,
+  amount double(20,3) not null default 0.000,
+  primary key (vou_no,unique_id,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;
@@ -1550,24 +1611,5 @@ drop view if exists v_sale;
 create  view v_sale as select sh.order_no as order_no,sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.saleman_code as saleman_code,sh.vou_date as vou_date,sh.credit_term as credit_term,sh.cur_code as cur_code,sh.remark as remark,sh.vou_total as vou_total,sh.grand_total as grand_total,sh.discount as discount,sh.disc_p as disc_p,sh.tax_amt as tax_amt,sh.tax_p as tax_p,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.paid as paid,sh.vou_balance as vou_balance,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.address as address,sh.order_code as order_code,sh.mac_id as mac_id,sh.session_id as session_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.expire_date as expire_date,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.sale_unit as sale_unit,sd.sale_price as sale_price,sd.sale_amt as sale_amt,sd.loc_code as loc_code,sd.batch_no as batch_no,sd.unique_id as unique_id,if(coalesce(sd.total_weight,0) = 0,sd.qty * s.weight,sd.total_weight) as total_weight,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((sale_his sh join sale_his_detail sd on(sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code)) join stock s on(sd.stock_code = s.stock_code and sd.comp_code = s.comp_code));
 drop view if exists v_stock_io;
 create  view v_stock_io as select i.vou_date as vou_date,i.remark as remark,i.description as description,i.comp_code as comp_code,i.mac_id as mac_id,i.created_date as created_date,i.created_by as created_by,i.vou_status as vou_status,i.deleted as deleted,i.dept_id as dept_id,i.labour_group_code as labour_group_code,i.job_code as job_code,i.received_name as received_name,i.received_phone as received_phone,i.car_no as car_no,i.trader_code as trader_code,iod.vou_no as vou_no,iod.unique_id as unique_id,iod.stock_code as stock_code,iod.loc_code as loc_code,iod.in_qty as in_qty,iod.in_unit as in_unit,iod.out_qty as out_qty,iod.out_unit as out_unit,iod.cur_code as cur_code,iod.cost_price as cost_price,iod.weight as weight,if(ifnull(iod.total_weight,0) = 0,if(coalesce(iod.in_qty,0) = 0,coalesce(iod.out_qty,0),coalesce(iod.in_qty,0)) * s.weight,0) as total_weight,coalesce(iod.weight_unit,s.weight_unit) as weight_unit,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.user_code as s_user_code,s.calculate as calculate from ((stock_in_out i join stock_in_out_detail iod on(i.vou_no = iod.vou_no and i.comp_code = iod.comp_code)) join stock s on(iod.stock_code = s.stock_code and iod.comp_code = s.comp_code));
-
-CREATE TABLE output_cost (
-  code VARCHAR(15) NOT NULL,
-  comp_code VARCHAR(15) NOT NULL,
-  user_code NVARCHAR(15) NOT NULL,
-  name VARCHAR(20) NULL,
-  price DOUBLE NULL,
-  updated_date TIMESTAMP NULL,
-  updated_by VARCHAR(15) NULL,
-  created_date TIMESTAMP NULL,
-  created_by VARCHAR(15) NULL,
-  intg_upd_status VARCHAR(15) NULL,
-  active BIT(1) NULL,
-  PRIMARY KEY (code, comp_code))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
-alter table acc_setting
-add column updated_date timestamp null after comm_acc;
-
+drop view if exists v_iss_rec;
+create view v_iss_rec as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.description as description,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.location as location,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.tran_source as tran_source,th.labour_group_code as labour_group_code,td.stock_code as stock_code,s.stock_name as stock_name,td.unique_id as unique_id,td.wet as wet,td.bag as bag,td.qty as qty,td.weight as weight,td.rice as rice,td.price as price,td.amount as amount from ((iss_rec_his th join iss_rec_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
