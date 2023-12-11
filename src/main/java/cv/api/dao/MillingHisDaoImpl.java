@@ -15,8 +15,10 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wai yan
@@ -33,52 +35,56 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
     }
 
     @Override
-    public List<MillingHis> search(String fromDate, String toDate, String cusCode,
-                                   String vouNo, String remark, String userCode) {
-        String strFilter = "";
-
-        if (!fromDate.equals("-") && !toDate.equals("-")) {
-            strFilter = "date(o.vouDate) between '" + fromDate
-                    + "' and '" + toDate + "'";
-        } else if (!fromDate.equals("-")) {
-            strFilter = "date(o.vouDate) >= '" + fromDate + "'";
-        } else if (!toDate.equals("-")) {
-            strFilter = "date(o.vouDate) <= '" + toDate + "'";
-        }
-        if (!cusCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.trader.code = '" + cusCode + "'";
-            } else {
-                strFilter = strFilter + " and o.trader.code = '" + cusCode + "'";
+    public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
+                                              String compCode, Integer deptId, boolean deleted,
+                                              String projectNo, String curCode) {
+        String sql = """
+                select a.*,t.trader_name, v.description
+                from (
+                select vou_date vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
+                from milling_his p
+                where comp_code = ?
+                and (dept_id = ? or 0 = ?)
+                and deleted =?
+                and date(vou_date) between ? and ?
+                and cur_code = ?
+                and (vou_no = ? or '-' = ?)
+                and (remark LIKE CONCAT(?, '%') or '-'= ?)
+                and (reference LIKE CONCAT(?, '%') or '-'= ?)
+                and (trader_code = ? or '-'= ?)
+                and (created_by = ? or '-'= ?)
+                and (project_no =? or '-' =?)
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                join vou_status v on a.vou_status_id = v.code
+                and a.comp_code = v.comp_code
+                order by vou_date desc""";
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
+                reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo);
+        List<MillingHis> purchaseList = new ArrayList<>();
+        if (!Objects.isNull(rs)) {
+            try {
+                while (rs.next()) {
+                    MillingHis s = new MillingHis();
+                    MillingHisKey key = new MillingHisKey();
+                    key.setVouNo(rs.getString("vou_no"));
+                    s.setKey(key);
+                    s.setVouDateStr(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                    s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                    s.setTraderName(rs.getString("trader_name"));
+                    s.setProcessType(rs.getString("description"));
+                    s.setRemark(rs.getString("remark"));
+                    s.setReference(rs.getString("reference"));
+                    s.setCreatedBy(rs.getString("created_by"));
+                    s.setDeptId(rs.getInt("dept_id"));
+                    purchaseList.add(s);
+                }
+            } catch (Exception e) {
+                log.error("getMillingHistory : " + e.getMessage());
             }
         }
-        if (!vouNo.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.vouNo = '" + vouNo + "'";
-            } else {
-                strFilter = strFilter + " and o.vouNo = '" + vouNo + "'";
-            }
-        }
-        if (!userCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.createdBy = '" + userCode + "'";
-            } else {
-                strFilter = strFilter + " and o.createdBy = '" + userCode + "'";
-            }
-        }
-        if (!remark.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.remark like '" + remark + "%'";
-            } else {
-                strFilter = strFilter + " and o.remark like '" + remark + "%'";
-            }
-        }
-        String strSql = "select o from milling o";
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
-        }
-
-        return findHSQL(strSql);
+        return purchaseList;
     }
 
     @Override

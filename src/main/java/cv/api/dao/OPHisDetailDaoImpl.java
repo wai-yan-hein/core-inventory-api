@@ -53,9 +53,9 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
                     op.setKey(key);
                     op.setDeptId(rs.getInt("dept_id"));
                     op.setStockCode(rs.getString("stock_code"));
-                    op.setQty(rs.getFloat("qty"));
-                    op.setPrice(rs.getFloat("price"));
-                    op.setAmount(rs.getFloat("amount"));
+                    op.setQty(rs.getDouble("qty"));
+                    op.setPrice(rs.getDouble("price"));
+                    op.setAmount(rs.getDouble("amount"));
                     op.setLocCode(rs.getString("loc_code"));
                     op.setUnitCode(rs.getString("unit"));
                     op.setUserCode(rs.getString("user_code"));
@@ -64,9 +64,12 @@ public class OPHisDetailDaoImpl extends AbstractDao<OPHisDetailKey, OPHisDetail>
                     op.setGroupName(rs.getString("stock_type_name"));
                     op.setBrandName(rs.getString("brand_name"));
                     op.setRelName(rs.getString("rel_name"));
-                    op.setWeight(rs.getFloat("weight"));
+                    op.setWeight(rs.getDouble("weight"));
                     op.setWeightUnit(rs.getString("weight_unit"));
-                    op.setTotalWeight(rs.getFloat("total_weight"));
+                    op.setTotalWeight(rs.getDouble("total_weight"));
+                    op.setWet(rs.getDouble("wet"));
+                    op.setRice(rs.getDouble("rice"));
+                    op.setBag(rs.getDouble("bag"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

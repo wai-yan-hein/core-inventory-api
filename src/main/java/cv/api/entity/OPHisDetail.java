@@ -17,21 +17,27 @@ public class OPHisDetail implements java.io.Serializable {
     @Column(name = "stock_code")
     private String stockCode;
     @Column(name = "qty")
-    private Float qty;
+    private double qty;
     @Column(name = "price")
-    private Float price;
+    private double price;
     @Column(name = "amount")
-    private Float amount;
+    private double amount;
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "unit")
     private String unitCode;
     @Column(name = "weight")
-    private Float weight;
+    private double weight;
     @Column(name = "weight_unit")
     private String weightUnit;
     @Column(name = "total_weight")
-    private Float totalWeight;
+    private double totalWeight;
+    @Column(name = "wet")
+    private Double wet;
+    @Column(name = "rice")
+    private Double rice;
+    @Column(name = "bag")
+    private Double bag;
     @Transient
     private String userCode;
     @Transient

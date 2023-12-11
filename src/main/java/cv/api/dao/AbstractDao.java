@@ -68,7 +68,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     }
 
     @Transactional
-    public void execSql(String... sql) {
+    public void   execSql(String... sql) {
         for (String s : sql) {
             jdbcTemplate.execute(s);
         }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wai yan
@@ -108,11 +109,13 @@ public class MillingHisServiceImpl implements MillingHisService {
     }
 
     private void saveMillingOut(List<MillingOutDetail> listOut, MillingHis milling) {
+
         String vouNo = milling.getKey().getVouNo();
         int deptId = milling.getDeptId();
         String locCode = milling.getLocCode();
         for (int i = 0; i < listOut.size(); i++) {
             MillingOutDetail cSd = listOut.get(i);
+            cSd.setSortId(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
                 MillingOutDetailKey key = new MillingOutDetailKey();
                 key.setCompCode(milling.getKey().getCompCode());
@@ -125,8 +128,8 @@ public class MillingHisServiceImpl implements MillingHisService {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
                     } else {
-                        MillingOutDetail pSd = listOut.get(i - 1);
-                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
+                        int max = findMaxUniqueId(listOut);
+                        cSd.getKey().setUniqueId(max + 1);
                     }
                 }
                 cSd.setLocCode(Util1.isNull(cSd.getLocCode(), locCode));
@@ -190,15 +193,26 @@ public class MillingHisServiceImpl implements MillingHisService {
         }
     }
 
+    private   int findMaxUniqueId(List<MillingOutDetail> details) {
+        return details.stream()
+                .map(MillingOutDetail::getKey)
+                .filter(Objects::nonNull)
+                .mapToInt(MillingOutDetailKey::getUniqueId)
+                .max()
+                .orElse(0); // Default value if the list is empty
+    }
+
     @Override
     public MillingHis update(MillingHis milling) {
         return hDao.save(milling);
     }
 
     @Override
-    public List<MillingHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
-        return hDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
+    public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode, String compCode, Integer deptId, boolean deleted, String projectNo, String curCode) {
+        return hDao.getMillingHistory(fromDate,toDate,traderCode,vouNo,remark,reference,userCode,stockCode,locCode,compCode,deptId,deleted,projectNo,curCode);
     }
+
+
 
     @Override
     public MillingHis findById(MillingHisKey id) {

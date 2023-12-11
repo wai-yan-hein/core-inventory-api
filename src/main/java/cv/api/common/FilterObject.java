@@ -31,7 +31,7 @@ public class FilterObject {
     private boolean close;
     private Integer deptId;
     private String processNo;
-    private boolean finished;
+    private Boolean finished;
     private String traderCode;
     private boolean nullBatch;
     private String batchNo;
@@ -44,5 +44,5 @@ public class FilterObject {
     private String orderStatus;
     private String tranSource;
     private boolean draft;
-
+    private String jobNo;
 }

@@ -84,7 +84,7 @@ public interface ReportService {
 
     List<VOrder> getOrderByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception;
 
-    List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
+    List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId, String locCode) throws Exception;
 
     List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
@@ -156,7 +156,7 @@ public interface ReportService {
 
     List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo,
                                      String remark, String desp, String userCode, String stockCode,
-                                     String locCode, String compCode, Integer deptId, String deleted, String traderCode) throws Exception;
+                                     String locCode, String compCode, Integer deptId, String deleted, String traderCode, String jobNo) throws Exception;
 
     List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
                                String remark, String reference, String userCode, String stockCode, String locCode,
@@ -172,9 +172,7 @@ public interface ReportService {
                                        String userCode, String stockCode, String locCode, String compCode,
                                        Integer deptId, String deleted, String projectNo, String curCode) throws Exception;
 
-    List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
-                                       String userCode, String stockCode, String locCode, String compCode,
-                                       Integer deptId, boolean deleted, String projectNo, String curCode) throws Exception;
+
 
     List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode,

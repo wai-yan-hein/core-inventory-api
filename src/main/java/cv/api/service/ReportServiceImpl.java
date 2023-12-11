@@ -1184,7 +1184,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
+    public List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId, String locCode) throws Exception {
         List<VPurchase> purchaseList = new ArrayList<>();
         String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
                 "v.s_user_code,v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
@@ -1194,6 +1194,7 @@ public class ReportServiceImpl implements ReportService {
                 "where (v.stock_code = '" + stockCode + "' or '-'='" + stockCode + "')\n" +
                 "and (v.stock_type_code = '" + typeCode + "' or '-'='" + typeCode + "')\n" +
                 "and (v.brand_code = '" + brandCode + "' or '-'='" + brandCode + "')\n" +
+                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "and (v.category_code = '" + catCode + "' or '-'='" + catCode + "')\n" +
                 "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
                 "and v.cur_code = '" + curCode + "'\n" +
@@ -1222,12 +1223,18 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
         List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and deleted = 0\n" +
+        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" +
+                "from (\n" +
+                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" +
+                "from v_purchase\n" +
+                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
+                "and comp_code = '" + compCode + "'\n" +
+                "and deleted = false\n" +
                 "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
                 "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
+                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
                 "group by stock_code,pur_unit\n" + ")a\n" +
                 "join v_relation rel \n" +
                 "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" +
@@ -2811,7 +2818,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus,
                                             String vouNo, String remark, String desp,
                                             String userCode, String stockCode, String locCode,
-                                            String compCode, Integer deptId, String deleted, String traderCode) throws Exception {
+                                            String compCode, Integer deptId, String deleted, String traderCode, String jobNo) throws Exception {
         String sql = "select a.*,v.description vou_status_name\n" +
                 "from (\n" +
                 "select vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n" +
@@ -2828,6 +2835,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
                 "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
                 "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
+                "and (job_code ='" + jobNo + "' or '-' ='" + jobNo + "')\n" +
                 "group by vou_no\n" + ")a\n" +
                 "join vou_status v on a.vou_status = v.code\n" +
                 "and a.comp_code = v.comp_code\n" +
@@ -3073,54 +3081,7 @@ public class ReportServiceImpl implements ReportService {
         return purchaseList;
     }
 
-    @Override
-    public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
-                                              String compCode, Integer deptId, boolean deleted,
-                                              String projectNo, String curCode) throws Exception {
-        String sql = """
-                select a.*,t.trader_name, v.description
-                from (
-                select vou_date vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
-                from milling_his p\s
-                where comp_code = ?
-                and (dept_id = ? or 0 = ?)
-                and deleted =?
-                and date(vou_date) between ? and ?
-                and cur_code = ?
-                and (vou_no = ? or '-' = ?)
-                and (remark LIKE CONCAT(?, '%') or '-'= ?)
-                and (reference LIKE CONCAT(?, '%') or '-'= ?)
-                and (trader_code = ? or '-'= ?)
-                and (created_by = ? or '-'= ?)
-                and (project_no =? or '-' =?)
-                group by vou_no)a
-                join trader t on a.trader_code = t.code
-                and a.comp_code = t.comp_code
-                join vou_status v on a.vou_status_id = v.code
-                and a.comp_code = v.comp_code
-                order by vou_date""";
-        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
-                reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo);
-        List<MillingHis> purchaseList = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                MillingHis s = new MillingHis();
-                MillingHisKey key = new MillingHisKey();
-                key.setVouNo(rs.getString("vou_no"));
-                s.setKey(key);
-                s.setVouDateStr(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setProcessType(rs.getString("description"));
-                s.setRemark(rs.getString("remark"));
-                s.setReference(rs.getString("reference"));
-                s.setCreatedBy(rs.getString("created_by"));
-                s.setDeptId(rs.getInt("dept_id"));
-                purchaseList.add(s);
-            }
-        }
-        return purchaseList;
-    }
+
 
     @Override
     public List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo,
@@ -4951,6 +4912,7 @@ public class ReportServiceImpl implements ReportService {
                 and a.comp_code = l.comp_code
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code
+                order by date(vou_date),qty desc
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
@@ -5014,7 +4976,7 @@ public class ReportServiceImpl implements ReportService {
                 left join category c on a.category_code = c.cat_code
                 and a.comp_code = c.comp_code
                 group by stock_code
-                order by qty
+                order by total_qty desc
                 """;
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,

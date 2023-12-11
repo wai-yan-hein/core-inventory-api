@@ -50,4 +50,6 @@ public class VouStatus {
     private boolean active;
     @Column(name = "report_name")
     private String reportName;
+    @Column(name = "mill_report_name")
+    private String millReportName;
 }

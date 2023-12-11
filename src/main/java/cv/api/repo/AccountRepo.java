@@ -236,12 +236,11 @@ public class AccountRepo {
             AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
             if (!Objects.isNull(setting)) {
                 LocationSetting ls = getLocationSetting(locCode, compCode);
-                String srcAcc = setting.getSourceAcc();
-                srcAcc = Util1.isNull(sh.getAccount(), srcAcc);
-                String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
-                String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
+                String payAcc = Util1.isNull(sh.getCashAcc(), Util1.isNull(ls.getCashAcc(), setting.getPayAcc()));
+                String deptCode = Util1.isNull(sh.getDeptCode(), Util1.isNull(ls.getDeptCode(), setting.getDeptCode()));
+                String srcAcc = Util1.isNull(sh.getSaleAcc(), setting.getSourceAcc());
+                String balAcc = Util1.isNull(sh.getDebtorAcc(), setting.getBalanceAcc());
                 String disAcc = setting.getDiscountAcc();
-                String balAcc = setting.getBalanceAcc();
                 String taxAcc = setting.getTaxAcc();
                 LocalDateTime vouDate = sh.getVouDate();
                 String traderCode = sh.getTraderCode();
@@ -458,6 +457,7 @@ public class AccountRepo {
                 String remark = ph.getRemark();
                 boolean deleted = ph.isDeleted();
                 double vouTotal = Util1.getDouble(ph.getVouTotal());
+                double grandTotal = Util1.getDouble(ph.getGrandTotal());
                 double vouPaid = Util1.getDouble(ph.getPaid());
                 double vouComm = Util1.getDouble(ph.getCommAmt());
                 double vouCommP = Util1.getDouble(ph.getCommP());
@@ -509,7 +509,7 @@ public class AccountRepo {
                     key.setDeptId(deptId);
                     gl.setKey(key);
                     gl.setGlDate(vouDate);
-                    if (vouPaid == vouTotal) {
+                    if (vouPaid == grandTotal) {
                         gl.setDescription("Purchase Voucher Full Paid");
                     } else {
                         gl.setDescription("Purchase Voucher Partial Paid");
