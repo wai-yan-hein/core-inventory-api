@@ -82,8 +82,9 @@ public class MillingController {
         Integer deptId = filter.getDeptId();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
+        String jobNo = Util1.isNull(filter.getJobNo(), "-");
         List<MillingHis> listPur = reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
-                stockCode, locCode, compCode, deptId, deleted, projectNo,curCode);
+                stockCode, locCode, compCode, deptId, deleted, projectNo,curCode, jobNo);
         return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
     }
 

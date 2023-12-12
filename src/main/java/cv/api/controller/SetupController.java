@@ -81,6 +81,8 @@ public class SetupController {
     private StockFormulaService stockFormulaService;
     @Autowired
     private OutputCostService outputCostService;
+    @Autowired
+    private LanguageService languageService;
 
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
@@ -534,6 +536,13 @@ public class SetupController {
         return Mono.justOrEmpty(b);
     }
 
+    @PostMapping(path = "/saveLanguage")
+    public Mono<Language> saveOrderStatus(@RequestBody Language language) {
+        language.setUpdatedDate(Util1.getTodayLocalDate());
+        Language b = languageService.save(language);
+        return Mono.justOrEmpty(b);
+    }
+
     @PostMapping(path = "/saveLabourGroup")
     public Mono<LabourGroup> saveLabourGroup(@RequestBody LabourGroup labourGroup) {
         labourGroup.setUpdatedDate(Util1.getTodayLocalDate());
@@ -551,6 +560,11 @@ public class SetupController {
     @GetMapping(path = "/getOrderStatus")
     public Flux<?> getOrderStatus(@RequestParam String compCode) {
         return Flux.fromIterable(orderStatusService.findAll(compCode));
+    }
+
+    @GetMapping(path = "/getLanguage")
+    public Flux<?> getLanguage(@RequestParam String compCode) {
+        return Flux.fromIterable(languageService.findAll(compCode));
     }
 
     @GetMapping(path = "/getLabourGroup")
@@ -576,6 +590,17 @@ public class SetupController {
     @PostMapping(path = "/findOrderStatus")
     public Mono<OrderStatus> findOrderStatus(@RequestBody OrderStatusKey key) {
         OrderStatus b = orderStatusService.findById(key);
+        return Mono.justOrEmpty(b);
+    }
+
+    @GetMapping(path = "/getUpdateLanguage")
+    public Flux<?> getUpdateLanguage(@RequestParam String updatedDate) {
+        return Flux.fromIterable(languageService.getLanguage(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @PostMapping(path = "/findLanguage")
+    public Mono<Language> findLanguage(@RequestBody LanguageKey key) {
+        Language b = languageService.findById(key);
         return Mono.justOrEmpty(b);
     }
 
