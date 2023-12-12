@@ -43,7 +43,7 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
                 and op.comp_code = u2.comp_code
                 where op.vou_no =?
                 and op.comp_code =?
-                order by unique_id""";
+                order by sort_id,unique_id""";
         ResultSet rs = getResult(sql,vouNo,compCode);
         if (rs != null) {
             try {
@@ -85,7 +85,7 @@ public class MillingOutDaoImpl extends AbstractDao<MillingOutDetailKey, MillingO
     public List<MillingOutDetail> searchDetail(String vouNo, String compCode, Integer deptId) {
         List<MillingOutDetail> list = new ArrayList<>();
         //sd_code, vou_no, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, unique_id, comp_code, dept_id
-        String sql = "select *\n" + "from miling_output\n" + "where vou_no='" + vouNo + "'\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "order by unique_id";
+        String sql = "select *\n" + "from milling_output\n" + "where vou_no='" + vouNo + "'\n" + "and comp_code ='" + compCode + "'\n" + "and dept_id ='" + deptId + "'\n" + "order by unique_id";
         try {
             ResultSet rs = getResult(sql);
             if (rs != null) {

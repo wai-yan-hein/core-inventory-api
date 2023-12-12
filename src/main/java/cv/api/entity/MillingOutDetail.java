@@ -54,6 +54,8 @@ public class MillingOutDetail {
     private double totalWeight;
     @Column(name = "percent_qty")
     private double percentQty;
+    @Column(name = "sort_id")
+    private Integer sortId;
     @Transient
     private String userCode;
     @Transient
