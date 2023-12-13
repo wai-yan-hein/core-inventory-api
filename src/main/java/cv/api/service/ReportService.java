@@ -288,4 +288,7 @@ public interface ReportService {
     List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
                                                          String vouNo, String remark, String locCode,Integer deptId,
                                                          boolean deleted, String compCode, int transSource);
+    List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
+                                       String userCode, String stockCode, String locCode, String compCode,
+                                       Integer deptId, boolean deleted, String projectNo, String curCode, String jobNo) throws Exception;
 }
