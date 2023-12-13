@@ -172,9 +172,7 @@ public interface ReportService {
                                        String userCode, String stockCode, String locCode, String compCode,
                                        Integer deptId, String deleted, String projectNo, String curCode) throws Exception;
 
-    List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
-                                       String userCode, String stockCode, String locCode, String compCode,
-                                       Integer deptId, boolean deleted, String projectNo, String curCode, String jobNo) throws Exception;
+
 
     List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode,
@@ -283,4 +281,11 @@ public interface ReportService {
     List<VPurchase> getTopPurchasePaddy(String fromDate,String toDate,String compCode,
                                         String stockCode,String groupCode,String catCode,
                                         String brandCode,String locCode);
+    List<VStockIssueReceive> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
+                                                         String vouNo, String remark, String locCode,Integer deptId,
+                                                         boolean deleted, String compCode, int transSource);
+
+    List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
+                                                         String vouNo, String remark, String locCode,Integer deptId,
+                                                         boolean deleted, String compCode, int transSource);
 }
