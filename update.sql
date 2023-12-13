@@ -1519,10 +1519,6 @@ add column warehouse_code varchar(15) null after active;
 alter table landing_his
 add column post bit(1) not null default b'0';
 
-<<<<<<< HEAD
-=======
-
->>>>>>> eb3417fea8b31b0041d4b0a9c6ac0f770ce76179
 CREATE TABLE output_cost (
   code VARCHAR(15) NOT NULL,
   comp_code VARCHAR(15) NOT NULL,
@@ -1539,7 +1535,6 @@ CREATE TABLE output_cost (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-<<<<<<< HEAD
 alter table acc_setting
 add column updated_date timestamp null after comm_acc;
 
@@ -1584,7 +1579,6 @@ create table iss_rec_his_detail (
   amount double(20,3) not null default 0.000,
   primary key (vou_no,unique_id,comp_code)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
-=======
 
 alter table acc_setting
 add column updated_date timestamp not null default current_timestamp;
@@ -1620,9 +1614,6 @@ alter table sale_his
 add column dept_code varchar(15) null after print_count,
 add column cash_acc varchar(15) null after dept_code,
 add column debtor_acc varchar(15) null after cash_acc;
-
-
->>>>>>> eb3417fea8b31b0041d4b0a9c6ac0f770ce76179
 
 #view
 drop view if exists v_milling_output;
