@@ -6347,6 +6347,56 @@ public class ReportServiceImpl implements ReportService {
             log.error(String.format("calculatePrice: %s", e.getMessage()));
         }
     }
+
+    @Override
+    public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
+                                              String compCode, Integer deptId, boolean deleted,
+                                              String projectNo, String curCode, String jobNo) throws Exception {
+        String sql = """
+                select a.*,t.trader_name, v.description
+                from (
+                select vou_date vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
+                from milling_his p\s
+                where comp_code = ?
+                and (dept_id = ? or 0 = ?)
+                and deleted =?
+                and date(vou_date) between ? and ?
+                and cur_code = ?
+                and (vou_no = ? or '-' = ?)
+                and (remark LIKE CONCAT(?, '%') or '-'= ?)
+                and (reference LIKE CONCAT(?, '%') or '-'= ?)
+                and (trader_code = ? or '-'= ?)
+                and (created_by = ? or '-'= ?)
+                and (project_no =? or '-' =?)
+                and (job_no =? or '-' =?)
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                join vou_status v on a.vou_status_id = v.code
+                and a.comp_code = v.comp_code
+                order by vou_date""";
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
+                reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo, jobNo, jobNo);
+        List<MillingHis> purchaseList = new ArrayList<>();
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                MillingHis s = new MillingHis();
+                MillingHisKey key = new MillingHisKey();
+                key.setVouNo(rs.getString("vou_no"));
+                s.setKey(key);
+                s.setVouDateStr(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setProcessType(rs.getString("description"));
+                s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
+                s.setCreatedBy(rs.getString("created_by"));
+                s.setDeptId(rs.getInt("dept_id"));
+                purchaseList.add(s);
+            }
+        }
+        return purchaseList;
+    }
 }
 
 

@@ -286,6 +286,14 @@ public interface ReportService {
                                                          boolean deleted, String compCode, int transSource);
 
     List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
+<<<<<<< HEAD
                                                          String vouNo, String remark, Integer deptId,
                                                          boolean deleted, String compCode);
+=======
+                                                         String vouNo, String remark, String locCode,Integer deptId,
+                                                         boolean deleted, String compCode, int transSource);
+    List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
+                                       String userCode, String stockCode, String locCode, String compCode,
+                                       Integer deptId, boolean deleted, String projectNo, String curCode, String jobNo) throws Exception;
+>>>>>>> c098cbbf40a0e730254f2073868e6e597c2f8c54
 }
