@@ -50,22 +50,21 @@ public class PurOrderController {
         return Flux.fromIterable(PurOrderHisService.getPurOrderHisDetail(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
-    @PostMapping(path = "/getPurOrderHisHistory")
-    public Flux<?> getPurOrderHisHistory(@RequestBody FilterObject filter) {
+    @PostMapping(path = "/getPurOrderHistory")
+    public Flux<?> getPurOrderHistory(@RequestBody FilterObject filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
+//        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
         boolean deleted = filter.isDeleted();
         String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        int tranSource = Integer.valueOf(Util1.isNull(filter.getTranSource(), "-"));
         return Flux.fromIterable(reportService.getPurOrderHistory(fromDate, toDate, traderCode,
-                        userCode,stockCode, vouNo, remark,locCode, deptId,deleted, compCode, tranSource))
+                        userCode,stockCode, vouNo, remark, deptId,deleted, compCode))
                 .onErrorResume(throwable -> Flux.empty());
     }
 

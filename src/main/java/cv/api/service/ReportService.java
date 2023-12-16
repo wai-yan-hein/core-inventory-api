@@ -286,6 +286,6 @@ public interface ReportService {
                                                          boolean deleted, String compCode, int transSource);
 
     List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
-                                                         String vouNo, String remark, String locCode,Integer deptId,
-                                                         boolean deleted, String compCode, int transSource);
+                                                         String vouNo, String remark, Integer deptId,
+                                                         boolean deleted, String compCode);
 }
