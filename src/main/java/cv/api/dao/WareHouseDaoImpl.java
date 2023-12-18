@@ -2,7 +2,6 @@ package cv.api.dao;
 
 import cv.api.common.Util1;
 import cv.api.entity.WareHouse;
-import cv.api.entity.LabourGroupKey;
 import cv.api.entity.WareHouseKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

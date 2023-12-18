@@ -1,7 +1,5 @@
 package cv.api.dao;
 
-import cv.api.entity.LandingHisPrice;
-import cv.api.entity.LandingHisPriceKey;
 import cv.api.entity.LandingHisQty;
 import cv.api.entity.LandingHisQtyKey;
 

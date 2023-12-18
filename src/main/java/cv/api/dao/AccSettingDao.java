@@ -7,7 +7,6 @@ package cv.api.dao;
 
 import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
-import cv.api.entity.OutputCost;
 
 import java.time.LocalDateTime;
 import java.util.List;

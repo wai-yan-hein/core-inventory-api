@@ -1,11 +1,8 @@
 package cv.api.controller;
 
 import cv.api.common.Util1;
-import cv.api.entity.LabourGroup;
-import cv.api.entity.LabourGroupKey;
 import cv.api.entity.WareHouse;
 import cv.api.entity.WareHouseKey;
-import cv.api.service.LabourGroupService;
 import cv.api.service.WareHouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

@@ -7,9 +7,9 @@ package cv.api.service;
 
 import cv.api.common.Util1;
 import cv.api.dao.StockCriteriaDao;
-import cv.api.entity.*;
+import cv.api.entity.StockCriteria;
+import cv.api.entity.StockCriteriaKey;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,7 @@
 package cv.api.dao;
 
-import cv.api.entity.*;
+import cv.api.entity.MillingExpense;
+import cv.api.entity.MillingExpenseKey;
 
 import java.util.List;
 

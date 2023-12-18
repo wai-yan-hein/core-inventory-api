@@ -163,10 +163,7 @@ public interface ReportService {
                                String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
                                String projectNo, String curCode);
 
-    List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
-                                 String remark, String reference, String userCode, String stockCode, String locCode,
-                                 String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
-                                 String projectNo, String curCode, String orderStatus);
+
 
     List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
                                        String userCode, String stockCode, String locCode, String compCode,

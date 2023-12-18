@@ -1,13 +1,9 @@
 package cv.api.service;
 
-import cv.api.dao.LabourGroupDao;
 import cv.api.dao.WareHouseDao;
-import cv.api.entity.OutputCost;
 import cv.api.entity.WareHouse;
-import cv.api.entity.LabourGroupKey;
 import cv.api.entity.WareHouseKey;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

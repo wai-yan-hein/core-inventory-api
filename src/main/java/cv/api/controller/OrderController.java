@@ -8,15 +8,15 @@ package cv.api.controller;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
+import cv.api.dao.OrderHisDao;
 import cv.api.entity.OrderHis;
-import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
 import cv.api.model.VOrder;
 import cv.api.service.OrderDetailService;
 import cv.api.service.OrderHisService;
 import cv.api.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,18 +26,16 @@ import java.util.List;
 /**
  * @author wai yan
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/order")
 @Slf4j
 public class OrderController {
 
     private final ReturnObject ro = new ReturnObject();
-    @Autowired
-    private OrderHisService ohService;
-    @Autowired
-    private OrderDetailService odService;
-    @Autowired
-    private ReportService reportService;
+    private final OrderHisService ohService;
+    private final OrderDetailService odService;
+    private final OrderHisDao orderHisDao;
 
     @PostMapping(path = "/saveOrder")
     public Mono<?> saveOrder(@RequestBody OrderHis order) {
@@ -93,7 +91,7 @@ public class OrderController {
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
         String orderStatus = Util1.isNull(filter.getOrderStatus(), "-");
-        List<VOrder> orderList = reportService.getOrderHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
+        List<VOrder> orderList = orderHisDao.getOrderHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
                 reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo, curCode,
                 orderStatus);
         return Flux.fromIterable(orderList).onErrorResume(throwable -> Flux.empty());

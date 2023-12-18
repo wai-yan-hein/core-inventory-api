@@ -2,8 +2,6 @@ package cv.api.dao;
 
 import cv.api.entity.StockFormula;
 import cv.api.entity.StockFormulaKey;
-import cv.api.entity.StockFormulaPrice;
-import cv.api.entity.StockFormulaQty;
 
 import java.time.LocalDateTime;
 import java.util.List;

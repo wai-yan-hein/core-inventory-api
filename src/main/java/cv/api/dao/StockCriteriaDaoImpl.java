@@ -6,14 +6,14 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.*;
+import cv.api.entity.StockCriteria;
+import cv.api.entity.StockCriteriaKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**

@@ -7,7 +7,6 @@ package cv.api.dao;
 
 import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
-import cv.api.entity.OutputCost;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;

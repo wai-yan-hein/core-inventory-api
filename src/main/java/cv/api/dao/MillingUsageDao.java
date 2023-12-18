@@ -5,8 +5,6 @@
  */
 package cv.api.dao;
 
-import cv.api.entity.MillingRawDetail;
-import cv.api.entity.MillingRawDetailKey;
 import cv.api.entity.MillingUsage;
 import cv.api.entity.MillingUsageKey;
 

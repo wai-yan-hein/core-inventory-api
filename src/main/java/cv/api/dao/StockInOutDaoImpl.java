@@ -104,7 +104,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         StockInOut io = findById(key);
         io.setDeleted(true);
         io.setUpdatedDate(LocalDateTime.now());
-        update(io);
+        updateEntity(io);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         StockInOut io = findById(key);
         io.setDeleted(false);
         io.setUpdatedDate(LocalDateTime.now());
-        update(io);
+        updateEntity(io);
     }
 
     @Override

@@ -8,7 +8,6 @@ package cv.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -85,4 +84,5 @@ public class VOrder {
     private Integer vouCount;
     private String orderStatus;
     private String orderStatusName;
+    private Boolean post;
 }

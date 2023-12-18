@@ -5,10 +5,10 @@
  */
 package cv.api.dao;
 
-import cv.api.entity.*;
+import cv.api.entity.StockCriteria;
+import cv.api.entity.StockCriteriaKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**

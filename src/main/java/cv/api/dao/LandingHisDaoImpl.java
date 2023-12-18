@@ -1,8 +1,8 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.LandingHisKey;
 import cv.api.entity.LandingHis;
+import cv.api.entity.LandingHisKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -42,7 +42,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
         if (his != null) {
             his.setDeleted(true);
             his.setUpdatedDate(LocalDateTime.now());
-            update(his);
+            updateEntity(his);
             return true;
         }
         return false;
@@ -54,7 +54,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
         if (his != null) {
             his.setDeleted(false);
             his.setUpdatedDate(LocalDateTime.now());
-            update(his);
+            updateEntity(his);
             return true;
         }
         return false;
@@ -136,7 +136,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
         LandingHis h = getByKey(key);
         if (h != null) {
             h.setUpdatedDate(LocalDateTime.now());
-            update(h);
+            updateEntity(h);
         }
         return true;
     }

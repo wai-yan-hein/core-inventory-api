@@ -2,7 +2,6 @@ package cv.api.dao;
 
 import cv.api.entity.GradeDetail;
 import cv.api.entity.GradeDetailKey;
-import cv.api.entity.StockFormulaQty;
 
 import java.time.LocalDateTime;
 import java.util.List;
