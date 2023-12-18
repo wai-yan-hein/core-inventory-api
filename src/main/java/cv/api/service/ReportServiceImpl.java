@@ -4927,6 +4927,133 @@ public class ReportServiceImpl implements ReportService {
         return list;
     }
 
+    @Override
+    public List<VStockIssueReceive> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
+                                                          String vouNo, String remark, String locCode,Integer  deptId,
+                                                          boolean deleted, String compCode, int transSource){
+        String filter = "";
+        if (!vouNo.equals("-")) {
+            filter += "and vou_no ='" + vouNo + "'\n";
+        }
+        if (!remark.equals("-")) {
+            filter += "and remark like '" + remark + "%'\n";
+        }
+        if (!userCode.equals("-")) {
+            filter += "and v.created_by ='" + userCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code ='" + stockCode + "'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and v.location ='" + locCode + "'\n";
+        }
+        String sql = "select v.vou_date,v.vou_no,v.stock_code,s.stock_name ,v.remark,v.created_by," +
+                "v.deleted,v.dept_id,l.loc_name loc_name,t.trader_name, v.labour_group_code\n" +
+                "from v_iss_rec v join location l\n" +
+                "on v.location = l.loc_code\n" +
+                "and v.comp_code = l.comp_code\n" +
+                "join stock s on v.stock_code = s.stock_code\n"+
+                " and v.comp_code =s.comp_code\n"+
+                "left join trader t on v.trader_code = t.code\n" +
+                "and v.comp_code = t.comp_code\n" +
+                "where v.comp_code = '" + compCode + "'\n" +
+                "and v.deleted = " + deleted + "\n" +
+                "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and (v.tran_source = " + transSource + " or 0 =" + transSource + ")\n" +
+                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter +
+                "group by v.vou_no\n" +
+                "order by v.vou_date desc\n";
+        ResultSet rs = reportDao.executeSql(sql);
+        List<VStockIssueReceive> vStockIRList = new ArrayList<>();
+        try{
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                VStockIssueReceive s = new VStockIssueReceive();
+                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                s.setVouNo(rs.getString("vou_no"));
+                s.setStockCode(rs.getString("stock_code"));
+                s.setStockName(rs.getString("stock_name"));
+                s.setRemark(rs.getString("remark"));
+                s.setCreatedBy(rs.getString("created_by"));
+                s.setDeleted(rs.getBoolean("deleted"));
+                s.setLocation(rs.getString("loc_name"));
+                s.setDeptId(rs.getInt("dept_id"));
+                s.setTraderName(rs.getString("trader_name"));
+                vStockIRList.add(s);
+            }
+        }
+        } catch (Exception e) {
+            log.error("getStockIssueReceiveList : " + e.getMessage());
+        }
+        return vStockIRList;
+    }
+
+    @Override
+    public List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
+                                                                String vouNo, String remark, Integer  deptId,
+                                                                boolean deleted, String compCode){
+        String filter = "";
+        if (!vouNo.equals("-")) {
+            filter += "and vou_no ='" + vouNo + "'\n";
+        }
+        if (!remark.equals("-")) {
+            filter += "and remark like '" + remark + "%'\n";
+        }
+        if (!userCode.equals("-")) {
+            filter += "and v.created_by ='" + userCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code ='" + stockCode + "'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
+        }
+//        if (!locCode.equals("-")) {
+//            filter += "and v.location ='" + locCode + "'\n";
+//        }
+        String sql = "select v.vou_date,v.vou_no,v.stock_code,s.stock_name ,v.remark,v.created_by," +
+                "v.deleted,v.due_date,v.dept_id,t.trader_name \n" +
+                "from v_pur_order v \n" +
+                "join stock s on v.stock_code = s.stock_code\n"+
+                " and v.comp_code =s.comp_code\n"+
+                "left join trader t on v.trader_code = t.code\n" +
+                "and v.comp_code = t.comp_code\n" +
+                "where v.comp_code = '" + compCode + "'\n" +
+                "and v.deleted = " + deleted + "\n" +
+                "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter +
+                "group by v.vou_no\n" +
+                "order by v.vou_date desc\n";
+        ResultSet rs = reportDao.executeSql(sql);
+        List<VPurOrder> vPurOrderList = new ArrayList<>();
+        try{
+            if (!Objects.isNull(rs)) {
+                while (rs.next()) {
+                    VPurOrder s = new VPurOrder();
+                    s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                    s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                    s.setDueDateTime(Util1.toZonedDateTime(rs.getTimestamp("due_date").toLocalDateTime()));
+                    s.setVouNo(rs.getString("vou_no"));
+                    s.setStockCode(rs.getString("stock_code"));
+                    s.setStockName(rs.getString("stock_name"));
+                    s.setRemark(rs.getString("remark"));
+                    s.setCreatedBy(rs.getString("created_by"));
+                    s.setDeleted(rs.getBoolean("deleted"));
+                    s.setDeptId(rs.getInt("dept_id"));
+                    s.setTraderName(rs.getString("trader_name"));
+                    vPurOrderList.add(s);
+                }
+            }
+        } catch (Exception e) {
+            log.error("getPurOrderList : " + e.getMessage());
+        }
+        return vPurOrderList;
+    }
+
     private void calculateStockIOOpeningByTrader(String opDate, String fromDate, String traderCode, String compCode, int macId) {
         String delSql = "delete from tmp_stock_opening where mac_id = " + macId;
         String sql = "insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_qty,ttl_weight,comp_code,dept_id,mac_id)\n" +
@@ -6139,4 +6266,58 @@ public class ReportServiceImpl implements ReportService {
             log.error(String.format("calculatePrice: %s", e.getMessage()));
         }
     }
+
+    @Override
+    public List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
+                                              String compCode, Integer deptId, boolean deleted,
+                                              String projectNo, String curCode, String jobNo) throws Exception {
+        String sql = """
+                select a.*,t.trader_name, v.description
+                from (
+                select vou_date vou_date,vou_no,remark,created_by,reference,vou_status_id, trader_code,comp_code,dept_id
+                from milling_his p\s
+                where comp_code = ?
+                and (dept_id = ? or 0 = ?)
+                and deleted =?
+                and date(vou_date) between ? and ?
+                and cur_code = ?
+                and (vou_no = ? or '-' = ?)
+                and (remark LIKE CONCAT(?, '%') or '-'= ?)
+                and (reference LIKE CONCAT(?, '%') or '-'= ?)
+                and (trader_code = ? or '-'= ?)
+                and (created_by = ? or '-'= ?)
+                and (project_no =? or '-' =?)
+                and (job_no =? or '-' =?)
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                join vou_status v on a.vou_status_id = v.code
+                and a.comp_code = v.comp_code
+                order by vou_date""";
+        ResultSet rs = getResult(sql, compCode, deptId, deptId, deleted, fromDate, toDate, curCode, vouNo, vouNo, remark, remark, reference,
+                reference, traderCode, traderCode, userCode, userCode, projectNo, projectNo, jobNo, jobNo);
+        List<MillingHis> purchaseList = new ArrayList<>();
+        if (!Objects.isNull(rs)) {
+            while (rs.next()) {
+                MillingHis s = new MillingHis();
+                MillingHisKey key = new MillingHisKey();
+                key.setVouNo(rs.getString("vou_no"));
+                s.setKey(key);
+                s.setVouDateStr(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                s.setTraderName(rs.getString("trader_name"));
+                s.setProcessType(rs.getString("description"));
+                s.setRemark(rs.getString("remark"));
+                s.setReference(rs.getString("reference"));
+                s.setCreatedBy(rs.getString("created_by"));
+                s.setDeptId(rs.getInt("dept_id"));
+                purchaseList.add(s);
+            }
+        }
+        return purchaseList;
+    }
 }
+
+
+
+

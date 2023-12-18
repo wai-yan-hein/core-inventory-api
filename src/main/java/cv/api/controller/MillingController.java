@@ -30,6 +30,7 @@ public class MillingController {
 
     private final ReturnObject ro = new ReturnObject();
     private final MillingHisService millingHisService;
+    private final ReportService reportService;
 
     @PostMapping(path = "/saveMilling")
     public Mono<?> saveMilling(@RequestBody MillingHis sale) {
@@ -65,7 +66,7 @@ public class MillingController {
     }
 
     @PostMapping(path = "/getMilling")
-    public Flux<?> getMilling(@RequestBody FilterObject filter) {
+    public Flux<?> getMilling(@RequestBody FilterObject filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -80,8 +81,9 @@ public class MillingController {
         Integer deptId = filter.getDeptId();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
-        List<MillingHis> listPur = millingHisService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
-                stockCode, locCode, compCode, deptId, deleted, projectNo, curCode);
+        String jobNo = Util1.isNull(filter.getJobNo(), "-");
+        List<MillingHis> listPur = reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
+                stockCode, locCode, compCode, deptId, deleted, projectNo,curCode, jobNo);
         return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -108,8 +110,8 @@ public class MillingController {
 
     @GetMapping(path = "/getRawDetail")
     public Flux<?> getRawDetail(@RequestParam String vouNo,
-                                @RequestParam String compCode,
-                                @RequestParam Integer deptId) {
+                                 @RequestParam String compCode,
+                                 @RequestParam Integer deptId) {
         return Flux.fromIterable(millingHisService.getMillingRaw(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -121,14 +123,13 @@ public class MillingController {
 
     @GetMapping(path = "/getOutputDetail")
     public Flux<?> getOutputDetail(@RequestParam String vouNo,
-                                   @RequestParam String compCode,
-                                   @RequestParam Integer deptId) {
+                                    @RequestParam String compCode,
+                                    @RequestParam Integer deptId) {
         return Flux.fromIterable(millingHisService.getMillingOut(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
-
     @GetMapping(path = "/getUsageDetail")
     public Flux<?> getUsageDetail(@RequestParam String vouNo,
-                                  @RequestParam String compCode) {
+                                   @RequestParam String compCode) {
         return Flux.fromIterable(millingHisService.getMillingUsage(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 }
