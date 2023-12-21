@@ -389,51 +389,6 @@ add column dept_id int not null default 1 after comp_code,
 drop primary key,
 add primary key (td_code, dept_id);
 
-
-#tmp
-drop table if exists tmp_stock_opening;
-create table tmp_stock_opening (
-  tran_date date not null,
-  stock_code varchar(15) not null,
-  loc_code varchar(15) not null,
-  mac_id int(11) not null,
-  comp_code varchar(15) not null,
-  dept_id int(11) not null,
-  trader_code varchar(15) not null default '-',
-  unit varchar(15) default null,
-  ttl_weight double(20,3) default null,
-  ttl_qty double(20,3) default null,
-  primary key (tran_date,stock_code,loc_code,mac_id,comp_code,dept_id,trader_code)
-) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci comment='	';
-
-
-
-drop table if exists tmp_stock_io_column;
-create table tmp_stock_io_column (
-  tran_option varchar(15) not null,
-  tran_date date not null,
-  stock_code varchar(15) not null,
-  loc_code varchar(15) not null,
-  mac_id int(11) not null,
-  vou_no varchar(15) not null,
-  comp_code varchar(15) not null,
-  dept_id int(11) not null,
-  op_qty double(20,3) not null default 0.000,
-  pur_qty double(20,3) not null default 0.000,
-  in_qty double(20,3) not null default 0.000,
-  sale_qty double(20,3) not null default 0.000,
-  out_qty double(20,3) not null default 0.000,
-  remark varchar(255) default null,
-  trader_code varchar(15) not null default '-',
-  op_weight double(20,3) not null default 0.000,
-  pur_weight double(20,3) not null default 0.000,
-  in_weight double(20,3) not null default 0.000,
-  sale_weight double(20,3) not null default 0.000,
-  out_weight double(20,3) not null default 0.000,
-  primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
-) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
-
-
 create table process_his (
   vou_no varchar(15) not null,
   stock_code varchar(15) not null,
@@ -1453,12 +1408,6 @@ alter table sale_his_detail
 add column org_price double(20,3) null after total_weight,
 add column weight_loss double(20,3) null after org_price;
 
-#change
-alter table pur_his_detail
-add column rice double(20,3) null after m_percent,
-add column wet double(20,3) null after rice,
-add column bag double(20,3) null after wet;
-
 alter table pur_his
 add column weight_vou_no varchar(25) null after print_count,
 add column cash_acc varchar(15) null after weight_vou_no,
@@ -1583,27 +1532,28 @@ create table iss_rec_his_detail (
 alter table acc_setting
 add column updated_date timestamp not null default current_timestamp;
 
+#change
+alter table pur_his_detail
+add column rice double(20,3) default 0.0 after m_percent,
+add column wet double(20,3) default 0.0 after rice,
+add column bag double(20,3) default 0.0 after wet;
+
 alter table transfer_his_detail
-add column wet double(20,3) null after total_weight,
-add column rice double(20,3) null after wet,
-add column bag double(20,3) null after rice,
-add column price double(20,3) null after bag,
-add column amount double(20,3) null after price;
+add column wet double(20,3) default 0.0 after total_weight,
+add column rice double(20,3) default 0.0 after wet,
+add column bag double(20,3) default 0.0 after rice,
+add column price double(20,3) default 0.0 after bag,
+add column amount double(20,3) default 0.0 after price;
 
 alter table op_his_detail
-add column wet double(20,3) null after total_weight,
-add column rice double(20,3) null after wet,
-add column bag double(20,3) null after rice;
+add column wet double(20,3) default 0.0 after total_weight,
+add column rice double(20,3) default 0.0 after wet,
+add column bag double(20,3) default 0.0 after rice;
 
 alter table stock_in_out_detail
-add column wet double(20,3) null after total_weight,
-add column rice double(20,3) null after wet,
-add column bag double(20,3) null after rice;
-
-alter table stock_in_out_detail
-add column rice double(20,3) null after total_weight,
-add column wet double(20,3) null after rice,
-add column bag double(20,3) null after wet;
+add column rice double(20,3) default 0.0 after total_weight,
+add column wet double(20,3) default 0.0 after rice,
+add column bag double(20,3) default 0.0 after wet;
 
 alter table vou_status
 add column mill_report_name varchar(255) null after report_name;
@@ -1614,6 +1564,59 @@ alter table sale_his
 add column dept_code varchar(15) null after print_count,
 add column cash_acc varchar(15) null after dept_code,
 add column debtor_acc varchar(15) null after cash_acc;
+
+#tmp
+drop table if exists tmp_stock_io_column;
+create table tmp_stock_io_column (
+  tran_option varchar(15) not null,
+  tran_date date not null,
+  stock_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  mac_id int(11) not null,
+  vou_no varchar(15) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  op_qty double(20,3) not null default 0.000,
+  pur_qty double(20,3) not null default 0.000,
+  in_qty double(20,3) not null default 0.000,
+  sale_qty double(20,3) not null default 0.000,
+  out_qty double(20,3) not null default 0.000,
+  remark varchar(255) default null,
+  trader_code varchar(15) not null default '-',
+  op_weight double(20,3) not null default 0.000,
+  pur_weight double(20,3) not null default 0.000,
+  in_weight double(20,3) not null default 0.000,
+  sale_weight double(20,3) not null default 0.000,
+  out_weight double(20,3) not null default 0.000,
+  wet double(20,3) default null,
+  rice double(20,3) default null,
+  op_bag double(20,3) default null,
+  pur_bag double(20,3) default null,
+  in_bag double(20,3) default null,
+  sale_bag double(20,3) default null,
+  out_bag double(20,3) default null,
+  ttl_amt double(20,3) default null,
+  primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
+) engine=innodb default charset=utf8mb3;
+
+drop table if exists tmp_stock_opening;
+create table tmp_stock_opening (
+  tran_date date not null,
+  stock_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  unit varchar(15) not null,
+  mac_id int(11) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  trader_code varchar(15) not null default '-',
+  ttl_weight double(20,3) default null,
+  ttl_qty double(20,3) default null,
+  ttl_wet double(20,3) default null,
+  ttl_rice double(20,3) default null,
+  ttl_bag double(20,3) default null,
+  ttl_amt double(20,3) default null,
+  primary key (tran_date,stock_code,loc_code,unit,mac_id,comp_code,dept_id,trader_code)
+) engine=innodb default charset=utf8mb3 comment='	';
 
 
 #view
@@ -1634,7 +1637,7 @@ create  view v_weight_loss as select wlh.vou_no as vou_no,wlh.comp_code as comp_
 drop view if exists v_purchase;
 create  view v_purchase as select ph.project_no as project_no,ph.vou_date as vou_date,ph.balance as balance,ph.deleted as deleted,ph.discount as discount,ph.due_date as due_date,ph.paid as paid,ph.remark as remark,ph.ref_no as ref_no,ph.updated_by as updated_by,ph.updated_date as updated_date,ph.created_by as created_by,ph.created_date as created_date,ph.vou_total as vou_total,ph.cur_code as cur_code,ph.trader_code as trader_code,ph.disc_p as disc_p,ph.tax_p as tax_p,ph.tax_amt as tax_amt,ph.dept_id as dept_id,ph.intg_upd_status as intg_upd_status,ph.comp_code as comp_code,ph.reference as reference,ph.batch_no as batch_no,ph.labour_group_code as labour_group_code,ph.land_vou_no as land_vou_no,ph.grand_total as grand_total,pd.vou_no as vou_no,pd.stock_code as stock_code,pd.exp_date as exp_date,pd.avg_qty as avg_qty,pd.qty as qty,pd.weight as weight,pd.weight_unit as weight_unit,pd.std_weight as std_weight,pd.pur_unit as pur_unit,pd.pur_price as pur_price,pd.pur_amt as pur_amt,pd.loc_code as loc_code,pd.unique_id as unique_id,pd.total_weight as total_weight,pd.wet as wet,pd.rice as rice,pd.bag as bag,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((pur_his ph join pur_his_detail pd on(ph.vou_no = pd.vou_no and ph.comp_code = pd.comp_code)) join stock s on(pd.stock_code = s.stock_code and pd.comp_code = s.comp_code));
 drop view if exists v_transfer;
-create  view v_transfer as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.ref_no as ref_no,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code_from as loc_code_from,th.loc_code_to as loc_code_to,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.labour_group_code as labour_group_code,td.stock_code as stock_code,td.qty as qty,td.unit as unit,td.unique_id as unique_id,td.weight as weight,td.weight_unit as weight_unit,td.total_weight as total_weight,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((transfer_his th join transfer_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
+create view v_transfer as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.ref_no as ref_no,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code_from as loc_code_from,th.loc_code_to as loc_code_to,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.labour_group_code as labour_group_code,td.stock_code as stock_code,td.qty as qty,td.unit as unit,td.unique_id as unique_id,td.weight as weight,td.weight_unit as weight_unit,td.total_weight as total_weight,td.wet as wet,td.rice as rice,td.bag as bag,td.price as price,td.amount as amount,s.user_code as user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((transfer_his th join transfer_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
 drop view if exists v_milling_usage;
 create  view v_milling_usage as select mh.vou_no as vou_no,mh.comp_code as comp_code,mh.trader_code as trader_code,mh.vou_date as vou_date,mh.remark as remark,mh.deleted as deleted,mh.job_no as job_no,mu.stock_code as stock_code,mu.qty as qty,mu.unit as unit,mu.loc_code as loc_code,s.user_code as user_code,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.calculate as calculate,s.rel_code as rel_code from ((milling_his mh join milling_usage mu on(mh.vou_no = mu.vou_no and mh.comp_code = mu.comp_code)) join stock s on(mu.stock_code = s.stock_code and mu.comp_code = s.comp_code));
 drop view if exists v_process_his_detail;
