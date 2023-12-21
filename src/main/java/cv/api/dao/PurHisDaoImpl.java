@@ -100,7 +100,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         PurHis obj =findById(key);
         obj.setDeleted(true);
         obj.setUpdatedDate(LocalDateTime.now());
-        update(obj);
+        updateEntity(obj);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         PurHis obj =findById(key);
         obj.setDeleted(false);
         obj.setUpdatedDate(LocalDateTime.now());
-        update(obj);
+        updateEntity(obj);
     }
 
 

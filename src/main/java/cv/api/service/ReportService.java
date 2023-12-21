@@ -163,15 +163,10 @@ public interface ReportService {
                                String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
                                String projectNo, String curCode);
 
-    List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
-                                 String remark, String reference, String userCode, String stockCode, String locCode,
-                                 String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
-                                 String projectNo, String curCode, String orderStatus);
 
     List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
                                        String userCode, String stockCode, String locCode, String compCode,
                                        Integer deptId, String deleted, String projectNo, String curCode) throws Exception;
-
 
 
     List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
@@ -266,12 +261,13 @@ public interface ReportService {
                                                       boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                       boolean calMill,
                                                       String compCode, Integer deptId, Integer macId);
+
     List<ClosingBalance> getStockInOutSummaryByPaddy(String opDate, String fromDate, String toDate,
-                                                      String typeCode, String catCode, String brandCode,
-                                                      String stockCode, String vouTypeCode,
-                                                      boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                                      boolean calMill,
-                                                      String compCode, Integer deptId, Integer macId);
+                                                     String typeCode, String catCode, String brandCode,
+                                                     String stockCode, String vouTypeCode,
+                                                     boolean calSale, boolean calPur, boolean calRI, boolean calRO,
+                                                     boolean calMill,
+                                                     String compCode, Integer deptId, Integer macId);
 
     VLanding getLandingReport(String vouNo, String compCode);
 
@@ -283,17 +279,28 @@ public interface ReportService {
     List<ClosingBalance> getStockPayableConsignor(String opDate, String fromDate, String toDate, String traderCode, String stockCode, String compCode, int macId, boolean summary);
 
     List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode, String stockCode,
-                                    String groupCode, String catCode, String brandCode, String locCode,String labourGroupCode);
-    List<VPurchase> getTopPurchasePaddy(String fromDate,String toDate,String compCode,
-                                        String stockCode,String groupCode,String catCode,
-                                        String brandCode,String locCode);
-    List<VStockIssueReceive> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
-                                                         String vouNo, String remark, String locCode,Integer deptId,
+                                    String groupCode, String catCode, String brandCode, String locCode, String labourGroupCode);
+
+    List<VPurchase> getTopPurchasePaddy(String fromDate, String toDate, String compCode,
+                                        String stockCode, String groupCode, String catCode,
+                                        String brandCode, String locCode);
+
+    List<VStockIssueReceive> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
+                                                         String vouNo, String remark, String locCode, Integer deptId,
                                                          boolean deleted, String compCode, int transSource);
 
-    List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
-                                                         String vouNo, String remark, String locCode,Integer deptId,
-                                                         boolean deleted, String compCode, int transSource);
+    //    List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
+//                                                         String vouNo, String remark, Integer deptId,
+//                                                         boolean deleted, String compCode);
+    List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
+                                       String vouNo, String remark, Integer deptId,
+                                       boolean deleted, String compCode);
+
+    List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
+                                 String remark, String reference, String userCode, String stockCode, String locCode,
+                                 String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
+                                 String projectNo, String curCode, String orderStatus);
+
     List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
                                        String userCode, String stockCode, String locCode, String compCode,
                                        Integer deptId, boolean deleted, String projectNo, String curCode, String jobNo) throws Exception;

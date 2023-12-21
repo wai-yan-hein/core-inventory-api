@@ -6,7 +6,6 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.RetInHis;
 import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +98,7 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
         RetOutHis s = findById(key);
         s.setDeleted(true);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
     }
 
     @Override
@@ -107,7 +106,7 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
         RetOutHis s = findById(key);
         s.setDeleted(false);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
     }
 
 

@@ -6,14 +6,11 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,6 +64,8 @@ public class OrderHis {
     private String projectNo;
     @Column(name = "order_status")
     private String orderStatus;
+    @Column(name = "post")
+    private boolean post;
     @Transient
     private String status = "STATUS";
     @Transient

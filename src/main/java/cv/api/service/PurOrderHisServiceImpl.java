@@ -28,6 +28,7 @@ public class PurOrderHisServiceImpl implements PurOrderHisService {
     @Override
     public PurOrderHis save(PurOrderHis obj) {
         obj.setVouDate(Util1.toDateTime(obj.getVouDate()));
+        obj.setDueDate(Util1.toDateTime(obj.getDueDate()));
         if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
             obj.getKey().setVouNo(getVoucherNo(obj.getDeptId(), obj.getMacId(), obj.getKey().getCompCode()));
         }
@@ -36,7 +37,7 @@ public class PurOrderHisServiceImpl implements PurOrderHisService {
         //delete detail
         boolean delete = detailDao.deletePurOrderHisDetail(vouNo, compCode);
         if (delete) {
-            List<PurOrderHisDetail> listDetail = obj.getListPurOrderHisDetail();
+            List<PurOrderHisDetail> listDetail = obj.getListPurOrderDetail();
             for (int i = 0; i < listDetail.size(); i++) {
                 PurOrderHisDetail cSd = listDetail.get(i);
                 if (cSd.getStockCode() != null) {
@@ -62,8 +63,6 @@ public class PurOrderHisServiceImpl implements PurOrderHisService {
                     }
                     detailDao.save(cSd);
                 }
-
-//                obj.setListIRDetail(listDetail);
             }
             dao.save(obj);
         }

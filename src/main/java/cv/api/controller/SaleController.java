@@ -112,7 +112,7 @@ public class SaleController {
     }
 
     @PostMapping(path = "/deleteSale")
-    public Mono<?> deleteSale(@RequestBody SaleHisKey key) throws Exception {
+    public Mono<?> deleteSale(@RequestBody SaleHisKey key) {
         shService.delete(key);
         //delete in account
         accountRepo.deleteInvVoucher(key);

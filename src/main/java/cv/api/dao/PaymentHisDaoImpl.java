@@ -35,14 +35,14 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
     public void restore(PaymentHisKey key) {
         PaymentHis ph = getByKey(key);
         ph.setDeleted(false);
-        update(ph);
+        updateEntity(ph);
     }
 
     @Override
     public void delete(PaymentHisKey key) {
         PaymentHis ph = getByKey(key);
         ph.setDeleted(true);
-        update(ph);
+        updateEntity(ph);
     }
 
     @Override

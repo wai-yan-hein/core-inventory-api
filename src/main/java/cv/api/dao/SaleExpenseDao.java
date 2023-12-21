@@ -1,6 +1,5 @@
 package cv.api.dao;
 
-import cv.api.entity.PurExpense;
 import cv.api.entity.SaleExpense;
 import cv.api.entity.SaleExpenseKey;
 

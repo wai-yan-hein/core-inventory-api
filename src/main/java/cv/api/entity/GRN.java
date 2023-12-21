@@ -1,13 +1,10 @@
 package cv.api.entity;
 
-import lombok.Data;
-
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data

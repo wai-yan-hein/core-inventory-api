@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.common.General;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisKey;
+import cv.api.model.VOrder;
 
 import java.util.Date;
 import java.util.List;
@@ -21,8 +22,7 @@ public interface OrderHisService {
 
     OrderHis update(OrderHis orderHis);
 
-    List<OrderHis> search(String fromDate, String toDate, String cusCode,
-                         String vouNo, String remark, String userCode);
+
 
     OrderHis findById(OrderHisKey id);
 

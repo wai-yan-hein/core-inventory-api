@@ -98,7 +98,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
         RetInHis s = findById(key);
         s.setDeleted(true);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
         RetInHis s = findById(key);
         s.setDeleted(false);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package cv.api.dao;
 
-import cv.api.entity.StockFormulaPrice;
-import cv.api.entity.StockFormulaPriceKey;
 import cv.api.entity.StockFormulaQty;
 import cv.api.entity.StockFormulaQtyKey;
 

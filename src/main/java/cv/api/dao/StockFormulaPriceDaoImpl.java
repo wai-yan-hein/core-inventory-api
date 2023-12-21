@@ -1,6 +1,7 @@
 package cv.api.dao;
 
-import cv.api.entity.*;
+import cv.api.entity.StockFormulaPrice;
+import cv.api.entity.StockFormulaPriceKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 

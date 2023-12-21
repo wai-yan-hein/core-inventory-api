@@ -14,12 +14,12 @@ import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
+import cv.api.model.VOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -83,10 +83,8 @@ public class OrderHisServiceImpl implements OrderHisService {
         return shDao.save(orderHis);
     }
 
-    @Override
-    public List<OrderHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
-        return shDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
-    }
+
+
 
     @Override
     public OrderHis findById(OrderHisKey id) {

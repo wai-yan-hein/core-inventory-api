@@ -8,7 +8,6 @@ package cv.api.service;
 import cv.api.dao.AccSettingDao;
 import cv.api.entity.AccKey;
 import cv.api.entity.AccSetting;
-import cv.api.entity.OutputCost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

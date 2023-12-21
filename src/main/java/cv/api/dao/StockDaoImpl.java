@@ -47,7 +47,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         Stock s = findById(key);
         s.setDeleted(true);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
         return 1;
     }
 
@@ -299,7 +299,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         obj.setSaleClosed(s.isSaleClosed());
         obj.setFavorite(s.isFavorite());
         obj.setUpdatedDate(LocalDateTime.now());
-        update(obj);
+        updateEntity(obj);
         return obj;
     }
 
@@ -309,7 +309,7 @@ public class StockDaoImpl extends AbstractDao<StockKey, Stock> implements StockD
         if(s!=null){
             s.setDeleted(false);
             s.setUpdatedDate(LocalDateTime.now());
-            update(s);
+            updateEntity(s);
             return true;
         }
         return false;

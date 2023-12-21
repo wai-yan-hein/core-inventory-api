@@ -12,7 +12,6 @@ import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +33,8 @@ public class SaleHisServiceImpl implements SaleHisService {
     private final SeqTableDao seqDao;
     private final SaleExpenseDao saleExpenseDao;
     private final VouDiscountDao vouDiscountDao;
+    private final SaleOrderJoinDao saleOrderJoinDao;
+    private final OrderHisDao orderHisDao;
 
     @Override
     public SaleHis save(@NotNull SaleHis saleHis) {
@@ -57,12 +58,15 @@ public class SaleHisServiceImpl implements SaleHisService {
         }
         List<SaleExpense> listExp = saleHis.getListExpense();
         List<VouDiscount> listDiscount = saleHis.getListVouDiscount();
+        List<String> listOrder = saleHis.getListOrder();
         //save expense
         saveSaleExpense(listExp, saleHis);
         //save detail
         saveDetail(listSD, saleHis);
         //save vou discount
         saveVouDiscount(listDiscount, saleHis);
+        //save sale order join
+        saveSaleOrderJoin(listOrder, saleHis);
         shDao.save(saleHis);
         saleHis.setListSH(listSD);
         return saleHis;
@@ -73,7 +77,7 @@ public class SaleHisServiceImpl implements SaleHisService {
         if (listExp != null) {
             for (int i = 0; i < listExp.size(); i++) {
                 SaleExpense e = listExp.get(i);
-                if (Util1.getFloat(e.getAmount()) > 0) {
+                if (Util1.getDouble(e.getAmount()) > 0) {
                     if (e.getKey().getExpenseCode() != null) {
                         if (e.getKey().getUniqueId() == 0) {
                             if (i == 0) {
@@ -144,6 +148,37 @@ public class SaleHisServiceImpl implements SaleHisService {
         }
     }
 
+    private void saveSaleOrderJoin(List<String> list, SaleHis sh) {
+        if (list != null) {
+            List<SaleOrderJoin> listJoin = saleOrderJoinDao.getSaleOrder(sh.getKey().getVouNo(), sh.getKey().getCompCode());
+            listJoin.forEach(join -> saleOrderJoinDao.deleteOrder(join.getKey()));
+            String saleVouNo = sh.getKey().getVouNo();
+            String compCode = sh.getKey().getCompCode();
+            for (String orderNo : list) {
+                SaleOrderJoin obj = new SaleOrderJoin();
+                SaleOrderJoinKey key = new SaleOrderJoinKey();
+                key.setSaleVouNo(saleVouNo);
+                key.setOrderVouNo(orderNo);
+                key.setCompCode(compCode);
+                obj.setKey(key);
+                saleOrderJoinDao.save(obj);
+                //update order
+                OrderHisKey orderKey = new OrderHisKey();
+                orderKey.setVouNo(orderNo);
+                orderKey.setCompCode(compCode);
+                updateOrder(orderKey, true);
+            }
+        }
+    }
+
+    private void updateOrder(OrderHisKey key, boolean post) {
+        OrderHis oh = orderHisDao.findById(key);
+        if (oh != null) {
+            oh.setPost(post);
+            orderHisDao.update(oh);
+        }
+    }
+
     @Override
     public SaleHis update(SaleHis saleHis) {
         return shDao.save(saleHis);
@@ -160,8 +195,15 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public void delete(SaleHisKey key) throws Exception {
+    public void delete(SaleHisKey key) {
         shDao.delete(key);
+        List<SaleOrderJoin> list = saleOrderJoinDao.getSaleOrder(key.getVouNo(), key.getCompCode());
+        list.forEach(order -> {
+            OrderHisKey orderKey = new OrderHisKey();
+            orderKey.setVouNo(order.getKey().getOrderVouNo());
+            orderKey.setCompCode(order.getKey().getCompCode());
+            updateOrder(orderKey, false);
+        });
     }
 
     @Override
@@ -205,12 +247,12 @@ public class SaleHisServiceImpl implements SaleHisService {
 
     @Override
     public List<VouDiscount> getVoucherDiscount(String vouNo, String compCode) {
-        return vouDiscountDao.getVoucherDiscount(vouNo,compCode);
+        return vouDiscountDao.getVoucherDiscount(vouNo, compCode);
     }
 
     @Override
     public List<VouDiscount> searchDiscountDescription(String str, String compCode) {
-        return vouDiscountDao.getDescription(str,compCode);
+        return vouDiscountDao.getDescription(str, compCode);
     }
 
 

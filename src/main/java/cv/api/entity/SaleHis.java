@@ -6,13 +6,11 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -126,5 +124,7 @@ public class SaleHis {
     private List<VouDiscountKey> listDelVouDiscount;
     @Transient
     private ZonedDateTime vouDateTime;
+    @Transient
+    private List<String> listOrder;
 
 }

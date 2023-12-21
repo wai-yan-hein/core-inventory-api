@@ -36,13 +36,13 @@ public class PurOrderHisDetailDaoImpl extends AbstractDao<PurOrderHisDetailKey, 
         String sql = """
                 select op.*,s.stock_name,s.user_code 
                 from pur_order_his_detail op
-                join location l on op.loc_code = l.loc_code
-                and op.comp_code =l.comp_code
                 join stock s on op.stock_code = s.stock_code
                 and op.comp_code =s.comp_code
                 where op.vou_no =?
                 and op.comp_code =?
                 """;
+        //                join location l on op.loc_code = l.loc_code
+//                and op.comp_code =l.comp_code
         ResultSet rs = getResult(sql, vouNo, compCode);
         try {
             while (rs.next()) {

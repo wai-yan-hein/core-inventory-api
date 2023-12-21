@@ -1,7 +1,5 @@
 package cv.api.dao;
 
-import cv.api.entity.PurExpense;
-import cv.api.entity.PurExpenseKey;
 import cv.api.entity.SaleExpense;
 import cv.api.entity.SaleExpenseKey;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +44,7 @@ public class SaleExpenseDaoImpl extends AbstractDao<SaleExpenseKey, SaleExpense>
                     key.setVouNo(rs.getString("vou_no"));
                     e.setKey(key);
                     e.setExpenseName(rs.getString("expense_name"));
-                    e.setAmount(rs.getFloat("amount"));
+                    e.setAmount(rs.getDouble("amount"));
                     list.add(e);
                 }
             } catch (Exception e) {

@@ -6,8 +6,6 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.Category;
-import cv.api.entity.CategoryKey;
 import cv.api.entity.OutputCost;
 import cv.api.entity.OutputCostKey;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,6 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.TransferHis;
 import cv.api.entity.WeightLossHis;
 import cv.api.entity.WeightLossHisKey;
 import org.springframework.stereotype.Repository;
@@ -31,7 +30,7 @@ public class WeightLossDaoImpl extends AbstractDao<WeightLossHisKey, WeightLossH
         WeightLossHis th = findById(key);
         th.setDeleted(true);
         th.setUpdatedDate(LocalDateTime.now());
-        update(th);
+        updateEntity(th);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class WeightLossDaoImpl extends AbstractDao<WeightLossHisKey, WeightLossH
         WeightLossHis th = findById(key);
         th.setDeleted(false);
         th.setUpdatedDate(LocalDateTime.now());
-        update(th);
+        updateEntity(th);
     }
 
     @Override

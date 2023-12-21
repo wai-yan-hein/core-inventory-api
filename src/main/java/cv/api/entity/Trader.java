@@ -5,11 +5,13 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data

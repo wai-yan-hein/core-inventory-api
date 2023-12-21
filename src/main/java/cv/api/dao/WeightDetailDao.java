@@ -1,9 +1,7 @@
 package cv.api.dao;
 
-import cv.api.entity.WeightHis;
 import cv.api.entity.WeightHisDetail;
 import cv.api.entity.WeightHisDetailKey;
-import cv.api.entity.WeightHisKey;
 import cv.api.model.WeightColumn;
 
 import java.util.List;

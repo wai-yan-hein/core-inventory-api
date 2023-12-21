@@ -1,6 +1,7 @@
 package cv.api.dao;
 
-import cv.api.entity.*;
+import cv.api.entity.LandingHisGrade;
+import cv.api.entity.LandingHisGradeKey;
 
 import java.util.List;
 

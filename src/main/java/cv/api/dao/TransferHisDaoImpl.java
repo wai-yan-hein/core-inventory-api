@@ -52,7 +52,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         TransferHis th = findById(key);
         th.setDeleted(true);
         th.setUpdatedDate(LocalDateTime.now());
-        update(th);
+        updateEntity(th);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         TransferHis th = findById(key);
         th.setDeleted(false);
         th.setUpdatedDate(LocalDateTime.now());
-        update(th);
+        updateEntity(th);
     }
 
     @Override

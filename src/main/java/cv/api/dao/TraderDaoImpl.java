@@ -141,7 +141,7 @@ public class TraderDaoImpl extends AbstractDao<TraderKey, Trader> implements Tra
         Trader t = findById(key);
         t.setDeleted(true);
         t.setUpdatedDate(LocalDateTime.now());
-        update(t);
+        updateEntity(t);
         return 1;
     }
 

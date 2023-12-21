@@ -6,9 +6,10 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.Data;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**

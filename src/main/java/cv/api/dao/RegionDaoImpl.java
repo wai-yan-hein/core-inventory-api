@@ -80,7 +80,7 @@ public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements Reg
         Region r =getByKey(key);
         r.setDeleted(true);
         r.setUpdatedDate(LocalDateTime.now());
-        update(r);
+        updateEntity(r);
         return 1;
     }
 

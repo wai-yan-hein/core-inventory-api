@@ -56,7 +56,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         OPHis op = findByCode(key);
         op.setDeleted(true);
         op.setUpdatedDate(LocalDateTime.now());
-        update(op);
+        updateEntity(op);
         return true;
     }
 
@@ -65,7 +65,7 @@ public class OPHisDaoImpl extends AbstractDao<OPHisKey, OPHis> implements OPHisD
         OPHis op = findByCode(key);
         op.setDeleted(false);
         op.setUpdatedDate(LocalDateTime.now());
-        update(op);
+        updateEntity(op);
         return true;
     }
 

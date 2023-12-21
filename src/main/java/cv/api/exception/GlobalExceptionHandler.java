@@ -1,7 +1,6 @@
 package cv.api.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import net.lingala.zip4j.exception.ZipException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -66,7 +66,6 @@ public class SecurityConfig {
         authenticationWebFilter.setSecurityContextRepository(sessionConfig);
         return authenticationWebFilter;
     }
-    @Bean
     public void corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // allow cookies

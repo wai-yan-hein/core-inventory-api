@@ -8,6 +8,8 @@ package cv.api.dao;
 import cv.api.common.General;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisKey;
+import cv.api.model.VOrder;
+import jakarta.persistence.criteria.Order;
 
 import java.util.Date;
 import java.util.List;
@@ -18,9 +20,12 @@ import java.util.List;
 public interface OrderHisDao {
 
     OrderHis save(OrderHis sh);
+    void update(OrderHis oh);
 
-    List<OrderHis> search(String fromDate, String toDate, String cusCode,
-                         String vouNo, String remark, String userCode);
+    List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
+                                 String remark, String reference, String userCode, String stockCode, String locCode,
+                                 String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
+                                 String projectNo, String curCode, String orderStatus);
 
     OrderHis findById(OrderHisKey id);
 

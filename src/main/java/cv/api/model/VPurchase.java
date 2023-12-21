@@ -2,10 +2,8 @@ package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.LandingHisPrice;
-import cv.api.entity.LandingHisQty;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data

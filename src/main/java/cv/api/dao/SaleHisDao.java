@@ -25,7 +25,7 @@ public interface SaleHisDao {
 
     SaleHis findById(SaleHisKey id);
 
-    void delete(SaleHisKey key) throws Exception;
+    void delete(SaleHisKey key);
 
     void restore(SaleHisKey key) throws Exception;
 

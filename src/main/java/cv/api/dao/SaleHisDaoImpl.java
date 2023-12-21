@@ -7,7 +7,6 @@ package cv.api.dao;
 
 import cv.api.common.General;
 import cv.api.common.Util1;
-import cv.api.entity.RetOutHis;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -96,11 +94,11 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     }
 
     @Override
-    public void delete(SaleHisKey key) throws Exception {
+    public void delete(SaleHisKey key) {
         SaleHis s = findById(key);
         s.setDeleted(true);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
     }
 
     @Override
@@ -108,7 +106,7 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
         SaleHis s = findById(key);
         s.setDeleted(false);
         s.setUpdatedDate(LocalDateTime.now());
-        update(s);
+        updateEntity(s);
     }
 
 

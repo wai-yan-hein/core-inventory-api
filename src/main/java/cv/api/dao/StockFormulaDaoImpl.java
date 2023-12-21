@@ -2,8 +2,6 @@ package cv.api.dao;
 
 import cv.api.entity.StockFormula;
 import cv.api.entity.StockFormulaKey;
-import cv.api.entity.StockFormulaPrice;
-import cv.api.entity.StockFormulaQty;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -29,7 +27,7 @@ public class StockFormulaDaoImpl extends AbstractDao<StockFormulaKey, StockFormu
         if (f != null) {
             f.setDeleted(true);
             f.setUpdatedDate(LocalDateTime.now());
-            update(f);
+            updateEntity(f);
             return true;
         }
         return false;

@@ -1,7 +1,6 @@
 package cv.api.service;
 
 import cv.api.dao.PatternDao;
-import cv.api.entity.Job;
 import cv.api.entity.Pattern;
 import cv.api.entity.PatternKey;
 import org.springframework.beans.factory.annotation.Autowired;

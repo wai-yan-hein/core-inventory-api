@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisKey;
+import cv.api.model.VOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wai yan
@@ -37,53 +39,11 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
     }
 
     @Override
-    public List<OrderHis> search(String fromDate, String toDate, String cusCode,
-                                 String vouNo, String remark, String userCode) {
-        String strFilter = "";
-
-        if (!fromDate.equals("-") && !toDate.equals("-")) {
-            strFilter = "date(o.vouDate) between '" + fromDate
-                    + "' and '" + toDate + "'";
-        } else if (!fromDate.equals("-")) {
-            strFilter = "date(o.vouDate) >= '" + fromDate + "'";
-        } else if (!toDate.equals("-")) {
-            strFilter = "date(o.vouDate) <= '" + toDate + "'";
-        }
-        if (!cusCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.trader.code = '" + cusCode + "'";
-            } else {
-                strFilter = strFilter + " and o.trader.code = '" + cusCode + "'";
-            }
-        }
-        if (!vouNo.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.vouNo = '" + vouNo + "'";
-            } else {
-                strFilter = strFilter + " and o.vouNo = '" + vouNo + "'";
-            }
-        }
-        if (!userCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.createdBy = '" + userCode + "'";
-            } else {
-                strFilter = strFilter + " and o.createdBy = '" + userCode + "'";
-            }
-        }
-        if (!remark.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.remark like '" + remark + "%'";
-            } else {
-                strFilter = strFilter + " and o.remark like '" + remark + "%'";
-            }
-        }
-        String strSql = "select o from OrderHis o";
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter + " order by o.vouDate,o.vouNo";
-        }
-
-        return findHSQL(strSql);
+    public void update(OrderHis oh) {
+        updateEntity(oh);
     }
+
+
 
     @Override
     public OrderHis findById(OrderHisKey id) {
@@ -172,5 +132,88 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
             log.error("getVoucherCount : " + e.getMessage());
         }
         return g;
+    }
+    @Override
+    public List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode,
+                                        String vouNo, String remark, String reference,
+                                        String userCode, String stockCode, String locCode,
+                                        String compCode, Integer deptId, String deleted,
+                                        String nullBatch, String batchNo, String projectNo, String curCode, String orderStauts) {
+        List<VOrder> saleList = new ArrayList<>();
+        String filter = "";
+        if (!vouNo.equals("-")) {
+            filter += "and vou_no = '" + vouNo + "'\n";
+        }
+        if (!remark.equals("-")) {
+            filter += "and remark like '" + remark + "%'\n";
+        }
+        if (!reference.equals("-")) {
+            filter += "and reference like '" + reference + "%'\n";
+        }
+        if (!traderCode.equals("-")) {
+            filter += "and trader_code = '" + traderCode + "'\n";
+        }
+        if (!userCode.equals("-")) {
+            filter += "and created_by = '" + userCode + "'\n";
+        }
+        if (!stockCode.equals("-")) {
+            filter += "and stock_code = '" + stockCode + "'\n";
+        }
+        if (!saleManCode.equals("-")) {
+            filter += "and saleman_code = '" + saleManCode + "'\n";
+        }
+        if (!locCode.equals("-")) {
+            filter += "and loc_code = '" + locCode + "'\n";
+        }
+        if (!projectNo.equals("-")) {
+            filter += "and project_no = '" + projectNo + "'\n";
+        }
+        if (!curCode.equals("-")) {
+            filter += "and cur_code = '" + curCode + "'\n";
+        }
+        if (!orderStauts.equals("-")) {
+            filter += "and order_status = '" + orderStauts + "'\n";
+        }
+        String sql = "select a.*,t.trader_name,t.user_code,os.description order_status_name\n" +
+                "from (\n" +
+                "select  vou_no,vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code," +
+                "comp_code,dept_id,order_status,post\n" +
+                "from v_order s \n" +
+                "where comp_code = '" + compCode + "'\n" +
+                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
+                "and deleted = " + deleted + "\n" +
+                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" +
+                "group by vou_no\n" + ")a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "left join order_status os on a.order_status = os.code\n" +
+                "and a.comp_code = os.comp_code\n" +
+                "order by vou_date desc";
+        try {
+            ResultSet rs = getResult(sql);
+            if (!Objects.isNull(rs)) {
+                while (rs.next()) {
+                    VOrder s = new VOrder();
+                    s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
+                    s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
+                    s.setVouNo(rs.getString("vou_no"));
+                    s.setTraderCode(rs.getString("user_code"));
+                    s.setTraderName(rs.getString("trader_name"));
+                    s.setRemark(rs.getString("remark"));
+                    s.setReference(rs.getString("reference"));
+                    s.setCreatedBy(rs.getString("created_by"));
+                    s.setVouTotal(rs.getDouble("vou_total"));
+                    s.setDeleted(rs.getBoolean("deleted"));
+                    s.setDeptId(rs.getInt("dept_id"));
+                    s.setOrderStatus(rs.getString("order_status"));
+                    s.setOrderStatusName(rs.getString("order_status_name"));
+                    s.setPost(rs.getBoolean("post"));
+                    saleList.add(s);
+                }
+            }
+        } catch (Exception e) {
+            log.error("getSaleHistory : " + e.getMessage());
+        }
+        return saleList;
     }
 }

@@ -64,7 +64,7 @@ public class PurOrderHis implements Serializable {
     @Transient
     private String status = "STATUS";
     @Transient
-    private List<PurOrderHisDetail> listPurOrderHisDetail;
+    private List<PurOrderHisDetail> listPurOrderDetail;
     @Transient
     private List<PurOrderHisKey> listDel;
     @Transient

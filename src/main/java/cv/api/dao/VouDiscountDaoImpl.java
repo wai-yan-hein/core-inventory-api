@@ -1,7 +1,5 @@
 package cv.api.dao;
 
-import cv.api.entity.SaleExpense;
-import cv.api.entity.SaleExpenseKey;
 import cv.api.entity.VouDiscount;
 import cv.api.entity.VouDiscountKey;
 import lombok.extern.slf4j.Slf4j;

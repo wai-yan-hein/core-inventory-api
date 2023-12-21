@@ -32,7 +32,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
         if (his != null) {
             his.setDeleted(true);
             his.setUpdatedDate(LocalDateTime.now());
-            update(his);
+            updateEntity(his);
         }
         return true;
     }
@@ -43,7 +43,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
         if (his != null) {
             his.setDeleted(false);
             his.setUpdatedDate(LocalDateTime.now());
-            update(his);
+            updateEntity(his);
         }
         return true;
     }

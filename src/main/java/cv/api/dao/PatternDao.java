@@ -1,6 +1,5 @@
 package cv.api.dao;
 
-import cv.api.entity.Job;
 import cv.api.entity.Pattern;
 import cv.api.entity.PatternKey;
 
