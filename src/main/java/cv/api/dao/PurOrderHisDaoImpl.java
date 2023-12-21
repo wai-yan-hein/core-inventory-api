@@ -28,7 +28,7 @@ public class PurOrderHisDaoImpl extends AbstractDao<PurOrderHisKey, PurOrderHis>
         if (his != null) {
             his.setDeleted(true);
             his.setUpdatedDate(LocalDateTime.now());
-            update(his);
+            updateEntity(his);
         }
         return true;
     }
@@ -39,7 +39,7 @@ public class PurOrderHisDaoImpl extends AbstractDao<PurOrderHisKey, PurOrderHis>
         if (his != null) {
             his.setDeleted(false);
             his.setUpdatedDate(LocalDateTime.now());
-            update(his);
+            updateEntity(his);
         }
         return true;
     }
