@@ -19,7 +19,7 @@ import java.util.List;
  */
 public interface ReportService {
 
-    void insertTmp(List<String> listStr, Integer macId, String taleName);
+    void insertTmp(List<String> listStr, Integer macId, String taleName, String warehouse);
 
     void executeSql(String... sql) throws Exception;
 
@@ -267,7 +267,7 @@ public interface ReportService {
                                                      String stockCode, String vouTypeCode,
                                                      boolean calSale, boolean calPur, boolean calRI, boolean calRO,
                                                      boolean calMill,
-                                                     String compCode, Integer deptId, Integer macId);
+                                                     String compCode, Integer deptId, Integer macId, String warehouse);
 
     VLanding getLandingReport(String vouNo, String compCode);
 

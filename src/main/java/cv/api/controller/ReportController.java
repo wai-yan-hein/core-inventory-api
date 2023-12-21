@@ -159,7 +159,8 @@ public class ReportController {
                 String fromDueDate = filter.getFromDueDate();
                 String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
-                reportService.insertTmp(filter.getListLocation(), macId, "f_location");
+                String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
+                reportService.insertTmp(filter.getListLocation(), macId, "f_location", warehouse);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         List<VSale> saleByCustomer = reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
@@ -304,7 +305,7 @@ public class ReportController {
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutSummaryByPaddy" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByPaddy(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByPaddy(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId, warehouse);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetailByWeight" -> {

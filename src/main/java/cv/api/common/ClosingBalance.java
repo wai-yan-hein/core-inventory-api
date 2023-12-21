@@ -73,4 +73,5 @@ public class ClosingBalance {
     private double rice;
     private double bag;
     private double price;
+    private String warehouse;
 }

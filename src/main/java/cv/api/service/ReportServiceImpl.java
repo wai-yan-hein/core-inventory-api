@@ -4422,19 +4422,20 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<ClosingBalance> getStockInOutSummaryByPaddy(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode,
                                                             String stockCode, String vouTypeCode, boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                                            boolean calMill, String compCode, Integer deptId, Integer macId) {
+                                                            boolean calMill, String compCode, Integer deptId, Integer macId, String warehouse) {
         calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
         calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
         String getSql = "select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,\n" +
                 "sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight+a.sale_weight) bal_weight, \n" +
                 "sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag+a.sale_bag) bal_bag, \n" +
-                "s.weight_unit,s.pur_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,st.stock_type_name,l.loc_name\n" +
+                "s.weight_unit,s.pur_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code," +
+                "st.stock_type_name,l.loc_name, w.description\n" +
                 "from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,\n" +
                 "sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,comp_code,\n" +
                 "sum(op_weight) op_weight,sum(pur_weight) pur_weight,\n" +
                 "sum(in_weight) in_weight,sum(out_weight) out_weight,sum(sale_weight) sale_weight,\n" +
                 "ifnull(sum(op_bag),0) op_bag,ifnull(sum(pur_bag),0) pur_bag,\n" +
-                "ifnull(sum(in_bag),0) in_bag,ifnull(sum(out_bag),0) out_bag,ifnull(sum(sale_bag),0) sale_bag,\n"+
+                "ifnull(sum(in_bag),0) in_bag,ifnull(sum(out_bag),0) out_bag,ifnull(sum(sale_bag),0) sale_bag,\n" +
                 " sum(wet) wet, sum(rice) rice, sum(ttl_amt) ttl_amt \n" +
                 "from tmp_stock_io_column\n" +
                 "where mac_id = " + macId + "\n" +
@@ -4445,8 +4446,11 @@ public class ReportServiceImpl implements ReportService {
                 "and s.comp_code = st.comp_code\n" +
                 "join location l on a.loc_code = l.loc_code\n" +
                 "and a.comp_code = l.comp_code\n" +
+                "join warehouse w on l.warehouse_code = w.code \n" +
+                "and a.comp_code = l.comp_code\n" +
+                "and (l.warehouse_code = '" + warehouse + "' or '-' = '" + warehouse + "')\n" +
                 "group by a.stock_code,a.loc_code\n" +
-                "order by a.loc_code, s_user_code";
+                "order by a.loc_code, s_user_code, w.description";
         List<ClosingBalance> balances = new ArrayList<>();
         try {
             ResultSet rs = reportDao.executeSql(getSql);
@@ -4521,11 +4525,12 @@ public class ReportServiceImpl implements ReportService {
                     b.setLocName(rs.getString("loc_name"));
                     b.setWet(rs.getDouble("wet"));
                     b.setRice(rs.getDouble("rice"));
+                    b.setWarehouse(rs.getString("description"));
                     balances.add(b);
                 }
             }
         } catch (Exception e) {
-            log.info("getStockInOutSummaryByWeight: " + Arrays.toString(e.getStackTrace()));
+            log.info("getStockInOutSummaryByPaddy: " + Arrays.toString(e.getStackTrace()));
         }
         return balances;
     }
@@ -5185,8 +5190,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
-                                              String vouNo, String remark, Integer  deptId,
-                                              boolean deleted, String compCode){
+                                              String vouNo, String remark, Integer deptId,
+                                              boolean deleted, String compCode) {
         String filter = "";
         if (!vouNo.equals("-")) {
             filter += "and vou_no ='" + vouNo + "'\n";
@@ -5209,8 +5214,8 @@ public class ReportServiceImpl implements ReportService {
         String sql = "select v.vou_date,v.vou_no,v.stock_code,s.stock_name ,v.remark,v.created_by," +
                 "v.deleted,v.due_date,v.dept_id,t.trader_name \n" +
                 "from v_pur_order v \n" +
-                "join stock s on v.stock_code = s.stock_code\n"+
-                " and v.comp_code =s.comp_code\n"+
+                "join stock s on v.stock_code = s.stock_code\n" +
+                " and v.comp_code =s.comp_code\n" +
                 "left join trader t on v.trader_code = t.code\n" +
                 "and v.comp_code = t.comp_code\n" +
                 "where v.comp_code = '" + compCode + "'\n" +
@@ -5221,7 +5226,7 @@ public class ReportServiceImpl implements ReportService {
                 "order by v.vou_date desc\n";
         ResultSet rs = reportDao.executeSql(sql);
         List<VPurOrder> vPurOrderList = new ArrayList<>();
-        try{
+        try {
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
                     VPurOrder s = new VPurOrder();
@@ -6496,11 +6501,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void insertTmp(List<String> listStr, Integer macId, String taleName) {
+    public void insertTmp(List<String> listStr, Integer macId, String taleName, String warehouse) {
         try {
             deleteTmp(taleName, macId);
-            if (listStr == null || listStr.isEmpty()) {
-                String sql = "insert into " + taleName + "(f_code,mac_id)\n" + "select loc_code," + macId + " mac_id from location";
+            if (listStr == null || listStr.isEmpty() || !warehouse.equals("-")) {
+                String sql = "insert into " + taleName + "(f_code,mac_id)\n" + "select loc_code," + macId + " mac_id from location " +
+                        " where warehouse_code = '" + warehouse + "' or '-' = '" + warehouse + "'";
                 executeSql(sql);
             } else {
                 for (String str : listStr) {
