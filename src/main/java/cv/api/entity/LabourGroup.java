@@ -34,4 +34,8 @@ public class LabourGroup {
     private boolean deleted;
     @Column(name="member_count")
     private Integer memberCount;
+    @Column(name = "qty")
+    private Double qty;
+    @Column(name = "price")
+    private Double price;
 }
