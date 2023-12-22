@@ -38,7 +38,8 @@ public class LabourPaymentController {
 
     @PostMapping("/history")
     public Flux<LabourPaymentDto> history(@RequestBody FilterObject filter) {
-        return labourPaymentService.history(filter);
+        return labourPaymentService.history(filter).delayElements(Duration.ofSeconds(3
+        ));
     }
 
     @GetMapping("/getDetail")
