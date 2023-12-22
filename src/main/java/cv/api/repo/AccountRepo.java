@@ -4,9 +4,9 @@ import cv.api.auto.LocationSetting;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dao.SaleExpenseDao;
+import cv.api.dto.LabourPaymentDto;
 import cv.api.entity.*;
 import cv.api.model.*;
-import cv.api.r2dbc.LabourPayment;
 import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +56,7 @@ public class AccountRepo {
                                 case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
                                 case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
                                 case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
+                                case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
                             }
                         }
                     }, (e) -> {
@@ -69,6 +70,7 @@ public class AccountRepo {
                             case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
                             case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
                             case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
+                            case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
                     });
@@ -182,6 +184,16 @@ public class AccountRepo {
             log.error("updatePayment : " + e.getMessage());
         }
     }
+
+    private void updateLabourPayment(String vouNo, String compCode, String status) {
+        labourPaymentService.update(vouNo, compCode, status).doOnSuccess(update -> {
+            if (update) {
+                log.info("updateLabourPayment : " + vouNo);
+            }
+        }).subscribe();
+
+    }
+
 
     public void sendTrader(Trader t) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
@@ -856,18 +868,18 @@ public class AccountRepo {
         }
     }
 
-    public void sendLabourPayment(LabourPayment ph) {
+    public void sendLabourPayment(LabourPaymentDto ph) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             if (ph != null) {
                 String sourceAcc = ph.getSourceAcc();
+                String compCode = ph.getCompCode();
+                String vouNo = ph.getVouNo();
                 if (!Util1.isNullOrEmpty(sourceAcc)) {
-                    String compCode = ph.getCompCode();
                     Integer deptId = ph.getDeptId();
                     LocalDateTime vouDate = ph.getVouDate();
                     String curCode = ph.getCurCode();
                     String remark = ph.getRemark();
-                    String vouNo = ph.getVouNo();
-                    boolean deleted = ph.isDeleted();
+                    boolean deleted = ph.getDeleted();
                     labourPaymentService.getDetail(vouNo, compCode)
                             .flatMap(detail -> {
                                 Gl gl = new Gl();
@@ -894,6 +906,8 @@ public class AccountRepo {
                             .subscribe(this::sendAccount);
 
 
+                } else {
+                    updateLabourPayment(vouNo,compCode,"IGNORE");
                 }
             }
         }

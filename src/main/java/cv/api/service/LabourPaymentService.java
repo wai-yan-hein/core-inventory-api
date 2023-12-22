@@ -30,7 +30,7 @@ public class LabourPaymentService {
     private final DatabaseClient databaseClient;
     private final VouNoService vouNoService;
 
-    public Mono<LabourPayment> save(LabourPaymentDto dto) {
+    public Mono<LabourPaymentDto> save(LabourPaymentDto dto) {
         return saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
             List<LabourPaymentDetail> list = dto.getListDetail();
             if (list != null && !list.isEmpty()) {
@@ -51,7 +51,7 @@ public class LabourPaymentService {
 
     }
 
-    private Mono<LabourPayment> saveOrUpdate(LabourPaymentDto dto) {
+    private Mono<LabourPaymentDto> saveOrUpdate(LabourPaymentDto dto) {
         String vouNo = dto.getVouNo();
         String compCode = dto.getCompCode();
         int deptId = dto.getDeptId();
@@ -64,10 +64,10 @@ public class LabourPaymentService {
                         payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
                         payment.setCreatedDate(LocalDateTime.now());
                         payment.setUpdatedDate(LocalDateTime.now());
-                        return template.insert(payment);
+                        return template.insert(payment).map(LabourPayment::buildDto);
                     });
         } else {
-            return update(payment);
+            return update(payment).map(LabourPayment::buildDto);
         }
     }
 
@@ -125,7 +125,7 @@ public class LabourPaymentService {
                 .bind("expenseAcc", Parameters.in(R2dbcType.VARCHAR, data.getExpenseAcc()))
                 .bind("vouNo", data.getVouNo())
                 .bind("compCode", data.getCompCode())
-                .bind("deptCode", data.getDeptCode())
+                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, data.getDeptCode()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(data);
@@ -263,6 +263,38 @@ public class LabourPaymentService {
                         .isNull()
                         .and("vou_date").greaterThanOrEquals(syncDate))).all();
 
+    }
+
+    public Mono<Boolean> update(String vouNo, String compCode, String status) {
+        String sql = """
+                update labour_payment
+                set intg_upd_status = :status
+                where vou_no =:vouNo
+                and comp_code = :compCode
+                """;
+        return databaseClient.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .bind("status", Parameters.in(R2dbcType.VARCHAR, status))
+                .fetch()
+                .rowsUpdated()
+                .thenReturn(true);
+    }
+
+    public Mono<Boolean> update(String vouNo, String compCode, boolean deleted) {
+        String sql = """
+                update labour_payment
+                set deleted = :deleted
+                where vou_no =:vouNo
+                and comp_code = :compCode
+                """;
+        return databaseClient.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .bind("deleted", deleted)
+                .fetch()
+                .rowsUpdated()
+                .thenReturn(true);
     }
 }
 

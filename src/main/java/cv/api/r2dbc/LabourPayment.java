@@ -1,5 +1,7 @@
 package cv.api.r2dbc;
 
+import cv.api.common.Util1;
+import cv.api.dto.LabourPaymentDto;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
@@ -32,5 +34,27 @@ public class LabourPayment {
     private double payTotal;
     private String deptCode;
 
+    public LabourPaymentDto buildDto() {
+        return LabourPaymentDto.builder()
+                .vouNo(getVouNo())
+                .compCode(getCompCode())
+                .deptId(getDeptId())
+                .vouDate(getVouDate())
+                .vouDateTime(Util1.toZonedDateTime(getVouDate()))
+                .labourGroupCode(getLabourGroupCode())
+                .curCode(getCurCode())
+                .remark(getRemark())
+                .createdBy(getCreatedBy())
+                .updatedBy(getUpdatedBy())
+                .deleted(isDeleted())
+                .macId(getMacId())
+                .fromDate(getFromDate())
+                .toDate(getToDate())
+                .sourceAcc(getSourceAcc())
+                .expenseAcc(getExpenseAcc())
+                .payTotal(getPayTotal())
+                .deptCode(getDeptCode())
+                .build();
+    }
 
 }
