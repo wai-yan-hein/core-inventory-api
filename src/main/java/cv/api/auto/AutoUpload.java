@@ -2,6 +2,7 @@ package cv.api.auto;
 
 import cv.api.common.Util1;
 import cv.api.entity.*;
+import cv.api.r2dbc.LabourPayment;
 import cv.api.repo.AccountRepo;
 import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class AutoUpload {
     private final RetOutService retOutService;
     private final TraderService traderService;
     private final PaymentHisService paymentHisService;
+    private final LabourPaymentService labourPaymentService;
     private boolean syncing = false;
     private final AccountRepo accountRepo;
     private final Environment environment;
@@ -136,4 +139,21 @@ public class AutoUpload {
             });
         }
     }
+    private void uploadLabourPayment() {
+        labourPaymentService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)))
+                .collectList()
+                .doOnNext(vouList -> {
+                    if (!vouList.isEmpty()) {
+                        log.info("uploadPayment : " + vouList.size());
+                        vouList.forEach(vou -> {
+                            if (vou.isDeleted()) {
+                                accountRepo.deleteVoucher(vou.getVouNo(),vou.getCompCode(),"LABOUR_PAYMENT");
+                            } else {
+                                accountRepo.sendLabourPayment(vou);
+                            }
+                        });
+                    }
+                }).subscribe();
+    }
+
 }

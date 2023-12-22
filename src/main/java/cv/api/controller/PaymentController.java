@@ -8,22 +8,19 @@ import cv.api.entity.PaymentHisKey;
 import cv.api.repo.AccountRepo;
 import cv.api.service.PaymentHisService;
 import cv.api.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/payment")
 public class PaymentController {
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private PaymentHisService paymentHisService;
-    @Autowired
-    private PaymentHisDetailDao paymentHisDetailDao;
-    @Autowired
-    private AccountRepo accountRepo;
+    private final ReportService reportService;
+    private final PaymentHisService paymentHisService;
+    private final PaymentHisDetailDao paymentHisDetailDao;
+    private final AccountRepo accountRepo;
 
     @GetMapping(path = "/getTraderBalance")
     public Flux<?> getCustomerBalance(@RequestParam String traderCode,

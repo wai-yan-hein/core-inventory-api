@@ -16,8 +16,8 @@ import cv.api.repo.AccountRepo;
 import cv.api.service.ReportService;
 import cv.api.service.RetInDetailService;
 import cv.api.service.RetInService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,17 +30,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/retin")
 @Slf4j
+@RequiredArgsConstructor
 public class RetInController {
 
     private final ReturnObject ro = new ReturnObject();
-    @Autowired
-    private RetInService riService;
-    @Autowired
-    private RetInDetailService rdService;
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private AccountRepo accountRepo;
+    private final RetInService riService;
+    private final RetInDetailService rdService;
+    private final ReportService reportService;
+    private final AccountRepo accountRepo;
 
     @PostMapping(path = "/saveReturnIn")
     public Mono<RetInHis> saveReturnIn(@RequestBody RetInHis retin) {

@@ -6,10 +6,13 @@ import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
 import cv.api.r2dbc.LabourPayment;
 import cv.api.r2dbc.LabourPaymentDetail;
-import io.r2dbc.spi.Parameter;
+import io.r2dbc.spi.Parameters;
+import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -58,6 +61,7 @@ public class LabourPaymentService {
             return vouNoService.getVouNo(deptId, "LabourPayment", compCode, macId)
                     .flatMap(seqNo -> {
                         payment.setVouNo(seqNo);
+                        payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
                         payment.setCreatedDate(LocalDateTime.now());
                         payment.setUpdatedDate(LocalDateTime.now());
                         return template.insert(payment);
@@ -97,7 +101,10 @@ public class LabourPaymentService {
                   updated_by = :updatedBy,
                   deleted = :deleted,
                   mac_id = :macId,
-                  account = :account
+                  member_count =:memberCount,
+                  source_acc = :sourceAcc,
+                  expense_acc =:expenseAcc,
+                  dept_code=:deptCode
                 WHERE vou_no = :vouNo AND comp_code = :compCode""";
 
         return databaseClient.sql(sql)
@@ -113,9 +120,12 @@ public class LabourPaymentService {
                 .bind("updatedBy", data.getUpdatedBy())
                 .bind("deleted", data.isDeleted())
                 .bind("macId", data.getMacId())
-                .bind("account", data.getAccount())
+                .bind("memberCount", data.getMemberCount())
+                .bind("sourceAcc", Parameters.in(R2dbcType.VARCHAR, data.getSourceAcc()))
+                .bind("expenseAcc", Parameters.in(R2dbcType.VARCHAR, data.getExpenseAcc()))
                 .bind("vouNo", data.getVouNo())
                 .bind("compCode", data.getCompCode())
+                .bind("deptCode", data.getDeptCode())
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(data);
@@ -179,9 +189,9 @@ public class LabourPaymentService {
                 from labour_payment
                 where deleted = :deleted
                 and comp_code =:compCode
-                and date(vou_date) between :startDate and :endDate
+                and date(vou_date) between :fromDate and :toDate
                 and cur_code =:curCode
-                and created_by =:userCode or '-' =:userCode
+                and (created_by =:userCode or '-' =:userCode)
                 )a
                 join labour_group l on a.labour_group_code = l.code
                 and a.comp_code = l.comp_code
@@ -190,8 +200,8 @@ public class LabourPaymentService {
         return databaseClient.sql(sql)
                 .bind("deleted", deleted)
                 .bind("compCode", compCode)
-                .bind("startDate", fromDate)
-                .bind("endDate", toDate)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
                 .bind("curCode", curCode)
                 .bind("userCode", userCode)
                 //vou_no, comp_code, dept_id, vou_date, labour_group_code, cur_code,
@@ -212,20 +222,47 @@ public class LabourPaymentService {
                         .updatedDate(row.get("updated_date", LocalDateTime.class))
                         .updatedBy(row.get("updated_by", String.class))
                         .deleted(row.get("deleted", Boolean.class))
-                        .account(row.get("account", String.class))
                         .memberCount(row.get("member_count", Integer.class))
                         .payTotal(row.get("pay_total", Double.class))
                         .sourceAcc(row.get("source_acc", String.class))
                         .expenseAcc(row.get("expense_acc", String.class))
                         .labourName(row.get("labour_name", String.class))
                         .fromDate(row.get("from_date", LocalDate.class))
-                        .toDate(row.get("from_date", LocalDate.class))
+                        .toDate(row.get("to_date", LocalDate.class))
+                        .deptCode(row.get("dept_code", String.class))
                         .build()).all();
     }
 
-    public Flux<LabourPaymentDetail> getDetail(String vouNo,String compCode) {
-        //
-        return  null;
+    public Flux<LabourPaymentDetail> getDetail(String vouNo, String compCode) {
+        //vou_no, comp_code, unique_id, description, qty, price, amount, account
+        String sql = """
+                select *
+                from labour_payment_detail
+                where vou_no=:vouNo
+                and comp_code=:compCode
+                """;
+        return databaseClient.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .map((row) -> LabourPaymentDetail.builder()
+                        .vouNo(row.get("vou_no", String.class))
+                        .compCode(row.get("comp_code", String.class))
+                        .uniqueId(row.get("unique_id", Integer.class))
+                        .description(row.get("description", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .price(row.get("price", Double.class))
+                        .amount(row.get("amount", Double.class))
+                        .account(row.get("account", String.class))
+                        .build())
+                .all();
+    }
+
+    public Flux<LabourPayment> unUploadVoucher(LocalDateTime syncDate) {
+        return template.select(LabourPayment.class)
+                .matching(Query.query(Criteria.where("intg_upd_status")
+                        .isNull()
+                        .and("vou_date").greaterThanOrEquals(syncDate))).all();
+
     }
 }
 

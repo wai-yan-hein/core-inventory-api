@@ -26,7 +26,6 @@ public class LabourPaymentDto {
     private String updatedBy;
     private Boolean deleted;
     private int macId;
-    private String account;
     private Integer memberCount;
     private ZonedDateTime vouDateTime;
     private Double payTotal;
@@ -35,9 +34,10 @@ public class LabourPaymentDto {
     private String sourceAcc;
     private String expenseAcc;
     private String labourName;
+    private String deptCode;
     private List<LabourPaymentDetail> listDetail;
 
-    public LabourPayment toEntity(){
+    public LabourPayment toEntity() {
         return LabourPayment.builder()
                 .vouNo(getVouNo())
                 .compCode(getCompCode())
@@ -52,11 +52,13 @@ public class LabourPaymentDto {
                 .updatedBy(getUpdatedBy())
                 .deleted(getDeleted())
                 .macId(getMacId())
-                .account(getAccount())
                 .memberCount(getMemberCount())
                 .payTotal(getPayTotal())
                 .fromDate(getFromDate())
                 .toDate(getToDate())
+                .sourceAcc(getSourceAcc())
+                .expenseAcc(getExpenseAcc())
+                .deptCode(getDeptCode())
                 .build();
     }
 

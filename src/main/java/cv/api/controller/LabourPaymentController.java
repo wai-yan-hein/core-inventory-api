@@ -5,6 +5,7 @@ import cv.api.common.ReportFilter;
 import cv.api.dto.LabourPaymentDto;
 import cv.api.r2dbc.LabourPayment;
 import cv.api.r2dbc.LabourPaymentDetail;
+import cv.api.repo.AccountRepo;
 import cv.api.service.LabourPaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,14 @@ import java.time.Duration;
 @RequestMapping("/labourPayment")
 public class LabourPaymentController {
     private final LabourPaymentService labourPaymentService;
+    private final AccountRepo accountRepo;
 
     @PostMapping
     public Mono<LabourPayment> savePayment(@RequestBody LabourPaymentDto dto) {
-        return labourPaymentService.save(dto);
+        return labourPaymentService.save(dto).flatMap(payment -> {
+            accountRepo.sendLabourPayment(payment);
+            return Mono.just(payment);
+        });
     }
 
     @PostMapping("/calculatePayment")
@@ -37,7 +42,7 @@ public class LabourPaymentController {
     }
 
     @GetMapping("/getDetail")
-    public Flux<LabourPaymentDetail> getDetail(@RequestParam String vouNo,@RequestParam String compCode) {
-        return labourPaymentService.getDetail(vouNo,compCode);
+    public Flux<LabourPaymentDetail> getDetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        return labourPaymentService.getDetail(vouNo, compCode);
     }
 }

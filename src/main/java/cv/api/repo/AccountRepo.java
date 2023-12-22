@@ -6,9 +6,10 @@ import cv.api.common.Util1;
 import cv.api.dao.SaleExpenseDao;
 import cv.api.entity.*;
 import cv.api.model.*;
+import cv.api.r2dbc.LabourPayment;
 import cv.api.service.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,32 +22,23 @@ import java.util.Objects;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AccountRepo {
     private final String ACK = "ACK";
     private final String appName = "SM";
     private final Integer macId = 98;
-    @Autowired
-    private WebClient accountApi;
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private Environment environment;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private TraderGroupService groupService;
-    @Autowired
-    private GRNService grnService;
-    @Autowired
-    private PurExpenseService purExpenseService;
-    @Autowired
-    private ExpenseService expenseService;
-    @Autowired
-    private AccSettingService settingService;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private SaleExpenseDao saleExpenseDao;
+    private final WebClient accountApi;
+    private final ReportService reportService;
+    private final Environment environment;
+    private final TraderService traderService;
+    private final TraderGroupService groupService;
+    private final GRNService grnService;
+    private final PurExpenseService purExpenseService;
+    private final ExpenseService expenseService;
+    private final AccSettingService settingService;
+    private final LocationService locationService;
+    private final SaleExpenseDao saleExpenseDao;
+    private final LabourPaymentService labourPaymentService;
 
     private void sendAccount(List<Gl> glList) {
         if (!glList.isEmpty()) {
@@ -67,7 +59,7 @@ public class AccountRepo {
                             }
                         }
                     }, (e) -> {
-                        Gl gl = glList.get(0);
+                        Gl gl = glList.getFirst();
                         String vouNo = gl.getRefNo();
                         String compCode = gl.getKey().getCompCode();
                         String tranSource = gl.getTranSource();
@@ -864,6 +856,49 @@ public class AccountRepo {
         }
     }
 
+    public void sendLabourPayment(LabourPayment ph) {
+        if (Util1.getBoolean(environment.getProperty("integration"))) {
+            if (ph != null) {
+                String sourceAcc = ph.getSourceAcc();
+                if (!Util1.isNullOrEmpty(sourceAcc)) {
+                    String compCode = ph.getCompCode();
+                    Integer deptId = ph.getDeptId();
+                    LocalDateTime vouDate = ph.getVouDate();
+                    String curCode = ph.getCurCode();
+                    String remark = ph.getRemark();
+                    String vouNo = ph.getVouNo();
+                    boolean deleted = ph.isDeleted();
+                    labourPaymentService.getDetail(vouNo, compCode)
+                            .flatMap(detail -> {
+                                Gl gl = new Gl();
+                                GlKey key = new GlKey();
+                                key.setCompCode(compCode);
+                                key.setDeptId(deptId);
+                                gl.setKey(key);
+                                gl.setGlDate(vouDate);
+                                gl.setDescription(detail.getDescription());
+                                gl.setSrcAccCode(sourceAcc);
+                                gl.setAccCode(Util1.isNull(detail.getAccount(), ph.getExpenseAcc()));
+                                gl.setCrAmt(detail.getAmount());
+                                gl.setCurCode(curCode);
+                                gl.setReference(remark);
+                                gl.setDeptCode(ph.getDeptCode());
+                                gl.setCreatedDate(LocalDateTime.now());
+                                gl.setCreatedBy(appName);
+                                gl.setTranSource("LABOUR_PAYMENT");
+                                gl.setRefNo(vouNo);
+                                gl.setDeleted(deleted);
+                                gl.setMacId(macId);
+                                return Mono.just(gl);
+                            }).collectList()
+                            .subscribe(this::sendAccount);
+
+
+                }
+            }
+        }
+    }
+
     public void deleteInvVoucher(SaleHisKey key) {
         Gl gl = new Gl();
         GlKey glKey = new GlKey();
@@ -871,6 +906,16 @@ public class AccountRepo {
         gl.setKey(glKey);
         gl.setTranSource("SALE");
         gl.setRefNo(key.getVouNo());
+        deleteGlByVoucher(gl);
+    }
+
+    public void deleteVoucher(String vouNo, String compCode, String tranSource) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(compCode);
+        gl.setKey(glKey);
+        gl.setTranSource(tranSource);
+        gl.setRefNo(vouNo);
         deleteGlByVoucher(gl);
     }
 
@@ -922,7 +967,7 @@ public class AccountRepo {
                 .body(Mono.just(gl), Gl.class)
                 .retrieve()
                 .bodyToMono(String.class)
-                .subscribe(s -> {
+                .doOnSuccess(s -> {
                     String vouNo = gl.getRefNo();
                     String compCode = gl.getKey().getCompCode();
                     switch (gl.getTranSource()) {
@@ -932,7 +977,7 @@ public class AccountRepo {
                         case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
                         case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
                     }
-                }, (e) -> {
+                }).doOnError(e -> {
                     String vouNo = gl.getRefNo();
                     String compCode = gl.getKey().getCompCode();
                     String tranSource = gl.getTranSource();
@@ -944,7 +989,7 @@ public class AccountRepo {
                         case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
                     }
                     log.error("deleteGlByVoucher : " + e.getMessage());
-                });
+                }).subscribe();
     }
 
     private LocationSetting getLocationSetting(String locCode, String compCode) {

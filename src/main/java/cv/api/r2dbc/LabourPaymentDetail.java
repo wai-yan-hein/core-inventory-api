@@ -10,7 +10,7 @@ import lombok.Data;
 public class LabourPaymentDetail {
     private String vouNo;
     private String compCode;
-    private int uniqueId;
+    private Integer uniqueId;
     private Integer deptId;
     private String tranOption;
     private String description;

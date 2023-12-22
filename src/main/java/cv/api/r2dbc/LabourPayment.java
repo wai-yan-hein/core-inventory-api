@@ -24,13 +24,13 @@ public class LabourPayment {
     private String updatedBy;
     private boolean deleted;
     private int macId;
-    private String account;
     private Integer memberCount;
     private LocalDate fromDate;
     private LocalDate toDate;
     private String sourceAcc;
     private String expenseAcc;
     private double payTotal;
+    private String deptCode;
 
 
 }
