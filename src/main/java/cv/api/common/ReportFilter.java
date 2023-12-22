@@ -48,6 +48,7 @@ public class ReportFilter {
     private boolean deleted;
     private boolean active;
     private String labourGroupCode;
+    private String warehouseCode;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

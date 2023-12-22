@@ -45,6 +45,19 @@ public class ClosingBalance {
     private double balWeight;
     private String balWeightRel;
 
+    private double openBag;
+    private String openBagRel;
+    private double purBag;
+    private String purBagRel;
+    private double inBag;
+    private String inBagRel;
+    private double outBag;
+    private String outBagRel;
+    private double saleBag;
+    private String saleBagRel;
+    private double balBag;
+    private String balBagRel;
+
     private String groupName;
     private String remark;
     private String compCode;
@@ -54,4 +67,11 @@ public class ClosingBalance {
     private String traderCode;
     private String traderUserCode;
     private String traderName;
+
+    private String locName;
+    private double wet;
+    private double rice;
+    private double bag;
+    private double price;
+    private String warehouse;
 }
