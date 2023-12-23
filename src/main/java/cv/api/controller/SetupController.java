@@ -3,10 +3,11 @@ package cv.api.controller;
 import cv.api.common.*;
 import cv.api.entity.*;
 import cv.api.model.AccTraderKey;
+import cv.api.r2dbc.StockColor;
 import cv.api.repo.AccountRepo;
 import cv.api.service.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,66 +22,39 @@ import java.util.List;
 @RestController
 @RequestMapping("/setup")
 @Slf4j
+@RequiredArgsConstructor
 public class SetupController {
 
     private final ReturnObject ro = new ReturnObject();
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private SaleManService saleManService;
-    @Autowired
-    private StockBrandService brandService;
-    @Autowired
-    private StockTypeService typeService;
-    @Autowired
-    private StockUnitService unitService;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private RegionService regionService;
-    @Autowired
-    private StockService stockService;
-    @Autowired
-    private StockCriteriaService stockCriteriaService;
-    @Autowired
-    private VouStatusService vouStatusService;
-    @Autowired
-    private OPHisService opHisService;
-    @Autowired
-    private OPHisDetailService opHisDetailService;
-    @Autowired
-    private PatternService patternService;
-    @Autowired
-    private ReorderService reorderService;
-    @Autowired
-    private PriceOptionService optionService;
-    @Autowired
-    private UnitRelationService unitRelationService;
-    @Autowired
-    private ReportService reportService;
-
-    @Autowired
-    private TraderGroupService traderGroupService;
-    @Autowired
-    private GRNService batchService;
-    @Autowired
-    private ConverterService converterService;
-    @Autowired
-    private AccountRepo accountRepo;
-    @Autowired
-    private AccSettingService accSettingService;
-    @Autowired
-    private OrderStatusService orderStatusService;
-    @Autowired
-    private LabourGroupService labourGroupService;
-    @Autowired
-    private JobService jobService;
-    @Autowired
-    private StockFormulaService stockFormulaService;
-    @Autowired
-    private OutputCostService outputCostService;
+    private final CategoryService categoryService;
+    private final LocationService locationService;
+    private final SaleManService saleManService;
+    private final StockBrandService brandService;
+    private final StockTypeService typeService;
+    private final StockUnitService unitService;
+    private final TraderService traderService;
+    private final RegionService regionService;
+    private final StockService stockService;
+    private final StockCriteriaService stockCriteriaService;
+    private final VouStatusService vouStatusService;
+    private final OPHisService opHisService;
+    private final OPHisDetailService opHisDetailService;
+    private final PatternService patternService;
+    private final ReorderService reorderService;
+    private final PriceOptionService optionService;
+    private final UnitRelationService unitRelationService;
+    private final ReportService reportService;
+    private final TraderGroupService traderGroupService;
+    private final GRNService batchService;
+    private final ConverterService converterService;
+    private final AccountRepo accountRepo;
+    private final AccSettingService accSettingService;
+    private final OrderStatusService orderStatusService;
+    private final LabourGroupService labourGroupService;
+    private final JobService jobService;
+    private final StockFormulaService stockFormulaService;
+    private final OutputCostService outputCostService;
+    private final StockColorService stockColorService;
 
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
@@ -492,6 +466,7 @@ public class SetupController {
         List<General> str = stockService.delete(key);
         return Flux.fromIterable(str);
     }
+
     @PostMapping(path = "/restoreStock")
     public Mono<?> restoreStock(@RequestBody StockKey key) {
         return Mono.just(stockService.restore(key));
@@ -898,6 +873,16 @@ public class SetupController {
     @GetMapping(path = "/getUpdateOutputCost")
     public Flux<?> getUpdateOutputCost(@RequestParam String updatedDate) {
         return Flux.fromIterable(outputCostService.getOutputCost(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @PostMapping(path = "/saveStockColor")
+    public Mono<StockColor> saveStockColor(@RequestBody StockColor color) {
+        return stockColorService.saveOrUpdate(color);
+    }
+
+    @GetMapping(path = "/saveStockColor")
+    public Flux<StockColor> getStockColor(@RequestParam String compCode) {
+        return stockColorService.getStockColor(compCode);
     }
 
 }

@@ -28,4 +28,5 @@ public interface SeqTableService {
     int getSequence(Integer macId, String option, String period, String compCode);
 
     List<SeqTable> findAll();
+
 }
