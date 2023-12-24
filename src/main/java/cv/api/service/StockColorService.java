@@ -33,6 +33,7 @@ public class StockColorService {
             return seqService.getNextCode("color_code_seq", color.getCompCode(), 5)
                     .flatMap(seqNo -> {
                         color.setColorId(seqNo);
+                        color.setUpdatedDate(LocalDateTime.now());
                         return template.insert(color);
                     });
         } else {

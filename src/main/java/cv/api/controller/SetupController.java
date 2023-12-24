@@ -880,7 +880,7 @@ public class SetupController {
         return stockColorService.saveOrUpdate(color);
     }
 
-    @GetMapping(path = "/saveStockColor")
+    @GetMapping(path = "/getStockColor")
     public Flux<StockColor> getStockColor(@RequestParam String compCode) {
         return stockColorService.getStockColor(compCode);
     }
