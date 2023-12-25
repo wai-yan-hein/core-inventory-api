@@ -5,10 +5,12 @@
  */
 package cv.api.service;
 
+import cv.api.common.FilterObject;
 import cv.api.common.General;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
 import cv.api.entity.VouDiscount;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -47,5 +49,5 @@ public interface SaleHisService {
 
     List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
-
+    Flux<?> getSale(FilterObject filterObject);
 }

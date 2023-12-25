@@ -7,6 +7,7 @@ package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.VouDiscount;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
