@@ -35,6 +35,7 @@ public class LabourPaymentDto {
     private String expenseAcc;
     private String labourName;
     private String deptCode;
+
     private List<LabourPaymentDetail> listDetail;
 
     public LabourPayment toEntity() {

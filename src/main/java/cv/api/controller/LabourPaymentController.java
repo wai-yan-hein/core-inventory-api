@@ -3,7 +3,6 @@ package cv.api.controller;
 import cv.api.common.FilterObject;
 import cv.api.common.ReportFilter;
 import cv.api.dto.LabourPaymentDto;
-import cv.api.r2dbc.LabourPayment;
 import cv.api.r2dbc.LabourPaymentDetail;
 import cv.api.repo.AccountRepo;
 import cv.api.service.LabourPaymentService;
@@ -12,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +21,7 @@ public class LabourPaymentController {
     private final AccountRepo accountRepo;
 
     @PostMapping
-    public Mono<LabourPayment> savePayment(@RequestBody LabourPaymentDto dto) {
+    public Mono<LabourPaymentDto> savePayment(@RequestBody LabourPaymentDto dto) {
         return labourPaymentService.save(dto).flatMap(payment -> {
             accountRepo.sendLabourPayment(payment);
             return Mono.just(payment);
@@ -44,5 +41,18 @@ public class LabourPaymentController {
     @GetMapping("/getDetail")
     public Flux<LabourPaymentDetail> getDetail(@RequestParam String vouNo, @RequestParam String compCode) {
         return labourPaymentService.getDetail(vouNo, compCode);
+    }
+
+    @DeleteMapping("delete/{vouNo}/{compCode}")
+    public Mono<Boolean> delete(@PathVariable String vouNo, @PathVariable String compCode) {
+        return labourPaymentService.update(vouNo, compCode, true).flatMap(delete -> {
+            accountRepo.deleteVoucher(vouNo, compCode, "LABOUR_PAYMENT");
+            return Mono.just(true);
+        });
+    }
+
+    @PutMapping("restore/{vouNo}/{compCode}")
+    public Mono<Boolean> restore(@PathVariable String vouNo, @PathVariable String compCode) {
+        return labourPaymentService.update(vouNo, compCode, false);
     }
 }

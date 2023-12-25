@@ -1623,6 +1623,43 @@ alter table labour_group
 add column qty double(20,3) null after deleted,
 add column price double(20,3) null after qty;
 
+create table labour_payment (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  vou_date datetime not null,
+  labour_group_code varchar(15) not null,
+  cur_code varchar(15) not null,
+  remark text default null,
+  created_date timestamp not null,
+  created_by varchar(15) not null,
+  updated_date timestamp not null,
+  updated_by varchar(15) default null,
+  deleted bit(1) not null default b'0',
+  mac_id int(11) not null,
+  member_count int(11) default null,
+  pay_total double(20,3) default null,
+  source_acc varchar(15) default null,
+  expense_acc varchar(15) default null,
+  from_date date default null,
+  to_date date default null,
+  dept_code varchar(15) default null,
+  intg_upd_status varchar(15) default null,
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
+create table labour_payment_detail (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  unique_id int(11) not null,
+  description text default null,
+  qty double(20,3) not null,
+  price double(20,3) not null,
+  amount double(20,3) not null,
+  account varchar(15) default null,
+  primary key (vou_no,comp_code,unique_id)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 
 #view
 drop view if exists v_milling_output;
