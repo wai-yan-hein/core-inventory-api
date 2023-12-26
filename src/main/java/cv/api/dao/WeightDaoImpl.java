@@ -87,6 +87,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
                 h.setKey(key);
+                h.setDeptId(rs.getInt("dept_id"));
                 h.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                 h.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                 h.setStockCode(rs.getString("stock_code"));
