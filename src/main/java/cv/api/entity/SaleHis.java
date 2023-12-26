@@ -104,6 +104,8 @@ public class SaleHis {
     private String cashAcc;
     @Column(name = "dept_code")
     private String deptCode;
+    @Column(name = "weight_vou_no")
+    private String weightVouNo;
     @Transient
     private String status = "STATUS";
     @Transient

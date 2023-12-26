@@ -35,6 +35,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     private final VouDiscountDao vouDiscountDao;
     private final SaleOrderJoinDao saleOrderJoinDao;
     private final OrderHisDao orderHisDao;
+    private final WeightDao weightDao;
 
     @Override
     public SaleHis save(@NotNull SaleHis saleHis) {
@@ -69,6 +70,7 @@ public class SaleHisServiceImpl implements SaleHisService {
         saveSaleOrderJoin(listOrder, saleHis);
         shDao.save(saleHis);
         saleHis.setListSH(listSD);
+        updateWeight(saleHis, true);
         return saleHis;
     }
 
@@ -171,6 +173,20 @@ public class SaleHisServiceImpl implements SaleHisService {
         }
     }
 
+    private void updateWeight(SaleHis sh, boolean status) {
+        String weightVouNo = sh.getWeightVouNo();
+        if (!Util1.isNullOrEmpty(weightVouNo)) {
+            WeightHisKey key = new WeightHisKey();
+            key.setVouNo(weightVouNo);
+            key.setCompCode(sh.getKey().getCompCode());
+            WeightHis wh = weightDao.findById(key);
+            if (wh != null) {
+                wh.setPost(status);
+                weightDao.save(wh);
+            }
+        }
+    }
+
     private void updateOrder(OrderHisKey key, boolean post) {
         OrderHis oh = orderHisDao.findById(key);
         if (oh != null) {
@@ -196,14 +212,18 @@ public class SaleHisServiceImpl implements SaleHisService {
 
     @Override
     public void delete(SaleHisKey key) {
-        shDao.delete(key);
-        List<SaleOrderJoin> list = saleOrderJoinDao.getSaleOrder(key.getVouNo(), key.getCompCode());
-        list.forEach(order -> {
-            OrderHisKey orderKey = new OrderHisKey();
-            orderKey.setVouNo(order.getKey().getOrderVouNo());
-            orderKey.setCompCode(order.getKey().getCompCode());
-            updateOrder(orderKey, false);
-        });
+        SaleHis saleHis = findById(key);
+        if (saleHis != null) {
+            updateWeight(saleHis, false);
+            List<SaleOrderJoin> list = saleOrderJoinDao.getSaleOrder(key.getVouNo(), key.getCompCode());
+            list.forEach(order -> {
+                OrderHisKey orderKey = new OrderHisKey();
+                orderKey.setVouNo(order.getKey().getOrderVouNo());
+                orderKey.setCompCode(order.getKey().getCompCode());
+                updateOrder(orderKey, false);
+            });
+            shDao.delete(key);
+        }
     }
 
     @Override

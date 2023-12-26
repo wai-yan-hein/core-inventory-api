@@ -18,6 +18,6 @@ public class LabourPaymentDetail {
     private Double price;
     private Double amount;
     private String account;
-
+    private String deptCode;
 
 }
