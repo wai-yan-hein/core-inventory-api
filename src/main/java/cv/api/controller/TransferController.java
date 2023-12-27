@@ -14,8 +14,9 @@ import cv.api.model.VTransfer;
 import cv.api.service.ReportService;
 import cv.api.service.TransferHisDetailService;
 import cv.api.service.TransferHisService;
+import cv.api.service.TransferService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,14 +29,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/transfer")
 @Slf4j
+@RequiredArgsConstructor
 public class TransferController {
 
-    @Autowired
-    private TransferHisService thService;
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private TransferHisDetailService detailService;
+    private final TransferHisService thService;
+    private final ReportService reportService;
+    private final TransferHisDetailService detailService;
+    private final TransferService transferService;
 
     @PostMapping(path = "/saveTransfer")
     public Mono<TransferHis> saveTransfer(@RequestBody TransferHis obj) {
@@ -87,5 +87,11 @@ public class TransferController {
     public Mono<?> restoreTransfer(@RequestBody TransferHisKey key) {
         thService.restore(key);
         return Mono.just(true);
+    }
+
+    @GetMapping(value = "/getTransferReport")
+    public Flux<VTransfer> getTransferReport(@RequestParam String vouNo,
+                                             @RequestParam String compCode) {
+        return transferService.getTransferVoucher(vouNo, compCode);
     }
 }
