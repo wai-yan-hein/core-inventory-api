@@ -95,6 +95,7 @@ public class LabourPaymentService {
                   labour_group_code = :labourGroupCode,
                   cur_code = :curCode,
                   remark = :remark,
+                  pay_total=:payTotal,
                   created_date = :createdDate,
                   created_by = :createdBy,
                   updated_date = :updatedDate,
@@ -115,6 +116,7 @@ public class LabourPaymentService {
                 .bind("labourGroupCode", data.getLabourGroupCode())
                 .bind("curCode", data.getCurCode())
                 .bind("remark", data.getRemark())
+                .bind("payTotal",data.getPayTotal())
                 .bind("createdDate", data.getCreatedDate())
                 .bind("createdBy", data.getCreatedBy())
                 .bind("updatedDate", LocalDateTime.now())
@@ -256,7 +258,7 @@ public class LabourPaymentService {
                         .price(row.get("price", Double.class))
                         .amount(row.get("amount", Double.class))
                         .account(row.get("account", String.class))
-                        .deptCode(row.get("dept_code",String.class))
+                        .deptCode(row.get("dept_code", String.class))
                         .build())
                 .all();
     }

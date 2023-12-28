@@ -2,8 +2,6 @@ package cv.api.controller;
 
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
-import cv.api.entity.StockIOKey;
-import cv.api.entity.StockInOut;
 import cv.api.entity.StockIssueReceive;
 import cv.api.entity.StockIssueReceiveKey;
 import cv.api.service.ReportService;
@@ -65,7 +63,7 @@ public class StockIssueReceiveController {
         Integer deptId = filter.getDeptId();
         boolean deleted = filter.isDeleted();
         String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        int tranSource = Integer.valueOf(Util1.isNull(filter.getTranSource(), "-"));
+        int tranSource = Integer.parseInt(Util1.isNull(filter.getTranSource(), "-"));
         return Flux.fromIterable(reportService.getStockIssueReceiveHistory(fromDate, toDate, traderCode,
                         userCode,stockCode, vouNo, remark,locCode, deptId,deleted, compCode, tranSource))
                 .onErrorResume(throwable -> Flux.empty());

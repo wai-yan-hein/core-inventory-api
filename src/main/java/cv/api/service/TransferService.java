@@ -14,7 +14,7 @@ public class TransferService {
 
     public Flux<VTransfer> getTransferVoucher(String vouNo, String compCode) {
         String sql = """
-                SELECT stock_name, unit, qty,sale_price_n, ft.loc_name AS fLocName, tt.loc_name AS tLocName,
+                SELECT stock_name, unit, t.qty,sale_price_n,t.qty*sale_price_n sale_amt,ft.loc_name AS fLocName, tt.loc_name AS tLocName,
                 t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no, t.weight, t.weight_unit,
                 u1.unit_name, u2.unit_name AS weight_unit_name, g.labour_name
                 FROM v_transfer t
@@ -34,6 +34,7 @@ public class TransferService {
                         .unit(row.get("unit", String.class))
                         .qty(row.get("qty", Double.class))
                         .price(row.get("sale_price_n", Double.class))
+                        .saleAmt(row.get("sale_amt", Double.class))
                         .vouNo(row.get("vou_no", String.class))
                         .vouDate(row.get("vou_date", String.class))
                         .fromLocationName(row.get("fLocName", String.class))

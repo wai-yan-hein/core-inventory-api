@@ -34,4 +34,5 @@ public class VTransfer {
     private String weightUnitName;
     private String labourGroupName;
     private String traderName;
+    private Double saleAmt;
 }

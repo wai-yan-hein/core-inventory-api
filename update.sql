@@ -1599,7 +1599,7 @@ create table tmp_stock_io_column (
   primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
 ) engine=innodb default charset=utf8mb3;
 
-drop table if exists tmp_stock_opening;
+drop table if exists git ening;
 create table tmp_stock_opening (
   tran_date date not null,
   stock_code varchar(15) not null,
@@ -1668,6 +1668,12 @@ add column bag double(20,3) null after rice;
 alter table sale_his
 add column weight_vou_no varchar(25) null after debtor_acc;
 
+create table sale_order_join (
+  sale_vou_no varchar(25) not null,
+  order_vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  primary key (sale_vou_no,order_vou_no,comp_code)
+) engine=innodb default charset=latin1 collate=latin1_swedish_ci;
 
 
 #view
