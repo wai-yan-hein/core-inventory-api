@@ -28,6 +28,8 @@ public interface ReportService {
     ResultSet getResult(String sql, Object... params) throws Exception;
 
     String getOpeningDate(String compCode, int tranSource);
+    String getOpeningDateByLocation(String compCode,String locCode);
+
 
     List<VSale> getSaleVoucher(String vouNo, String compCode) throws Exception;
 

@@ -33,7 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RetInController {
 
-    private final ReturnObject ro = new ReturnObject();
+    private final ReturnObject ro = ReturnObject.builder().build();
     private final RetInService riService;
     private final RetInDetailService rdService;
     private final ReportService reportService;

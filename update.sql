@@ -1599,7 +1599,7 @@ create table tmp_stock_io_column (
   primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
 ) engine=innodb default charset=utf8mb3;
 
-drop table if exists git ening;
+drop table if exists tmp_stock_opening;
 create table tmp_stock_opening (
   tran_date date not null,
   stock_code varchar(15) not null,

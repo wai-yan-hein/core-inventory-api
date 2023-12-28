@@ -1,5 +1,9 @@
 package cv.api.service;
 
+import cv.api.common.ReportFilter;
+import cv.api.common.ReturnObject;
+import cv.api.common.Util1;
+import cv.api.entity.VStockBalance;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -7,11 +11,16 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class StockReportService {
-    private final R2dbcEntityTemplate template;
     private final DatabaseClient client;
 
     private Mono<Long> calculateOpeningByPaddy(String opDate, String fromDate, String typeCode,
@@ -307,4 +316,161 @@ public class StockReportService {
         String sql = "delete from tmp_stock_io_column where mac_id = " + macId;
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
     }
+
+    public Mono<ReturnObject> getTransferSaleClosing(ReportFilter filter) {
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String compCode = filter.getCompCode();
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
+        Integer macId = filter.getMacId();
+        String opDate = filter.getOpDate();
+        log.info("opDate Location : " + opDate);
+        String sql = """
+                select a.stock_code,s.user_code,s.stock_name,s.sale_price_n,
+                sum(a.op_qty) op_qty,sum(a.sale_qty) sale_qty,sum(a.transfer_qty) transfer_qty
+                from (
+                select stock_code,sum(qty)op_qty,0 sale_qty,0 transfer_qty,comp_code
+                from tmp_stock_balance
+                where mac_id =:macId
+                group by stock_code
+                    union all
+                select stock_code,0,sum(qty) sale_qty, 0 transfer_qty,comp_code
+                from v_sale
+                where deleted = false
+                and comp_code =:compCode
+                and date(vou_date) between :fromDate and :toDate
+                and (loc_code =:locCode or'-' =:locCode)
+                group by stock_code
+                	union all
+                select stock_code,0,0,sum(qty) transfer_qty,comp_code
+                from v_transfer
+                where deleted = false
+                and comp_code =:compCode
+                and date(vou_date) between :fromDate and :toDate
+                and (loc_code_to =:locCode or'-' =:locCode)
+                group by stock_code
+                )a
+                join stock s on a.stock_code = s.stock_code
+                and a.comp_code = s.comp_code
+                group by a.stock_code
+                order by s.user_code;
+                """;
+        Mono<ReturnObject> monoReturn = client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("locCode", locCode)
+                .bind("macId", macId)
+                .map((row) -> VStockBalance.builder()
+                        .stockCode(row.get("stock_code", String.class))
+                        .userCode(row.get("user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .salePrice(row.get("sale_price_n", Double.class))
+                        .opQty(row.get("op_qty", Double.class))
+                        .saleQty(row.get("sale_qty", Double.class))
+                        .transferQty(row.get("transfer_qty", Double.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(this::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+        //stock_code, user_code, stock_name, sale_price_n, sale_qty, transfer_qty
+        return deleteTmpClosing(macId)
+                .then(calStockBalanceQty(opDate, fromDate, toDate, locCode, compCode, macId))
+                .then(monoReturn);
+    }
+
+    private Mono<Long> calStockBalanceQty(String opDate, String fromDate,
+                                          String toDate, String locCode, String compCode, Integer macId) {
+        String sql = """
+                insert into tmp_stock_balance(stock_code, qty, loc_code,comp_code,mac_id)
+                select stock_code,sum(qty) qty,loc_code,comp_code,:macId
+                from (
+                select stock_code,sum(qty) as qty,loc_code,comp_code
+                from v_opening
+                where deleted = false
+                and tran_source =1
+                and date(op_date) =:opDate
+                and (loc_code=:locCode or '-' =:locCode)
+                and calculate =true
+                group by stock_code
+                	union all
+                select stock_code,sum(qty) * - 1 as qty,loc_code,comp_code
+                from v_sale
+                where deleted = 0
+                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and comp_code = :compCode
+                and (loc_code=:locCode or '-' =:locCode)
+                group by stock_code
+                	union all
+                select stock_code,sum(in_qty),loc_code,comp_code
+                from v_stock_io
+                where in_qty is not null
+                and in_unit is not null
+                and deleted = 0
+                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and comp_code = :compCode
+                group by stock_code
+                	union all
+                select stock_code,sum(out_qty) * - 1,loc_code,comp_code
+                from v_stock_io
+                where out_qty is not null
+                and out_unit is not null
+                and deleted = 0
+                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and comp_code = :compCode
+                and (loc_code=:locCode or '-' =:locCode)
+                and calculate =1
+                group by stock_code
+                	union all
+                select stock_code,sum(qty) * - 1,loc_code_from,comp_code
+                from v_transfer
+                where deleted = 0
+                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and comp_code = :compCode
+                and (loc_code_from =:locCode or '-' =:locCode)
+                group by stock_code
+                	union all
+                select stock_code,sum(qty),loc_code_to,comp_code
+                from v_transfer
+                where deleted = 0
+                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and comp_code = :compCode
+                and (loc_code_to =:locCode or '-' =:locCode)
+                group by stock_code
+                )a
+                group by stock_code
+                """;
+        return client.sql(sql)
+                .bind("opDate", opDate)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("locCode", locCode)
+                .bind("compCode", compCode)
+                .bind("macId", macId)
+                .fetch()
+                .rowsUpdated();
+    }
+
+    private Mono<Long> deleteTmpClosing(Integer macId) {
+        String delSql = "delete from tmp_stock_balance where mac_id =:macId";
+        return client.sql(delSql).bind("macId", macId).fetch().rowsUpdated();
+    }
+
+    private byte[] convertToJsonBytes(Object data) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            try (Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                Util1.gson.toJson(data, writer);
+            }
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            // Handle the exception according to your application's error handling strategy
+            return new byte[0]; // Or throw a custom exception
+        }
+    }
+
 }

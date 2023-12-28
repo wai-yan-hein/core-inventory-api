@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MillingController {
 
-    private final ReturnObject ro = new ReturnObject();
+    private final ReturnObject ro = ReturnObject.builder().build();
     private final MillingHisService millingHisService;
     private final ReportService reportService;
 

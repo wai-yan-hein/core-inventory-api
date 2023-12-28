@@ -6,6 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,7 +16,8 @@ import java.io.Serializable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-public class VStockBalance implements Serializable {
+@Builder
+public class VStockBalance {
 
     private String stockCode;
     private String stockName;
@@ -26,5 +28,9 @@ public class VStockBalance implements Serializable {
     private String unitName;
     private Double smallestQty;
     private String userCode;
+    private Double salePrice;
+    private Double opQty;
+    private Double saleQty;
+    private Double transferQty;
 
 }

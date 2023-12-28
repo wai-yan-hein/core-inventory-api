@@ -79,6 +79,31 @@ public class ReportServiceImpl implements ReportService {
         return Util1.isNull(opDate, "1998-10-07");
     }
 
+    @Override
+    public String getOpeningDateByLocation(String compCode,String locCode) {
+        String opDate = null;
+        String sql = """
+                select max(op_date) op_date
+                from op_his
+                where deleted = false
+                and comp_code =?
+                and loc_code =?
+                """;
+        try {
+            ResultSet rs = reportDao.getResultSql(sql, compCode, locCode);
+            if (rs != null) {
+                while (rs.next()) {
+                    Date date = rs.getDate("op_date");
+                    if (date != null) {
+                        opDate = Util1.toDateStr(date, "yyyy-MM-dd");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.isNull(opDate, "1998-10-07");    }
+
 
     @Override
     public List<VSale> getSaleVoucher(String vouNo, String compCode) throws Exception {
@@ -1686,14 +1711,13 @@ public class ReportServiceImpl implements ReportService {
             if (!Objects.isNull(rs)) {
                 try {
                     while (rs.next()) {
-                        VStockBalance b = new VStockBalance();
-                        b.setUserCode(rs.getString("user_code"));
-                        b.setStockCode(rs.getString("stock_code"));
-                        b.setStockName(rs.getString("stock_name"));
-                        float smallQty = rs.getFloat("qty");
-                        String relCode = rs.getString("rel_code");
-                        b.setUnitName(getRelStr(relCode, compCode, smallQty));
-                        b.setLocationName("All");
+                        VStockBalance b = VStockBalance.builder()
+                                .userCode(rs.getString("user_code"))
+                                .stockCode(rs.getString("stock_code"))
+                                .stockName(rs.getString("stock_name"))
+                                .unitName(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("qty")))
+                                .locationName("All")
+                                .build();
                         balances.add(b);
                     }
                 } catch (Exception e) {
@@ -1712,16 +1736,16 @@ public class ReportServiceImpl implements ReportService {
             if (!Objects.isNull(rs)) {
                 try {
                     while (rs.next()) {
-                        VStockBalance b = new VStockBalance();
-                        b.setUserCode(rs.getString("user_code"));
-                        b.setStockCode(rs.getString("stock_code"));
-                        b.setStockName(rs.getString("stock_name"));
-                        b.setLocationName(rs.getString("loc_name"));
-                        b.setLocCode(rs.getString("loc_code"));
-                        float smallQty = rs.getFloat("smallest_qty");
-                        String relCode = rs.getString("rel_code");
-                        b.setUnitName(getRelStr(relCode, compCode, smallQty));
+                        VStockBalance b = VStockBalance.builder()
+                                .userCode(rs.getString("user_code"))
+                                .stockCode(rs.getString("stock_code"))
+                                .stockName(rs.getString("stock_name"))
+                                .locationName(rs.getString("loc_name"))
+                                .locCode(rs.getString("loc_code"))
+                                .unitName(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("smallest_qty")))
+                                .build();
                         balances.add(b);
+
                     }
                 } catch (Exception e) {
                     log.error("getStockBalance : " + e.getMessage());
@@ -1753,13 +1777,15 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
                 while (rs.next()) {
-                    VStockBalance b = new VStockBalance();
-                    b.setUserCode(rs.getString("user_code"));
-                    b.setStockName(rs.getString("stock_name"));
-                    b.setTotalQty(rs.getDouble("qty"));
-                    b.setWeight(rs.getDouble("weight"));
-                    b.setLocationName("All");
+                    VStockBalance b = VStockBalance.builder()
+                            .userCode(rs.getString("user_code"))
+                            .stockName(rs.getString("stock_name"))
+                            .totalQty(rs.getDouble("qty"))
+                            .weight(rs.getDouble("weight"))
+                            .locationName("All")
+                            .build();
                     list.add(b);
+
                 }
             } catch (Exception e) {
                 log.error("getStockBalanceByWeight : " + e.getMessage());
@@ -1776,13 +1802,16 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
                 while (rs.next()) {
-                    VStockBalance b = new VStockBalance();
-                    b.setUserCode(rs.getString("user_code"));
-                    b.setStockName(rs.getString("stock_name"));
-                    b.setTotalQty(rs.getDouble("qty"));
-                    b.setWeight(rs.getDouble("weight"));
-                    b.setLocationName(rs.getString("loc_name"));
+                    VStockBalance b = VStockBalance.builder()
+                            .userCode(rs.getString("user_code"))
+                            .stockName(rs.getString("stock_name"))
+                            .totalQty(rs.getDouble("qty"))
+                            .weight(rs.getDouble("weight"))
+                            .locationName(rs.getString("loc_name"))
+                            .build();
+
                     list.add(b);
+
                 }
             } catch (Exception e) {
                 log.error("getStockBalanceByWeight : " + e.getMessage());
