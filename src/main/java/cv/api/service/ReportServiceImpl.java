@@ -28,8 +28,8 @@ import java.util.*;
  */
 @Service
 @Transactional
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ReportServiceImpl implements ReportService {
     private final DecimalFormat formatter = new DecimalFormat("###.##");
     private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
@@ -153,7 +153,7 @@ public class ReportServiceImpl implements ReportService {
         }
         if (!saleList.isEmpty()) {
             List<VouDiscount> listDis = saleHisService.getVoucherDiscount(vouNo, compCode);
-            saleList.get(0).setListDiscount(listDis);
+            saleList.getFirst().setListDiscount(listDis);
         }
         return saleList;
     }
@@ -259,9 +259,9 @@ public class ReportServiceImpl implements ReportService {
                 list.add(p);
             }
             if (!list.isEmpty()) {
-                String landVouNo = list.get(0).getLandVouNo();
+                String landVouNo = list.getFirst().getLandVouNo();
                 if (!Util1.isNullOrEmpty(landVouNo)) {
-                    list.get(0).setListPrice(landingHisPriceDao.getLandingPrice(landVouNo, compCode));
+                    list.getFirst().setListPrice(landingHisPriceDao.getLandingPrice(landVouNo, compCode));
                 }
             }
         }
@@ -3263,18 +3263,19 @@ public class ReportServiceImpl implements ReportService {
         List<VTransfer> openingList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VTransfer s = new VTransfer();
-                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setRemark(rs.getString("remark"));
-                s.setRefNo(rs.getString("ref_no"));
-                s.setCreatedBy(rs.getString("created_by"));
-                s.setDeleted(rs.getBoolean("deleted"));
-                s.setFromLocationName(rs.getString("from_loc_name"));
-                s.setToLocationName(rs.getString("to_loc_name"));
-                s.setDeptId(rs.getInt("dept_id"));
-                s.setTraderName(rs.getString("trader_name"));
+                VTransfer s = VTransfer.builder()
+                        .vouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()))
+                        .vouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"))
+                        .vouNo(rs.getString("vou_no"))
+                        .remark(rs.getString("remark"))
+                        .refNo(rs.getString("ref_no"))
+                        .createdBy(rs.getString("created_by"))
+                        .deleted(rs.getBoolean("deleted"))
+                        .fromLocationName(rs.getString("from_loc_name"))
+                        .toLocationName(rs.getString("to_loc_name"))
+                        .deptId(rs.getInt("dept_id"))
+                        .traderName(rs.getString("trader_name"))
+                        .build();
                 openingList.add(s);
             }
         }
@@ -3507,26 +3508,20 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = getResult(sql, compCode, vouNo);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    VTransfer in = new VTransfer();
-                    in.setStockName(rs.getString("stock_name"));
-                    in.setUnit(rs.getString("unit"));
-                    in.setQty(rs.getDouble("qty"));
-                    in.setVouNo(rs.getString("vou_no"));
-                    in.setVouDate(rs.getString("vou_date"));
-                    in.setFromLocationName(rs.getString("fLocName"));
-                    in.setToLocationName(rs.getString("tLocName"));
-                    in.setStockCode(rs.getString("user_code"));
-                    in.setRemark(rs.getString("remark"));
-                    in.setRefNo(rs.getString("ref_no"));
-                    in.setUnitName(rs.getString("unit_name"));
-                    in.setLabourGroupName(rs.getString("labour_name"));
-                    double weight = rs.getFloat("weight");
-                    if (weight > 0) {
-                        in.setWeight(weight);
-                        in.setWeightUnit(rs.getString("weight_unit"));
-                        in.setWeightUnitName(rs.getString("weight_unit_name"));
-                    }
-                    riList.add(in);
+                    VTransfer s = VTransfer.builder()
+                            .vouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()))
+                            .vouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"))
+                            .vouNo(rs.getString("vou_no"))
+                            .remark(rs.getString("remark"))
+                            .refNo(rs.getString("ref_no"))
+                            .createdBy(rs.getString("created_by"))
+                            .deleted(rs.getBoolean("deleted"))
+                            .fromLocationName(rs.getString("from_loc_name"))
+                            .toLocationName(rs.getString("to_loc_name"))
+                            .deptId(rs.getInt("dept_id"))
+                            .traderName(rs.getString("trader_name"))
+                            .build();
+                    riList.add(s);
                 }
             }
         } catch (Exception e) {
@@ -5208,9 +5203,6 @@ public class ReportServiceImpl implements ReportService {
         if (!traderCode.equals("-")) {
             filter += "and trader_code = '" + traderCode + "'\n";
         }
-//        if (!locCode.equals("-")) {
-//            filter += "and v.location ='" + locCode + "'\n";
-//        }
         String sql = "select v.vou_date,v.vou_no,v.stock_code,s.stock_name ,v.remark,v.created_by," +
                 "v.deleted,v.due_date,v.dept_id,t.trader_name \n" +
                 "from v_pur_order v \n" +

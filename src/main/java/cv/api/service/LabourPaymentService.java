@@ -57,11 +57,11 @@ public class LabourPaymentService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         LabourPayment payment = dto.toEntity();
+        payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
         if (vouNo == null) {
             return vouNoService.getVouNo(deptId, "LabourPayment", compCode, macId)
                     .flatMap(seqNo -> {
                         payment.setVouNo(seqNo);
-                        payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
                         payment.setCreatedDate(LocalDateTime.now());
                         payment.setUpdatedDate(LocalDateTime.now());
                         return template.insert(payment).map(LabourPayment::buildDto);
@@ -95,6 +95,7 @@ public class LabourPaymentService {
                   labour_group_code = :labourGroupCode,
                   cur_code = :curCode,
                   remark = :remark,
+                  pay_total=:payTotal,
                   created_date = :createdDate,
                   created_by = :createdBy,
                   updated_date = :updatedDate,
@@ -104,7 +105,8 @@ public class LabourPaymentService {
                   member_count =:memberCount,
                   source_acc = :sourceAcc,
                   expense_acc =:expenseAcc,
-                  dept_code=:deptCode
+                  dept_code=:deptCode,
+                  post=:post
                 WHERE vou_no = :vouNo AND comp_code = :compCode""";
 
         return databaseClient.sql(sql)
@@ -114,6 +116,7 @@ public class LabourPaymentService {
                 .bind("labourGroupCode", data.getLabourGroupCode())
                 .bind("curCode", data.getCurCode())
                 .bind("remark", data.getRemark())
+                .bind("payTotal",data.getPayTotal())
                 .bind("createdDate", data.getCreatedDate())
                 .bind("createdBy", data.getCreatedBy())
                 .bind("updatedDate", LocalDateTime.now())
@@ -126,6 +129,7 @@ public class LabourPaymentService {
                 .bind("vouNo", data.getVouNo())
                 .bind("compCode", data.getCompCode())
                 .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, data.getDeptCode()))
+                .bind("post", data.isPost())
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(data);
@@ -230,6 +234,7 @@ public class LabourPaymentService {
                         .fromDate(row.get("from_date", LocalDate.class))
                         .toDate(row.get("to_date", LocalDate.class))
                         .deptCode(row.get("dept_code", String.class))
+                        .post(row.get("post", Boolean.class))
                         .build()).all();
     }
 
@@ -253,6 +258,7 @@ public class LabourPaymentService {
                         .price(row.get("price", Double.class))
                         .amount(row.get("amount", Double.class))
                         .account(row.get("account", String.class))
+                        .deptCode(row.get("dept_code", String.class))
                         .build())
                 .all();
     }

@@ -874,7 +874,7 @@ public class AccountRepo {
                 String sourceAcc = ph.getSourceAcc();
                 String compCode = ph.getCompCode();
                 String vouNo = ph.getVouNo();
-                if (!Util1.isNullOrEmpty(sourceAcc)) {
+                if (!Util1.isNullOrEmpty(sourceAcc) && ph.getPost()) {
                     Integer deptId = ph.getDeptId();
                     LocalDateTime vouDate = ph.getVouDate();
                     String curCode = ph.getCurCode();
@@ -894,7 +894,7 @@ public class AccountRepo {
                                 gl.setCrAmt(detail.getAmount());
                                 gl.setCurCode(curCode);
                                 gl.setReference(remark);
-                                gl.setDeptCode(ph.getDeptCode());
+                                gl.setDeptCode(Util1.isNull(gl.getDeptCode(), ph.getDeptCode()));
                                 gl.setCreatedDate(LocalDateTime.now());
                                 gl.setCreatedBy(appName);
                                 gl.setTranSource("LABOUR_PAYMENT");
@@ -907,7 +907,7 @@ public class AccountRepo {
 
 
                 } else {
-                    updateLabourPayment(vouNo,compCode,"IGNORE");
+                    updateLabourPayment(vouNo, compCode, "IGNORE");
                 }
             }
         }

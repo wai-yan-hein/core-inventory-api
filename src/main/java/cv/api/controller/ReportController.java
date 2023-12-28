@@ -12,6 +12,7 @@ import cv.api.entity.VStockBalance;
 import cv.api.model.*;
 import cv.api.service.ReportService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,11 +30,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/report")
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReportController {
     private final ReturnObject ro = new ReturnObject();
-    @Autowired
-    private ReportService reportService;
+    private final ReportService reportService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getSaleReport(@RequestParam String vouNo,

@@ -5,12 +5,14 @@ import cv.api.dto.LabourPaymentDto;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@Slf4j
 public class LabourPayment {
     @Id
     private String vouNo;
@@ -33,6 +35,8 @@ public class LabourPayment {
     private String expenseAcc;
     private double payTotal;
     private String deptCode;
+    private boolean post;
+
 
     public LabourPaymentDto buildDto() {
         return LabourPaymentDto.builder()
@@ -54,6 +58,7 @@ public class LabourPayment {
                 .expenseAcc(getExpenseAcc())
                 .payTotal(getPayTotal())
                 .deptCode(getDeptCode())
+                .post(isPost())
                 .build();
     }
 

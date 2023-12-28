@@ -35,6 +35,8 @@ public class LabourPaymentDto {
     private String expenseAcc;
     private String labourName;
     private String deptCode;
+    private Boolean post;
+
 
     private List<LabourPaymentDetail> listDetail;
 
@@ -60,6 +62,7 @@ public class LabourPaymentDto {
                 .sourceAcc(getSourceAcc())
                 .expenseAcc(getExpenseAcc())
                 .deptCode(getDeptCode())
+                .post(getPost())
                 .build();
     }
 

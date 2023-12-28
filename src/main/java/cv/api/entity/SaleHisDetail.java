@@ -53,6 +53,12 @@ public class SaleHisDetail {
     private Double orgPrice;
     @Column(name = "weight_loss")
     private Double weightLoss;
+    @Column(name = "wet")
+    private Double wet;
+    @Column(name = "rice")
+    private Double rice;
+    @Column(name = "bag")
+    private Double bag;
     @Transient
     private String userCode;
     @Transient
