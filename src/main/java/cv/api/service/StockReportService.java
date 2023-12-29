@@ -447,7 +447,6 @@ public class StockReportService {
                 """;
         return client.sql(sql)
                 .bind("opDate", opDate)
-                .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .bind("locCode", locCode)
                 .bind("compCode", compCode)

@@ -109,7 +109,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VSale> getSaleVoucher(String vouNo, String compCode) throws Exception {
         List<VSale> saleList = new ArrayList<>();
         String sql = """
-                select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
+                select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.reference,v.vou_no,v.vou_date,v.stock_name,
                 v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
                 v.paid,v.vou_balance,t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,
                 v.comp_code,c.cat_name,r.reg_name,u1.unit_name sale_unit_name,u2.unit_name weight_unit_name
@@ -147,6 +147,7 @@ public class ReportServiceImpl implements ReportService {
             sale.setTraderName(rs.getString("trader_name"));
             sale.setRemark(remark);
             sale.setRefNo(refNo);
+            sale.setReference(rs.getString("reference"));
             sale.setPhoneNo(rs.getString("phone"));
             sale.setAddress(rs.getString("address"));
             sale.setRfId(rs.getString("rfid"));
@@ -235,7 +236,7 @@ public class ReportServiceImpl implements ReportService {
         List<VPurchase> list = new ArrayList<>();
         String sql = """
                 select t.trader_name,t.phone,p.remark,p.vou_no,
-                p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,
+                p.batch_no,p.vou_date,p.stock_name,p.pur_unit,p.qty,p.pur_price,p.pur_amt,
                 p.vou_total,p.discount,p.paid,p.balance,
                 p.weight,p.weight_unit,l.labour_name,p.land_vou_no,u1.unit_name weight_unit_name,
                 u2.unit_name pur_unit_name,loc.loc_name,r.reg_name
