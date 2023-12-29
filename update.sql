@@ -1673,7 +1673,7 @@ create table sale_order_join (
   order_vou_no varchar(25) not null,
   comp_code varchar(15) not null,
   primary key (sale_vou_no,order_vou_no,comp_code)
-) engine=innodb default charset=latin1 collate=latin1_swedish_ci;
+) engine=innodb default  charset=utf8mb3 collate=utf8mb3_general_ci;
 
 
 #view

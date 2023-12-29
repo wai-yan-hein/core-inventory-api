@@ -249,7 +249,7 @@ public class AccountRepo {
                 LocalDateTime vouDate = sh.getVouDate();
                 String traderCode = sh.getTraderCode();
                 String curCode = sh.getCurCode();
-                String remark = sh.getRemark();
+                String remark = Util1.isNull(sh.getReference(), sh.getRemark());
                 boolean deleted = sh.isDeleted();
                 String vouNo = sh.getKey().getVouNo();
                 String projectNo = sh.getProjectNo();
