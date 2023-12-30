@@ -135,6 +135,7 @@ public class ReportController {
                 Integer deptId = filter.getDeptId();
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
+                String opDatePaddy = reportService.getOpeningDate(compCode, OPHis.STOCK_OP_PADDY);
                 String opPayableDate = reportService.getOpeningDate(compCode, OPHis.STOCK_PAYABLE);
                 String opDateLocation = reportService.getOpeningDateByLocation(compCode, locCode);
                 String fromDate = filter.getFromDate();
@@ -305,7 +306,8 @@ public class ReportController {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutSummaryByPaddy" -> {
+                    case "StockInOutSummaryByPaddy","StockInOutSummaryByRice" -> {
+                        filter.setOpDate(opDatePaddy);
                         return stockReportService.getStockInOutPaddy(filter);
                     }
                     case "StockInOutDetailByWeight" -> {

@@ -37,7 +37,7 @@ public class StockReportService {
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
-                 and tran_source = 1
+                 and tran_source = 3
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -84,7 +84,7 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code_to
                  union all
-                 select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
+                 select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(wet) wet, sum(rice) rice, sum(in_bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
                  from v_stock_io
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
@@ -97,7 +97,7 @@ public class StockReportService {
                  and in_qty>0
                  group by stock_code, loc_code
                  union all
-                 select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
+                 select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(out_bag)*-1 bag, loc_code, weight_unit, sum(amount) ttl_amt
                  from v_stock_io
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
@@ -149,7 +149,7 @@ public class StockReportService {
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String tfSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,wet,rice,out_bag,out_weight,ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag) ttl_bag, sum(total_weight)*-1 ttl_weight,sum(amount) ttl_amt,loc_code_from,:macId,comp_code,dept_id
+                select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag)*-1 ttl_bag, sum(total_weight)*-1 ttl_weight,sum(amount) ttl_amt,loc_code_from,:macId,comp_code,dept_id
                 from v_transfer
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
@@ -177,7 +177,7 @@ public class StockReportService {
                 group by date(vou_date),vou_no,stock_code,loc_code_to""";
         String stockIn = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,wet,rice,in_bag,in_weight,ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'StockIn',vou_date vou_date,vou_no,remark,stock_code,sum(in_qty) ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag) ttl_bag,sum(total_weight) ttl_weight,sum(amount) ttl_amt,loc_code,:macId,comp_code,dept_id
+                select 'StockIn',vou_date vou_date,vou_no,remark,stock_code,sum(in_qty) ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(in_bag) ttl_bag,sum(total_weight) ttl_weight,sum(amount) ttl_amt,loc_code,:macId,comp_code,dept_id
                 from v_stock_io
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
@@ -188,11 +188,11 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and in_qty>0
+                and (in_qty>0 or in_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String stockOut = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,wet,rice,out_bag,out_weight,ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'StockOut',vou_date vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag) ttl_bag,sum(total_weight)*-1 ttl_weight,sum(amount) ttl_amt,loc_code,:macId,comp_code,dept_id
+                select 'StockOut',vou_date vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(out_bag)*-1 ttl_bag,sum(total_weight)*-1 ttl_weight,sum(amount) ttl_amt,loc_code,:macId,comp_code,dept_id
                 from v_stock_io
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
@@ -203,7 +203,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and out_qty>0
+                and (out_qty>0 or out_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
         Mono<Long> purMono = client.sql(purSql)
@@ -277,6 +277,7 @@ public class StockReportService {
 
     public Mono<ReturnObject> getStockInOutPaddy(ReportFilter filter) {
         String opDate = filter.getOpDate();
+        log.info(opDate);
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
         String typeCode = filter.getStockTypeCode();
@@ -288,9 +289,9 @@ public class StockReportService {
         Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         String sql = """
-                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,
-                sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight+a.sale_weight) bal_weight,
-                sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag+a.sale_bag) bal_bag,
+                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,
+                sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight) bal_weight,
+                sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag) bal_bag,
                 s.weight_unit,s.pur_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
                 st.stock_type_name,l.loc_name, w.description,c.user_code c_user_code,c.cat_name
                 from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,
@@ -302,7 +303,7 @@ public class StockReportService {
                 sum(wet) wet, sum(rice) rice, sum(ttl_amt) ttl_amt
                 from tmp_stock_io_column
                 where mac_id = :macId
-                group by stock_code, loc_code)a
+                group by stock_code)a
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
                 join stock_type st on s.stock_type_code = st.stock_type_code
@@ -314,32 +315,33 @@ public class StockReportService {
                 join warehouse w on l.warehouse_code = w.code
                 and a.comp_code = l.comp_code
                 group by a.stock_code
-                order by c_user_code, s_user_code, w.description""";
+                order by c_user_code, s_user_code
+                """;
         Mono<ReturnObject> monoResult = client.sql(sql)
                 .bind("macId", macId)
                 .map((row) -> ClosingBalance.builder()
-                        .openQty(row.get("op_qty", Double.class))
-                        .purQty(row.get("pur_qty", Double.class))
-                        .inQty(row.get("in_qty", Double.class))
-                        .saleQty(row.get("sale_qty", Double.class))
-                        .outQty(row.get("out_qty", Double.class))
-                        .balQty(row.get("bal_qty", Double.class))
-                        .openWeight(row.get("op_Weight", Double.class))
-                        .purWeight(row.get("pur_Weight", Double.class))
-                        .inWeight(row.get("in_Weight", Double.class))
-                        .saleWeight(row.get("sale_Weight", Double.class))
-                        .outWeight(row.get("out_Weight", Double.class))
-                        .balWeight(row.get("bal_Weight", Double.class))
-                        .openBag(row.get("op_bag", Double.class))
-                        .purBag(row.get("pur_bag", Double.class))
-                        .inBag(row.get("in_bag", Double.class))
-                        .saleBag(row.get("sale_bag", Double.class))
-                        .outBag(row.get("out_bag", Double.class))
-                        .balBag(row.get("bal_bag", Double.class))
+                        .openQty(Util1.toNull(row.get("op_qty", Double.class)))
+                        .purQty(Util1.toNull(row.get("pur_qty", Double.class)))
+                        .inQty(Util1.toNull(row.get("in_qty", Double.class)))
+                        .saleQty(Util1.toNull(row.get("sale_qty", Double.class)))
+                        .outQty(Util1.toNull(row.get("out_qty", Double.class)))
+                        .balQty(Util1.toNull(row.get("bal_qty", Double.class)))
+                        .openWeight(Util1.toNull(row.get("op_Weight", Double.class)))
+                        .purWeight(Util1.toNull(row.get("pur_Weight", Double.class)))
+                        .inWeight(Util1.toNull(row.get("in_Weight", Double.class)))
+                        .saleWeight(Util1.toNull(row.get("sale_Weight", Double.class)))
+                        .outWeight(Util1.toNull(row.get("out_Weight", Double.class)))
+                        .balWeight(Util1.toNull(row.get("bal_Weight", Double.class)))
+                        .openBag(Util1.toNull(row.get("op_bag", Double.class)))
+                        .purBag(Util1.toNull(row.get("pur_bag", Double.class)))
+                        .inBag(Util1.toNull(row.get("in_bag", Double.class)))
+                        .saleBag(Util1.toNull(row.get("sale_bag", Double.class)))
+                        .outBag(Util1.toNull(row.get("out_bag", Double.class)))
+                        .balBag(Util1.toNull(row.get("bal_bag", Double.class)))
                         .stockUsrCode(row.get("s_user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
                         .stockCode(row.get("stock_code", String.class))
-                        .catName(row.get("cat_name",String.class))
+                        .catName(row.get("cat_name", String.class))
                         .locName(row.get("loc_name", String.class))
                         .wet(row.get("wet", Double.class))
                         .rice(row.get("rice", Double.class))
@@ -374,6 +376,10 @@ public class StockReportService {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer macId = filter.getMacId();
         String opDate = filter.getOpDate();
+        String typeCode = filter.getStockTypeCode();
+        String catCode = filter.getCatCode();
+        String brandCode = filter.getBrandCode();
+        String stockCode = filter.getStockCode();
         log.info("opDate Location : " + opDate);
         String sql = """
                 select a.stock_code,s.user_code,s.stock_name,s.sale_price_n,
@@ -390,6 +396,10 @@ public class StockReportService {
                 and comp_code =:compCode
                 and date(vou_date) between :fromDate and :toDate
                 and (loc_code =:locCode or'-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 	union all
                 select stock_code,0,0,sum(qty) transfer_qty,comp_code
@@ -398,6 +408,10 @@ public class StockReportService {
                 and comp_code =:compCode
                 and date(vou_date) between :fromDate and :toDate
                 and (loc_code_to =:locCode or'-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 )a
                 join stock s on a.stock_code = s.stock_code
@@ -411,6 +425,10 @@ public class StockReportService {
                 .bind("compCode", compCode)
                 .bind("locCode", locCode)
                 .bind("macId", macId)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
                 .map((row) -> VStockBalance.builder()
                         .stockCode(row.get("stock_code", String.class))
                         .userCode(row.get("user_code", String.class))
@@ -430,12 +448,14 @@ public class StockReportService {
                         .build());
         //stock_code, user_code, stock_name, sale_price_n, sale_qty, transfer_qty
         return deleteTmpClosing(macId)
-                .then(calStockBalanceQty(opDate, toDate, locCode, compCode, macId))
+                .then(calStockBalanceQty(opDate, fromDate, locCode, compCode, macId, typeCode, catCode, brandCode, stockCode))
                 .then(monoReturn);
     }
 
-    private Mono<Long> calStockBalanceQty(String opDate,
-                                          String toDate, String locCode, String compCode, Integer macId) {
+    private Mono<Long> calStockBalanceQty(String opDate, String fromDate,
+                                          String locCode, String compCode,
+                                          Integer macId, String typeCode, String catCode,
+                                          String brandCode, String stockCode) {
         String sql = """
                 insert into tmp_stock_balance(stock_code, qty, loc_code,comp_code,mac_id)
                 select stock_code,sum(qty) qty,loc_code,comp_code,:macId
@@ -444,17 +464,26 @@ public class StockReportService {
                 from v_opening
                 where deleted = false
                 and tran_source =1
+                and comp_code = :compCode
                 and date(op_date) =:opDate
                 and (loc_code=:locCode or '-' =:locCode)
                 and calculate =true
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 	union all
                 select stock_code,sum(qty) * - 1 as qty,loc_code,comp_code
                 from v_sale
                 where deleted = 0
-                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
                 and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 	union all
                 select stock_code,sum(in_qty),loc_code,comp_code
@@ -462,8 +491,13 @@ public class StockReportService {
                 where in_qty is not null
                 and in_unit is not null
                 and deleted = 0
-                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 	union all
                 select stock_code,sum(out_qty) * - 1,loc_code,comp_code
@@ -471,36 +505,52 @@ public class StockReportService {
                 where out_qty is not null
                 and out_unit is not null
                 and deleted = 0
-                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
                 and (loc_code=:locCode or '-' =:locCode)
                 and calculate =1
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 	union all
                 select stock_code,sum(qty) * - 1,loc_code_from,comp_code
                 from v_transfer
                 where deleted = 0
-                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
                 and (loc_code_from =:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 	union all
                 select stock_code,sum(qty),loc_code_to,comp_code
                 from v_transfer
                 where deleted = 0
-                and date(vou_date)>=:opDate and date(vou_date)< :toDate
+                and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
                 and (loc_code_to =:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
                 group by stock_code
                 )a
                 group by stock_code
                 """;
         return client.sql(sql)
                 .bind("opDate", opDate)
-                .bind("toDate", toDate)
+                .bind("fromDate", fromDate)
                 .bind("locCode", locCode)
                 .bind("compCode", compCode)
                 .bind("macId", macId)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
     }

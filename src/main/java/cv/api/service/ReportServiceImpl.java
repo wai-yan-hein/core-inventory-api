@@ -2757,11 +2757,11 @@ public class ReportServiceImpl implements ReportService {
                 io.setStockUsrCode(rs.getString("s_user_code"));
                 io.setStockName(rs.getString("stock_name"));
                 io.setLocName(rs.getString("loc_name"));
-                io.setOutQty(rs.getFloat("out_qty"));
+                io.setOutQty(rs.getDouble("out_qty"));
                 io.setOutUnit(rs.getString("out_unit"));
                 io.setCurCode(rs.getString("cur_code"));
-                io.setCostPrice(rs.getFloat("cost_price"));
-                io.setOutAmt(rs.getFloat("out_amt"));
+                io.setCostPrice(rs.getDouble("cost_price"));
+                io.setOutAmt(rs.getDouble("out_amt"));
                 list.add(io);
             }
         }
@@ -2836,8 +2836,8 @@ public class ReportServiceImpl implements ReportService {
                 io.setVouTypeName(rs.getString("description"));
                 io.setRelName(rs.getString("rel_name"));
                 io.setInUnit(rs.getString("unit"));
-                io.setCostPrice(rs.getFloat("price"));
-                io.setSmallPrice(rs.getFloat("small_price"));
+                io.setCostPrice(rs.getDouble("price"));
+                io.setSmallPrice(rs.getDouble("small_price"));
                 io.setRemark(rs.getString("remark"));
                 ioList.add(io);
             }
@@ -3565,7 +3565,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
         String sql = """
                 select vou_no,vou_date,v.remark,description,s_user_code,stock_name,weight,in_qty,
-                in_unit,out_qty,out_unit,received_name, received_phone, car_no,
+                in_unit,out_qty,out_unit,in_bag,out_bag,received_name, received_phone, car_no,
                 l.loc_name,g.labour_name,t.trader_name,t.phone,r.reg_name,j.job_name,
                 s1.unit_name weight_unit_name,s2.unit_name in_unit_name,s3.unit_name out_unit_name
                 from v_stock_io v join location l
@@ -3598,9 +3598,9 @@ public class ReportServiceImpl implements ReportService {
                     //vou_no, vou_date, remark, description, s_user_code, stock_name, in_qty, in_unit, out_qty, out_unit, loc_name
                     in.setStockName(rs.getString("stock_name"));
                     in.setInUnit(rs.getString("in_unit"));
-                    in.setInQty(rs.getDouble("in_qty"));
+                    in.setInQty(Util1.toNull(rs.getDouble("in_qty")));
                     in.setOutUnit(rs.getString("out_unit"));
-                    in.setOutQty(rs.getDouble("out_qty"));
+                    in.setOutQty(Util1.toNull(rs.getDouble("out_qty")));
                     in.setVouNo(rs.getString("vou_no"));
                     in.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     in.setLocName(rs.getString("loc_name"));
@@ -3619,7 +3619,9 @@ public class ReportServiceImpl implements ReportService {
                     in.setInUnitName(rs.getString("in_unit_name"));
                     in.setOutUnitName(rs.getString("out_unit_name"));
                     in.setWeightUnitName(rs.getString("weight_unit_name"));
-                    in.setWeight(rs.getDouble("weight"));
+                    in.setWeight(Util1.toNull(rs.getDouble("weight")));
+                    in.setInBag(Util1.toNull(rs.getDouble("in_bag")));
+                    in.setOutBag(Util1.toNull(rs.getDouble("out_bag")));
                     riList.add(in);
                 }
             }
@@ -3731,9 +3733,9 @@ public class ReportServiceImpl implements ReportService {
                     s.setStockCode(rs.getString("stock_code"));
                     s.setStockName(rs.getString("stock_name"));
                     s.setVouDate(Util1.toDateStr(rs.getDate("end_date"), "dd/MM/yyyy"));
-                    s.setQty(rs.getFloat("qty"));
+                    s.setQty(rs.getDouble("qty"));
                     s.setUnit(rs.getString("unit"));
-                    s.setPrice(rs.getFloat("price"));
+                    s.setPrice(rs.getDouble("price"));
                     s.setRemark(rs.getString("remark"));
                     s.setProcessNo(rs.getString("process_no"));
                     s.setDescription(rs.getString("description"));
@@ -3774,9 +3776,9 @@ public class ReportServiceImpl implements ReportService {
                     VStockIO io = new VStockIO();
                     io.setStockCode(rs.getString("stock_code"));
                     io.setStockName(rs.getString("stock_name"));
-                    io.setQty(rs.getFloat("qty"));
+                    io.setQty(rs.getDouble("qty"));
                     io.setUnit(rs.getString("unit"));
-                    io.setPrice(rs.getFloat("avg_price"));
+                    io.setPrice(rs.getDouble("avg_price"));
                     io.setLocName(rs.getString("loc_name"));
                     io.setDescription(rs.getString("description"));
                     list.add(io);
@@ -3817,9 +3819,9 @@ public class ReportServiceImpl implements ReportService {
                     VStockIO io = new VStockIO();
                     io.setStockCode(rs.getString("stock_code"));
                     io.setStockName(rs.getString("stock_name"));
-                    io.setQty(rs.getFloat("qty"));
+                    io.setQty(rs.getDouble("qty"));
                     io.setUnit(rs.getString("unit"));
-                    io.setPrice(rs.getFloat("price"));
+                    io.setPrice(rs.getDouble("price"));
                     io.setLocName(rs.getString("loc_name"));
                     io.setDescription(rs.getString("description"));
                     list.add(io);
@@ -3862,9 +3864,9 @@ public class ReportServiceImpl implements ReportService {
                     io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     io.setStockCode(rs.getString("user_code"));
                     io.setStockName(rs.getString("stock_name"));
-                    io.setQty(rs.getFloat("qty"));
+                    io.setQty(rs.getDouble("qty"));
                     io.setUnit(rs.getString("unit"));
-                    io.setPrice(rs.getFloat("price"));
+                    io.setPrice(rs.getDouble("price"));
                     io.setLocName(rs.getString("loc_name"));
                     io.setDescription(rs.getString("description"));
                     list.add(io);
