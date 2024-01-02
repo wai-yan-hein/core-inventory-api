@@ -105,7 +105,7 @@ public class ReportServiceImpl implements ReportService {
                 and v.comp_code =?""";
         ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
         while (rs.next()) {
-            VSale sale = new VSale();
+            VSale sale = VSale.builder().build();
             String remark = rs.getString("remark");
             String refNo = "-";
             if (remark != null) {
@@ -330,7 +330,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale sale = new VSale();
+                VSale sale = VSale.builder().build();
                 sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 sale.setVouNo(rs.getString("vou_no"));
                 sale.setSaleManCode(rs.getString("saleman_code"));
@@ -364,7 +364,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
                 // rel_code, trader_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
                 String userCode = rs.getString("s_user_code");
@@ -414,7 +414,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
                 // rel_code, trader_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
                 String userCode = rs.getString("s_user_code");
@@ -509,7 +509,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
                 // rel_code, saleman_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
                 String userCode = rs.getString("s_user_code");
@@ -553,7 +553,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale sale = new VSale();
+                VSale sale = VSale.builder().build();
                 sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 sale.setVouNo(rs.getString("vou_no"));
                 sale.setTraderCode(rs.getString("trader_code"));
@@ -749,7 +749,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale sale = new VSale();
+                VSale sale = VSale.builder().build();
                 String relCode = rs.getString("rel_code");
                 double smallQty = rs.getDouble("smallest_qty");
                 sale.setStockCode(rs.getString("s_user_code"));
@@ -840,7 +840,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
                 // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setRemark(rs.getString("remark"));
@@ -902,7 +902,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
                 // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderName(rs.getString("trader_name"));
@@ -953,7 +953,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
                 // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setRemark(rs.getString("remark"));
@@ -1020,7 +1020,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
                 // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setRemark(rs.getString("remark"));
@@ -1129,7 +1129,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale sale = new VSale();
+                VSale sale = VSale.builder().build();
                 sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 sale.setVouNo(rs.getString("vou_no"));
                 sale.setTraderCode(rs.getString("trader_code"));
@@ -2919,7 +2919,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(sql);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    VSale s = new VSale();
+                    VSale s = VSale.builder().build();
                     s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                     s.setVouNo(rs.getString("vou_no"));
@@ -3342,7 +3342,7 @@ public class ReportServiceImpl implements ReportService {
         List<VSale> saleList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setStockUserCode(rs.getString("s_user_code"));
@@ -4007,7 +4007,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale sale = new VSale();
+                VSale sale = VSale.builder().build();
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setStockCode(rs.getString("stock_code"));
                 sale.setSaleUnit(rs.getString("unit"));
@@ -4062,7 +4062,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setCreditTerm(Util1.toDateStr(rs.getDate("credit_term"), "dd/MM/yyyy"));
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
@@ -4108,7 +4108,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setCreditTerm(Util1.toDateStr(rs.getDate("credit_term"), "dd/MM/yyyy"));
                 s.setVouNo(rs.getString("vou_no"));
@@ -4258,7 +4258,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode);
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouTotal(rs.getDouble("vou_total"));
                 s.setVouBalance(rs.getDouble("vou_balance"));
                 s.setPaid(rs.getDouble("paid"));
@@ -4316,7 +4316,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //group_name, user_code, stock_name, qty, unit, weight,
                 // weight_unit, price, amount, ttl_qty, ttl
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setGroupName(rs.getString("group_name"));
                 s.setStockUserCode(rs.getString("user_code"));
                 s.setStockName(rs.getString("stock_name"));
@@ -4825,7 +4825,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VSale p = new VSale();
+                VSale p = VSale.builder().build();
                 //s_user_code, stock_name, qty, total_weight, pur_unit, weight_unit, comp_code, unit_name, weight_unit_name
                 p.setStockCode(rs.getString("stock_code"));
                 p.setStockUserCode(rs.getString("s_user_code"));
@@ -5518,7 +5518,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 // cur_code, vou_balance, user_code, trader_name,
                 // address, credit_amt, diff_amt
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setUserCode(rs.getString("user_code"));
                 s.setCurCode(rs.getString("cur_code"));
                 s.setVouBalance(rs.getDouble("vou_balance"));
@@ -5583,7 +5583,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 // cur_code, vou_balance, user_code, trader_name,
                 // address, credit_amt, diff_amt
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setUserCode(rs.getString("user_code"));
                 s.setCurCode(rs.getString("cur_code"));
                 s.setVouBalance(rs.getDouble("vou_balance"));
@@ -5648,7 +5648,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //vou_date, vou_no, cur_code, vou_total, vou_balance,
                 //  remark, reference, outstanding, user_code, address, trader_name
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setUserCode(rs.getString("user_code"));
                 s.setTraderCode(rs.getString("trader_code"));
@@ -5717,7 +5717,7 @@ public class ReportServiceImpl implements ReportService {
             while (rs.next()) {
                 //vou_date, vou_no, cur_code, vou_total, vou_balance,
                 //  remark, reference, outstanding, user_code, address, trader_name
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setUserCode(rs.getString("user_code"));
                 s.setTraderCode(rs.getString("trader_code"));

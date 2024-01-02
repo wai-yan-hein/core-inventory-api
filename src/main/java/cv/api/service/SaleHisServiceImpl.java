@@ -317,39 +317,38 @@ public class SaleHisServiceImpl implements SaleHisService {
         if (!curCode.equals("-")) {
             filter += "and cur_code = :curCode\n";
         }
-        return null;
-//        String sql = "select a.*,t.trader_name,t.user_code\n" +
-//                "from (\n" +
-//                "select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,\n" +
-//                "deleted,trader_code,loc_code,comp_code,dept_id\n" +
-//                "from v_sale s \n" + "where comp_code = :compCode\n" +
-//                "and (dept_id = :deptId or 0 = :deptId)\n" +
-//                "and deleted = :deleted\n" +
-//                "and date(vou_date) between :fromDate and :toDate\n" + filter + "\n" +
-//                "group by vou_no\n" + ")a\n" +
-//                "join trader t on a.trader_code = t.code\n" +
-//                "and a.comp_code = t.comp_code\n" +
-//                "order by vou_date desc";
-//        return databaseClient.sql(sql)
-//                .bind("vouNo", vouNo)
-//                .bind("remark", remark)
-//                .bind("reference", reference)
-//                .bind("traderCode", traderCode)
-//                .bind("userCode", userCode)
-//                .bind("stockCode", stockCode)
-//                .bind("saleManCode", saleManCode)
-//                .bind("locCode", locCode)
-//                .bind("batchNo", batchNo)
-//                .bind("projectNo", projectNo)
-//                .bind("curCode", curCode)
-//                .bind("deptId", deptId)
-//                .bind("deleted", deleted)
-//                .bind("fromDate", fromDate)
-//                .bind("toDate", toDate)
-//                .map((row) -> VSale.builder()
-//                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
-//                        .build()
-//                ).all();
+        String sql = "select a.*,t.trader_name,t.user_code\n" +
+                "from (\n" +
+                "select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,\n" +
+                "deleted,trader_code,loc_code,comp_code,dept_id\n" +
+                "from v_sale s \n" + "where comp_code = :compCode\n" +
+                "and (dept_id = :deptId or 0 = :deptId)\n" +
+                "and deleted = :deleted\n" +
+                "and date(vou_date) between :fromDate and :toDate\n" + filter + "\n" +
+                "group by vou_no\n" + ")a\n" +
+                "join trader t on a.trader_code = t.code\n" +
+                "and a.comp_code = t.comp_code\n" +
+                "order by vou_date desc";
+        return databaseClient.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("remark", remark)
+                .bind("reference", reference)
+                .bind("traderCode", traderCode)
+                .bind("userCode", userCode)
+                .bind("stockCode", stockCode)
+                .bind("saleManCode", saleManCode)
+                .bind("locCode", locCode)
+                .bind("batchNo", batchNo)
+                .bind("projectNo", projectNo)
+                .bind("curCode", curCode)
+                .bind("deptId", deptId)
+                .bind("deleted", deleted)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map((row) -> VSale.builder()
+                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .build()
+                ).all();
     }
 
 
