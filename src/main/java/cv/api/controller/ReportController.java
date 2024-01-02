@@ -12,6 +12,7 @@ import cv.api.entity.VStockBalance;
 import cv.api.model.*;
 import cv.api.service.ReportService;
 import cv.api.service.StockReportService;
+import cv.api.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -33,6 +34,7 @@ import java.util.List;
 public class ReportController {
     private final ReportService reportService;
     private final StockReportService stockReportService;
+    private final TransferService transferService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getSaleReport(@RequestParam String vouNo,
@@ -103,10 +105,9 @@ public class ReportController {
     }
 
     @GetMapping(value = "/getTransferReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getTransferReport(@RequestParam String vouNo,
-                                     @RequestParam String compCode) {
-        List<VTransfer> listRI = reportService.getTransferVoucher(vouNo, compCode);
-        return Flux.fromIterable(listRI).onErrorResume(throwable -> Flux.empty());
+    public Flux<VTransfer> getTransferReport(@RequestParam String vouNo,
+                                             @RequestParam String compCode) {
+        return transferService.getTransferVoucher(vouNo, compCode);
     }
 
     @GetMapping(value = "/getStockInOutVoucher", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -306,8 +307,14 @@ public class ReportController {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutSummaryByPaddy","StockInOutSummaryByRice" -> {
+                    case "StockInOutSummaryByPaddy" -> {
                         filter.setOpDate(opDatePaddy);
+                        filter.setReportType(0);
+                        return stockReportService.getStockInOutPaddy(filter);
+                    }
+                    case "StockInOutSummaryByRice" -> {
+                        filter.setOpDate(opDatePaddy);
+                        filter.setReportType(1);
                         return stockReportService.getStockInOutPaddy(filter);
                     }
                     case "StockInOutDetailByWeight" -> {

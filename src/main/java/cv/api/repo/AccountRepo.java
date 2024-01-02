@@ -14,7 +14,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,11 @@ public class AccountRepo {
                     .body(Mono.just(glList), List.class)
                     .retrieve()
                     .bodyToMono(Response.class)
-                    .doOnSuccess(response -> {
+                    .retryWhen(
+                            Retry.backoff(3, Duration.ofMillis(100))
+                                    .maxBackoff(Duration.ofSeconds(5))
+                                    .jitter(0.5)
+                    ).doOnSuccess(response -> {
                         if (response != null) {
                             String vouNo = response.getVouNo();
                             String compCode = response.getCompCode();

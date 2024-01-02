@@ -286,15 +286,27 @@ public class StockReportService {
         String stockCode = filter.getStockCode();
         String compCode = filter.getCompCode();
         Integer macId = filter.getMacId();
+        int type = filter.getReportType();
         Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        if (type == 1) {
+            return opMono.then(clMono)
+                    .then(getResultStockBag(macId));
+        } else {
+            return opMono.then(clMono)
+                    .then(getResultStockQty(macId));
+        }
+    }
+
+    private Mono<ReturnObject> getResultStockQty(Integer macId) {
         String sql = """
-                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
+                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,
+                s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
                 st.stock_type_name,l.loc_name, w.description,c.user_code c_user_code,c.cat_name
                 from (
-                select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,
-                sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,comp_code,
-                sum(wet) wet, sum(rice) rice, sum(ttl_amt) ttl_amt
+                select stock_code,loc_code,sum(ifnull(op_qty,0)) op_qty,sum(ifnull(pur_qty,0)) pur_qty,
+                sum(ifnull(in_qty,0)) in_qty,sum(ifnull(out_qty,0)) out_qty,sum(ifnull(sale_qty,0)) sale_qty,comp_code,
+                sum(ifnull(wet,0)) wet, sum(ifnull(rice,0)) rice, sum(ifnull(ttl_amt,0)) ttl_amt
                 from tmp_stock_io_column
                 where mac_id = :macId
                 group by stock_code)a
@@ -309,9 +321,10 @@ public class StockReportService {
                 join warehouse w on l.warehouse_code = w.code
                 and a.comp_code = l.comp_code
                 group by a.stock_code
-                having bal_qty>0
-                order by c_user_code, s_user_code""";
-        Mono<ReturnObject> monoResult = client.sql(sql)
+                having bal_qty <>0
+                order by c_user_code, s_user_code
+                """;
+        return client.sql(sql)
                 .bind("macId", macId)
                 .map((row) -> ClosingBalance.builder()
                         .openQty(Util1.toNull(row.get("op_qty", Double.class)))
@@ -320,12 +333,53 @@ public class StockReportService {
                         .saleQty(Util1.toNull(row.get("sale_qty", Double.class)))
                         .outQty(Util1.toNull(row.get("out_qty", Double.class)))
                         .balQty(Util1.toNull(row.get("bal_qty", Double.class)))
-                        .openWeight(Util1.toNull(row.get("op_Weight", Double.class)))
-                        .purWeight(Util1.toNull(row.get("pur_Weight", Double.class)))
-                        .inWeight(Util1.toNull(row.get("in_Weight", Double.class)))
-                        .saleWeight(Util1.toNull(row.get("sale_Weight", Double.class)))
-                        .outWeight(Util1.toNull(row.get("out_Weight", Double.class)))
-                        .balWeight(Util1.toNull(row.get("bal_Weight", Double.class)))
+                        .stockUsrCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .stockCode(row.get("stock_code", String.class))
+                        .catName(row.get("cat_name", String.class))
+                        .locName(row.get("loc_name", String.class))
+                        .wet(row.get("wet", Double.class))
+                        .rice(row.get("rice", Double.class))
+                        .warehouse(row.get("description", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(this::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+    private Mono<ReturnObject> getResultStockBag(Integer macId) {
+        String sql = """
+                select a.*,sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag) bal_bag,
+                s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
+                st.stock_type_name,l.loc_name, w.description,c.user_code c_user_code,c.cat_name
+                from (
+                select stock_code,loc_code,sum(ifnull(op_bag,0)) op_bag,sum(ifnull(pur_bag,0)) pur_bag,
+                sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag,sum(ifnull(sale_bag,0)) sale_bag,comp_code,
+                sum(ifnull(wet,0)) wet, sum(ifnull(rice,0)) rice, sum(ifnull(ttl_amt,0)) ttl_amt
+                from tmp_stock_io_column
+                where mac_id = :macId
+                group by stock_code)a
+                join stock s on a.stock_code = s.stock_code
+                and a.comp_code = s.comp_code
+                join stock_type st on s.stock_type_code = st.stock_type_code
+                and s.comp_code = st.comp_code
+                join category c on s.category_code = c.cat_code
+                and s.comp_code = c.comp_code
+                join location l on a.loc_code = l.loc_code
+                and a.comp_code = l.comp_code
+                join warehouse w on l.warehouse_code = w.code
+                and a.comp_code = l.comp_code
+                group by a.stock_code
+                having bal_bag <>0
+                order by c_user_code, s_user_code""";
+        return client.sql(sql)
+                .bind("macId", macId)
+                .map((row) -> ClosingBalance.builder()
                         .openBag(Util1.toNull(row.get("op_bag", Double.class)))
                         .purBag(Util1.toNull(row.get("pur_bag", Double.class)))
                         .inBag(Util1.toNull(row.get("in_bag", Double.class)))
@@ -349,8 +403,6 @@ public class StockReportService {
                         .message("Data fetched successfully")
                         .file(fileBytes)
                         .build());
-        return opMono.then(clMono)
-                .then(monoResult);
     }
 
     private Mono<Long> deleteTmpOpening(Integer macId) {
