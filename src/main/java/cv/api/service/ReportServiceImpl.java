@@ -3530,8 +3530,8 @@ public class ReportServiceImpl implements ReportService {
                 and t.comp_code = u2.comp_code
                 left join labour_group g on t.labour_group_code = g.code
                 and t.comp_code = g.comp_code
-                where t.comp_code =:compCode
-                and t.vou_no =:vouNo
+                where t.comp_code =?
+                and t.vou_no =?
                 order by unique_id
                 """;
         List<VTransfer> riList = new ArrayList<>();
