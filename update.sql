@@ -1573,7 +1573,7 @@ create table tmp_stock_io_column (
   stock_code varchar(15) not null,
   loc_code varchar(15) not null,
   mac_id int(11) not null,
-  vou_no varchar(15) not null,
+  vou_no varchar(25) not null,
   comp_code varchar(15) not null,
   dept_id int(11) not null,
   op_qty double(20,3) not null default 0.000,

@@ -3514,7 +3514,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
         String sql = """
-                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
+                select stock_name,unit,t.qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
                 t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
                 u1.unit_name,u2.unit_name weight_unit_name,g.labour_name
                 from v_transfer t
