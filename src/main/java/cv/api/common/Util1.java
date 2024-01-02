@@ -175,8 +175,6 @@ public class Util1 {
     }
 
 
-
-
     public static void writeJsonFile(Object data, String exportPath) throws IOException {
         try (Writer writer = new FileWriter(exportPath, StandardCharsets.UTF_8)) {
             gson.toJson(data, writer);
@@ -210,8 +208,8 @@ public class Util1 {
     }
 
 
-    public static Double toNull(double value) {
-        return value == 0 ? null : value;
+    public static Double toNull(Double value) {
+        return value != null && value == 0.0 ? null : value;
     }
 
     public static String cleanStr(String str) {
@@ -236,6 +234,7 @@ public class Util1 {
         // Format the float number
         return decimalFormat.format(opQty);
     }
+
     public static String format(double opQty) {
         String pattern = "#,###.##;(#,###.##)";
         DecimalFormat decimalFormat = new DecimalFormat(pattern);

@@ -79,12 +79,38 @@ public class ReportServiceImpl implements ReportService {
         return Util1.isNull(opDate, "1998-10-07");
     }
 
+    @Override
+    public String getOpeningDateByLocation(String compCode, String locCode) {
+        String opDate = null;
+        String sql = """
+                select max(op_date) op_date
+                from op_his
+                where deleted = false
+                and comp_code =?
+                and loc_code =?
+                """;
+        try {
+            ResultSet rs = reportDao.getResultSql(sql, compCode, locCode);
+            if (rs != null) {
+                while (rs.next()) {
+                    Date date = rs.getDate("op_date");
+                    if (date != null) {
+                        opDate = Util1.toDateStr(date, "yyyy-MM-dd");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return Util1.isNull(opDate, "1998-10-07");
+    }
+
 
     @Override
     public List<VSale> getSaleVoucher(String vouNo, String compCode) throws Exception {
         List<VSale> saleList = new ArrayList<>();
         String sql = """
-                select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
+                select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.reference,v.vou_no,v.vou_date,v.stock_name,
                 v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
                 v.paid,v.vou_balance,t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,
                 v.comp_code,c.cat_name,r.reg_name,u1.unit_name sale_unit_name,u2.unit_name weight_unit_name
@@ -122,6 +148,7 @@ public class ReportServiceImpl implements ReportService {
             sale.setTraderName(rs.getString("trader_name"));
             sale.setRemark(remark);
             sale.setRefNo(refNo);
+            sale.setReference(rs.getString("reference"));
             sale.setPhoneNo(rs.getString("phone"));
             sale.setAddress(rs.getString("address"));
             sale.setRfId(rs.getString("rfid"));
@@ -210,7 +237,7 @@ public class ReportServiceImpl implements ReportService {
         List<VPurchase> list = new ArrayList<>();
         String sql = """
                 select t.trader_name,t.phone,p.remark,p.vou_no,
-                p.batch_no,p.vou_date,p.stock_name,p.pur_unit,qty,p.pur_price,p.pur_amt,
+                p.batch_no,p.vou_date,p.stock_name,p.pur_unit,p.qty,p.pur_price,p.pur_amt,
                 p.vou_total,p.discount,p.paid,p.balance,
                 p.weight,p.weight_unit,l.labour_name,p.land_vou_no,u1.unit_name weight_unit_name,
                 u2.unit_name pur_unit_name,loc.loc_name,r.reg_name
@@ -1686,14 +1713,13 @@ public class ReportServiceImpl implements ReportService {
             if (!Objects.isNull(rs)) {
                 try {
                     while (rs.next()) {
-                        VStockBalance b = new VStockBalance();
-                        b.setUserCode(rs.getString("user_code"));
-                        b.setStockCode(rs.getString("stock_code"));
-                        b.setStockName(rs.getString("stock_name"));
-                        float smallQty = rs.getFloat("qty");
-                        String relCode = rs.getString("rel_code");
-                        b.setUnitName(getRelStr(relCode, compCode, smallQty));
-                        b.setLocationName("All");
+                        VStockBalance b = VStockBalance.builder()
+                                .userCode(rs.getString("user_code"))
+                                .stockCode(rs.getString("stock_code"))
+                                .stockName(rs.getString("stock_name"))
+                                .unitName(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("qty")))
+                                .locationName("All")
+                                .build();
                         balances.add(b);
                     }
                 } catch (Exception e) {
@@ -1712,16 +1738,16 @@ public class ReportServiceImpl implements ReportService {
             if (!Objects.isNull(rs)) {
                 try {
                     while (rs.next()) {
-                        VStockBalance b = new VStockBalance();
-                        b.setUserCode(rs.getString("user_code"));
-                        b.setStockCode(rs.getString("stock_code"));
-                        b.setStockName(rs.getString("stock_name"));
-                        b.setLocationName(rs.getString("loc_name"));
-                        b.setLocCode(rs.getString("loc_code"));
-                        float smallQty = rs.getFloat("smallest_qty");
-                        String relCode = rs.getString("rel_code");
-                        b.setUnitName(getRelStr(relCode, compCode, smallQty));
+                        VStockBalance b = VStockBalance.builder()
+                                .userCode(rs.getString("user_code"))
+                                .stockCode(rs.getString("stock_code"))
+                                .stockName(rs.getString("stock_name"))
+                                .locationName(rs.getString("loc_name"))
+                                .locCode(rs.getString("loc_code"))
+                                .unitName(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("smallest_qty")))
+                                .build();
                         balances.add(b);
+
                     }
                 } catch (Exception e) {
                     log.error("getStockBalance : " + e.getMessage());
@@ -1753,13 +1779,15 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
                 while (rs.next()) {
-                    VStockBalance b = new VStockBalance();
-                    b.setUserCode(rs.getString("user_code"));
-                    b.setStockName(rs.getString("stock_name"));
-                    b.setTotalQty(rs.getDouble("qty"));
-                    b.setWeight(rs.getDouble("weight"));
-                    b.setLocationName("All");
+                    VStockBalance b = VStockBalance.builder()
+                            .userCode(rs.getString("user_code"))
+                            .stockName(rs.getString("stock_name"))
+                            .totalQty(rs.getDouble("qty"))
+                            .weight(rs.getDouble("weight"))
+                            .locationName("All")
+                            .build();
                     list.add(b);
+
                 }
             } catch (Exception e) {
                 log.error("getStockBalanceByWeight : " + e.getMessage());
@@ -1776,13 +1804,16 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, macId);
             try {
                 while (rs.next()) {
-                    VStockBalance b = new VStockBalance();
-                    b.setUserCode(rs.getString("user_code"));
-                    b.setStockName(rs.getString("stock_name"));
-                    b.setTotalQty(rs.getDouble("qty"));
-                    b.setWeight(rs.getDouble("weight"));
-                    b.setLocationName(rs.getString("loc_name"));
+                    VStockBalance b = VStockBalance.builder()
+                            .userCode(rs.getString("user_code"))
+                            .stockName(rs.getString("stock_name"))
+                            .totalQty(rs.getDouble("qty"))
+                            .weight(rs.getDouble("weight"))
+                            .locationName(rs.getString("loc_name"))
+                            .build();
+
                     list.add(b);
+
                 }
             } catch (Exception e) {
                 log.error("getStockBalanceByWeight : " + e.getMessage());
@@ -1978,24 +2009,24 @@ public class ReportServiceImpl implements ReportService {
         List<ClosingBalance> balanceList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                ClosingBalance cb = new ClosingBalance();
+                ClosingBalance cb = ClosingBalance.builder().build();
                 cb.setTypeUserCode(rs.getString("type_user_code"));
                 cb.setTypeName(rs.getString("stock_type_name"));
                 cb.setStockName(rs.getString("stock_name"));
                 cb.setStockUsrCode(rs.getString("user_code"));
                 cb.setStockCode(rs.getString("stock_code"));
-                cb.setOpenQty(rs.getFloat("op_qty"));
-                cb.setOpenAmt(rs.getFloat("op_amt"));
-                cb.setPurQty(rs.getFloat("pur_qty"));
-                cb.setPurAmt(rs.getFloat("pur_amt"));
-                cb.setInQty(rs.getFloat("in_qty"));
-                cb.setInAmt(rs.getFloat("in_amt"));
-                cb.setOutQty(rs.getFloat("out_qty"));
-                cb.setOutAmt(rs.getFloat("out_amt"));
-                cb.setSaleQty(rs.getFloat("sale_qty"));
-                cb.setSaleAmt(rs.getFloat("sale_amt"));
-                cb.setBalQty(rs.getFloat("bal_qty"));
-                cb.setClosingAmt(rs.getFloat("cl_amt"));
+                cb.setOpenQty(rs.getDouble("op_qty"));
+                cb.setOpenAmt(rs.getDouble("op_amt"));
+                cb.setPurQty(rs.getDouble("pur_qty"));
+                cb.setPurAmt(rs.getDouble("pur_amt"));
+                cb.setInQty(rs.getDouble("in_qty"));
+                cb.setInAmt(rs.getDouble("in_amt"));
+                cb.setOutQty(rs.getDouble("out_qty"));
+                cb.setOutAmt(rs.getDouble("out_amt"));
+                cb.setSaleQty(rs.getDouble("sale_qty"));
+                cb.setSaleAmt(rs.getDouble("sale_amt"));
+                cb.setBalQty(rs.getDouble("bal_qty"));
+                cb.setClosingAmt(rs.getDouble("cl_amt"));
                 balanceList.add(cb);
             }
         }
@@ -2208,24 +2239,24 @@ public class ReportServiceImpl implements ReportService {
         List<ClosingBalance> balanceList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                ClosingBalance cb = new ClosingBalance();
+                ClosingBalance cb = ClosingBalance.builder().build();
                 cb.setStockName(rs.getString("stock_name"));
                 cb.setStockUsrCode(rs.getString("user_code"));
                 cb.setStockCode(rs.getString("stock_code"));
                 cb.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 cb.setVouNo(rs.getString("vou_no"));
-                cb.setOpenQty(rs.getFloat("op_qty"));
-                cb.setOpenAmt(rs.getFloat("op_amt"));
-                cb.setPurQty(rs.getFloat("pur_qty"));
-                cb.setPurAmt(rs.getFloat("pur_amt"));
-                cb.setInQty(rs.getFloat("in_qty"));
-                cb.setInAmt(rs.getFloat("in_amt"));
-                cb.setOutQty(rs.getFloat("out_qty"));
-                cb.setOutAmt(rs.getFloat("out_amt"));
-                cb.setSaleQty(rs.getFloat("sale_qty"));
-                cb.setSaleAmt(rs.getFloat("sale_amt"));
-                cb.setBalQty(rs.getFloat("bal_qty"));
-                cb.setClosingAmt(rs.getFloat("cl_amt"));
+                cb.setOpenQty(rs.getDouble("op_qty"));
+                cb.setOpenAmt(rs.getDouble("op_amt"));
+                cb.setPurQty(rs.getDouble("pur_qty"));
+                cb.setPurAmt(rs.getDouble("pur_amt"));
+                cb.setInQty(rs.getDouble("in_qty"));
+                cb.setInAmt(rs.getDouble("in_amt"));
+                cb.setOutQty(rs.getDouble("out_qty"));
+                cb.setOutAmt(rs.getDouble("out_amt"));
+                cb.setSaleQty(rs.getDouble("sale_qty"));
+                cb.setSaleAmt(rs.getDouble("sale_amt"));
+                cb.setBalQty(rs.getDouble("bal_qty"));
+                cb.setClosingAmt(rs.getDouble("cl_amt"));
                 balanceList.add(cb);
             }
         }
@@ -2255,13 +2286,13 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(getSql, macId);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
-                    float opQty = rs.getFloat("op_qty");
-                    float purQty = rs.getFloat("pur_qty");
-                    float inQty = rs.getFloat("in_qty");
-                    float saleQty = rs.getFloat("sale_qty");
-                    float outQty = rs.getFloat("out_qty");
-                    float balQty = rs.getFloat("bal_qty");
+                    ClosingBalance b = ClosingBalance.builder().build();
+                    double opQty = rs.getFloat("op_qty");
+                    double purQty = rs.getFloat("pur_qty");
+                    double inQty = rs.getFloat("in_qty");
+                    double saleQty = rs.getFloat("sale_qty");
+                    double outQty = rs.getFloat("out_qty");
+                    double balQty = rs.getFloat("bal_qty");
                     String relCode = rs.getString("rel_code");
                     b.setOpenQty(opQty);
                     b.setOpenRel(getRelStr(relCode, compCode, opQty));
@@ -2323,13 +2354,13 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(getSql, macId, compCode);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
-                    float opQty = rs.getFloat("op_qty");
-                    float purQty = rs.getFloat("pur_qty");
-                    float inQty = rs.getFloat("in_qty");
-                    float saleQty = rs.getFloat("sale_qty");
-                    float outQty = rs.getFloat("out_qty");
-                    float balQty = rs.getFloat("bal_qty");
+                    ClosingBalance b = ClosingBalance.builder().build();
+                    double opQty = rs.getFloat("op_qty");
+                    double purQty = rs.getFloat("pur_qty");
+                    double inQty = rs.getFloat("in_qty");
+                    double saleQty = rs.getFloat("sale_qty");
+                    double outQty = rs.getFloat("out_qty");
+                    double balQty = rs.getFloat("bal_qty");
                     String relCode = rs.getString("rel_code");
                     b.setOpenQty(opQty);
                     b.setPurQty(purQty);
@@ -2415,7 +2446,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(getSql, macId, compCode);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
+                    ClosingBalance b = ClosingBalance.builder().build();
                     double opQty = rs.getDouble("op_qty");
                     double purQty = rs.getDouble("pur_qty");
                     double inQty = rs.getDouble("in_qty");
@@ -2726,11 +2757,11 @@ public class ReportServiceImpl implements ReportService {
                 io.setStockUsrCode(rs.getString("s_user_code"));
                 io.setStockName(rs.getString("stock_name"));
                 io.setLocName(rs.getString("loc_name"));
-                io.setOutQty(rs.getFloat("out_qty"));
+                io.setOutQty(rs.getDouble("out_qty"));
                 io.setOutUnit(rs.getString("out_unit"));
                 io.setCurCode(rs.getString("cur_code"));
-                io.setCostPrice(rs.getFloat("cost_price"));
-                io.setOutAmt(rs.getFloat("out_amt"));
+                io.setCostPrice(rs.getDouble("cost_price"));
+                io.setOutAmt(rs.getDouble("out_amt"));
                 list.add(io);
             }
         }
@@ -2805,8 +2836,8 @@ public class ReportServiceImpl implements ReportService {
                 io.setVouTypeName(rs.getString("description"));
                 io.setRelName(rs.getString("rel_name"));
                 io.setInUnit(rs.getString("unit"));
-                io.setCostPrice(rs.getFloat("price"));
-                io.setSmallPrice(rs.getFloat("small_price"));
+                io.setCostPrice(rs.getDouble("price"));
+                io.setSmallPrice(rs.getDouble("small_price"));
                 io.setRemark(rs.getString("remark"));
                 ioList.add(io);
             }
@@ -3483,7 +3514,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
         String sql = """
-                select stock_name,unit,qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
+                select stock_name,unit,t.qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
                 t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
                 u1.unit_name,u2.unit_name weight_unit_name,g.labour_name
                 from v_transfer t
@@ -3534,7 +3565,7 @@ public class ReportServiceImpl implements ReportService {
     public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
         String sql = """
                 select vou_no,vou_date,v.remark,description,s_user_code,stock_name,weight,in_qty,
-                in_unit,out_qty,out_unit,received_name, received_phone, car_no,
+                in_unit,out_qty,out_unit,in_bag,out_bag,received_name, received_phone, car_no,
                 l.loc_name,g.labour_name,t.trader_name,t.phone,r.reg_name,j.job_name,
                 s1.unit_name weight_unit_name,s2.unit_name in_unit_name,s3.unit_name out_unit_name
                 from v_stock_io v join location l
@@ -3567,9 +3598,9 @@ public class ReportServiceImpl implements ReportService {
                     //vou_no, vou_date, remark, description, s_user_code, stock_name, in_qty, in_unit, out_qty, out_unit, loc_name
                     in.setStockName(rs.getString("stock_name"));
                     in.setInUnit(rs.getString("in_unit"));
-                    in.setInQty(rs.getDouble("in_qty"));
+                    in.setInQty(Util1.toNull(rs.getDouble("in_qty")));
                     in.setOutUnit(rs.getString("out_unit"));
-                    in.setOutQty(rs.getDouble("out_qty"));
+                    in.setOutQty(Util1.toNull(rs.getDouble("out_qty")));
                     in.setVouNo(rs.getString("vou_no"));
                     in.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     in.setLocName(rs.getString("loc_name"));
@@ -3588,7 +3619,9 @@ public class ReportServiceImpl implements ReportService {
                     in.setInUnitName(rs.getString("in_unit_name"));
                     in.setOutUnitName(rs.getString("out_unit_name"));
                     in.setWeightUnitName(rs.getString("weight_unit_name"));
-                    in.setWeight(rs.getDouble("weight"));
+                    in.setWeight(Util1.toNull(rs.getDouble("weight")));
+                    in.setInBag(Util1.toNull(rs.getDouble("in_bag")));
+                    in.setOutBag(Util1.toNull(rs.getDouble("out_bag")));
                     riList.add(in);
                 }
             }
@@ -3700,9 +3733,9 @@ public class ReportServiceImpl implements ReportService {
                     s.setStockCode(rs.getString("stock_code"));
                     s.setStockName(rs.getString("stock_name"));
                     s.setVouDate(Util1.toDateStr(rs.getDate("end_date"), "dd/MM/yyyy"));
-                    s.setQty(rs.getFloat("qty"));
+                    s.setQty(rs.getDouble("qty"));
                     s.setUnit(rs.getString("unit"));
-                    s.setPrice(rs.getFloat("price"));
+                    s.setPrice(rs.getDouble("price"));
                     s.setRemark(rs.getString("remark"));
                     s.setProcessNo(rs.getString("process_no"));
                     s.setDescription(rs.getString("description"));
@@ -3743,9 +3776,9 @@ public class ReportServiceImpl implements ReportService {
                     VStockIO io = new VStockIO();
                     io.setStockCode(rs.getString("stock_code"));
                     io.setStockName(rs.getString("stock_name"));
-                    io.setQty(rs.getFloat("qty"));
+                    io.setQty(rs.getDouble("qty"));
                     io.setUnit(rs.getString("unit"));
-                    io.setPrice(rs.getFloat("avg_price"));
+                    io.setPrice(rs.getDouble("avg_price"));
                     io.setLocName(rs.getString("loc_name"));
                     io.setDescription(rs.getString("description"));
                     list.add(io);
@@ -3786,9 +3819,9 @@ public class ReportServiceImpl implements ReportService {
                     VStockIO io = new VStockIO();
                     io.setStockCode(rs.getString("stock_code"));
                     io.setStockName(rs.getString("stock_name"));
-                    io.setQty(rs.getFloat("qty"));
+                    io.setQty(rs.getDouble("qty"));
                     io.setUnit(rs.getString("unit"));
-                    io.setPrice(rs.getFloat("price"));
+                    io.setPrice(rs.getDouble("price"));
                     io.setLocName(rs.getString("loc_name"));
                     io.setDescription(rs.getString("description"));
                     list.add(io);
@@ -3831,9 +3864,9 @@ public class ReportServiceImpl implements ReportService {
                     io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     io.setStockCode(rs.getString("user_code"));
                     io.setStockName(rs.getString("stock_name"));
-                    io.setQty(rs.getFloat("qty"));
+                    io.setQty(rs.getDouble("qty"));
                     io.setUnit(rs.getString("unit"));
-                    io.setPrice(rs.getFloat("price"));
+                    io.setPrice(rs.getDouble("price"));
                     io.setLocName(rs.getString("loc_name"));
                     io.setDescription(rs.getString("description"));
                     list.add(io);
@@ -4362,7 +4395,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(getSql);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
+                    ClosingBalance b = ClosingBalance.builder().build();
                     double opQty = rs.getDouble("op_qty");
                     double purQty = rs.getDouble("pur_qty");
                     double inQty = rs.getDouble("in_qty");
@@ -4451,14 +4484,13 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(getSql);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
+                    ClosingBalance b = ClosingBalance.builder().build();
                     double opQty = rs.getDouble("op_qty");
                     double purQty = rs.getDouble("pur_qty");
                     double inQty = rs.getDouble("in_qty");
                     double saleQty = rs.getDouble("sale_qty");
                     double outQty = rs.getDouble("out_qty");
                     double balQty = rs.getDouble("bal_qty");
-
                     double opWeight = rs.getDouble("op_Weight");
                     double purWeight = rs.getDouble("pur_Weight");
                     double inWeight = rs.getDouble("in_Weight");
@@ -4632,7 +4664,7 @@ public class ReportServiceImpl implements ReportService {
             log.error("getLandingReport : " + e.getMessage());
         }
         if (!listQty.isEmpty()) {
-            header.setWetPercent(listQty.get(0).getPercent());
+            header.setWetPercent(listQty.getFirst().getPercent());
         }
         header.setListPrice(listPrice);
         header.setListQty(listQty);
@@ -4671,7 +4703,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, macId, compCode);
             try {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
+                    ClosingBalance b = ClosingBalance.builder().build();
                     b.setStockCode(rs.getString("stock_code"));
                     b.setStockName(rs.getString("stock_name"));
                     b.setStockUsrCode(rs.getString("s_user_code"));
@@ -4717,7 +4749,7 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.getResultSql(sql, macId, compCode);
                 if (!Objects.isNull(rs)) {
                     while (rs.next()) {
-                        ClosingBalance b = new ClosingBalance();
+                        ClosingBalance b = ClosingBalance.builder().build();
                         double opQty = rs.getDouble("op_qty");
                         double outQty = rs.getDouble("out_qty");
                         double balQty = rs.getDouble("bal_qty");
@@ -4871,7 +4903,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, macId, compCode);
             try {
                 while (rs.next()) {
-                    ClosingBalance b = new ClosingBalance();
+                    ClosingBalance b = ClosingBalance.builder().build();
                     b.setStockCode(rs.getString("stock_code"));
                     b.setStockName(rs.getString("stock_name"));
                     b.setStockUsrCode(rs.getString("s_user_code"));
@@ -4920,7 +4952,7 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.getResultSql(sql, macId, compCode, stockCode, traderCode);
                 if (!Objects.isNull(rs)) {
                     while (rs.next()) {
-                        ClosingBalance b = new ClosingBalance();
+                        ClosingBalance b = ClosingBalance.builder().build();
                         double opQty = rs.getDouble("op_qty");
                         double outQty = rs.getDouble("out_qty");
                         double balQty = rs.getDouble("bal_qty");

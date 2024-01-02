@@ -33,7 +33,7 @@ import java.util.List;
 @Slf4j
 public class SaleController {
 
-    private final ReturnObject ro = new ReturnObject();
+    private final ReturnObject ro = ReturnObject.builder().build();
     @Autowired
     private SaleHisService shService;
     @Autowired

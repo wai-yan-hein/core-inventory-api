@@ -28,27 +28,29 @@ public class StockInOutDetail {
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "in_qty")
-    private double inQty;
+    private Double inQty;
     @Column(name = "in_unit")
     private String inUnitCode;
     @Column(name = "out_qty")
-    private double outQty;
+    private Double outQty;
     @Column(name = "out_unit")
     private String outUnitCode;
     @Column(name = "cost_price")
-    private double costPrice;
+    private Double costPrice;
     @Column(name = "weight")
-    private double weight;
+    private Double weight;
     @Column(name = "weight_unit")
     private String weightUnit;
     @Column(name = "total_weight")
-    private double totalWeight;
+    private Double totalWeight;
     @Column(name = "wet")
     private Double wet;
     @Column(name = "rice")
     private Double rice;
-    @Column(name = "bag")
-    private Double bag;
+    @Column(name = "in_bag")
+    private Double inBag;
+    @Column(name = "out_bag")
+    private Double outBag;
     @Transient
     private String userCode;
     @Transient

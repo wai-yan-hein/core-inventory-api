@@ -32,7 +32,7 @@ import java.util.List;
 @Slf4j
 public class OrderController {
 
-    private final ReturnObject ro = new ReturnObject();
+    private final ReturnObject ro = ReturnObject.builder().build();
     private final OrderHisService ohService;
     private final OrderDetailService odService;
     private final OrderHisDao orderHisDao;

@@ -1,61 +1,64 @@
 package cv.api.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@Builder
 public class ClosingBalance {
     private String typeUserCode;
     private String typeName;
+    private String catName;
     private String stockUsrCode;
     private String stockCode;
     private String stockName;
     private String vouNo;
     private String vouDate;
-    private double openQty;
-    private double openAmt;
+    private Double openQty;
+    private Double openAmt;
     private String openRel;
-    private double purQty;
-    private double purAmt;
+    private Double purQty;
+    private Double purAmt;
     private String purRel;
-    private double inQty;
-    private double inAmt;
+    private Double inQty;
+    private Double inAmt;
     private String inRel;
-    private double outQty;
-    private double outAmt;
+    private Double outQty;
+    private Double outAmt;
     private String outRel;
-    private double saleQty;
-    private double saleAmt;
+    private Double saleQty;
+    private Double saleAmt;
     private String saleRel;
-    private double balQty;
-    private double closingAmt;
+    private Double balQty;
+    private Double closingAmt;
     private String balRel;
 
-    private double openWeight;
+    private Double openWeight;
     private String openWeightRel;
-    private double purWeight;
+    private Double purWeight;
     private String purWeightRel;
-    private double inWeight;
+    private Double inWeight;
     private String inWeightRel;
-    private double outWeight;
+    private Double outWeight;
     private String outWeightRel;
-    private double saleWeight;
+    private Double saleWeight;
     private String saleWeightRel;
-    private double balWeight;
+    private Double balWeight;
     private String balWeightRel;
 
-    private double openBag;
+    private Double openBag;
     private String openBagRel;
-    private double purBag;
+    private Double purBag;
     private String purBagRel;
-    private double inBag;
+    private Double inBag;
     private String inBagRel;
-    private double outBag;
+    private Double outBag;
     private String outBagRel;
-    private double saleBag;
+    private Double saleBag;
     private String saleBagRel;
-    private double balBag;
+    private Double balBag;
     private String balBagRel;
 
     private String groupName;
@@ -69,9 +72,9 @@ public class ClosingBalance {
     private String traderName;
 
     private String locName;
-    private double wet;
-    private double rice;
-    private double bag;
-    private double price;
+    private Double wet;
+    private Double rice;
+    private Double bag;
+    private Double price;
     private String warehouse;
 }

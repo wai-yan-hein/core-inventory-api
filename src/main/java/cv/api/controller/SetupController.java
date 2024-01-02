@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SetupController {
 
-    private final ReturnObject ro = new ReturnObject();
+    private final ReturnObject ro = ReturnObject.builder().build();
     private final CategoryService categoryService;
     private final LocationService locationService;
     private final SaleManService saleManService;

@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/process")
 @Slf4j
 public class ProcessController {
-    private final ReturnObject ro = new ReturnObject();
+    private final ReturnObject ro = ReturnObject.builder().build();
     @Autowired
     private ProcessHisService processHisService;
     @Autowired

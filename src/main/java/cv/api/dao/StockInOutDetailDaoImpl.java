@@ -37,7 +37,8 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
     public List<StockInOutDetail> search(String vouNo, String compCode) {
         List<StockInOutDetail> listOP = new ArrayList<>();
         String sql = """
-                select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name
+                select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,
+                rel.rel_name,l.loc_name
                 from stock_in_out_detail op
                 join location l on op.loc_code = l.loc_code
                 and op.comp_code = l.comp_code
@@ -85,7 +86,8 @@ public class StockInOutDetailDaoImpl extends AbstractDao<StockInOutKey, StockInO
                     op.setTotalWeight(rs.getDouble("total_weight"));
                     op.setWet(rs.getDouble("wet"));
                     op.setRice(rs.getDouble("rice"));
-                    op.setBag(rs.getDouble("bag"));
+                    op.setInBag(rs.getDouble("in_bag"));
+                    op.setOutBag(rs.getDouble("out_bag"));
                     listOP.add(op);
                 }
             } catch (Exception e) {

@@ -11,10 +11,9 @@ import cv.api.entity.ReorderLevel;
 import cv.api.entity.VStockBalance;
 import cv.api.model.*;
 import cv.api.service.ReportService;
-import lombok.AllArgsConstructor;
+import cv.api.service.StockReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -32,8 +31,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ReportController {
-    private final ReturnObject ro = new ReturnObject();
     private final ReportService reportService;
+    private final StockReportService stockReportService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<?> getSaleReport(@RequestParam String vouNo,
@@ -128,13 +127,17 @@ public class ReportController {
 
     @PostMapping(value = "/getReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ReturnObject> getReport(@RequestBody ReportFilter filter) {
+        ReturnObject ro = ReturnObject.builder().build();
         String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
         try {
             if (isValidReportFilter(filter, ro)) {
                 String compCode = filter.getCompCode();
                 Integer deptId = filter.getDeptId();
+                String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
+                String opDatePaddy = reportService.getOpeningDate(compCode, OPHis.STOCK_OP_PADDY);
                 String opPayableDate = reportService.getOpeningDate(compCode, OPHis.STOCK_PAYABLE);
+                String opDateLocation = reportService.getOpeningDateByLocation(compCode, locCode);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
@@ -146,7 +149,6 @@ public class ReportController {
                 String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
                 String vouTypeCode = Util1.isNull(filter.getVouTypeCode(), "-");
                 String smCode = Util1.isNull(filter.getSaleManCode(), "-");
-                String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 String projectNo = Util1.isAll(filter.getProjectNo());
                 String labourGroupCode = Util1.isAll(filter.getLabourGroupCode());
@@ -256,7 +258,7 @@ public class ReportController {
                     }
                     case "PurchaseList" -> {
                         List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
-                                typeCode, catCode, brandCode, locCode,labourGroupCode);
+                                typeCode, catCode, brandCode, locCode, labourGroupCode);
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "InventoryClosingSummary" -> {
@@ -304,9 +306,9 @@ public class ReportController {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutSummaryByPaddy" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByPaddy(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId, warehouse);
-                        Util1.writeJsonFile(listBalance, exportPath);
+                    case "StockInOutSummaryByPaddy","StockInOutSummaryByRice" -> {
+                        filter.setOpDate(opDatePaddy);
+                        return stockReportService.getStockInOutPaddy(filter);
                     }
                     case "StockInOutDetailByWeight" -> {
                         reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
@@ -405,6 +407,10 @@ public class ReportController {
                         List<VPurchase> list = reportService.getTopPurchasePaddy(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
                         Util1.writeJsonFile(list, exportPath);
                     }
+                    case "TransferSaleClosing" -> {
+                        filter.setOpDate(opDateLocation);
+                        return stockReportService.getTransferSaleClosing(filter);
+                    }
                     default -> ro.setMessage("Report Not Exists.");
                 }
                 byte[] bytes = new FileInputStream(exportPath).readAllBytes();
@@ -485,9 +491,10 @@ public class ReportController {
         List<VStockBalance> list = reportService.getStockBalance(opDate, clDate, "-", "-", "-",
                 stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
         if (list.isEmpty()) {
-            VStockBalance b = new VStockBalance();
-            b.setLocationName("No Stock.");
-            b.setUnitName("No Stock.");
+            VStockBalance b = VStockBalance.builder()
+                    .locationName("No Stock")
+                    .unitName("No Stock.").build();
+            list.add(b);
         }
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
@@ -503,9 +510,10 @@ public class ReportController {
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
         List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, macId, summary);
         if (list.isEmpty()) {
-            VStockBalance b = new VStockBalance();
-            b.setLocationName("No Stock.");
-            b.setUnitName("No Stock.");
+            VStockBalance b = VStockBalance.builder()
+                    .locationName("No Stock")
+                    .unitName("No Stock.").build();
+            list.add(b);
         }
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
