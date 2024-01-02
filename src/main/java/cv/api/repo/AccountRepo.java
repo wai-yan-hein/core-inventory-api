@@ -46,7 +46,7 @@ public class AccountRepo {
                     .body(Mono.just(glList), List.class)
                     .retrieve()
                     .bodyToMono(Response.class)
-                    .subscribe(response -> {
+                    .doOnSuccess(response -> {
                         if (response != null) {
                             String vouNo = response.getVouNo();
                             String compCode = response.getCompCode();
@@ -59,7 +59,7 @@ public class AccountRepo {
                                 case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
                             }
                         }
-                    }, (e) -> {
+                    }).doOnError(e -> {
                         Gl gl = glList.getFirst();
                         String vouNo = gl.getRefNo();
                         String compCode = gl.getKey().getCompCode();
@@ -73,7 +73,7 @@ public class AccountRepo {
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
-                    });
+                    }).subscribe();
         }
     }
 

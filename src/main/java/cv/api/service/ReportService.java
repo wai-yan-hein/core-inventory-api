@@ -202,7 +202,6 @@ public interface ReportService {
 
     List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);
 
-    List<VTransfer> getTransferVoucher(String vouNo, String compCode);
 
     List<VStockIO> getStockInOutVoucher(String vouNo, String compCode);
 

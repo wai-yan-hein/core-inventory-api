@@ -3512,63 +3512,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
-        String sql = """
-                select stock_name,unit,t.qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
-                t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
-                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name,t.sale_price_n
-                from v_transfer t
-                join location ft
-                on t.loc_code_from =ft.loc_code
-                and t.comp_code = ft.comp_code
-                join location tt
-                on t.loc_code_to = tt.loc_code
-                and t.comp_code = tt.comp_code
-                left join stock_unit u1 on t.unit = u1.unit_code
-                and t.comp_code = u1.comp_code
-                left join stock_unit u2 on t.weight_unit = u2.unit_code
-                and t.comp_code = u2.comp_code
-                left join labour_group g on t.labour_group_code = g.code
-                and t.comp_code = g.comp_code
-                where t.comp_code =?
-                and t.vou_no =?
-                order by unique_id
-                """;
-        List<VTransfer> riList = new ArrayList<>();
-        try {
-            ResultSet rs = getResult(sql, compCode, vouNo);
-            if (!Objects.isNull(rs)) {
-                while (rs.next()) {
-                    VTransfer in = VTransfer.builder().build();
-                    in.setStockName(rs.getString("stock_name"));
-                    in.setUnit(rs.getString("unit"));
-                    in.setQty(rs.getDouble("qty"));
-                    in.setVouNo(rs.getString("vou_no"));
-                    in.setVouDate(rs.getString("vou_date"));
-                    in.setFromLocationName(rs.getString("fLocName"));
-                    in.setToLocationName(rs.getString("tLocName"));
-                    in.setStockCode(rs.getString("user_code"));
-                    in.setRemark(rs.getString("remark"));
-                    in.setRefNo(rs.getString("ref_no"));
-                    in.setUnitName(rs.getString("unit_name"));
-                    in.setLabourGroupName(rs.getString("labour_name"));
-                    in.setPrice(rs.getDouble("sale_price_n"));
-                    double weight = rs.getFloat("weight");
-                    if (weight > 0) {
-                        in.setWeight(weight);
-                        in.setWeightUnit(rs.getString("weight_unit"));
-                        in.setWeightUnitName(rs.getString("weight_unit_name"));
-                    }
-                    riList.add(in);
-                }
-            }
-        } catch (Exception e) {
-            log.error(String.format("getTransferVoucher: %s", e.getMessage()));
-        }
-        return riList;
-    }
-
-    @Override
     public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
         String sql = """
                 select vou_no,vou_date,v.remark,description,s_user_code,stock_name,weight,in_qty,
