@@ -3516,7 +3516,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select stock_name,unit,t.qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
                 t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
-                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name
+                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name,t.created_by
                 from v_transfer t
                 join location ft
                 on t.loc_code_from =ft.loc_code
@@ -3539,20 +3539,26 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = getResult(sql, compCode, vouNo);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    VTransfer s = VTransfer.builder()
-                            .vouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()))
-                            .vouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"))
-                            .vouNo(rs.getString("vou_no"))
-                            .remark(rs.getString("remark"))
-                            .refNo(rs.getString("ref_no"))
-                            .createdBy(rs.getString("created_by"))
-                            .deleted(rs.getBoolean("deleted"))
-                            .fromLocationName(rs.getString("from_loc_name"))
-                            .toLocationName(rs.getString("to_loc_name"))
-                            .deptId(rs.getInt("dept_id"))
-                            .traderName(rs.getString("trader_name"))
-                            .build();
-                    riList.add(s);
+                    VTransfer in = VTransfer.builder().build();
+                    in.setStockName(rs.getString("stock_name"));
+                    in.setUnit(rs.getString("unit"));
+                    in.setQty(rs.getDouble("qty"));
+                    in.setVouNo(rs.getString("vou_no"));
+                    in.setVouDate(rs.getString("vou_date"));
+                    in.setFromLocationName(rs.getString("fLocName"));
+                    in.setToLocationName(rs.getString("tLocName"));
+                    in.setStockCode(rs.getString("user_code"));
+                    in.setRemark(rs.getString("remark"));
+                    in.setRefNo(rs.getString("ref_no"));
+                    in.setUnitName(rs.getString("unit_name"));
+                    in.setLabourGroupName(rs.getString("labour_name"));
+                    double weight = rs.getFloat("weight");
+                    if (weight > 0) {
+                        in.setWeight(weight);
+                        in.setWeightUnit(rs.getString("weight_unit"));
+                        in.setWeightUnitName(rs.getString("weight_unit_name"));
+                    }
+                    riList.add(in);
                 }
             }
         } catch (Exception e) {

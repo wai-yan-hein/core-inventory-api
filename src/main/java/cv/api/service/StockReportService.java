@@ -289,17 +289,11 @@ public class StockReportService {
         Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         String sql = """
-                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,
-                sum(a.op_weight+a.pur_weight+a.in_weight+a.out_weight) bal_weight,
-                sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag) bal_bag,
-                s.weight_unit,s.pur_unit,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
+                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
                 st.stock_type_name,l.loc_name, w.description,c.user_code c_user_code,c.cat_name
-                from (select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,
+                from (
+                select stock_code,loc_code,sum(op_qty) op_qty,sum(pur_qty) pur_qty,
                 sum(in_qty) in_qty,sum(out_qty) out_qty,sum(sale_qty) sale_qty,comp_code,
-                sum(op_weight) op_weight,sum(pur_weight) pur_weight,
-                sum(in_weight) in_weight,sum(out_weight) out_weight,sum(sale_weight) sale_weight,
-                ifnull(sum(op_bag),0) op_bag,ifnull(sum(pur_bag),0) pur_bag,
-                ifnull(sum(in_bag),0) in_bag,ifnull(sum(out_bag),0) out_bag,ifnull(sum(sale_bag),0) sale_bag,
                 sum(wet) wet, sum(rice) rice, sum(ttl_amt) ttl_amt
                 from tmp_stock_io_column
                 where mac_id = :macId
@@ -315,8 +309,8 @@ public class StockReportService {
                 join warehouse w on l.warehouse_code = w.code
                 and a.comp_code = l.comp_code
                 group by a.stock_code
-                order by c_user_code, s_user_code
-                """;
+                having bal_qty>0
+                order by c_user_code, s_user_code""";
         Mono<ReturnObject> monoResult = client.sql(sql)
                 .bind("macId", macId)
                 .map((row) -> ClosingBalance.builder()
