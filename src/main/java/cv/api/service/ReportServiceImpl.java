@@ -3516,7 +3516,7 @@ public class ReportServiceImpl implements ReportService {
         String sql = """
                 select stock_name,unit,t.qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
                 t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
-                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name,t.created_by
+                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name,t.sale_price_n
                 from v_transfer t
                 join location ft
                 on t.loc_code_from =ft.loc_code
@@ -3530,8 +3530,8 @@ public class ReportServiceImpl implements ReportService {
                 and t.comp_code = u2.comp_code
                 left join labour_group g on t.labour_group_code = g.code
                 and t.comp_code = g.comp_code
-                where t.comp_code =?
-                and t.vou_no =?
+                where t.comp_code =:compCode
+                and t.vou_no =:vouNo
                 order by unique_id
                 """;
         List<VTransfer> riList = new ArrayList<>();
@@ -3552,6 +3552,7 @@ public class ReportServiceImpl implements ReportService {
                     in.setRefNo(rs.getString("ref_no"));
                     in.setUnitName(rs.getString("unit_name"));
                     in.setLabourGroupName(rs.getString("labour_name"));
+                    in.setPrice(rs.getDouble("sale_price_n"));
                     double weight = rs.getFloat("weight");
                     if (weight > 0) {
                         in.setWeight(weight);
