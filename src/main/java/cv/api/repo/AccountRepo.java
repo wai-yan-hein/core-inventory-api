@@ -900,7 +900,7 @@ public class AccountRepo {
                                 gl.setCrAmt(detail.getAmount());
                                 gl.setCurCode(curCode);
                                 gl.setReference(remark);
-                                gl.setDeptCode(Util1.isNull(gl.getDeptCode(), ph.getDeptCode()));
+                                gl.setDeptCode(Util1.isNull(detail.getDeptCode(), ph.getDeptCode()));
                                 gl.setCreatedDate(LocalDateTime.now());
                                 gl.setCreatedBy(appName);
                                 gl.setTranSource("LABOUR_PAYMENT");
