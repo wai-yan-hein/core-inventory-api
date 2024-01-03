@@ -8,13 +8,16 @@ package cv.api.controller;
 import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
+import cv.api.dao.SaleOrderJoinDao;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
+import cv.api.entity.SaleOrderJoin;
 import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
 import cv.api.service.ReportService;
 import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +33,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/sale")
 @Slf4j
+@RequiredArgsConstructor
 public class SaleController {
 
     private final ReturnObject ro = ReturnObject.builder().build();
-    @Autowired
-    private SaleHisService shService;
-    @Autowired
-    private SaleDetailService sdService;
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private AccountRepo accountRepo;
+    private final SaleHisService shService;
+    private final SaleDetailService sdService;
+    private final ReportService reportService;
+    private final AccountRepo accountRepo;
+    private final SaleOrderJoinDao saleOrderJoinDao;
 
     @PostMapping(path = "/saveSale")
     public Mono<?> saveSale(@NotNull @RequestBody SaleHis sale) {
@@ -167,6 +168,12 @@ public class SaleController {
     public Flux<?> searchDiscountDescription(@RequestParam String str,
                                              @RequestParam String compCode) {
         return Flux.fromIterable(shService.searchDiscountDescription(str, compCode)).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @GetMapping(path = "/getSaleOrder")
+    public Flux<SaleOrderJoin> getSaleOrder(@RequestParam String vouNo,
+                                            @RequestParam String compCode) {
+        return Flux.fromIterable(saleOrderJoinDao.getSaleOrder(vouNo, compCode));
     }
 
 

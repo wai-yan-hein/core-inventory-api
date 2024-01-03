@@ -320,8 +320,8 @@ public class StockReportService {
                 and a.comp_code = l.comp_code
                 join warehouse w on l.warehouse_code = w.code
                 and a.comp_code = l.comp_code
+                and (a.op_qty<>0 or a.pur_qty<>0 or a.in_qty<>0 or a.out_qty <> 0)
                 group by a.stock_code
-                having bal_qty <>0
                 order by c_user_code, s_user_code
                 """;
         return client.sql(sql)
@@ -374,8 +374,8 @@ public class StockReportService {
                 and a.comp_code = l.comp_code
                 join warehouse w on l.warehouse_code = w.code
                 and a.comp_code = l.comp_code
+                and (a.op_bag<>0 or a.pur_bag<>0 or a.in_bag<>0 or a.out_bag <> 0)
                 group by a.stock_code
-                having bal_bag <>0
                 order by c_user_code, s_user_code""";
         return client.sql(sql)
                 .bind("macId", macId)
