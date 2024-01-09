@@ -3512,56 +3512,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VTransfer> getTransferVoucher(String vouNo, String compCode) {
-        String sql = """
-                select stock_name,unit,t.qty,ft.loc_name as fLocName,tt.loc_name as tLocName,
-                t.vou_no, t.vou_date, t.user_code, t.remark, t.ref_no,t.weight,t.weight_unit,
-                u1.unit_name,u2.unit_name weight_unit_name,g.labour_name
-                from v_transfer t
-                join location ft
-                on t.loc_code_from =ft.loc_code
-                and t.comp_code = ft.comp_code
-                join location tt
-                on t.loc_code_to = tt.loc_code
-                and t.comp_code = tt.comp_code
-                left join stock_unit u1 on t.unit = u1.unit_code
-                and t.comp_code = u1.comp_code
-                left join stock_unit u2 on t.weight_unit = u2.unit_code
-                and t.comp_code = u2.comp_code
-                left join labour_group g on t.labour_group_code = g.code
-                and t.comp_code = g.comp_code
-                where t.comp_code =?
-                and t.vou_no =?
-                order by unique_id
-                """;
-        List<VTransfer> riList = new ArrayList<>();
-        try {
-            ResultSet rs = getResult(sql, compCode, vouNo);
-            if (!Objects.isNull(rs)) {
-                while (rs.next()) {
-                    VTransfer s = VTransfer.builder()
-                            .vouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()))
-                            .vouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"))
-                            .vouNo(rs.getString("vou_no"))
-                            .remark(rs.getString("remark"))
-                            .refNo(rs.getString("ref_no"))
-                            .createdBy(rs.getString("created_by"))
-                            .deleted(rs.getBoolean("deleted"))
-                            .fromLocationName(rs.getString("from_loc_name"))
-                            .toLocationName(rs.getString("to_loc_name"))
-                            .deptId(rs.getInt("dept_id"))
-                            .traderName(rs.getString("trader_name"))
-                            .build();
-                    riList.add(s);
-                }
-            }
-        } catch (Exception e) {
-            log.error(String.format("getTransferVoucher: %s", e.getMessage()));
-        }
-        return riList;
-    }
-
-    @Override
     public List<VStockIO> getStockInOutVoucher(String vouNo, String compCode) {
         String sql = """
                 select vou_no,vou_date,v.remark,description,s_user_code,stock_name,weight,in_qty,

@@ -19,9 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
+import java.security.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wai yan
@@ -280,56 +283,46 @@ public class SaleHisServiceImpl implements SaleHisService {
         String projectNo = Util1.isAll(filterObject.getProjectNo());
         String curCode = Util1.isAll(filterObject.getCurCode());
 
-        String filter = "";
-        if (!vouNo.equals("-")) {
-            filter += "and vou_no = :vouNo\n";
+        StringBuilder filter = new StringBuilder();
+
+        if (Boolean.parseBoolean(nullBatch)) {
+            filter.append("and (batch_no is null or batch_no ='') \n");
         }
-        if (!remark.equals("-")) {
-            filter += "and remark like :remark%\n";
-        }
-        if (!reference.equals("-")) {
-            filter += "and reference like :reference%\n";
-        }
-        if (!traderCode.equals("-")) {
-            filter += "and trader_code = :traderCode\n";
-        }
-        if (!userCode.equals("-")) {
-            filter += "and created_by = :userCode\n";
-        }
-        if (!stockCode.equals("-")) {
-            filter += "and stock_code = :stockCode\n";
-        }
-        if (!saleManCode.equals("-")) {
-            filter += "and saleman_code = :saleManCode\n";
-        }
-        if (!locCode.equals("-")) {
-            filter += "and loc_code = :locCode\n";
-        }
-        if (nullBatch.equals("true")) {
-            filter += "and (batch_no is null or batch_no ='') \n";
-        }
-        if (!batchNo.equals("-")) {
-            filter += "and batch_no = :batchNo\n";
-        }
-        if (!projectNo.equals("-")) {
-            filter += "and project_no = :projectNo\n";
-        }
-        if (!curCode.equals("-")) {
-            filter += "and cur_code = :curCode\n";
-        }
-        String sql = "select a.*,t.trader_name,t.user_code\n" +
-                "from (\n" +
-                "select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,\n" +
-                "deleted,trader_code,loc_code,comp_code,dept_id\n" +
-                "from v_sale s \n" + "where comp_code = :compCode\n" +
-                "and (dept_id = :deptId or 0 = :deptId)\n" +
-                "and deleted = :deleted\n" +
-                "and date(vou_date) between :fromDate and :toDate\n" + filter + "\n" +
-                "group by vou_no\n" + ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "order by vou_date desc";
+        String sql = """
+                select a.*,t.trader_name,t.user_code
+                from (
+                select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
+                deleted,trader_code,loc_code,comp_code,dept_id
+                from v_sale s
+                where comp_code = :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                and deleted = :deleted
+                and date(vou_date) between :fromDate and :toDate
+                and (vou_no = :vouNo or '-' = :vouNo)
+                and (remark REGEXP :remark or '-' = :remark)
+                and (reference REGEXP :reference or '-' = :reference)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                and (created_by = :userCode or '-' = :userCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (saleman_code = :saleManCode or '-' = :saleManCode)
+                and (loc_code = :locCode or '-' = :locCode)             
+                and (batch_no = :batchNo or '-' = :batchNo)            
+                and (project_no = :projectNo or '-' = :projectNo)            
+                and (cur_code = :curCode or '-' = :curCode)
+                """ + filter +
+                """
+                        group by vou_no
+                        )a
+                         join trader t on a.trader_code = t.code
+                         and a.comp_code = t.comp_code
+                         order by vou_date desc""";
+
         return databaseClient.sql(sql)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("deleted", deleted)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
                 .bind("vouNo", vouNo)
                 .bind("remark", remark)
                 .bind("reference", reference)
@@ -341,12 +334,20 @@ public class SaleHisServiceImpl implements SaleHisService {
                 .bind("batchNo", batchNo)
                 .bind("projectNo", projectNo)
                 .bind("curCode", curCode)
-                .bind("deptId", deptId)
-                .bind("deleted", deleted)
-                .bind("fromDate", fromDate)
-                .bind("toDate", toDate)
                 .map((row) -> VSale.builder()
-                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDateTime.class), "dd/MM/yyyy"))
+                        .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderCode(row.get("user_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .remark(row.get("remark", String.class))
+                        .reference(row.get("reference", String.class))
+                        .createdBy(row.get("created_by", String.class))
+                        .paid(row.get("paid", Double.class))
+                        .vouTotal(row.get("vou_total", Double.class))
+                        .vouBalance(row.get("vou_balance", Double.class))
+                        .deleted(row.get("deleted", Boolean.class))
+                        .deptId(row.get("dept_id", Integer.class))
                         .build()
                 ).all();
     }

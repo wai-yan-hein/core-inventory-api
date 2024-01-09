@@ -42,13 +42,13 @@ public class ReportFilter {
     private String projectNo;
     private boolean orderFavorite;
     private float creditAmt;
-
     private String fromDueDate;
     private String toDueDate;
     private boolean deleted;
     private boolean active;
     private String labourGroupCode;
     private String warehouseCode;
+    private int reportType;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

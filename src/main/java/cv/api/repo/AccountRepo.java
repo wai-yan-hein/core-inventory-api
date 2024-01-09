@@ -14,7 +14,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,11 @@ public class AccountRepo {
                     .body(Mono.just(glList), List.class)
                     .retrieve()
                     .bodyToMono(Response.class)
-                    .subscribe(response -> {
+                    .retryWhen(
+                            Retry.backoff(3, Duration.ofMillis(100))
+                                    .maxBackoff(Duration.ofSeconds(5))
+                                    .jitter(0.5)
+                    ).doOnSuccess(response -> {
                         if (response != null) {
                             String vouNo = response.getVouNo();
                             String compCode = response.getCompCode();
@@ -59,7 +65,7 @@ public class AccountRepo {
                                 case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
                             }
                         }
-                    }, (e) -> {
+                    }).doOnError(e -> {
                         Gl gl = glList.getFirst();
                         String vouNo = gl.getRefNo();
                         String compCode = gl.getKey().getCompCode();
@@ -73,7 +79,7 @@ public class AccountRepo {
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
-                    });
+                    }).subscribe();
         }
     }
 
@@ -894,7 +900,7 @@ public class AccountRepo {
                                 gl.setCrAmt(detail.getAmount());
                                 gl.setCurCode(curCode);
                                 gl.setReference(remark);
-                                gl.setDeptCode(Util1.isNull(gl.getDeptCode(), ph.getDeptCode()));
+                                gl.setDeptCode(Util1.isNull(detail.getDeptCode(), ph.getDeptCode()));
                                 gl.setCreatedDate(LocalDateTime.now());
                                 gl.setCreatedBy(appName);
                                 gl.setTranSource("LABOUR_PAYMENT");
