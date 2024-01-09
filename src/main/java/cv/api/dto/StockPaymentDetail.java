@@ -1,4 +1,4 @@
-package cv.api.entity;
+package cv.api.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +12,10 @@ public class StockPaymentDetail {
     private String compCode;
     private Integer uniqueId;
     private Integer deptId;
-    private LocalDate saleVouDate;
-    private String saleVouNo;
-    private Double payQty;
+    private LocalDate refDate;
+    private String stockCode;
+    private String refNo;
+    private Double qty;
     private String remark;
     private String reference;
-    private boolean fullPaid;
 }

@@ -1375,7 +1375,7 @@ add column report_name varchar(255);
 
 alter table pattern
 add column updated_date timestamp not null default current_timestamp;
-
+//
 alter table stock_type
 add column finished_group bit(1) not null default 0 after active;
 
@@ -1678,6 +1678,9 @@ create table sale_order_join (
 alter table stock_in_out_detail
 add column out_bag double(20,3) null default null after in_bag,
 change column bag in_bag double(20,3) null default null ;
+
+alter table order_his
+add column post bit(1) not null default 0 after order_status;
 
 
 #view

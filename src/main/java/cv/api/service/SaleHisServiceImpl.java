@@ -106,7 +106,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     private void saveDetail(List<SaleHisDetail> listSD, SaleHis sh) {
         String compCode = sh.getKey().getCompCode();
         String vouNo = sh.getKey().getVouNo();
-        int depId = sh.getDeptId();
+        int depId = sh.getDeptId() == null ? 0 : sh.getDeptId();
         for (int i = 0; i < listSD.size(); i++) {
             SaleHisDetail cSd = listSD.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {

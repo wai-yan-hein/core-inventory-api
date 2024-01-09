@@ -18,7 +18,7 @@ import java.util.Objects;
 @Configuration
 @Slf4j
 @PropertySource(value = {"file:config/application.properties"})
-public class WebFlexConfig {
+public class WebClientConfig {
 
     @Autowired
     private Environment environment;

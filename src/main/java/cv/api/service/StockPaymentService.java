@@ -4,6 +4,8 @@ import cv.api.common.FilterObject;
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
+import cv.api.dto.StockPayment;
+import cv.api.dto.StockPaymentDetail;
 import cv.api.r2dbc.LabourPayment;
 import cv.api.r2dbc.LabourPaymentDetail;
 import io.r2dbc.spi.Parameters;
@@ -30,12 +32,12 @@ public class StockPaymentService {
     private final DatabaseClient databaseClient;
     private final VouNoService vouNoService;
 
-    public Mono<LabourPaymentDto> save(LabourPaymentDto dto) {
+    public Mono<StockPayment> save(StockPayment dto) {
         return saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
-            List<LabourPaymentDetail> list = dto.getListDetail();
+            List<StockPaymentDetail> list = dto.getListDetail();
             if (list != null && !list.isEmpty()) {
                 return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                        .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
                         .concatMap(detail -> {
                             int uniqueId = list.indexOf(detail) + 1;
                             detail.setUniqueId(uniqueId);
@@ -51,23 +53,22 @@ public class StockPaymentService {
 
     }
 
-    private Mono<LabourPaymentDto> saveOrUpdate(LabourPaymentDto dto) {
-        String vouNo = dto.getVouNo();
-        String compCode = dto.getCompCode();
-        int deptId = dto.getDeptId();
-        int macId = dto.getMacId();
-        LabourPayment payment = dto.toEntity();
+    private Mono<StockPayment> saveOrUpdate(StockPayment payment) {
+        String vouNo = payment.getVouNo();
+        String compCode = payment.getCompCode();
+        int deptId = payment.getDeptId();
+        int macId = payment.getMacId();
         payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
         if (vouNo == null) {
-            return vouNoService.getVouNo(deptId, "LabourPayment", compCode, macId)
+            return vouNoService.getVouNo(deptId, "StockPayment", compCode, macId)
                     .flatMap(seqNo -> {
                         payment.setVouNo(seqNo);
                         payment.setCreatedDate(LocalDateTime.now());
                         payment.setUpdatedDate(LocalDateTime.now());
-                        return template.insert(payment).map(LabourPayment::buildDto);
+                        return insert(payment);
                     });
         } else {
-            return update(payment).map(LabourPayment::buildDto);
+            return update(payment);
         }
     }
 
@@ -85,7 +86,7 @@ public class StockPaymentService {
                 .defaultIfEmpty(false);
     }
 
-    public Mono<LabourPayment> update(LabourPayment data) {
+    public Mono<StockPayment> update(StockPayment data) {
         String sql = """
                 UPDATE labour_payment
                 SET
@@ -113,26 +114,67 @@ public class StockPaymentService {
                 .bind("vouNo", data.getVouNo())
                 .bind("compCode", data.getCompCode())
                 .bind("vouDate", data.getVouDate())
-                .bind("labourGroupCode", data.getLabourGroupCode())
-                .bind("curCode", data.getCurCode())
                 .bind("remark", data.getRemark())
-                .bind("payTotal",data.getPayTotal())
                 .bind("createdDate", data.getCreatedDate())
                 .bind("createdBy", data.getCreatedBy())
                 .bind("updatedDate", LocalDateTime.now())
                 .bind("updatedBy", data.getUpdatedBy())
-                .bind("deleted", data.isDeleted())
                 .bind("macId", data.getMacId())
-                .bind("memberCount", data.getMemberCount())
-                .bind("sourceAcc", Parameters.in(R2dbcType.VARCHAR, data.getSourceAcc()))
-                .bind("expenseAcc", Parameters.in(R2dbcType.VARCHAR, data.getExpenseAcc()))
                 .bind("vouNo", data.getVouNo())
                 .bind("compCode", data.getCompCode())
-                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, data.getDeptCode()))
-                .bind("post", data.isPost())
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(data);
+    }
+    private Mono<StockPayment> insert(StockPayment p) {
+        String sql = """
+            INSERT INTO stock_payment
+            (vou_no,
+            comp_code,
+            dept_id,
+            vou_date,
+            trader_code,
+            remark,
+            deleted,
+            created_date,
+            created_by,
+            updated_date,
+            updated_by,
+            mac_id,
+            tran_option)
+            VALUES
+            (:vouNo,
+            :compCode,
+            :deptId,
+            :vouDate,
+            :traderCode,
+            :remark,
+            :deleted,
+            :createdDate,
+            :createdBy,
+            :updatedDate,
+            :updatedBy,
+            :macId,
+            :tranOption);
+            """;
+
+        return databaseClient.sql(sql)
+                .bind("vouNo", p.getVouNo())
+                .bind("compCode", p.getCompCode())
+                .bind("deptId", p.getDeptId())
+                .bind("vouDate", p.getVouDate())
+                .bind("traderCode", p.getTraderCode())
+                .bind("remark", p.getRemark())
+                .bind("deleted", p.getDeleted())
+                .bind("createdDate", p.getCreatedDate())
+                .bind("createdBy", p.getCreatedBy())
+                .bind("updatedDate", p.getUpdatedDate())
+                .bind("updatedBy", p.getUpdatedBy())
+                .bind("macId", p.getMacId())
+                .bind("tranOption", p.getTranOption())
+                .fetch()
+                .rowsUpdated()
+                .thenReturn(p);
     }
 
 

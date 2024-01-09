@@ -61,9 +61,7 @@ public class SecurityConfig {
         AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(new JWTReactiveAuthenticationManager(jwtService));
         authenticationWebFilter.setServerAuthenticationConverter(new TokenAuthenticationConverter(jwtService));
         authenticationWebFilter.setRequiresAuthenticationMatcher(new JWTHeadersExchangeMatcher());
-        authenticationWebFilter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
-        NoOpServerSecurityContextRepository sessionConfig = NoOpServerSecurityContextRepository.getInstance();
-        authenticationWebFilter.setSecurityContextRepository(sessionConfig);
+        authenticationWebFilter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance());
         return authenticationWebFilter;
     }
     public void corsConfigurationSource() {
