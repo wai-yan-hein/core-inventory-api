@@ -39,9 +39,14 @@ public class SaleHisServiceImpl implements SaleHisService {
 
     @Override
     public SaleHis save(@NotNull SaleHis saleHis) {
+        Integer deptId = saleHis.getDeptId();
+        if (deptId == null) {
+            log.error("deptId is null from mac id : " + saleHis.getMacId());
+            return null;
+        }
         saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
-            saleHis.getKey().setVouNo(getVoucherNo(saleHis.getDeptId(), saleHis.getMacId(), saleHis.getKey().getCompCode()));
+            saleHis.getKey().setVouNo(getVoucherNo(deptId, saleHis.getMacId(), saleHis.getKey().getCompCode()));
         }
         List<SaleHisDetail> listSD = saleHis.getListSH();
         List<SaleDetailKey> listDel = saleHis.getListDel();
