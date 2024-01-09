@@ -142,7 +142,7 @@ public class PaymentHisDaoImpl extends AbstractDao<PaymentHisKey, PaymentHis> im
         ResultSet rs = getResult(sql, vouNo, compCode);
         try {
             while (rs.next()) {
-                VSale s = new VSale();
+                VSale s = VSale.builder().build();
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderCode(rs.getString("trader_code"));
                 s.setCurCode(rs.getString("cur_code"));

@@ -7,7 +7,9 @@ package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.VouDiscount;
+import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -15,8 +17,8 @@ import java.util.List;
 /**
  * @author wai yan
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@Builder
 public class VSale {
 
     private String groupName;
@@ -97,5 +99,4 @@ public class VSale {
     private String saleUnitName;
     private String weightUnitName;
     List<VouDiscount> listDiscount;
-
 }

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -88,28 +89,33 @@ public class SaleController {
         return status;
     }
 
+//    @PostMapping(path = "/getSale")
+//    public Flux<?> getSale(@NotNull @RequestBody FilterObject filter) {
+//        String fromDate = Util1.isNull(filter.getFromDate(), "-");
+//        String toDate = Util1.isNull(filter.getToDate(), "-");
+//        String vouNo = Util1.isNull(filter.getVouNo(), "-");
+//        String userCode = Util1.isNull(filter.getUserCode(), "-");
+//        String cusCode = Util1.isNull(filter.getTraderCode(), "-");
+//        String remark = Util1.isNull(filter.getRemark(), "-");
+//        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+//        String saleManCode = Util1.isNull(filter.getSaleManCode(), "-");
+//        String reference = Util1.isNull(filter.getReference(), "-");
+//        String compCode = filter.getCompCode();
+//        String locCode = Util1.isNull(filter.getLocCode(), "-");
+//        Integer deptId = filter.getDeptId();
+//        String deleted = String.valueOf(filter.isDeleted());
+//        String nullBatch = String.valueOf(filter.isNullBatch());
+//        String batchNo = Util1.isNull(filter.getBatchNo(), "-");
+//        String projectNo = Util1.isAll(filter.getProjectNo());
+//        String curCode = Util1.isAll(filter.getCurCode());
+//        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
+//                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo, curCode);
+//        return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
+//    }
+
     @PostMapping(path = "/getSale")
     public Flux<?> getSale(@NotNull @RequestBody FilterObject filter) {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String cusCode = Util1.isNull(filter.getTraderCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String saleManCode = Util1.isNull(filter.getSaleManCode(), "-");
-        String reference = Util1.isNull(filter.getReference(), "-");
-        String compCode = filter.getCompCode();
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        Integer deptId = filter.getDeptId();
-        String deleted = String.valueOf(filter.isDeleted());
-        String nullBatch = String.valueOf(filter.isNullBatch());
-        String batchNo = Util1.isNull(filter.getBatchNo(), "-");
-        String projectNo = Util1.isAll(filter.getProjectNo());
-        String curCode = Util1.isAll(filter.getCurCode());
-        List<VSale> saleList = reportService.getSaleHistory(fromDate, toDate, cusCode, saleManCode, vouNo, remark,
-                reference, userCode, stockCode, locCode, compCode, deptId, deleted, nullBatch, batchNo, projectNo, curCode);
-        return Flux.fromIterable(saleList).onErrorResume(throwable -> Flux.empty());
+         return shService.getSale(filter);
     }
 
     @PostMapping(path = "/deleteSale")
