@@ -12,21 +12,15 @@ import cv.api.dao.SaleOrderJoinDao;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
 import cv.api.entity.SaleOrderJoin;
-import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
-import cv.api.service.ReportService;
 import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author wai yan
@@ -40,7 +34,6 @@ public class SaleController {
     private final ReturnObject ro = ReturnObject.builder().build();
     private final SaleHisService shService;
     private final SaleDetailService sdService;
-    private final ReportService reportService;
     private final AccountRepo accountRepo;
     private final SaleOrderJoinDao saleOrderJoinDao;
 

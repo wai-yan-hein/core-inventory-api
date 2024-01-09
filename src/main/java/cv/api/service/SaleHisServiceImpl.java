@@ -19,12 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author wai yan
@@ -287,9 +284,7 @@ public class SaleHisServiceImpl implements SaleHisService {
         String batchNo = Util1.isNull(filterObject.getBatchNo(), "-");
         String projectNo = Util1.isAll(filterObject.getProjectNo());
         String curCode = Util1.isAll(filterObject.getCurCode());
-
         StringBuilder filter = new StringBuilder();
-
         if (Boolean.parseBoolean(nullBatch)) {
             filter.append("and (batch_no is null or batch_no ='') \n");
         }
@@ -310,17 +305,15 @@ public class SaleHisServiceImpl implements SaleHisService {
                 and (created_by = :userCode or '-' = :userCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (saleman_code = :saleManCode or '-' = :saleManCode)
-                and (loc_code = :locCode or '-' = :locCode)             
-                and (batch_no = :batchNo or '-' = :batchNo)            
-                and (project_no = :projectNo or '-' = :projectNo)            
+                and (loc_code = :locCode or '-' = :locCode)
+                and (batch_no = :batchNo or '-' = :batchNo)
+                and (project_no = :projectNo or '-' = :projectNo)
                 and (cur_code = :curCode or '-' = :curCode)
-                """ + filter +
-                """
-                        group by vou_no
-                        )a
-                         join trader t on a.trader_code = t.code
-                         and a.comp_code = t.comp_code
-                         order by vou_date desc""";
+                and (""" + filter + """
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                order by vou_date desc""";
 
         return databaseClient.sql(sql)
                 .bind("compCode", compCode)
