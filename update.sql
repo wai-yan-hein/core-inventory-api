@@ -1679,6 +1679,9 @@ alter table stock_in_out_detail
 add column out_bag double(20,3) null default null after in_bag,
 change column bag in_bag double(20,3) null default null ;
 
+alter table order_his
+add column post bit(1) not null default 0 after order_status;
+
 
 #view
 drop view if exists v_milling_output;
