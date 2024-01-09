@@ -263,12 +263,6 @@ public interface ReportService {
                                                       boolean calMill,
                                                       String compCode, Integer deptId, Integer macId);
 
-    List<ClosingBalance> getStockInOutSummaryByPaddy(String opDate, String fromDate, String toDate,
-                                                     String typeCode, String catCode, String brandCode,
-                                                     String stockCode, String vouTypeCode,
-                                                     boolean calSale, boolean calPur, boolean calRI, boolean calRO,
-                                                     boolean calMill,
-                                                     String compCode, Integer deptId, Integer macId, String warehouse);
 
     VLanding getLandingReport(String vouNo, String compCode);
 

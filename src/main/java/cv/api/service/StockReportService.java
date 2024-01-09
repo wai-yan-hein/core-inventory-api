@@ -94,7 +94,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and in_qty>0
+                 and (in_qty>0 or in_bag>0)
                  group by stock_code, loc_code
                  union all
                  select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(out_bag)*-1 bag, loc_code, weight_unit, sum(amount) ttl_amt
@@ -107,7 +107,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and out_qty>0
+                 and (out_qty>0 or out_bag>0)
                  group by stock_code, loc_code)a
                  group by stock_code, loc_code;
                 """;

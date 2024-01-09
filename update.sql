@@ -1375,7 +1375,7 @@ add column report_name varchar(255);
 
 alter table pattern
 add column updated_date timestamp not null default current_timestamp;
-
+//
 alter table stock_type
 add column finished_group bit(1) not null default 0 after active;
 
