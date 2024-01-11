@@ -5259,12 +5259,12 @@ public class ReportServiceImpl implements ReportService {
                         select vou_no,cur_code,sum(vou_balance) outstanding,comp_code
                         from (
                         select vou_no,cur_code,vou_balance,comp_code
-                        from sale_his\s
+                        from sale_his
                         where trader_code=?
                         and comp_code =?
                         and deleted = false
                         and vou_balance>0
-                        \tunion all
+                          union all
                         select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code
                         from payment_his pd join payment_his_detail phd
                         on pd.vou_no = phd.vou_no
@@ -5280,7 +5280,7 @@ public class ReportServiceImpl implements ReportService {
                         on b.vou_no = sh.vou_no
                         and b.comp_code = sh.comp_code
                         where outstanding<>0
-                        order by vou_date;""";
+                        order by vou_date""";
             } else {
                 sql = """
                         select sh.vou_date,sh.reference,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding

@@ -128,7 +128,6 @@ public class SaleHisServiceImpl implements SaleHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                cSd.setTotalWeight(Util1.getDouble(cSd.getWeight()) * cSd.getQty());
                 sdDao.save(cSd);
             }
         }
@@ -286,7 +285,7 @@ public class SaleHisServiceImpl implements SaleHisService {
         String curCode = Util1.isAll(filterObject.getCurCode());
         StringBuilder filter = new StringBuilder();
         if (Boolean.parseBoolean(nullBatch)) {
-            filter.append("and (batch_no is null or batch_no ='') \n");
+            filter.append(" and (batch_no is null or batch_no ='')\n");
         }
         String sql = """
                 select a.*,t.trader_name,t.user_code
@@ -309,7 +308,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                 and (batch_no = :batchNo or '-' = :batchNo)
                 and (project_no = :projectNo or '-' = :projectNo)
                 and (cur_code = :curCode or '-' = :curCode)
-                and (""" + filter + """
+                """ + filter + """
                 group by vou_no)a
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code

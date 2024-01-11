@@ -51,4 +51,6 @@ public class StockType {
     private boolean active;
     @Column(name = "finished_group")
     private boolean finishedGroup;
+    @Column(name = "group_type")
+    private int groupType;
 }

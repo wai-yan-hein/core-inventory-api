@@ -58,6 +58,19 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code
                  union all
+                 select stock_code,0,sum(qty)*-1 qty, 0, 0, 0, loc_code, '-',0
+                 from v_stock_payment
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
+                 and calculate = true
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 group by stock_code, loc_code
+                 union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
                  from v_transfer
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
@@ -205,6 +218,21 @@ public class StockReportService {
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (out_qty>0 or out_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
+        String issueSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,wet,rice,out_bag,out_weight,ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'Issue',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,0 ttl_wet, 0 ttl_rice, sum(qty)*-1 ttl_bag, 0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
+                from v_stock_payment
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and tran_option='C'
+                group by date(vou_date),vou_no,stock_code,loc_code""";
         Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
         Mono<Long> purMono = client.sql(purSql)
                 .bind("macId", macId)
@@ -265,6 +293,17 @@ public class StockReportService {
                 .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
+        Mono<Long> issueMono = client.sql(issueSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch()
+                .rowsUpdated();
         return deleteTmpIO(macId)
                 .then(opMono)
                 .then(purMono)
@@ -272,6 +311,7 @@ public class StockReportService {
                 .then(ttMono)
                 .then(stockInMono)
                 .then(stockOutMono)
+                .then(issueMono)
                 .doOnError(e -> log.error("calculateClosingByPaddy : " + e.getMessage()));
     }
 
