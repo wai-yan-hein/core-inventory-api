@@ -94,6 +94,7 @@ public class StockPaymentService {
                      trader_code = :traderCode,
                      loc_code =:locCode,
                      remark = :remark,
+                     reference = :reference,
                      deleted = :deleted,
                      created_date = :createdDate,
                      updated_date = :updatedDate,
@@ -113,6 +114,7 @@ public class StockPaymentService {
                 .bind("traderCode", data.getTraderCode())
                 .bind("locCode", data.getLocCode())
                 .bind("remark", data.getRemark())
+                .bind("reference", data.getReference())
                 .bind("deleted", data.getDeleted())
                 .bind("createdDate", data.getCreatedDate())
                 .bind("updatedDate", LocalDateTime.now())
@@ -136,6 +138,7 @@ public class StockPaymentService {
                 trader_code,
                 loc_code,
                 remark,
+                reference,
                 deleted,
                 calculate,
                 created_date,
@@ -152,6 +155,7 @@ public class StockPaymentService {
                 :traderCode,
                 :locCode,
                 :remark,
+                :reference,
                 :deleted,
                 :calculate,
                 :createdDate,
@@ -170,6 +174,7 @@ public class StockPaymentService {
                 .bind("traderCode", p.getTraderCode())
                 .bind("locCode", p.getLocCode())
                 .bind("remark", Parameters.in(R2dbcType.VARCHAR, p.getRemark()))
+                .bind("remark", Parameters.in(R2dbcType.VARCHAR, p.getReference()))
                 .bind("deleted", p.getDeleted())
                 .bind("calculate", p.getCalculate())
                 .bind("createdDate", p.getCreatedDate())
@@ -265,6 +270,7 @@ public class StockPaymentService {
                 and pd.comp_code =:compCode
                 and pd.tran_option =:tranOption
                 and pd.deleted = false
+                and pay_qty>0
                 )a
                 group by vou_no,stock_code
                 )b
@@ -319,6 +325,7 @@ public class StockPaymentService {
                 and pd.comp_code =:compCode
                 and pd.tran_option =:tranOption
                 and pd.deleted = false
+                and pd.pay_bag > 0
                 )a
                 group by vou_no,stock_code
                 )b
@@ -364,7 +371,7 @@ public class StockPaymentService {
             String sql = """
                     select a.*,t.trader_name
                     from(
-                    select sp.*,spd.project_no,sum(pay_qty) pay_qty
+                    select sp.*,spd.project_no,sum(pay_qty) pay_qty,sum(pay_bag)pay_bag
                     from stock_payment sp join stock_payment_detail spd
                     on sp.vou_no = spd.vou_no
                     and sp.comp_code =spd.comp_code
@@ -403,10 +410,12 @@ public class StockPaymentService {
                             .traderCode(row.get("trader_code", String.class))
                             .traderName(row.get("trader_name", String.class))
                             .remark(row.get("remark", String.class))
+                            .reference(row.get("reference", String.class))
                             .deleted(row.get("deleted", Boolean.class))
                             .projectNo(row.get("project_no", String.class))
                             .calculate(row.get("calculate", Boolean.class))
                             .payQty(row.get("pay_qty", Double.class))
+                            .payBag(row.get("pay_bag", Double.class))
                             .createdDate(row.get("created_date", LocalDateTime.class))
                             .createdBy(row.get("created_by", String.class))
                             .locCode(row.get("loc_code",String.class))
@@ -443,6 +452,9 @@ public class StockPaymentService {
                         .qty(row.get("qty", Double.class))
                         .balQty(row.get("bal_qty", Double.class))
                         .payQty(row.get("pay_qty", Double.class))
+                        .bag(row.get("bag", Double.class))
+                        .balBag(row.get("bal_bag", Double.class))
+                        .payBag(row.get("pay_bag", Double.class))
                         .remark(row.get("remark", String.class))
                         .reference(row.get("reference", String.class))
                         .fullPaid(row.get("full_paid", Boolean.class))

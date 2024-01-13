@@ -30,4 +30,6 @@ public class StockPayment {
     private String projectNo;
     private Boolean calculate;
     private Double payQty;
+    private Double payBag;
+    private String reference;
 }

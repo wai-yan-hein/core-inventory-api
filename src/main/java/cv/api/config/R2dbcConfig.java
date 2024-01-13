@@ -15,7 +15,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 @Configuration
 @EnableTransactionManagement
 @EnableR2dbcRepositories(
-        basePackages = "your.r2dbc.repository.package",
+        basePackages = "cv.api.dto",
         repositoryFactoryBeanClass = R2dbcRepositoryFactoryBean.class
 )
 public class R2dbcConfig {

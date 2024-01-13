@@ -1685,6 +1685,44 @@ add column post bit(1) not null default 0 after order_status;
 alter table stock_type
 add column group_type int not null default 0 after finished_group;
 
+create table stock_payment (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  vou_date datetime not null,
+  trader_code varchar(15) not null,
+  remark text default null,
+  reference text default null,
+  deleted bit(1) not null default b'0',
+  created_date timestamp not null,
+  updated_date timestamp not null,
+  created_by varchar(15) not null,
+  updated_by varchar(15) default null,
+  mac_id int(11) not null,
+  tran_option varchar(15) not null,
+  calculate bit(1) not null default b'0',
+  loc_code varchar(15) default null,
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
+create table stock_payment_detail (
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  unique_id int(11) not null,
+  ref_date date not null,
+  stock_code varchar(15) default null,
+  ref_no varchar(25) default null,
+  qty double(20,3) default null,
+  pay_qty double(20,3) default null,
+  bal_qty double(20,3) default null,
+  bag double(20,3) default null,
+  pay_bag double(20,3) default null,
+  bal_bag double(20,3) default null,
+  remark text default null,
+  reference text default null,
+  full_paid bit(1) not null default b'0',
+  project_no varchar(15) default null,
+  primary key (vou_no,comp_code,unique_id)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 #view
 drop view if exists v_milling_output;
