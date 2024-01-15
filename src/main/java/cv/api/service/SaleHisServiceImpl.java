@@ -189,8 +189,8 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public SaleHis update(SaleHis saleHis) {
-        return shDao.save(saleHis);
+    public void update(SaleHis saleHis) {
+        shDao.update(saleHis);
     }
 
     @Override
@@ -265,7 +265,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public Flux<?> getSale(FilterObject filterObject) {
+    public Flux<VSale> getSale(FilterObject filterObject) {
         String fromDate = Util1.isNull(filterObject.getFromDate(), "-");
         String toDate = Util1.isNull(filterObject.getToDate(), "-");
         String vouNo = Util1.isNull(filterObject.getVouNo(), "-");
@@ -290,8 +290,8 @@ public class SaleHisServiceImpl implements SaleHisService {
         String sql = """
                 select a.*,t.trader_name,t.user_code
                 from (
-                select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
-                deleted,trader_code,loc_code,comp_code,dept_id
+                select vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
+                deleted,trader_code,loc_code,comp_code,dept_id,post,sum(qty) qty,sum(bag) bag
                 from v_sale s
                 where comp_code = :compCode
                 and (dept_id = :deptId or 0 = :deptId)
@@ -345,6 +345,9 @@ public class SaleHisServiceImpl implements SaleHisService {
                         .vouBalance(row.get("vou_balance", Double.class))
                         .deleted(row.get("deleted", Boolean.class))
                         .deptId(row.get("dept_id", Integer.class))
+                        .post(row.get("post", Boolean.class))
+                        .qty(row.get("qty", Double.class))
+                        .bag(row.get("bag", Double.class))
                         .build()
                 ).all();
     }

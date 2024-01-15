@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -20,15 +19,15 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Entity
-@Table(name = "iss_rec_his")
-public class StockIssueReceive implements Serializable {
+@Table(name = "consign_his")
+public class ConsignHis {
 
     @EmbeddedId
-    private StockIssueReceiveKey key;
+    private ConsignHisKey key;
     @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "location")
-    private String location;
+    @Column(name = "loc_code")
+    private String locCode;
     @Column(name = "remark")
     private String remark;
     @Column(name = "description")
@@ -66,9 +65,9 @@ public class StockIssueReceive implements Serializable {
     @Transient
     private String status = "STATUS";
     @Transient
-    private List<StockIssRecDetail> listIRDetail;
+    private List<ConsignHisDetail> listIRDetail;
     @Transient
-    private List<StockIssueReceiveKey> listDel;
+    private List<ConsignHisKey> listDel;
     @Transient
     private List<LocationKey> keys;
     @Transient

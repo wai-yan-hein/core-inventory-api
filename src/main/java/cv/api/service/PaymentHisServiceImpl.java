@@ -3,13 +3,11 @@ package cv.api.service;
 import cv.api.common.Util1;
 import cv.api.dao.PaymentHisDao;
 import cv.api.dao.PaymentHisDetailDao;
+import cv.api.dao.SaleHisDao;
 import cv.api.dao.SeqTableDao;
-import cv.api.entity.PaymentHis;
-import cv.api.entity.PaymentHisDetail;
-import cv.api.entity.PaymentHisDetailKey;
-import cv.api.entity.PaymentHisKey;
+import cv.api.entity.*;
 import cv.api.model.VSale;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +16,12 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PaymentHisServiceImpl implements PaymentHisService {
-    @Autowired
-    private PaymentHisDao dao;
-    @Autowired
-    private PaymentHisDetailDao detailDao;
-    @Autowired
-    private SeqTableDao seqDao;
+    private final PaymentHisDao dao;
+    private final PaymentHisDetailDao detailDao;
+    private final SeqTableDao seqDao;
+    private final SaleHisDao saleHisDao;
 
     @Override
     public PaymentHis save(PaymentHis obj) {
@@ -36,7 +33,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
         List<PaymentHisDetailKey> listDel = obj.getListDelete();
         String vouNo = obj.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(key -> detailDao.delete(key));
+            listDel.forEach(detailDao::delete);
         }
         for (int i = 0; i < listDetail.size(); i++) {
             PaymentHisDetail cSd = listDetail.get(i);
@@ -58,12 +55,26 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                     }
                 }
                 detailDao.save(cSd);
-
+                updateSale(cSd, true);
             }
             dao.save(obj);
             obj.setListDetail(listDetail);
         }
         return obj;
+    }
+
+    private void updateSale(PaymentHisDetail ph, boolean post) {
+        String saleVouNo = ph.getSaleVouNo();
+        if (!Util1.isNullOrEmpty(saleVouNo)) {
+            SaleHisKey key = new SaleHisKey();
+            key.setVouNo(saleVouNo);
+            key.setCompCode(ph.getKey().getCompCode());
+            SaleHis wh = saleHisDao.findById(key);
+            if (wh != null) {
+                wh.setPost(post);
+                saleHisDao.save(wh);
+            }
+        }
     }
 
     @Override
@@ -74,6 +85,8 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     @Override
     public void delete(PaymentHisKey key) {
         dao.delete(key);
+        List<PaymentHisDetail> list = detailDao.search(key.getVouNo(), key.getCompCode());
+        list.forEach(t -> updateSale(t, false));
     }
 
     @Override

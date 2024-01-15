@@ -10,7 +10,7 @@ public interface PaymentHisDetailDao {
 
     PaymentHisDetail find(PaymentHisDetailKey key);
 
-    List<PaymentHisDetail> search(String vouNo, String compCode,Integer deptId);
+    List<PaymentHisDetail> search(String vouNo, String compCode);
 
     void delete(PaymentHisDetailKey key);
 }

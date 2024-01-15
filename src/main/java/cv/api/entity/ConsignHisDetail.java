@@ -15,11 +15,11 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Entity
-@Table(name = "iss_rec_his_detail")
-public class StockIssRecDetail {
+@Table(name = "consign_his_detail")
+public class ConsignHisDetail {
 
     @EmbeddedId
-    private StockIssRecDetailKey key;
+    private ConsignHisDetailKey key;
     @Column(name = "dept_id")
     private Integer deptId;
     @Column(name = "stock_code")
@@ -27,19 +27,21 @@ public class StockIssRecDetail {
     @Column(name = "loc_code")
     private String locCode;
     @Column(name = "wet")
-    private double wet;
+    private Double wet;
     @Column(name = "bag")
-    private double bag;
+    private Double bag;
     @Column(name = "qty")
-    private double qty;
+    private Double qty;
     @Column(name = "weight")
-    private double weight;
+    private Double weight;
     @Column(name = "rice")
-    private double rice;
+    private Double rice;
     @Column(name = "price")
-    private double price;
+    private Double price;
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
+    @Column(name = "total_weight")
+    private Double totalWeight;
     @Transient
     private String userCode;
     @Transient

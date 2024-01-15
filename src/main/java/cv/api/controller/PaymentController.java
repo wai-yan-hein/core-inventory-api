@@ -9,10 +9,10 @@ import cv.api.repo.AccountRepo;
 import cv.api.service.PaymentHisService;
 import cv.api.service.ReportService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/payment")
@@ -66,8 +66,8 @@ public class PaymentController {
     }
 
     @GetMapping(path = "/getPaymentDetail")
-    public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/getPaymentHistory")

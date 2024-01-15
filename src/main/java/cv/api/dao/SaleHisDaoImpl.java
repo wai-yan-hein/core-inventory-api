@@ -36,6 +36,11 @@ public class SaleHisDaoImpl extends AbstractDao<SaleHisKey, SaleHis> implements 
     }
 
     @Override
+    public void update(SaleHis sh) {
+        updateEntity(sh);
+    }
+
+    @Override
     public List<SaleHis> search(String fromDate, String toDate, String cusCode,
                                 String vouNo, String remark, String userCode) {
         String strFilter = "";

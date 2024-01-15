@@ -58,7 +58,7 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code
                  union all
-                 select stock_code,0,sum(qty)*-1 qty, 0, 0, 0, loc_code, '-',0
+                 select stock_code,0,sum(pay_qty)*-1 qty, 0, 0, sum(pay_bag)*-1, loc_code, '-',0
                  from v_stock_payment
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
@@ -220,7 +220,7 @@ public class StockReportService {
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String issueSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,wet,rice,out_bag,out_weight,ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'Issue',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,0 ttl_wet, 0 ttl_rice, sum(qty)*-1 ttl_bag, 0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
+                select 'Issue',vou_date vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,0 ttl_wet, 0 ttl_rice, sum(pay_bag)*-1 ttl_bag, 0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
                 from v_stock_payment
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
@@ -658,4 +658,180 @@ public class StockReportService {
         }
     }
 
+    private Mono<Long> calculateOpeningConsign(String opDate, String fromDate, String typeCode,
+                                               String catCode, String brandCode, String stockCode,
+                                               String traderCode, String compCode, Integer macId) {
+        //opening
+        String sql = """
+                insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_bag,comp_code,mac_id)
+                select :opDate,trader_code,stock_code,loc_code,sum(bag) bag,comp_code,1
+                from (
+                select trader_code,stock_code,loc_code,comp_code,sum(bag) bag
+                from v_opening
+                where date(op_date) = :opDate
+                and comp_code =:compCode
+                and deleted = false
+                and calculate = true
+                and tran_source = 4
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by stock_code,trader_code
+                	union all
+                select trader_code,stock_code,loc_code,comp_code,sum(bag) bag
+                from v_consign
+                where date(vou_date) >=:opDate and date(vou_date)<:fromDate
+                and comp_code =:compCode
+                and deleted = false
+                and tran_source =1
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by stock_code,trader_code
+                	union all
+                select trader_code,stock_code,loc_code,comp_code,sum(bag)*-1 bag
+                from v_consign
+                where date(vou_date) >=:opDate and date(vou_date)<:fromDate
+                and comp_code =:compCode
+                and deleted = false
+                and tran_source =2
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by stock_code,trader_code
+                )a
+                group by stock_code,trader_code
+                having bag<>0
+                """;
+        return deleteTmpOpening(macId).then(client.sql(sql)
+                .bind("opDate", opDate)
+                .bind("fromDate", fromDate)
+                .bind("typeCode", typeCode)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .bind("compCode", compCode)
+                .bind("macId", macId)
+                .fetch()
+                .rowsUpdated());
+    }
+
+    private Mono<Long> calculateClosingConsign(String fromDate, String toDate, String typeCode,
+                                               String catCode, String brandCode, String stockCode,
+                                               String traderCode, String compCode, Integer macId) {
+        String opSql = """
+                select 'A-Opening',tran_date,stock_code,trader_code,sum(ttl_bag) ttl_bag
+                from tmp_stock_opening
+                where mac_id =:macId
+                group by stock_code,trader_code
+                """;
+        String inSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_bag,loc_code,mac_id,comp_code,dept_id)
+                select 'StockIn',date(vou_date) vou_date,vou_no,remark,stock_code,sum(bag) ttl_bag,loc_code,:macId,comp_code,dept_id
+                from v_consign
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and tran_source =1
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by date(vou_date),vou_no,stock_code,trader_code
+                """;
+        String outSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_bag,loc_code,mac_id,comp_code,dept_id)
+                select 'StockOut',date(vou_date) vou_date,vou_no,remark,stock_code,sum(bag)*-1 ttl_bag,loc_code,:macId,comp_code,dept_id
+                from v_consign
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and tran_source =2
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by date(vou_date),vou_no,stock_code,trader_code
+                """;
+        Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
+        Mono<Long> inMono = client.sql(inSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .fetch().rowsUpdated();
+        Mono<Long> outMono = client.sql(outSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", stockCode)
+                .fetch().rowsUpdated();
+        return deleteTmpIO(macId)
+                .then(opMono)
+                .then(inMono)
+                .then(outMono)
+                .doOnError(e -> log.error("calculateClosingConsign : " + e.getMessage()));
+
+    }
+    public Mono<ReturnObject> getStockInOutConsign(ReportFilter filter) {
+        String opDate = filter.getOpDate();
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String typeCode = filter.getStockTypeCode();
+        String catCode = filter.getCatCode();
+        String brandCode = filter.getBrandCode();
+        String stockCode = filter.getStockCode();
+        String compCode = filter.getCompCode();
+        String traderCode = Util1.isNull(filter.getTraderCode(),"-");
+        Integer macId = filter.getMacId();
+        int type = filter.getReportType();
+        Mono<Long> opMono = calculateOpeningConsign(opDate,fromDate,typeCode,catCode,brandCode,stockCode,traderCode,compCode,macId);
+        Mono<Long> clMono = calculateClosingConsign(fromDate,toDate,typeCode,catCode,brandCode,stockCode,traderCode,compCode,macId);
+        String sql= """
+                 select a.*,sum(a.op_bag+a.in_bag+a.out_bag) bal_bag,
+                s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
+                st.stock_type_name,c.user_code c_user_code,c.cat_name
+                from (
+                select stock_code,trader_code,comp_code,sum(ifnull(op_bag,0)) op_bag,
+                sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag
+                from tmp_stock_io_column
+                where mac_id = :macId
+                group by stock_code,trader_code)a
+                join stock s on a.stock_code = s.stock_code
+                and a.comp_code = s.comp_code
+                join stock_type st on s.stock_type_code = st.stock_type_code
+                and s.comp_code = st.comp_code
+                join category c on s.category_code = c.cat_code
+                and s.comp_code = c.comp_code
+                and (a.op_bag<>0  or a.in_bag<>0 or a.out_bag <> 0)
+                group by a.stock_code,a.trader_code
+                order by s.user_code""";
+        return null;
+    }
 }

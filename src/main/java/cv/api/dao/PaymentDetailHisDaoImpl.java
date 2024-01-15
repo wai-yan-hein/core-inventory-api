@@ -20,8 +20,8 @@ public class PaymentDetailHisDaoImpl extends AbstractDao<PaymentHisDetailKey, Pa
     }
 
     @Override
-    public List<PaymentHisDetail> search(String vouNo, String compCode,Integer deptId) {
-        String hsql = "select o from PaymentHisDetail o where o.key.vouNo='" + vouNo + "' and o.key.compCode ='" + compCode + "' and o.key.deptId ="+deptId;
+    public List<PaymentHisDetail> search(String vouNo, String compCode) {
+        String hsql = "select o from PaymentHisDetail o where o.key.vouNo='" + vouNo + "' and o.key.compCode ='" + compCode + "'";
         return findHSQL(hsql);
     }
 

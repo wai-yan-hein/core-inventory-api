@@ -2,7 +2,6 @@ package cv.api.service;
 import cv.api.entity.*;
 import cv.api.common.Util1;
 import cv.api.dao.*;
-import cv.api.model.VStockIssueReceive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,14 +13,14 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class StockIssRecServiceImpl implements StockIssRecService {
-    private final StockIssRecDao dao;
-    public final StockIssRecDetailDao detailDao;
+public class ConsignServiceImpl implements ConsignService {
+    private final ConsignDao dao;
+    public final ConsignDetailDao detailDao;
     private final SeqTableDao seqDao;
 
 
     @Override
-    public StockIssueReceive save(StockIssueReceive obj) {
+    public ConsignHis save(ConsignHis obj) {
         obj.setVouDate(Util1.toDateTime(obj.getVouDate()));
         if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
             obj.getKey().setVouNo(getVoucherNo(obj.getDeptId(), obj.getMacId(), obj.getKey().getCompCode()));
@@ -31,17 +30,17 @@ public class StockIssRecServiceImpl implements StockIssRecService {
         //delete detail
         boolean delete = detailDao.deleteStockIssRecDetail(vouNo, compCode);
         if (delete) {
-            List<StockIssRecDetail> listDetail = obj.getListIRDetail();
+            List<ConsignHisDetail> listDetail = obj.getListIRDetail();
             for (int i = 0; i < listDetail.size(); i++) {
-                StockIssRecDetail cSd = listDetail.get(i);
+                ConsignHisDetail cSd = listDetail.get(i);
                 if (cSd.getStockCode() != null) {
                     if (Util1.isNullOrEmpty(cSd.getKey())) {
-                        StockIssRecDetailKey key = new StockIssRecDetailKey();
+                        ConsignHisDetailKey key = new ConsignHisDetailKey();
                         key.setCompCode(obj.getKey().getCompCode());
                         key.setVouNo(vouNo);
                         key.setUniqueId(0);
                         cSd.setDeptId(obj.getDeptId());
-                        cSd.setLocCode(obj.getLocation());
+                        cSd.setLocCode(obj.getLocCode());
                         cSd.setKey(key);
                     }
                     double weight = cSd.getWeight();
@@ -50,15 +49,13 @@ public class StockIssRecServiceImpl implements StockIssRecService {
                             if (i == 0) {
                                 cSd.getKey().setUniqueId(1);
                             } else {
-                                StockIssRecDetail pSd = listDetail.get(i - 1);
+                                ConsignHisDetail pSd = listDetail.get(i - 1);
                                 cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                             }
                         }
                     }
                     detailDao.save(cSd);
                 }
-
-//                obj.setListIRDetail(listDetail);
             }
             dao.save(obj);
         }
@@ -67,31 +64,31 @@ public class StockIssRecServiceImpl implements StockIssRecService {
 
 
     @Override
-    public StockIssueReceive findById(StockIssueReceiveKey key) {
+    public ConsignHis findById(ConsignHisKey key) {
         return dao.findById(key);
     }
 
     @Override
-    public boolean delete(StockIssueReceiveKey key) {
+    public boolean delete(ConsignHisKey key) {
         return dao.delete(key);
     }
 
     @Override
-    public boolean restore(StockIssueReceiveKey key) {
+    public boolean restore(ConsignHisKey key) {
         return dao.restore(key);
     }
 
     @Override
-    public StockIssRecDetail save(StockIssRecDetail obj) {
+    public ConsignHisDetail save(ConsignHisDetail obj) {
         return detailDao.save(obj);
     }
 
     @Override
-    public boolean delete(StockIssRecDetailKey key) {
+    public boolean delete(ConsignHisDetailKey key) {
         return detailDao.delete(key);
     }
     @Override
-    public List<StockIssRecDetail> getStockIssRecDetail(String vouNo, String compCode) {
+    public List<ConsignHisDetail> getStockIssRecDetail(String vouNo, String compCode) {
         return detailDao.getStockIssRecDetail(vouNo, compCode);
     }
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {

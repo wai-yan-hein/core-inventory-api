@@ -34,7 +34,7 @@ public class StockPaymentService {
             List<StockPaymentDetail> list = dto.getListDetail();
             if (list != null && !list.isEmpty()) {
                 return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getQty())> 0 || Util1.getDouble(detail.getBag())>0)
+                        .filter(detail -> Util1.getDouble(detail.getPayQty())> 0 || Util1.getDouble(detail.getPayBag())>0)
                         .concatMap(detail -> {
                             int uniqueId = list.indexOf(detail) + 1;
                             detail.setUniqueId(uniqueId);
@@ -174,7 +174,7 @@ public class StockPaymentService {
                 .bind("traderCode", p.getTraderCode())
                 .bind("locCode", p.getLocCode())
                 .bind("remark", Parameters.in(R2dbcType.VARCHAR, p.getRemark()))
-                .bind("remark", Parameters.in(R2dbcType.VARCHAR, p.getReference()))
+                .bind("reference", Parameters.in(R2dbcType.VARCHAR, p.getReference()))
                 .bind("deleted", p.getDeleted())
                 .bind("calculate", p.getCalculate())
                 .bind("createdDate", p.getCreatedDate())
@@ -250,7 +250,7 @@ public class StockPaymentService {
         String sql = """
                 select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
                 sh.s_user_code,sh.stock_name,
-                sh.qty,sum(b.bal_qty) bal_qty
+                sh.qty,b.bal_qty
                 from (
                 select vou_no,stock_code,sum(qty) bal_qty,comp_code
                 from (
@@ -270,7 +270,7 @@ public class StockPaymentService {
                 and pd.comp_code =:compCode
                 and pd.tran_option =:tranOption
                 and pd.deleted = false
-                and pay_qty>0
+                and phd.pay_qty>0
                 )a
                 group by vou_no,stock_code
                 )b
@@ -305,7 +305,7 @@ public class StockPaymentService {
         String sql = """
                 select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
                 sh.s_user_code,sh.stock_name,
-                sh.bag,sum(b.bal_bag) bal_bag
+                sh.bag,b.bal_bag
                 from (
                 select vou_no,stock_code,sum(bag) bal_bag,comp_code
                 from (
@@ -325,7 +325,7 @@ public class StockPaymentService {
                 and pd.comp_code =:compCode
                 and pd.tran_option =:tranOption
                 and pd.deleted = false
-                and pd.pay_bag > 0
+                and phd.pay_bag > 0
                 )a
                 group by vou_no,stock_code
                 )b
