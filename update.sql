@@ -1682,6 +1682,43 @@ change column bag in_bag double(20,3) null default null ;
 alter table order_his
 add column post bit(1) not null default 0 after order_status;
 
+create table order_note (
+  vou_no varchar(25) not null,
+  comp_code varchar(25) not null,
+  dept_id int(11) default null,
+  mac_id int(11) default null,
+  trader_code varchar(25) default null,
+  vou_date datetime default null,
+  created_date timestamp null default current_timestamp(),
+  created_by varchar(45) default null,
+  updated_date timestamp null default current_timestamp(),
+  updated_by varchar(45) default null,
+  remark text default null,
+  ref_no varchar(255) default null,
+  receiver_name varchar(255) default null,
+  primary key (vou_no,comp_code)
+) engine=innodb default charset=utf8mb3;
+
+create table order_note_detail (
+  vou_no varchar(45) not null,
+  unique_id int(11) not null,
+  comp_code varchar(45) not null,
+  due_date date default null,
+  stock_code varchar(45) default null,
+  fabric_color_code varchar(45) default null,
+  gender varchar(15) default null,
+  size_xs double(20,3) default null,
+  size_s double(20,3) default null,
+  size_m double(20,3) default null,
+  size_l double(20,3) default null,
+  size_xl double(20,3) default null,
+  size_2xl double(20,3) default null,
+  size_3xl double(20,3) default null,
+  size_4xl double(20,3) default null,
+  total_qty double(20,3) default null,
+  remark text default null,
+  primary key (vou_no,unique_id,comp_code)
+) engine=innodb default charset=utf8mb3;
 
 #view
 drop view if exists v_milling_output;

@@ -5,19 +5,23 @@
  */
 package cv.api.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
+import java.util.Arrays;
 
 /**
  * @author wai yan
  */
 @Repository
+@Slf4j
 public class ReportDaoImpl extends AbstractDao<Serializable, Object> implements ReportDao {
 
     @Override
     public void executeSql(String... sql) {
+        log.info(Arrays.toString(sql));
         execSql(sql);
     }
 
@@ -27,7 +31,8 @@ public class ReportDaoImpl extends AbstractDao<Serializable, Object> implements 
     }
 
     @Override
-    public ResultSet executeSql(String sql)  {
+    public ResultSet executeSql(String sql) {
+        log.info(sql);
         return getResult(sql);
     }
 }
