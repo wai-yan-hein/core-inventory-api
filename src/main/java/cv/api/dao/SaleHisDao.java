@@ -19,6 +19,8 @@ import java.util.List;
 public interface SaleHisDao {
 
     SaleHis save(SaleHis sh);
+    void update(SaleHis sh);
+
 
     List<SaleHis> search(String fromDate, String toDate, String cusCode,
                          String vouNo, String remark, String userCode);

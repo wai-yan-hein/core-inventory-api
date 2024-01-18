@@ -106,6 +106,8 @@ public class SaleHis {
     private String deptCode;
     @Column(name = "weight_vou_no")
     private String weightVouNo;
+    @Column(name = "post")
+    private boolean post;
     @Transient
     private String status = "STATUS";
     @Transient

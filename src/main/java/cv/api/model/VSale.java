@@ -54,6 +54,7 @@ public class VSale {
     private String stockCode;
     private String expiredDate;
     private Double qty;
+    private Double bag;
     private String saleUnit;
     private Double salePrice;
     private Double saleAmount;
@@ -98,5 +99,6 @@ public class VSale {
     private Double totalWeight;
     private String saleUnitName;
     private String weightUnitName;
+    private Boolean post;
     List<VouDiscount> listDiscount;
 }

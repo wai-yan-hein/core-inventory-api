@@ -2,10 +2,10 @@ package cv.api.controller;
 
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
-import cv.api.entity.StockIssueReceive;
-import cv.api.entity.StockIssueReceiveKey;
+import cv.api.entity.ConsignHis;
+import cv.api.entity.ConsignHisKey;
 import cv.api.service.ReportService;
-import cv.api.service.StockIssRecService;
+import cv.api.service.ConsignService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,29 +18,29 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RequiredArgsConstructor
 public class StockIssueReceiveController {
-    private final StockIssRecService stockIssRecService;
+    private final ConsignService stockIssRecService;
 
     @Autowired
     private ReportService reportService;
     @PostMapping(path = "/saveStockIssRec")
-    public Mono<?> saveStockIssRec(@RequestBody StockIssueReceive obj) {
+    public Mono<?> saveStockIssRec(@RequestBody ConsignHis obj) {
         obj = stockIssRecService.save(obj);
         return Mono.justOrEmpty(obj);
     }
 
     @PostMapping(path = "/findStockIssRec")
-    public Mono<?> findStockIssRec(@RequestBody StockIssueReceiveKey key) {
+    public Mono<?> findStockIssRec(@RequestBody ConsignHisKey key) {
         return Mono.justOrEmpty(stockIssRecService.findById(key));
     }
 
     @PostMapping(path = "/deleteStockIssRec")
-    public Mono<?> deleteStockIssRec(@RequestBody StockIssueReceiveKey key) {
+    public Mono<?> deleteStockIssRec(@RequestBody ConsignHisKey key) {
         stockIssRecService.delete(key);
         return Mono.just(true);
     }
 
     @PostMapping(path = "/restoreStockIssRec")
-    public Mono<?> restoreStockIssRec(@RequestBody StockIssueReceiveKey key) {
+    public Mono<?> restoreStockIssRec(@RequestBody ConsignHisKey key) {
         stockIssRecService.restore(key);
         return Mono.just(true);
     }
@@ -70,8 +70,8 @@ public class StockIssueReceiveController {
     }
 
     @PostMapping(path = "/findStockIR")
-    public Mono<StockIssueReceive> findStockIR(@RequestBody StockIssueReceiveKey key) {
-        StockIssueReceive sh = stockIssRecService.findById(key);
+    public Mono<ConsignHis> findStockIR(@RequestBody ConsignHisKey key) {
+        ConsignHis sh = stockIssRecService.findById(key);
         return Mono.justOrEmpty(sh);
     }
 

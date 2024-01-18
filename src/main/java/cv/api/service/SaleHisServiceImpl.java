@@ -19,12 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author wai yan
@@ -46,9 +43,14 @@ public class SaleHisServiceImpl implements SaleHisService {
 
     @Override
     public SaleHis save(@NotNull SaleHis saleHis) {
+        Integer deptId = saleHis.getDeptId();
+        if (deptId == null) {
+            log.error("deptId is null from mac id : " + saleHis.getMacId());
+            return null;
+        }
         saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
         if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
-            saleHis.getKey().setVouNo(getVoucherNo(saleHis.getDeptId(), saleHis.getMacId(), saleHis.getKey().getCompCode()));
+            saleHis.getKey().setVouNo(getVoucherNo(deptId, saleHis.getMacId(), saleHis.getKey().getCompCode()));
         }
         List<SaleHisDetail> listSD = saleHis.getListSH();
         List<SaleDetailKey> listDel = saleHis.getListDel();
@@ -126,7 +128,6 @@ public class SaleHisServiceImpl implements SaleHisService {
                         cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
                     }
                 }
-                cSd.setTotalWeight(Util1.getDouble(cSd.getWeight()) * cSd.getQty());
                 sdDao.save(cSd);
             }
         }
@@ -188,8 +189,8 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public SaleHis update(SaleHis saleHis) {
-        return shDao.save(saleHis);
+    public void update(SaleHis saleHis) {
+        shDao.update(saleHis);
     }
 
     @Override
@@ -264,7 +265,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public Flux<?> getSale(FilterObject filterObject) {
+    public Flux<VSale> getSale(FilterObject filterObject) {
         String fromDate = Util1.isNull(filterObject.getFromDate(), "-");
         String toDate = Util1.isNull(filterObject.getToDate(), "-");
         String vouNo = Util1.isNull(filterObject.getVouNo(), "-");
@@ -282,17 +283,15 @@ public class SaleHisServiceImpl implements SaleHisService {
         String batchNo = Util1.isNull(filterObject.getBatchNo(), "-");
         String projectNo = Util1.isAll(filterObject.getProjectNo());
         String curCode = Util1.isAll(filterObject.getCurCode());
-
         StringBuilder filter = new StringBuilder();
-
         if (Boolean.parseBoolean(nullBatch)) {
-            filter.append("and (batch_no is null or batch_no ='') \n");
+            filter.append(" and (batch_no is null or batch_no ='')\n");
         }
         String sql = """
                 select a.*,t.trader_name,t.user_code
                 from (
-                select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
-                deleted,trader_code,loc_code,comp_code,dept_id
+                select vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
+                deleted,trader_code,loc_code,comp_code,dept_id,post,sum(qty) qty,sum(bag) bag
                 from v_sale s
                 where comp_code = :compCode
                 and (dept_id = :deptId or 0 = :deptId)
@@ -305,17 +304,15 @@ public class SaleHisServiceImpl implements SaleHisService {
                 and (created_by = :userCode or '-' = :userCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (saleman_code = :saleManCode or '-' = :saleManCode)
-                and (loc_code = :locCode or '-' = :locCode)             
-                and (batch_no = :batchNo or '-' = :batchNo)            
-                and (project_no = :projectNo or '-' = :projectNo)            
+                and (loc_code = :locCode or '-' = :locCode)
+                and (batch_no = :batchNo or '-' = :batchNo)
+                and (project_no = :projectNo or '-' = :projectNo)
                 and (cur_code = :curCode or '-' = :curCode)
-                """ + filter +
-                """
-                        group by vou_no
-                        )a
-                         join trader t on a.trader_code = t.code
-                         and a.comp_code = t.comp_code
-                         order by vou_date desc""";
+                """ + filter + """
+                group by vou_no)a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                order by vou_date desc""";
 
         return databaseClient.sql(sql)
                 .bind("compCode", compCode)
@@ -348,6 +345,9 @@ public class SaleHisServiceImpl implements SaleHisService {
                         .vouBalance(row.get("vou_balance", Double.class))
                         .deleted(row.get("deleted", Boolean.class))
                         .deptId(row.get("dept_id", Integer.class))
+                        .post(row.get("post", Boolean.class))
+                        .qty(row.get("qty", Double.class))
+                        .bag(row.get("bag", Double.class))
                         .build()
                 ).all();
     }

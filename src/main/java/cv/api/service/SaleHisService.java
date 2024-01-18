@@ -10,6 +10,7 @@ import cv.api.common.General;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
 import cv.api.entity.VouDiscount;
+import cv.api.model.VSale;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public interface SaleHisService {
 
     SaleHis save(SaleHis saleHis);
 
-    SaleHis update(SaleHis saleHis);
+    void update(SaleHis saleHis);
 
     List<SaleHis> search(String fromDate, String toDate, String cusCode,
                          String vouNo, String remark, String userCode);
@@ -49,5 +50,5 @@ public interface SaleHisService {
 
     List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
-    Flux<?> getSale(FilterObject filterObject);
+    Flux<VSale> getSale(FilterObject filterObject);
 }

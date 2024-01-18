@@ -111,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
         List<VSale> saleList = new ArrayList<>();
         String sql = """
                 select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.reference,v.vou_no,v.vou_date,v.stock_name,
-                v.qty,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
+                v.qty,v.bag,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
                 v.paid,v.vou_balance,t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,
                 v.comp_code,c.cat_name,r.reg_name,u1.unit_name sale_unit_name,u2.unit_name weight_unit_name
                 from v_sale v join trader t
@@ -156,6 +156,7 @@ public class ReportServiceImpl implements ReportService {
             sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
             sale.setStockName(rs.getString("stock_name"));
             sale.setQty(rs.getDouble("qty"));
+            sale.setBag(rs.getDouble("bag"));
             sale.setSalePrice(rs.getDouble("sale_price"));
             sale.setSaleAmount(rs.getDouble("sale_amt"));
             sale.setVouTotal(rs.getDouble("vou_total"));
@@ -3210,7 +3211,8 @@ public class ReportServiceImpl implements ReportService {
             filter = "and (v.trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n";
         }
 
-        String sql = "select sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by,v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
+        String sql = "select sum(v.qty) qty,sum(v.bag) bag,sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by," +
+                "v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
                 "from v_opening v join location l\n" +
                 "on v.loc_code = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
@@ -3237,6 +3239,8 @@ public class ReportServiceImpl implements ReportService {
                 key.setVouNo(rs.getString("vou_no"));
                 s.setKey(key);
                 s.setDeptId(rs.getInt("dept_id"));
+                s.setQty(rs.getDouble("qty"));
+                s.setBag(rs.getDouble("bag"));
                 s.setOpAmt(rs.getFloat("amount"));
                 s.setVouDateStr(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
                 s.setRemark(rs.getString("remark"));
@@ -4985,9 +4989,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VStockIssueReceive> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
-                                                                String vouNo, String remark, String locCode, Integer deptId,
-                                                                boolean deleted, String compCode, int transSource) {
+    public List<VConsign> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
+                                                      String vouNo, String remark, String locCode, Integer deptId,
+                                                      boolean deleted, String compCode, int transSource) {
         String filter = "";
         if (!vouNo.equals("-")) {
             filter += "and vou_no ='" + vouNo + "'\n";
@@ -5008,8 +5012,8 @@ public class ReportServiceImpl implements ReportService {
             filter += "and v.location ='" + locCode + "'\n";
         }
         String sql = "select v.vou_date,v.vou_no,v.stock_code,s.stock_name ,v.remark,v.created_by," +
-                "v.deleted,v.dept_id,l.loc_name loc_name,t.trader_name, v.labour_group_code\n" +
-                "from v_iss_rec v join location l\n" +
+                "v.deleted,v.dept_id,l.loc_name loc_name,t.trader_name, v.labour_group_code,sum(bag)bag\n" +
+                "from v_consign v join location l\n" +
                 "on v.location = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
                 "join stock s on v.stock_code = s.stock_code\n" +
@@ -5024,11 +5028,11 @@ public class ReportServiceImpl implements ReportService {
                 "group by v.vou_no\n" +
                 "order by v.vou_date desc\n";
         ResultSet rs = reportDao.executeSql(sql);
-        List<VStockIssueReceive> vStockIRList = new ArrayList<>();
+        List<VConsign> vStockIRList = new ArrayList<>();
         try {
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    VStockIssueReceive s = new VStockIssueReceive();
+                    VConsign s = new VConsign();
                     s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                     s.setVouNo(rs.getString("vou_no"));
@@ -5040,6 +5044,7 @@ public class ReportServiceImpl implements ReportService {
                     s.setLocation(rs.getString("loc_name"));
                     s.setDeptId(rs.getInt("dept_id"));
                     s.setTraderName(rs.getString("trader_name"));
+                    s.setBag(rs.getDouble("bag"));
                     vStockIRList.add(s);
                 }
             }
@@ -5259,12 +5264,12 @@ public class ReportServiceImpl implements ReportService {
                         select vou_no,cur_code,sum(vou_balance) outstanding,comp_code
                         from (
                         select vou_no,cur_code,vou_balance,comp_code
-                        from sale_his\s
+                        from sale_his
                         where trader_code=?
                         and comp_code =?
                         and deleted = false
                         and vou_balance>0
-                        \tunion all
+                          union all
                         select phd.sale_vou_no,phd.cur_code,phd.pay_amt*-1,pd.comp_code
                         from payment_his pd join payment_his_detail phd
                         on pd.vou_no = phd.vou_no
@@ -5280,7 +5285,7 @@ public class ReportServiceImpl implements ReportService {
                         on b.vou_no = sh.vou_no
                         and b.comp_code = sh.comp_code
                         where outstanding<>0
-                        order by vou_date;""";
+                        order by vou_date""";
             } else {
                 sql = """
                         select sh.vou_date,sh.reference,sh.remark,sh.vou_total,b.vou_no,b.cur_code,b.outstanding
@@ -5936,7 +5941,7 @@ public class ReportServiceImpl implements ReportService {
                 "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
                 "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
                 "group by date(vou_date),vou_no,stock_code";
-               String stockIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
+        String stockIn = "insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_weight,loc_code,mac_id,comp_code,dept_id)\n" +
                 "select 'StockIn',vou_date vou_date,vou_no,remark,stock_code,sum(in_qty) ttl_qty,sum(total_weight) ttl_weight,loc_code," + macId + ",'" + compCode + "'," + deptId + "\n" +
                 "from v_stock_io\n" +
                 "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
