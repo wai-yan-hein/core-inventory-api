@@ -136,8 +136,8 @@ public class ReportController {
                 Integer deptId = filter.getDeptId();
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
-                String opDatePaddy = reportService.getOpeningDate(compCode, OPHis.STOCK_OP_PADDY);
-                String opPayableDate = reportService.getOpeningDate(compCode, OPHis.STOCK_PAYABLE);
+                String opDatePaddy = reportService.getOpeningDate(compCode, OPHis.PADDY);
+                String opPayableDate = reportService.getOpeningDate(compCode, OPHis.PAYABLE);
                 String opDateLocation = reportService.getOpeningDateByLocation(compCode, locCode);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
@@ -153,7 +153,7 @@ public class ReportController {
                 String batchNo = Util1.isNull(filter.getBatchNo(), "-");
                 String projectNo = Util1.isAll(filter.getProjectNo());
                 String labourGroupCode = Util1.isAll(filter.getLabourGroupCode());
-                float creditAmt = filter.getCreditAmt();
+                double creditAmt = filter.getCreditAmt();
                 boolean calSale = filter.isCalSale();
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
@@ -417,6 +417,11 @@ public class ReportController {
                     case "TransferSaleClosing" -> {
                         filter.setOpDate(opDateLocation);
                         return stockReportService.getTransferSaleClosing(filter);
+                    }
+                    case "ConsignBalanceSummary" -> {
+                        String opConsingDate = reportService.getOpeningDate(compCode, OPHis.CONSIGN);
+                        filter.setOpDate(opConsingDate);
+                        return stockReportService.getStockInOutConsign(filter);
                     }
                     default -> ro.setMessage("Report Not Exists.");
                 }

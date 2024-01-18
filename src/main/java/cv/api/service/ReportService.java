@@ -224,10 +224,10 @@ public interface ReportService {
     List<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode);
 
     List<VSale> getCustomerBalanceSummary(String fromDate, String toDate, String compCode, String curCode, String traderCode,
-                                          String batchNo, String projectNo, String locCode, float creditAmt);
+                                          String batchNo, String projectNo, String locCode, double creditAmt);
 
     List<VSale> getSupplierBalanceSummary(String fromDate, String toDate, String compCode, String curCode, String traderCode,
-                                          String batchNo, String projectNo, String locCode, float creditAmt);
+                                          String batchNo, String projectNo, String locCode, double creditAmt);
 
     List<VSale> getCustomerBalanceDetail(String fromDate, String toDate, String compCode, String curCode, String traderCode,
                                          String batchNo, String projectNo, String locCode);

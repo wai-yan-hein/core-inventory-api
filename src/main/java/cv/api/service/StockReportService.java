@@ -660,11 +660,11 @@ public class StockReportService {
 
     private Mono<Long> calculateOpeningConsign(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
-                                               String traderCode, String compCode, Integer macId) {
+                                               String traderCode, String locCode, String compCode, Integer macId) {
         //opening
         String sql = """
-                insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_bag,comp_code,mac_id)
-                select :opDate,trader_code,stock_code,loc_code,sum(bag) bag,comp_code,1
+                insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_bag,comp_code,mac_id,dept_id)
+                select :opDate,trader_code,stock_code,loc_code,sum(bag) bag,comp_code,:macId,1
                 from (
                 select trader_code,stock_code,loc_code,comp_code,sum(bag) bag
                 from v_opening
@@ -676,7 +676,7 @@ public class StockReportService {
                 and (loc_code=:locCode or '-' =:locCode)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
-                and (cat_code = :catCode or '-' = :catCode)
+                and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (trader_code = :traderCode or '-' = :traderCode)
                 group by stock_code,trader_code
@@ -686,11 +686,11 @@ public class StockReportService {
                 where date(vou_date) >=:opDate and date(vou_date)<:fromDate
                 and comp_code =:compCode
                 and deleted = false
-                and tran_source =1
+                and tran_source =2
                 and (loc_code=:locCode or '-' =:locCode)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
-                and (cat_code = :catCode or '-' = :catCode)
+                and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (trader_code = :traderCode or '-' = :traderCode)
                 group by stock_code,trader_code
@@ -700,11 +700,11 @@ public class StockReportService {
                 where date(vou_date) >=:opDate and date(vou_date)<:fromDate
                 and comp_code =:compCode
                 and deleted = false
-                and tran_source =2
+                and tran_source =1
                 and (loc_code=:locCode or '-' =:locCode)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
-                and (cat_code = :catCode or '-' = :catCode)
+                and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (trader_code = :traderCode or '-' = :traderCode)
                 group by stock_code,trader_code
@@ -721,6 +721,7 @@ public class StockReportService {
                 .bind("stockCode", stockCode)
                 .bind("traderCode", traderCode)
                 .bind("compCode", compCode)
+                .bind("locCode", locCode)
                 .bind("macId", macId)
                 .fetch()
                 .rowsUpdated());
@@ -728,33 +729,17 @@ public class StockReportService {
 
     private Mono<Long> calculateClosingConsign(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
-                                               String traderCode, String compCode, Integer macId) {
+                                               String traderCode, String locCode, String compCode, Integer macId) {
         String opSql = """
-                select 'A-Opening',tran_date,stock_code,trader_code,sum(ttl_bag) ttl_bag
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,stock_code,trader_code,op_bag,loc_code,mac_id,comp_code,dept_id)
+                select 'A-Opening',tran_date,'-',stock_code,trader_code,sum(ttl_bag) ttl_bag,'-',mac_id,comp_code,dept_id
                 from tmp_stock_opening
                 where mac_id =:macId
                 group by stock_code,trader_code
                 """;
         String inSql = """
-                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_bag,loc_code,mac_id,comp_code,dept_id)
-                select 'StockIn',date(vou_date) vou_date,vou_no,remark,stock_code,sum(bag) ttl_bag,loc_code,:macId,comp_code,dept_id
-                from v_consign
-                where date(vou_date) between :fromDate and :toDate
-                and deleted = false
-                and calculate = true
-                and comp_code =:compCode
-                and tran_source =1
-                and (loc_code=:locCode or '-' =:locCode)
-                and (stock_type_code = :typeCode or '-' = :typeCode)
-                and (brand_code = :brandCode or '-' = :brandCode)
-                and (cat_code = :catCode or '-' = :catCode)
-                and (stock_code = :stockCode or '-' = :stockCode)
-                and (trader_code = :traderCode or '-' = :traderCode)
-                group by date(vou_date),vou_no,stock_code,trader_code
-                """;
-        String outSql = """
-                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_bag,loc_code,mac_id,comp_code,dept_id)
-                select 'StockOut',date(vou_date) vou_date,vou_no,remark,stock_code,sum(bag)*-1 ttl_bag,loc_code,:macId,comp_code,dept_id
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,stock_code,trader_code,in_bag,loc_code,mac_id,comp_code,dept_id)
+                select 'StockIn',date(vou_date) vou_date,vou_no,stock_code,trader_code,sum(bag) ttl_bag,loc_code,:macId,comp_code,dept_id
                 from v_consign
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
@@ -764,12 +749,31 @@ public class StockReportService {
                 and (loc_code=:locCode or '-' =:locCode)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
-                and (cat_code = :catCode or '-' = :catCode)
+                and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 and (trader_code = :traderCode or '-' = :traderCode)
-                group by date(vou_date),vou_no,stock_code,trader_code
+                group by stock_code,trader_code
                 """;
-        Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
+        String outSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,stock_code,trader_code,out_bag,loc_code,mac_id,comp_code,dept_id)
+                select 'StockOut',date(vou_date) vou_date,vou_no,stock_code,trader_code,sum(bag)*-1 ttl_bag,loc_code,:macId,comp_code,dept_id
+                from v_consign
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and tran_source =1
+                and (loc_code=:locCode or '-' =:locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by stock_code,trader_code
+                """;
+        Mono<Long> opMono = client.sql(opSql)
+                .bind("macId", macId)
+                .fetch().rowsUpdated();
         Mono<Long> inMono = client.sql(inSql)
                 .bind("macId", macId)
                 .bind("fromDate", fromDate)
@@ -780,6 +784,7 @@ public class StockReportService {
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .bind("traderCode", traderCode)
+                .bind("locCode", locCode)
                 .fetch().rowsUpdated();
         Mono<Long> outMono = client.sql(outSql)
                 .bind("macId", macId)
@@ -790,7 +795,8 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("traderCode", stockCode)
+                .bind("traderCode", traderCode)
+                .bind("locCode", locCode)
                 .fetch().rowsUpdated();
         return deleteTmpIO(macId)
                 .then(opMono)
@@ -799,6 +805,7 @@ public class StockReportService {
                 .doOnError(e -> log.error("calculateClosingConsign : " + e.getMessage()));
 
     }
+
     public Mono<ReturnObject> getStockInOutConsign(ReportFilter filter) {
         String opDate = filter.getOpDate();
         String fromDate = filter.getFromDate();
@@ -808,15 +815,14 @@ public class StockReportService {
         String brandCode = filter.getBrandCode();
         String stockCode = filter.getStockCode();
         String compCode = filter.getCompCode();
-        String traderCode = Util1.isNull(filter.getTraderCode(),"-");
+        String locCode = filter.getLocCode();
+        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
         Integer macId = filter.getMacId();
-        int type = filter.getReportType();
-        Mono<Long> opMono = calculateOpeningConsign(opDate,fromDate,typeCode,catCode,brandCode,stockCode,traderCode,compCode,macId);
-        Mono<Long> clMono = calculateClosingConsign(fromDate,toDate,typeCode,catCode,brandCode,stockCode,traderCode,compCode,macId);
-        String sql= """
-                 select a.*,sum(a.op_bag+a.in_bag+a.out_bag) bal_bag,
-                s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
-                st.stock_type_name,c.user_code c_user_code,c.cat_name
+        Mono<Long> opMono = calculateOpeningConsign(opDate, fromDate, typeCode, catCode, brandCode, stockCode, traderCode, locCode, compCode, macId);
+        Mono<Long> clMono = calculateClosingConsign(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, locCode, compCode, macId);
+        String sql = """
+                select a.*,sum(a.op_bag+a.in_bag+a.out_bag) bal_bag,
+                s.user_code s_user_code,s.stock_name,t.user_code t_user_code,t.trader_name
                 from (
                 select stock_code,trader_code,comp_code,sum(ifnull(op_bag,0)) op_bag,
                 sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag
@@ -825,13 +831,39 @@ public class StockReportService {
                 group by stock_code,trader_code)a
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
-                join stock_type st on s.stock_type_code = st.stock_type_code
-                and s.comp_code = st.comp_code
-                join category c on s.category_code = c.cat_code
-                and s.comp_code = c.comp_code
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
                 and (a.op_bag<>0  or a.in_bag<>0 or a.out_bag <> 0)
                 group by a.stock_code,a.trader_code
-                order by s.user_code""";
-        return null;
+                order by t.user_code,s.user_code
+                """;
+        Mono<ReturnObject> monoRo = client.sql(sql)
+                .bind("macId", macId)
+                .map((row) -> {
+                    return ClosingBalance.builder()
+                            .openBag(Util1.toNull(row.get("op_bag", Double.class)))
+                            .inBag(Util1.toNull(row.get("in_bag", Double.class)))
+                            .outBag(Util1.toNull(row.get("out_bag", Double.class)))
+                            .balBag(Util1.toNull(row.get("bal_bag", Double.class)))
+                            .stockUsrCode(row.get("s_user_code", String.class))
+                            .stockName(row.get("stock_name", String.class))
+                            .traderUserCode(row.get("t_user_code", String.class))
+                            .traderName(row.get("trader_name", String.class))
+                            .build();
+                    //stock_code, trader_code, comp_code, op_bag, in_bag, out_bag, bal_bag,
+                    // s_user_code, stock_name, st_user_code, stock_type_name, c_user_code, cat_name
+                }).all().collectList()
+                .map(this::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+
+        return deleteTmpIO(macId)
+                .then(opMono)
+                .then(clMono)
+                .then(monoRo);
+
     }
 }

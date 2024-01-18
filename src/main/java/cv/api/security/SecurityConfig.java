@@ -16,6 +16,7 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Slf4j
@@ -30,7 +31,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         log.info("security configured.");
         return http
-                .cors(corsSpec -> corsConfigurationSource())
+                .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
                 .authorizeExchange((auth) -> auth
                         .pathMatchers("/auth/**",
                                 "/v2/api-docs",
@@ -64,7 +65,8 @@ public class SecurityConfig {
         authenticationWebFilter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance());
         return authenticationWebFilter;
     }
-    public void corsConfigurationSource() {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // allow cookies
         //this is fucking shit pattern
@@ -73,6 +75,7 @@ public class SecurityConfig {
         config.addAllowedMethod("*"); // allow any method
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config); // apply CORS configuration to all paths
+        return source;
     }
 
     @Bean

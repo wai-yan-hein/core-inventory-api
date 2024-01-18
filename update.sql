@@ -1376,6 +1376,7 @@ add column report_name varchar(255);
 alter table pattern
 add column updated_date timestamp not null default current_timestamp;
 //
+
 alter table stock_type
 add column finished_group bit(1) not null default 0 after active;
 
@@ -1491,7 +1492,7 @@ create table consign_his (
   vou_no varchar(25) not null,
   comp_code varchar(15) not null,
   dept_id int(11) not null default 1,
-  location varchar(20) not null,
+  loc_code varchar(20) not null,
   description varchar(255) default null,
   vou_date datetime not null,
   remark varchar(255) default null,
@@ -1767,3 +1768,4 @@ drop view if exists v_consign;
 create view v_consign as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.description as description,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code as loc_code,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.tran_source as tran_source,th.labour_group_code as labour_group_code,td.stock_code as stock_code,td.unique_id as unique_id,td.wet as wet,td.bag as bag,td.qty as qty,td.weight as weight,td.rice as rice,td.price as price,td.amount as amount,s.user_code as stock_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((consign_his th join consign_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
 drop view if exists v_stock_payment;
 create  view v_stock_payment as select sp.vou_no as vou_no,sp.comp_code as comp_code,sp.dept_id as dept_id,sp.vou_date as vou_date,sp.trader_code as trader_code,sp.deleted as deleted,sp.tran_option as tran_option,sp.calculate as calculate,sp.loc_code as loc_code,spd.stock_code as stock_code,spd.ref_no as ref_no,spd.qty as qty,spd.pay_qty as pay_qty,spd.bal_qty as bal_qty,spd.pay_bag as pay_bag,spd.bal_bag as bal_bag,spd.remark as remark,spd.reference as reference,spd.full_paid as full_paid,spd.project_no as project_no,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code from ((stock_payment sp join stock_payment_detail spd) join stock s) where sp.vou_no = spd.vou_no and sp.comp_code = spd.comp_code and spd.stock_code = s.stock_code and spd.comp_code = s.comp_code;
+

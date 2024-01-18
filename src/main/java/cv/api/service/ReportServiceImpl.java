@@ -5009,12 +5009,12 @@ public class ReportServiceImpl implements ReportService {
             filter += "and trader_code = '" + traderCode + "'\n";
         }
         if (!locCode.equals("-")) {
-            filter += "and v.location ='" + locCode + "'\n";
+            filter += "and v.loc_code ='" + locCode + "'\n";
         }
         String sql = "select v.vou_date,v.vou_no,v.stock_code,s.stock_name ,v.remark,v.created_by," +
                 "v.deleted,v.dept_id,l.loc_name loc_name,t.trader_name, v.labour_group_code,sum(bag)bag\n" +
                 "from v_consign v join location l\n" +
-                "on v.location = l.loc_code\n" +
+                "on v.loc_code = l.loc_code\n" +
                 "and v.comp_code = l.comp_code\n" +
                 "join stock s on v.stock_code = s.stock_code\n" +
                 " and v.comp_code =s.comp_code\n" +
@@ -5341,7 +5341,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<VSale> getCustomerBalanceSummary(String fromDate, String toDate, String compCode,
                                                  String curCode, String traderCode, String batchNo,
-                                                 String projectNo, String locCode, float creditAmt) {
+                                                 String projectNo, String locCode, double creditAmt) {
         List<VSale> list = new ArrayList<>();
         String filter = "";
         if (!traderCode.equals("-")) {
@@ -5406,7 +5406,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSupplierBalanceSummary(String fromDate, String toDate, String compCode, String curCode, String traderCode, String batchNo, String projectNo, String locCode, float creditAmt) {
+    public List<VSale> getSupplierBalanceSummary(String fromDate, String toDate, String compCode, String curCode, String traderCode, String batchNo, String projectNo, String locCode, double creditAmt) {
         List<VSale> list = new ArrayList<>();
         String filter = "";
         if (!traderCode.equals("-")) {
