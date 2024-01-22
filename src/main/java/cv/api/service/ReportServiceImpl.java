@@ -5,10 +5,7 @@
  */
 package cv.api.service;
 
-import cv.api.common.ClosingBalance;
-import cv.api.common.General;
-import cv.api.common.StockValue;
-import cv.api.common.Util1;
+import cv.api.common.*;
 import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.ReportDao;
 import cv.api.dao.UnitRelationDetailDao;
@@ -16,8 +13,10 @@ import cv.api.entity.*;
 import cv.api.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
@@ -37,6 +36,7 @@ public class ReportServiceImpl implements ReportService {
     private final UnitRelationDetailDao detailDao;
     private final SaleHisService saleHisService;
     private final LandingHisPriceDao landingHisPriceDao;
+    private final DatabaseClient client;
 
     @Override
     public void executeSql(String... sql) {
@@ -1331,8 +1331,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
-        General general = new General();
-        general.setAmount(0.0f);
+        General general =General.builder().build();
+        general.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
                 "from (\n" +
                 "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
@@ -1357,7 +1357,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
-                general.setAmount(rs.getFloat("price"));
+                general.setAmount(rs.getDouble("price"));
             }
         } catch (Exception e) {
             log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
@@ -1367,8 +1367,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode) {
-        General general = new General();
-        general.setAmount(0.0f);
+        General g = General.builder().build();
+        g.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select v.loss_price/rel.smallest_qty smallest_price,v.rel_code,v.comp_code,v.dept_id\n" + "from v_weight_loss v\n" + "join v_relation rel\n" + "on v.rel_code = rel.rel_code\n" + "and v.loss_unit = rel.unit\n" + "and v.comp_code = rel.comp_code\n" +
                 "and v.stock_code ='" + stockCode + "'\n" + "where vou_no =(\n" + "select ph.vou_no\n" + "from weight_loss_his ph, weight_loss_his_detail pd\n" + "where date(ph.vou_date)<= '" + vouDate + "' \n" + "and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
                 "and pd.stock_code = '" + stockCode + "'\n" +
@@ -1380,18 +1380,18 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
-                general.setAmount(rs.getFloat("price"));
+                g.setAmount(rs.getDouble("price"));
             }
         } catch (Exception e) {
             log.error(String.format("getWeightLossRecentPrice: %s", e.getMessage()));
         }
-        return general;
+        return g;
     }
 
     @Override
     public General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode) {
-        General general = new General();
-        general.setAmount(0.0f);
+        General general =General.builder().build();
+        general.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" +
                 "select pd.unit,price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
                 "from v_process_his pd\n" +
@@ -1417,7 +1417,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
-                general.setAmount(rs.getFloat("price"));
+                general.setAmount(rs.getDouble("price"));
             }
         } catch (Exception e) {
             log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
@@ -1427,7 +1427,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode) {
-        General g = new General();
+        General g =General.builder().build();
         String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" +
                 "from (\n" +
                 "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price,pur.rel_code,pur.comp_code,pur.dept_id\n" +
@@ -1460,7 +1460,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
                 while (rs.next()) {
-                    g.setAmount(rs.getFloat("price"));
+                    g.setAmount(rs.getDouble("price"));
                 }
             }
         } catch (Exception e) {
@@ -1471,8 +1471,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
-        General general = new General();
-        general.setAmount(0.0f);
+        General general =General.builder().build();
+        general.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
                 "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
                 "from v_sale pd\n" +
@@ -1494,7 +1494,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
-                general.setAmount(rs.getFloat("price"));
+                general.setAmount(rs.getDouble("price"));
             }
         } catch (Exception e) {
             log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
@@ -1504,8 +1504,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getStockIORecentPrice(String stockCode, String vouDate, String unit) {
-        General general = new General();
-        general.setAmount(0.0f);
+        General general =General.builder().build();
+        general.setAmount(0.0);
         String sql = "select cost_price,stock_code,max(unique_id) \n" +
                 "from stock_in_out_detail\n" +
                 "where stock_code = '" + stockCode + "'and (in_unit = '" + unit + "' or out_unit = '" + unit + "')\n" +
@@ -1519,7 +1519,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
-                general.setAmount(rs.getFloat("cost_price"));
+                general.setAmount(rs.getDouble("cost_price"));
             }
         } catch (Exception e) {
             log.error(String.format("getStockIORecentPrice: %s", e.getMessage()));
@@ -2114,7 +2114,7 @@ public class ReportServiceImpl implements ReportService {
         List<General> generalList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                General g = new General();
+                General g =General.builder().build();
                 g.setStockCode(rs.getString("user_code"));
                 g.setStockName(rs.getString("stock_name"));
                 g.setSysCode(rs.getString("stock_code"));
@@ -2129,29 +2129,37 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<General> getTopSaleByCustomer(String fromDate, String toDate, String compCode) throws Exception {
-        String sql = "select t.user_code,t.trader_name,t.address, sum(sh.vou_total) vou_total,count(*) vou_qty\n" +
-                "from sale_his sh join trader t\n" +
-                "on sh.trader_code = t.code\n" +
-                "and sh.comp_code = t.comp_code\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and sh.comp_code = '" + compCode + "' and sh.deleted = false\n" +
-                "group by sh.trader_code\n" +
-                "order by vou_total desc";
-        ResultSet rs = reportDao.executeSql(sql);
-        List<General> generals = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                General g = new General();
-                g.setTraderCode(rs.getString("user_code"));
-                g.setTraderName(rs.getString("trader_name"));
-                g.setAmount(rs.getFloat("vou_total"));
-                g.setTotalQty(rs.getFloat("vou_qty"));
-                g.setAddress(rs.getString("address"));
-                generals.add(g);
-            }
-        }
-        return generals;
+    public Mono<ReturnObject> getTopSaleByCustomer(String fromDate, String toDate, Integer deptId, String compCode) {
+        String sql = """
+                select t.user_code,t.trader_name,t.address, sum(sh.vou_total) vou_total,count(*) vou_qty
+                from sale_his sh join trader t
+                on sh.trader_code = t.code
+                and sh.comp_code = t.comp_code
+                where sh.deleted = false
+                and sh.comp_code = :compCode
+                and (sh.dept_id =:deptId or 0 =:deptId)
+                and date(vou_date) between :fromDate and :toDate
+                group by sh.trader_code
+                order by vou_total desc""";
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("deptId",deptId)
+                .map((row) -> General.builder()
+                        .traderCode(row.get("user_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .amount(row.get("vou_total", Double.class))
+                        .totalQty(row.get("vou_qty", Double.class))
+                        .address(row.get("address", String.class))
+                        .build()).all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
     @Override
@@ -2167,11 +2175,11 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                General g = new General();
+                General g = General.builder().build();
                 g.setSaleManName(rs.getString("saleman_name"));
                 g.setSaleManCode(rs.getString("user_code"));
-                g.setTotalQty(rs.getFloat("vou_qty"));
-                g.setAmount(rs.getFloat("vou_total"));
+                g.setTotalQty(rs.getDouble("vou_qty"));
+                g.setAmount(rs.getDouble("vou_total"));
                 generals.add(g);
             }
         }
@@ -2200,13 +2208,13 @@ public class ReportServiceImpl implements ReportService {
         List<General> generals = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                General g = new General();
+                General g =General.builder().build();
                 g.setStockCode(rs.getString("s_user_code"));
                 g.setStockName(rs.getString("stock_name"));
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 g.setQtyRel(getRelStr(relCode, compCode, smallQty));
-                g.setAmount(rs.getFloat("ttl_amt"));
+                g.setAmount(rs.getDouble("ttl_amt"));
                 g.setSmallQty(smallQty);
                 generals.add(g);
             }
@@ -2746,7 +2754,7 @@ public class ReportServiceImpl implements ReportService {
         List<VStockIO> list = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VStockIO io = new VStockIO();
+                VStockIO io = VStockIO.builder().build();
                 io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 io.setVouNo(rs.getString("vou_no"));
                 io.setStockUsrCode(rs.getString("s_user_code"));
@@ -2828,7 +2836,7 @@ public class ReportServiceImpl implements ReportService {
         List<VStockIO> ioList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VStockIO io = new VStockIO();
+                VStockIO io = VStockIO.builder().build();
                 io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyy"));
                 io.setVouNo(rs.getString("vou_no"));
                 io.setStockUsrCode(rs.getString("stock_user_code"));
@@ -2846,133 +2854,6 @@ public class ReportServiceImpl implements ReportService {
         return ioList;
     }
 
-    @Override
-    public List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus,
-                                            String vouNo, String remark, String desp,
-                                            String userCode, String stockCode, String locCode,
-                                            String compCode, Integer deptId, String deleted, String traderCode, String jobNo) throws Exception {
-        String sql = "select a.*,v.description vou_status_name\n" +
-                "from (\n" +
-                "select vou_date,vou_no,description,remark,vou_status,created_by,deleted,comp_code,dept_id\n" +
-                "from v_stock_io \n" +
-                "where comp_code = '" + compCode + "'\n" +
-                "and deleted = " + deleted + "\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
-                "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
-                "and (description like '" + desp + "%' or '-%'= '" + desp + "%')\n" +
-                "and (vou_status = '" + vouStatus + "' or '-'='" + vouStatus + "')\n" +
-                "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "and (trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n" +
-                "and (job_code ='" + jobNo + "' or '-' ='" + jobNo + "')\n" +
-                "group by vou_no\n" + ")a\n" +
-                "join vou_status v on a.vou_status = v.code\n" +
-                "and a.comp_code = v.comp_code\n" +
-                "order by vou_date desc";
-        ResultSet rs = reportDao.executeSql(sql);
-        List<VStockIO> ioList = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VStockIO io = new VStockIO();
-                io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                io.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                io.setVouNo(rs.getString("vou_no"));
-                io.setDescription(rs.getString("description"));
-                io.setRemark(rs.getString("remark"));
-                io.setVouTypeName(rs.getString("vou_status_name"));
-                io.setCreatedBy(rs.getString("created_by"));
-                io.setDeleted(rs.getBoolean("deleted"));
-                io.setDeptId(rs.getInt("dept_id"));
-                ioList.add(io);
-            }
-        }
-        return ioList;
-    }
-
-    @Override
-    public List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
-                                      String remark, String reference, String userCode, String stockCode,
-                                      String locCode, String compCode, Integer deptId, String deleted,
-                                      String nullBatch, String batchNo, String projectNo, String curCode) {
-        List<VSale> saleList = new ArrayList<>();
-        String filter = "";
-        if (!vouNo.equals("-")) {
-            filter += "and vou_no = '" + vouNo + "'\n";
-        }
-        if (!remark.equals("-")) {
-            filter += "and remark like '" + remark + "%'\n";
-        }
-        if (!reference.equals("-")) {
-            filter += "and reference like '" + reference + "%'\n";
-        }
-        if (!traderCode.equals("-")) {
-            filter += "and trader_code = '" + traderCode + "'\n";
-        }
-        if (!userCode.equals("-")) {
-            filter += "and created_by = '" + userCode + "'\n";
-        }
-        if (!stockCode.equals("-")) {
-            filter += "and stock_code = '" + stockCode + "'\n";
-        }
-        if (!saleManCode.equals("-")) {
-            filter += "and saleman_code = '" + saleManCode + "'\n";
-        }
-        if (!locCode.equals("-")) {
-            filter += "and loc_code = '" + locCode + "'\n";
-        }
-        if (nullBatch.equals("true")) {
-            filter += "and (batch_no is null or batch_no ='') \n";
-        }
-        if (!batchNo.equals("-")) {
-            filter += "and batch_no = '" + batchNo + "'\n";
-        }
-        if (!projectNo.equals("-")) {
-            filter += "and project_no = '" + projectNo + "'\n";
-        }
-        if (!curCode.equals("-")) {
-            filter += "and cur_code = '" + curCode + "'\n";
-        }
-        String sql = "select a.*,t.trader_name,t.user_code\n" +
-                "from (\n" +
-                "select  vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,\n" +
-                "deleted,trader_code,loc_code,comp_code,dept_id\n" +
-                "from v_sale s \n" + "where comp_code = '" + compCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = " + deleted + "\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" +
-                "group by vou_no\n" + ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "order by vou_date desc";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (!Objects.isNull(rs)) {
-                while (rs.next()) {
-                    VSale s = VSale.builder().build();
-                    s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                    s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                    s.setVouNo(rs.getString("vou_no"));
-                    s.setTraderCode(rs.getString("user_code"));
-                    s.setTraderName(rs.getString("trader_name"));
-                    s.setRemark(rs.getString("remark"));
-                    s.setReference(rs.getString("reference"));
-                    s.setCreatedBy(rs.getString("created_by"));
-                    s.setPaid(rs.getDouble("paid"));
-                    s.setVouTotal(rs.getDouble("vou_total"));
-                    s.setVouBalance(rs.getDouble("vou_balance"));
-                    s.setDeleted(rs.getBoolean("deleted"));
-                    s.setDeptId(rs.getInt("dept_id"));
-                    saleList.add(s);
-                }
-            }
-        } catch (Exception e) {
-            log.error("getSaleHistory : " + e.getMessage());
-        }
-        return saleList;
-    }
 
     @Override
     public List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode,
@@ -3431,8 +3312,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
-        General g = new General();
-        g.setSmallQty(1.0f);
+        General g =General.builder().build();
+        g.setSmallQty(1.0);
         String sql = "select ud.qty,ud.smallest_qty\n" +
                 "from stock s join unit_relation_detail ud\n" + "on s.rel_code = ud.rel_code\n" +
                 "and s.comp_code =ud.comp_code\n" +
@@ -3442,8 +3323,8 @@ public class ReportServiceImpl implements ReportService {
         try {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs.next()) {
-                g.setQty(rs.getFloat("qty"));
-                g.setSmallQty(rs.getFloat("smallest_qty"));
+                g.setQty(rs.getDouble("qty"));
+                g.setSmallQty(rs.getDouble("smallest_qty"));
             }
         } catch (Exception e) {
             log.error(String.format("getSmallestQty: %s", e.getMessage()));
@@ -3471,7 +3352,7 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.executeSql(sql);
                 if (rs.next()) {
                     if (rs.getBoolean("exist")) {
-                        General g = new General();
+                        General g =General.builder().build();
                         g.setMessage("Transaction exist in " + s2);
                         str.add(g);
                     }
@@ -3497,7 +3378,7 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.executeSql(sql);
                 if (rs.next()) {
                     if (rs.getBoolean("exist")) {
-                        General g = new General();
+                        General g =General.builder().build();
                         g.setMessage("Transaction exist in " + s2);
                         list.add(g);
                     }
@@ -3548,8 +3429,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = getResult(sql, vouNo, compCode);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    VStockIO in = new VStockIO();
-                    //vou_no, vou_date, remark, description, s_user_code, stock_name, in_qty, in_unit, out_qty, out_unit, loc_name
+                    VStockIO in = VStockIO.builder().build();                     //vou_no, vou_date, remark, description, s_user_code, stock_name, in_qty, in_unit, out_qty, out_unit, loc_name
                     in.setStockName(rs.getString("stock_name"));
                     in.setInUnit(rs.getString("in_unit"));
                     in.setInQty(Util1.toNull(rs.getDouble("in_qty")));
@@ -3683,7 +3563,7 @@ public class ReportServiceImpl implements ReportService {
             //stock_code, stock_name, end_date, qty, unit, price, remark, process_no, description
             if (rs != null) {
                 while (rs.next()) {
-                    VStockIO s = new VStockIO();
+                    VStockIO s = VStockIO.builder().build();
                     s.setStockCode(rs.getString("stock_code"));
                     s.setStockName(rs.getString("stock_name"));
                     s.setVouDate(Util1.toDateStr(rs.getDate("end_date"), "dd/MM/yyyy"));
@@ -3727,7 +3607,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
                 while (rs.next()) {
-                    VStockIO io = new VStockIO();
+                    VStockIO io = VStockIO.builder().build();
                     io.setStockCode(rs.getString("stock_code"));
                     io.setStockName(rs.getString("stock_name"));
                     io.setQty(rs.getDouble("qty"));
@@ -3770,7 +3650,7 @@ public class ReportServiceImpl implements ReportService {
             if (rs != null) {
                 while (rs.next()) {
                     //vou_date, stock_code, stock_name, qty, unit, price, loc_code, pt_code, comp_code, dept_id, loc_name, description
-                    VStockIO io = new VStockIO();
+                    VStockIO io = VStockIO.builder().build();
                     io.setStockCode(rs.getString("stock_code"));
                     io.setStockName(rs.getString("stock_name"));
                     io.setQty(rs.getDouble("qty"));
@@ -3814,7 +3694,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.executeSql(sql);
             if (rs != null) {
                 while (rs.next()) {
-                    VStockIO io = new VStockIO();
+                    VStockIO io = VStockIO.builder().build();
                     io.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                     io.setStockCode(rs.getString("user_code"));
                     io.setStockName(rs.getString("stock_name"));

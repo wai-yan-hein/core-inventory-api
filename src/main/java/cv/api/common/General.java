@@ -1,14 +1,15 @@
 package cv.api.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
-
+@Builder
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class General {
-    private double amount;
-    private Float qty;
-    private Float smallQty;
+    private Double amount;
+    private Double qty;
+    private Double smallQty;
     private String stockCode;
     private String stockName;
     private String sysCode;
@@ -17,7 +18,7 @@ public class General {
     private String categoryName;
     private String traderCode;
     private String traderName;
-    private Float totalQty;
+    private Double totalQty;
     private String saleManName;
     private String saleManCode;
     private String qtyRel;

@@ -7,9 +7,11 @@ package cv.api.service;
 
 import cv.api.common.ClosingBalance;
 import cv.api.common.General;
+import cv.api.common.ReturnObject;
 import cv.api.common.StockValue;
 import cv.api.entity.*;
 import cv.api.model.*;
+import reactor.core.publisher.Mono;
 
 import java.sql.ResultSet;
 import java.util.List;
@@ -122,7 +124,7 @@ public interface ReportService {
 
     List<General> getStockListByGroup(String typeCode, String compCode, Integer macId) throws Exception;
 
-    List<General> getTopSaleByCustomer(String fromDate, String toDate, String compCode) throws Exception;
+    Mono<ReturnObject> getTopSaleByCustomer(String fromDate, String toDate, Integer deptId, String compCode) throws Exception;
 
     List<General> getTopSaleBySaleMan(String fromDate, String toDate, String compCode) throws Exception;
 
@@ -155,15 +157,6 @@ public interface ReportService {
     List<VStockIO> getStockIODetailByVoucherType(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
     List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
-
-    List<VStockIO> getStockIOHistory(String fromDate, String toDate, String vouStatus, String vouNo,
-                                     String remark, String desp, String userCode, String stockCode,
-                                     String locCode, String compCode, Integer deptId, String deleted, String traderCode, String jobNo) throws Exception;
-
-    List<VSale> getSaleHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
-                               String remark, String reference, String userCode, String stockCode, String locCode,
-                               String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
-                               String projectNo, String curCode);
 
 
     List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,

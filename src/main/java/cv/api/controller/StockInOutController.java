@@ -14,6 +14,7 @@ import cv.api.model.VStockIO;
 import cv.api.service.ReportService;
 import cv.api.service.StockInOutDetailService;
 import cv.api.service.StockInOutService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +29,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/stockio")
 @Slf4j
+@RequiredArgsConstructor
 public class StockInOutController {
 
-    @Autowired
-    private StockInOutService ioService;
-    @Autowired
-    private StockInOutDetailService iodService;
-    @Autowired
-    private ReportService reportService;
+    private final StockInOutService ioService;
+    private final StockInOutDetailService iodService;
 
     @PostMapping(path = "/saveStockIO")
     public Mono<StockInOut> saveStockIO(@RequestBody StockInOut stockio) {
@@ -45,24 +43,8 @@ public class StockInOutController {
     }
 
     @PostMapping(path = "/getStockIO")
-    public Flux<?> getStockIO(@RequestBody FilterObject filter) throws Exception {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String description = Util1.isNull(filter.getDescription(), "-");
-        String vouStatus = Util1.isNull(filter.getVouStatus(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String compCode = filter.getCompCode();
-        Integer deptId = filter.getDeptId();
-        String deleted = String.valueOf(filter.isDeleted());
-        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        String jobNo = Util1.isNull(filter.getJobNo(), "-");
-        List<VStockIO> listStockIO = reportService.getStockIOHistory(fromDate, toDate, vouStatus,
-                vouNo, remark, description, userCode, stockCode, locCode, compCode, deptId, deleted, traderCode, jobNo);
-        return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
+    public Flux<VStockIO> getStockIO(@RequestBody FilterObject filter) {
+        return ioService.getStockIOHistory(filter);
     }
 
     @PostMapping(path = "/deleteStockIO")
