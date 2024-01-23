@@ -21,7 +21,7 @@ public class ReportDaoImpl extends AbstractDao<Serializable, Object> implements 
 
     @Override
     public void executeSql(String... sql) {
-        log.info(Arrays.toString(sql));
+//        log.info(Arrays.toString(sql));
         execSql(sql);
     }
 
@@ -32,7 +32,7 @@ public class ReportDaoImpl extends AbstractDao<Serializable, Object> implements 
 
     @Override
     public ResultSet executeSql(String sql) {
-        log.info(sql);
+//        log.info(sql);
         return getResult(sql);
     }
 }

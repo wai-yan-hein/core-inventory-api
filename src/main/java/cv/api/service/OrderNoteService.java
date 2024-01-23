@@ -84,82 +84,82 @@ public class OrderNoteService {
 
     public Mono<OrderNote> update(OrderNote p) {
         String sql = """
-                UPDATE cv_inv_pc.order_note
+                UPDATE order_note
                 SET
+                vou_no = :vouNo,
+                comp_code = :compCode,
                 dept_id = :deptId,
                 mac_id = :macId,
                 trader_code = :traderCode,
+                stock_code = :stockCode,
+                order_code = :orderCode,
+                order_name = :orderName,
                 vou_date = :vouDate,
                 created_date = :createdDate,
-                created_by = :createdBy,
+                created_by = :createdBy
                 updated_date = :updatedDate,
                 updated_by = :updatedBy,
                 deleted = :deleted
-                WHERE vou_no = :vouNo AND comp_code = :compCode;                                
+                WHERE vou_no = :vouNo AND comp_code = :compCode;                                                                                              
                 """;
-
-        return databaseClient.sql(sql)
-                .bind("vouNo", p.getVouNo())
-                .bind("compCode", p.getCompCode())
-                .bind("deptId", p.getDeptId())
-                .bind("macId", p.getMacId())
-                .bind("vouDate", p.getVouDate())
-                .bind("traderCode", p.getTraderCode())
-                .bind("deleted", p.getDeleted())
-                .bind("createdDate", p.getCreatedDate())
-                .bind("createdBy", p.getCreatedBy())
-                .bind("updatedDate", p.getUpdatedDate())
-                .bind("updatedBy", p.getUpdatedBy())
-                .fetch()
-                .rowsUpdated()
-                .thenReturn(p);
+        return execute(sql, p);
     }
 
     private Mono<OrderNote> insert(OrderNote p) {
         String sql = """
-                    INSERT INTO order_note
-                    (vou_no,
-                    comp_code,
-                    dept_id,
-                    mac_id,
-                    trader_code,
-                    vou_date,
-                    created_date,
-                    created_by,
-                    updated_date,
-                    updated_by,
-                    remark,
-                    ref_no,
-                    receiver_name)
-                    VALUES
-                    (
-                    :vouNo,
-                    :compCode,
-                    :deptId,
-                    :macId,
-                    :traderCode,
-                    :vouDate,
-                    :createdDate,
-                    :createdBy,
-                    :updatedDate,
-                    :updatedBy,
-                    :remark,
-                    :refNo,
-                    :receiverName);
-                    """;
+                INSERT INTO order_note
+                (
+                vou_no,
+                comp_code,
+                dept_id,
+                mac_id,
+                trader_code,
+                stock_code,
+                order_code,
+                order_name,
+                vou_date,
+                created_date,
+                created_by,
+                updated_date,
+                updated_by,
+                deleted)
+                VALUES
+                (
+                :vouNo,
+                :compCode,
+                :deptId,
+                :macId,
+                :traderCode,
+                :stockCode,
+                :orderCode,
+                :orderName,
+                :vouDate,
+                :createdDate,
+                :createdBy,
+                :updatedDate,
+                :updatedBy,
+                :deleted);
+                """;
 
+        return execute(sql, p);
+    }
+
+    private Mono<OrderNote> execute(String sql, OrderNote p) {
         return databaseClient.sql(sql)
                 .bind("vouNo", p.getVouNo())
                 .bind("compCode", p.getCompCode())
                 .bind("deptId", p.getDeptId())
                 .bind("macId", p.getMacId())
-                .bind("vouDate", p.getVouDate())
                 .bind("traderCode", p.getTraderCode())
-                .bind("deleted", p.getDeleted())
+                .bind("stockCode", p.getStockCode())
+                .bind("orderCode", p.getOrderCode())
+                .bind("orderName", p.getOrderName())
+                .bind("vouDate", p.getVouDate())
                 .bind("createdDate", p.getCreatedDate())
                 .bind("createdBy", p.getCreatedBy())
                 .bind("updatedDate", p.getUpdatedDate())
                 .bind("updatedBy", p.getUpdatedBy())
+                .bind("deleted", p.getDeleted())
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(p);
