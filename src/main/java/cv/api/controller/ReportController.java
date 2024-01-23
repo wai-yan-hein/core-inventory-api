@@ -275,8 +275,7 @@ public class ReportController {
                         Util1.writeJsonFile(generalList, exportPath);
                     }
                     case "TopSaleByCustomer" -> {
-                        List<General> sale = reportService.getTopSaleByCustomer(fromDate, toDate, compCode);
-                        Util1.writeJsonFile(sale, exportPath);
+                        return reportService.getTopSaleByCustomer(fromDate, toDate, deptId, compCode);
                     }
                     case "TopSaleBySaleMan" -> {
                         List<General> sale = reportService.getTopSaleBySaleMan(fromDate, toDate, compCode);

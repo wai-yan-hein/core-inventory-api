@@ -10,9 +10,7 @@ import com.google.myanmartools.TransliterateZ2U;
 import com.google.myanmartools.ZawgyiDetector;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -250,5 +248,17 @@ public class Util1 {
             return ldt.atZone(ZoneId.systemDefault());
         }
         return null;
+    }
+
+    public static byte[] convertToJsonBytes(Object data) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            try (Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                Util1.gson.toJson(data, writer);
+            }
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            // Handle the exception according to your application's error handling strategy
+            return new byte[0]; // Or throw a custom exception
+        }
     }
 }

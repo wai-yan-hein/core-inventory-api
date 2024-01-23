@@ -161,7 +161,7 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
 
     @Override
     public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
-        General g = new General();
+        General g = General.builder().build();
         String sql = "select count(*) vou_count,sum(paid) paid\n" +
                 "from milling_his\n" +
                 "where deleted = false\n" +
@@ -170,8 +170,8 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
         try {
             ResultSet rs = getResult(sql);
             if (rs.next()) {
-                g.setQty(rs.getFloat("vou_count"));
-                g.setAmount(rs.getFloat("paid"));
+                g.setQty(rs.getDouble("vou_count"));
+                g.setAmount(rs.getDouble("paid"));
             }
         } catch (Exception e) {
             log.error("getVoucherCount : " + e.getMessage());
