@@ -6,8 +6,6 @@
 package cv.api.service;
 
 import cv.api.common.FilterObject;
-import cv.api.common.ReportFilter;
-import cv.api.entity.LocationKey;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
 import cv.api.model.VStockIO;
@@ -32,10 +30,8 @@ public interface StockInOutService {
 
     void restore(StockIOKey key) throws Exception;
 
-    List<StockInOut> unUpload(String syncDate);
 
     Date getMaxDate();
 
-    List<StockInOut> search(String updatedDate, List<LocationKey> keys);
     Flux<VStockIO> getStockIOHistory(FilterObject filterObject);
 }

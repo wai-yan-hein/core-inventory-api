@@ -48,11 +48,7 @@ public class AccountRepo {
                     .body(Mono.just(glList), List.class)
                     .retrieve()
                     .bodyToMono(Response.class)
-                    .retryWhen(
-                            Retry.backoff(3, Duration.ofMillis(100))
-                                    .maxBackoff(Duration.ofSeconds(5))
-                                    .jitter(0.5)
-                    ).doOnSuccess(response -> {
+                    .doOnSuccess(response -> {
                         if (response != null) {
                             String vouNo = response.getVouNo();
                             String compCode = response.getCompCode();
@@ -79,7 +75,7 @@ public class AccountRepo {
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
-                    }).subscribe();
+                    }).block();
         }
     }
 
@@ -225,7 +221,10 @@ public class AccountRepo {
                 accountApi.post().uri("/account/saveTrader")
                         .body(Mono.just(accTrader), AccTrader.class)
                         .retrieve().bodyToMono(AccTrader.class)
-                        .doOnSuccess(response -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode())).subscribe();
+                        .doOnError(e -> {
+                            log.error("saveTrader :" + e.getMessage());
+                        }).doOnSuccess(response -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()))
+                        .block();
             }
         }
     }

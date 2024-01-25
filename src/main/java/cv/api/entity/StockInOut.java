@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "stock_in_out")
-public class StockInOut implements Serializable {
+public class StockInOut {
 
     @EmbeddedId
     private StockIOKey key;

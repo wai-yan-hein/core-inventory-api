@@ -25,5 +25,6 @@ public class General {
     private String message;
     private String address;
     private String relation;
+    private Double bag;
 }
 

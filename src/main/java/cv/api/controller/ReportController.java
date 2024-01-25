@@ -182,8 +182,7 @@ public class ReportController {
                         Util1.writeJsonFile(saleByCustomer, exportPath);
                     }
                     case "SaleByStockSummary" -> {
-                        List<VSale> saleByStock = reportService.getSaleByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(saleByStock, exportPath);
+                        return reportService.getSaleByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                     }
                     case "SaleByStockWeightSummary" -> {
                         List<VSale> data = reportService.getSaleByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
@@ -282,8 +281,7 @@ public class ReportController {
                         Util1.writeJsonFile(sale, exportPath);
                     }
                     case "TopSaleByStock" -> {
-                        List<General> general = reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode, deptId);
-                        Util1.writeJsonFile(general, exportPath);
+                        return reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode, deptId);
                     }
                     case "OpeningByLocation" -> {
                         List<VOpening> opening = reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode, deptId);

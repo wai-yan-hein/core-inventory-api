@@ -7,21 +7,17 @@ package cv.api.controller;
 
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
+import cv.api.dto.StockInOutDetailDto;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
-import cv.api.entity.StockInOutDetail;
 import cv.api.model.VStockIO;
-import cv.api.service.ReportService;
 import cv.api.service.StockInOutDetailService;
 import cv.api.service.StockInOutService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 /**
  * @author wai yan
@@ -66,14 +62,12 @@ public class StockInOutController {
     }
 
     @GetMapping(path = "/getStockIODetail")
-    public Flux<?> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode) {
-        List<StockInOutDetail> listSD = iodService.search(vouNo, compCode);
-        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockInOutDetailDto> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        return iodService.search(vouNo, compCode);
     }
 
     @GetMapping(path = "/getStockIODetailByJob")
-    public Flux<?> getStockIODetailByJob(@RequestParam String jobId, @RequestParam String compCode) {
-        List<StockInOutDetail> listSD = iodService.searchByJob(jobId, compCode);
-        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockInOutDetailDto> getStockIODetailByJob(@RequestParam String jobId, @RequestParam String compCode) {
+        return iodService.searchByJob(jobId, compCode);
     }
 }

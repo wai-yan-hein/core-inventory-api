@@ -5,8 +5,10 @@
  */
 package cv.api.service;
 
+import cv.api.dto.StockInOutDetailDto;
 import cv.api.entity.StockInOutDetail;
 import cv.api.entity.StockInOutKey;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -17,9 +19,9 @@ public interface StockInOutDetailService {
 
     StockInOutDetail save(StockInOutDetail stock);
 
-    List<StockInOutDetail> search(String vouNo, String compCode);
+    Flux<StockInOutDetailDto> search(String vouNo, String compCode);
 
-    List<StockInOutDetail> searchByJob(String jobId, String compCode);
+    Flux<StockInOutDetailDto> searchByJob(String jobId, String compCode);
 
     int delete(StockInOutKey key);
 }

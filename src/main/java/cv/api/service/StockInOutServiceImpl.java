@@ -6,12 +6,14 @@
 package cv.api.service;
 
 import cv.api.common.FilterObject;
-import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dao.SeqTableDao;
 import cv.api.dao.StockInOutDao;
 import cv.api.dao.StockInOutDetailDao;
-import cv.api.entity.*;
+import cv.api.entity.StockIOKey;
+import cv.api.entity.StockInOut;
+import cv.api.entity.StockInOutDetail;
+import cv.api.entity.StockInOutKey;
 import cv.api.model.VStockIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +56,7 @@ public class StockInOutServiceImpl implements StockInOutService {
         for (int i = 0; i < listSD.size(); i++) {
             StockInOutDetail cSd = listSD.get(i);
             if (Util1.isNullOrEmpty(cSd.getKey())) {
-                StockInOutKey key = new StockInOutKey();
+                StockInOutKey key =new StockInOutKey();
                 key.setCompCode(io.getKey().getCompCode());
                 key.setVouNo(vouNo);
                 key.setUniqueId(null);
@@ -99,20 +100,14 @@ public class StockInOutServiceImpl implements StockInOutService {
         ioDao.restore(key);
     }
 
-    @Override
-    public List<StockInOut> unUpload(String syncDate) {
-        return ioDao.unUpload(syncDate);
-    }
+
 
     @Override
     public Date getMaxDate() {
         return ioDao.getMaxDate();
     }
 
-    @Override
-    public List<StockInOut> search(String updatedDate, List<LocationKey> keys) {
-        return ioDao.search(updatedDate, keys);
-    }
+
 
     @Override
     public Flux<VStockIO> getStockIOHistory(FilterObject filterObject) {
