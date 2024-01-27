@@ -96,20 +96,5 @@ public class RegionDaoImpl extends AbstractDao<RegionKey, Region> implements Reg
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from region";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getOldDate();
-    }
+
 }

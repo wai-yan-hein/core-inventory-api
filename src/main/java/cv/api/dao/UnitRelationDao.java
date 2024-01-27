@@ -5,7 +5,6 @@ import cv.api.entity.StockUnit;
 import cv.api.entity.UnitRelation;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public interface UnitRelationDao {
@@ -18,8 +17,6 @@ public interface UnitRelationDao {
     List<StockUnit> getRelation(String relCode, String compCode, Integer deptId);
 
     List<UnitRelation> unUpload();
-
-    Date getMaxDate();
 
     List<UnitRelation> getRelation(LocalDateTime updatedDate);
 

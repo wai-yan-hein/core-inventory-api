@@ -27,7 +27,5 @@ public interface StockTypeDao {
 
     List<StockType> unUpload();
 
-    Date getMaxDate();
-
     List<StockType> getStockType(LocalDateTime updatedDate);
 }

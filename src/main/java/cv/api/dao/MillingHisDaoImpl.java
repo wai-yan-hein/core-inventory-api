@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,22 +129,6 @@ public class MillingHisDaoImpl extends AbstractDao<MillingHisKey, MillingHis> im
         return list;
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from milling_his";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
 
 
     @Override

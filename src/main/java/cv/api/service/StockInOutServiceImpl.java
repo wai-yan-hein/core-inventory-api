@@ -100,15 +100,6 @@ public class StockInOutServiceImpl implements StockInOutService {
         ioDao.restore(key);
     }
 
-
-
-    @Override
-    public Date getMaxDate() {
-        return ioDao.getMaxDate();
-    }
-
-
-
     @Override
     public Flux<VStockIO> getStockIOHistory(FilterObject filterObject) {
         String fromDate = Util1.isNull(filterObject.getFromDate(), "-");

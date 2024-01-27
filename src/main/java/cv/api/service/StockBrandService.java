@@ -9,7 +9,6 @@ import cv.api.entity.StockBrand;
 import cv.api.entity.StockBrandKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +26,6 @@ public interface StockBrandService {
 
     List<StockBrand> unUpload();
 
-    Date getMaxDate();
 
     List<StockBrand> getBrand(LocalDateTime updatedDate);
 }

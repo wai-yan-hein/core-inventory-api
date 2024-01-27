@@ -18,7 +18,5 @@ public interface JobService {
     List<Job> search(String description);
     List<Job> unUpload();
 
-    Date getMaxDate();
-
     List<Job> getJob(LocalDateTime updatedDate);
 }

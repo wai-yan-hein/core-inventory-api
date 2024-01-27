@@ -1,14 +1,12 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.entity.Trader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -120,17 +118,17 @@ public class ConvertServiceImpl implements ConverterService {
     }
 
     private void convertTrader() {
-        List<Trader> list = traderService.findAll();
-        list.forEach(t -> {
-            String traderName =t.getTraderName();
-            String address = t.getAddress();
-            if(Util1.isZGText(address) || Util1.isZGText(traderName)){
-                t.setTraderName(Util1.convertToUniCode(traderName));
-                t.setAddress(Util1.convertToUniCode(address));
-                traderService.saveTrader(t);
-            }
-        });
-        log.info("converted trader.");
+//        List<Trader> list = traderService.findAll();
+//        list.forEach(t -> {
+//            String traderName =t.getTraderName();
+//            String address = t.getAddress();
+//            if(Util1.isZGText(address) || Util1.isZGText(traderName)){
+//                t.setTraderName(Util1.convertToUniCode(traderName));
+//                t.setAddress(Util1.convertToUniCode(address));
+//                traderService.saveTrader(t);
+//            }
+//        });
+//        log.info("converted trader.");
     }
 
     private void convertSale() {

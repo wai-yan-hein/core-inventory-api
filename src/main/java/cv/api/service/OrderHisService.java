@@ -35,8 +35,6 @@ public interface OrderHisService {
 
     List<OrderHis> unUpload(String syncDate);
 
-    Date getMaxDate();
-
     void truncate(OrderHisKey key);
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);

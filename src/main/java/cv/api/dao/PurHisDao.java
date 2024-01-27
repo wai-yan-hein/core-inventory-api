@@ -10,7 +10,6 @@ import cv.api.entity.PurHisKey;
 import cv.api.model.VDescription;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,8 +32,6 @@ public interface PurHisDao {
     List<PurHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<PurHis> unUpload(String syncDate);
-
-    Date getMaxDate();
 
     List<PurHis> search(String updatedDate, List<String> keys);
     List<VDescription> getDescription(String str, String compCode, String tranType);

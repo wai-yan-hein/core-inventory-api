@@ -27,8 +27,6 @@ public interface StockUnitDao {
 
     List<StockUnit> unUpload();
 
-    Date getMaxDate();
-
     List<StockUnit> getUnit(LocalDateTime updatedDate);
 
 

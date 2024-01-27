@@ -119,11 +119,6 @@ public class OrderHisServiceImpl implements OrderHisService {
         return shDao.unUpload(syncDate);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return shDao.getMaxDate();
-    }
-
 
     @Override
     public void truncate(OrderHisKey key) {

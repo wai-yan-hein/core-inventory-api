@@ -14,7 +14,6 @@ import cv.api.model.VSale;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,8 +38,6 @@ public interface SaleHisService {
     List<SaleHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<SaleHis> unUpload(String syncDate);
-
-    Date getMaxDate();
 
     void truncate(SaleHisKey key);
 

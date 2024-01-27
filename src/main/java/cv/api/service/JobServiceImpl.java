@@ -58,10 +58,6 @@ public class JobServiceImpl implements JobService {
         return dao.unUpload();
     }
 
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<Job> getJob(LocalDateTime updatedDate) {

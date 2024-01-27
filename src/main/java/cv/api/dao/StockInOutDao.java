@@ -28,7 +28,5 @@ public interface StockInOutDao {
     void restore(StockIOKey key) throws Exception;
 
 
-    Date getMaxDate();
-
 
 }

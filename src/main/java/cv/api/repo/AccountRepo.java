@@ -14,9 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -208,11 +206,11 @@ public class AccountRepo {
                 accTrader.setKey(key);
                 accTrader.setTraderName(t.getTraderName());
                 accTrader.setUserCode(t.getUserCode());
-                accTrader.setActive(t.isActive());
+                accTrader.setActive(t.getActive());
                 accTrader.setAppName(appName);
                 accTrader.setMacId(macId);
                 accTrader.setAccount(t.getAccount());
-                accTrader.setDeleted(t.isDeleted());
+                accTrader.setDeleted(t.getDeleted());
                 switch (traderType) {
                     case "CUS" -> accTrader.setTraderType("C");
                     case "SUP" -> accTrader.setTraderType("S");
@@ -221,10 +219,14 @@ public class AccountRepo {
                 accountApi.post().uri("/account/saveTrader")
                         .body(Mono.just(accTrader), AccTrader.class)
                         .retrieve().bodyToMono(AccTrader.class)
-                        .doOnError(e -> {
+                        .onErrorResume(e -> {
                             log.error("saveTrader :" + e.getMessage());
-                        }).doOnSuccess(response -> updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode()))
-                        .block();
+                            return Mono.empty();
+                        }).doOnSuccess(response -> {
+                            if (response != null) {
+                                updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode());
+                            }
+                        }).subscribe();
             }
         }
     }
@@ -264,10 +266,10 @@ public class AccountRepo {
                 double vouTax = Util1.getDouble(sh.getTaxAmt());
                 double taxPercent = Util1.getDouble(sh.getTaxPercent());
                 Integer deptId = sh.getDeptId();
-                TraderKey k = new TraderKey();
+                TraderKey k = TraderKey.builder().build();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                Trader t = traderService.findById(k);
+                Trader t = traderService.findById(k).block();
                 if (t != null) {
                     //income by trader group
                     String groupCode = t.getGroupCode();
@@ -475,10 +477,10 @@ public class AccountRepo {
                 String batchNo = ph.getBatchNo();
                 String projectNo = ph.getProjectNo();
                 Integer deptId = ph.getDeptId();
-                TraderKey k = new TraderKey();
+                TraderKey k = TraderKey.builder().build();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                Trader t = traderService.findById(k);
+                Trader t = traderService.findById(k).block();
                 if (t != null) {
                     balAcc = Util1.isNull(t.getAccount(), balAcc);
                 }
@@ -657,10 +659,10 @@ public class AccountRepo {
                 double vouTotal = Util1.getDouble(ri.getVouTotal());
                 double vouPaid = Util1.getDouble(ri.getPaid());
                 Integer deptId = ri.getDeptId();
-                TraderKey k = new TraderKey();
+                TraderKey k = TraderKey.builder().build();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                Trader t = traderService.findById(k);
+                Trader t = traderService.findById(k).block();
                 String traderName = t == null ? "" : t.getTraderName();
                 if (t != null) {
                     balAcc = Util1.isNull(t.getAccount(), balAcc);
@@ -744,10 +746,10 @@ public class AccountRepo {
                 double vouTotal = Util1.getDouble(ro.getVouTotal());
                 double vouPaid = Util1.getDouble(ro.getPaid());
                 Integer deptId = ro.getDeptId();
-                TraderKey k = new TraderKey();
+                TraderKey k = TraderKey.builder().build();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                Trader t = traderService.findById(k);
+                Trader t = traderService.findById(k).block();
                 String traderName = t == null ? "" : t.getTraderName();
                 if (t != null) {
                     balAcc = Util1.isNull(t.getAccount(), balAcc);
@@ -825,11 +827,12 @@ public class AccountRepo {
                     String tranOption = ph.getTranOption();
                     boolean deleted = ph.isDeleted();
                     String projectNo = ph.getProjectNo();
-                    TraderKey k = new TraderKey();
+                    TraderKey k = TraderKey.builder().build();
                     k.setCode(traderCode);
                     k.setCompCode(compCode);
-                    Trader t = traderService.findById(k);
+                    Trader t = traderService.findById(k).block();
                     AccSetting setting = settingService.findByCode(new AccKey("SALE", compCode));
+                    assert t != null;
                     if (!Util1.isNullOrEmpty(t.getAccount())) {
                         List<Gl> list = new ArrayList<>();
                         Gl gl = new Gl();

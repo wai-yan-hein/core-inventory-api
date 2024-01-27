@@ -11,7 +11,6 @@ import cv.api.entity.StockInOut;
 import cv.api.model.VStockIO;
 import reactor.core.publisher.Flux;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,9 +28,6 @@ public interface StockInOutService {
     void delete(StockIOKey key) throws Exception;
 
     void restore(StockIOKey key) throws Exception;
-
-
-    Date getMaxDate();
 
     Flux<VStockIO> getStockIOHistory(FilterObject filterObject);
 }

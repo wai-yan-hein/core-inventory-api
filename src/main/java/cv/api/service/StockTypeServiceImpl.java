@@ -53,10 +53,6 @@ public class StockTypeServiceImpl implements StockTypeService {
         return dao.unUpload();
     }
 
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<StockType> getStockType(LocalDateTime updatedDate) {

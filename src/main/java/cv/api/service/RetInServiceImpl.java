@@ -120,10 +120,6 @@ public class RetInServiceImpl implements RetInService {
         return rDao.unUpload(syncDate);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return rDao.getMaxDate();
-    }
 
     @Override
     public List<RetInHis> search(String updatedDate, List<String> keys) {

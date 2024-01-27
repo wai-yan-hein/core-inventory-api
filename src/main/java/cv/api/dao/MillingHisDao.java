@@ -34,7 +34,6 @@ public interface MillingHisDao {
 
     List<MillingHis> unUpload(String syncDate);
 
-    Date getMaxDate();
 
     void truncate(MillingHisKey key);
 

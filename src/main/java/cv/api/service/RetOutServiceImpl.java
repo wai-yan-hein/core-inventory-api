@@ -113,11 +113,6 @@ public class RetOutServiceImpl implements RetOutService {
     }
 
     @Override
-    public Date getMaxDate() {
-        return rDao.getMaxDate();
-    }
-
-    @Override
     public List<RetOutHis> search(String updatedDate, List<String> keys) {
         return rDao.search(updatedDate, keys);
     }

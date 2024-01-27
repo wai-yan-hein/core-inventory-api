@@ -17,7 +17,6 @@ public interface TransferHisService {
 
     void restore(TransferHisKey key);
 
-    Date getMaxDate();
 
     List<TransferHis> search(String updatedDate, List<String> keys);
 

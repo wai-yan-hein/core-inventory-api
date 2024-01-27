@@ -129,22 +129,7 @@ public class RetOutDaoImpl extends AbstractDao<RetOutHisKey, RetOutHis> implemen
         return list;
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from ret_out_his";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
+
 
     @Override
     public List<RetOutHis> search(String updatedDate, List<String> keys) {

@@ -1,7 +1,6 @@
 package cv.api.security;
 
 
-import cv.api.common.Util1;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.web.server.ServerWebExchange;
@@ -17,7 +16,7 @@ import java.util.function.Predicate;
 public class TokenAuthenticationConverter implements ServerAuthenticationConverter {
     private static final String BEARER = "Bearer ";
     private static final Predicate<String> matchBearerLength = authValue -> authValue.length() > BEARER.length();
-    private static final Function<String, String> isolateBearerValue = authValue -> authValue.substring(BEARER.length(), authValue.length());
+    private static final Function<String, String> isolateBearerValue = authValue -> authValue.substring(BEARER.length());
 
     private final JwtService jwtService;
 
@@ -30,6 +29,6 @@ public class TokenAuthenticationConverter implements ServerAuthenticationConvert
         return Mono.justOrEmpty(exchange).map(SecurityUtils::getTokenFromRequest)
                 .filter(Objects::nonNull).filter(matchBearerLength)
                 .map(isolateBearerValue)
-                .filter(token -> !Util1.isNullOrEmpty(token)).map(jwtService::getAuthentication)
+                .filter(jwtService::isTokenValid).map(jwtService::getAuthentication)
                 .filter(Objects::nonNull);    }
 }

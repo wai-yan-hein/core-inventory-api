@@ -20,6 +20,4 @@ public interface OPHisService {
     boolean restore(OPHisKey key);
 
     List<OPHis> search(String updatedDate, List<LocationKey> keys);
-
-    Date getMaxDate();
 }

@@ -8,6 +8,8 @@ package cv.api.service;
 import cv.api.common.General;
 import cv.api.entity.Trader;
 import cv.api.entity.TraderKey;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -18,33 +20,28 @@ import java.util.List;
  */
 public interface TraderService {
 
-    Trader findById(TraderKey key);
+    Mono<Trader> findById(TraderKey key);
 
-    Trader findByRFID(String rfId, String compCode, Integer deptId);
+    Mono<Trader> findByRFID(String rfId, String compCode, Integer deptId);
 
-    List<Trader> searchTrader(String str, String type, String compCode, Integer deptId);
-
-    List<Trader> search(String regionCode, String coaCode);
+    Flux<Trader> searchTrader(String str, String type, String compCode, Integer deptId);
 
 
-    Trader saveTrader(Trader trader);
+    Mono<Trader> saveTrader(Trader trader);
 
-    List<Trader> findAll(String compCode);
+    Flux<Trader> findAll(String compCode);
 
-    List<Trader> findAll();
+    Flux<General> delete(TraderKey key);
 
-    List<Trader> findCustomer(String compCode, Integer deptId);
+    Flux<Trader> unUploadTrader();
 
-    List<Trader> findEmployee(String compCode, Integer deptId);
+    Mono<String> getMaxDate();
 
-    List<Trader> findSupplier(String compCode, Integer deptId);
+    Flux<Trader> getUpdateTrader(LocalDateTime updatedDate);
+    Flux<Trader> getUpdateCustomer(LocalDateTime updatedDate);
 
-    List<General> delete(TraderKey key);
-
-    List<Trader> unUploadTrader();
-
-    Date getMaxDate();
-
-    List<Trader> getTrader(LocalDateTime updatedDate);
+    Flux<Trader> getCustomer(String compCode,Integer deptId);
+    Flux<Trader> getSupplier(String compCode,Integer deptId);
+    Flux<Trader> getEmployee(String compCode,Integer deptId);
 
 }

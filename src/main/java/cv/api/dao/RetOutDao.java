@@ -9,7 +9,6 @@ import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,7 +32,6 @@ public interface RetOutDao {
 
     List<RetOutHis> unUpload(String syncDate);
 
-    Date getMaxDate();
 
     List<RetOutHis> search(String updatedDate, List<String> keys);
 }

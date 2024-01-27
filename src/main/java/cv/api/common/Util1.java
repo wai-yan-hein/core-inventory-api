@@ -15,10 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -131,7 +128,7 @@ public class Util1 {
         return LocalDateTime.now();
     }
 
-    public static Date getSyncDate() {
+    public static LocalDateTime getSyncDate() {
         return Util1.toDate(SYNC_DATE);
     }
 
@@ -182,10 +179,13 @@ public class Util1 {
         }
     }
 
-    public static Date getOldDate() {
-        return Util1.toDate("1998-10-07");
+    public static String getOldDate() {
+        return Util1.toDateTimeStrMYSQL(toDate("1998-10-07"));
     }
-
+    public static LocalDateTime toDate(String mysql) {
+        LocalDate localDate = LocalDate.parse(mysql);
+        return localDate.atStartOfDay();
+    }
     public static LocalDateTime getOldLocalDateTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.parse(LocalDateTime.now().toString(), formatter);
@@ -260,5 +260,9 @@ public class Util1 {
             // Handle the exception according to your application's error handling strategy
             return new byte[0]; // Or throw a custom exception
         }
+    }
+    public static String toDateTimeStrMYSQL(LocalDateTime date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return date == null ? null : formatter.format(date);
     }
 }

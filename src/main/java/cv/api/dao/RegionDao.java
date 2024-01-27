@@ -9,7 +9,6 @@ import cv.api.entity.Region;
 import cv.api.entity.RegionKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +26,6 @@ public interface RegionDao {
 
     List<Region> findAll(String compCode);
     List<Region> getRegion(LocalDateTime updatedDate);
-    Date getMaxDate();
 
 
 }

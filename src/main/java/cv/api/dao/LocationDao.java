@@ -9,7 +9,6 @@ import cv.api.entity.Location;
 import cv.api.entity.LocationKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,8 +29,7 @@ public interface LocationDao {
     List<Location> search(String parent);
 
     List<Location> unUpload();
-
-    Date getMaxDate();
+    
 
     List<Location> getLocation(LocalDateTime updatedDate);
 

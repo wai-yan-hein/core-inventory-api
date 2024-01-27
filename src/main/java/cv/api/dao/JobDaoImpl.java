@@ -1,7 +1,6 @@
 package cv.api.dao;
 
 import cv.api.common.FilterObject;
-import cv.api.common.Util1;
 import cv.api.entity.Job;
 import cv.api.entity.JobKey;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -101,23 +99,6 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
     public List<Job> unUpload() {
         String hsql = "select o from Job o where o.intgUpdStatus is null";
         return findHSQL(hsql);
-    }
-
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from labour_group";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getOldDate();
     }
 
     @Override

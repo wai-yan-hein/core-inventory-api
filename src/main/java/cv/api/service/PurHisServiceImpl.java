@@ -164,10 +164,6 @@ public class PurHisServiceImpl implements PurHisService {
         return phDao.unUpload(syncDate);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return phDao.getMaxDate();
-    }
 
     @Override
     public List<PurHis> search(String updatedDate, List<String> keys) {

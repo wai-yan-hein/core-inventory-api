@@ -12,6 +12,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.List;
 
 @Component
@@ -51,15 +52,20 @@ public class AutoUpload {
     }
 
     private void uploadTrader() {
-        List<Trader> traders = traderService.unUploadTrader();
-        if (!traders.isEmpty()) {
-            log.info(String.format("uploadTrader: %s", traders.size()));
-            traders.forEach(accountRepo::sendTrader);
-        }
+        traderService.unUploadTrader()
+                .collectList()
+                .delayElement(Duration.ofMillis(50))
+                .doOnNext(traders -> {
+                    if (!traders.isEmpty()) {
+                        log.info(String.format("uploadTrader: %s", traders.size()));
+                        traders.forEach(accountRepo::sendTrader);
+                    }
+                }).subscribe();
     }
 
+
     private void uploadSaleVoucher() {
-        List<SaleHis> vouchers = saleHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        List<SaleHis> vouchers = saleHisService.unUploadVoucher(Util1.toDate(syncDate));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadSaleVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -83,7 +89,7 @@ public class AutoUpload {
     }
 
     private void uploadPurchaseVoucher() {
-        List<PurHis> vouchers = purHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        List<PurHis> vouchers = purHisService.unUploadVoucher(Util1.toDate(syncDate));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadPurchaseVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -98,7 +104,7 @@ public class AutoUpload {
 
 
     private void uploadReturnInVoucher() {
-        List<RetInHis> vouchers = retInService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        List<RetInHis> vouchers = retInService.unUploadVoucher(Util1.toDate(syncDate));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadReturnInVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -112,7 +118,7 @@ public class AutoUpload {
     }
 
     private void uploadReturnOutVoucher() {
-        List<RetOutHis> vouchers = retOutService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        List<RetOutHis> vouchers = retOutService.unUploadVoucher(Util1.toDate(syncDate));
         if (!vouchers.isEmpty()) {
             log.info(String.format("uploadReturnOutVoucher: %s", vouchers.size()));
             vouchers.forEach(vou -> {
@@ -126,7 +132,7 @@ public class AutoUpload {
     }
 
     private void uploadPayment() {
-        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)));
+        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(Util1.toDate(syncDate));
         if (!vouchers.isEmpty()) {
             log.info("uploadPayment : " + vouchers.size());
             vouchers.forEach(vou -> {
@@ -138,15 +144,16 @@ public class AutoUpload {
             });
         }
     }
+
     private void uploadLabourPayment() {
-        labourPaymentService.unUploadVoucher(Util1.parseLocalDateTime(Util1.toDate(syncDate)))
+        labourPaymentService.unUploadVoucher(Util1.toDate(syncDate))
                 .collectList()
                 .doOnNext(vouList -> {
                     if (!vouList.isEmpty()) {
                         log.info("uploadLabourPayment : " + vouList.size());
                         vouList.forEach(vou -> {
                             if (vou.isDeleted()) {
-                                accountRepo.deleteVoucher(vou.getVouNo(),vou.getCompCode(),"LABOUR_PAYMENT");
+                                accountRepo.deleteVoucher(vou.getVouNo(), vou.getCompCode(), "LABOUR_PAYMENT");
                             } else {
                                 accountRepo.sendLabourPayment(vou.buildDto());
                             }

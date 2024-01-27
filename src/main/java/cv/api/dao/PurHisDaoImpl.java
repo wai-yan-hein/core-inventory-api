@@ -132,22 +132,6 @@ public class PurHisDaoImpl extends AbstractDao<PurHisKey, PurHis> implements Pur
         return list;
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from pur_his";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
 
     @Override
     public List<PurHis> search(String updatedDate, List<String> keys) {

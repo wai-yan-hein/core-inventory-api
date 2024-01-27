@@ -23,8 +23,6 @@ public interface UnitRelationService {
 
     List<UnitRelation> unUpload();
 
-    Date getMaxDate();
-
     List<UnitRelation> getRelation(LocalDateTime updatedDate);
 
 

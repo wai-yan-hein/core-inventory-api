@@ -72,22 +72,6 @@ public class UnitRelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> 
         return list;
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from unit_relation";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getOldDate();
-    }
 
     @Override
     public List<UnitRelation> getRelation(LocalDateTime updatedDate) {

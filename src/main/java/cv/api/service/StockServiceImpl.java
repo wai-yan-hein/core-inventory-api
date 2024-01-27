@@ -108,11 +108,6 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
-
-    @Override
     public List<Stock> getStock(LocalDateTime updatedDate) {
         return dao.getStock(updatedDate);
     }

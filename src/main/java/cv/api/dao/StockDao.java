@@ -36,7 +36,6 @@ public interface StockDao {
 
     List<Stock> unUpload();
 
-    Date getMaxDate();
 
     List<Stock> getStock(LocalDateTime updatedDate);
 
