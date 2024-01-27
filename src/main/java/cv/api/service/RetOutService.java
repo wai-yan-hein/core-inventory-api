@@ -35,8 +35,6 @@ public interface RetOutService {
 
     List<RetOutHis> unUpload(String syncDate);
 
-    Date getMaxDate();
-
     List<RetOutHis> search(String updatedDate, List<String> keys);
 
 }

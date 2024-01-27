@@ -16,8 +16,5 @@ public interface WareHouseDao {
 
     WareHouse findById(WareHouseKey id);
 
-
-    Date getMaxDate();
-
     List<WareHouse> getWareHouse(LocalDateTime updatedDate);
 }

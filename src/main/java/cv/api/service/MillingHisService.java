@@ -9,7 +9,6 @@ import cv.api.common.General;
 import cv.api.entity.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,8 +34,6 @@ public interface MillingHisService {
     List<MillingHis> unUploadVoucher(LocalDateTime syncDate);
 
     List<MillingHis> unUpload(String syncDate);
-
-    Date getMaxDate();
 
     void truncate(MillingHisKey key);
 

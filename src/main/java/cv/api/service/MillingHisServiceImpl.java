@@ -247,11 +247,6 @@ public class MillingHisServiceImpl implements MillingHisService {
         return hDao.unUpload(syncDate);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return hDao.getMaxDate();
-    }
-
 
     @Override
     public void truncate(MillingHisKey key) {

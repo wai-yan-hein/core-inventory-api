@@ -17,9 +17,6 @@ public interface StockInOutDetailDao {
 
     StockInOutDetail save(StockInOutDetail sdh);
 
-    List<StockInOutDetail> search(String vouNo, String compCode);
-
-    List<StockInOutDetail> searchByJob(String jboId, String compCode);
 
     int delete(StockInOutKey key);
 

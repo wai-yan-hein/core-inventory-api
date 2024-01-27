@@ -760,37 +760,49 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
-        List<VSale> saleList = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" + "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,sale_unit\n" + ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "order by s_user_code";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VSale sale = VSale.builder().build();
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                sale.setStockCode(rs.getString("s_user_code"));
-                sale.setStockName(rs.getString("stock_name"));
-                sale.setRelName(rs.getString("rel_name"));
-                sale.setSaleAmount(rs.getDouble("ttl_amt"));
-                sale.setQtyStr(getRelStr(relCode, compCode, smallQty));
-                sale.setTotalQty(smallQty);
-                sale.setSaleUnit(rs.getString("unit"));
-                saleList.add(sale);
-            }
-        }
-        return saleList;
+    public Mono<ReturnObject> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode,
+                                                    String catCode, String locCode, String compCode, Integer deptId, Integer macId) {
+        String sql = """
+                select stock_code,s_user_code,stock_name,sum(qty) qty,sum(bag) bag,sum(sale_amt) amount,comp_code,dept_id
+                from v_sale
+                where deleted = false
+                and date(vou_date) between :fromDate and :toDate
+                and comp_code = :compCode
+                and cur_code = :curCode
+                and (dept_id =:deptId or 0 =:deptId)
+                and (loc_code = :locCode or '-' = :locCode)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                group by stock_code
+                order by s_user_code;
+                """;
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("curCode", curCode)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("locCode", locCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .map((row) -> VSale.builder()
+                        .stockCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .saleAmount(row.get("amount", Double.class))
+                        .qty(Util1.toNull(row.get("qty", Double.class)))
+                        .bag(Util1.toNull(row.get("bag", Double.class)))
+                        .build()).all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
     @Override
@@ -1331,7 +1343,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
-        General general =General.builder().build();
+        General general = General.builder().build();
         general.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
                 "from (\n" +
@@ -1390,7 +1402,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode) {
-        General general =General.builder().build();
+        General general = General.builder().build();
         general.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" +
                 "select pd.unit,price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
@@ -1427,7 +1439,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode) {
-        General g =General.builder().build();
+        General g = General.builder().build();
         String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" +
                 "from (\n" +
                 "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price,pur.rel_code,pur.comp_code,pur.dept_id\n" +
@@ -1471,7 +1483,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
-        General general =General.builder().build();
+        General general = General.builder().build();
         general.setAmount(0.0);
         String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
                 "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
@@ -1504,7 +1516,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getStockIORecentPrice(String stockCode, String vouDate, String unit) {
-        General general =General.builder().build();
+        General general = General.builder().build();
         general.setAmount(0.0);
         String sql = "select cost_price,stock_code,max(unique_id) \n" +
                 "from stock_in_out_detail\n" +
@@ -2114,7 +2126,7 @@ public class ReportServiceImpl implements ReportService {
         List<General> generalList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                General g =General.builder().build();
+                General g = General.builder().build();
                 g.setStockCode(rs.getString("user_code"));
                 g.setStockName(rs.getString("stock_name"));
                 g.setSysCode(rs.getString("stock_code"));
@@ -2145,7 +2157,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("compCode", compCode)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("deptId",deptId)
+                .bind("deptId", deptId)
                 .map((row) -> General.builder()
                         .traderCode(row.get("user_code", String.class))
                         .traderName(row.get("trader_name", String.class))
@@ -2187,39 +2199,47 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<General> getTopSaleByStock(String fromDate, String toDate, String typeCode,
-                                           String brandCode, String catCode, String compCode,
-                                           Integer deptId) throws Exception {
-        String sql = "select a.*,sum(ttl_amt) ttl_amt,sum(a.ttl_qty) smallest_qty\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,comp_code\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and deleted = false\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "group by stock_code,sale_unit\n" +
-                ")a\n" +
-                "group by stock_code\n" +
-                "order by smallest_qty desc";
-        ResultSet rs = reportDao.executeSql(sql);
-        List<General> generals = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                General g =General.builder().build();
-                g.setStockCode(rs.getString("s_user_code"));
-                g.setStockName(rs.getString("stock_name"));
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                g.setQtyRel(getRelStr(relCode, compCode, smallQty));
-                g.setAmount(rs.getDouble("ttl_amt"));
-                g.setSmallQty(smallQty);
-                generals.add(g);
-            }
-        }
-        return generals;
+    public Mono<ReturnObject> getTopSaleByStock(String fromDate, String toDate, String typeCode,
+                                                String brandCode, String catCode, String compCode,
+                                                Integer deptId) {
+        String sql = """
+                select a.*,sum(amount) amount,sum(a.qty) qty,sum(a.bag) bag
+                from (
+                select stock_code,s_user_code,stock_name,sum(qty) qty,sum(bag)bag,sum(sale_amt) amount,comp_code
+                from v_sale
+                where deleted = false
+                and date(vou_date) between :fromDate and :toDate
+                and comp_code = :compCode
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code =:catCode or '-' = :catCode)
+                and (dept_id =:deptId or 0 = :deptId)
+                group by stock_code
+                )a
+                group by stock_code
+                order by qty desc,bag desc""";
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("deptId", deptId)
+                .map((row) -> General.builder()
+                        .stockCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .amount(row.get("amount", Double.class))
+                        .qty(Util1.toNull(row.get("qty", Double.class)))
+                        .bag(Util1.toNull(row.get("bag", Double.class)))
+                        .build()).all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
     @Override
@@ -3312,7 +3332,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId) {
-        General g =General.builder().build();
+        General g = General.builder().build();
         g.setSmallQty(1.0);
         String sql = "select ud.qty,ud.smallest_qty\n" +
                 "from stock s join unit_relation_detail ud\n" + "on s.rel_code = ud.rel_code\n" +
@@ -3352,7 +3372,7 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.executeSql(sql);
                 if (rs.next()) {
                     if (rs.getBoolean("exist")) {
-                        General g =General.builder().build();
+                        General g = General.builder().build();
                         g.setMessage("Transaction exist in " + s2);
                         str.add(g);
                     }
@@ -3378,7 +3398,7 @@ public class ReportServiceImpl implements ReportService {
                 ResultSet rs = reportDao.executeSql(sql);
                 if (rs.next()) {
                     if (rs.getBoolean("exist")) {
-                        General g =General.builder().build();
+                        General g = General.builder().build();
                         g.setMessage("Transaction exist in " + s2);
                         list.add(g);
                     }

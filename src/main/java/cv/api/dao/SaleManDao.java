@@ -29,6 +29,4 @@ public interface SaleManDao {
 
     List<SaleMan> getSaleMan(LocalDateTime updatedDate);
 
-    Date getMaxDate();
-
 }

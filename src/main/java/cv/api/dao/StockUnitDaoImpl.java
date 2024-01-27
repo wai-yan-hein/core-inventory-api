@@ -53,23 +53,6 @@ public class StockUnitDaoImpl extends AbstractDao<StockUnitKey, StockUnit> imple
     }
 
     @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from stock_unit";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getOldDate();
-    }
-
-    @Override
     public List<StockUnit> getUnit(LocalDateTime updatedDate) {
         String hsql = "select o from StockUnit o where o.updatedDate >:updatedDate";
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();

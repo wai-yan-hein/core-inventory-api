@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -238,10 +237,6 @@ public class SaleHisServiceImpl implements SaleHisService {
         return shDao.unUpload(syncDate);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return shDao.getMaxDate();
-    }
 
 
     @Override

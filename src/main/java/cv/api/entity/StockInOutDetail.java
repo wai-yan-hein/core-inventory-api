@@ -6,9 +6,11 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author wai yan
@@ -51,6 +53,8 @@ public class StockInOutDetail {
     private Double inBag;
     @Column(name = "out_bag")
     private Double outBag;
+    @Column(name = "amount")
+    private Double amount;
     @Transient
     private String userCode;
     @Transient
@@ -65,4 +69,5 @@ public class StockInOutDetail {
     private String relName;
     @Transient
     private String locName;
+
 }

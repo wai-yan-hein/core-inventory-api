@@ -91,24 +91,6 @@ public class OrderHisDaoImpl extends AbstractDao<OrderHisKey, OrderHis> implemen
     }
 
     @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from order_his";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
-
-
-    @Override
     public void truncate(OrderHisKey key) {
 
     }

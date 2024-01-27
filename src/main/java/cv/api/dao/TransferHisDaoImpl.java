@@ -63,22 +63,6 @@ public class TransferHisDaoImpl extends AbstractDao<TransferHisKey, TransferHis>
         updateEntity(th);
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from transfer_his";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
 
     @Override
     public List<TransferHis> search(String updatedDate, List<String> location) {

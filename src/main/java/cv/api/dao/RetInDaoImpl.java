@@ -128,22 +128,7 @@ public class RetInDaoImpl extends AbstractDao<RetInHisKey, RetInHis> implements 
         return list;
     }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from ret_in_his";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
+
 
     @Override
     public List<RetInHis> search(String updatedDate, List<String> keys) {

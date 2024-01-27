@@ -44,11 +44,6 @@ public class LabourGroupServiceImpl implements LabourGroupService{
         return dao.findById(key);
     }
     @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
-
-    @Override
     public List<LabourGroup> getLabourGroup(LocalDateTime updatedDate) {
         return dao.getLabourGroup(updatedDate);
     }

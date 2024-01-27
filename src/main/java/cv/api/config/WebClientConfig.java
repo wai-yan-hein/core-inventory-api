@@ -1,7 +1,7 @@
 package cv.api.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -17,12 +17,24 @@ import java.util.Objects;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 @PropertySource(value = {"file:config/application.properties"})
 public class WebClientConfig {
 
-    @Autowired
-    private Environment environment;
-
+    private final Environment environment;
+    @Bean
+    public WebClient dmsApi() {
+        log.info("dms api : " + environment.getProperty("dms.url"));
+        return WebClient.builder()
+                .exchangeStrategies(ExchangeStrategies.builder()
+                        .codecs(config -> config
+                                .defaultCodecs()
+                                .maxInMemorySize(16 * 1024 * 1024))
+                        .build())
+                .baseUrl(Objects.requireNonNull(environment.getProperty("dms.url")))
+                .clientConnector(reactorClientHttpConnector())
+                .build();
+    }
     @Bean
     public WebClient accountApi() {
         log.info("account : " + environment.getProperty("account.url"));
@@ -55,7 +67,7 @@ public class WebClientConfig {
     @Bean
     public ConnectionProvider connectionProvider() {
         return ConnectionProvider.builder("custom-provider")
-                .maxConnections(10) // maximum number of connections
+                .maxConnections(50) // maximum number of connections
                 .maxIdleTime(Duration.ofSeconds(10)) // maximum idle time
                 .maxLifeTime(Duration.ofSeconds(60)) // maximum lifetime
                 .pendingAcquireTimeout(Duration.ofSeconds(30)) // pending acquire timeout

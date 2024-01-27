@@ -42,10 +42,6 @@ public class WareHouseServiceImpl implements WareHouseService{
     public WareHouse findById(WareHouseKey key) {
         return dao.findById(key);
     }
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<WareHouse> getWarehouse(LocalDateTime updatedDate) {

@@ -32,7 +32,6 @@ public interface RetInDao {
 
     List<RetInHis> unUpload(String syncDate);
 
-    Date getMaxDate();
 
     List<RetInHis> search(String updatedDate, List<String> keys);
     void truncate(RetInHisKey key);

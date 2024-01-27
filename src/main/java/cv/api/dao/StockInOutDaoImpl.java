@@ -6,16 +6,13 @@
 package cv.api.dao;
 
 import cv.api.common.Util1;
-import cv.api.entity.LocationKey;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +22,6 @@ import java.util.List;
 @Slf4j
 @Repository
 public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> implements StockInOutDao {
-    @Autowired
-    private StockInOutDetailDao dao;
 
     @Override
     public StockInOut findById(StockIOKey id) {
@@ -115,50 +110,10 @@ public class StockInOutDaoImpl extends AbstractDao<StockIOKey, StockInOut> imple
         updateEntity(io);
     }
 
-    @Override
-    public List<StockInOut> unUpload(String syncDate) {
-        String hsql = "select o from StockInOut o where intgUpdStatus is null and date(o.vouDate) >= '" + syncDate + "'";
-        List<StockInOut> list = findHSQL(hsql);
-        list.forEach((o) -> {
-            String vouNo = o.getKey().getVouNo();
-            String compCode = o.getKey().getCompCode();
-            o.setListSH(dao.search(vouNo, compCode));
-        });
-        return list;
-    }
 
-    @Override
-    public Date getMaxDate() {
-        String sql = "select max(updated_date) date from stock_in_out";
-        ResultSet rs = getResult(sql);
-        try {
-            if (rs.next()) {
-                Date date = rs.getTimestamp("date");
-                if (date != null) {
-                    return date;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return Util1.getSyncDate();
-    }
 
-    @Override
-    public List<StockInOut> search(String updatedDate, List<LocationKey> keys) {
-        List<StockInOut> list = new ArrayList<>();
-        if (keys != null) {
-            for (LocationKey key : keys) {
-                String hql = "select o from StockInOut o where o.locCode='" + key.getLocCode() + "' and updatedDate > '" + updatedDate + "'";
-                list.addAll(findHSQL(hql));
-            }
-        }
-        list.forEach(o -> {
-            String vouNo = o.getKey().getVouNo();
-            String compCode = o.getKey().getCompCode();
-            o.setListSH(dao.search(vouNo, compCode));
-        });
-        return list;
-    }
+
+
+
 
 }

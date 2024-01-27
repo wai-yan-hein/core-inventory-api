@@ -65,10 +65,6 @@ public class VouStatusServiceImpl implements VouStatusService {
         return vouDao.unUpload();
     }
 
-    @Override
-    public Date getMaxDate() {
-        return vouDao.getMaxDate();
-    }
 
     @Override
     public List<VouStatus> getVouStatus(LocalDateTime updatedDate) {

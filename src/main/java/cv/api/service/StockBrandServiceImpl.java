@@ -68,11 +68,6 @@ public class StockBrandServiceImpl implements StockBrandService {
     }
 
     @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
-
-    @Override
     public List<StockBrand> getBrand(LocalDateTime updatedDate) {
         return dao.getBrand(updatedDate);
     }

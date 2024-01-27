@@ -9,7 +9,6 @@ import cv.api.entity.StockUnit;
 import cv.api.entity.StockUnitKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,8 +25,6 @@ public interface StockUnitService {
     List<StockUnit> unUpload();
 
     int delete(String id);
-
-    Date getMaxDate();
 
     List<StockUnit> getUnit(LocalDateTime updatedDate);
 }

@@ -15,8 +15,5 @@ public interface OrderStatusService {
     OrderStatus findById(OrderStatusKey key);
     List<OrderStatus> search(String description);
     List<OrderStatus> unUpload();
-
-    Date getMaxDate();
-
     List<OrderStatus> getOrderStatus(LocalDateTime updatedDate);
 }

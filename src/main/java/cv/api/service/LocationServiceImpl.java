@@ -65,10 +65,6 @@ public class LocationServiceImpl implements LocationService {
         return dao.unUpload();
     }
 
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<Location> getLocation(LocalDateTime updatedDate) {

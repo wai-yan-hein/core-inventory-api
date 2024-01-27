@@ -29,7 +29,6 @@ public interface VouStatusDao {
 
     List<VouStatus> unUpload();
 
-    Date getMaxDate();
 
     List<VouStatus> getVouStatus(LocalDateTime updatedDate);
 

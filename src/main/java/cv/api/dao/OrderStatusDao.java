@@ -20,7 +20,6 @@ public interface OrderStatusDao {
 
     List<OrderStatus> unUpload();
 
-    Date getMaxDate();
 
     List<OrderStatus> getOrderStatus(LocalDateTime updatedDate);
 }

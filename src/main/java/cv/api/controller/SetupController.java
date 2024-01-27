@@ -323,67 +323,76 @@ public class SetupController {
         trader.setUpdatedDate(Util1.getTodayLocalDate());
         trader.setType("CUS");
         trader.setMacId(0);
-        Trader b = traderService.saveTrader(trader);
-        accountRepo.sendTrader(b);
-        return Mono.justOrEmpty(b);
+        return traderService.saveTrader(trader).map(t -> {
+            accountRepo.sendTrader(t);
+            return t;
+        });
     }
 
     @PostMapping(path = "/saveTrader")
     public Mono<Trader> saveTrader(@RequestBody Trader trader) {
-        trader.setUpdatedDate(Util1.getTodayLocalDate());
-        trader = traderService.saveTrader(trader);
-        accountRepo.sendTrader(trader);
-        return Mono.justOrEmpty(trader);
+        return traderService.saveTrader(trader).map(t -> {
+            accountRepo.sendTrader(t);
+            return t;
+        });
     }
 
     @GetMapping(path = "/getTrader")
-    public Flux<?> getTrader(@RequestParam String compCode) {
-        return Flux.fromIterable(traderService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Trader> getTrader(@RequestParam String compCode) {
+        return traderService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateTrader")
-    public Flux<?> getUpdateTrader(@RequestParam String updatedDate) {
-        return Flux.fromIterable(traderService.getTrader(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<Trader> getUpdateTrader(@RequestParam String updatedDate) {
+        return traderService.getUpdateTrader(Util1.toLocalDateTime(updatedDate));
     }
+    @GetMapping(path = "/getUpdateCustomer")
+    public Flux<Trader> getUpdateCustomer(@RequestParam String updatedDate) {
+        return traderService.getUpdateCustomer(Util1.toLocalDateTime(updatedDate));
+    }
+
 
 
     @GetMapping(path = "/getCustomer")
     public Flux<Trader> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(traderService.findCustomer(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+        return traderService.getCustomer(compCode, deptId);
     }
 
     @GetMapping(path = "/getEmployee")
     public Flux<Trader> getEmployee(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(traderService.findEmployee(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+        return traderService.getEmployee(compCode, deptId);
     }
 
     @GetMapping(path = "/getTraderList")
-    public Flux<?> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Trader> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId);
     }
 
     @GetMapping(path = "/getSupplier")
-    public Flux<?> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(traderService.findSupplier(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Trader> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return traderService.getSupplier(compCode, deptId);
     }
 
 
     @PostMapping(path = "/deleteTrader")
-    public Flux<?> deleteTrader(@RequestBody TraderKey key) {
-        List<General> list = traderService.delete(key);
-        if (list.isEmpty()) {
-            AccTraderKey k = new AccTraderKey();
-            k.setCompCode(key.getCompCode());
-            k.setCode(key.getCode());
-            accountRepo.deleteTrader(k);
-        }
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+    public Flux<General> deleteTrader(@RequestBody TraderKey key) {
+        return traderService.delete(key)
+                .collectList()
+                .doOnNext(generals -> {
+                    if (generals.isEmpty()) {
+                        AccTraderKey accTraderKey = new AccTraderKey();
+                        accTraderKey.setCompCode(key.getCompCode());
+                        accTraderKey.setCode(key.getCode());
+                        accountRepo.deleteTrader(accTraderKey);
+                    }
+                })
+                .flatMapMany(Flux::fromIterable);
     }
+
 
     @PostMapping(path = "/findTrader")
     public Mono<Trader> findTrader(@RequestBody TraderKey key) {
-        Trader b = traderService.findById(key);
-        return Mono.justOrEmpty(b);
+        return traderService.findById(key);
     }
 
     @GetMapping(path = "/findTraderRFID")

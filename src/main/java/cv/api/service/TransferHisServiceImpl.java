@@ -92,10 +92,6 @@ public class TransferHisServiceImpl implements TransferHisService {
         dao.restore(key);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<TransferHis> search(String updatedDate, List<String> location) {

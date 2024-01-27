@@ -55,10 +55,6 @@ public class OrderStatusServiceImpl implements OrderStatusService{
         return dao.unUpload();
     }
 
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<OrderStatus> getOrderStatus(LocalDateTime updatedDate) {

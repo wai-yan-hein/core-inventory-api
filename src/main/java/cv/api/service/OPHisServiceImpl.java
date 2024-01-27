@@ -97,9 +97,5 @@ public class OPHisServiceImpl implements OPHisService {
         return opHisDao.search(updatedDate, keys);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return opHisDao.getMaxDate();
-    }
 
 }

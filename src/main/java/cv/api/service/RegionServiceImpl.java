@@ -71,9 +71,4 @@ public class RegionServiceImpl implements RegionService {
     public List<Region> getRegion(LocalDateTime updatedDate) {
         return dao.getRegion(updatedDate);
     }
-
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 }

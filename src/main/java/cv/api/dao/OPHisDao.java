@@ -22,7 +22,6 @@ public interface OPHisDao {
 
     List<OPHis> search(String updatedDate, List<LocationKey> keys);
 
-    Date getMaxDate();
 
 
 }

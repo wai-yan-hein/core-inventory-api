@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,12 +58,6 @@ public class SaleManServiceImpl implements SaleManService {
     public List<SaleMan> getSaleMan(LocalDateTime updatedDate) {
         return dao.getSaleMan(updatedDate);
     }
-
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
-
     private String getSaleManCode(Integer macId, String compCode) {
         int seqNo = seqService.getSequence(macId, "SM", "-", compCode);
         return String.format("%0" + 2 + "d", macId) + "-" + String.format("%0" + 3 + "d", seqNo);

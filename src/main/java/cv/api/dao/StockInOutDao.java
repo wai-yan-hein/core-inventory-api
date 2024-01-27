@@ -5,7 +5,6 @@
  */
 package cv.api.dao;
 
-import cv.api.entity.LocationKey;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
 
@@ -28,10 +27,6 @@ public interface StockInOutDao {
 
     void restore(StockIOKey key) throws Exception;
 
-    List<StockInOut> unUpload(String syncDate);
 
-    Date getMaxDate();
-
-    List<StockInOut> search(String updatedDate, List<LocationKey> keys);
 
 }

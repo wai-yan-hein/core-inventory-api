@@ -14,7 +14,5 @@ public interface LabourGroupService {
     int delete(LabourGroupKey key);
     LabourGroup findById(LabourGroupKey key);
 
-    Date getMaxDate();
-
     List<LabourGroup> getLabourGroup(LocalDateTime updatedDate);
 }

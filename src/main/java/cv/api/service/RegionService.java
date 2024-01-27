@@ -28,7 +28,5 @@ public interface RegionService {
 
     List<Region> findAll(String compCode);
     List<Region> getRegion(LocalDateTime updatedDate);
-    Date getMaxDate();
-
 
 }

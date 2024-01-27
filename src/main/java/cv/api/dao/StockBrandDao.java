@@ -27,8 +27,6 @@ public interface StockBrandDao {
 
     List<StockBrand> unUpload();
 
-    Date getMaxDate();
-
     List<StockBrand> getBrand(LocalDateTime updatedDate);
 
 

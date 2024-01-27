@@ -29,5 +29,4 @@ public interface SaleManService {
 
     List<SaleMan> getSaleMan(LocalDateTime updatedDate);
 
-    Date getMaxDate();
 }

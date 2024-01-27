@@ -46,10 +46,6 @@ public class StockUnitServiceImpl implements StockUnitService {
         return dao.delete(id);
     }
 
-    @Override
-    public Date getMaxDate() {
-        return dao.getMaxDate();
-    }
 
     @Override
     public List<StockUnit> getUnit(LocalDateTime updatedDate) {

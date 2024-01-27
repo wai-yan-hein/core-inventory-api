@@ -3,25 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cv.api.entity;
+package cv.api.dto;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.Builder;
 import lombok.Data;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**
  * @author wai yan
  */
 @Data
-@Embeddable
-public class StockInOutKey implements Serializable {
+@Builder
+public class StockInOutKeyDto {
 
-    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "unique_id")
     private Integer uniqueId;
-    @Column(name = "comp_code")
     private String compCode;
 }
