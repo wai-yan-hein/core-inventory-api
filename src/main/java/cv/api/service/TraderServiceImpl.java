@@ -369,7 +369,7 @@ public class TraderServiceImpl implements TraderService {
                 .bind("code", t.getKey().getCode())
                 .bind("compCode", t.getKey().getCompCode())
                 .bind("deptId", t.getDeptId())
-                .bind("macId", t.getMacId())
+                .bind("macId", Parameters.in(R2dbcType.INTEGER,t.getMacId()))
                 .bind("type", t.getType())
                 .bind("active", t.getActive())
                 .bind("address", Parameters.in(R2dbcType.VARCHAR, t.getAddress()))

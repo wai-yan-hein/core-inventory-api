@@ -54,7 +54,6 @@ public class AutoUpload {
     private void uploadTrader() {
         traderService.unUploadTrader()
                 .collectList()
-                .delayElement(Duration.ofMillis(50))
                 .doOnNext(traders -> {
                     if (!traders.isEmpty()) {
                         log.info(String.format("uploadTrader: %s", traders.size()));

@@ -26,6 +26,7 @@ public class AutoDownload {
 
     private void downloadTrader() {
         traderService.getMaxDate().flatMapMany(dmsRepo::getUpdateTrader)
+
                 .flatMap(trader -> traderService.saveTrader(trader.toTraderInv()))
                 .subscribe();
     }

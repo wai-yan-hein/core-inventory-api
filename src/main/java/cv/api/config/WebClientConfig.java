@@ -67,7 +67,7 @@ public class WebClientConfig {
     @Bean
     public ConnectionProvider connectionProvider() {
         return ConnectionProvider.builder("custom-provider")
-                .maxConnections(10) // maximum number of connections
+                .maxConnections(50) // maximum number of connections
                 .maxIdleTime(Duration.ofSeconds(10)) // maximum idle time
                 .maxLifeTime(Duration.ofSeconds(60)) // maximum lifetime
                 .pendingAcquireTimeout(Duration.ofSeconds(30)) // pending acquire timeout

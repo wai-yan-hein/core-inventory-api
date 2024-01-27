@@ -45,6 +45,10 @@ public class TraderDMSDto {
                 .active(getActive())
                 .deptId(1)
                 .type("CUS")
+                .createdDate(getCreatedDate())
+                .updatedDate(getUpdatedDate())
+                .cashDown(false)
+                .multi(false)
                 .build();
     }
 
