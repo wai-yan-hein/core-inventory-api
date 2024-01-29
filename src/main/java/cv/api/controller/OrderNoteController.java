@@ -9,9 +9,6 @@ import cv.api.common.FilterObject;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dto.OrderNote;
-import cv.api.entity.SaleHis;
-import cv.api.entity.SaleHisKey;
-import cv.api.entity.SaleOrderJoin;
 import cv.api.repo.AccountRepo;
 import cv.api.service.OrderNoteService;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +36,21 @@ public class OrderNoteController {
         orderNote.setUpdatedDate(Util1.getTodayLocalDate());
         return orderNoteService.save(orderNote).thenReturn(orderNote);
     }
+
+    @PostMapping(path = "/getOrderNote")
+    public Flux<?> getOrderNote(@NotNull @RequestBody FilterObject filter) {
+        return orderNoteService.history(filter);
+    }
+
+    @GetMapping(path = "/findOrderNote")
+    public Mono<?> findOrderNote(@NotNull @RequestParam String vouNo, @RequestParam String compCode) {
+        return orderNoteService.findOrderNote(vouNo, compCode);
+    }
+
+    @GetMapping(path = "/getOrderNoteDetail")
+    public Flux<?> getOrderNoteDetail(@NotNull @RequestParam String vouNo, @RequestParam String compCode) {
+        return orderNoteService.getDetail(vouNo, compCode);
+    }
+
 
 }

@@ -1738,6 +1738,31 @@ rename to  consign_his_detail;
 alter table stock_in_out_detail
 add column amount double(20,3) null after out_bag;
 
+CREATE TABLE order_note (
+  vou_no varchar(25) NOT NULL,
+  comp_code varchar(25) NOT NULL,
+  dept_id int(11) DEFAULT NULL,
+  mac_id int(11) DEFAULT NULL,
+  trader_code varchar(25) DEFAULT NULL,
+  stock_code varchar(45) DEFAULT NULL,
+  order_code varchar(45) DEFAULT NULL,
+  order_name text DEFAULT NULL,
+  vou_date datetime DEFAULT NULL,
+  created_date timestamp NULL DEFAULT current_timestamp(),
+  created_by varchar(45) DEFAULT NULL,
+  updated_date timestamp NULL DEFAULT current_timestamp(),
+  updated_by varchar(45) DEFAULT NULL,
+  deleted bit(1) DEFAULT NULL,
+  PRIMARY KEY (vou_no,comp_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+CREATE TABLE order_file_join (
+  vou_no varchar(45) NOT NULL,
+  comp_code varchar(45) NOT NULL,
+  file_id varchar(255) NOT NULL,
+  PRIMARY KEY (vou_no,comp_code,file_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;

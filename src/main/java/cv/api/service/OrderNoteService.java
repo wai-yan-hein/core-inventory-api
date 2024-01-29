@@ -1,11 +1,10 @@
 package cv.api.service;
 
 import cv.api.common.FilterObject;
-import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
-import cv.api.dto.*;
+import cv.api.dto.OrderFileJoin;
+import cv.api.dto.OrderNote;
 import cv.api.r2dbc.LabourPayment;
-import cv.api.r2dbc.LabourPaymentDetail;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -165,130 +163,74 @@ public class OrderNoteService {
                 .thenReturn(p);
     }
 
-
-    public Flux<LabourPaymentDetail> calculatePayment(ReportFilter filter) {
-        String startDate = filter.getFromDate();
-        String enDate = filter.getToDate();
-        String labourGroupCode = filter.getLabourGroupCode();
-        String compCode = filter.getCompCode();
-        String sql = """
-                select a.*,l.labour_name,ifnull(l.price,0) price,ifnull(l.qty,0)*ifnull(l.price,0)*a.bag amount
-                from (
-                select 'Purchase' tran_option,labour_group_code,sum(bag) bag,comp_code
-                from v_purchase
-                where date(vou_date) between :startDate and :endDate
-                and deleted = false
-                and comp_code =:compCode
-                and labour_group_code =:labourGroupCode
-                    union all
-                select v.description tran_option,s.labour_group_code,sum(s.bag) bag,s.comp_code
-                from v_stock_io s join vou_status v
-                on s.vou_status = v.code
-                and s.comp_code = v.comp_code
-                where date(s.vou_date) between :startDate and :endDate
-                and s.deleted = false
-                and s.comp_code =:compCode
-                and s.labour_group_code =:labourGroupCode
-                group by s.vou_status
-                )a
-                join labour_group l on a.labour_group_code = l.code
-                and a.comp_code = l.comp_code
-                """;
-        return databaseClient.sql(sql)
-                .bind("startDate", startDate)
-                .bind("endDate", enDate)
-                .bind("compCode", compCode)
-                .bind("labourGroupCode", labourGroupCode)
-                .map((row) -> LabourPaymentDetail.builder()
-                        .tranOption(row.get("tran_option", String.class))
-                        .description(row.get("tran_option", String.class))
-                        .qty(row.get("bag", Double.class))
-                        .price(row.get("price", Double.class))
-                        .amount(row.get("amount", Double.class))
-                        .build())
-                .all();
-    }
-
-    public Flux<LabourPaymentDto> history(FilterObject filter) {
+    public Flux<OrderNote> history(FilterObject filter) {
         String compCode = filter.getCompCode();
         boolean deleted = filter.isDeleted();
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
-        String curCode = filter.getCurCode();
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
+        String traderCode = filter.getTraderCode();
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        String orderNo = filter.getOrderNo();
+        String orderName = filter.getOrderName();
         String sql = """
-                select a.*,l.labour_name
-                from (
-                select *
-                from labour_payment
-                where deleted = :deleted
-                and comp_code =:compCode
-                and date(vou_date) between :fromDate and :toDate
-                and cur_code =:curCode
-                and (created_by =:userCode or '-' =:userCode)
-                )a
-                join labour_group l on a.labour_group_code = l.code
-                and a.comp_code = l.comp_code
-                order by a.vou_date desc
+                SELECT *,t.trader_name, s.stock_name FROM
+                order_note o
+                join trader t
+                on t.code = o.trader_code
+                and t.comp_code = o.comp_code
+                join stock s
+                on s.stock_code = o.stock_code
+                and s.comp_code = o.comp_code
+                where date(vou_date) between :fromDate and :toDate
+                and '-' = :traderCode or o.trader_code = :traderCode
+                and '-' = :stockCode or o.stock_code = :stockCode
+                and '-' = :orderNo or o.order_code regexp :orderNo
+                and '' = :orderName or o.order_name regexp :orderName
+                and o.deleted = :deleted
+                and o.comp_code = :compCode;
                 """;
         return databaseClient.sql(sql)
                 .bind("deleted", deleted)
                 .bind("compCode", compCode)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("curCode", curCode)
-                .bind("userCode", userCode)
-                //vou_no, comp_code, dept_id, vou_date, labour_group_code, cur_code,
-                // remark, created_date, created_by, updated_date,
-                // updated_by, deleted, mac_id, account, member_count,
-                // pay_total, source_acc, expense_acc, labour_name
-                .map((row) -> LabourPaymentDto.builder()
+                .bind("traderCode", traderCode)
+                .bind("stockCode", stockCode)
+                .bind("orderNo", orderNo)
+                .bind("orderName", orderName)
+                .map((row) -> OrderNote.builder()
                         .vouNo(row.get("vou_no", String.class))
                         .compCode(row.get("comp_code", String.class))
                         .deptId(row.get("dept_id", Integer.class))
                         .vouDate(row.get("vou_date", LocalDateTime.class))
                         .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
-                        .labourGroupCode(row.get("labour_group_code", String.class))
-                        .curCode(row.get("cur_code", String.class))
-                        .remark(row.get("remark", String.class))
+                        .traderName(row.get("trader_name", String.class))
                         .createdDate(row.get("created_date", LocalDateTime.class))
                         .createdBy(row.get("created_by", String.class))
                         .updatedDate(row.get("updated_date", LocalDateTime.class))
                         .updatedBy(row.get("updated_by", String.class))
                         .deleted(row.get("deleted", Boolean.class))
-                        .memberCount(row.get("member_count", Integer.class))
-                        .payTotal(row.get("pay_total", Double.class))
-                        .sourceAcc(row.get("source_acc", String.class))
-                        .expenseAcc(row.get("expense_acc", String.class))
-                        .labourName(row.get("labour_name", String.class))
-                        .fromDate(row.get("from_date", LocalDate.class))
-                        .toDate(row.get("to_date", LocalDate.class))
-                        .deptCode(row.get("dept_code", String.class))
-                        .post(row.get("post", Boolean.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .orderCode(row.get("order_Code", String.class))
+                        .orderName(row.get("order_name", String.class))
                         .build()).all();
     }
 
-    public Flux<LabourPaymentDetail> getDetail(String vouNo, String compCode) {
+    public Flux<OrderFileJoin> getDetail(String vouNo, String compCode) {
         //vou_no, comp_code, unique_id, description, qty, price, amount, account
         String sql = """
                 select *
-                from labour_payment_detail
+                from order_file_join
                 where vou_no=:vouNo
                 and comp_code=:compCode
                 """;
         return databaseClient.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
-                .map((row) -> LabourPaymentDetail.builder()
+                .map((row) -> OrderFileJoin.builder()
                         .vouNo(row.get("vou_no", String.class))
                         .compCode(row.get("comp_code", String.class))
-                        .uniqueId(row.get("unique_id", Integer.class))
-                        .description(row.get("description", String.class))
-                        .qty(row.get("qty", Double.class))
-                        .price(row.get("price", Double.class))
-                        .amount(row.get("amount", Double.class))
-                        .account(row.get("account", String.class))
-                        .deptCode(row.get("dept_code", String.class))
+                        .fileId(row.get("file_id", String.class))
                         .build())
                 .all();
     }
@@ -331,6 +273,33 @@ public class OrderNoteService {
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(true);
+    }
+
+    public Mono<?> findOrderNote(String vouNo, String compCode) {
+        String sql = """
+                SELECT * from
+                order_note
+                where vou_no = :vouNo and comp_code = :compCode;
+                """;
+        return databaseClient.sql(sql)
+                .bind("compCode", compCode)
+                .bind("vouNo", vouNo)
+                .map((row) -> OrderNote.builder()
+                        .vouNo(row.get("vou_no", String.class))
+                        .compCode(row.get("comp_code", String.class))
+                        .deptId(row.get("dept_id", Integer.class))
+                        .vouDate(row.get("vou_date", LocalDateTime.class))
+                        .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
+                        .createdDate(row.get("created_date", LocalDateTime.class))
+                        .createdBy(row.get("created_by", String.class))
+                        .updatedDate(row.get("updated_date", LocalDateTime.class))
+                        .updatedBy(row.get("updated_by", String.class))
+                        .deleted(row.get("deleted", Boolean.class))
+                        .orderCode(row.get("order_Code", String.class))
+                        .orderName(row.get("order_name", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .stockName(row.get("stock_code", String.class))
+                        .build()).one();
     }
 }
 
