@@ -38,7 +38,7 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
                     "and date(end_date) between '" + fromDate + "' and '" + toDate + "'";
         }
         String sql = """ 
-                select * from Job
+                select * from job
                 where deleted = false
                 and dept_id = ?
                 and comp_code = ?
