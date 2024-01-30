@@ -84,9 +84,7 @@ public class OrderNoteService {
         String sql = """
                 UPDATE order_note
                 SET
-                vou_no = :vouNo,
-                comp_code = :compCode,
-                dept_id = :deptId,
+                dept_id=:deptId,
                 mac_id = :macId,
                 trader_code = :traderCode,
                 stock_code = :stockCode,
@@ -94,11 +92,11 @@ public class OrderNoteService {
                 order_name = :orderName,
                 vou_date = :vouDate,
                 created_date = :createdDate,
-                created_by = :createdBy
+                created_by = :createdBy,
                 updated_date = :updatedDate,
                 updated_by = :updatedBy,
                 deleted = :deleted
-                WHERE vou_no = :vouNo AND comp_code = :compCode;                                                                                              
+                WHERE vou_no = :vouNo AND comp_code = :compCode;
                 """;
         return execute(sql, p);
     }
@@ -173,8 +171,8 @@ public class OrderNoteService {
         String orderNo = filter.getOrderNo();
         String orderName = filter.getOrderName();
         String sql = """
-                SELECT o.*,t.trader_name, s.stock_name FROM
-                order_note o
+                SELECT o.*,t.trader_name, s.stock_name
+                FROM order_note o
                 join trader t
                 on t.code = o.trader_code
                 and t.comp_code = o.comp_code
