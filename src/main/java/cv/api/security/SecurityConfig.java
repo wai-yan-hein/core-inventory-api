@@ -14,7 +14,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -59,7 +58,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationWebFilter webFilter() {
         log.info("webFilter.");
-        AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(new JWTReactiveAuthenticationManager(jwtService));
+        AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(repositoryReactiveAuthenticationManager());
         authenticationWebFilter.setServerAuthenticationConverter(new TokenAuthenticationConverter(jwtService));
         authenticationWebFilter.setRequiresAuthenticationMatcher(new JWTHeadersExchangeMatcher());
         authenticationWebFilter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance());
@@ -82,6 +81,11 @@ public class SecurityConfig {
     public ServerSecurityContextRepository securityContextRepository() {
         return NoOpServerSecurityContextRepository.getInstance(); // Use NoOpServerSecurityContextRepository to disable session management
     }
+    @Bean
+    public JWTReactiveAuthenticationManager repositoryReactiveAuthenticationManager() {
+        return new JWTReactiveAuthenticationManager(null, passwordEncoder());
+    }
+
 
 
     @Bean

@@ -53,13 +53,8 @@ public class AutoUpload {
 
     private void uploadTrader() {
         traderService.unUploadTrader()
-                .collectList()
-                .doOnNext(traders -> {
-                    if (!traders.isEmpty()) {
-                        log.info(String.format("uploadTrader: %s", traders.size()));
-                        traders.forEach(accountRepo::sendTrader);
-                    }
-                }).subscribe();
+                .doOnNext(accountRepo::sendTrader)
+                .subscribe();
     }
 
 

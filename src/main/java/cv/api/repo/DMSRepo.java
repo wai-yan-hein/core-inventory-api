@@ -19,6 +19,7 @@ public class DMSRepo {
 
 
     public Flux<TraderDMSDto> getUpdateTrader(String updatedDate) {
+        log.info("getUpdateTrader : " + updatedDate);
         return dmsApi.get()
                 .uri(builder -> builder.path("/trader/getUpdateTrader")
                         .queryParam("updatedDate", updatedDate)

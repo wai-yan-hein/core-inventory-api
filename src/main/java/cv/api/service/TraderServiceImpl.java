@@ -238,6 +238,20 @@ public class TraderServiceImpl implements TraderService {
     }
 
     @Override
+    public Mono<String> getDMSMaxDate() {
+        String sql = """
+                select max(updated_date) updated_date
+                from trader
+                where mig_code ='DMS'
+                """;
+        return client.sql(sql)
+                .map((row, rowMetadata) -> {
+                    LocalDateTime date = row.get("updated_date", LocalDateTime.class);
+                    return date == null ? Util1.getOldDate() : Util1.toDateTimeStrMYSQL(date);
+                }).one();
+    }
+
+    @Override
     public Flux<Trader> getUpdateTrader(LocalDateTime updatedDate) {
         String sql = """
                 select *
@@ -248,6 +262,7 @@ public class TraderServiceImpl implements TraderService {
                 .bind("updatedDate", updatedDate)
                 .map((row, rowMetadata) -> mapToTrader(row)).all();
     }
+
     @Override
     public Flux<Trader> getUpdateCustomer(LocalDateTime updatedDate) {
         String sql = """
@@ -369,7 +384,7 @@ public class TraderServiceImpl implements TraderService {
                 .bind("code", t.getKey().getCode())
                 .bind("compCode", t.getKey().getCompCode())
                 .bind("deptId", t.getDeptId())
-                .bind("macId", Parameters.in(R2dbcType.INTEGER,t.getMacId()))
+                .bind("macId", Parameters.in(R2dbcType.INTEGER, t.getMacId()))
                 .bind("type", t.getType())
                 .bind("active", t.getActive())
                 .bind("address", Parameters.in(R2dbcType.VARCHAR, t.getAddress()))

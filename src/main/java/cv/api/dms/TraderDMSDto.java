@@ -45,6 +45,7 @@ public class TraderDMSDto {
                 .active(getActive())
                 .deptId(1)
                 .type("CUS")
+                .migCode("DMS")
                 .createdDate(getCreatedDate())
                 .updatedDate(getUpdatedDate())
                 .cashDown(false)

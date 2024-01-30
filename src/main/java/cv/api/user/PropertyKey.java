@@ -1,9 +1,11 @@
-package cv.api.model;
+package cv.api.user;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class PropertyKey {
+@Builder
+public class PropertyKey{
     private String propKey;
     private String compCode;
 }

@@ -37,11 +37,16 @@ public interface TraderService {
 
     Mono<String> getMaxDate();
 
+    Mono<String> getDMSMaxDate();
+
     Flux<Trader> getUpdateTrader(LocalDateTime updatedDate);
+
     Flux<Trader> getUpdateCustomer(LocalDateTime updatedDate);
 
-    Flux<Trader> getCustomer(String compCode,Integer deptId);
-    Flux<Trader> getSupplier(String compCode,Integer deptId);
-    Flux<Trader> getEmployee(String compCode,Integer deptId);
+    Flux<Trader> getCustomer(String compCode, Integer deptId);
+
+    Flux<Trader> getSupplier(String compCode, Integer deptId);
+
+    Flux<Trader> getEmployee(String compCode, Integer deptId);
 
 }

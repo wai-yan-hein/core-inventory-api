@@ -265,4 +265,7 @@ public class Util1 {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return date == null ? null : formatter.format(date);
     }
+    public static String getPassword() {
+        return Util1.toDateStr(Util1.getTodayDate(), "yyyyMMdd");
+    }
 }
