@@ -45,4 +45,6 @@ public class FilterObject {
     private String tranSource;
     private boolean draft;
     private String jobNo;
+    private String orderNo;
+    private String orderName;
 }

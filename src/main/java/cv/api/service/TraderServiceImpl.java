@@ -128,7 +128,7 @@ public class TraderServiceImpl implements TraderService {
                 where active = true
                 and deleted = false
                 and comp_code =:compCode
-                and (dept_id =:deptId or 0 =deptId)
+                and (dept_id =:deptId or 0 =:deptId)
                 and (LOWER(REPLACE(user_code, ' ', '')) like :text or LOWER(REPLACE(trader_name, ' ', '')) like :text)
                 and (multi =1 or type =:type)
                 order by user_code,trader_name
