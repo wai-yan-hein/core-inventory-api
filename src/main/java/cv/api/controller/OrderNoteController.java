@@ -27,9 +27,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class OrderNoteController {
 
-    private final ReturnObject ro = ReturnObject.builder().build();
     private final OrderNoteService orderNoteService;
-    private final AccountRepo accountRepo;
 
     @PostMapping(path = "/saveOrderNote")
     public Mono<?> saveSale(@NotNull @RequestBody OrderNote orderNote) {

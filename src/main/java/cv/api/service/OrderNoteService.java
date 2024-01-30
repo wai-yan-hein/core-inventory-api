@@ -214,6 +214,8 @@ public class OrderNoteService {
                         .stockName(row.get("stock_name", String.class))
                         .orderCode(row.get("order_Code", String.class))
                         .orderName(row.get("order_name", String.class))
+                        .traderCode(row.get("trader_code",String.class))
+                        .stockCode(row.get("stock_code",String.class))
                         .build()).all();
     }
 
