@@ -173,7 +173,7 @@ public class OrderNoteService {
         String orderNo = filter.getOrderNo();
         String orderName = filter.getOrderName();
         String sql = """
-                SELECT *,t.trader_name, s.stock_name FROM
+                SELECT o.*,t.trader_name, s.stock_name FROM
                 order_note o
                 join trader t
                 on t.code = o.trader_code
@@ -182,9 +182,9 @@ public class OrderNoteService {
                 on s.stock_code = o.stock_code
                 and s.comp_code = o.comp_code
                 where date(vou_date) between :fromDate and :toDate
-                and '-' = :traderCode or o.trader_code = :traderCode
-                and '-' = :stockCode or o.stock_code = :stockCode
-                and '-' = :orderNo or o.order_code regexp :orderNo
+                and ('-' = :traderCode or o.trader_code = :traderCode)
+                and ('-' = :stockCode or o.stock_code = :stockCode)
+                and ('-' = :orderNo or o.order_code regexp :orderNo)
                 and ('' = :orderName or o.order_name regexp :orderName)
                 and o.deleted = :deleted
                 and o.comp_code = :compCode
@@ -246,7 +246,7 @@ public class OrderNoteService {
 
     public Mono<Boolean> update(String vouNo, String compCode, String status) {
         String sql = """
-                update labour_payment
+                update order_note
                 set intg_upd_status = :status
                 where vou_no =:vouNo
                 and comp_code = :compCode
@@ -262,7 +262,7 @@ public class OrderNoteService {
 
     public Mono<Boolean> update(String vouNo, String compCode, boolean deleted) {
         String sql = """
-                update labour_payment
+                update order_note
                 set deleted = :deleted
                 where vou_no =:vouNo
                 and comp_code = :compCode

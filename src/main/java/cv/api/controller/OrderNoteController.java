@@ -52,5 +52,9 @@ public class OrderNoteController {
         return orderNoteService.getDetail(vouNo, compCode);
     }
 
+    @GetMapping(path = "/updateOrderNote")
+    public Mono<?> updateOrderNote(@NotNull @RequestParam String vouNo, @RequestParam String compCode, @RequestParam Boolean deleted) {
+        return orderNoteService.update(vouNo, compCode, deleted);
+    }
 
 }
