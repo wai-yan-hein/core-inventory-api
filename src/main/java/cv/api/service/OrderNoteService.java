@@ -185,9 +185,10 @@ public class OrderNoteService {
                 and '-' = :traderCode or o.trader_code = :traderCode
                 and '-' = :stockCode or o.stock_code = :stockCode
                 and '-' = :orderNo or o.order_code regexp :orderNo
-                and '' = :orderName or o.order_name regexp :orderName
+                and ('' = :orderName or o.order_name regexp :orderName)
                 and o.deleted = :deleted
-                and o.comp_code = :compCode;
+                and o.comp_code = :compCode
+                order by o.vou_date desc;
                 """;
         return databaseClient.sql(sql)
                 .bind("deleted", deleted)
