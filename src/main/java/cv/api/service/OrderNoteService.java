@@ -47,22 +47,23 @@ public class OrderNoteService {
 
     }
 
-    private Mono<OrderNote> saveOrUpdate(OrderNote orderNote) {
-        String vouNo = orderNote.getVouNo();
-        String compCode = orderNote.getCompCode();
-        int deptId = orderNote.getDeptId();
-        int macId = orderNote.getMacId();
-        orderNote.setVouDate(Util1.toDateTime(orderNote.getVouDate()));
+    private Mono<OrderNote> saveOrUpdate(OrderNote note) {
+        String vouNo = note.getVouNo();
+        String compCode = note.getCompCode();
+        int deptId = note.getDeptId();
+        int macId = note.getMacId();
+        note.setVouDate(Util1.toDateTime(note.getVouDate()));
         if (vouNo == null) {
             return vouNoService.getVouNo(deptId, "OrderNote", compCode, macId)
                     .flatMap(seqNo -> {
-                        orderNote.setVouNo(seqNo);
-                        orderNote.setCreatedDate(LocalDateTime.now());
-                        orderNote.setUpdatedDate(LocalDateTime.now());
-                        return insert(orderNote);
+                        note.setVouNo(seqNo);
+                        note.setCreatedDate(LocalDateTime.now());
+                        note.setUpdatedDate(LocalDateTime.now());
+                        return insert(note);
                     });
         } else {
-            return update(orderNote);
+            note.setUpdatedDate(Util1.getTodayLocalDate());
+            return update(note);
         }
     }
 
@@ -212,8 +213,8 @@ public class OrderNoteService {
                         .stockName(row.get("stock_name", String.class))
                         .orderCode(row.get("order_Code", String.class))
                         .orderName(row.get("order_name", String.class))
-                        .traderCode(row.get("trader_code",String.class))
-                        .stockCode(row.get("stock_code",String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .stockCode(row.get("stock_code", String.class))
                         .build()).all();
     }
 
@@ -276,7 +277,7 @@ public class OrderNoteService {
                 .thenReturn(true);
     }
 
-    public Mono<?> findOrderNote(String vouNo, String compCode) {
+    public Mono<OrderNote> findOrderNote(String vouNo, String compCode) {
         String sql = """
                 SELECT * from
                 order_note
