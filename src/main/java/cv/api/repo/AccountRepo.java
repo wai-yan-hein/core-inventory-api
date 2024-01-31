@@ -76,7 +76,7 @@ public class AccountRepo {
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
-                    }).block();
+                    }).subscribe();
         }
     }
 

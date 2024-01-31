@@ -53,16 +53,14 @@ public class OrderNoteService {
         int deptId = note.getDeptId();
         int macId = note.getMacId();
         note.setVouDate(Util1.toDateTime(note.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
+            note.setCreatedDate(LocalDateTime.now());
             return vouNoService.getVouNo(deptId, "OrderNote", compCode, macId)
                     .flatMap(seqNo -> {
                         note.setVouNo(seqNo);
-                        note.setCreatedDate(LocalDateTime.now());
-                        note.setUpdatedDate(LocalDateTime.now());
                         return insert(note);
                     });
         } else {
-            note.setUpdatedDate(Util1.getTodayLocalDate());
             return update(note);
         }
     }
@@ -137,7 +135,6 @@ public class OrderNoteService {
                 :updatedBy,
                 :deleted);
                 """;
-
         return execute(sql, p);
     }
 
@@ -149,13 +146,13 @@ public class OrderNoteService {
                 .bind("macId", p.getMacId())
                 .bind("traderCode", p.getTraderCode())
                 .bind("stockCode", p.getStockCode())
-                .bind("orderCode", p.getOrderCode())
-                .bind("orderName", p.getOrderName())
+                .bind("orderCode", Parameters.in(R2dbcType.VARCHAR, p.getOrderCode()))
+                .bind("orderName", Parameters.in(R2dbcType.VARCHAR, p.getOrderName()))
                 .bind("vouDate", p.getVouDate())
                 .bind("createdDate", p.getCreatedDate())
                 .bind("createdBy", p.getCreatedBy())
-                .bind("updatedDate", p.getUpdatedDate())
-                .bind("updatedBy", p.getUpdatedBy())
+                .bind("updatedDate", Parameters.in(R2dbcType.TIMESTAMP, p.getUpdatedDate()))
+                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, p.getUpdatedBy()))
                 .bind("deleted", p.getDeleted())
                 .fetch()
                 .rowsUpdated()
