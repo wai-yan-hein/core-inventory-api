@@ -37,6 +37,7 @@ public class ReportServiceImpl implements ReportService {
     private final SaleHisService saleHisService;
     private final LandingHisPriceDao landingHisPriceDao;
     private final DatabaseClient client;
+    private final OPHisService opHisService;
 
     @Override
     public void executeSql(String... sql) {
@@ -1537,6 +1538,39 @@ public class ReportServiceImpl implements ReportService {
             log.error(String.format("getStockIORecentPrice: %s", e.getMessage()));
         }
         return general;
+    }
+
+    @Override
+    public Mono<General> getWeightAvgPrice(String stockCode,String locCode, String compCode) {
+        String sql= """
+                select stock_code,comp_code,sum(amount)/sum(qty) price
+                from  (
+                select stock_code,comp_code,sum(qty) qty,sum(amount) amount
+                from v_opening
+                where deleted =false
+                and date(op_date)=:opDate
+                and comp_code =:compCode
+                and stock_code =:stockCode
+                group by stock_code,comp_code
+                	union all
+                select stock_code,comp_code,sum(qty) qty,sum(pur_amt) amount
+                from v_purchase
+                where deleted =false
+                and comp_code =:compCode
+                and stock_code =:stockCode
+                group by stock_code,comp_code
+                )a
+                group by stock_code,comp_code
+                """;
+        return opHisService.getOpeningDateByLocation(compCode,locCode)
+                .flatMap(opDate -> client.sql(sql)
+                        .bind("opDate",opDate)
+                        .bind("compCode",compCode)
+                        .bind("stockCode",stockCode)
+                        .map((row) -> General.builder()
+                                .amount(Util1.getDouble(row.get("price",Double.class)))
+                                .build())
+                        .one());
     }
 
     private void calStockBalanceByLocation(String opDate, String clDate, String typeCode, String cateCode,

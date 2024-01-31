@@ -98,9 +98,10 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
     @Override
     public Flux<StockInOutDetailDto> searchByJob(String jobCode, String compCode) {
         String sql = """
-                select a.*,round( a.tot_weight / (in_tot_qty + out_tot_qty),3) avg_weight
+                select a.*,round( a.tot_weight / (in_tot_qty + out_tot_qty),3) avg_weight,
                 from (
-                select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,op.*,s.user_code,s.stock_name,st.finished_group
+                select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,
+                op.*,s.user_code,s.stock_name,st.finished_group
                 from stock_in_out_detail op
                 join stock_in_out l on op.vou_no = l.vou_no
                 and op.comp_code = l.comp_code

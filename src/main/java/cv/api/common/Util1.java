@@ -109,6 +109,13 @@ public class Util1 {
 
         return strDate;
     }
+    public static String toDateStr(LocalDate date, String format) {
+        if (date == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        return date.format(formatter);
+    }
 
     public static String toDateStr(LocalDateTime dateTime, String format) {
         if (dateTime == null) {

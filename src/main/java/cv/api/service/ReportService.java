@@ -105,6 +105,8 @@ public interface ReportService {
     General getSaleRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
     General getStockIORecentPrice(String stockCode, String purDate, String unit);
+    Mono<General> getWeightAvgPrice(String stockCode,String locCode, String compCode);
+
 
     List<VStockBalance> getStockBalance(String opDate, String clDate, String typeCode, String catCode, String brandCode, String stockCode,
                                         boolean calSale, boolean calPur, boolean calRI, boolean calRO,

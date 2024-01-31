@@ -489,6 +489,13 @@ public class ReportController {
         return Mono.justOrEmpty(reportService.getStockIORecentPrice(stockCode, vouDate, unit));
     }
 
+    @GetMapping(path = "/getWeightAvgPrice")
+    public Mono<General> getWeightAvgPrice(@RequestParam String stockCode,
+                                               @RequestParam String locCode,
+                                               @RequestParam String compCode) {
+        return reportService.getWeightAvgPrice(stockCode, locCode, compCode);
+    }
+
     @GetMapping(path = "/getStockBalance")
     public Flux<?> getStockBalance(@RequestParam String stockCode,
                                    @RequestParam boolean calSale, @RequestParam boolean calPur,

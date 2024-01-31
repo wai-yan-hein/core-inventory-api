@@ -280,7 +280,7 @@ public class AccountRepo {
                     String payAcc = Util1.isNull(sh.getCashAcc(), Util1.isNull(ls.getCashAcc(), setting.getPayAcc()));
                     String deptCode = Util1.isNull(sh.getDeptCode(), Util1.isNull(ls.getDeptCode(), setting.getDeptCode()));
                     String srcAcc = Util1.isNull(sh.getSaleAcc(), setting.getSourceAcc());
-                    String balAcc = Util1.isNull(sh.getDebtorAcc(), setting.getBalanceAcc());
+                    String balAcc = Util1.isNull(sh.getDebtorAcc(), Util1.isNull(t.getAccount(), setting.getBalanceAcc()));
                     String disAcc = setting.getDiscountAcc();
                     String taxAcc = setting.getTaxAcc();
                     LocalDateTime vouDate = sh.getVouDate();
@@ -295,22 +295,16 @@ public class AccountRepo {
                     double vouTax = Util1.getDouble(sh.getTaxAmt());
                     double taxPercent = Util1.getDouble(sh.getTaxPercent());
                     Integer deptId = sh.getDeptId();
-
-                    if (t != null) {
-                        //income by trader group
-                        String groupCode = t.getGroupCode();
-                        TraderGroupKey key = new TraderGroupKey();
-                        key.setGroupCode(groupCode);
-                        key.setCompCode(compCode);
-                        key.setDeptId(deptId);
-                        TraderGroup g = groupService.findById(key);
-                        if (g != null) {
-                            if (!Util1.isNullOrEmpty(g.getAccount())) {
-                                srcAcc = g.getAccount();
-                            }
-                        }
-                        if (!Util1.isNullOrEmpty(t.getAccount())) {
-                            balAcc = t.getAccount();
+                    //income by trader group
+                    String groupCode = t.getGroupCode();
+                    TraderGroupKey groupKey = new TraderGroupKey();
+                    groupKey.setGroupCode(groupCode);
+                    groupKey.setCompCode(compCode);
+                    groupKey.setDeptId(deptId);
+                    TraderGroup g = groupService.findById(groupKey);
+                    if (g != null) {
+                        if (!Util1.isNullOrEmpty(g.getAccount())) {
+                            srcAcc = g.getAccount();
                         }
                     }
                     String batchNo = "";
@@ -491,7 +485,7 @@ public class AccountRepo {
                     String payAcc = Util1.isNull(ph.getCashAcc(), Util1.isNull(ls.getCashAcc(), setting.getPayAcc()));
                     String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                     String srcAcc = Util1.isNull(ph.getPurchaseAcc(), setting.getSourceAcc());
-                    String balAcc = Util1.isNull(ph.getPayableAcc(), setting.getBalanceAcc());
+                    String balAcc = Util1.isNull(ph.getPayableAcc(), Util1.isNull(t.getAccount(), setting.getBalanceAcc()));
                     String commAcc = setting.getCommAcc();
                     String disAcc = setting.getDiscountAcc();
                     LocalDateTime vouDate = ph.getVouDate();
@@ -508,10 +502,6 @@ public class AccountRepo {
                     String batchNo = ph.getBatchNo();
                     String projectNo = ph.getProjectNo();
                     Integer deptId = ph.getDeptId();
-                    if (t != null) {
-                        balAcc = Util1.isNull(t.getAccount(), balAcc);
-                    }
-                    balAcc = Util1.isNull(ph.getPayableAcc(), balAcc);
                     List<Gl> listGl = new ArrayList<>();
                     //income
                     if (vouTotal > 0) {
@@ -681,7 +671,7 @@ public class AccountRepo {
                     String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
                     String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                     String srcAcc = setting.getSourceAcc();
-                    String balAcc = setting.getBalanceAcc();
+                    String balAcc = Util1.isNull(t.getAccount(), setting.getBalanceAcc());
                     LocalDateTime vouDate = ri.getVouDate();
                     String curCode = ri.getCurCode();
                     String remark = ri.getRemark();
@@ -691,10 +681,7 @@ public class AccountRepo {
                     double vouTotal = Util1.getDouble(ri.getVouTotal());
                     double vouPaid = Util1.getDouble(ri.getPaid());
                     Integer deptId = ri.getDeptId();
-                    String traderName = t == null ? "" : t.getTraderName();
-                    if (t != null) {
-                        balAcc = Util1.isNull(t.getAccount(), balAcc);
-                    }
+                    String traderName = t.getTraderName();
                     List<Gl> listGl = new ArrayList<>();
                     //income
                     if (vouTotal > 0) {
@@ -769,7 +756,7 @@ public class AccountRepo {
                     String payAcc = Util1.isNull(ls.getCashAcc(), setting.getPayAcc());
                     String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                     String srcAcc = setting.getSourceAcc();
-                    String balAcc = setting.getBalanceAcc();
+                    String balAcc = Util1.isNull(t.getAccount(), setting.getBalanceAcc());
                     LocalDateTime vouDate = ro.getVouDate();
                     String curCode = ro.getCurCode();
                     String remark = ro.getRemark();
@@ -779,10 +766,7 @@ public class AccountRepo {
                     double vouTotal = Util1.getDouble(ro.getVouTotal());
                     double vouPaid = Util1.getDouble(ro.getPaid());
                     Integer deptId = ro.getDeptId();
-                    String traderName = t == null ? "" : t.getTraderName();
-                    if (t != null) {
-                        balAcc = Util1.isNull(t.getAccount(), balAcc);
-                    }
+                    String traderName = t.getTraderName();
                     List<Gl> listGl = new ArrayList<>();
                     //income
                     if (vouTotal > 0) {
