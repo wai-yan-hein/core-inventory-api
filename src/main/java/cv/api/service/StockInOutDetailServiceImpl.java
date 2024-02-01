@@ -99,8 +99,10 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
     public Flux<StockInOutDetailDto> searchByJob(String jobCode, String compCode) {
         String sql = """
                 select a.*,round( a.tot_weight / (in_tot_qty + out_tot_qty),3) avg_weight,
+                round( a.ttl_amt / (in_tot_qty + out_tot_qty),3) price
                 from (
                 select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,
+                sum(amount) ttl_amt,
                 op.*,s.user_code,s.stock_name,st.finished_group
                 from stock_in_out_detail op
                 join stock_in_out l on op.vou_no = l.vou_no
@@ -113,7 +115,7 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
                 and l.comp_code =:compCode
                 and l.deleted = false
                 group by op.stock_code,weight_unit,in_unit,out_unit)a
-                order by a.finished_group desc,a.vou_no,a.unique_id;
+                order by a.finished_group desc,a.vou_no,a.unique_id
                 """;
         return client.sql(sql)
                 .bind("jobCode", jobCode)
@@ -132,7 +134,7 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
                         .outUnitCode(row.get("out_unit", String.class))
                         .userCode(row.get("user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
-                        .costPrice(row.get("cost_price", Double.class))
+                        .costPrice(row.get("price", Double.class))
                         .weight(row.get("avg_weight", Double.class))
                         .weightUnit(row.get("weight_unit", String.class))
                         .totalWeight(row.get("tot_weight", Double.class))
