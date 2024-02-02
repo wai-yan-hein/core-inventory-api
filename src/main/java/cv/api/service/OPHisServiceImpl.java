@@ -5,22 +5,26 @@ import cv.api.dao.OPHisDao;
 import cv.api.dao.OPHisDetailDao;
 import cv.api.dao.SeqTableDao;
 import cv.api.entity.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
+import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OPHisServiceImpl implements OPHisService {
-    @Autowired
-    private OPHisDao opHisDao;
-    @Autowired
-    private OPHisDetailDao opHisDetailDao;
-    @Autowired
-    private SeqTableDao seqDao;
+    private final OPHisDao opHisDao;
+    private final OPHisDetailDao opHisDetailDao;
+    private final SeqTableDao seqDao;
+    private final DatabaseClient client;
 
     @Override
     public OPHis save(OPHis op) {
@@ -31,7 +35,7 @@ public class OPHisServiceImpl implements OPHisService {
         List<OPHisDetailKey> listDel = op.getListDel();
         String vouNo = op.getKey().getVouNo();
         if (listDel != null) {
-            listDel.forEach(key -> opHisDetailDao.delete(key));
+            listDel.forEach(opHisDetailDao::delete);
         }
         for (int i = 0; i < listSD.size(); i++) {
             OPHisDetail cSd = listSD.get(i);
@@ -93,9 +97,22 @@ public class OPHisServiceImpl implements OPHisService {
     }
 
     @Override
-    public List<OPHis> search(String updatedDate, List<LocationKey> keys) {
-        return opHisDao.search(updatedDate, keys);
+    public Mono<String> getOpeningDateByLocation(String compCode, String locCode) {
+        String defaultOpDate = "1998-10-07";
+        String sql = """
+                select max(op_date) op_date
+                from op_his
+                where deleted = false
+                and comp_code =:compCode
+                and loc_code =:locCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("locCode", locCode)
+                .map((row, rowMetadata) -> {
+                    LocalDate opDate = row.get("op_date", LocalDate.class);
+                    return opDate != null ? Util1.toDateStr(opDate, "yyyy-MM-dd") : defaultOpDate;
+                }).one();
     }
-
 
 }

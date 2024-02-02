@@ -47,22 +47,21 @@ public class OrderNoteService {
 
     }
 
-    private Mono<OrderNote> saveOrUpdate(OrderNote orderNote) {
-        String vouNo = orderNote.getVouNo();
-        String compCode = orderNote.getCompCode();
-        int deptId = orderNote.getDeptId();
-        int macId = orderNote.getMacId();
-        orderNote.setVouDate(Util1.toDateTime(orderNote.getVouDate()));
-        if (vouNo == null) {
+    private Mono<OrderNote> saveOrUpdate(OrderNote note) {
+        String vouNo = note.getVouNo();
+        String compCode = note.getCompCode();
+        int deptId = note.getDeptId();
+        int macId = note.getMacId();
+        note.setVouDate(Util1.toDateTime(note.getVouDate()));
+        if (Util1.isNullOrEmpty(vouNo)) {
+            note.setCreatedDate(LocalDateTime.now());
             return vouNoService.getVouNo(deptId, "OrderNote", compCode, macId)
                     .flatMap(seqNo -> {
-                        orderNote.setVouNo(seqNo);
-                        orderNote.setCreatedDate(LocalDateTime.now());
-                        orderNote.setUpdatedDate(LocalDateTime.now());
-                        return insert(orderNote);
+                        note.setVouNo(seqNo);
+                        return insert(note);
                     });
         } else {
-            return update(orderNote);
+            return update(note);
         }
     }
 
@@ -136,7 +135,6 @@ public class OrderNoteService {
                 :updatedBy,
                 :deleted);
                 """;
-
         return execute(sql, p);
     }
 
@@ -148,13 +146,13 @@ public class OrderNoteService {
                 .bind("macId", p.getMacId())
                 .bind("traderCode", p.getTraderCode())
                 .bind("stockCode", p.getStockCode())
-                .bind("orderCode", p.getOrderCode())
-                .bind("orderName", p.getOrderName())
+                .bind("orderCode", Parameters.in(R2dbcType.VARCHAR, p.getOrderCode()))
+                .bind("orderName", Parameters.in(R2dbcType.VARCHAR, p.getOrderName()))
                 .bind("vouDate", p.getVouDate())
                 .bind("createdDate", p.getCreatedDate())
                 .bind("createdBy", p.getCreatedBy())
-                .bind("updatedDate", p.getUpdatedDate())
-                .bind("updatedBy", p.getUpdatedBy())
+                .bind("updatedDate", Parameters.in(R2dbcType.TIMESTAMP, p.getUpdatedDate()))
+                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, p.getUpdatedBy()))
                 .bind("deleted", p.getDeleted())
                 .fetch()
                 .rowsUpdated()
@@ -212,8 +210,8 @@ public class OrderNoteService {
                         .stockName(row.get("stock_name", String.class))
                         .orderCode(row.get("order_Code", String.class))
                         .orderName(row.get("order_name", String.class))
-                        .traderCode(row.get("trader_code",String.class))
-                        .stockCode(row.get("stock_code",String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .stockCode(row.get("stock_code", String.class))
                         .build()).all();
     }
 
@@ -276,7 +274,7 @@ public class OrderNoteService {
                 .thenReturn(true);
     }
 
-    public Mono<?> findOrderNote(String vouNo, String compCode) {
+    public Mono<OrderNote> findOrderNote(String vouNo, String compCode) {
         String sql = """
                 SELECT * from
                 order_note

@@ -123,14 +123,14 @@ public class TraderServiceImpl implements TraderService {
         text = Util1.cleanStr(text);
         text = text + "%";
         String sql = """
-                select code,user_code,trader_name,price_type,type,address,credit_amt,credit_days
+                select code,user_code,trader_name,price_type,type,address,credit_amt,credit_days,account
                 from trader
                 where active = true
                 and deleted = false
                 and comp_code =:compCode
                 and (dept_id =:deptId or 0 =:deptId)
                 and (LOWER(REPLACE(user_code, ' ', '')) like :text or LOWER(REPLACE(trader_name, ' ', '')) like :text)
-                and (multi =1 or type =:type)
+                and (multi =1 or :type =:type)
                 order by user_code,trader_name
                 limit 100
                 """;
@@ -151,6 +151,7 @@ public class TraderServiceImpl implements TraderService {
                         .address(row.get("address", String.class))
                         .creditAmt(row.get("credit_amt", Double.class))
                         .creditDays(row.get("credit_days", Integer.class))
+                        .account(row.get("account",String.class))
                         .build()).all();
     }
 

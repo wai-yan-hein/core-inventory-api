@@ -46,7 +46,6 @@ public class StockInOutServiceImpl implements StockInOutService {
         if (Util1.isNullOrEmpty(io.getKey().getVouNo())) {
             io.getKey().setVouNo(getVoucherNo(io.getDeptId(), io.getMacId(), io.getKey().getCompCode()));
         }
-
         List<StockInOutDetail> listSD = io.getListSH();
         List<StockInOutKey> listDel = io.getListDel();
         String vouNo = io.getKey().getVouNo();
