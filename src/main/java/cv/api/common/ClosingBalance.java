@@ -61,6 +61,32 @@ public class ClosingBalance {
     private Double balBag;
     private String balBagRel;
 
+    private Double openWet;
+    private String openWetRel;
+    private Double purWet;
+    private String purWetRel;
+    private Double inWet;
+    private String inWetRel;
+    private Double outWet;
+    private String outWetRel;
+    private Double saleWet;
+    private String saleWetRel;
+    private Double balWet;
+    private String balWetRel;
+
+    private Double openRice;
+    private String openRiceRel;
+    private Double purRice;
+    private String purRiceRel;
+    private Double inRice;
+    private String inRiceRel;
+    private Double outRice;
+    private String outRiceRel;
+    private Double saleRice;
+    private String saleRiceRel;
+    private Double balRice;
+    private String balRiceRel;
+
     private String groupName;
     private String remark;
     private String compCode;
@@ -72,8 +98,8 @@ public class ClosingBalance {
     private String traderName;
 
     private String locName;
-    private Double wet;
-    private Double rice;
+//    private Double wet;
+//    private Double rice;
     private Double bag;
     private Double price;
     private String warehouse;
