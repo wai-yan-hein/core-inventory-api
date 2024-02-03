@@ -34,7 +34,7 @@ public class StockPaymentService {
             List<StockPaymentDetail> list = dto.getListDetail();
             if (list != null && !list.isEmpty()) {
                 return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getPayQty())> 0 || Util1.getDouble(detail.getPayBag())>0)
+                        .filter(detail -> Util1.getDouble(detail.getPayQty()) > 0 || Util1.getDouble(detail.getPayBag()) > 0)
                         .concatMap(detail -> {
                             int uniqueId = list.indexOf(detail) + 1;
                             detail.setUniqueId(uniqueId);
@@ -247,40 +247,80 @@ public class StockPaymentService {
 
     public Flux<StockPaymentDetail> calculatePaymentQty(String traderCode, String compCode, String tranOption) {
         // group type 1 is for paddy
-        String sql = """
-                select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
-                sh.s_user_code,sh.stock_name,
-                sh.qty,b.bal_qty
-                from (
-                select vou_no,stock_code,sum(qty) bal_qty,comp_code
-                from (
-                select vou_no,stock_code,qty,comp_code
-                from v_sale
-                where trader_code=:traderCode
-                and comp_code =:compCode
-                and deleted = false
-                and group_type =1
-                and qty>0
-                  union all
-                select phd.ref_no,stock_code,phd.pay_qty*-1,pd.comp_code
-                from stock_payment pd join stock_payment_detail phd
-                on pd.vou_no = phd.vou_no
-                and pd.comp_code = phd.comp_code
-                where pd.trader_code=:traderCode
-                and pd.comp_code =:compCode
-                and pd.tran_option =:tranOption
-                and pd.deleted = false
-                and phd.pay_qty>0
-                )a
-                group by vou_no,stock_code
-                )b
-                join v_sale sh
-                on b.vou_no = sh.vou_no
-                and b.stock_code = sh.stock_code
-                and b.comp_code = sh.comp_code
-                having bal_qty <>0
-                order by vou_date
-                """;
+        String sql;
+        if (tranOption.equals("C")) {
+            sql = """
+                    select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
+                    sh.s_user_code,sh.stock_name,
+                    sh.qty,b.bal_qty
+                    from (
+                    select vou_no,stock_code,sum(qty) bal_qty,comp_code
+                    from (
+                    select vou_no,stock_code,qty,comp_code
+                    from v_sale
+                    where trader_code=:traderCode
+                    and comp_code =:compCode
+                    and deleted = false
+                    and group_type =1
+                    and s_pay = true
+                    and qty>0
+                      union all
+                    select phd.ref_no,stock_code,phd.pay_qty*-1,pd.comp_code
+                    from stock_payment pd join stock_payment_detail phd
+                    on pd.vou_no = phd.vou_no
+                    and pd.comp_code = phd.comp_code
+                    where pd.trader_code=:traderCode
+                    and pd.comp_code =:compCode
+                    and pd.tran_option =:tranOption
+                    and pd.deleted = false
+                    and phd.pay_qty>0
+                    )a
+                    group by vou_no,stock_code
+                    )b
+                    join v_sale sh
+                    on b.vou_no = sh.vou_no
+                    and b.stock_code = sh.stock_code
+                    and b.comp_code = sh.comp_code
+                    having bal_qty <>0
+                    order by vou_date
+                    """;
+        } else {
+            sql = """
+                    select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
+                    sh.s_user_code,sh.stock_name,
+                    sh.qty,b.bal_qty
+                    from (
+                    select vou_no,stock_code,sum(qty) bal_qty,comp_code
+                    from (
+                    select vou_no,stock_code,qty,comp_code
+                    from v_purchase
+                    where trader_code=:traderCode
+                    and comp_code =:compCode
+                    and deleted = false
+                    and group_type =1
+                    and s_rec = true
+                    and qty>0
+                      union all
+                    select phd.ref_no,stock_code,phd.pay_qty*-1,pd.comp_code
+                    from stock_payment pd join stock_payment_detail phd
+                    on pd.vou_no = phd.vou_no
+                    and pd.comp_code = phd.comp_code
+                    where pd.trader_code=:traderCode
+                    and pd.comp_code =:compCode
+                    and pd.tran_option =:tranOption
+                    and pd.deleted = false
+                    and phd.pay_qty>0
+                    )a
+                    group by vou_no,stock_code
+                    )b
+                    join v_purchase sh
+                    on b.vou_no = sh.vou_no
+                    and b.stock_code = sh.stock_code
+                    and b.comp_code = sh.comp_code
+                    having bal_qty <>0
+                    order by vou_date
+                    """;
+        }
         //vou_date, reference, remark, vou_no, qty, bag, bal_qty, bal_bag
         return client.sql(sql)
                 .bind("compCode", compCode)
@@ -300,42 +340,83 @@ public class StockPaymentService {
                         .build())
                 .all();
     }
+
     public Flux<StockPaymentDetail> calculatePaymentBag(String traderCode, String compCode, String tranOption) {
         // group type 2 is for rice
-        String sql = """
-                select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
-                sh.s_user_code,sh.stock_name,
-                sh.bag,b.bal_bag
-                from (
-                select vou_no,stock_code,sum(bag) bal_bag,comp_code
-                from (
-                select vou_no,stock_code,bag,comp_code
-                from v_sale
-                where trader_code=:traderCode
-                and comp_code =:compCode
-                and deleted = false
-                and group_type =2
-                and bag>0
-                  union all
-                select phd.ref_no,stock_code,phd.pay_bag*-1,pd.comp_code
-                from stock_payment pd join stock_payment_detail phd
-                on pd.vou_no = phd.vou_no
-                and pd.comp_code = phd.comp_code
-                where pd.trader_code=:traderCode
-                and pd.comp_code =:compCode
-                and pd.tran_option =:tranOption
-                and pd.deleted = false
-                and phd.pay_bag > 0
-                )a
-                group by vou_no,stock_code
-                )b
-                join v_sale sh
-                on b.vou_no = sh.vou_no
-                and b.stock_code = sh.stock_code
-                and b.comp_code = sh.comp_code
-                having bal_bag <>0
-                order by vou_date
-                """;
+        String sql;
+        if (tranOption.equals("C")) {
+            sql = """
+                    select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
+                    sh.s_user_code,sh.stock_name,
+                    sh.bag,b.bal_bag
+                    from (
+                    select vou_no,stock_code,sum(bag) bal_bag,comp_code
+                    from (
+                    select vou_no,stock_code,bag,comp_code
+                    from v_sale
+                    where trader_code=:traderCode
+                    and comp_code =:compCode
+                    and deleted = false
+                    and s_pay = true
+                    and group_type =2
+                    and bag>0
+                      union all
+                    select phd.ref_no,stock_code,phd.pay_bag*-1,pd.comp_code
+                    from stock_payment pd join stock_payment_detail phd
+                    on pd.vou_no = phd.vou_no
+                    and pd.comp_code = phd.comp_code
+                    where pd.trader_code=:traderCode
+                    and pd.comp_code =:compCode
+                    and pd.tran_option =:tranOption
+                    and pd.deleted = false
+                    and phd.pay_bag > 0
+                    )a
+                    group by vou_no,stock_code
+                    )b
+                    join v_sale sh
+                    on b.vou_no = sh.vou_no
+                    and b.stock_code = sh.stock_code
+                    and b.comp_code = sh.comp_code
+                    having bal_bag <>0
+                    order by vou_date
+                    """;
+        } else {
+            sql = """
+                    select sh.project_no,sh.vou_date,sh.reference,sh.remark,b.vou_no,b.stock_code,
+                    sh.s_user_code,sh.stock_name,
+                    sh.bag,b.bal_bag
+                    from (
+                    select vou_no,stock_code,sum(bag) bal_bag,comp_code
+                    from (
+                    select vou_no,stock_code,bag,comp_code
+                    from v_purchase
+                    where trader_code=:traderCode
+                    and comp_code =:compCode
+                    and deleted = false
+                    and s_rec = true
+                    and group_type =2
+                    and bag>0
+                      union all
+                    select phd.ref_no,stock_code,phd.pay_bag*-1,pd.comp_code
+                    from stock_payment pd join stock_payment_detail phd
+                    on pd.vou_no = phd.vou_no
+                    and pd.comp_code = phd.comp_code
+                    where pd.trader_code=:traderCode
+                    and pd.comp_code =:compCode
+                    and pd.tran_option =:tranOption
+                    and pd.deleted = false
+                    and phd.pay_bag > 0
+                    )a
+                    group by vou_no,stock_code
+                    )b
+                    join v_purchase sh
+                    on b.vou_no = sh.vou_no
+                    and b.stock_code = sh.stock_code
+                    and b.comp_code = sh.comp_code
+                    having bal_bag <>0
+                    order by vou_date
+                    """;
+        }
         //vou_date, reference, remark, vou_no, qty, bag, bal_qty, bal_bag
         return client.sql(sql)
                 .bind("compCode", compCode)
@@ -418,7 +499,7 @@ public class StockPaymentService {
                             .payBag(row.get("pay_bag", Double.class))
                             .createdDate(row.get("created_date", LocalDateTime.class))
                             .createdBy(row.get("created_by", String.class))
-                            .locCode(row.get("loc_code",String.class))
+                            .locCode(row.get("loc_code", String.class))
                             .build()).all();
         }
         //vou_no, comp_code, dept_id, vou_date, trader_code, remark, deleted,

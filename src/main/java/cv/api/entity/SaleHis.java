@@ -108,6 +108,10 @@ public class SaleHis {
     private String weightVouNo;
     @Column(name = "post")
     private boolean post;
+    @Column(name = "s_pay")
+    private boolean sPay;
+    @Column(name = "tran_source")
+    private int tranSource;
     @Transient
     private String status = "STATUS";
     @Transient

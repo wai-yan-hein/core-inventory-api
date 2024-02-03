@@ -51,13 +51,28 @@ public class StockReportService {
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
+                 and s_rec = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code
-                 union all
+                    union all
+                 select stock_code,sum(total_weight) weight,sum(qty) qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
+                 from v_sale
+                 where date(vou_date) >= '2023-12-01' and date(vou_date)<'2024-12-01'
+                 and comp_code ='01'
+                 and deleted = false
+                 and calculate = true
+                 and s_pay = false
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (cat_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 group by stock_code, loc_code
+                    union all
                  select stock_code,0,sum(pay_qty)*-1 qty, 0, 0, sum(pay_bag)*-1, loc_code, '-',0
                  from v_stock_payment
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
@@ -153,11 +168,27 @@ public class StockReportService {
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
                 and calculate = true
+                and s_rec = false
                 and comp_code =:compCode
                 and loc_code in (select f_code from f_location where mac_id =:macId)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                group by date(vou_date),vou_no,stock_code,loc_code""";
+        String saleSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,wet,rice,out_bag,out_weight,ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0) ttl_weight,sum(sale_price),loc_code,:macId,comp_code,dept_id
+                from v_sale
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and s_pay = false
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (cat_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String tfSql = """
@@ -244,6 +275,16 @@ public class StockReportService {
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .fetch().rowsUpdated();
+        Mono<Long> saleMono = client.sql(saleSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated();
 // Continue with the existing code...
 
         Mono<Long> tfMono = client.sql(tfSql)
@@ -311,6 +352,9 @@ public class StockReportService {
                 .then(purMono)
                 .doOnSuccess(rowsUpdated -> log.info("Purchase rows updated: " + rowsUpdated))
                 .doOnError(e -> log.error("Error in Purchase: " + e.getMessage(), e))
+                .then(saleMono)
+                .doOnSuccess(rowsUpdated -> log.info("Sale rows updated: " + rowsUpdated))
+                .doOnError(e -> log.error("Error in Sale: " + e.getMessage(), e))
                 .then(tfMono)
                 .doOnSuccess(rowsUpdated -> log.info("Transfer-F rows updated: " + rowsUpdated))
                 .doOnError(e -> log.error("Error in Transfer-F: " + e.getMessage(), e))

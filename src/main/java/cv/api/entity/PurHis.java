@@ -104,6 +104,10 @@ public class PurHis {
     private String deptCode;
     @Column(name = "grand_total")
     private Double grandTotal;
+    @Column(name = "s_rec")
+    private boolean sRec;
+    @Column(name = "tran_source")
+    private int tranSource;
     @Transient
     private String status = "STATUS";
     @Transient
