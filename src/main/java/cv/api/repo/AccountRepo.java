@@ -214,6 +214,8 @@ public class AccountRepo {
                 accTrader.setMacId(macId);
                 accTrader.setAccount(t.getAccount());
                 accTrader.setDeleted(t.getDeleted());
+                accTrader.setCreatedDate(t.getCreatedDate());
+                accTrader.setCreatedBy(t.getCreatedBy());
                 switch (traderType) {
                     case "CUS" -> accTrader.setTraderType("C");
                     case "SUP" -> accTrader.setTraderType("S");
