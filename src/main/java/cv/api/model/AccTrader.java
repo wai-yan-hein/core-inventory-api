@@ -2,6 +2,8 @@ package cv.api.model;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class AccTrader implements java.io.Serializable {
     private AccTraderKey key;
@@ -13,7 +15,8 @@ public class AccTrader implements java.io.Serializable {
     private Integer macId;
     private String account;
     private boolean deleted;
-
+    private LocalDateTime createdDate;
+    private String createdBy;
     public AccTrader() {
     }
 }

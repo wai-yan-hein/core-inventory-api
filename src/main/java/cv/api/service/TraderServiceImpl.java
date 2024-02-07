@@ -21,7 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * @author WSwe
@@ -33,7 +33,6 @@ import java.util.List;
 public class TraderServiceImpl implements TraderService {
 
     private final SeqTableService seqService;
-    private final ReportService reportService;
     private final DatabaseClient client;
 
 
@@ -151,7 +150,7 @@ public class TraderServiceImpl implements TraderService {
                         .address(row.get("address", String.class))
                         .creditAmt(row.get("credit_amt", Double.class))
                         .creditDays(row.get("credit_days", Integer.class))
-                        .account(row.get("account",String.class))
+                        .account(row.get("account", String.class))
                         .build()).all();
     }
 
@@ -193,25 +192,65 @@ public class TraderServiceImpl implements TraderService {
 
     @Override
     public Flux<General> delete(TraderKey key) {
-        List<General> list = reportService.isTraderExist(key.getCode(), key.getCompCode());
-        if (list.isEmpty()) {
-            deleteTrader(key);
-        }
-        return Flux.fromIterable(list);
+        return searchVoucher(key.getCode(), key.getCompCode())
+                .collectList()
+                .flatMapMany(list -> {
+                    if (list.isEmpty()) {
+                        return deleteTrader(key)
+                                .thenMany(Flux.empty());
+                    } else {
+                        return Flux.fromIterable(list);
+                    }
+                });
     }
 
-    private void deleteTrader(TraderKey key) {
+
+    private Flux<General> searchVoucher(String traderCode, String compCode) {
+        HashMap<String, String> hm = new HashMap<>();
+        hm.put("sale_his", "Sale");
+        hm.put("pur_his", "Purchase");
+        hm.put("ret_in_his", "Return In");
+        hm.put("ret_out_his", "Return Out");
+
+        return Flux.fromIterable(hm.entrySet())
+                .flatMap(entry -> {
+                    String tableName = entry.getKey();
+                    String transactionType = entry.getValue();
+
+                    String sql = """
+                            SELECT COUNT(*) AS count
+                            FROM %s
+                            WHERE deleted = false
+                            AND trader_code = :traderCode
+                            AND comp_code = :compCode""";
+                    sql = String.format(sql, tableName);
+                    return client.sql(sql)
+                            .bind("traderCode", traderCode)
+                            .bind("compCode", compCode)
+                            .map(row -> {
+                                Integer count = row.get("count", Integer.class);
+                                if (count != null && count > 0) {
+                                    return General.builder().message("Transaction exists in " + transactionType).build();
+                                }
+                                return General.builder().build();
+                            }).all();
+                })
+                .filter(general -> general.getMessage() != null);
+    }
+
+
+    private Mono<Boolean> deleteTrader(TraderKey key) {
         String sql = """
                 update trader
                 set deleted = true
                 where code =:code
                 and comp_code=:compCode
                 """;
-        client.sql(sql)
+        return client.sql(sql)
                 .bind("code", key.getCode())
                 .bind("compCode", key.getCompCode())
                 .fetch()
-                .rowsUpdated().then();
+                .rowsUpdated().thenReturn(true);
     }
 
     @Override
@@ -284,6 +323,7 @@ public class TraderServiceImpl implements TraderService {
                 from trader
                 where comp_code =:compCode
                 and type ='CUS'
+                and deleted = false
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
@@ -297,6 +337,7 @@ public class TraderServiceImpl implements TraderService {
                 from trader
                 where comp_code =:compCode
                 and type ='SUP'
+                and deleted = false
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
@@ -311,6 +352,7 @@ public class TraderServiceImpl implements TraderService {
                 from trader
                 where comp_code =:compCode
                 and type ='EMP'
+                and deleted = false
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)

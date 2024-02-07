@@ -1568,49 +1568,38 @@ add column debtor_acc varchar(15) null after cash_acc;
 
 #tmp
 drop table if exists tmp_stock_io_column;
-CREATE TABLE tmp_stock_io_column (
-  tran_option varchar(15) NOT NULL,
-  tran_date date NOT NULL,
-  stock_code varchar(15) NOT NULL,
-  loc_code varchar(15) NOT NULL,
-  mac_id int(11) NOT NULL,
-  vou_no varchar(25) NOT NULL,
-  comp_code varchar(15) NOT NULL,
-  dept_id int(11) NOT NULL,
-  op_qty double(20,3) NOT NULL DEFAULT 0.000,
-  pur_qty double(20,3) NOT NULL DEFAULT 0.000,
-  in_qty double(20,3) NOT NULL DEFAULT 0.000,
-  sale_qty double(20,3) NOT NULL DEFAULT 0.000,
-  out_qty double(20,3) NOT NULL DEFAULT 0.000,
-  remark varchar(255) DEFAULT NULL,
-  trader_code varchar(15) NOT NULL DEFAULT '-',
-  op_weight double(20,3) NOT NULL DEFAULT 0.000,
-  pur_weight double(20,3) NOT NULL DEFAULT 0.000,
-  in_weight double(20,3) NOT NULL DEFAULT 0.000,
-  sale_weight double(20,3) NOT NULL DEFAULT 0.000,
-  out_weight double(20,3) NOT NULL DEFAULT 0.000,
-  op_wet double(20,3) DEFAULT NULL,
-  pur_wet double(20,3) DEFAULT NULL,
-  in_wet double(20,3) DEFAULT NULL,
-  sale_wet double(20,3) DEFAULT NULL,
-  out_wet double(20,3) DEFAULT NULL,
-  op_rice double(20,3) DEFAULT NULL,
-  pur_rice double(20,3) DEFAULT NULL,
-  in_rice double(20,3) DEFAULT NULL,
-  sale_rice double(20,3) DEFAULT NULL,
-  out_rice double(20,3) DEFAULT NULL,
-  op_bag double(20,3) DEFAULT NULL,
-  pur_bag double(20,3) DEFAULT NULL,
-  in_bag double(20,3) DEFAULT NULL,
-  sale_bag double(20,3) DEFAULT NULL,
-  out_bag double(20,3) DEFAULT NULL,
-  op_ttl_amt double(20,3) DEFAULT NULL,
-  pur_ttl_amt double(20,3) DEFAULT NULL,
-  in_ttl_amt double(20,3) DEFAULT NULL,
-  out_ttl_amt double(20,3) DEFAULT NULL,
-  sale_ttl_amt double(20,3) DEFAULT NULL,
-  PRIMARY KEY (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+create table tmp_stock_io_column (
+  tran_option varchar(15) not null,
+  tran_date date not null,
+  stock_code varchar(15) not null,
+  loc_code varchar(15) not null,
+  mac_id int(11) not null,
+  vou_no varchar(25) not null,
+  comp_code varchar(15) not null,
+  dept_id int(11) not null,
+  op_qty double(20,3) not null default 0.000,
+  pur_qty double(20,3) not null default 0.000,
+  in_qty double(20,3) not null default 0.000,
+  sale_qty double(20,3) not null default 0.000,
+  out_qty double(20,3) not null default 0.000,
+  remark varchar(255) default null,
+  trader_code varchar(15) not null default '-',
+  op_weight double(20,3) not null default 0.000,
+  pur_weight double(20,3) not null default 0.000,
+  in_weight double(20,3) not null default 0.000,
+  sale_weight double(20,3) not null default 0.000,
+  out_weight double(20,3) not null default 0.000,
+  wet double(20,3) default null,
+  rice double(20,3) default null,
+  op_bag double(20,3) default null,
+  pur_bag double(20,3) default null,
+  in_bag double(20,3) default null,
+  sale_bag double(20,3) default null,
+  out_bag double(20,3) default null,
+  ttl_amt double(20,3) default null,
+  primary key (tran_option,tran_date,stock_code,loc_code,mac_id,vou_no,comp_code,dept_id,trader_code)
+) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
+
 
 
 drop table if exists tmp_stock_opening;
@@ -1788,7 +1777,6 @@ add column tran_source int not null default 0;
 alter table sale_his
 add column tran_source int not null default 0;
 
-
 update stock_in_out_detail
 set amount =ifnull(in_qty,0)+ifnull(out_qty,0)*cost_price;
 
@@ -1825,4 +1813,3 @@ drop view if exists v_consign;
 create view v_consign as select th.vou_no as vou_no,th.created_by as created_by,th.created_date as created_date,th.deleted as deleted,th.vou_date as vou_date,th.description as description,th.remark as remark,th.updated_by as updated_by,th.updated_date as updated_date,th.loc_code as loc_code,th.mac_id as mac_id,th.dept_id as dept_id,th.comp_code as comp_code,th.trader_code as trader_code,th.tran_source as tran_source,th.labour_group_code as labour_group_code,td.stock_code as stock_code,td.unique_id as unique_id,td.wet as wet,td.bag as bag,td.qty as qty,td.weight as weight,td.rice as rice,td.price as price,td.amount as amount,s.user_code as stock_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.brand_code as brand_code,s.category_code as category_code,s.rel_code as rel_code,s.calculate as calculate from ((consign_his th join consign_his_detail td on(th.vou_no = td.vou_no and th.comp_code = td.comp_code)) join stock s on(td.stock_code = s.stock_code and td.comp_code = s.comp_code));
 drop view if exists v_stock_payment;
 create  view v_stock_payment as select sp.vou_no as vou_no,sp.comp_code as comp_code,sp.dept_id as dept_id,sp.vou_date as vou_date,sp.trader_code as trader_code,sp.deleted as deleted,sp.tran_option as tran_option,sp.calculate as calculate,sp.loc_code as loc_code,spd.stock_code as stock_code,spd.ref_no as ref_no,spd.qty as qty,spd.pay_qty as pay_qty,spd.bal_qty as bal_qty,spd.pay_bag as pay_bag,spd.bal_bag as bal_bag,spd.remark as remark,spd.reference as reference,spd.full_paid as full_paid,spd.project_no as project_no,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as category_code,s.brand_code as brand_code,s.rel_code as rel_code from ((stock_payment sp join stock_payment_detail spd) join stock s) where sp.vou_no = spd.vou_no and sp.comp_code = spd.comp_code and spd.stock_code = s.stock_code and spd.comp_code = s.comp_code;
-

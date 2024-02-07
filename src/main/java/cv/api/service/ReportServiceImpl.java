@@ -3440,7 +3440,6 @@ public class ReportServiceImpl implements ReportService {
             } catch (Exception e) {
                 log.error(String.format("searchVoucher: %s", e.getMessage()));
             }
-
         });
         return list;
     }
