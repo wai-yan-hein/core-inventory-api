@@ -306,7 +306,15 @@ public class ReportController {
                     }
                     case "StockInOutSummaryByPaddy", "StockInOutPaddySummaryByLocation", "StockInOutPaddyDetailByLocation" -> {
                         filter.setOpDate(opDatePaddy);
-                        filter.setReportType(0);
+
+                        switch (reportName) {
+                            case "StockInOutPaddySummaryByLocation", "StockInOutPaddyDetailByLocation" -> {
+                                filter.setReportType(1);
+                            }
+                            default -> {
+                                filter.setReportType(0);
+                            }
+                        }
                         return stockReportService.getStockInOutPaddy(filter);
                     }
                     case "StockInOutSummaryByRice" -> {
@@ -491,8 +499,8 @@ public class ReportController {
 
     @GetMapping(path = "/getWeightAvgPrice")
     public Mono<General> getWeightAvgPrice(@RequestParam String stockCode,
-                                               @RequestParam String locCode,
-                                               @RequestParam String compCode) {
+                                           @RequestParam String locCode,
+                                           @RequestParam String compCode) {
         return reportService.getWeightAvgPrice(stockCode, locCode, compCode);
     }
 
