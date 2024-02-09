@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -44,14 +46,14 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code,loc_code
-                    union all
+                 union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code, weight_unit,sum(pur_amt) ttl_amt
                  from v_purchase
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
                  and calculate = true
                  and s_rec = false
-                 and comp_code =:compCode
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -59,13 +61,13 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code
                     union all
-                 select stock_code,sum(total_weight) weight,sum(qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
+                 select stock_code,sum(total_weight) weight,sum(qty) qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
                  from v_sale
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code ='01'
+                 and deleted = false
                  and calculate = true
                  and s_pay = false
-                 and comp_code =:compCode
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -75,48 +77,48 @@ public class StockReportService {
                     union all
                  select stock_code,0,sum(pay_qty)*-1 qty, 0, 0, sum(pay_bag)*-1, loc_code, '-',0
                  from v_stock_payment
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
+                 and deleted = false
                  and calculate = true
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code
-                    union all
+                 union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
                  from v_transfer
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
+                 and deleted = false
                  and calculate = true
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and loc_code_from in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code_from
-                    union all
+                 union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, loc_code_to, weight_unit, sum(amount) ttl_amt
                  from v_transfer
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
+                 and deleted = false
                  and calculate = true
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and loc_code_to in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code, loc_code_to
-                    union all
+                 union all
                  select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(wet) wet, sum(rice) rice, sum(in_bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
                  from v_stock_io
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and deleted = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -124,12 +126,12 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (in_qty>0 or in_bag>0)
                  group by stock_code, loc_code
-                    union all
+                 union all
                  select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty, sum(wet) wet, sum(rice) rice, sum(out_bag)*-1 bag, loc_code, weight_unit, sum(amount) ttl_amt
                  from v_stock_io
-                 where deleted = false
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
-                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and deleted = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -177,8 +179,8 @@ public class StockReportService {
                 and (stock_code = :stockCode or '-' = :stockCode)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String saleSql = """
-                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,sale_wet,sale_rice,out_bag,out_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0) ttl_weight,sum(sale_price),loc_code,:macId,comp_code,dept_id
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'Sale',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0) ttl_weight,sum(sale_amt) ttl_amt,loc_code,:macId,comp_code,dept_id
                 from v_sale
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
@@ -235,7 +237,7 @@ public class StockReportService {
                 and (in_qty>0 or in_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String stockOut = """
-                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'StockOut',vou_date vou_date,vou_no,remark,stock_code,sum(out_qty)*-1 ttl_qty,sum(wet) ttl_wet, sum(rice) ttl_rice, sum(out_bag)*-1 ttl_bag,ifnull(sum(total_weight)*-1,0) ttl_weight,sum(amount) ttl_amt,loc_code,:macId,comp_code,dept_id
                 from v_stock_io
                 where date(vou_date) between :fromDate and :toDate
@@ -250,7 +252,7 @@ public class StockReportService {
                 and (out_qty>0 or out_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String issueSql = """
-                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'Issue',vou_date vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,0 ttl_wet, 0 ttl_rice, sum(pay_bag)*-1 ttl_bag, 0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
                 from v_stock_payment
                 where date(vou_date) between :fromDate and :toDate
@@ -399,7 +401,9 @@ public class StockReportService {
 
     private Mono<ReturnObject> getResultStockQty(Integer macId) {
         String sql = """
-                select a.*,sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,
+                select a.*,
+                sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,
+                sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag) bal_bag,
                 sum(a.op_wet+a.pur_wet+a.in_wet+a.out_wet) bal_wet,
                 sum(a.op_rice+a.pur_rice+a.in_rice+a.out_rice) bal_rice,
                 sum(a.op_ttl_amt+a.pur_ttl_amt+a.in_ttl_amt+a.out_ttl_amt) bal_ttl_amt,
@@ -408,12 +412,14 @@ public class StockReportService {
                 from (
                 select stock_code,loc_code,sum(ifnull(op_qty,0)) op_qty,sum(ifnull(pur_qty,0)) pur_qty,
                 sum(ifnull(in_qty,0)) in_qty,sum(ifnull(out_qty,0)) out_qty,sum(ifnull(sale_qty,0)) sale_qty,comp_code,
+                sum(ifnull(op_bag,0)) op_bag,sum(ifnull(pur_bag,0)) pur_bag,
+                sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag,sum(ifnull(sale_bag,0)) sale_bag,
                 sum(ifnull(op_wet,0)) op_wet,sum(ifnull(pur_wet,0)) pur_wet,
                 sum(ifnull(in_wet,0)) in_wet,sum(ifnull(out_wet,0)) out_wet,sum(ifnull(sale_wet,0)) sale_wet,
                 sum(ifnull(op_rice,0)) op_rice,sum(ifnull(pur_rice,0)) pur_rice,
                 sum(ifnull(in_rice,0)) in_rice,sum(ifnull(out_rice,0)) out_rice,sum(ifnull(sale_rice,0)) sale_rice,
                 sum(ifnull(op_ttl_amt,0)) op_ttl_amt,sum(ifnull(pur_ttl_amt,0)) pur_ttl_amt,
-                sum(ifnull(in_ttl_amt,0)) in_ttl_amt,sum(ifnull(out_ttl_amt,0)) out_ttl_amt,sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt
+                sum(ifnull(in_ttl_amt,0)) in_ttl_amt,sum(ifnull(out_ttl_amt,0)) out_ttl_amt,sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt               
                 from tmp_stock_io_column
                 where mac_id = :macId
                 group by stock_code)a
@@ -440,6 +446,12 @@ public class StockReportService {
                         .saleQty(Util1.toNull(row.get("sale_qty", Double.class)))
                         .outQty(Util1.toNull(row.get("out_qty", Double.class)))
                         .balQty(Util1.toNull(row.get("bal_qty", Double.class)))
+                        .openBag(Util1.toNull(row.get("op_bag", Double.class)))
+                        .purBag(Util1.toNull(row.get("pur_bag", Double.class)))
+                        .inBag(Util1.toNull(row.get("in_bag", Double.class)))
+                        .saleBag(Util1.toNull(row.get("sale_bag", Double.class)))
+                        .outBag(Util1.toNull(row.get("out_bag", Double.class)))
+                        .balBag(Util1.toNull(row.get("bal_bag", Double.class)))
                         .openWet(Util1.toNull(row.get("op_wet", Double.class)))
                         .purWet(Util1.toNull(row.get("pur_wet", Double.class)))
                         .inWet(Util1.toNull(row.get("in_wet", Double.class)))
@@ -479,27 +491,28 @@ public class StockReportService {
     private Mono<ReturnObject> getResultStockBag(Integer macId) {
         String sql = """
                 select a.*,
-                sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty) bal_qty,
-                sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag) bal_bag,
-                sum(a.op_wet+a.pur_wet+a.in_wet+a.out_wet) bal_wet,
-                sum(a.op_rice+a.pur_rice+a.in_rice+a.out_rice) bal_rice,
-                sum(a.op_ttl_amt+a.pur_ttl_amt+a.in_ttl_amt+a.out_ttl_amt) bal_ttl_amt,
+                sum(a.op_qty+a.pur_qty+a.in_qty+a.out_qty+a.sale_qty) bal_qty,
+                sum(a.op_bag+a.pur_bag+a.in_bag+a.out_bag+a.sale_bag) bal_bag,
+                sum(a.op_wet+a.pur_wet+a.in_wet+a.out_wet+a.sale_wet) bal_wet,
+                sum(a.op_rice+a.pur_rice+a.in_rice+a.out_rice+a.sale_rice) bal_rice,
+                sum(a.op_ttl_amt+a.pur_ttl_amt+a.in_ttl_amt+a.out_ttl_amt+a.sale_ttl_amt) bal_ttl_amt,
                 s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
                 st.stock_type_name,l.loc_name, w.description,c.user_code c_user_code,c.cat_name
                 from (
                 select stock_code,loc_code,sum(ifnull(op_bag,0)) op_bag,sum(ifnull(pur_bag,0)) pur_bag,
+                sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag,sum(ifnull(sale_bag,0)) sale_bag,comp_code,
                 sum(ifnull(op_qty,0)) op_qty,sum(ifnull(pur_qty,0)) pur_qty,
                 sum(ifnull(in_qty,0)) in_qty,sum(ifnull(out_qty,0)) out_qty,sum(ifnull(sale_qty,0)) sale_qty,
-                sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag,sum(ifnull(sale_bag,0)) sale_bag,comp_code,
                 sum(ifnull(op_wet,0)) op_wet,sum(ifnull(pur_wet,0)) pur_wet,
                 sum(ifnull(in_wet,0)) in_wet,sum(ifnull(out_wet,0)) out_wet,sum(ifnull(sale_wet,0)) sale_wet,
                 sum(ifnull(op_rice,0)) op_rice,sum(ifnull(pur_rice,0)) pur_rice,
                 sum(ifnull(in_rice,0)) in_rice,sum(ifnull(out_rice,0)) out_rice,sum(ifnull(sale_rice,0)) sale_rice,
                 sum(ifnull(op_ttl_amt,0)) op_ttl_amt,sum(ifnull(pur_ttl_amt,0)) pur_ttl_amt,
-                sum(ifnull(in_ttl_amt,0)) in_ttl_amt,sum(ifnull(out_ttl_amt,0)) out_ttl_amt,sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt
+                sum(ifnull(in_ttl_amt,0)) in_ttl_amt,sum(ifnull(out_ttl_amt,0)) out_ttl_amt,sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt,
+                tran_option, tran_date, vou_no
                 from tmp_stock_io_column
                 where mac_id = :macId
-                group by stock_code)a
+                group by stock_code, tran_option, vou_no)a
                 join stock s on a.stock_code = s.stock_code
                 and a.comp_code = s.comp_code
                 join stock_type st on s.stock_type_code = st.stock_type_code
@@ -510,8 +523,8 @@ public class StockReportService {
                 and a.comp_code = l.comp_code
                 join warehouse w on l.warehouse_code = w.code
                 and a.comp_code = l.comp_code
-                and (a.op_bag<>0 or a.pur_bag<>0 or a.in_bag<>0 or a.out_bag <> 0)
-                group by a.stock_code
+                and (a.op_bag<>0 or a.pur_bag<>0 or a.in_bag<>0 or a.out_bag <> 0 or a.sale_bag <> 0)
+                group by a.stock_code, a.tran_option, a.vou_no
                 order by c_user_code, s_user_code""";
         return client.sql(sql)
                 .bind("macId", macId)
@@ -552,6 +565,9 @@ public class StockReportService {
                         .catName(row.get("cat_name", String.class))
                         .locName(row.get("loc_name", String.class))
                         .warehouse(row.get("description", String.class))
+                        .tranOption(row.get("tran_option", String.class))
+                        .vouDate(Util1.toDateStr(row.get("tran_date", LocalDate.class), "dd/MM/yyyy"))
+                        .catName(row.get("cat_name", String.class))
                         .build())
                 .all()
                 .collectList()

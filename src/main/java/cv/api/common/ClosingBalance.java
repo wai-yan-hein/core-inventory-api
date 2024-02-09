@@ -103,4 +103,5 @@ public class ClosingBalance {
     private Double bag;
     private Double price;
     private String warehouse;
+    private String tranOption;
 }

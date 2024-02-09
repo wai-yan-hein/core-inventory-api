@@ -304,9 +304,17 @@ public class ReportController {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDateLocation, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutSummaryByPaddy", "StockInOutPaddySummaryByLocation", "StockInOutPaddyDetailByLocation" -> {
+                    case "StockInOutSummaryByPaddy", "StockInOutPaddySummaryByLocation", "StockInOutPaddyDetailByLocation", "StockInOutPaddyDetailByLocation1" -> {
                         filter.setOpDate(opDatePaddy);
-                        filter.setReportType(0);
+
+                        switch (reportName) {
+                            case "StockInOutPaddySummaryByLocation", "StockInOutPaddyDetailByLocation", "StockInOutPaddyDetailByLocation1" -> {
+                                filter.setReportType(1);
+                            }
+                            default -> {
+                                filter.setReportType(0);
+                            }
+                        }
                         return stockReportService.getStockInOutPaddy(filter);
                     }
                     case "StockInOutSummaryByRice" -> {
@@ -491,8 +499,8 @@ public class ReportController {
 
     @GetMapping(path = "/getWeightAvgPrice")
     public Mono<General> getWeightAvgPrice(@RequestParam String stockCode,
-                                               @RequestParam String locCode,
-                                               @RequestParam String compCode) {
+                                           @RequestParam String locCode,
+                                           @RequestParam String compCode) {
         return reportService.getWeightAvgPrice(stockCode, locCode, compCode);
     }
 
