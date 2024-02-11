@@ -96,12 +96,17 @@ public class ClosingBalance {
     private String traderCode;
     private String traderUserCode;
     private String traderName;
-
     private String locName;
-//    private Double wet;
-//    private Double rice;
     private Double bag;
     private Double price;
     private String warehouse;
     private String tranOption;
+
+    private Double opPrice;
+    private Double purPrice;
+    private Double inPrice;
+    private Double outPrice;
+    private Double salePrice;
+    private Double clPrice;
+
 }

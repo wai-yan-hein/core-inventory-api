@@ -109,6 +109,7 @@ public class Util1 {
 
         return strDate;
     }
+
     public static String toDateStr(LocalDate date, String format) {
         if (date == null) {
             return null;
@@ -146,6 +147,16 @@ public class Util1 {
             return value;
         } else {
             return strValue;
+        }
+    }
+
+    public static double isZero(Double input, Double output) {
+        if (input == null) {
+            return Util1.getDouble(output);
+        } else if (input == 0) {
+            return Util1.getDouble(output);
+        } else {
+            return Util1.getDouble(input);
         }
     }
 
@@ -189,10 +200,12 @@ public class Util1 {
     public static String getOldDate() {
         return Util1.toDateTimeStrMYSQL(toDate("1998-10-07"));
     }
+
     public static LocalDateTime toDate(String mysql) {
         LocalDate localDate = LocalDate.parse(mysql);
         return localDate.atStartOfDay();
     }
+
     public static LocalDateTime getOldLocalDateTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.parse(LocalDateTime.now().toString(), formatter);
@@ -268,10 +281,12 @@ public class Util1 {
             return new byte[0]; // Or throw a custom exception
         }
     }
+
     public static String toDateTimeStrMYSQL(LocalDateTime date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return date == null ? null : formatter.format(date);
     }
+
     public static String getPassword() {
         return Util1.toDateStr(Util1.getTodayDate(), "yyyyMMdd");
     }
