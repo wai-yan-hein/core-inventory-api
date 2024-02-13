@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -44,7 +46,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code
-                 union all
+                    union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(pur_amt) ttl_amt
                  from v_purchase
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
@@ -59,10 +61,10 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code
                     union all
-                 select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag) bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
+                 select stock_code,sum(total_weight) weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
                  from v_sale
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
-                 and comp_code ='01'
+                 and comp_code =:compCode
                  and deleted = false
                  and calculate = true
                  and s_pay = false
@@ -73,19 +75,34 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code
                     union all
-                 select stock_code,0,sum(pay_qty)*-1 qty, 0, 0, sum(pay_bag)*-1, loc_code, '-',0
+                 select stock_code,0,sum(pay_qty)*-1 qty,0,0,sum(pay_bag)*-1, loc_code, '-',0
                  from v_stock_payment
-                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 where deleted = false
                  and comp_code =:compCode
-                 and deleted = false
                  and calculate = true
-                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and tran_option ='C'
+                 and date(vou_date) >=:opDate and date(vou_date)<:fromDate
+                 and loc_code in (select f_code from f_location where mac_id =:macId)
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code
-                 union all
+                    union all
+                 select stock_code,0,sum(pay_qty) qty,0,0,sum(pay_bag), loc_code, '-',0
+                 from v_stock_payment
+                 where deleted = false
+                 and comp_code =:compCode
+                 and calculate = true
+                 and tran_option ='S'
+                 and date(vou_date) >=:opDate and date(vou_date)<:fromDate
+                 and loc_code in (select f_code from f_location where mac_id =:macId)
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 group by stock_code
+                    union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
                  from v_transfer
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
@@ -250,20 +267,45 @@ public class StockReportService {
                 and (out_qty>0 or out_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String issueSql = """
-                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'Issue',vou_date vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,0 ttl_wet, 0 ttl_rice, sum(pay_bag)*-1 ttl_bag, 0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
-                from v_stock_payment
-                where date(vou_date) between :fromDate and :toDate
-                and deleted = false
-                and calculate = true
-                and comp_code =:compCode
-                and loc_code in (select f_code from f_location where mac_id =:macId)
-                and (stock_type_code = :typeCode or '-' = :typeCode)
-                and (brand_code = :brandCode or '-' = :brandCode)
-                and (category_code = :catCode or '-' = :catCode)
-                and (stock_code = :stockCode or '-' = :stockCode)
-                and tran_option='C'
-                group by date(vou_date),vou_no,stock_code,loc_code""";
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'Issue',date(v.vou_date) vou_date,v.vou_no,v.remark,v.stock_code,sum(v.pay_qty)*-1 ttl_qty,
+                sum(iszero(sh.qty,sh.bag)*wet)ttl_wet,sum(iszero(sh.qty,sh.bag)*rice)ttl_rice, sum(v.pay_bag)*-1 ttl_bag,
+                0 ttl_weight,sum(sh.sale_amt)amount,v.loc_code,:macId,v.comp_code,v.dept_id
+                from v_stock_payment v join sale_his_detail sh
+                on v.ref_no = sh.vou_no
+                and v.comp_code = sh.comp_code
+                where v.deleted = false
+                and v.comp_code =:compCode
+                and v.calculate = true
+                and v.tran_option ='C'
+                and date(v.vou_date) >= :fromDate and date(v.vou_date)<:toDate
+                and v.loc_code in (select f_code from f_location where mac_id =:macId )
+                and (v.stock_type_code = :typeCode or '-' = :typeCode)
+                and (v.brand_code = :brandCode or '-' = :brandCode)
+                and (v.category_code = :catCode or '-' = :catCode)
+                and (v.stock_code = :stockCode or '-' = :stockCode)
+                group by date(v.vou_date),v.vou_no,v.stock_code,v.loc_code
+                """;
+        String recSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,pur_wet,pur_rice,pur_bag,pur_weight,pur_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'Receive',date(v.vou_date) vou_date,v.vou_no,v.remark,v.stock_code,sum(v.pay_qty)*-1 ttl_qty,
+                sum(iszero(sh.qty,sh.bag)*wet)ttl_wet,sum(iszero(sh.qty,sh.bag)*rice)ttl_rice, sum(v.pay_bag)*-1 ttl_bag,
+                0 ttl_weight,sum(sh.pur_amt)amount,v.loc_code,:macId,v.comp_code,v.dept_id
+                from v_stock_payment v join pur_his_detail sh
+                on v.ref_no = sh.vou_no
+                and v.comp_code = sh.comp_code
+                where v.deleted = false
+                and v.comp_code =:compCode
+                and v.calculate = true
+                and v.tran_option ='S'
+                and date(v.vou_date) >= :fromDate and date(v.vou_date)<:toDate
+                and v.loc_code in (select f_code from f_location where mac_id =:macId )
+                and (v.stock_type_code = :typeCode or '-' = :typeCode)
+                and (v.brand_code = :brandCode or '-' = :brandCode)
+                and (v.category_code = :catCode or '-' = :catCode)
+                and (v.stock_code = :stockCode or '-' = :stockCode)
+                group by date(v.vou_date),v.vou_no,v.stock_code,v.loc_code
+                """;
         Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
         Mono<Long> purMono = client.sql(purSql)
                 .bind("macId", macId)
@@ -285,8 +327,6 @@ public class StockReportService {
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .fetch().rowsUpdated();
-// Continue with the existing code...
-
         Mono<Long> tfMono = client.sql(tfSql)
                 .bind("macId", macId)
                 .bind("fromDate", fromDate)
@@ -345,6 +385,17 @@ public class StockReportService {
                 .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
+        Mono<Long> recMono = client.sql(recSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch()
+                .rowsUpdated();
         return deleteTmpIO(macId)
                 .then(opMono)
                 .doOnSuccess(rowsUpdated -> log.info("Operation rows updated: " + rowsUpdated))
@@ -370,11 +421,14 @@ public class StockReportService {
                 .then(issueMono)
                 .doOnSuccess(rowsUpdated -> log.info("Issue rows updated: " + rowsUpdated))
                 .doOnError(e -> log.error("Error in Issue: " + e.getMessage(), e))
+                .then(recMono)
+                .doOnSuccess(rowsUpdated -> log.info("Receive rows updated: " + rowsUpdated))
+                .doOnError(e -> log.error("Error in Receive: " + e.getMessage(), e))
                 .doOnError(e -> log.error("calculateClosingByPaddy : " + e.getMessage(), e));
 
     }
 
-    public Mono<ReturnObject> getStockInOutPaddy(ReportFilter filter) {
+    public Mono<ReturnObject> getStockInOutPaddy(ReportFilter filter, boolean detail) {
         String opDate = filter.getOpDate();
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
@@ -388,7 +442,12 @@ public class StockReportService {
         Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return opMono.then(clMono)
-                .then(getResultStockQty(macId, type));
+                .flatMap(aLong -> {
+                    if (detail) {
+                        return getResultStockDetail(macId);
+                    }
+                    return getResultStockQty(macId, type);
+                });
     }
 
     private Mono<ReturnObject> getResultStockQty(Integer macId, int type) {
@@ -396,9 +455,9 @@ public class StockReportService {
                 select a.*,
                 sum(ifnull(a.op_qty,0)+ifnull(a.pur_qty,0)+ifnull(a.in_qty,0)+ifnull(a.out_qty,0)+ifnull(a.sale_qty,0)) bal_qty,
                 sum(ifnull(a.op_bag,0)+ifnull(a.pur_bag,0)+ifnull(a.in_bag,0)+ifnull(a.out_bag,0)+ifnull(a.sale_bag,0)) bal_bag,
-                sum(ifnull(a.op_wet,0)+ifnull(a.pur_wet,0)+ifnull(a.in_wet,0)+ifnull(a.out_wet,0)+ifnull(a.sale_wet,0)) bal_wet,
-                sum(ifnull(a.op_rice,0)+ifnull(a.pur_rice,0)+ifnull(a.in_rice,0)+ifnull(a.out_rice,0)+ifnull(a.sale_rice,0)) bal_rice,
-                sum(ifnull(a.op_ttl_amt,0)+ifnull(a.pur_ttl_amt,0)+ifnull(a.in_ttl_amt,0)+ifnull(a.out_ttl_amt,0)+ifnull(a.sale_ttl_amt,0)) bal_amt,
+                sum(ifnull(a.op_wet,0)+ifnull(a.pur_wet,0)+ifnull(a.in_wet,0)) bal_wet,
+                sum(ifnull(a.op_rice,0)+ifnull(a.pur_rice,0)+ifnull(a.in_rice,0)) bal_rice,
+                sum(ifnull(a.op_ttl_amt,0)+ifnull(a.pur_ttl_amt,0)+ifnull(a.in_ttl_amt,0))bal_amt,
                 s.user_code s_user_code,s.stock_name,st.user_code st_user_code,
                 st.stock_type_name,c.user_code c_user_code,c.cat_name
                 from (
@@ -449,9 +508,9 @@ public class StockReportService {
                 """;
         String filter = null;
         switch (type) {
-            case 0 -> filter = "bal_qty<>0";
-            case 1 -> filter = "bal_bag<>0";
-            case 2 -> filter = "(bal_qty<>0 and bal_bag<>0)";
+            case 0 -> filter = "(op_qty<>0 or pur_qty<>0 or in_qty<>0 or out_qty<>0 or sale_qty<>0)";
+            case 1 -> filter = "(op_bag<>0 or pur_bag<>0 or in_bag<>0 or out_bag<>0 or sale_bag<>0)";
+            case 2 -> filter = "op_qty<>0";
         }
         sql = String.format(sql, filter);
         return client.sql(sql)
@@ -512,6 +571,172 @@ public class StockReportService {
                         .message("Data fetched successfully")
                         .file(fileBytes)
                         .build());
+    }
+
+    private Mono<ReturnObject> getResultStockDetail(Integer macId) {
+        String sql = """
+                select a.*,
+                sum(ifnull(a.op_qty,0)+ifnull(a.pur_qty,0)+ifnull(a.in_qty,0)+ifnull(a.out_qty,0)+ifnull(a.sale_qty,0)) bal_qty,
+                sum(ifnull(a.op_bag,0)+ifnull(a.pur_bag,0)+ifnull(a.in_bag,0)+ifnull(a.out_bag,0)+ifnull(a.sale_bag,0)) bal_bag,
+                sum(ifnull(a.op_wet,0)+ifnull(a.pur_wet,0)+ifnull(a.in_wet,0)) bal_wet,
+                sum(ifnull(a.op_rice,0)+ifnull(a.pur_rice,0)+ifnull(a.in_rice,0)) bal_rice,
+                sum(ifnull(a.op_ttl_amt,0)+ifnull(a.pur_ttl_amt,0)+ifnull(a.in_ttl_amt,0))bal_amt
+                from (
+                select tran_option,tran_date,vou_no,remark,stock_code,comp_code,op_qty,pur_qty,in_qty,out_qty,sale_qty,op_bag,pur_bag,in_bag,out_bag,sale_bag,
+                op_wet,round(op_wet/(iszero(op_qty,op_bag)),2) avg_op_wet,
+                pur_wet,round(pur_wet/(iszero(pur_qty,pur_bag)),2)avg_pur_wet,
+                in_wet,round(in_wet/(iszero(in_qty,in_bag)),2)avg_in_wet,
+                out_wet,round(out_wet/(iszero(out_qty,out_bag)),2)avg_out_wet,
+                sale_wet,round(sale_wet/(iszero(sale_qty,sale_bag)),2)avg_sale_wet,
+                op_rice,round(op_rice/(iszero(op_qty,op_bag)),2)avg_op_rice,
+                pur_rice,round(pur_rice/(iszero(pur_qty,pur_bag)),2)avg_pur_rice,
+                in_rice,round(in_rice/(iszero(in_qty,in_bag)),2)avg_in_rice,
+                out_rice,round(out_rice/(iszero(out_qty,out_bag)),2) avg_out_rice,
+                sale_rice,round(sale_rice/(iszero(sale_qty,sale_bag)),2) avg_sale_rice,
+                op_ttl_amt,round(op_ttl_amt/(iszero(op_qty,op_bag)),2)op_price,
+                pur_ttl_amt,round(pur_ttl_amt/(iszero(pur_qty,pur_bag)),2)pur_price,
+                in_ttl_amt,round(in_ttl_amt/(iszero(in_qty,in_bag)),2)in_price,
+                out_ttl_amt,round(out_ttl_amt/(iszero(out_qty,out_bag)),2) out_price,
+                sale_ttl_amt,round(sale_ttl_amt/(iszero(sale_qty,sale_bag)),2) sale_price
+                from (
+                select tran_option,tran_date,vou_no,remark,stock_code,loc_code,comp_code,
+                sum(ifnull(op_qty,0)) op_qty,sum(ifnull(pur_qty,0)) pur_qty,
+                sum(ifnull(in_qty,0)) in_qty,sum(ifnull(out_qty,0)) out_qty,
+                sum(ifnull(sale_qty,0)) sale_qty,sum(ifnull(op_bag,0)) op_bag,
+                sum(ifnull(pur_bag,0)) pur_bag,sum(ifnull(in_bag,0)) in_bag,
+                sum(ifnull(out_bag,0)) out_bag,sum(ifnull(sale_bag,0)) sale_bag,
+                sum(ifnull(op_wet,0)) op_wet,sum(ifnull(pur_wet,0)) pur_wet,
+                sum(ifnull(in_wet,0)) in_wet,sum(ifnull(out_wet,0)) out_wet,
+                sum(ifnull(sale_wet,0)) sale_wet,sum(ifnull(op_rice,0)) op_rice,
+                sum(ifnull(pur_rice,0)) pur_rice,sum(ifnull(in_rice,0)) in_rice,
+                sum(ifnull(out_rice,0)) out_rice,sum(ifnull(sale_rice,0)) sale_rice,
+                sum(ifnull(op_ttl_amt,0)) op_ttl_amt,sum(ifnull(pur_ttl_amt,0)) pur_ttl_amt,
+                sum(ifnull(in_ttl_amt,0)) in_ttl_amt,sum(ifnull(out_ttl_amt,0)) out_ttl_amt,
+                sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt
+                from tmp_stock_io_column
+                where mac_id = :macId
+                group by tran_date,stock_code,vou_no,tran_option
+                )i)a
+                group by tran_date,stock_code,vou_no,tran_option
+                order by a.tran_option,a.tran_date,a.vou_no
+                """;
+        return client.sql(sql)
+                .bind("macId", macId)
+                .map((row) -> {
+                    var cl = ClosingBalance.builder()
+                            .vouDate(Util1.toDateStr(row.get("tran_date", LocalDate.class), "dd/MM/yyyy"))
+                            .tranOption(row.get("tran_option", String.class))
+                            .remark(row.get("remark", String.class))
+                            .openQty(Util1.toNull(row.get("op_qty", Double.class)))
+                            .purQty(Util1.toNull(row.get("pur_qty", Double.class)))
+                            .inQty(Util1.toNull(row.get("in_qty", Double.class)))
+                            .saleQty(Util1.toNull(row.get("sale_qty", Double.class)))
+                            .outQty(Util1.toNull(row.get("out_qty", Double.class)))
+                            .balQty(row.get("bal_qty", Double.class))
+                            .openBag(Util1.toNull(row.get("op_bag", Double.class)))
+                            .purBag(Util1.toNull(row.get("pur_bag", Double.class)))
+                            .inBag(Util1.toNull(row.get("in_bag", Double.class)))
+                            .saleBag(Util1.toNull(row.get("sale_bag", Double.class)))
+                            .outBag(Util1.toNull(row.get("out_bag", Double.class)))
+                            .balBag(row.get("bal_bag", Double.class))
+                            .openWet(Util1.toNull(row.get("avg_op_wet", Double.class)))
+                            .openWetTotal(Util1.toNull(row.get("op_wet", Double.class)))
+                            .purWet(Util1.toNull(row.get("avg_pur_wet", Double.class)))
+                            .purWetTotal(Util1.toNull(row.get("pur_wet", Double.class)))
+                            .inWet(Util1.toNull(row.get("avg_in_wet", Double.class)))
+                            .inWetTotal(Util1.toNull(row.get("in_wet", Double.class)))
+                            .saleWet(Util1.toNull(row.get("avg_sale_wet", Double.class)))
+                            .outWet(Util1.toNull(row.get("avg_out_wet", Double.class)))
+                            .openRice(Util1.toNull(row.get("avg_op_rice", Double.class)))
+                            .openRiceTotal(Util1.toNull(row.get("op_rice", Double.class)))
+                            .purRice(Util1.toNull(row.get("avg_pur_rice", Double.class)))
+                            .purRiceTotal(Util1.toNull(row.get("pur_rice", Double.class)))
+                            .inRice(Util1.toNull(row.get("avg_in_rice", Double.class)))
+                            .inRiceTotal(Util1.toNull(row.get("in_rice", Double.class)))
+                            .saleRice(Util1.toNull(row.get("avg_sale_rice", Double.class)))
+                            .outRice(Util1.toNull(row.get("avg_out_rice", Double.class)))
+                            .opPrice(Util1.toNull(row.get("op_price", Double.class)))
+                            .purPrice(Util1.toNull(row.get("pur_price", Double.class)))
+                            .inPrice(Util1.toNull(row.get("in_price", Double.class)))
+                            .outPrice(Util1.toNull(row.get("out_price", Double.class)))
+                            .salePrice(Util1.toNull(row.get("sale_price", Double.class)))
+                            .build();
+                    cl.setRemark(Util1.isNull(cl.getRemark(), cl.getTranOption()));
+                    return cl;
+                })
+                .all()
+                .collectList()
+                .map(this::calOpCl)
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+    private List<ClosingBalance> calOpCl(List<ClosingBalance> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
+                ClosingBalance prv = list.get(i - 1);
+                double balQty = Util1.getDouble(prv.getBalQty());
+                double balBag = Util1.getDouble(prv.getBalBag());
+                double balWet = Util1.getDouble(prv.getBalWetTotal());
+                double balRice = Util1.getDouble(prv.getBalRiceTotal());
+                double balAmt = Util1.getDouble(prv.getClosingAmt());
+                ClosingBalance c = list.get(i);
+                c.setOpenQty(balQty);
+                c.setOpenBag(balBag);
+                c.setOpenWetTotal(balWet);
+                c.setOpenRiceTotal(balRice);
+                c.setOpenAmt(balAmt);
+                //qty
+                double opQty = Util1.getDouble(c.getOpenQty());
+                double purQty = Util1.getDouble(c.getPurQty());
+                double inQty = Util1.getDouble(c.getInQty());
+                double outQty = Util1.getDouble(c.getOutQty());
+                double saleQty = Util1.getDouble(c.getSaleQty());
+                double clQty = opQty + purQty + inQty + outQty + saleQty;
+                c.setBalQty(clQty);
+                //bag
+                double opBag = Util1.getDouble(c.getOpenBag());
+                double purBag = Util1.getDouble(c.getPurBag());
+                double inBag = Util1.getDouble(c.getInQty());
+                double outBag = Util1.getDouble(c.getOutQty());
+                double saleBag = Util1.getDouble(c.getSaleQty());
+                double clBag = opBag + purBag + inBag + outBag + saleBag;
+                c.setBalBag(clBag);
+                //wet
+                double opWet = Util1.getDouble(c.getOpenWetTotal());
+                double purWet = Util1.getDouble(c.getPurWetTotal());
+                double inWet = Util1.getDouble(c.getInWetTotal());
+                double clWet = opWet + purWet + inWet;
+                c.setBalWetTotal(clWet);
+                //rice
+                double opRice = Util1.getDouble(c.getOpenRiceTotal());
+                double purRice = Util1.getDouble(c.getPurRiceTotal());
+                double inRice = Util1.getDouble(c.getInRiceTotal());
+                double clRice = opRice + purRice + inRice;
+                c.setBalRiceTotal(clRice);
+                //price
+                double opAmt = Util1.getDouble(c.getOpenAmt());
+                double purPrice = Util1.getDouble(c.getPurPriceTotal());
+                double inPrice = Util1.getDouble(c.getInPriceTotal());
+                double clPrice = opAmt + purPrice + inPrice;
+                c.setClosingAmt(clPrice);
+                double qty = Util1.isZero(c.getBalQty(), c.getBalBag());
+                if (qty > 0) {
+                    c.setBalWet(Util1.getDouble(c.getBalWetTotal()) / qty);
+                    c.setBalRice(Util1.getDouble(c.getBalRiceTotal()) / qty);
+                    c.setClPrice(Util1.getDouble(c.getClosingAmt()) / qty);
+                }
+                c.setBalWet(Util1.toNull(c.getBalWet()));
+                c.setBalRice(Util1.toNull(c.getBalRice()));
+                c.setClPrice(Util1.toNull(c.getClPrice()));
+            }
+
+        }
+        return list;
     }
 
     private Mono<Long> deleteTmpOpening(Integer macId) {

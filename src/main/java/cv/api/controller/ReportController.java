@@ -304,19 +304,24 @@ public class ReportController {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDateLocation, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutSummaryByPaddy" -> {
+                    case "StockInOutSummaryByPaddy","StockInOutPaddySummaryByStock" -> {
                         filter.setOpDate(opDatePaddy);
-                        return stockReportService.getStockInOutPaddy(filter);
+                        return stockReportService.getStockInOutPaddy(filter, false);
                     }
                     case "StockInOutPaddySummaryWetRice" -> {
                         filter.setReportType(2);
                         filter.setOpDate(opDatePaddy);
-                        return stockReportService.getStockInOutPaddy(filter);
+                        return stockReportService.getStockInOutPaddy(filter, false);
+                    }
+                    case "StockInOutPaddyDetailWetRice", "StockInOutPaddyDetail" -> {
+                        filter.setReportType(2);
+                        filter.setOpDate(opDatePaddy);
+                        return stockReportService.getStockInOutPaddy(filter, true);
                     }
                     case "StockInOutSummaryByRice" -> {
                         filter.setOpDate(opDatePaddy);
                         filter.setReportType(1);
-                        return stockReportService.getStockInOutPaddy(filter);
+                        return stockReportService.getStockInOutPaddy(filter, false);
                     }
                     case "StockInOutDetailByWeight" -> {
                         reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);

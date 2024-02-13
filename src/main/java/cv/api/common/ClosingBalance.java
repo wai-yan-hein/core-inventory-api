@@ -49,43 +49,43 @@ public class ClosingBalance {
     private String balWeightRel;
 
     private Double openBag;
-    private String openBagRel;
+    private Double openBagTotal;
     private Double purBag;
-    private String purBagRel;
+    private Double purBagTotal;
     private Double inBag;
-    private String inBagRel;
+    private Double inBagTotal;
     private Double outBag;
-    private String outBagRel;
+    private Double outBagTotal;
     private Double saleBag;
-    private String saleBagRel;
+    private Double saleBagTotal;
     private Double balBag;
-    private String balBagRel;
+    private Double balBagTotal;
 
     private Double openWet;
-    private String openWetRel;
+    private Double openWetTotal;
     private Double purWet;
-    private String purWetRel;
+    private Double purWetTotal;
     private Double inWet;
-    private String inWetRel;
+    private Double inWetTotal;
     private Double outWet;
-    private String outWetRel;
+    private Double outWetTotal;
     private Double saleWet;
-    private String saleWetRel;
+    private Double saleWetTotal;
     private Double balWet;
-    private String balWetRel;
+    private Double balWetTotal;
 
     private Double openRice;
-    private String openRiceRel;
+    private Double openRiceTotal;
     private Double purRice;
-    private String purRiceRel;
+    private Double purRiceTotal;
     private Double inRice;
-    private String inRiceRel;
+    private Double inRiceTotal;
     private Double outRice;
-    private String outRiceRel;
+    private Double outRiceTotal;
     private Double saleRice;
-    private String saleRiceRel;
+    private Double saleRiceTotal;
     private Double balRice;
-    private String balRiceRel;
+    private Double balRiceTotal;
 
     private String groupName;
     private String remark;
@@ -103,8 +103,11 @@ public class ClosingBalance {
     private String tranOption;
 
     private Double opPrice;
+    private Double opPriceTotal;
     private Double purPrice;
+    private Double purPriceTotal;
     private Double inPrice;
+    private Double inPriceTotal;
     private Double outPrice;
     private Double salePrice;
     private Double clPrice;
