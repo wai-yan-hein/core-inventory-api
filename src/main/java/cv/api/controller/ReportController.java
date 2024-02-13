@@ -265,10 +265,6 @@ public class ReportController {
                         List<ClosingBalance> balances = reportService.getClosingStock(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                         Util1.writeJsonFile(balances, exportPath);
                     }
-                    case "InventoryClosingDetail" -> {
-                        List<ClosingBalance> c = reportService.getClosingStockDetail(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(c, exportPath);
-                    }
                     case "StockListByGroup" -> {
                         List<General> generalList = reportService.getStockListByGroup(typeCode, compCode, macId);
                         Util1.writeJsonFile(generalList, exportPath);

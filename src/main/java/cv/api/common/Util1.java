@@ -31,6 +31,7 @@ public class Util1 {
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
+            .serializeNulls() // Add this line to exclude null fields from serialization
             .create();
     public static String SYNC_DATE;
     //private static final char[] password = {'c', 'o', 'r', 'e', 'v', 'a', 'l', 'u', 'e'};
@@ -52,12 +53,6 @@ public class Util1 {
         return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
-    public static LocalDateTime parseLocalDateTime(Date date) {
-        if (date != null) {
-            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-        return null;
-    }
 
     public static Date toDate(Object objDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

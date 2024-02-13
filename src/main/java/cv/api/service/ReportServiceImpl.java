@@ -2073,7 +2073,7 @@ public class ReportServiceImpl implements ReportService {
                 cb.setSaleQty(rs.getDouble("sale_qty"));
                 cb.setSaleAmt(rs.getDouble("sale_amt"));
                 cb.setBalQty(rs.getDouble("bal_qty"));
-                cb.setClosingAmt(rs.getDouble("cl_amt"));
+                cb.setBalAmount(rs.getDouble("cl_amt"));
                 balanceList.add(cb);
             }
         }
@@ -2276,55 +2276,6 @@ public class ReportServiceImpl implements ReportService {
                         .build());
     }
 
-    @Override
-    public List<ClosingBalance> getClosingStockDetail(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception {
-        insertPriceDetail(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-        insertClosingIntoColumn(macId);
-        String sql = """
-                select s.user_code,s.stock_name,a.*,
-                (a.pur_amt/a.pur_qty) * bal_qty cl_amt
-                from (
-                select stock_code,tran_date vou_date,vou_no,
-                sum(op_qty) op_qty,sum(op_amt) op_amt,
-                sum(pur_qty) pur_qty,sum(pur_amt) pur_amt,
-                sum(in_qty) in_qty,sum(in_amt) in_amt,
-                sum(out_qty) out_qty,sum(out_amt) out_amt,
-                sum(sale_qty) sale_qty,sum(sale_amt) sale_amt,
-                sum(op_qty)+sum(pur_qty)+sum(in_qty)+sum(out_qty)+sum(sale_qty) bal_qty,comp_code
-                from tmp_closing_column
-                where mac_id = ?
-                group by stock_code,tran_date,vou_no
-                )a
-                join stock s on a.stock_code = s.stock_code
-                and a.comp_code = s.comp_code
-                order by s.user_code,date(a.vou_date) vou_date""";
-        ResultSet rs = reportDao.getResultSql(sql, macId);
-        List<ClosingBalance> balanceList = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                ClosingBalance cb = ClosingBalance.builder().build();
-                cb.setStockName(rs.getString("stock_name"));
-                cb.setStockUsrCode(rs.getString("user_code"));
-                cb.setStockCode(rs.getString("stock_code"));
-                cb.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                cb.setVouNo(rs.getString("vou_no"));
-                cb.setOpenQty(rs.getDouble("op_qty"));
-                cb.setOpenAmt(rs.getDouble("op_amt"));
-                cb.setPurQty(rs.getDouble("pur_qty"));
-                cb.setPurAmt(rs.getDouble("pur_amt"));
-                cb.setInQty(rs.getDouble("in_qty"));
-                cb.setInAmt(rs.getDouble("in_amt"));
-                cb.setOutQty(rs.getDouble("out_qty"));
-                cb.setOutAmt(rs.getDouble("out_amt"));
-                cb.setSaleQty(rs.getDouble("sale_qty"));
-                cb.setSaleAmt(rs.getDouble("sale_amt"));
-                cb.setBalQty(rs.getDouble("bal_qty"));
-                cb.setClosingAmt(rs.getDouble("cl_amt"));
-                balanceList.add(cb);
-            }
-        }
-        return balanceList;
-    }
 
     @Override
     public List<ClosingBalance> getStockInOutSummary(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
@@ -2583,17 +2534,17 @@ public class ReportServiceImpl implements ReportService {
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
 
                     c.setOpenWeight(opWeight);
-                    c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
+                    //c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     c.setPurWeight(purWeight);
-                    c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
+                   // c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     c.setInWeight(inWeight);
-                    c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
+                    //c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     c.setSaleWeight(saleWeight);
-                    c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
+                    //c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     c.setOutWeight(outWeight);
-                    c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
+                    //c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     c.setBalWeight(clWeight);
-                    c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight));
+                    //c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight));
                 } else {
                     ClosingBalance c = balances.get(i);
                     double opQty = c.getOpenQty();
@@ -2622,17 +2573,17 @@ public class ReportServiceImpl implements ReportService {
                     c.setBalQty(clQty);
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
                     c.setOpenWeight(opWeight);
-                    c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
+                    //c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     c.setPurWeight(purWeight);
-                    c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
+                    //c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     c.setInWeight(inWeight);
-                    c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
+                    //c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     c.setSaleWeight(saleWeight);
-                    c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
+                    //c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     c.setOutWeight(outWeight);
-                    c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
+                    //c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     c.setBalWeight(clWeight);
-                    c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight));
+                    //c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight));
                 }
             }
         } catch (Exception e) {
@@ -4310,17 +4261,17 @@ public class ReportServiceImpl implements ReportService {
                     b.setBalRel(balQty == 0 ? null : Util1.format(balQty));
 
                     b.setOpenWeight(opWeight);
-                    b.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
+                    //b.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     b.setPurWeight(purWeight);
-                    b.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
+                    //b.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     b.setInWeight(inWeight);
-                    b.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
+                    //b.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     b.setSaleWeight(saleWeight);
-                    b.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
+                    //b.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     b.setOutWeight(outWeight);
-                    b.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
+                    //b.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     b.setBalWeight(balWeight);
-                    b.setBalWeightRel(balWeight == 0 ? null : Util1.format(balWeight));
+                    //b.setBalWeightRel(balWeight == 0 ? null : Util1.format(balWeight));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
                     b.setStockCode(rs.getString("stock_code"));

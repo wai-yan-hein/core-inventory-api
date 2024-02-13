@@ -398,33 +398,14 @@ public class StockReportService {
                 .rowsUpdated();
         return deleteTmpIO(macId)
                 .then(opMono)
-                .doOnSuccess(rowsUpdated -> log.info("Operation rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Operation: " + e.getMessage(), e))
                 .then(purMono)
-                .doOnSuccess(rowsUpdated -> log.info("Purchase rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Purchase: " + e.getMessage(), e))
                 .then(saleMono)
-                .doOnSuccess(rowsUpdated -> log.info("Sale rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Sale: " + e.getMessage(), e))
                 .then(tfMono)
-                .doOnSuccess(rowsUpdated -> log.info("Transfer-F rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Transfer-F: " + e.getMessage(), e))
                 .then(ttMono)
-                .doOnSuccess(rowsUpdated -> log.info("Transfer-T rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Transfer-T: " + e.getMessage(), e))
                 .then(stockInMono)
-                .doOnSuccess(rowsUpdated -> log.info("StockIn rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in StockIn: " + e.getMessage(), e))
                 .then(stockOutMono)
-                .doOnSuccess(rowsUpdated -> log.info("StockOut rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in StockOut: " + e.getMessage(), e))
                 .then(issueMono)
-                .doOnSuccess(rowsUpdated -> log.info("Issue rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Issue: " + e.getMessage(), e))
-                .then(recMono)
-                .doOnSuccess(rowsUpdated -> log.info("Receive rows updated: " + rowsUpdated))
-                .doOnError(e -> log.error("Error in Receive: " + e.getMessage(), e))
-                .doOnError(e -> log.error("calculateClosingByPaddy : " + e.getMessage(), e));
+                .then(recMono);
 
     }
 
@@ -546,7 +527,7 @@ public class StockReportService {
                             .inPrice(Util1.toNull(row.get("in_price", Double.class)))
                             .outPrice(Util1.toNull(row.get("out_price", Double.class)))
                             .salePrice(Util1.toNull(row.get("sale_price", Double.class)))
-                            .closingAmt(row.get("bal_amt", Double.class))
+                            .balAmount(row.get("bal_amt", Double.class))
                             .stockUsrCode(row.get("s_user_code", String.class))
                             .stockName(row.get("stock_name", String.class))
                             .stockCode(row.get("stock_code", String.class))
@@ -556,7 +537,7 @@ public class StockReportService {
                     if (qty > 0) {
                         cl.setBalWet(Util1.getDouble(cl.getBalWet()) / qty);
                         cl.setBalRice(Util1.getDouble(cl.getBalRice()) / qty);
-                        cl.setClPrice(Util1.getDouble(cl.getClosingAmt()) / qty);
+                        cl.setClPrice(Util1.getDouble(cl.getBalAmount()) / qty);
                     }
                     cl.setBalWet(Util1.toNull(cl.getBalWet()));
                     cl.setBalRice(Util1.toNull(cl.getBalRice()));
@@ -575,50 +556,35 @@ public class StockReportService {
 
     private Mono<ReturnObject> getResultStockDetail(Integer macId) {
         String sql = """
-                select a.*,
-                sum(ifnull(a.op_qty,0)+ifnull(a.pur_qty,0)+ifnull(a.in_qty,0)+ifnull(a.out_qty,0)+ifnull(a.sale_qty,0)) bal_qty,
-                sum(ifnull(a.op_bag,0)+ifnull(a.pur_bag,0)+ifnull(a.in_bag,0)+ifnull(a.out_bag,0)+ifnull(a.sale_bag,0)) bal_bag,
-                sum(ifnull(a.op_wet,0)+ifnull(a.pur_wet,0)+ifnull(a.in_wet,0)) bal_wet,
-                sum(ifnull(a.op_rice,0)+ifnull(a.pur_rice,0)+ifnull(a.in_rice,0)) bal_rice,
-                sum(ifnull(a.op_ttl_amt,0)+ifnull(a.pur_ttl_amt,0)+ifnull(a.in_ttl_amt,0))bal_amt
+                select a.*,ttl_wet/iszero(bal_qty,bal_bag) avg_bal_wet,
+                ttl_rice/iszero(bal_qty,bal_bag) avg_bal_rice,
+                ttl_amt/iszero(bal_qty,bal_bag) avg_bal_price
                 from (
-                select tran_option,tran_date,vou_no,remark,stock_code,comp_code,op_qty,pur_qty,in_qty,out_qty,sale_qty,op_bag,pur_bag,in_bag,out_bag,sale_bag,
-                op_wet,round(op_wet/(iszero(op_qty,op_bag)),2) avg_op_wet,
-                pur_wet,round(pur_wet/(iszero(pur_qty,pur_bag)),2)avg_pur_wet,
-                in_wet,round(in_wet/(iszero(in_qty,in_bag)),2)avg_in_wet,
-                out_wet,round(out_wet/(iszero(out_qty,out_bag)),2)avg_out_wet,
-                sale_wet,round(sale_wet/(iszero(sale_qty,sale_bag)),2)avg_sale_wet,
-                op_rice,round(op_rice/(iszero(op_qty,op_bag)),2)avg_op_rice,
-                pur_rice,round(pur_rice/(iszero(pur_qty,pur_bag)),2)avg_pur_rice,
-                in_rice,round(in_rice/(iszero(in_qty,in_bag)),2)avg_in_rice,
-                out_rice,round(out_rice/(iszero(out_qty,out_bag)),2) avg_out_rice,
-                sale_rice,round(sale_rice/(iszero(sale_qty,sale_bag)),2) avg_sale_rice,
-                op_ttl_amt,round(op_ttl_amt/(iszero(op_qty,op_bag)),2)op_price,
-                pur_ttl_amt,round(pur_ttl_amt/(iszero(pur_qty,pur_bag)),2)pur_price,
-                in_ttl_amt,round(in_ttl_amt/(iszero(in_qty,in_bag)),2)in_price,
-                out_ttl_amt,round(out_ttl_amt/(iszero(out_qty,out_bag)),2) out_price,
-                sale_ttl_amt,round(sale_ttl_amt/(iszero(sale_qty,sale_bag)),2) sale_price
-                from (
-                select tran_option,tran_date,vou_no,remark,stock_code,loc_code,comp_code,
-                sum(ifnull(op_qty,0)) op_qty,sum(ifnull(pur_qty,0)) pur_qty,
-                sum(ifnull(in_qty,0)) in_qty,sum(ifnull(out_qty,0)) out_qty,
-                sum(ifnull(sale_qty,0)) sale_qty,sum(ifnull(op_bag,0)) op_bag,
-                sum(ifnull(pur_bag,0)) pur_bag,sum(ifnull(in_bag,0)) in_bag,
-                sum(ifnull(out_bag,0)) out_bag,sum(ifnull(sale_bag,0)) sale_bag,
-                sum(ifnull(op_wet,0)) op_wet,sum(ifnull(pur_wet,0)) pur_wet,
-                sum(ifnull(in_wet,0)) in_wet,sum(ifnull(out_wet,0)) out_wet,
-                sum(ifnull(sale_wet,0)) sale_wet,sum(ifnull(op_rice,0)) op_rice,
-                sum(ifnull(pur_rice,0)) pur_rice,sum(ifnull(in_rice,0)) in_rice,
-                sum(ifnull(out_rice,0)) out_rice,sum(ifnull(sale_rice,0)) sale_rice,
-                sum(ifnull(op_ttl_amt,0)) op_ttl_amt,sum(ifnull(pur_ttl_amt,0)) pur_ttl_amt,
-                sum(ifnull(in_ttl_amt,0)) in_ttl_amt,sum(ifnull(out_ttl_amt,0)) out_ttl_amt,
-                sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt
+                select *,
+                round(op_wet/(iszero(op_qty,op_bag)),2) avg_op_wet,
+                round(pur_wet/(iszero(pur_qty,pur_bag)),2)avg_pur_wet,
+                round(in_wet/(iszero(in_qty,in_bag)),2)avg_in_wet,
+                round(out_wet/(iszero(out_qty,out_bag)),2)avg_out_wet,
+                round(sale_wet/(iszero(sale_qty,sale_bag)),2)avg_sale_wet,
+                round(op_rice/(iszero(op_qty,op_bag)),2)avg_op_rice,
+                round(pur_rice/(iszero(pur_qty,pur_bag)),2)avg_pur_rice,
+                round(in_rice/(iszero(in_qty,in_bag)),2)avg_in_rice,
+                round(out_rice/(iszero(out_qty,out_bag)),2) avg_out_rice,
+                round(sale_rice/(iszero(sale_qty,sale_bag)),2) avg_sale_rice,
+                round(op_ttl_amt/(iszero(op_qty,op_bag)),2)op_price,
+                round(pur_ttl_amt/(iszero(pur_qty,pur_bag)),2)pur_price,
+                round(in_ttl_amt/(iszero(in_qty,in_bag)),2)in_price,
+                round(out_ttl_amt/(iszero(out_qty,out_bag)),2) out_price,
+                round(sale_ttl_amt/(iszero(sale_qty,sale_bag)),2) sale_price,
+                ifnull(op_qty,0)+ifnull(pur_qty,0)+ifnull(in_qty,0)+ifnull(out_qty,0)+ifnull(sale_qty,0) bal_qty,
+                ifnull(op_bag,0)+ifnull(pur_bag,0)+ifnull(in_bag,0)+ifnull(out_bag,0)+ifnull(sale_bag,0) bal_bag,
+                ifnull(op_wet,0)+ifnull(pur_wet,0)+ifnull(in_wet,0) ttl_wet,
+                ifnull(op_rice,0)+ifnull(pur_rice,0)+ifnull(in_rice,0) ttl_rice,
+                ifnull(op_ttl_amt,0)+ifnull(pur_ttl_amt,0)+ifnull(in_ttl_amt,0) ttl_amt
                 from tmp_stock_io_column
-                where mac_id = :macId
-                group by tran_date,stock_code,vou_no,tran_option
-                )i)a
-                group by tran_date,stock_code,vou_no,tran_option
-                order by a.tran_option,a.tran_date,a.vou_no
+                where mac_id =:macId
+                )a
+                order by a.tran_date,a.tran_option,a.vou_no
                 """;
         return client.sql(sql)
                 .bind("macId", macId)
@@ -627,6 +593,7 @@ public class StockReportService {
                             .vouDate(Util1.toDateStr(row.get("tran_date", LocalDate.class), "dd/MM/yyyy"))
                             .tranOption(row.get("tran_option", String.class))
                             .remark(row.get("remark", String.class))
+                            .vouNo(row.get("vou_no", String.class))
                             .openQty(Util1.toNull(row.get("op_qty", Double.class)))
                             .purQty(Util1.toNull(row.get("pur_qty", Double.class)))
                             .inQty(Util1.toNull(row.get("in_qty", Double.class)))
@@ -640,26 +607,33 @@ public class StockReportService {
                             .outBag(Util1.toNull(row.get("out_bag", Double.class)))
                             .balBag(row.get("bal_bag", Double.class))
                             .openWet(Util1.toNull(row.get("avg_op_wet", Double.class)))
-                            .openWetTotal(Util1.toNull(row.get("op_wet", Double.class)))
                             .purWet(Util1.toNull(row.get("avg_pur_wet", Double.class)))
-                            .purWetTotal(Util1.toNull(row.get("pur_wet", Double.class)))
+                            .purWetTotal(row.get("pur_wet", Double.class))
                             .inWet(Util1.toNull(row.get("avg_in_wet", Double.class)))
-                            .inWetTotal(Util1.toNull(row.get("in_wet", Double.class)))
+                            .inWetTotal(row.get("in_wet", Double.class))
                             .saleWet(Util1.toNull(row.get("avg_sale_wet", Double.class)))
                             .outWet(Util1.toNull(row.get("avg_out_wet", Double.class)))
+                            .balWet(row.get("avg_bal_wet", Double.class))
                             .openRice(Util1.toNull(row.get("avg_op_rice", Double.class)))
-                            .openRiceTotal(Util1.toNull(row.get("op_rice", Double.class)))
                             .purRice(Util1.toNull(row.get("avg_pur_rice", Double.class)))
                             .purRiceTotal(Util1.toNull(row.get("pur_rice", Double.class)))
                             .inRice(Util1.toNull(row.get("avg_in_rice", Double.class)))
-                            .inRiceTotal(Util1.toNull(row.get("in_rice", Double.class)))
+                            .inRiceTotal(row.get("in_rice", Double.class))
                             .saleRice(Util1.toNull(row.get("avg_sale_rice", Double.class)))
                             .outRice(Util1.toNull(row.get("avg_out_rice", Double.class)))
+                            .balRice(row.get("avg_bal_rice", Double.class))
                             .opPrice(Util1.toNull(row.get("op_price", Double.class)))
                             .purPrice(Util1.toNull(row.get("pur_price", Double.class)))
+                            .purPriceTotal(row.get("pur_ttl_amt", Double.class))
                             .inPrice(Util1.toNull(row.get("in_price", Double.class)))
+                            .inPriceTotal(row.get("in_ttl_amt", Double.class))
                             .outPrice(Util1.toNull(row.get("out_price", Double.class)))
                             .salePrice(Util1.toNull(row.get("sale_price", Double.class)))
+                            .clPrice(row.get("avg_bal_price", Double.class))
+                            .balWetTotal(row.get("ttl_wet", Double.class))
+                            .balRiceTotal(row.get("ttl_rice", Double.class))
+                            .balAmount(row.get("ttl_amt", Double.class))
+                            .openAmt(row.get("op_ttl_amt", Double.class))
                             .build();
                     cl.setRemark(Util1.isNull(cl.getRemark(), cl.getTranOption()));
                     return cl;
@@ -683,12 +657,12 @@ public class StockReportService {
                 double balBag = Util1.getDouble(prv.getBalBag());
                 double balWet = Util1.getDouble(prv.getBalWetTotal());
                 double balRice = Util1.getDouble(prv.getBalRiceTotal());
-                double balAmt = Util1.getDouble(prv.getClosingAmt());
+                double balAmt = Util1.getDouble(prv.getBalAmount());
                 ClosingBalance c = list.get(i);
                 c.setOpenQty(balQty);
                 c.setOpenBag(balBag);
-                c.setOpenWetTotal(balWet);
-                c.setOpenRiceTotal(balRice);
+                c.setOpWetTotal(balWet);
+                c.setOpRiceTotal(balRice);
                 c.setOpenAmt(balAmt);
                 //qty
                 double opQty = Util1.getDouble(c.getOpenQty());
@@ -701,34 +675,31 @@ public class StockReportService {
                 //bag
                 double opBag = Util1.getDouble(c.getOpenBag());
                 double purBag = Util1.getDouble(c.getPurBag());
-                double inBag = Util1.getDouble(c.getInQty());
-                double outBag = Util1.getDouble(c.getOutQty());
-                double saleBag = Util1.getDouble(c.getSaleQty());
+                double inBag = Util1.getDouble(c.getInBag());
+                double outBag = Util1.getDouble(c.getOutBag());
+                double saleBag = Util1.getDouble(c.getSaleBag());
                 double clBag = opBag + purBag + inBag + outBag + saleBag;
                 c.setBalBag(clBag);
                 //wet
-                double opWet = Util1.getDouble(c.getOpenWetTotal());
-                double purWet = Util1.getDouble(c.getPurWetTotal());
-                double inWet = Util1.getDouble(c.getInWetTotal());
-                double clWet = opWet + purWet + inWet;
+                double opWet = Util1.getDouble(c.getOpWetTotal());
+                double clWet = opWet + Util1.getDouble(c.getBalWetTotal());
                 c.setBalWetTotal(clWet);
                 //rice
-                double opRice = Util1.getDouble(c.getOpenRiceTotal());
-                double purRice = Util1.getDouble(c.getPurRiceTotal());
-                double inRice = Util1.getDouble(c.getInRiceTotal());
-                double clRice = opRice + purRice + inRice;
+                double opRice = Util1.getDouble(c.getOpRiceTotal());
+                double clRice = opRice + Util1.getDouble(c.getBalRiceTotal());
                 c.setBalRiceTotal(clRice);
                 //price
                 double opAmt = Util1.getDouble(c.getOpenAmt());
-                double purPrice = Util1.getDouble(c.getPurPriceTotal());
-                double inPrice = Util1.getDouble(c.getInPriceTotal());
-                double clPrice = opAmt + purPrice + inPrice;
-                c.setClosingAmt(clPrice);
+                double clAmt = opAmt + Util1.getDouble(c.getBalAmount());
+                c.setBalAmount(clAmt);
                 double qty = Util1.isZero(c.getBalQty(), c.getBalBag());
                 if (qty > 0) {
+                    c.setOpenWet(prv.getBalWet());
+                    c.setOpenRice(prv.getBalRice());
+                    c.setOpPrice(prv.getClPrice());
                     c.setBalWet(Util1.getDouble(c.getBalWetTotal()) / qty);
                     c.setBalRice(Util1.getDouble(c.getBalRiceTotal()) / qty);
-                    c.setClPrice(Util1.getDouble(c.getClosingAmt()) / qty);
+                    c.setClPrice(Util1.getDouble(c.getBalAmount()) / qty);
                 }
                 c.setBalWet(Util1.toNull(c.getBalWet()));
                 c.setBalRice(Util1.toNull(c.getBalRice()));
