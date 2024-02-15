@@ -7,7 +7,6 @@ import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisKey;
 import cv.api.repo.AccountRepo;
 import cv.api.service.PaymentHisService;
-import cv.api.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -17,7 +16,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping(path = "/payment")
 public class PaymentController {
-    private final ReportService reportService;
     private final PaymentHisService paymentHisService;
     private final PaymentHisDetailDao paymentHisDetailDao;
     private final AccountRepo accountRepo;
@@ -26,7 +24,7 @@ public class PaymentController {
     public Flux<?> getCustomerBalance(@RequestParam String traderCode,
                                       @RequestParam String tranOption,
                                       @RequestParam String compCode) {
-        return Flux.fromIterable(reportService.getTraderBalance(traderCode, tranOption, compCode)).onErrorResume(throwable -> Flux.empty());
+        return paymentHisService.getTraderBalance(traderCode,tranOption,compCode);
     }
 
     @PostMapping(path = "/deletePayment")
@@ -45,7 +43,7 @@ public class PaymentController {
 
 
     @PostMapping(path = "/savePayment")
-    public Mono<?> savePayment(@RequestBody PaymentHis ph) {
+    public Mono<PaymentHis> savePayment(@RequestBody PaymentHis ph) {
         ph = paymentHisService.save(ph);
         accountRepo.sendPayment(ph);
         return Mono.justOrEmpty(ph);
@@ -72,25 +70,6 @@ public class PaymentController {
 
     @PostMapping(path = "/getPaymentHistory")
     public Flux<?> getPaymentHistory(@RequestBody FilterObject filter) {
-        String tranOption = Util1.isNull(filter.getTranOption(), "-");
-        if (tranOption.equals("C") || tranOption.equals("S")) {
-            String fromDate = Util1.isNull(filter.getFromDate(), "-");
-            String toDate = Util1.isNull(filter.getToDate(), "-");
-            String vouNo = Util1.isNull(filter.getVouNo(), "-");
-            String saleVouNo = Util1.isNull(filter.getSaleVouNo(), "-");
-            String userCode = Util1.isNull(filter.getUserCode(), "-");
-            String account = Util1.isAll(filter.getAccount());
-            String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-            String remark = Util1.isNull(filter.getRemark(), "-");
-            String compCode = filter.getCompCode();
-            boolean deleted = filter.isDeleted();
-            String projectNo = Util1.isAll(filter.getProjectNo());
-            String curCode = Util1.isAll(filter.getCurCode());
-            return Flux.fromIterable(paymentHisService.search(fromDate, toDate, traderCode,
-                            curCode, vouNo, saleVouNo, userCode, account, projectNo, remark,
-                            deleted, compCode, tranOption))
-                    .onErrorResume(throwable -> Flux.empty());
-        }
-        return Flux.empty();
+        return paymentHisService.search(filter);
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.List;
 
 @Component
@@ -130,7 +129,7 @@ public class AutoUpload {
         if (!vouchers.isEmpty()) {
             log.info("uploadPayment : " + vouchers.size());
             vouchers.forEach(vou -> {
-                if (vou.isDeleted()) {
+                if (vou.getDeleted()) {
                     accountRepo.deleteInvVoucher(vou.getKey());
                 } else {
                     accountRepo.sendPayment(vou);
