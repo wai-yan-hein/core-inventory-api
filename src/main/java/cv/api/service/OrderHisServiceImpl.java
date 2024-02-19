@@ -61,7 +61,7 @@ public class OrderHisServiceImpl implements OrderHisService {
                 cSd.setDeptId(orderHis.getDeptId());
                 cSd.setKey(key);
             }
-            if (cSd.getStockCode() != null) {
+            if (cSd.getStockCode() != null || cSd.getDesign() != null) {
                 if (cSd.getKey().getUniqueId() == 0) {
                     if (i == 0) {
                         cSd.getKey().setUniqueId(1);
