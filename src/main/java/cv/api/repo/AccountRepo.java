@@ -842,50 +842,50 @@ public class AccountRepo {
                     String remark = ph.getRemark();
                     String vouNo = ph.getKey().getVouNo();
                     String tranOption = ph.getTranOption();
-                    boolean deleted = ph.isDeleted();
+                    boolean deleted = ph.getDeleted();
                     String projectNo = ph.getProjectNo();
                     TraderKey k = TraderKey.builder().build();
                     k.setCode(traderCode);
                     k.setCompCode(compCode);
-                    Trader t = traderService.findById(k).block();
-                    AccSetting setting = settingService.findByCode(new AccKey("SALE", compCode));
-                    assert t != null;
-                    if (!Util1.isNullOrEmpty(t.getAccount())) {
-                        List<Gl> list = new ArrayList<>();
-                        Gl gl = new Gl();
-                        GlKey key = new GlKey();
-                        key.setCompCode(compCode);
-                        key.setDeptId(deptId);
-                        gl.setKey(key);
-                        gl.setGlDate(vouDate);
-                        if (tranOption.equals("C")) {
-                            gl.setDescription("Cash Received.");
-                            gl.setSrcAccCode(account);
-                            gl.setAccCode(t.getAccount());
-                            gl.setTraderCode(traderCode);
-                            gl.setDrAmt(payAmt);
-                        } else if (tranOption.equals("S")) {
-                            gl.setDescription("Cash Payment.");
-                            gl.setSrcAccCode(account);
-                            gl.setAccCode(t.getAccount());
-                            gl.setTraderCode(traderCode);
-                            gl.setCrAmt(payAmt);
+                    traderService.findById(k).doOnNext(t -> {
+                        AccSetting setting = settingService.findByCode(new AccKey("SALE", compCode));
+                        if (!Util1.isNullOrEmpty(t.getAccount())) {
+                            List<Gl> list = new ArrayList<>();
+                            Gl gl = new Gl();
+                            GlKey key = new GlKey();
+                            key.setCompCode(compCode);
+                            key.setDeptId(deptId);
+                            gl.setKey(key);
+                            gl.setGlDate(vouDate);
+                            if (tranOption.equals("C")) {
+                                gl.setDescription("Cash Received.");
+                                gl.setSrcAccCode(account);
+                                gl.setAccCode(t.getAccount());
+                                gl.setTraderCode(traderCode);
+                                gl.setDrAmt(payAmt);
+                            } else if (tranOption.equals("S")) {
+                                gl.setDescription("Cash Payment.");
+                                gl.setSrcAccCode(account);
+                                gl.setAccCode(t.getAccount());
+                                gl.setTraderCode(traderCode);
+                                gl.setCrAmt(payAmt);
+                            }
+                            gl.setCurCode(curCode);
+                            gl.setReference(remark);
+                            gl.setDeptCode(setting != null ? setting.getDeptCode() : null);
+                            gl.setCreatedDate(LocalDateTime.now());
+                            gl.setCreatedBy(appName);
+                            gl.setTranSource("PAYMENT");
+                            gl.setRefNo(vouNo);
+                            gl.setDeleted(deleted);
+                            gl.setMacId(macId);
+                            gl.setProjectNo(projectNo);
+                            list.add(gl);
+                            sendAccount(list);
+                        } else {
+                            log.info(String.format("sendPayment : %s debtor account empty", traderCode));
                         }
-                        gl.setCurCode(curCode);
-                        gl.setReference(remark);
-                        gl.setDeptCode(setting != null ? setting.getDeptCode() : null);
-                        gl.setCreatedDate(LocalDateTime.now());
-                        gl.setCreatedBy(appName);
-                        gl.setTranSource("PAYMENT");
-                        gl.setRefNo(vouNo);
-                        gl.setDeleted(deleted);
-                        gl.setMacId(macId);
-                        gl.setProjectNo(projectNo);
-                        list.add(gl);
-                        sendAccount(list);
-                    } else {
-                        log.info(String.format("sendPayment : %s debtor account empty", traderCode));
-                    }
+                    }).subscribe();
                 } else {
                     updatePayment(ph.getKey().getVouNo(), ph.getKey().getCompCode(), "NN");
                 }

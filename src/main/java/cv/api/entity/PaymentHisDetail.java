@@ -1,8 +1,11 @@
 package cv.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -14,13 +17,13 @@ public class PaymentHisDetail {
     @Column(name = "sale_vou_no")
     private String saleVouNo;
     @Column(name = "pay_amt")
-    private double payAmt;
+    private Double payAmt;
     @Column(name = "dis_amt")
-    private double disAmt;
+    private Double disAmt;
     @Column(name = "dis_percent")
-    private double disPercent;
+    private Double disPercent;
     @Column(name = "full_paid")
-    private boolean fullPaid;
+    private Boolean fullPaid;
     @Column(name = "cur_code")
     private String curCode;
     @Column(name = "remark")
@@ -29,10 +32,10 @@ public class PaymentHisDetail {
     private String reference;
     @Temporal(TemporalType.DATE)
     @Column(name = "sale_vou_date")
-    private Date saleDate;
+    private LocalDate saleDate;
     @Column(name = "vou_total")
-    private double vouTotal;
+    private Double vouTotal;
     @Column(name = "vou_balance")
-    private double vouBalance;
+    private Double vouBalance;
 
 }

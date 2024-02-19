@@ -14,10 +14,6 @@ public interface PaymentHisDao {
     void restore(PaymentHisKey key);
 
     void delete(PaymentHisKey key);
-
-    List<PaymentHis> search(String startDate, String endDate, String traderCode,
-                            String curCode, String vouNo,String saleVouNo, String userCode, String account,
-                            String projectNo, String remark, boolean deleted, String compCode,String tranOption);
     List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
     List<VSale> getPaymentVoucher(String vouNo, String compCode);
     boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption);

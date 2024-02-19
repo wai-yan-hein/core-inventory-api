@@ -22,9 +22,9 @@ public class PaymentHis {
     @Column(name = "remark")
     private String remark;
     @Column(name = "deleted")
-    private boolean deleted;
+    private Boolean deleted;
     @Column(name = "amount")
-    private Float amount;
+    private Double amount;
     @Column(name = "created_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime createdDate;
     @Column(name = "updated_date", columnDefinition = "TIMESTAMP")

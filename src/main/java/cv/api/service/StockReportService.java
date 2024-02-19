@@ -491,7 +491,7 @@ public class StockReportService {
         switch (type) {
             case 0 -> filter = "(op_qty<>0 or pur_qty<>0 or in_qty<>0 or out_qty<>0 or sale_qty<>0)";
             case 1 -> filter = "(op_bag<>0 or pur_bag<>0 or in_bag<>0 or out_bag<>0 or sale_bag<>0)";
-            case 2 -> filter = "op_qty<>0";
+            case 2 -> filter = "stock_code is not null";
         }
         sql = String.format(sql, filter);
         return client.sql(sql)
