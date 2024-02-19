@@ -1791,6 +1791,9 @@ begin
 end$$
 DELIMITER ;
 
+alter table order_his_detail
+add column design text null after weight_unit,
+add column size text null after design;
 
 #view
 drop view if exists v_milling_output;
