@@ -1780,6 +1780,12 @@ add column tran_source int not null default 0;
 update stock_in_out_detail
 set amount =ifnull(in_qty,0)+ifnull(out_qty,0)*cost_price;
 
+alter table pur_his
+add column outstanding double(20,3) not null default 0;
+alter table sale_his
+add column outstanding double(20,3) not null default 0;
+
+
 DELIMITER $$
 create definer=root@localhost function iszero(input double, output double) returns double
 begin

@@ -1,10 +1,9 @@
 package cv.api.controller;
 
 import cv.api.common.FilterObject;
-import cv.api.common.Util1;
-import cv.api.dao.PaymentHisDetailDao;
 import cv.api.entity.PaymentHis;
-import cv.api.entity.PaymentHisKey;
+import cv.api.entity.PaymentHisDetail;
+import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
 import cv.api.service.PaymentHisService;
 import lombok.RequiredArgsConstructor;
@@ -17,26 +16,33 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "/payment")
 public class PaymentController {
     private final PaymentHisService paymentHisService;
-    private final PaymentHisDetailDao paymentHisDetailDao;
     private final AccountRepo accountRepo;
 
     @GetMapping(path = "/getTraderBalance")
-    public Flux<?> getCustomerBalance(@RequestParam String traderCode,
-                                      @RequestParam String tranOption,
-                                      @RequestParam String compCode) {
-        return paymentHisService.getTraderBalance(traderCode,tranOption,compCode);
+    public Flux<PaymentHisDetail> getCustomerBalance(@RequestParam String traderCode,
+                                                     @RequestParam String tranOption,
+                                                     @RequestParam String compCode) {
+        return paymentHisService.getTraderBalance(traderCode, tranOption, compCode);
     }
 
-    @PostMapping(path = "/deletePayment")
-    public Mono<?> deletePayment(@RequestBody PaymentHisKey key) {
-        paymentHisService.delete(key);
-        accountRepo.deleteInvVoucher(key);
-        return Mono.just(true);
+    @GetMapping(path = "/getTraderBalanceSummary")
+    public Mono<PaymentHis> getTraderBalanceSummary(@RequestParam String traderCode,
+                                                    @RequestParam String tranOption,
+                                                    @RequestParam String compCode) {
+        return paymentHisService.getTraderBalanceSummary(traderCode, tranOption, compCode);
     }
 
-    @PostMapping(path = "/restorePayment")
-    public Mono<?> restorePayment(@RequestBody PaymentHisKey key) {
-        paymentHisService.restore(key);
+    @DeleteMapping(path = "/deletePayment")
+    public Mono<Boolean> deletePayment(@RequestParam String vouNo, @RequestParam String compCode) {
+        return paymentHisService.delete(vouNo, compCode).flatMap(aBoolean -> {
+            accountRepo.deleteInvVoucher(vouNo, compCode);
+            return Mono.just(true);
+        });
+    }
+
+    @DeleteMapping(path = "/restorePayment")
+    public Mono<Boolean> restorePayment(@RequestParam String vouNo, @RequestParam String compCode) {
+        paymentHisService.restore(vouNo, compCode);
         return Mono.just(true);
 
     }
@@ -44,28 +50,20 @@ public class PaymentController {
 
     @PostMapping(path = "/savePayment")
     public Mono<PaymentHis> savePayment(@RequestBody PaymentHis ph) {
-        ph = paymentHisService.save(ph);
-        accountRepo.sendPayment(ph);
-        return Mono.justOrEmpty(ph);
+        return paymentHisService.save(ph).flatMap(his -> {
+            accountRepo.sendPayment(his);
+            return Mono.just(his);
+        });
     }
 
-    @PostMapping(path = "/paymentReport")
-    public Flux<?> paymentReport(@RequestBody PaymentHisKey ph) {
-        return Flux.fromIterable(paymentHisService.getPaymentVoucher(ph.getVouNo(), ph.getCompCode())).onErrorResume(throwable -> Flux.empty());
-    }
-
-    @PostMapping(path = "/checkPaymentExist")
-    public Mono<?> checkPaymentExist(@RequestBody FilterObject ph) {
-        String vouNo = ph.getVouNo();
-        String tranOption = ph.getTranOption();
-        String compCode = ph.getCompCode();
-        String traderCode = ph.getTraderCode();
-        return Mono.just(paymentHisService.checkPaymentExists(vouNo, traderCode, compCode, tranOption));
+    @GetMapping(path = "/paymentReport")
+    public Flux<VSale> paymentReport(@RequestParam String vouNo, @RequestParam String compCode) {
+        return paymentHisService.getPaymentVoucher(vouNo, compCode);
     }
 
     @GetMapping(path = "/getPaymentDetail")
-    public Flux<?> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Flux.fromIterable(paymentHisDetailDao.search(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<PaymentHisDetail> getPaymentDetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        return paymentHisService.getPaymentDetail(vouNo, compCode);
     }
 
     @PostMapping(path = "/getPaymentHistory")

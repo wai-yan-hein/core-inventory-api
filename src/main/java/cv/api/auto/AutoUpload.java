@@ -125,17 +125,18 @@ public class AutoUpload {
     }
 
     private void uploadPayment() {
-        List<PaymentHis> vouchers = paymentHisService.unUploadVoucher(Util1.toDate(syncDate));
-        if (!vouchers.isEmpty()) {
-            log.info("uploadPayment : " + vouchers.size());
-            vouchers.forEach(vou -> {
-                if (vou.getDeleted()) {
-                    accountRepo.deleteInvVoucher(vou.getKey());
-                } else {
-                    accountRepo.sendPayment(vou);
-                }
-            });
-        }
+        paymentHisService.unUploadVoucher(Util1.toDate(syncDate)).collectList().doOnNext(vouchers -> {
+            if (!vouchers.isEmpty()) {
+                log.info("uploadPayment : " + vouchers.size());
+                vouchers.forEach(vou -> {
+                    if (vou.getDeleted()) {
+                        accountRepo.deleteInvVoucher(vou.getVouNo(),vou.getCompCode());
+                    } else {
+                        accountRepo.sendPayment(vou);
+                    }
+                });
+            }
+        }).subscribe();
     }
 
     private void uploadLabourPayment() {

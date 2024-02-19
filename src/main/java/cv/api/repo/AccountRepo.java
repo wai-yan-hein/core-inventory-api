@@ -833,14 +833,14 @@ public class AccountRepo {
             if (ph != null) {
                 String account = ph.getAccount();
                 if (!Util1.isNullOrEmpty(account)) {
-                    String compCode = ph.getKey().getCompCode();
+                    String compCode = ph.getCompCode();
                     Integer deptId = ph.getDeptId();
                     String traderCode = ph.getTraderCode();
                     LocalDateTime vouDate = ph.getVouDate();
                     double payAmt = ph.getAmount();
                     String curCode = ph.getCurCode();
                     String remark = ph.getRemark();
-                    String vouNo = ph.getKey().getVouNo();
+                    String vouNo = ph.getVouNo();
                     String tranOption = ph.getTranOption();
                     boolean deleted = ph.getDeleted();
                     String projectNo = ph.getProjectNo();
@@ -887,7 +887,7 @@ public class AccountRepo {
                         }
                     }).subscribe();
                 } else {
-                    updatePayment(ph.getKey().getVouNo(), ph.getKey().getCompCode(), "NN");
+                    updatePayment(ph.getVouNo(), ph.getCompCode(), "NN");
                 }
             }
         }
@@ -989,13 +989,13 @@ public class AccountRepo {
         deleteGlByVoucher(gl);
     }
 
-    public void deleteInvVoucher(PaymentHisKey key) {
+    public void deleteInvVoucher(String vouNo, String compCode) {
         Gl gl = new Gl();
         GlKey glKey = new GlKey();
-        glKey.setCompCode(key.getCompCode());
+        glKey.setCompCode(compCode);
         gl.setKey(glKey);
         gl.setTranSource("PAYMENT");
-        gl.setRefNo(key.getVouNo());
+        gl.setRefNo(vouNo);
         deleteGlByVoucher(gl);
     }
 

@@ -18,6 +18,7 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +39,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     private final VouDiscountDao vouDiscountDao;
     private final SaleOrderJoinDao saleOrderJoinDao;
     private final OrderHisDao orderHisDao;
-    private final DatabaseClient databaseClient;
+    private final DatabaseClient client;
 
     @Override
     public SaleHis save(@NotNull SaleHis saleHis) {
@@ -238,7 +239,6 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
 
-
     @Override
     public void truncate(SaleHisKey key) {
         shDao.truncate(key);
@@ -309,7 +309,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                 and a.comp_code = t.comp_code
                 order by vou_date desc""";
 
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("compCode", compCode)
                 .bind("deptId", deptId)
                 .bind("deleted", deleted)
@@ -347,5 +347,19 @@ public class SaleHisServiceImpl implements SaleHisService {
                 ).all();
     }
 
+    @Override
+    public Mono<Boolean> updatePost(String vouNo, String compCode, boolean post) {
+        String sql = """
+                update sale_his
+                set post = :post
+                where vou_no=:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("post", post)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated().thenReturn(true);
+    }
 
 }

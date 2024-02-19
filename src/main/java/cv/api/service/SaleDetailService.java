@@ -7,6 +7,7 @@ package cv.api.service;
 
 import cv.api.entity.SaleDetailKey;
 import cv.api.entity.SaleHisDetail;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public interface SaleDetailService {
     List<SaleHisDetail> getSaleByBatch(String batchNo, String compCode, Integer depId);
 
     List<SaleHisDetail> getSaleByBatchDetail(String batchNo, String compCode, Integer depId);
+
 
 
 }
