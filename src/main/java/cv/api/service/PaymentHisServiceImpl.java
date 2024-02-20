@@ -520,7 +520,6 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                     group by trader_code,cur_code
                     """;
         }
-
         return client.sql(sql)
                 .bind("traderCode", traderCode)
                 .bind("compCode", compCode)

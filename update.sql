@@ -1781,9 +1781,9 @@ update stock_in_out_detail
 set amount =ifnull(in_qty,0)+ifnull(out_qty,0)*cost_price;
 
 alter table pur_his
-add column outstanding double(20,3) not null default 0;
+add column outstanding double(20,3);
 alter table sale_his
-add column outstanding double(20,3) not null default 0;
+add column outstanding double(20,3);
 
 
 DELIMITER $$
