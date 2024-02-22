@@ -112,6 +112,8 @@ public class SaleHis {
     private boolean sPay;
     @Column(name = "tran_source")
     private int tranSource;
+    @Column(name = "outstanding")
+    private Double outstanding;
     @Transient
     private String status = "STATUS";
     @Transient
@@ -125,7 +127,7 @@ public class SaleHis {
     @Transient
     private List<SaleExpense> listExpense;
     @Transient
-    private  List<SaleExpenseKey> listDelExpense;
+    private List<SaleExpenseKey> listDelExpense;
     @Transient
     private List<VouDiscount> listVouDiscount;
     @Transient

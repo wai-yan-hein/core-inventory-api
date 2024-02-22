@@ -2,18 +2,19 @@ package cv.api.service;
 
 import cv.api.common.FilterObject;
 import cv.api.common.Util1;
-import cv.api.dao.PaymentHisDao;
-import cv.api.dao.PaymentHisDetailDao;
-import cv.api.dao.SaleHisDao;
-import cv.api.dao.SeqTableDao;
-import cv.api.entity.*;
+import cv.api.entity.PaymentHis;
+import cv.api.entity.PaymentHisDetail;
 import cv.api.model.VSale;
+import io.r2dbc.spi.Parameters;
+import io.r2dbc.spi.R2dbcType;
+import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,81 +25,236 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentHisServiceImpl implements PaymentHisService {
-    private final PaymentHisDao dao;
-    private final PaymentHisDetailDao detailDao;
-    private final SeqTableDao seqDao;
-    private final SaleHisDao saleHisDao;
+    private final SaleHisService saleHisService;
     private final DatabaseClient client;
+    private final VouNoService vouNoService;
 
     @Override
-    public PaymentHis save(PaymentHis obj) {
-        obj.setVouDate(Util1.toDateTime(obj.getVouDate()));
-        if (Util1.isNullOrEmpty(obj.getKey().getVouNo())) {
-            obj.getKey().setVouNo(getVoucherNo(obj.getMacId(), obj.getKey().getCompCode(), obj.getDeptId(), obj.getTranOption()));
-        }
-        List<PaymentHisDetail> listDetail = obj.getListDetail();
-        List<PaymentHisDetailKey> listDel = obj.getListDelete();
-        String vouNo = obj.getKey().getVouNo();
-        if (listDel != null) {
-            listDel.forEach(detailDao::delete);
-        }
-        for (int i = 0; i < listDetail.size(); i++) {
-            PaymentHisDetail cSd = listDetail.get(i);
-            if (Util1.isNullOrEmpty(cSd.getKey())) {
-                PaymentHisDetailKey key = new PaymentHisDetailKey();
-                key.setCompCode(obj.getKey().getCompCode());
-                key.setVouNo(vouNo);
-                key.setUniqueId(0);
-                key.setDeptId(obj.getDeptId());
-                cSd.setKey(key);
+    public Mono<PaymentHis> save(PaymentHis dto) {
+        return saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
+            List<PaymentHisDetail> list = dto.getListDetail();
+            if (list != null && !list.isEmpty()) {
+                return Flux.fromIterable(list)
+                        .filter(detail -> Util1.getDouble(detail.getPayAmt()) != 0)
+                        .concatMap(detail -> {
+                            int uniqueId = list.indexOf(detail) + 1;
+                            detail.setUniqueId(uniqueId);
+                            detail.setVouNo(payment.getVouNo());
+                            detail.setCompCode(payment.getCompCode());
+                            detail.setDeptId(payment.getDeptId());
+                            return updateSale(detail, true).then(insertDetail(detail));
+                        }).then(Mono.just(payment));
             }
-            if (Util1.getFloat(cSd.getPayAmt()) > 0) {
-                if (cSd.getKey().getUniqueId() == 0) {
-                    if (i == 0) {
-                        cSd.getKey().setUniqueId(1);
-                    } else {
-                        PaymentHisDetail pSd = listDetail.get(i - 1);
-                        cSd.getKey().setUniqueId(pSd.getKey().getUniqueId() + 1);
-                    }
-                }
-                detailDao.save(cSd);
-                updateSale(cSd, true);
-            }
-            dao.save(obj);
-            obj.setListDetail(listDetail);
-        }
-        return obj;
+            return Mono.empty();
+        }));
     }
 
-    private void updateSale(PaymentHisDetail ph, boolean post) {
+    public Mono<PaymentHisDetail> insertDetail(PaymentHisDetail his) {
+        String sql = """
+                INSERT INTO payment_his_detail
+                (vou_no, comp_code, unique_id, dept_id, sale_vou_date, sale_vou_no, pay_amt,
+                 dis_percent, dis_amt, cur_code, remark, reference, full_paid, vou_total, vou_balance)
+                VALUES
+                (:vouNo, :compCode, :uniqueId, :deptId, :saleVouDate, :saleVouNo, :payAmt,
+                 :disPercent, :disAmt, :curCode, :remark, :reference, :fullPaid, :vouTotal, :vouBalance)
+                """;
+        return executeUpdate(sql, his);
+    }
+
+    private Mono<PaymentHisDetail> executeUpdate(String sql, PaymentHisDetail his) {
+        return client.sql(sql)
+                .bind("vouNo", his.getVouNo())
+                .bind("compCode", his.getCompCode())
+                .bind("uniqueId", his.getUniqueId())
+                .bind("deptId", his.getDeptId())
+                .bind("saleVouDate", his.getSaleDate())
+                .bind("saleVouNo", his.getSaleVouNo())
+                .bind("payAmt", his.getPayAmt())
+                .bind("disPercent", Parameters.in(R2dbcType.DOUBLE, his.getDisPercent()))
+                .bind("disAmt", Parameters.in(R2dbcType.DOUBLE, his.getDisAmt()))
+                .bind("curCode", Parameters.in(R2dbcType.VARCHAR, his.getCurCode()))
+                .bind("remark", Parameters.in(R2dbcType.VARCHAR, his.getRemark()))
+                .bind("reference", Parameters.in(R2dbcType.VARCHAR, his.getReference()))
+                .bind("fullPaid", his.getFullPaid())
+                .bind("vouTotal", his.getVouTotal())
+                .bind("vouBalance", his.getVouBalance())
+                .fetch().rowsUpdated().thenReturn(his);
+    }
+
+    private Mono<Boolean> deleteDetail(String vouNo, String compCode) {
+        String sql = """
+                delete from payment_his_detail
+                where vou_no=:vouNo and comp_code=:compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .thenReturn(true)
+                .defaultIfEmpty(false);
+    }
+
+
+    private Mono<PaymentHis> saveOrUpdate(PaymentHis dto) {
+        String vouNo = dto.getVouNo();
+        String compCode = dto.getCompCode();
+        int deptId = dto.getDeptId();
+        int macId = dto.getMacId();
+        String tranOption = dto.getTranOption();
+        String option = tranOption.equals("C") ? "RECEIVE" : "PAYMENT";
+        dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
+        if (vouNo == null) {
+            return vouNoService.getVouNo(deptId, option, compCode, macId)
+                    .flatMap(seqNo -> {
+                        seqNo = tranOption + "-" + seqNo;
+                        dto.setVouNo(seqNo);
+                        dto.setCreatedDate(LocalDateTime.now());
+                        dto.setUpdatedDate(LocalDateTime.now());
+                        return insertPayment(dto);
+                    });
+        } else {
+            return updatePayment(dto);
+        }
+    }
+
+    public Mono<PaymentHis> insertPayment(PaymentHis his) {
+        String sql = """
+                INSERT INTO payment_his
+                (vou_no, comp_code, dept_id, vou_date, trader_code, cur_code, remark, amount,
+                 deleted, created_date, created_by, updated_date, updated_by, mac_id, account,
+                 project_no, intg_upd_status, tran_option)
+                VALUES
+                (:vouNo, :compCode, :deptId, :vouDate, :traderCode, :curCode, :remark, :amount,
+                 :deleted, :createdDate, :createdBy, :updatedDate, :updatedBy, :macId, :account,
+                 :projectNo, :intgUpdStatus, :tranOption)
+                """;
+        return executeUpdate(sql, his);
+    }
+
+    public Mono<PaymentHis> updatePayment(PaymentHis his) {
+        String sql = """
+                UPDATE payment_his
+                SET dept_id = :deptId,
+                    vou_date = :vouDate,
+                    trader_code = :traderCode,
+                    cur_code = :curCode,
+                    remark = :remark,
+                    amount = :amount,
+                    deleted = :deleted,
+                    created_date = :createdDate,
+                    created_by = :createdBy,
+                    updated_date = :updatedDate,
+                    updated_by = :updatedBy,
+                    mac_id = :macId,
+                    account = :account,
+                    project_no = :projectNo,
+                    intg_upd_status = :intgUpdStatus,
+                    tran_option = :tranOption
+                WHERE vou_no = :vouNo AND comp_code = :compCode
+                """;
+        return executeUpdate(sql, his);
+    }
+
+    private Mono<PaymentHis> executeUpdate(String sql, PaymentHis his) {
+        return client.sql(sql)
+                .bind("vouNo", his.getVouNo())
+                .bind("compCode", his.getCompCode())
+                .bind("deptId", his.getDeptId())
+                .bind("vouDate", his.getVouDate())
+                .bind("traderCode", his.getTraderCode())
+                .bind("curCode", his.getCurCode())
+                .bind("remark", Parameters.in(R2dbcType.VARCHAR, his.getRemark()))
+                .bind("amount", his.getAmount())
+                .bind("deleted", his.getDeleted())
+                .bind("createdDate", his.getCreatedDate())
+                .bind("createdBy", his.getCreatedBy())
+                .bind("updatedDate", LocalDateTime.now())
+                .bind("updatedBy", Parameters.in(R2dbcType.TIMESTAMP, his.getUpdatedBy()))
+                .bind("macId", his.getMacId())
+                .bind("account", Parameters.in(R2dbcType.VARCHAR, his.getAccount()))
+                .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, his.getProjectNo()))
+                .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, his.getIntgUpdStatus()))
+                .bind("tranOption", his.getTranOption())
+                .fetch().rowsUpdated().thenReturn(his);
+    }
+
+    private PaymentHis mapToPayment(Row row) {
+        return PaymentHis.builder()
+                .vouNo(row.get("vou_no", String.class))
+                .compCode(row.get("comp_code", String.class))
+                .deptId(row.get("dept_id", Integer.class))
+                .vouDate(row.get("vou_date", LocalDateTime.class))
+                .traderCode(row.get("trader_code", String.class))
+                .curCode(row.get("cur_code", String.class))
+                .remark(row.get("remark", String.class))
+                .amount(row.get("amount", Double.class))
+                .deleted(row.get("deleted", Boolean.class))
+                .createdDate(row.get("created_date", LocalDateTime.class))
+                .createdBy(row.get("created_by", String.class))
+                .updatedDate(row.get("updated_date", LocalDateTime.class))
+                .updatedBy(row.get("updated_by", String.class))
+                .macId(row.get("mac_id", Integer.class))
+                .account(row.get("account", String.class))
+                .projectNo(row.get("project_no", String.class))
+                .intgUpdStatus(row.get("intg_upd_status", String.class))
+                .tranOption(row.get("tran_option", String.class))
+                .build();
+    }
+
+
+    private Mono<Boolean> updateSale(PaymentHisDetail ph, boolean post) {
         String saleVouNo = ph.getSaleVouNo();
+        String compCode = ph.getCompCode();
         if (!Util1.isNullOrEmpty(saleVouNo)) {
-            SaleHisKey key = new SaleHisKey();
-            key.setVouNo(saleVouNo);
-            key.setCompCode(ph.getKey().getCompCode());
-            SaleHis wh = saleHisDao.findById(key);
-            if (wh != null) {
-                wh.setPost(post);
-                saleHisDao.save(wh);
-            }
+            return saleHisService.updatePost(saleVouNo, compCode, post);
         }
+        return Mono.just(false);
+    }
+
+
+    @Override
+    public Mono<PaymentHis> find(String vouNo, String compCode) {
+        String sql = """
+                select *
+                from payment_his
+                where comp_code =:compCode
+                and vou_no=:vouNo
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("vouNo", vouNo)
+                .map((row, rowMetadata) -> mapToPayment(row)).one();
+
     }
 
     @Override
-    public PaymentHis find(PaymentHisKey key) {
-        return dao.find(key);
+    public Mono<Boolean> delete(String vouNo, String compCode) {
+        String sql = """
+                update payment_his set deleted = true where vou_no = :vouNo and comp_code = :compCode
+                """;
+        Mono<Boolean> deleteMono = client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated()
+                .thenReturn(true);
+
+        Mono<Boolean> updateMono = getPaymentDetail(vouNo, compCode)
+                .flatMap(pd -> updateSale(pd, false))
+                .then(Mono.just(true));
+
+        return deleteMono.then(updateMono);
     }
 
     @Override
-    public void delete(PaymentHisKey key) {
-        dao.delete(key);
-        List<PaymentHisDetail> list = detailDao.search(key.getVouNo(), key.getCompCode());
-        list.forEach(t -> updateSale(t, false));
-    }
-
-    @Override
-    public void restore(PaymentHisKey key) {
-        dao.restore(key);
+    public Mono<Boolean> restore(String vouNo, String compCode) {
+        String sql = """
+                update payment_his set deleted = true where vou_no = :vouNo and comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
     }
 
     @Override
@@ -154,52 +310,80 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                     .bind("createdBy", userCode)
                     .bind("account", account)
                     .bind("remark", remark)
-                    .map((row) -> {
-                        PaymentHis p = new PaymentHis();
-                        PaymentHisKey key = new PaymentHisKey();
-                        key.setCompCode(row.get("comp_code", String.class));
-                        key.setVouNo(row.get("vou_no", String.class));
-                        p.setKey(key);
-                        p.setDeptId(row.get("dept_id", Integer.class));
-                        p.setVouDate(row.get("vou_date", LocalDateTime.class));
-                        p.setVouDateTime(Util1.toZonedDateTime(p.getVouDate()));
-                        p.setAmount(row.get("amount", Double.class));
-                        p.setRemark(row.get("remark", String.class));
-                        p.setDeleted(row.get("deleted", Boolean.class));
-                        p.setCreatedBy(row.get("created_by", String.class));
-                        p.setProjectNo(row.get("project_no", String.class));
-                        p.setTraderCode(row.get("trader_code", String.class));
-                        p.setTraderName(row.get("trader_name", String.class));
-                        p.setAccount(row.get("account", String.class));
-                        p.setCurCode(row.get("cur_code", String.class));
-                        return p;
-                    }).all();
+                    .map((row) -> PaymentHis.builder()
+                            .vouNo(row.get("vou_no", String.class))
+                            .compCode(row.get("comp_code", String.class))
+                            .deptId(row.get("dept_id", Integer.class))
+                            .vouDate(row.get("vou_date", LocalDateTime.class))
+                            .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
+                            .amount(row.get("amount", Double.class))
+                            .remark(row.get("remark", String.class))
+                            .deleted(row.get("deleted", Boolean.class))
+                            .createdBy(row.get("created_by", String.class))
+                            .projectNo(row.get("project_no", String.class))
+                            .traderCode(row.get("trader_code", String.class))
+                            .traderName(row.get("trader_name", String.class))
+                            .account(row.get("account", String.class))
+                            .curCode(row.get("cur_code", String.class))
+                            .createdDate(row.get("created_date", LocalDateTime.class))
+                            .createdBy(row.get("created_by", String.class))
+                            .build())
+                    .all();
+
         }
         return Flux.empty();
     }
 
     @Override
-    public List<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
-        return dao.unUploadVoucher(syncDate);
+    public Flux<PaymentHis> unUploadVoucher(LocalDateTime syncDate) {
+        String sql = """
+                select *
+                from payment_his
+                where intg_upd_status is null
+                and vou_date >= :syncDate
+                """;
+        return client.sql(sql)
+                .bind("syncDate", syncDate)
+                .map((row, rowMetadata) -> mapToPayment(row)).all();
     }
 
     @Override
-    public List<VSale> getPaymentVoucher(String vouNo, String compCode) {
-        return dao.getPaymentVoucher(vouNo, compCode);
+    public Flux<VSale> getPaymentVoucher(String vouNo, String compCode) {
+        String sql = """
+                select a.*,t.user_code,t.trader_name,t.address
+                from (
+                select ph.vou_date,ph.vou_no,ph.trader_code,ph.cur_code,ph.amount,phd.sale_vou_no,
+                phd.sale_vou_date,phd.vou_total,phd.pay_amt,phd.vou_balance,phd.unique_id,ph.comp_code,ph.tran_option
+                from payment_his ph, payment_his_detail phd
+                where ph.vou_no = phd.vou_no
+                and ph.comp_code = phd.comp_code
+                and ph.vou_no =:vouNo
+                and ph.comp_code =:compCode
+                )a
+                join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
+                order by unique_id""";
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .map((row, rowMetadata) -> VSale.builder()
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .curCode(row.get("cur_code", String.class))
+                        .paid(row.get("pay_amt", Double.class))
+                        .vouBalance(row.get("vou_balance", Double.class))
+                        .userCode(row.get("user_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .address(row.get("address", String.class))
+                        .tranOption(row.get("tran_option", String.class))
+                        .saleVouNo(row.get("sale_vou_no", String.class))
+                        .vouTotal(row.get("vou_total", Double.class))
+                        .payDate(Util1.toDateStr(row.get("vou_date", LocalDateTime.class), "dd/MM/yyyy"))
+                        .vouDate(Util1.toDateStr(row.get("sale_vou_date", LocalDate.class), "dd/MM/yyyy"))
+                        .build()).all();
+
     }
 
-    @Override
-    public boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption) {
-        return dao.checkPaymentExists(vouNo, traderCode, compCode, tranOption);
-    }
-
-    private String getVoucherNo(Integer macId, String compCode, Integer deptId, String tranOption) {
-        String option = tranOption.equals("C") ? "RECEIVE" : "PAYMENT";
-        String period = Util1.toDateStr(Util1.getTodayDate(), "MMyy");
-        int seqNo = seqDao.getSequence(macId, option, period, compCode);
-        String deptCode = String.format("%0" + 2 + "d", deptId) + "-";
-        return tranOption + "-" + deptCode + String.format("%0" + 2 + "d", macId) + String.format("%0" + 5 + "d", seqNo) + "-" + period;
-    }
 
     @Override
     public Flux<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode) {
@@ -261,7 +445,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                         join pur_his sh
                         on b.vou_no = sh.vou_no
                         and b.comp_code = sh.comp_code
-                        where outstanding<>0
+                        where b.outstanding<>0
                         order by vou_date;""";
 
             }
@@ -269,18 +453,113 @@ public class PaymentHisServiceImpl implements PaymentHisService {
                     .bind("traderCode", traderCode)
                     .bind("compCode", compCode)
                     .bind("tranOption", tranOption)
-                    .map((row, rowMetadata) -> {
-                        PaymentHisDetail pd = new PaymentHisDetail();
-                        pd.setSaleDate(row.get("vou_date", LocalDate.class));
-                        pd.setSaleVouNo(row.get("vou_no", String.class));
-                        pd.setRemark(row.get("remark", String.class));
-                        pd.setVouTotal(row.get("vou_total", Double.class));
-                        pd.setVouBalance(row.get("outstanding", Double.class));
-                        pd.setCurCode(row.get("cur_code", String.class));
-                        pd.setReference(row.get("reference", String.class));
-                        return pd;
-                    }).all();
+                    .map((row, rowMetadata) -> PaymentHisDetail.builder()
+                            .saleDate(row.get("vou_date", LocalDate.class))
+                            .saleVouNo(row.get("vou_no", String.class))
+                            .remark(row.get("remark", String.class))
+                            .vouTotal(row.get("vou_total", Double.class))
+                            .vouBalance(row.get("outstanding", Double.class))
+                            .curCode(row.get("cur_code", String.class))
+                            .reference(row.get("reference", String.class))
+                            .build())
+                    .all();
+
         }
         return Flux.empty();
+    }
+
+    @Override
+    public Mono<PaymentHis> getTraderBalanceSummary(String traderCode, String tranOption, String compCode) {
+        String sql;
+        if (tranOption.equals("C")) {
+            sql = """
+                    select trader_code,cur_code,sum(vou_balance) outstanding,comp_code
+                    from (
+                    select trader_code,cur_code,round(sum(vou_balance),0) vou_balance,comp_code
+                    from sale_his
+                    where trader_code=:traderCode
+                    and comp_code =:compCode
+                    and deleted = false
+                    and vou_balance>0
+                    group by trader_code,cur_code,comp_code
+                      union all
+                    select pd.trader_code,phd.cur_code,round(sum(phd.pay_amt),0)*-1,pd.comp_code
+                    from payment_his pd join payment_his_detail phd
+                    on pd.vou_no = phd.vou_no
+                    and pd.comp_code = phd.comp_code
+                    where pd.trader_code=:traderCode
+                    and pd.comp_code =:compCode
+                    and pd.tran_option ='C'
+                    and pd.deleted = false
+                    group by pd.trader_code,pd.cur_code,pd.comp_code
+                    )a
+                    group by trader_code,cur_code
+                    """;
+        } else {
+            sql = """
+                    select trader_code,cur_code,sum(vou_balance) outstanding,comp_code
+                    from (
+                    select trader_code,cur_code,round(sum(balance),0) vou_balance,comp_code
+                    from pur_his
+                    where trader_code=:traderCode
+                    and comp_code =:compCode
+                    and deleted = false
+                    and balance>0
+                    group by trader_code,cur_code,comp_code
+                      union all
+                    select pd.trader_code,phd.cur_code,round(sum(phd.pay_amt),0)*-1,pd.comp_code
+                    from payment_his pd join payment_his_detail phd
+                    on pd.vou_no = phd.vou_no
+                    and pd.comp_code = phd.comp_code
+                    where pd.trader_code=:traderCode
+                    and pd.comp_code =:compCode
+                    and pd.tran_option ='S'
+                    and pd.deleted = false
+                    group by pd.trader_code,pd.cur_code,pd.comp_code
+                    )a
+                    group by trader_code,cur_code
+                    """;
+        }
+        return client.sql(sql)
+                .bind("traderCode", traderCode)
+                .bind("compCode", compCode)
+                .map((row) -> PaymentHis.builder()
+                        .traderCode(row.get("trader_code", String.class))
+                        .curCode(row.get("cur_code", String.class))
+                        .amount(row.get("outstanding", Double.class))
+                        .build()).one();
+    }
+
+    @Override
+    public Flux<PaymentHisDetail> getPaymentDetail(String vouNo, String compCode) {
+        String sql = """
+                select *
+                from payment_his_detail
+                where comp_code = :compCode
+                and vou_no=:vouNo
+                order by unique_id;
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("vouNo", vouNo)
+                .map((row) -> PaymentHisDetail.builder()
+                        .vouNo(row.get("vou_no", String.class))
+                        .compCode(row.get("comp_code", String.class))
+                        .deptId(row.get("unique_id", Integer.class))
+                        .deptId(row.get("dept_id", Integer.class))
+                        .saleDate(row.get("sale_vou_date", LocalDate.class))
+                        .saleVouNo(row.get("sale_vou_no", String.class))
+                        .payAmt(row.get("pay_amt", Double.class))
+                        .disPercent(row.get("dis_percent", Double.class))
+                        .disAmt(row.get("dis_amt", Double.class))
+                        .curCode(row.get("cur_code", String.class))
+                        .remark(row.get("remark", String.class))
+                        .reference(row.get("reference", String.class))
+                        .fullPaid(row.get("full_paid", Boolean.class))
+                        .vouTotal(row.get("vou_total", Double.class))
+                        .vouBalance(row.get("vou_balance", Double.class))
+                        .build())
+                .all();
+
     }
 }

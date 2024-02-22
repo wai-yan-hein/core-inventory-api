@@ -798,12 +798,24 @@ public class ReportServiceImpl implements ReportService {
                         .bag(Util1.toNull(row.get("bag", Double.class)))
                         .build()).all()
                 .collectList()
+                .map(this::calPercent)
                 .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
                         .message("Data fetched successfully")
                         .file(fileBytes)
                         .build());
+    }
+
+    private List<VSale> calPercent(List<VSale> list) {
+        double totalQty = list.stream()
+                .filter(v -> Objects.nonNull(v.getQty())) // Filter out null values
+                .mapToDouble(VSale::getQty) // Map to double
+                .sum(); // Perform the sum operation
+        if (!list.isEmpty()) {
+            list.forEach(t -> t.setQtyPercent((t.getQty() / totalQty) * 100));
+        }
+        return list;
     }
 
     @Override
@@ -1541,8 +1553,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Mono<General> getWeightAvgPrice(String stockCode,String locCode, String compCode) {
-        String sql= """
+    public Mono<General> getWeightAvgPrice(String stockCode, String locCode, String compCode) {
+        String sql = """
                 select stock_code,comp_code,sum(amount)/sum(qty) price
                 from  (
                 select stock_code,comp_code,sum(qty) qty,sum(amount) amount
@@ -1562,13 +1574,13 @@ public class ReportServiceImpl implements ReportService {
                 )a
                 group by stock_code,comp_code
                 """;
-        return opHisService.getOpeningDateByLocation(compCode,locCode)
+        return opHisService.getOpeningDateByLocation(compCode, locCode)
                 .flatMap(opDate -> client.sql(sql)
-                        .bind("opDate",opDate)
-                        .bind("compCode",compCode)
-                        .bind("stockCode",stockCode)
+                        .bind("opDate", opDate)
+                        .bind("compCode", compCode)
+                        .bind("stockCode", stockCode)
                         .map((row) -> General.builder()
-                                .amount(Util1.getDouble(row.get("price",Double.class)))
+                                .amount(Util1.getDouble(row.get("price", Double.class)))
                                 .build())
                         .one());
     }
@@ -2260,14 +2272,15 @@ public class ReportServiceImpl implements ReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("deptId", deptId)
-                .map((row) -> General.builder()
+                .map((row) -> VSale.builder()
                         .stockCode(row.get("s_user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
-                        .amount(row.get("amount", Double.class))
+                        .saleAmount(row.get("amount", Double.class))
                         .qty(Util1.toNull(row.get("qty", Double.class)))
                         .bag(Util1.toNull(row.get("bag", Double.class)))
                         .build()).all()
                 .collectList()
+                .map(this::calPercent)
                 .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
@@ -2536,7 +2549,7 @@ public class ReportServiceImpl implements ReportService {
                     c.setOpenWeight(opWeight);
                     //c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     c.setPurWeight(purWeight);
-                   // c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
+                    // c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     c.setInWeight(inWeight);
                     //c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     c.setSaleWeight(saleWeight);
@@ -5134,8 +5147,6 @@ public class ReportServiceImpl implements ReportService {
                 "group by date(vou_date),vou_no,stock_code,trader_code";
         executeSql(delSql, saleSql, opSql, outSql);
     }
-
-
 
 
     @Override

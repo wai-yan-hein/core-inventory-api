@@ -3,29 +3,29 @@ package cv.api.service;
 import cv.api.common.FilterObject;
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisDetail;
-import cv.api.entity.PaymentHisKey;
 import cv.api.model.VSale;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface PaymentHisService {
-    PaymentHis save(PaymentHis obj);
+    Mono<PaymentHis> save(PaymentHis obj);
 
-    PaymentHis find(PaymentHisKey key);
+    Mono<PaymentHis> find(String vouNo, String compCode);
 
-    void delete(PaymentHisKey key);
+    Mono<Boolean> delete(String vouNo, String compCode);
 
-    void restore(PaymentHisKey key);
+    Mono<Boolean> restore(String vouNo, String compCode);
 
     Flux<PaymentHis> search(FilterObject filter);
 
-    List<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
+    Flux<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 
-    List<VSale> getPaymentVoucher(String vouNo, String compCode);
+    Flux<VSale> getPaymentVoucher(String vouNo, String compCode);
 
-    boolean checkPaymentExists(String vouNo, String traderCode, String compCode, String tranOption);
     Flux<PaymentHisDetail> getTraderBalance(String traderCode, String tranOption, String compCode);
+    Mono<PaymentHis> getTraderBalanceSummary(String traderCode, String tranOption, String compCode);
+    Flux<PaymentHisDetail> getPaymentDetail(String vouNo,String compCode);
 
 }

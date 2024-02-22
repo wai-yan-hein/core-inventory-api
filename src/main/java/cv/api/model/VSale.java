@@ -100,5 +100,6 @@ public class VSale {
     private String saleUnitName;
     private String weightUnitName;
     private Boolean post;
+    private double qtyPercent;
     List<VouDiscount> listDiscount;
 }

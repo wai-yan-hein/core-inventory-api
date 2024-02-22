@@ -108,6 +108,8 @@ public class PurHis {
     private boolean sRec;
     @Column(name = "tran_source")
     private int tranSource;
+    @Column(name = "outstanding")
+    private Double outstanding;
     @Transient
     private String status = "STATUS";
     @Transient

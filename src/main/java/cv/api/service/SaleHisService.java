@@ -12,6 +12,7 @@ import cv.api.entity.SaleHisKey;
 import cv.api.entity.VouDiscount;
 import cv.api.model.VSale;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,4 +49,5 @@ public interface SaleHisService {
     List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
     Flux<VSale> getSale(FilterObject filterObject);
+    Mono<Boolean> updatePost(String vouNo, String compCode, boolean post);
 }
