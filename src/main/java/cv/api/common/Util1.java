@@ -285,4 +285,10 @@ public class Util1 {
     public static String getPassword() {
         return Util1.toDateStr(Util1.getTodayDate(), "yyyyMMdd");
     }
+
+    public static String addDay(String sqlFormat, int day) {
+        LocalDate date = LocalDate.parse(sqlFormat);
+        LocalDate minusDays = date.plusDays(day);
+        return minusDays.toString();
+    }
 }

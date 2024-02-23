@@ -263,7 +263,7 @@ public class StockReportService {
         String retOutSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(ttl_wet)*-1 ttl_wet, sum(ttl_rice)*-1 ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0)*-1 ttl_weight,sum(amt)*-1,loc_code,:macId,comp_code,dept_id
-                from v_return_in
+                from v_return_out
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
                 and calculate = true
@@ -341,7 +341,7 @@ public class StockReportService {
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'Issue',date(vou_date) vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,
                 0,0, sum(pay_bag)*-1 ttl_bag,0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
-                from v_stock_payment v
+                from v_stock_payment
                 where deleted = false
                 and comp_code =:compCode
                 and calculate = true
@@ -1235,7 +1235,7 @@ public class StockReportService {
 
     public Mono<ReturnObject> getStockValue(ReportFilter filter) {
         String opDate = filter.getOpDate();
-        String toDate = filter.getToDate();
+        String toDate = Util1.addDay(filter.getToDate(), 1);
         String typeCode = filter.getStockTypeCode();
         String catCode = filter.getCatCode();
         String brandCode = filter.getBrandCode();
@@ -1243,6 +1243,7 @@ public class StockReportService {
         String compCode = filter.getCompCode();
         int deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
+        log.info(toDate);
         Mono<Long> monoPrice = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, deptId, macId);
         Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
         return monoPrice.then(monoOp).then(getStockValueResult(macId));
