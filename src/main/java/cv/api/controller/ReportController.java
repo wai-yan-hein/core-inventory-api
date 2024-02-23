@@ -135,10 +135,8 @@ public class ReportController {
                 String compCode = filter.getCompCode();
                 Integer deptId = filter.getDeptId();
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
-                String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
-                String opDatePaddy = reportService.getOpeningDate(compCode, OPHis.PADDY);
+                String opDate =reportService.getOpeningDateByLocation(compCode, locCode);
                 String opPayableDate = reportService.getOpeningDate(compCode, OPHis.PAYABLE);
-                String opDateLocation = reportService.getOpeningDateByLocation(compCode, locCode);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
@@ -297,26 +295,26 @@ public class ReportController {
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutSummaryByWeight" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDateLocation, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
+                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutQtySummary","StockInOutQtySummaryByStock" -> {
-                        filter.setOpDate(opDatePaddy);
+                    case "StockInOutQtySummary", "StockInOutQtySummaryByStock" -> {
+                        filter.setOpDate(opDate);
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
                     case "StockInOutPaddySummaryWetRice" -> {
                         filter.setReportType(2);
-                        filter.setOpDate(opDatePaddy);
+                        filter.setOpDate(opDate);
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
                     case "StockInOutPaddyDetailWetRice", "StockInOutQtyBagDetail" -> {
                         filter.setReportType(2);
-                        filter.setOpDate(opDatePaddy);
-                        log.info(opDatePaddy);
+                        filter.setOpDate(opDate);
+                        log.info(opDate);
                         return stockReportService.getStockInOutPaddy(filter, true);
                     }
                     case "StockInOutBagSummary" -> {
-                        filter.setOpDate(opDatePaddy);
+                        filter.setOpDate(opDate);
                         filter.setReportType(1);
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
@@ -328,6 +326,9 @@ public class ReportController {
                     case "StockValue" -> {
                         List<StockValue> values = reportService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         Util1.writeJsonFile(values, exportPath);
+                    }
+                    case "StockValueQty" -> {
+                        return stockReportService.getStockValue(filter);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
                         List<VStockIO> values = reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
@@ -418,7 +419,7 @@ public class ReportController {
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "TransferSaleClosing" -> {
-                        filter.setOpDate(opDateLocation);
+                        filter.setOpDate(opDate);
                         return stockReportService.getTransferSaleClosing(filter);
                     }
                     case "ConsignBalanceSummary" -> {

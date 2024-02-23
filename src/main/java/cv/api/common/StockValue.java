@@ -1,10 +1,12 @@
 package cv.api.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@Builder
 public class StockValue {
     private String stockUserCode;
     private String stockCode;
@@ -12,20 +14,20 @@ public class StockValue {
     private String stockTypeUserCode;
     private String stockTypeName;
     private String balRel;
-    private Float purAvgPrice;
-    private Float purAvgAmount;
-    private Float inAvgPrice;
-    private Float inAvgAmount;
-    private Float stdPrice;
-    private Float stdAmount;
-    private Float recentPrice;
-    private Float recentAmt;
-    private Float fifoPrice;
-    private Float fifoAmt;
-    private Float lifoPrice;
-    private Float lifoAmt;
-    private Float ioRecentPrice;
-    private Float ioRecentAmt;
-    private double qty;
+    private Double purAvgPrice;
+    private Double purAvgAmount;
+    private Double inAvgPrice;
+    private Double inAvgAmount;
+    private Double stdPrice;
+    private Double stdAmount;
+    private Double recentPrice;
+    private Double recentAmt;
+    private Double fifoPrice;
+    private Double fifoAmt;
+    private Double lifoPrice;
+    private Double lifoAmt;
+    private Double ioRecentPrice;
+    private Double ioRecentAmt;
+    private Double qty;
     private String relation;
 }

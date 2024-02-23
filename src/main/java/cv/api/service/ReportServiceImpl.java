@@ -96,10 +96,11 @@ public class ReportServiceImpl implements ReportService {
                 from op_his
                 where deleted = false
                 and comp_code =?
-                and loc_code =?
+                and (loc_code =? or '-'=?)
+                and tran_source<>3
                 """;
         try {
-            ResultSet rs = reportDao.getResultSql(sql, compCode, locCode);
+            ResultSet rs = reportDao.getResultSql(sql, compCode, locCode, locCode);
             if (rs != null) {
                 while (rs.next()) {
                     Date date = rs.getDate("op_date");
@@ -2650,26 +2651,26 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(getSql, macId, compCode);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    StockValue value = new StockValue();
+                    StockValue value = StockValue.builder().build();
                     value.setStockUserCode(rs.getString("s_user_code"));
                     value.setStockName(rs.getString("stock_name"));
                     value.setBalRel(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("bal_qty")));
                     value.setQty(rs.getDouble("bal_qty"));
                     value.setRelation(rs.getString("rel_name"));
-                    value.setPurAvgPrice(rs.getFloat("pur_avg_price"));
-                    value.setPurAvgAmount(rs.getFloat("pur_avg_amt"));
-                    value.setInAvgPrice(rs.getFloat("in_avg_price"));
-                    value.setInAvgAmount(rs.getFloat("in_avg_amt"));
-                    value.setStdPrice(rs.getFloat("std_price"));
-                    value.setStdAmount(rs.getFloat("std_amt"));
-                    value.setRecentPrice(rs.getFloat("pur_recent_price"));
-                    value.setRecentAmt(rs.getFloat("pur_recent_amt"));
-                    value.setFifoPrice(rs.getFloat("fifo_price"));
-                    value.setFifoAmt(rs.getFloat("fifo_amt"));
-                    value.setLifoPrice(rs.getFloat("lifo_price"));
-                    value.setLifoAmt(rs.getFloat("lifo_amt"));
-                    value.setIoRecentPrice(rs.getFloat("io_recent_price"));
-                    value.setIoRecentAmt(rs.getFloat("io_recent_amt"));
+                    value.setPurAvgPrice(rs.getDouble("pur_avg_price"));
+                    value.setPurAvgAmount(rs.getDouble("pur_avg_amt"));
+                    value.setInAvgPrice(rs.getDouble("in_avg_price"));
+                    value.setInAvgAmount(rs.getDouble("in_avg_amt"));
+                    value.setStdPrice(rs.getDouble("std_price"));
+                    value.setStdAmount(rs.getDouble("std_amt"));
+                    value.setRecentPrice(rs.getDouble("pur_recent_price"));
+                    value.setRecentAmt(rs.getDouble("pur_recent_amt"));
+                    value.setFifoPrice(rs.getDouble("fifo_price"));
+                    value.setFifoAmt(rs.getDouble("fifo_amt"));
+                    value.setLifoPrice(rs.getDouble("lifo_price"));
+                    value.setLifoAmt(rs.getDouble("lifo_amt"));
+                    value.setIoRecentPrice(rs.getDouble("io_recent_price"));
+                    value.setIoRecentAmt(rs.getDouble("io_recent_amt"));
                     values.add(value);
                 }
             }
@@ -2880,89 +2881,6 @@ public class ReportServiceImpl implements ReportService {
         return ioList;
     }
 
-
-    @Override
-    public List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode,
-                                        String vouNo, String remark, String reference,
-                                        String userCode, String stockCode, String locCode,
-                                        String compCode, Integer deptId, String deleted,
-                                        String nullBatch, String batchNo, String projectNo, String curCode, String orderStauts) {
-        List<VOrder> saleList = new ArrayList<>();
-        String filter = "";
-        if (!vouNo.equals("-")) {
-            filter += "and vou_no = '" + vouNo + "'\n";
-        }
-        if (!remark.equals("-")) {
-            filter += "and remark like '" + remark + "%'\n";
-        }
-        if (!reference.equals("-")) {
-            filter += "and reference like '" + reference + "%'\n";
-        }
-        if (!traderCode.equals("-")) {
-            filter += "and trader_code = '" + traderCode + "'\n";
-        }
-        if (!userCode.equals("-")) {
-            filter += "and created_by = '" + userCode + "'\n";
-        }
-        if (!stockCode.equals("-")) {
-            filter += "and stock_code = '" + stockCode + "'\n";
-        }
-        if (!saleManCode.equals("-")) {
-            filter += "and saleman_code = '" + saleManCode + "'\n";
-        }
-        if (!locCode.equals("-")) {
-            filter += "and loc_code = '" + locCode + "'\n";
-        }
-        if (!projectNo.equals("-")) {
-            filter += "and project_no = '" + projectNo + "'\n";
-        }
-        if (!curCode.equals("-")) {
-            filter += "and cur_code = '" + curCode + "'\n";
-        }
-        if (!orderStauts.equals("-")) {
-            filter += "and order_status = '" + orderStauts + "'\n";
-        }
-        String sql = "select a.*,t.trader_name,t.user_code,os.description order_status_name\n" +
-                "from (\n" +
-                "select  vou_no,vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code," +
-                "comp_code,dept_id,order_status\n" +
-                "from v_order s \n" +
-                "where comp_code = '" + compCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = " + deleted + "\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter + "\n" +
-                "group by vou_no\n" + ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "left join order_status os on a.order_status = os.code\n" +
-                "and a.comp_code = os.comp_code\n" +
-                "order by vou_date desc";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (!Objects.isNull(rs)) {
-                while (rs.next()) {
-                    VOrder s = new VOrder();
-                    s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                    s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                    s.setVouNo(rs.getString("vou_no"));
-                    s.setTraderCode(rs.getString("user_code"));
-                    s.setTraderName(rs.getString("trader_name"));
-                    s.setRemark(rs.getString("remark"));
-                    s.setReference(rs.getString("reference"));
-                    s.setCreatedBy(rs.getString("created_by"));
-                    s.setVouTotal(rs.getDouble("vou_total"));
-                    s.setDeleted(rs.getBoolean("deleted"));
-                    s.setDeptId(rs.getInt("dept_id"));
-                    s.setOrderStatus(rs.getString("order_status"));
-                    s.setOrderStatusName(rs.getString("order_status_name"));
-                    saleList.add(s);
-                }
-            }
-        } catch (Exception e) {
-            log.error("getSaleHistory : " + e.getMessage());
-        }
-        return saleList;
-    }
 
     @Override
     public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
@@ -3414,11 +3332,6 @@ public class ReportServiceImpl implements ReportService {
             }
         });
         return list;
-    }
-
-    @Override
-    public List<General> isTraderExist(String traderCode, String compCode) {
-        return searchVoucher(traderCode, compCode);
     }
 
     @Override
