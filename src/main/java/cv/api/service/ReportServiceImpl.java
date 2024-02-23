@@ -58,14 +58,22 @@ public class ReportServiceImpl implements ReportService {
     public String getOpeningDate(String compCode, int tranSource) {
         String opDate = null;
         String sql = """
-                select max(op_date) op_date
+                select
+                case
+                when exists (
+                            select 1 from op_his
+                            where deleted = false
+                            and comp_code =?
+                            and tran_source =?
+                        ) then op_date
+                        else max(op_date)
+                    end as op_date
                 from op_his
                 where deleted = false
                 and comp_code =?
-                and tran_source =?
                 """;
         try {
-            ResultSet rs = reportDao.getResultSql(sql, compCode, tranSource);
+            ResultSet rs = reportDao.getResultSql(sql, compCode, tranSource, compCode);
             if (rs != null) {
                 while (rs.next()) {
                     Date date = rs.getDate("op_date");

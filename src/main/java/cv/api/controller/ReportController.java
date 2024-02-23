@@ -300,7 +300,7 @@ public class ReportController {
                         List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDateLocation, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
                         Util1.writeJsonFile(listBalance, exportPath);
                     }
-                    case "StockInOutQtySummary","StockInOutPaddySummaryByStock" -> {
+                    case "StockInOutQtySummary","StockInOutQtySummaryByStock" -> {
                         filter.setOpDate(opDatePaddy);
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
@@ -312,6 +312,7 @@ public class ReportController {
                     case "StockInOutPaddyDetailWetRice", "StockInOutQtyBagDetail" -> {
                         filter.setReportType(2);
                         filter.setOpDate(opDatePaddy);
+                        log.info(opDatePaddy);
                         return stockReportService.getStockInOutPaddy(filter, true);
                     }
                     case "StockInOutBagSummary" -> {

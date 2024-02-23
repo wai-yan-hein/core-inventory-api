@@ -39,7 +39,7 @@ public class StockReportService {
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
-                 and tran_source = 3
+                 and (tran_source = 3 or tran_source =1)
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -54,6 +54,32 @@ public class StockReportService {
                  and deleted = false
                  and calculate = true
                  and s_rec = false
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 group by stock_code
+                    union all
+                 select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(amt) ttl_amt
+                 from v_return_in
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
+                 and calculate = true
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 group by stock_code
+                    union all
+                 select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(amt) ttl_amt
+                 from v_return_out
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
+                 and calculate = true
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -208,6 +234,34 @@ public class StockReportService {
                 and (cat_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
+        String retInSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'ReturnIn',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(bag) ttl_bag, ifnull(sum(total_weight),0) ttl_weight,sum(amt),loc_code,:macId,comp_code,dept_id
+                from v_return_in
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                group by date(vou_date),vou_no,stock_code,loc_code""";
+        String retOutSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(ttl_wet)*-1 ttl_wet, sum(ttl_rice)*-1 ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0)*-1 ttl_weight,sum(amt)*-1,loc_code,:macId,comp_code,dept_id
+                from v_return_in
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                group by date(vou_date),vou_no,stock_code,loc_code""";
         String tfSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'Transfer-F',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight)*-1,0) ttl_weight,sum(amount) ttl_amt,loc_code_from,:macId,comp_code,dept_id
@@ -327,6 +381,26 @@ public class StockReportService {
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .fetch().rowsUpdated();
+        Mono<Long> retInMono = client.sql(retInSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated();
+        Mono<Long> retOutMono = client.sql(retOutSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated();
         Mono<Long> tfMono = client.sql(tfSql)
                 .bind("macId", macId)
                 .bind("fromDate", fromDate)
@@ -399,6 +473,8 @@ public class StockReportService {
         return deleteTmpIO(macId)
                 .then(opMono)
                 .then(purMono)
+                .then(retInMono)
+                .then(retOutMono)
                 .then(saleMono)
                 .then(tfMono)
                 .then(ttMono)
@@ -1130,5 +1206,9 @@ public class StockReportService {
                 .then(clMono)
                 .then(monoRo);
 
+    }
+
+    public Mono<ReturnObject> getStockValue(ReportFilter filter) {
+        return Mono.empty();
     }
 }

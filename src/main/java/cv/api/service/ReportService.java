@@ -192,7 +192,6 @@ public interface ReportService {
 
     List<General> isStockExist(String stockCode, String compCode);
 
-    List<General> isTraderExist(String traderCode, String compCode);
 
     List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);
 
@@ -276,19 +275,9 @@ public interface ReportService {
     List<VConsign> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
                                                String vouNo, String remark, String locCode, Integer deptId,
                                                boolean deleted, String compCode, int transSource);
-
-    //    List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode,String userCode,  String stockCode,
-//                                                         String vouNo, String remark, Integer deptId,
-//                                                         boolean deleted, String compCode);
     List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
                                        String vouNo, String remark, Integer deptId,
                                        boolean deleted, String compCode);
-
-    List<VOrder> getOrderHistory(String fromDate, String toDate, String traderCode, String saleManCode, String vouNo,
-                                 String remark, String reference, String userCode, String stockCode, String locCode,
-                                 String compCode, Integer deptId, String deleted, String nullBatch, String batchNo,
-                                 String projectNo, String curCode, String orderStatus);
-
     List<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
                                        String userCode, String stockCode, String locCode, String compCode,
                                        Integer deptId, boolean deleted, String projectNo, String curCode, String jobNo) throws Exception;
