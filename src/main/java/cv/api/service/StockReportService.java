@@ -1,9 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.ClosingBalance;
-import cv.api.common.ReportFilter;
-import cv.api.common.ReturnObject;
-import cv.api.common.Util1;
+import cv.api.common.*;
 import cv.api.entity.VStockBalance;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +24,7 @@ public class StockReportService {
 
     private Mono<Long> calculateOpeningByPaddy(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
-                                               String compCode, Integer macId) {
+                                               String compCode, Integer deptId, Integer macId) {
         //opening
         String sql = """
                  insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,ttl_wet,ttl_rice,ttl_bag,ttl_weight,ttl_amt,loc_code,unit,comp_code,dept_id,mac_id)
@@ -39,12 +36,13 @@ public class StockReportService {
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
-                 and tran_source = 3
+                 and (tran_source = 3 or tran_source =1)
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(pur_amt) ttl_amt
@@ -59,6 +57,35 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
+                 group by stock_code
+                    union all
+                 select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(amt) ttl_amt
+                 from v_return_in
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
+                 and calculate = true
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
+                 group by stock_code
+                    union all
+                 select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(amt) ttl_amt
+                 from v_return_out
+                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
+                 and calculate = true
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
@@ -73,6 +100,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (cat_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                     union all
                  select stock_code,0,sum(pay_qty)*-1 qty,0,0,sum(pay_bag)*-1, loc_code, '-',0
@@ -87,6 +115,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                     union all
                  select stock_code,0,sum(pay_qty) qty,0,0,sum(pay_bag), loc_code, '-',0
@@ -101,6 +130,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                     union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
@@ -114,6 +144,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                  union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code_to, weight_unit, sum(amount) ttl_amt
@@ -127,6 +158,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code
                  union all
                  select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(in_bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
@@ -139,6 +171,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  and (in_qty>0 or in_bag>0)
                  group by stock_code
                  union all
@@ -152,6 +185,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and (dept_id =:deptId or 0 =:deptId)
                  and (out_qty>0 or out_bag>0)
                  group by stock_code)a
                  group by stock_code;
@@ -164,6 +198,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("stockCode", stockCode)
                 .bind("compCode", compCode)
+                .bind("deptId", deptId)
                 .bind("macId", macId)
                 .fetch()
                 .rowsUpdated());
@@ -171,7 +206,7 @@ public class StockReportService {
 
     private Mono<Long> calculateClosingByPaddy(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
-                                               String compCode, Integer macId) {
+                                               String compCode, Integer deptId, Integer macId) {
         String opSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,op_wet,op_rice,op_bag,op_weight,op_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'A-Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(ttl_bag) ttl_bag, ifnull(sum(ttl_weight),0) ttl_weight,sum(ttl_amt),loc_code,mac_id,comp_code,dept_id
@@ -192,6 +227,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String saleSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -207,6 +243,37 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (cat_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                group by date(vou_date),vou_no,stock_code,loc_code""";
+        String retInSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'ReturnIn',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(bag) ttl_bag, ifnull(sum(total_weight),0) ttl_weight,sum(amt),loc_code,:macId,comp_code,dept_id
+                from v_return_in
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                group by date(vou_date),vou_no,stock_code,loc_code""";
+        String retOutSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(ttl_wet)*-1 ttl_wet, sum(ttl_rice)*-1 ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0)*-1 ttl_weight,sum(amt)*-1,loc_code,:macId,comp_code,dept_id
+                from v_return_in
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String tfSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -221,6 +288,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code_from""";
         String ttSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -235,6 +303,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code_to""";
         String stockIn = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -249,6 +318,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
                 and (in_qty>0 or in_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String stockOut = """
@@ -264,47 +334,45 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
                 and (out_qty>0 or out_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String issueSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'Issue',date(v.vou_date) vou_date,v.vou_no,v.remark,v.stock_code,sum(v.pay_qty)*-1 ttl_qty,
-                sum(iszero(sh.qty,sh.bag)*wet)ttl_wet,sum(iszero(sh.qty,sh.bag)*rice)ttl_rice, sum(v.pay_bag)*-1 ttl_bag,
-                0 ttl_weight,sum(sh.sale_amt)amount,v.loc_code,:macId,v.comp_code,v.dept_id
-                from v_stock_payment v join sale_his_detail sh
-                on v.ref_no = sh.vou_no
-                and v.comp_code = sh.comp_code
-                where v.deleted = false
-                and v.comp_code =:compCode
-                and v.calculate = true
-                and v.tran_option ='C'
-                and date(v.vou_date) >= :fromDate and date(v.vou_date)<:toDate
-                and v.loc_code in (select f_code from f_location where mac_id =:macId )
-                and (v.stock_type_code = :typeCode or '-' = :typeCode)
-                and (v.brand_code = :brandCode or '-' = :brandCode)
-                and (v.category_code = :catCode or '-' = :catCode)
-                and (v.stock_code = :stockCode or '-' = :stockCode)
-                group by date(v.vou_date),v.vou_no,v.stock_code,v.loc_code
+                select 'Issue',date(vou_date) vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,
+                0,0, sum(pay_bag)*-1 ttl_bag,0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
+                from v_stock_payment v
+                where deleted = false
+                and comp_code =:compCode
+                and calculate = true
+                and tran_option ='C'
+                and date(vou_date) >= :fromDate and date(vou_date)<:toDate
+                and loc_code in (select f_code from f_location where mac_id =:macId )
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                group by date(vou_date),vou_no,stock_code,loc_code
                 """;
         String recSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,pur_wet,pur_rice,pur_bag,pur_weight,pur_ttl_amt,loc_code,mac_id,comp_code,dept_id)
-                select 'Receive',date(v.vou_date) vou_date,v.vou_no,v.remark,v.stock_code,sum(v.pay_qty)*-1 ttl_qty,
-                sum(iszero(sh.qty,sh.bag)*wet)ttl_wet,sum(iszero(sh.qty,sh.bag)*rice)ttl_rice, sum(v.pay_bag)*-1 ttl_bag,
-                0 ttl_weight,sum(sh.pur_amt)amount,v.loc_code,:macId,v.comp_code,v.dept_id
-                from v_stock_payment v join pur_his_detail sh
-                on v.ref_no = sh.vou_no
-                and v.comp_code = sh.comp_code
-                where v.deleted = false
-                and v.comp_code =:compCode
-                and v.calculate = true
-                and v.tran_option ='S'
-                and date(v.vou_date) >= :fromDate and date(v.vou_date)<:toDate
-                and v.loc_code in (select f_code from f_location where mac_id =:macId )
-                and (v.stock_type_code = :typeCode or '-' = :typeCode)
-                and (v.brand_code = :brandCode or '-' = :brandCode)
-                and (v.category_code = :catCode or '-' = :catCode)
-                and (v.stock_code = :stockCode or '-' = :stockCode)
-                group by date(v.vou_date),v.vou_no,v.stock_code,v.loc_code
+                select 'Receive',date(vou_date) vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,
+                0 ttl_wet,0 ttl_rice, sum(pay_bag)*-1 ttl_bag,
+                0 ttl_weight,0 amount,loc_code,:macId,comp_code,dept_id
+                from v_stock_payment
+                where deleted = false
+                and comp_code =:compCode
+                and calculate = true
+                and tran_option ='S'
+                and date(vou_date) >= :fromDate and date(vou_date)<:toDate
+                and loc_code in (select f_code from f_location where mac_id =:macId )
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                group by date(vou_date),vou_no,stock_code,loc_code
                 """;
         Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
         Mono<Long> purMono = client.sql(purSql)
@@ -316,6 +384,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> saleMono = client.sql(saleSql)
                 .bind("macId", macId)
@@ -326,6 +395,29 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
+                .fetch().rowsUpdated();
+        Mono<Long> retInMono = client.sql(retInSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
+                .fetch().rowsUpdated();
+        Mono<Long> retOutMono = client.sql(retOutSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> tfMono = client.sql(tfSql)
                 .bind("macId", macId)
@@ -336,6 +428,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
 
@@ -348,6 +441,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
 
@@ -360,6 +454,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
 
@@ -372,6 +467,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> issueMono = client.sql(issueSql)
@@ -383,6 +479,7 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> recMono = client.sql(recSql)
@@ -394,11 +491,14 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
         return deleteTmpIO(macId)
                 .then(opMono)
                 .then(purMono)
+                .then(retInMono)
+                .then(retOutMono)
                 .then(saleMono)
                 .then(tfMono)
                 .then(ttMono)
@@ -418,10 +518,11 @@ public class StockReportService {
         String brandCode = filter.getBrandCode();
         String stockCode = filter.getStockCode();
         String compCode = filter.getCompCode();
+        int deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
         int type = filter.getReportType();
-        Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-        Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+        Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
         return opMono.then(clMono)
                 .flatMap(aLong -> {
                     if (detail) {
@@ -1130,5 +1231,147 @@ public class StockReportService {
                 .then(clMono)
                 .then(monoRo);
 
+    }
+
+    public Mono<ReturnObject> getStockValue(ReportFilter filter) {
+        String opDate = filter.getOpDate();
+        String toDate = filter.getToDate();
+        String typeCode = filter.getStockTypeCode();
+        String catCode = filter.getCatCode();
+        String brandCode = filter.getBrandCode();
+        String stockCode = filter.getStockCode();
+        String compCode = filter.getCompCode();
+        int deptId = filter.getDeptId();
+        Integer macId = filter.getMacId();
+        Mono<Long> monoPrice = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, deptId, macId);
+        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+        return monoPrice.then(monoOp).then(getStockValueResult(macId));
+    }
+
+    private Mono<ReturnObject> getStockValueResult(Integer macId) {
+        String sql = """
+                select b.*,s.user_code,s.stock_name
+                from (
+                select t.stock_code,t.ttl_qty,t.comp_code,a.pur_avg_price,a.pur_recent_price,
+                ttl_qty*pur_avg_price pur_avg_amt,ttl_qty*pur_recent_price pur_recent_amt
+                from tmp_stock_opening t left join (
+                select stock_code,sum(ifnull(pur_avg_price,0))pur_avg_price,
+                sum(ifnull(pur_recent_price,0))pur_recent_price,mac_id
+                from tmp_stock_price
+                where mac_id =:macId
+                group by stock_code
+                )a
+                on t.stock_code = a.stock_code
+                and t.mac_id  = a.mac_id
+                where t.mac_id =:macId
+                and t.ttl_qty<>0
+                )b
+                join stock s on b.stock_code = s.stock_code
+                and b.comp_code = s.comp_code
+                order by user_code
+                """;
+        return client.sql(sql).bind("macId", macId)
+                .map((row, rowMetadata) -> StockValue.builder()
+                        .stockUserCode(row.get("user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .qty(row.get("ttl_qty", Double.class))
+                        .purAvgPrice(Util1.toNull(row.get("pur_avg_price", Double.class)))
+                        .purAvgAmount(Util1.toNull(row.get("pur_avg_amt", Double.class)))
+                        .recentPrice(Util1.toNull(row.get("pur_recent_price", Double.class)))
+                        .recentAmt(Util1.toNull(row.get("pur_recent_amt", Double.class)))
+                        .build()).all().collectList()
+                .map(this::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+    private Mono<Long> calculatePrice(String toDate, String opDate, String stockCode,
+                                      String typeCode, String catCode, String brandCode,
+                                      String compCode, Integer deptId, Integer macId) {
+        String delSql = """
+                delete from tmp_stock_price where mac_id =:macId
+                """;
+        String purSql = """
+                insert into tmp_stock_price(tran_option,stock_code,pur_avg_price,mac_id)
+                select 'PUR-AVG',stock_code,avg(pur_price),:macId
+                from (
+                select 'PUR-AVG',stock_code,pur_price
+                from v_purchase
+                where deleted = false
+                and date(vou_date) <=:toDate
+                and comp_code =:compCode
+                and (stock_type_code =:typeCode or '-' =:typeCode)
+                and (category_code =:catCode or '-' =:catCode)
+                and (brand_code =:brandCode or '-' =:brandCode)
+                and (stock_code =:stockCode or '-' =:stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                group by stock_code,pur_price
+                	union all
+                select 'OP',stock_code,price
+                from v_opening
+                where price > 0
+                and deleted = false
+                and date(op_date) <=:opDate
+                and comp_code =:compCode
+                and (stock_type_code =:typeCode or '-' =:typeCode)
+                and (category_code =:catCode or '-' =:catCode)
+                and (brand_code =:brandCode or '-' =:brandCode)
+                and (stock_code =:stockCode or '-' =:stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                and loc_code in (select f_code from f_location where mac_id =:macId))a
+                group by stock_code
+                """;
+        String purRecentSql = """
+                insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)
+                select a.stock_code,'PUR_RECENT',a.pur_price,33
+                from (
+                with rows_and_position as
+                (
+                select stock_code, pur_price,row_number() over (partition by stock_code order by vou_date desc) as position,comp_code,dept_id
+                from v_purchase
+                where deleted = false
+                and date(vou_date) between :opDate and :toDate
+                and comp_code =:compCode
+                and (stock_type_code =:typeCode or '-' =:typeCode)
+                and (category_code =:catCode or '-' =:catCode)
+                and (brand_code =:brandCode or '-' =:brandCode)
+                and (stock_code =:stockCode or '-' =:stockCode)
+                and (dept_id =:deptId or 0 =:deptId)
+                and loc_code in (select f_code from f_location where mac_id =:macId))
+                select stock_code,pur_price,comp_code
+                from rows_and_position
+                where position =1
+                )a
+                """;
+        Mono<Long> delMono = client.sql(delSql)
+                .bind("macId", macId)
+                .fetch().rowsUpdated();
+        Mono<Long> purMono = client.sql(purSql)
+                .bind("toDate", toDate)
+                .bind("opDate", opDate)
+                .bind("compCode", compCode)
+                .bind("macId", macId)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("typeCode", typeCode)
+                .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
+                .fetch().rowsUpdated();
+        Mono<Long> purRecentMono = client.sql(purRecentSql)
+                .bind("toDate", toDate)
+                .bind("opDate", opDate)
+                .bind("compCode", compCode)
+                .bind("macId", macId)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("typeCode", typeCode)
+                .bind("stockCode", stockCode)
+                .bind("deptId", deptId)
+                .fetch().rowsUpdated();
+        return delMono.then(purMono).then(purRecentMono);
     }
 }
