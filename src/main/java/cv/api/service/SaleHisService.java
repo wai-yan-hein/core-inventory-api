@@ -5,7 +5,7 @@
  */
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.General;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
@@ -48,6 +48,6 @@ public interface SaleHisService {
 
     List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
-    Flux<VSale> getSale(FilterObject filterObject);
+    Flux<VSale> getSale(ReportFilter filterObject);
     Mono<Boolean> updatePost(String vouNo, String compCode, boolean post);
 }

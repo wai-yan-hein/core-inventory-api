@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.GRN;
 import cv.api.entity.GRNKey;
@@ -34,7 +34,7 @@ public class GRNController {
     }
 
     @PostMapping(path = "/history")
-    public Flux<?> getHistory(@RequestBody FilterObject filter) {
+    public Flux<?> getHistory(@RequestBody ReportFilter filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

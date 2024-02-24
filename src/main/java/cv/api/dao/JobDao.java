@@ -1,6 +1,6 @@
 package cv.api.dao;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.entity.Job;
 import cv.api.entity.JobKey;
 
@@ -10,7 +10,7 @@ import java.util.List;
 public interface JobDao {
     Job save(Job Job);
 
-    List<Job> findAll(FilterObject filterObject);
+    List<Job> findAll(ReportFilter filterObject);
 
     int delete(JobKey key);
 

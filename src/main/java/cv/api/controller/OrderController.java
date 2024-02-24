@@ -5,7 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dao.OrderHisDao;
@@ -71,7 +71,7 @@ public class OrderController {
     }
 
     @PostMapping(path = "/getOrder")
-    public Flux<?> getOrder(@RequestBody FilterObject filter) {
+    public Flux<?> getOrder(@RequestBody ReportFilter filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

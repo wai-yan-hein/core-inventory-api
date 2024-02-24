@@ -5,7 +5,7 @@
  */
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.dao.*;
@@ -260,7 +260,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public Flux<VSale> getSale(FilterObject filterObject) {
+    public Flux<VSale> getSale(ReportFilter filterObject) {
         String fromDate = Util1.isNull(filterObject.getFromDate(), "-");
         String toDate = Util1.isNull(filterObject.getToDate(), "-");
         String vouNo = Util1.isNull(filterObject.getVouNo(), "-");

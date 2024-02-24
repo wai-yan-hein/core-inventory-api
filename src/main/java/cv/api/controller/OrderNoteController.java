@@ -5,7 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.dto.OrderFileJoin;
 import cv.api.dto.OrderNote;
 import cv.api.service.OrderNoteService;
@@ -33,7 +33,7 @@ public class OrderNoteController {
     }
 
     @PostMapping(path = "/getOrderNote")
-    public Flux<OrderNote> getOrderNote(@NotNull @RequestBody FilterObject filter) {
+    public Flux<OrderNote> getOrderNote(@NotNull @RequestBody ReportFilter filter) {
         return orderNoteService.history(filter);
     }
 

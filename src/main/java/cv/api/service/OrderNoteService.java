@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.OrderFileJoin;
 import cv.api.dto.OrderNote;
@@ -159,7 +159,7 @@ public class OrderNoteService {
                 .thenReturn(p);
     }
 
-    public Flux<OrderNote> history(FilterObject filter) {
+    public Flux<OrderNote> history(ReportFilter filter) {
         String compCode = filter.getCompCode();
         boolean deleted = filter.isDeleted();
         String fromDate = filter.getFromDate();

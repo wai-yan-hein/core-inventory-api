@@ -49,6 +49,27 @@ public class ReportFilter {
     private String labourGroupCode;
     private String warehouseCode;
     private int reportType;
+    private boolean summary;
+    private String remark;
+    private String userCode;
+    private String tranSource;
+    private String description;
+    private String vouStatus;
+    private String jobNo;
+    private String tranOption;
+    private String saleVouNo;
+    private String account;
+    private String orderNo;
+    private String orderName;
+    private String reference;
+    private boolean nullBatch;
+    private boolean finished;
+    private boolean close;
+    private boolean orderByBatch;
+    private String processNo;
+    private String orderStatus;
+    private String refNo;
+    private boolean draft;
 
     public ReportFilter(Integer macId, String compCode) {
         this.macId = macId;

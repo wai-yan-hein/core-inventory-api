@@ -1,6 +1,6 @@
 package cv.api.dao;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.entity.Job;
 import cv.api.entity.JobKey;
 import lombok.extern.slf4j.Slf4j;
@@ -22,17 +22,14 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
     }
 
     @Override
-    public List<Job> findAll(FilterObject filterObject) {
+    public List<Job> findAll(ReportFilter filterObject) {
         String compCode = filterObject.getCompCode();
         Integer deptId = filterObject.getDeptId();
         String fromDate = filterObject.getFromDate();
         String toDate = filterObject.getToDate();
-        Boolean finished = filterObject.getFinished();
+        boolean finished = filterObject.isFinished();
         List<Job> jList = new ArrayList<>();
         String whereClause = "";
-        if (finished != null) {
-            whereClause += " and finished = " + finished;
-        }
         if (!fromDate.isEmpty() && !toDate.isEmpty()) {
             whereClause += " and date(start_date) between '" + fromDate + "' and '" + toDate + "'" +
                     "and date(end_date) between '" + fromDate + "' and '" + toDate + "'";
@@ -42,8 +39,9 @@ public class JobDaoImpl extends AbstractDao<JobKey, Job> implements JobDao {
                 where deleted = false
                 and dept_id = ?
                 and comp_code = ?
+                and finished = ?
                 """ + whereClause;
-        ResultSet rs = getResult(sql, deptId, compCode);
+        ResultSet rs = getResult(sql, deptId, compCode,finished);
 
         if (rs != null) {
             try {

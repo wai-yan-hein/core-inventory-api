@@ -5,7 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisDetail;
@@ -48,7 +48,7 @@ public class RetOutController {
     }
 
     @PostMapping(path = "/getReturnOut")
-    public Flux<?> getReturnOut(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getReturnOut(@RequestBody ReportFilter filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

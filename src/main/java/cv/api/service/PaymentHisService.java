@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisDetail;
 import cv.api.model.VSale;
@@ -18,7 +18,7 @@ public interface PaymentHisService {
 
     Mono<Boolean> restore(String vouNo, String compCode);
 
-    Flux<PaymentHis> search(FilterObject filter);
+    Flux<PaymentHis> search(ReportFilter filter);
 
     Flux<PaymentHis> unUploadVoucher(LocalDateTime syncDate);
 

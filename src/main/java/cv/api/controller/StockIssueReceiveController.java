@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.ConsignHis;
 import cv.api.entity.ConsignHisKey;
@@ -51,7 +51,7 @@ public class StockIssueReceiveController {
     }
 
     @PostMapping(path = "/getStockIssRecHistory")
-    public Flux<?> getStockIssRecHistory(@RequestBody FilterObject filter) {
+    public Flux<?> getStockIssRecHistory(@RequestBody ReportFilter filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

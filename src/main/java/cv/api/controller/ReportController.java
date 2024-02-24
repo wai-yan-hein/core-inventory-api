@@ -135,7 +135,7 @@ public class ReportController {
                 String compCode = filter.getCompCode();
                 Integer deptId = filter.getDeptId();
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
-                String opDate =reportService.getOpeningDateByLocation(compCode, locCode);
+                String opDate = reportService.getOpeningDateByLocation(compCode, locCode);
                 String opPayableDate = reportService.getOpeningDate(compCode, OPHis.PAYABLE);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
@@ -162,7 +162,7 @@ public class ReportController {
                 String reportName = filter.getReportName();
                 String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location", warehouse);
-                log.info("opening date : "+opDate);
+                log.info("opening date : " + opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         List<VSale> saleByCustomer = reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
@@ -510,11 +510,11 @@ public class ReportController {
     }
 
     @GetMapping(path = "/getStockBalance")
-    public Flux<?> getStockBalance(@RequestParam String stockCode,
-                                   @RequestParam boolean calSale, @RequestParam boolean calPur,
-                                   @RequestParam boolean calRI, @RequestParam boolean calRO,
-                                   @RequestParam String compCode, @RequestParam Integer deptId,
-                                   @RequestParam Integer macId, @RequestParam boolean summary) {
+    public Flux<VStockBalance> getStockBalance(@RequestParam String stockCode,
+                                               @RequestParam boolean calSale, @RequestParam boolean calPur,
+                                               @RequestParam boolean calRI, @RequestParam boolean calRO,
+                                               @RequestParam String compCode, @RequestParam Integer deptId,
+                                               @RequestParam Integer macId, @RequestParam boolean summary) {
         String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
         List<VStockBalance> list = reportService.getStockBalance(opDate, clDate, "-", "-", "-",
@@ -526,6 +526,14 @@ public class ReportController {
             list.add(b);
         }
         return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+    }
+
+    @PostMapping(path = "/getStockBalanceQty")
+    public Flux<ClosingBalance> getStockBalance(@RequestBody ReportFilter filter) {
+        String opDate = reportService.getOpeningDateByLocation(filter.getCompCode(), "-");
+        filter.setOpDate(opDate);
+        filter.setDeptId(0);
+        return stockReportService.getStockBalance(filter);
     }
 
     @GetMapping(path = "/getStockBalanceByWeight")
@@ -575,7 +583,7 @@ public class ReportController {
     }
 
     @PostMapping(path = "/getSaleSummaryByDepartment")
-    public Flux<?> getSaleSummaryByDepartment(@RequestBody FilterObject filter) {
+    public Flux<?> getSaleSummaryByDepartment(@RequestBody ReportFilter filter) {
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();
@@ -583,7 +591,7 @@ public class ReportController {
     }
 
     @PostMapping(path = "/getOrderSummaryByDepartment")
-    public Flux<?> getOrderSummaryByDepartment(@RequestBody FilterObject filter) {
+    public Flux<?> getOrderSummaryByDepartment(@RequestBody ReportFilter filter) {
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();

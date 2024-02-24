@@ -543,7 +543,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/getJob")
-    public Flux<?> getJob(@RequestBody FilterObject filterObject) {
+    public Flux<?> getJob(@RequestBody ReportFilter filterObject) {
         return Flux.fromIterable(jobService.findAll(filterObject));
     }
 
@@ -598,7 +598,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/getOpening")
-    public Flux<?> getOpening(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getOpening(@RequestBody ReportFilter filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

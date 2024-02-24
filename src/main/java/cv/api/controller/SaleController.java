@@ -5,7 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dao.SaleOrderJoinDao;
@@ -82,7 +82,7 @@ public class SaleController {
         return status;
     }
     @PostMapping(path = "/getSale")
-    public Flux<?> getSale(@NotNull @RequestBody FilterObject filter) {
+    public Flux<?> getSale(@NotNull @RequestBody ReportFilter filter) {
          return shService.getSale(filter);
     }
 

@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReportFilter;
 import cv.api.dto.LabourPaymentDto;
 import cv.api.r2dbc.LabourPaymentDetail;
@@ -34,7 +34,7 @@ public class LabourPaymentController {
     }
 
     @PostMapping("/history")
-    public Flux<LabourPaymentDto> history(@RequestBody FilterObject filter) {
+    public Flux<LabourPaymentDto> history(@RequestBody ReportFilter filter) {
         return labourPaymentService.history(filter);
     }
 
