@@ -136,5 +136,7 @@ public class SaleHis {
     private ZonedDateTime vouDateTime;
     @Transient
     private List<String> listOrder;
+    @Transient
+    private List<SaleNote> listSaleNote;
 
 }

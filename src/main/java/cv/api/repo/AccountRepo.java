@@ -62,7 +62,7 @@ public class AccountRepo {
                                 case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
                             }
                         }
-                    }).doOnError(e -> {
+                    }).onErrorResume(e -> {
                         Gl gl = glList.getFirst();
                         String vouNo = gl.getRefNo();
                         String compCode = gl.getKey().getCompCode();
@@ -76,6 +76,7 @@ public class AccountRepo {
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
+                        return Mono.empty();
                     }).subscribe();
         }
     }

@@ -190,8 +190,9 @@ public class ReportServiceImpl implements ReportService {
             saleList.add(sale);
         }
         if (!saleList.isEmpty()) {
-            List<VouDiscount> listDis = saleHisService.getVoucherDiscount(vouNo, compCode);
-            saleList.getFirst().setListDiscount(listDis);
+            //this is hla chan myae
+            //List<VouDiscount> listDis = saleHisService.getVoucherDiscount(vouNo, compCode).collectList().block();
+           // saleList.getFirst().setListDiscount(listDis);
         }
         return saleList;
     }
