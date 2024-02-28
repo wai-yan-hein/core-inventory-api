@@ -297,6 +297,7 @@ public class AccountRepo {
                     double vouPaid = Util1.getDouble(sh.getPaid());
                     double vouTax = Util1.getDouble(sh.getTaxAmt());
                     double taxPercent = Util1.getDouble(sh.getTaxPercent());
+                    double totalPayment = Util1.getDouble(sh.getTotalPayment());
                     Integer deptId = sh.getDeptId();
                     //income by trader group
                     String groupCode = t.getGroupCode();
@@ -416,6 +417,31 @@ public class AccountRepo {
                         gl.setGlDate(vouDate);
                         gl.setDescription(String.format("Sale Voucher Tax (%s)", taxPercent));
                         gl.setTraderCode(traderCode);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        listGl.add(gl);
+                    }
+                    if (totalPayment > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Sale Voucher Received");
+                        gl.setSrcAccCode(payAcc);
+                        gl.setAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setDrAmt(totalPayment);
+                        gl.setCurCode(curCode);
                         gl.setCurCode(curCode);
                         gl.setReference(remark);
                         gl.setDeptCode(deptCode);
