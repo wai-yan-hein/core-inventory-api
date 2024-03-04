@@ -18,4 +18,7 @@ public class AccTrader {
     private LocalDateTime createdDate;
     private String createdBy;
     private String regCode;
+    private String phone;
+    private String email;
+    private String address;
 }

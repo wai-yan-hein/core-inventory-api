@@ -313,10 +313,11 @@ public class SaleHisServiceImpl implements SaleHisService {
             filter.append(" and (batch_no is null or batch_no ='')\n");
         }
         String sql = """
-                select a.*,t.trader_name,t.user_code
+                select a.*,t.trader_name,t.user_code t_user_code
                 from (
                 select vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
-                deleted,trader_code,loc_code,comp_code,dept_id,post,sum(qty) qty,sum(bag) bag
+                deleted,trader_code,loc_code,comp_code,dept_id,post,sum(qty) qty,sum(bag) bag,
+                opening,outstanding,total_payment,total_balance
                 from v_sale s
                 where comp_code = :compCode
                 and (dept_id = :deptId or 0 = :deptId)
@@ -360,7 +361,8 @@ public class SaleHisServiceImpl implements SaleHisService {
                         .vouDate(Util1.toDateStr(row.get("vou_date", LocalDateTime.class), "dd/MM/yyyy"))
                         .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
                         .vouNo(row.get("vou_no", String.class))
-                        .traderCode(row.get("user_code", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .traderUserCode(row.get("t_user_code", String.class))
                         .traderName(row.get("trader_name", String.class))
                         .remark(row.get("remark", String.class))
                         .reference(row.get("reference", String.class))
@@ -373,6 +375,10 @@ public class SaleHisServiceImpl implements SaleHisService {
                         .post(row.get("post", Boolean.class))
                         .qty(row.get("qty", Double.class))
                         .bag(row.get("bag", Double.class))
+                        .opening(row.get("opening", Double.class))
+                        .outstanding(row.get("outstanding", Double.class))
+                        .totalBalance(row.get("total_balance", Double.class))
+                        .totalPayment(row.get("total_payment", Double.class))
                         .build()
                 ).all();
     }
