@@ -12,11 +12,11 @@ public class VouDiscount {
     @Column(name = "description")
     private String description;
     @Column(name = "qty")
-    private double qty;
+    private Double qty;
     @Column(name = "price")
-    private double price;
+    private Double price;
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
     @Column(name = "unit")
     private String unit;
     @Transient

@@ -114,6 +114,12 @@ public class SaleHis {
     private int tranSource;
     @Column(name = "outstanding")
     private Double outstanding;
+    @Column(name = "total_payment")
+    private Double totalPayment;
+    @Column(name = "opening")
+    private Double opening;
+    @Column(name = "total_balance")
+    private Double totalBalance;
     @Transient
     private String status = "STATUS";
     @Transient
@@ -136,5 +142,7 @@ public class SaleHis {
     private ZonedDateTime vouDateTime;
     @Transient
     private List<String> listOrder;
+    @Transient
+    private List<SaleNote> listSaleNote;
 
 }

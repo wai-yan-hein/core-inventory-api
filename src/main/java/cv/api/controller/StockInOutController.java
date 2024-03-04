@@ -5,7 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.StockInOutDetailDto;
 import cv.api.entity.StockIOKey;
@@ -39,7 +39,7 @@ public class StockInOutController {
     }
 
     @PostMapping(path = "/getStockIO")
-    public Flux<VStockIO> getStockIO(@RequestBody FilterObject filter) {
+    public Flux<VStockIO> getStockIO(@RequestBody ReportFilter filter) {
         return ioService.getStockIOHistory(filter);
     }
 

@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisDetail;
 import cv.api.model.VSale;
@@ -67,7 +67,7 @@ public class PaymentController {
     }
 
     @PostMapping(path = "/getPaymentHistory")
-    public Flux<?> getPaymentHistory(@RequestBody FilterObject filter) {
+    public Flux<?> getPaymentHistory(@RequestBody ReportFilter filter) {
         return paymentHisService.search(filter);
     }
 }

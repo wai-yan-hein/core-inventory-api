@@ -5,7 +5,7 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.TransferHis;
 import cv.api.entity.TransferHisDetail;
@@ -46,7 +46,7 @@ public class TransferController {
     }
 
     @PostMapping(path = "/getTransfer")
-    public Flux<?> getTransfer(@RequestBody FilterObject filter) throws Exception {
+    public Flux<?> getTransfer(@RequestBody ReportFilter filter) throws Exception {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

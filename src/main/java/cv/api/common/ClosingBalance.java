@@ -95,5 +95,9 @@ public class ClosingBalance {
     private Double opRiceTotal;
     private Double balRiceTotal;
     private Double balAmount;
+    private String locationName;
+    private String unitName;
+    private double weight;
+    private double totalQty;
 
 }

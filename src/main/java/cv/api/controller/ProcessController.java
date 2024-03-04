@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.entity.ProcessHis;
@@ -49,7 +49,7 @@ public class ProcessController {
     }
 
     @PostMapping(path = "/getProcess")
-    public Flux<?> getProcess(@RequestBody FilterObject filter) {
+    public Flux<?> getProcess(@RequestBody ReportFilter filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
@@ -59,7 +59,7 @@ public class ProcessController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
         boolean deleted = filter.isDeleted();
-        boolean finished = filter.getFinished();
+        boolean finished = filter.isFinished();
         String processNo = Util1.isNull(filter.getProcessNo(), "-");
         String pt = filter.getVouStatus();
         return Flux.fromIterable(processHisService.search(fromDate, toDate, vouNo, processNo, remark, stockCode, pt, locCode,

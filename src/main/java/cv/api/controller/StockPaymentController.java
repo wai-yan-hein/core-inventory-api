@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.dto.StockPayment;
 import cv.api.dto.StockPaymentDetail;
 import cv.api.service.StockPaymentService;
@@ -52,7 +52,7 @@ public class StockPaymentController {
     }
 
     @PostMapping(path = "/getPaymentHistory")
-    public Flux<StockPayment> getPaymentHistory(@RequestBody FilterObject filter) {
+    public Flux<StockPayment> getPaymentHistory(@RequestBody ReportFilter filter) {
         return paymentService.history(filter);
     }
 }

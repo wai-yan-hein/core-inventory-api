@@ -2,8 +2,11 @@ package cv.api.dao;
 
 import cv.api.entity.VouDiscount;
 import cv.api.entity.VouDiscountKey;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -11,48 +14,45 @@ import java.util.List;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class VouDiscountDaoImpl extends AbstractDao<VouDiscountKey, VouDiscount> implements VouDiscountDao {
+    private final DatabaseClient client;
+
     @Override
     public VouDiscount save(VouDiscount p) {
         saveOrUpdate(p, p.getKey());
         return p;
     }
 
-    @Override
-    public List<VouDiscount> getVoucherDiscount(String vouNo, String compCode) {
+    public Flux<VouDiscount> getVoucherDiscount(String vouNo, String compCode) {
         String sql = """
                 select v.*,u.unit_name
                 from vou_discount v join stock_unit u
                 on v.unit = u.unit_code
                 and v.comp_code = u.comp_code
-                where v.vou_no =?
-                and v.comp_code =?
+                where v.vou_no =:vouNo
+                and v.comp_code =:compCode
                 order by unique_id""";
-        ResultSet rs = getResult(sql, vouNo, compCode);
-        List<VouDiscount> list = new ArrayList<>();
-        if (rs != null) {
-            try {
-                while (rs.next()) {
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .map((row, rowMetadata) -> {
                     VouDiscount e = new VouDiscount();
                     VouDiscountKey key = new VouDiscountKey();
-                    key.setCompCode(rs.getString("comp_code"));
-                    key.setUniqueId(rs.getInt("unique_id"));
-                    key.setVouNo(rs.getString("vou_no"));
+                    key.setCompCode(row.get("comp_code", String.class));
+                    key.setUniqueId(row.get("unique_id", Integer.class));
+                    key.setVouNo(row.get("vou_no", String.class));
                     e.setKey(key);
-                    e.setDescription(rs.getString("description"));
-                    e.setUnit(rs.getString("unit"));
-                    e.setUnitName(rs.getString("unit_name"));
-                    e.setQty(rs.getDouble("qty"));
-                    e.setPrice(rs.getDouble("price"));
-                    e.setAmount(rs.getDouble("amount"));
-                    list.add(e);
-                }
-            } catch (Exception e) {
-                log.error("search : " + e.getMessage());
-            }
-        }
-        return list;
+                    e.setDescription(row.get("description", String.class));
+                    e.setUnit(row.get("unit", String.class));
+                    e.setUnitName(row.get("unit_name", String.class));
+                    e.setQty(row.get("qty", Double.class));
+                    e.setPrice(row.get("price", Double.class));
+                    e.setAmount(row.get("amount", Double.class));
+                    return e;
+                }).all();
     }
+
 
     @Override
     public void delete(VouDiscountKey key) {

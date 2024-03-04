@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisDetail;
@@ -258,7 +258,7 @@ public class PaymentHisServiceImpl implements PaymentHisService {
     }
 
     @Override
-    public Flux<PaymentHis> search(FilterObject filter) {
+    public Flux<PaymentHis> search(ReportFilter filter) {
         String tranOption = Util1.isNull(filter.getTranOption(), "-");
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");

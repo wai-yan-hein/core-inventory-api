@@ -5,8 +5,8 @@
  */
 package cv.api.service;
 
-import cv.api.common.FilterObject;
 import cv.api.common.General;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dao.*;
 import cv.api.entity.*;
@@ -40,22 +40,23 @@ public class SaleHisServiceImpl implements SaleHisService {
     private final SaleOrderJoinDao saleOrderJoinDao;
     private final OrderHisDao orderHisDao;
     private final DatabaseClient client;
+    private final SaleNoteService saleNoteService;
 
     @Override
-    public SaleHis save(@NotNull SaleHis saleHis) {
-        Integer deptId = saleHis.getDeptId();
+    public SaleHis save(@NotNull SaleHis sh) {
+        Integer deptId = sh.getDeptId();
         if (deptId == null) {
-            log.error("deptId is null from mac id : " + saleHis.getMacId());
+            log.error("deptId is null from mac id : " + sh.getMacId());
             return null;
         }
-        saleHis.setVouDate(Util1.toDateTime(saleHis.getVouDate()));
-        if (Util1.isNullOrEmpty(saleHis.getKey().getVouNo())) {
-            saleHis.getKey().setVouNo(getVoucherNo(deptId, saleHis.getMacId(), saleHis.getKey().getCompCode()));
+        sh.setVouDate(Util1.toDateTime(sh.getVouDate()));
+        if (Util1.isNullOrEmpty(sh.getKey().getVouNo())) {
+            sh.getKey().setVouNo(getVoucherNo(deptId, sh.getMacId(), sh.getKey().getCompCode()));
         }
-        List<SaleHisDetail> listSD = saleHis.getListSH();
-        List<SaleDetailKey> listDel = saleHis.getListDel();
-        List<SaleExpenseKey> listDelExp = saleHis.getListDelExpense();
-        List<VouDiscountKey> listDelVouDiscount = saleHis.getListDelVouDiscount();
+        List<SaleHisDetail> listSD = sh.getListSH();
+        List<SaleDetailKey> listDel = sh.getListDel();
+        List<SaleExpenseKey> listDelExp = sh.getListDelExpense();
+        List<VouDiscountKey> listDelVouDiscount = sh.getListDelVouDiscount();
         //backup
         if (listDel != null) {
             listDel.forEach(sdDao::delete);
@@ -66,20 +67,23 @@ public class SaleHisServiceImpl implements SaleHisService {
         if (listDelVouDiscount != null) {
             listDelVouDiscount.forEach(vouDiscountDao::delete);
         }
-        List<SaleExpense> listExp = saleHis.getListExpense();
-        List<VouDiscount> listDiscount = saleHis.getListVouDiscount();
-        List<String> listOrder = saleHis.getListOrder();
+        List<SaleExpense> listExp = sh.getListExpense();
+        List<VouDiscount> listDiscount = sh.getListVouDiscount();
+        List<String> listOrder = sh.getListOrder();
+        List<SaleNote> listSaleNote = sh.getListSaleNote();
         //save expense
-        saveSaleExpense(listExp, saleHis);
+        saveSaleExpense(listExp, sh);
         //save detail
-        saveDetail(listSD, saleHis);
+        saveDetail(listSD, sh);
         //save vou discount
-        saveVouDiscount(listDiscount, saleHis);
+        saveVouDiscount(listDiscount, sh);
         //save sale order join
-        saveSaleOrderJoin(listOrder, saleHis);
-        shDao.save(saleHis);
-        saleHis.setListSH(listSD);
-        return saleHis;
+        saveSaleOrderJoin(listOrder, sh);
+        //save note
+        saveNote(listSaleNote, sh);
+        shDao.save(sh);
+        sh.setListSH(listSD);
+        return sh;
     }
 
     private void saveSaleExpense(List<SaleExpense> listExp, SaleHis sh) {
@@ -157,6 +161,25 @@ public class SaleHisServiceImpl implements SaleHisService {
         }
     }
 
+    private void saveNote(List<SaleNote> list, SaleHis sh) {
+        String vouNo = sh.getKey().getVouNo();
+        String compCode = sh.getKey().getCompCode();
+        if (list != null && !list.isEmpty()) {
+            saleNoteService.delete(vouNo, compCode)
+                    .flatMap(delete -> Flux.fromIterable(list)
+                            .concatMap(cSd -> {
+                                if (!Util1.isNullOrEmpty(cSd.getDescription())) {
+                                    int uniqueId = list.indexOf(cSd) + 1;
+                                    cSd.setUniqueId(uniqueId);
+                                    cSd.setVouNo(vouNo);
+                                    cSd.setCompCode(compCode);
+                                    return saleNoteService.insert(cSd);
+                                }
+                                return Mono.empty();
+                            }).then()).subscribe();
+        }
+    }
+
     private void saveSaleOrderJoin(List<String> list, SaleHis sh) {
         if (list != null) {
             List<SaleOrderJoin> listJoin = saleOrderJoinDao.getSaleOrder(sh.getKey().getVouNo(), sh.getKey().getCompCode());
@@ -194,7 +217,8 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public List<SaleHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String userCode) {
+    public List<SaleHis> search(String fromDate, String toDate, String cusCode, String vouNo, String remark, String
+            userCode) {
         return shDao.search(fromDate, toDate, cusCode, vouNo, remark, userCode);
     }
 
@@ -250,8 +274,14 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public List<VouDiscount> getVoucherDiscount(String vouNo, String compCode) {
+    public Flux<VouDiscount> getVoucherDiscount(String vouNo, String compCode) {
         return vouDiscountDao.getVoucherDiscount(vouNo, compCode);
+    }
+
+    @Override
+    public Flux<SaleNote> getSaleNote(String vouNo, String compCode) {
+        return saleNoteService.getSaleNote(vouNo, compCode);
+
     }
 
     @Override
@@ -260,7 +290,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public Flux<VSale> getSale(FilterObject filterObject) {
+    public Flux<VSale> getSale(ReportFilter filterObject) {
         String fromDate = Util1.isNull(filterObject.getFromDate(), "-");
         String toDate = Util1.isNull(filterObject.getToDate(), "-");
         String vouNo = Util1.isNull(filterObject.getVouNo(), "-");

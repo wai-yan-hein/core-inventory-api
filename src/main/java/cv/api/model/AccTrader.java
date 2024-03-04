@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class AccTrader implements java.io.Serializable {
+public class AccTrader {
     private AccTraderKey key;
     private String userCode;
     private String traderName;
@@ -17,6 +17,5 @@ public class AccTrader implements java.io.Serializable {
     private boolean deleted;
     private LocalDateTime createdDate;
     private String createdBy;
-    public AccTrader() {
-    }
+    private String regCode;
 }

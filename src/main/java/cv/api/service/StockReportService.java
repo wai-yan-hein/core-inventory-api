@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -43,7 +44,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(pur_amt) ttl_amt
                  from v_purchase
@@ -58,7 +59,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(amt) ttl_amt
                  from v_return_in
@@ -72,7 +73,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(amt) ttl_amt
                  from v_return_out
@@ -86,7 +87,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
                  from v_sale
@@ -101,7 +102,7 @@ public class StockReportService {
                  and (cat_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,0,sum(pay_qty)*-1 qty,0,0,sum(pay_bag)*-1, loc_code, '-',0
                  from v_stock_payment
@@ -116,7 +117,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,0,sum(pay_qty) qty,0,0,sum(pay_bag), loc_code, '-',0
                  from v_stock_payment
@@ -131,7 +132,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
                  from v_transfer
@@ -145,7 +146,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code_from
                  union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code_to, weight_unit, sum(amount) ttl_amt
                  from v_transfer
@@ -159,7 +160,7 @@ public class StockReportService {
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
-                 group by stock_code
+                 group by stock_code,loc_code_to
                  union all
                  select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(in_bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
                  from v_stock_io
@@ -173,7 +174,7 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
                  and (in_qty>0 or in_bag>0)
-                 group by stock_code
+                 group by stock_code,loc_code
                  union all
                  select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(out_bag)*-1 bag, loc_code, weight_unit, sum(amount) ttl_amt
                  from v_stock_io
@@ -187,8 +188,8 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  and (dept_id =:deptId or 0 =:deptId)
                  and (out_qty>0 or out_bag>0)
-                 group by stock_code)a
-                 group by stock_code;
+                 group by stock_code,loc_code)a
+                 group by stock_code,loc_code;
                 """;
         return deleteTmpOpening(macId).then(client.sql(sql)
                 .bind("opDate", opDate)
@@ -263,7 +264,7 @@ public class StockReportService {
         String retOutSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'ReturnOut',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,sum(ttl_wet)*-1 ttl_wet, sum(ttl_rice)*-1 ttl_rice, sum(bag)*-1 ttl_bag, ifnull(sum(total_weight),0)*-1 ttl_weight,sum(amt)*-1,loc_code,:macId,comp_code,dept_id
-                from v_return_in
+                from v_return_out
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
                 and calculate = true
@@ -341,7 +342,7 @@ public class StockReportService {
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'Issue',date(vou_date) vou_date,vou_no,remark,stock_code,sum(pay_qty)*-1 ttl_qty,
                 0,0, sum(pay_bag)*-1 ttl_bag,0 ttl_weight,0,loc_code,:macId,comp_code,dept_id
-                from v_stock_payment v
+                from v_stock_payment
                 where deleted = false
                 and comp_code =:compCode
                 and calculate = true
@@ -1235,7 +1236,7 @@ public class StockReportService {
 
     public Mono<ReturnObject> getStockValue(ReportFilter filter) {
         String opDate = filter.getOpDate();
-        String toDate = filter.getToDate();
+        String toDate = Util1.addDay(filter.getToDate(), 1);
         String typeCode = filter.getStockTypeCode();
         String catCode = filter.getCatCode();
         String brandCode = filter.getBrandCode();
@@ -1248,26 +1249,93 @@ public class StockReportService {
         return monoPrice.then(monoOp).then(getStockValueResult(macId));
     }
 
+    public Flux<ClosingBalance> getStockBalance(ReportFilter filter) {
+        String opDate = filter.getOpDate();
+        String toDate = Util1.addDay(filter.getToDate(), 1);
+        String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
+        String catCode = Util1.isNull(filter.getCatCode(), "-");
+        String brandCode = Util1.isNull(filter.getBrandCode(), "-");
+        String stockCode = filter.getStockCode();
+        String compCode = filter.getCompCode();
+        int deptId = filter.getDeptId();
+        Integer macId = filter.getMacId();
+        boolean summary = filter.isSummary();
+        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+        String sql;
+        if (summary) {
+            sql = """
+                    select a.*,s.stock_name,l.loc_name
+                    from (
+                    select stock_code,loc_code,sum(ttl_weight)ttl_weight,sum(ttl_qty) ttl_qty,
+                    sum(ttl_wet)ttl_wet,sum(ttl_rice)ttl_rice,sum(ttl_bag)ttl_bag,sum(ttl_amt)ttl_amt,comp_code
+                    from tmp_stock_opening
+                    where mac_id =:macId
+                    group by stock_code
+                    )a
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code
+                    join location l on a.loc_code = l.loc_code
+                    and a.comp_code = l.comp_code
+                    """;
+        } else {
+            sql = """
+                    select a.*,s.stock_name,l.loc_name
+                    from (
+                    select stock_code,loc_code,ttl_weight,ttl_qty,ttl_wet,ttl_rice,ttl_bag,ttl_amt,comp_code
+                    from tmp_stock_opening
+                    where mac_id =:macId
+                    )a
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code
+                    join location l on a.loc_code = l.loc_code
+                    and a.comp_code = l.comp_code
+                    """;
+        }
+        Flux<ClosingBalance> flux = client.sql(sql)
+                .bind("macId", macId)
+                .map((row) -> ClosingBalance.builder()
+                        .stockCode(row.get("stock_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .locName(row.get("loc_name", String.class))
+                        .balWeight(row.get("ttl_weight", Double.class))
+                        .balQty(row.get("ttl_qty", Double.class))
+                        .balWet(row.get("ttl_wet", Double.class))
+                        .balRice(row.get("ttl_rice", Double.class))
+                        .balBag(row.get("ttl_bag", Double.class))
+                        .balAmount(row.get("ttl_amt", Double.class))
+                        .build()).all()
+                .switchIfEmpty(Flux.just(ClosingBalance.builder()
+                        .stockName("No Stock.")
+                        .locName("No Stock.")
+                        .build()));
+        return monoOp.thenMany(flux);
+    }
+
     private Mono<ReturnObject> getStockValueResult(Integer macId) {
         String sql = """
-                select b.*,s.user_code,s.stock_name
+                select c.*,s.user_code,s.stock_name
                 from (
-                select t.stock_code,t.ttl_qty,t.comp_code,a.pur_avg_price,a.pur_recent_price,
-                ttl_qty*pur_avg_price pur_avg_amt,ttl_qty*pur_recent_price pur_recent_amt
-                from tmp_stock_opening t left join (
+                select a.*,b.pur_avg_price,b.pur_recent_price,
+                a.ttl_qty*b.pur_avg_price pur_avg_amt,a.ttl_qty*b.pur_recent_price pur_recent_amt
+                from (
+                select stock_code,sum(ttl_qty) ttl_qty,comp_code,mac_id
+                from tmp_stock_opening
+                where mac_id =:macId
+                group by stock_code
+                )a left join (
                 select stock_code,sum(ifnull(pur_avg_price,0))pur_avg_price,
                 sum(ifnull(pur_recent_price,0))pur_recent_price,mac_id
                 from tmp_stock_price
                 where mac_id =:macId
                 group by stock_code
-                )a
-                on t.stock_code = a.stock_code
-                and t.mac_id  = a.mac_id
-                where t.mac_id =:macId
-                and t.ttl_qty<>0
                 )b
-                join stock s on b.stock_code = s.stock_code
-                and b.comp_code = s.comp_code
+                on a.stock_code = b.stock_code
+                and a.mac_id  = b.mac_id
+                where a.mac_id =:macId
+                and a.ttl_qty<>0
+                )c
+                join stock s on c.stock_code = s.stock_code
+                and c.comp_code = s.comp_code
                 order by user_code
                 """;
         return client.sql(sql).bind("macId", macId)
@@ -1327,7 +1395,7 @@ public class StockReportService {
                 """;
         String purRecentSql = """
                 insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)
-                select a.stock_code,'PUR_RECENT',a.pur_price,33
+                select a.stock_code,'PUR_RECENT',a.pur_price,:macId
                 from (
                 with rows_and_position as
                 (

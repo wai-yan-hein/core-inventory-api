@@ -5,7 +5,7 @@
  */
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
 import cv.api.model.VStockIO;
@@ -29,5 +29,5 @@ public interface StockInOutService {
 
     void restore(StockIOKey key) throws Exception;
 
-    Flux<VStockIO> getStockIOHistory(FilterObject filterObject);
+    Flux<VStockIO> getStockIOHistory(ReportFilter filterObject);
 }

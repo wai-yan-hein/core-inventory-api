@@ -5,13 +5,11 @@
  */
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dao.SaleOrderJoinDao;
-import cv.api.entity.SaleHis;
-import cv.api.entity.SaleHisKey;
-import cv.api.entity.SaleOrderJoin;
+import cv.api.entity.*;
 import cv.api.repo.AccountRepo;
 import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
@@ -82,7 +80,7 @@ public class SaleController {
         return status;
     }
     @PostMapping(path = "/getSale")
-    public Flux<?> getSale(@NotNull @RequestBody FilterObject filter) {
+    public Flux<?> getSale(@NotNull @RequestBody ReportFilter filter) {
          return shService.getSale(filter);
     }
 
@@ -133,9 +131,14 @@ public class SaleController {
     }
 
     @GetMapping(path = "/getVoucherDiscount")
-    public Flux<?> getVoucherDiscount(@RequestParam String vouNo,
+    public Flux<VouDiscount> getVoucherDiscount(@RequestParam String vouNo,
+                                                @RequestParam String compCode) {
+        return shService.getVoucherDiscount(vouNo, compCode);
+    }
+    @GetMapping(path = "/getSaleNote")
+    public Flux<SaleNote> getSaleNote(@RequestParam String vouNo,
                                       @RequestParam String compCode) {
-        return Flux.fromIterable(shService.getVoucherDiscount(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+        return shService.getSaleNote(vouNo, compCode);
     }
 
     @GetMapping(path = "/searchDiscountDescription")

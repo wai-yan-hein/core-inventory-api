@@ -5,7 +5,7 @@
  */
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dao.SeqTableDao;
 import cv.api.dao.StockInOutDao;
@@ -100,7 +100,7 @@ public class StockInOutServiceImpl implements StockInOutService {
     }
 
     @Override
-    public Flux<VStockIO> getStockIOHistory(FilterObject filterObject) {
+    public Flux<VStockIO> getStockIOHistory(ReportFilter filterObject) {
         String fromDate = Util1.isNull(filterObject.getFromDate(), "-");
         String toDate = Util1.isNull(filterObject.getToDate(), "-");
         String vouStatus = Util1.isNull(filterObject.getVouStatus(), "-");

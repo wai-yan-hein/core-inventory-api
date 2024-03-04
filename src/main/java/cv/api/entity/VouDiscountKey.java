@@ -14,5 +14,5 @@ public class VouDiscountKey implements Serializable {
     @Column(name = "comp_code")
     private String compCode;
     @Column(name = "unique_id")
-    private int uniqueId;
+    private Integer uniqueId;
 }

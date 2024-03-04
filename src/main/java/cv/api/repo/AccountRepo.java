@@ -62,7 +62,7 @@ public class AccountRepo {
                                 case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
                             }
                         }
-                    }).doOnError(e -> {
+                    }).onErrorResume(e -> {
                         Gl gl = glList.getFirst();
                         String vouNo = gl.getRefNo();
                         String compCode = gl.getKey().getCompCode();
@@ -76,6 +76,7 @@ public class AccountRepo {
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
                         log.error(e.getMessage());
+                        return Mono.empty();
                     }).subscribe();
         }
     }
@@ -202,34 +203,35 @@ public class AccountRepo {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             if (t != null) {
                 String traderType = t.getType();
-                AccTrader accTrader = new AccTrader();
+                AccTrader trader = new AccTrader();
                 AccTraderKey key = new AccTraderKey();
                 key.setCode(t.getKey().getCode());
                 key.setCompCode(t.getKey().getCompCode());
-                accTrader.setKey(key);
-                accTrader.setTraderName(t.getTraderName());
-                accTrader.setUserCode(t.getUserCode());
-                accTrader.setActive(t.getActive());
-                accTrader.setAppName(appName);
-                accTrader.setMacId(macId);
-                accTrader.setAccount(t.getAccount());
-                accTrader.setDeleted(t.getDeleted());
-                accTrader.setCreatedDate(t.getCreatedDate());
-                accTrader.setCreatedBy(t.getCreatedBy());
+                trader.setKey(key);
+                trader.setTraderName(t.getTraderName());
+                trader.setUserCode(t.getUserCode());
+                trader.setActive(t.getActive());
+                trader.setAppName(appName);
+                trader.setMacId(macId);
+                trader.setAccount(t.getAccount());
+                trader.setDeleted(t.getDeleted());
+                trader.setCreatedDate(t.getCreatedDate());
+                trader.setCreatedBy(t.getCreatedBy());
+                trader.setRegCode(t.getRegCode());
                 switch (traderType) {
-                    case "CUS" -> accTrader.setTraderType("C");
-                    case "SUP" -> accTrader.setTraderType("S");
-                    default -> accTrader.setTraderType("D");
+                    case "CUS" -> trader.setTraderType("C");
+                    case "SUP" -> trader.setTraderType("S");
+                    default -> trader.setTraderType("D");
                 }
                 String account = t.getAccount();
                 String compCode = t.getKey().getCompCode();
                 if (account == null) {
                     getAccount(compCode).flatMap(acc -> {
-                        accTrader.setAccount(acc);
-                        return saveTrader(accTrader);
+                        trader.setAccount(acc);
+                        return saveTrader(trader);
                     });
                 } else {
-                    saveTrader(accTrader).subscribe();
+                    saveTrader(trader).subscribe();
                 }
             }
         }
@@ -296,6 +298,7 @@ public class AccountRepo {
                     double vouPaid = Util1.getDouble(sh.getPaid());
                     double vouTax = Util1.getDouble(sh.getTaxAmt());
                     double taxPercent = Util1.getDouble(sh.getTaxPercent());
+                    double totalPayment = Util1.getDouble(sh.getTotalPayment());
                     Integer deptId = sh.getDeptId();
                     //income by trader group
                     String groupCode = t.getGroupCode();
@@ -415,6 +418,31 @@ public class AccountRepo {
                         gl.setGlDate(vouDate);
                         gl.setDescription(String.format("Sale Voucher Tax (%s)", taxPercent));
                         gl.setTraderCode(traderCode);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        listGl.add(gl);
+                    }
+                    if (totalPayment > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Sale Voucher Received");
+                        gl.setSrcAccCode(payAcc);
+                        gl.setAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setDrAmt(totalPayment);
+                        gl.setCurCode(curCode);
                         gl.setCurCode(curCode);
                         gl.setReference(remark);
                         gl.setDeptCode(deptCode);

@@ -1,6 +1,6 @@
 package cv.api.controller;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.WeightHis;
 import cv.api.entity.WeightHisKey;
@@ -52,7 +52,7 @@ public class WeightController {
     }
 
     @PostMapping(path = "/getWeightHistory")
-    public Flux<?> getWeightHistory(@RequestBody FilterObject filter) {
+    public Flux<?> getWeightHistory(@RequestBody ReportFilter filter) {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");

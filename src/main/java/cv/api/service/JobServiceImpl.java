@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dao.JobDao;
 import cv.api.entity.Job;
@@ -34,7 +34,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Job> findAll(FilterObject filterObject) {
+    public List<Job> findAll(ReportFilter filterObject) {
         return dao.findAll(filterObject);
     }
 

@@ -5,10 +5,11 @@
  */
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.General;
 import cv.api.entity.SaleHis;
 import cv.api.entity.SaleHisKey;
+import cv.api.entity.SaleNote;
 import cv.api.entity.VouDiscount;
 import cv.api.model.VSale;
 import reactor.core.publisher.Flux;
@@ -44,10 +45,12 @@ public interface SaleHisService {
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);
 
-    List<VouDiscount> getVoucherDiscount(String vouNo, String compCode);
+    Flux<VouDiscount> getVoucherDiscount(String vouNo, String compCode);
+    Flux<SaleNote> getSaleNote(String vouNo, String compCode);
+
 
     List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
-    Flux<VSale> getSale(FilterObject filterObject);
+    Flux<VSale> getSale(ReportFilter filterObject);
     Mono<Boolean> updatePost(String vouNo, String compCode, boolean post);
 }

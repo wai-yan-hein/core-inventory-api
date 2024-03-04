@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
@@ -179,7 +179,7 @@ public class LabourPaymentService {
                 .all();
     }
 
-    public Flux<LabourPaymentDto> history(FilterObject filter) {
+    public Flux<LabourPaymentDto> history(ReportFilter filter) {
         String compCode = filter.getCompCode();
         boolean deleted = filter.isDeleted();
         String fromDate = filter.getFromDate();

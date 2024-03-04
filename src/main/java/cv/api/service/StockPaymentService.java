@@ -1,6 +1,6 @@
 package cv.api.service;
 
-import cv.api.common.FilterObject;
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.StockPayment;
 import cv.api.dto.StockPaymentDetail;
@@ -437,7 +437,7 @@ public class StockPaymentService {
                 .all();
     }
 
-    public Flux<StockPayment> history(FilterObject filter) {
+    public Flux<StockPayment> history(ReportFilter filter) {
         String tranOption = Util1.isNull(filter.getTranOption(), "-");
         if (tranOption.equals("C") || tranOption.equals("S")) {
             String fromDate = Util1.isNull(filter.getFromDate(), "-");
