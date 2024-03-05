@@ -1304,7 +1304,7 @@ public class StockReportService {
                         .balBag(row.get("ttl_bag", Double.class))
                         .balAmount(row.get("ttl_amt", Double.class))
                         .build()).all()
-                .switchIfEmpty(Flux.just(ClosingBalance.builder()
+                .switchIfEmpty(Flux.defer(() -> Flux.just(ClosingBalance.builder()
                         .stockName("No Stock.")
                         .locName("No Stock.")
                         .build()));
