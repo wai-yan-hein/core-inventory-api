@@ -1307,7 +1307,7 @@ public class StockReportService {
                 .switchIfEmpty(Flux.defer(() -> Flux.just(ClosingBalance.builder()
                         .stockName("No Stock.")
                         .locName("No Stock.")
-                        .build()));
+                        .build())));
         return monoOp.thenMany(flux);
     }
 
