@@ -1,6 +1,7 @@
 package cv.api.repo;
 
 import cv.api.auto.LocationSetting;
+import cv.api.common.Message;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dao.SaleExpenseDao;
@@ -79,6 +80,18 @@ public class AccountRepo {
                         return Mono.empty();
                     }).subscribe();
         }
+    }
+
+    public Mono<String> sendDownloadMessage(String entity, String message) {
+        Message mg = new Message();
+        mg.setHeader("DOWNLOAD");
+        mg.setEntity(entity);
+        mg.setMessage(message);
+        return accountApi.post()
+                .uri("/message/send")
+                .body(Mono.just(mg), Message.class)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
     private void updateSale(String vouNo, String compCode) {
@@ -218,6 +231,9 @@ public class AccountRepo {
                 trader.setCreatedDate(t.getCreatedDate());
                 trader.setCreatedBy(t.getCreatedBy());
                 trader.setRegCode(t.getRegCode());
+                trader.setPhone(t.getPhone());
+                trader.setAddress(t.getAddress());
+                trader.setEmail(t.getEmail());
                 switch (traderType) {
                     case "CUS" -> trader.setTraderType("C");
                     case "SUP" -> trader.setTraderType("S");
@@ -247,6 +263,7 @@ public class AccountRepo {
                 }).doOnSuccess(response -> {
                     if (response != null) {
                         updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode());
+                        sendDownloadMessage("TRADER_ACC", response.getTraderName()).subscribe();
                     }
                 });
     }

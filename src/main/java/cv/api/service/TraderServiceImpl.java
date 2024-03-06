@@ -182,6 +182,7 @@ public class TraderServiceImpl implements TraderService {
                 select *
                 from trader
                 where comp_code =:compCode
+                and deleted =false
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)

@@ -7,6 +7,7 @@ package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.VouDiscount;
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +89,7 @@ public class VSale {
     private String phoneNo;
     private String address;
     private String projectNo;
+    private String traderUserCode;
     private String userCode;
     private Double creditAmt;
     private Double diffAmt;
@@ -101,5 +103,10 @@ public class VSale {
     private String weightUnitName;
     private Boolean post;
     private double qtyPercent;
+    private Double outstanding;
+    private Double totalPayment;
+    private Double opening;
+    private Double totalBalance;
+
     List<VouDiscount> listDiscount;
 }
