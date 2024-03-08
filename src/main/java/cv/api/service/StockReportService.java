@@ -188,7 +188,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("stockCode", stockCode)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("macId", macId)
                 .fetch()
                 .rowsUpdated());
@@ -364,7 +363,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> saleMono = client.sql(saleSql)
                 .bind("macId", macId)
@@ -375,7 +373,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> retInMono = client.sql(retInSql)
                 .bind("macId", macId)
@@ -386,7 +383,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> retOutMono = client.sql(retOutSql)
                 .bind("macId", macId)
@@ -397,7 +393,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> tfMono = client.sql(tfSql)
                 .bind("macId", macId)
@@ -408,7 +403,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
 
@@ -421,7 +415,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
 
@@ -434,7 +427,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
 
@@ -447,7 +439,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> issueMono = client.sql(issueSql)
@@ -459,7 +450,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> recMono = client.sql(recSql)
@@ -471,7 +461,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch()
                 .rowsUpdated();
         return deleteTmpIO(macId)
