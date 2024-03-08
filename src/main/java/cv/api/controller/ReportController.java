@@ -530,6 +530,7 @@ public class ReportController {
 
     @PostMapping(path = "/getStockBalanceQty")
     public Flux<ClosingBalance> getStockBalance(@RequestBody ReportFilter filter) {
+        reportService.insertTmp(filter.getListLocation(), filter.getMacId(), "f_location", "-");
         String opDate = reportService.getOpeningDateByLocation(filter.getCompCode(), "-");
         filter.setOpDate(opDate);
         filter.setDeptId(0);

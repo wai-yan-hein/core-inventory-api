@@ -43,7 +43,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(pur_amt) ttl_amt
@@ -58,7 +57,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(amt) ttl_amt
@@ -72,7 +70,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(amt) ttl_amt
@@ -86,7 +83,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
@@ -101,7 +97,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (cat_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,0,sum(pay_qty)*-1 qty,0,0,sum(pay_bag)*-1, loc_code, '-',0
@@ -116,7 +111,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,0,sum(pay_qty) qty,0,0,sum(pay_bag), loc_code, '-',0
@@ -131,7 +125,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code
                     union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
@@ -145,7 +138,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code_from
                  union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code_to, weight_unit, sum(amount) ttl_amt
@@ -159,7 +151,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  group by stock_code,loc_code_to
                  union all
                  select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(in_bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
@@ -172,7 +163,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  and (in_qty>0 or in_bag>0)
                  group by stock_code,loc_code
                  union all
@@ -186,7 +176,6 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (dept_id =:deptId or 0 =:deptId)
                  and (out_qty>0 or out_bag>0)
                  group by stock_code,loc_code)a
                  group by stock_code,loc_code;
@@ -228,7 +217,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String saleSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -244,7 +232,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (cat_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String retInSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -259,7 +246,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String retOutSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -274,7 +260,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String tfSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -289,7 +274,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code_from""";
         String ttSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -304,7 +288,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code_to""";
         String stockIn = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -319,7 +302,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 and (in_qty>0 or in_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String stockOut = """
@@ -335,7 +317,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 and (out_qty>0 or out_bag>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String issueSql = """
@@ -353,7 +334,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code
                 """;
         String recSql = """
@@ -372,7 +352,6 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
                 group by date(vou_date),vou_no,stock_code,loc_code
                 """;
         Mono<Long> opMono = client.sql(opSql).bind("macId", macId).fetch().rowsUpdated();
