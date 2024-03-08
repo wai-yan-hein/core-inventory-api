@@ -41,6 +41,9 @@ public class StockServiceImpl implements StockService {
             Stock valid = findById(new StockKey(stockCode, compCode));
             if (valid == null) {
                 stock.getKey().setStockCode(stockCode);
+                if(stock.getWeight() == null) {
+                    stock.setWeight(0.0);
+                }
             } else {
                 throw new IllegalStateException("Duplicate Stock Code");
             }
