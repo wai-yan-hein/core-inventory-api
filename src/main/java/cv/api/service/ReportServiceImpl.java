@@ -34,7 +34,6 @@ public class ReportServiceImpl implements ReportService {
     private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
     private final ReportDao reportDao;
     private final UnitRelationDetailDao detailDao;
-    private final SaleHisService saleHisService;
     private final LandingHisPriceDao landingHisPriceDao;
     private final DatabaseClient client;
     private final OPHisService opHisService;
@@ -2557,17 +2556,11 @@ public class ReportServiceImpl implements ReportService {
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
 
                     c.setOpenWeight(opWeight);
-                    //c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     c.setPurWeight(purWeight);
-                    // c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     c.setInWeight(inWeight);
-                    //c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     c.setSaleWeight(saleWeight);
-                    //c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     c.setOutWeight(outWeight);
-                    //c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     c.setBalWeight(clWeight);
-                    //c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight));
                 } else {
                     ClosingBalance c = balances.get(i);
                     double opQty = c.getOpenQty();
@@ -2596,17 +2589,11 @@ public class ReportServiceImpl implements ReportService {
                     c.setBalQty(clQty);
                     c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
                     c.setOpenWeight(opWeight);
-                    //c.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     c.setPurWeight(purWeight);
-                    //c.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     c.setInWeight(inWeight);
-                    //c.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     c.setSaleWeight(saleWeight);
-                    //c.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     c.setOutWeight(outWeight);
-                    //c.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     c.setBalWeight(clWeight);
-                    //c.setBalWeightRel(clWeight == 0 ? null : Util1.format(clWeight));
                 }
             }
         } catch (Exception e) {
@@ -4196,17 +4183,11 @@ public class ReportServiceImpl implements ReportService {
                     b.setBalRel(balQty == 0 ? null : Util1.format(balQty));
 
                     b.setOpenWeight(opWeight);
-                    //b.setOpenWeightRel(opWeight == 0 ? null : Util1.format(opWeight));
                     b.setPurWeight(purWeight);
-                    //b.setPurWeightRel(purWeight == 0 ? null : Util1.format(purWeight));
                     b.setInWeight(inWeight);
-                    //b.setInWeightRel(inWeight == 0 ? null : Util1.format(inWeight));
                     b.setSaleWeight(saleWeight);
-                    //b.setSaleWeightRel(saleWeight == 0 ? null : Util1.format(saleWeight));
                     b.setOutWeight(outWeight);
-                    //b.setOutWeightRel(outWeight == 0 ? null : Util1.format(outWeight));
                     b.setBalWeight(balWeight);
-                    //b.setBalWeightRel(balWeight == 0 ? null : Util1.format(balWeight));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
                     b.setStockCode(rs.getString("stock_code"));
@@ -5859,6 +5840,9 @@ public class ReportServiceImpl implements ReportService {
     public void insertTmp(List<String> listStr, Integer macId, String taleName, String warehouse) {
         try {
             deleteTmp(taleName, macId);
+            if (listStr != null) {
+                listStr.removeIf(s -> s.equals("-"));
+            }
             if (listStr == null || listStr.isEmpty() || !warehouse.equals("-")) {
                 String sql = "insert into " + taleName + "(f_code,mac_id)\n" + "select loc_code," + macId + " mac_id from location " +
                         " where warehouse_code = '" + warehouse + "' or '-' = '" + warehouse + "'";
