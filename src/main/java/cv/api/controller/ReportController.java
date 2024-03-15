@@ -140,7 +140,7 @@ public class ReportController {
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
-                Integer macId = filter.getMacId();
+                int macId = filter.getMacId();
                 String stockCode = Util1.isNull(filter.getStockCode(), "-");
                 String brandCode = Util1.isNull(filter.getBrandCode(), "-");
                 String catCode = Util1.isNull(filter.getCatCode(), "-");
@@ -162,7 +162,6 @@ public class ReportController {
                 String reportName = filter.getReportName();
                 String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location", warehouse);
-                log.info("opening date : " + opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         List<VSale> saleByCustomer = reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);

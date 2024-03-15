@@ -192,7 +192,7 @@ public class ReportServiceImpl implements ReportService {
         if (!saleList.isEmpty()) {
             //this is hla chan myae
             //List<VouDiscount> listDis = saleHisService.getVoucherDiscount(vouNo, compCode).collectList().block();
-           // saleList.getFirst().setListDiscount(listDis);
+            // saleList.getFirst().setListDiscount(listDis);
         }
         return saleList;
     }
@@ -5865,8 +5865,10 @@ public class ReportServiceImpl implements ReportService {
                 executeSql(sql);
             } else {
                 for (String str : listStr) {
-                    String sql = "insert into " + taleName + "(f_code,mac_id)\n" + "select '" + str + "'," + macId;
-                    executeSql(sql);
+                    if (str != null && str.length() > 2) {
+                        String sql = "insert into " + taleName + "(f_code,mac_id)\n" + "select '" + str + "'," + macId;
+                        executeSql(sql);
+                    }
                 }
             }
         } catch (Exception e) {
