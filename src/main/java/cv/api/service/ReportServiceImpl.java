@@ -96,7 +96,7 @@ public class ReportServiceImpl implements ReportService {
                 where deleted = false
                 and comp_code =?
                 and (loc_code =? or '-'=?)
-                and tran_source<>3
+                and (tran_source=1 or tran_source=3)
                 """;
         try {
             ResultSet rs = reportDao.getResultSql(sql, compCode, locCode, locCode);

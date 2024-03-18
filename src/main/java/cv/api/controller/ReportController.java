@@ -162,6 +162,7 @@ public class ReportController {
                 String reportName = filter.getReportName();
                 String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
                 reportService.insertTmp(filter.getListLocation(), macId, "f_location", warehouse);
+                log.info("op date : "+opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         List<VSale> saleByCustomer = reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
@@ -310,7 +311,6 @@ public class ReportController {
                     case "StockInOutQtyDetailWetRice", "StockInOutQtyBagDetail" -> {
                         filter.setReportType(2);
                         filter.setOpDate(opDate);
-                        log.info(opDate);
                         return stockReportService.getStockInOutPaddy(filter, true);
                     }
                     case "StockInOutQtyDetail" -> {
@@ -419,7 +419,7 @@ public class ReportController {
                         List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
                         Util1.writeJsonFile(list, exportPath);
                     }
-                    case "TopPurchasePaddy" -> {
+                    case "TopPurchaseQty" -> {
                         List<VPurchase> list = reportService.getTopPurchasePaddy(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
                         Util1.writeJsonFile(list, exportPath);
                     }
