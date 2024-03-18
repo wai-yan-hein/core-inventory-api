@@ -302,12 +302,12 @@ public class ReportController {
                         filter.setOpDate(opDate);
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
-                    case "StockInOutPaddySummaryWetRice" -> {
+                    case "StockInOutQtySummaryWetRice" -> {
                         filter.setReportType(2);
                         filter.setOpDate(opDate);
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
-                    case "StockInOutPaddyDetailWetRice", "StockInOutQtyBagDetail" -> {
+                    case "StockInOutQtyDetailWetRice", "StockInOutQtyBagDetail" -> {
                         filter.setReportType(2);
                         filter.setOpDate(opDate);
                         log.info(opDate);

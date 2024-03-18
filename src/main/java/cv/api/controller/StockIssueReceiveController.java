@@ -19,9 +19,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class StockIssueReceiveController {
     private final ConsignService stockIssRecService;
-
-    @Autowired
-    private ReportService reportService;
+    private final ReportService reportService;
     @PostMapping(path = "/saveStockIssRec")
     public Mono<?> saveStockIssRec(@RequestBody ConsignHis obj) {
         obj = stockIssRecService.save(obj);

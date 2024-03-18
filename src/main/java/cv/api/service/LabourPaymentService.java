@@ -151,7 +151,7 @@ public class LabourPaymentService {
                 and comp_code =:compCode
                 and labour_group_code =:labourGroupCode
                     union all
-                select v.description tran_option,s.labour_group_code,sum(s.bag) bag,s.comp_code
+                select v.description tran_option,s.labour_group_code,sum(iszero(s.in_bag,s.out_bag)) bag,s.comp_code
                 from v_stock_io s join vou_status v
                 on s.vou_status = v.code
                 and s.comp_code = v.comp_code
