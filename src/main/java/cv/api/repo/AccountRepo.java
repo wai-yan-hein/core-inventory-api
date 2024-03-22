@@ -9,7 +9,8 @@ import cv.api.dto.LabourPaymentDto;
 import cv.api.entity.*;
 import cv.api.model.*;
 import cv.api.service.*;
-import cv.api.user.PropertyKey;
+import cv.api.user.SystemPropertyDto;
+import cv.api.user.SystemPropertyKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -42,6 +43,7 @@ public class AccountRepo {
     private final SaleExpenseDao saleExpenseDao;
     private final LabourPaymentService labourPaymentService;
     private final UserRepo userRepo;
+
 
 
     private void sendAccount(List<Gl> glList) {
@@ -270,11 +272,11 @@ public class AccountRepo {
 
     private Mono<String> getAccount(String compCode) {
         String DEBTOR_ACC = "debtor.account";
-        var key = PropertyKey.builder()
+        var key = SystemPropertyKey.builder()
                 .propKey(DEBTOR_ACC)
                 .compCode(compCode)
                 .build();
-        return userRepo.findSystemProperty(key);
+        return userRepo.findSystemProperty(key).map(SystemPropertyDto::getPropValue);
     }
 
     public void deleteTrader(AccTraderKey key) {

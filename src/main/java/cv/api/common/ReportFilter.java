@@ -1,10 +1,12 @@
 package cv.api.common;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 public class ReportFilter {
     private List<String> listTrader;
     private List<String> listSaleMan;
@@ -71,10 +73,7 @@ public class ReportFilter {
     private String refNo;
     private boolean draft;
 
-    public ReportFilter(Integer macId, String compCode) {
-        this.macId = macId;
-        this.compCode = compCode;
-    }
+
 
 
 }

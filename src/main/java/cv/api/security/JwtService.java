@@ -4,7 +4,6 @@ package cv.api.security;
 import cv.api.common.Util1;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +42,11 @@ public class JwtService {
 
     private String buildToken(UserDetails userDetails, long expiration) {
         String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
-        return Jwts.builder().setSubject(userDetails.getUsername()).claim(AUTHORITIES_KEY, authorities).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + expiration)).signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
+        return Jwts.builder().subject(userDetails.getUsername()).claim(AUTHORITIES_KEY, authorities)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey())
+                .compact();
     }
 
     public boolean isTokenValid(String token) {
@@ -57,7 +60,7 @@ public class JwtService {
 
     private boolean isTokenExpired(String token) {
         try {
-            Claims claims = Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
+            Claims claims = getClaims(token);
             Date expirationDate = claims.getExpiration();
             return expirationDate.before(new Date());
         } catch (Exception e) {
@@ -66,20 +69,24 @@ public class JwtService {
         }
     }
 
+    private Claims getClaims(String token) {
+        return Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
+    }
+
     public Authentication getAuthentication(String token) {
         if (Util1.isNullOrEmpty(token) || !isTokenValid(token)) {
             log.info("token invalid.");
             return null;
         }
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
+        Claims claims = getClaims(token);
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 
         User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode("404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970");
-        return Keys.hmacShaKeyFor(keyBytes);
+    private SecretKey getSignInKey() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode("404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"));
+
     }
 }

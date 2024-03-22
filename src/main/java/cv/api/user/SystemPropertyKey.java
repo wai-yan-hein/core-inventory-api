@@ -1,4 +1,4 @@
-package cv.api.report.model;
+package cv.api.user;
 
 import lombok.Builder;
 import lombok.Data;

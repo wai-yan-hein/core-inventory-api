@@ -15,7 +15,6 @@ import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,7 +35,7 @@ public class SaleController {
     private final SaleOrderJoinDao saleOrderJoinDao;
 
     @PostMapping(path = "/saveSale")
-    public Mono<?> saveSale(@NotNull @RequestBody SaleHis sale) {
+    public Mono<?> saveSale( @RequestBody SaleHis sale) {
         sale.setUpdatedDate(Util1.getTodayLocalDate());
         //if change location
         if (isValidSale(sale, ro)) {
@@ -53,7 +52,7 @@ public class SaleController {
         return Mono.justOrEmpty(sale);
     }
 
-    private boolean isValidSale(@NotNull SaleHis sale, ReturnObject ro) {
+    private boolean isValidSale( SaleHis sale, ReturnObject ro) {
         boolean status = true;
         if (Util1.isNullOrEmpty(sale.getTraderCode())) {
             status = false;
@@ -80,18 +79,23 @@ public class SaleController {
         return status;
     }
     @PostMapping(path = "/getSale")
-    public Flux<?> getSale(@NotNull @RequestBody ReportFilter filter) {
+    public Flux<?> getSale( @RequestBody ReportFilter filter) {
          return shService.getSale(filter);
     }
 
     @PostMapping(path = "/deleteSale")
     public Mono<?> deleteSale(@RequestBody SaleHisKey key) {
         shService.delete(key);
-        //delete in account
+        //delete in an account
         accountRepo.deleteInvVoucher(key);
         //delete in cloud
         return Mono.just(true);
     }
+    @PutMapping(path = "/updateSPay")
+    public Mono<Boolean> updateSPay(@RequestParam String vouNo,@RequestParam String compCode,@RequestParam boolean sPay) {
+        return shService.updateSPay(vouNo,compCode,sPay);
+    }
+
 
     @PostMapping(path = "/restoreSale")
     public Mono<?> restoreSale(@RequestBody SaleHisKey key) throws Exception {

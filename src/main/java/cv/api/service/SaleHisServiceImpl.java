@@ -13,7 +13,6 @@ import cv.api.entity.*;
 import cv.api.model.VSale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,7 @@ public class SaleHisServiceImpl implements SaleHisService {
     private final SaleNoteService saleNoteService;
 
     @Override
-    public SaleHis save(@NotNull SaleHis sh) {
+    public SaleHis save(SaleHis sh) {
         Integer deptId = sh.getDeptId();
         if (deptId == null) {
             log.error("deptId is null from mac id : " + sh.getMacId());
@@ -317,7 +316,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                 from (
                 select vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
                 deleted,trader_code,loc_code,comp_code,dept_id,post,sum(qty) qty,sum(bag) bag,
-                opening,outstanding,total_payment,total_balance
+                opening,outstanding,total_payment,total_balance,s_pay
                 from v_sale s
                 where comp_code = :compCode
                 and (dept_id = :deptId or 0 = :deptId)
@@ -379,6 +378,7 @@ public class SaleHisServiceImpl implements SaleHisService {
                         .outstanding(row.get("outstanding", Double.class))
                         .totalBalance(row.get("total_balance", Double.class))
                         .totalPayment(row.get("total_payment", Double.class))
+                        .sPay((row.get("s_pay", Boolean.class)))
                         .build()
                 ).all();
     }
@@ -397,5 +397,19 @@ public class SaleHisServiceImpl implements SaleHisService {
                 .fetch()
                 .rowsUpdated().thenReturn(true);
     }
+
+    @Override
+    public Mono<Boolean> updateSPay(String vouNo, String compCode, boolean sPay) {
+        String sql = """
+                update sale_his
+                set s_pay = :sPay
+                where vou_no=:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("sPay", sPay)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated().thenReturn(true);    }
 
 }

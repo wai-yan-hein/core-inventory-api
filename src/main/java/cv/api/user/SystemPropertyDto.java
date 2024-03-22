@@ -4,12 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-@Data
-@Builder
-public class SysProperty {
 
-    private PropertyKey key;
+@Builder
+@Data
+public class SystemPropertyDto {
+    private SystemPropertyKey key;
     private String propValue;
     private String remark;
     private LocalDateTime updatedDate;
-}
+
+    }

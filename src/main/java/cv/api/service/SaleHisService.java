@@ -46,11 +46,16 @@ public interface SaleHisService {
     General getVoucherInfo(String vouDate, String compCode, Integer depId);
 
     Flux<VouDiscount> getVoucherDiscount(String vouNo, String compCode);
+
     Flux<SaleNote> getSaleNote(String vouNo, String compCode);
 
 
     List<VouDiscount> searchDiscountDescription(String str, String compCode);
 
     Flux<VSale> getSale(ReportFilter filterObject);
+
     Mono<Boolean> updatePost(String vouNo, String compCode, boolean post);
+
+    Mono<Boolean> updateSPay(String vouNo, String compCode, boolean sPay);
+
 }

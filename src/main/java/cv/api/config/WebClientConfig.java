@@ -56,20 +56,6 @@ public class WebClientConfig {
                 .build();
     }
 
-    @Bean
-    public WebClient userApi() {
-        log.info("user api : " + environment.getProperty("user.url"));
-        return WebClient.builder()
-                .exchangeStrategies(ExchangeStrategies.builder()
-                        .codecs(config -> config
-                                .defaultCodecs()
-                                .maxInMemorySize(16 * 1024 * 1024))
-                        .build())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getToken())
-                .baseUrl(Objects.requireNonNull(environment.getProperty("user.url")))
-                .clientConnector(reactorClientHttpConnector())
-                .build();
-    }
 
 
     @Bean

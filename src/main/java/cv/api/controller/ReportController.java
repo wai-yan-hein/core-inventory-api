@@ -333,7 +333,7 @@ public class ReportController {
                         Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockValueQty" -> {
-                        return stockReportService.getStockValue(filter);
+                        return stockReportService.getStockValueRO(filter);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
                         List<VStockIO> values = reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);

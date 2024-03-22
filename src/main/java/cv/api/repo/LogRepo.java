@@ -1,10 +1,15 @@
-package cv.api.report.service;
+package cv.api.repo;
 
 
+import cv.api.common.StockValue;
+import cv.api.report.model.StockValueDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +27,14 @@ public class LogRepo {
                     .baseUrl(url)
                     .build();
         }
+    }
+    public Mono<Boolean> stockValue(List<StockValueDto> list) {
+        return logApi.post()
+                .uri("/report/stockValue")
+                .body(Mono.just(list), List.class)
+                .retrieve()
+                .bodyToMono(Boolean.class);
+
     }
 
 

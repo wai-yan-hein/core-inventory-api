@@ -7,6 +7,7 @@ package cv.api.service;
 
 import cv.api.entity.Location;
 import cv.api.entity.LocationKey;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,5 +33,5 @@ public interface LocationService {
 
     List<Location> getLocation(LocalDateTime updatedDate);
 
-    List<String> getLocation(Integer deptId);
+    Mono<Boolean> insertTmp(List<String> listStr, String compCode,Integer macId, String warehouse);
 }

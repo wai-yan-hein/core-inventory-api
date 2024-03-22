@@ -107,6 +107,7 @@ public class VSale {
     private Double totalPayment;
     private Double opening;
     private Double totalBalance;
+    private Boolean sPay;
 
     List<VouDiscount> listDiscount;
 }

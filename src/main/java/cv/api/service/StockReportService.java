@@ -25,7 +25,7 @@ public class StockReportService {
 
     private Mono<Long> calculateOpeningByPaddy(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
-                                               String compCode, Integer deptId, Integer macId) {
+                                               String compCode, Integer macId) {
         //opening
         String sql = """
                  insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,ttl_wet,ttl_rice,ttl_bag,ttl_weight,ttl_amt,loc_code,unit,comp_code,dept_id,mac_id)
@@ -195,7 +195,7 @@ public class StockReportService {
 
     private Mono<Long> calculateClosingByPaddy(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
-                                               String compCode, Integer deptId, Integer macId) {
+                                               String compCode, Integer macId) {
         String opSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,op_wet,op_rice,op_bag,op_weight,op_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'A-Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(ttl_bag) ttl_bag, ifnull(sum(ttl_weight),0) ttl_weight,sum(ttl_amt),loc_code,mac_id,comp_code,dept_id
@@ -487,11 +487,10 @@ public class StockReportService {
         String brandCode = filter.getBrandCode();
         String stockCode = filter.getStockCode();
         String compCode = filter.getCompCode();
-        int deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
         int type = filter.getReportType();
-        Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-        Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+        Mono<Long> opMono = calculateOpeningByPaddy(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Long> clMono = calculateClosingByPaddy(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return opMono.then(clMono)
                 .flatMap(aLong -> {
                     if (detail) {
@@ -1202,19 +1201,29 @@ public class StockReportService {
 
     }
 
-    public Mono<ReturnObject> getStockValue(ReportFilter filter) {
+    public Mono<ReturnObject> getStockValueRO(ReportFilter filter) {
+        return getStockValue(filter).collectList()
+                .map(this::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+    public Flux<StockValue> getStockValue(ReportFilter filter) {
         String opDate = filter.getOpDate();
         String toDate = Util1.addDay(filter.getToDate(), 1);
-        String typeCode = filter.getStockTypeCode();
-        String catCode = filter.getCatCode();
-        String brandCode = filter.getBrandCode();
-        String stockCode = filter.getStockCode();
+        String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
+        String catCode = Util1.isNull(filter.getCatCode(), "-");
+        String brandCode = Util1.isNull(filter.getBrandCode(), "-");
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String compCode = filter.getCompCode();
-        int deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
-        Mono<Long> monoPrice = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, deptId, macId);
-        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-        return monoPrice.then(monoOp).then(getStockValueResult(macId));
+        Mono<Long> monoPrice = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, macId);
+        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        return monoPrice.then(monoOp)
+                .thenMany(getStockValueResult(macId));
     }
 
     public Flux<ClosingBalance> getStockBalance(ReportFilter filter) {
@@ -1225,10 +1234,9 @@ public class StockReportService {
         String brandCode = Util1.isNull(filter.getBrandCode(), "-");
         String stockCode = filter.getStockCode();
         String compCode = filter.getCompCode();
-        int deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
         boolean summary = filter.isSummary();
-        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         String sql;
         if (summary) {
             sql = """
@@ -1279,9 +1287,9 @@ public class StockReportService {
         return monoOp.thenMany(flux);
     }
 
-    private Mono<ReturnObject> getStockValueResult(Integer macId) {
+    private Flux<StockValue> getStockValueResult(Integer macId) {
         String sql = """
-                select c.*,s.user_code,s.stock_name
+                 select c.*,s.user_code,s.stock_name,st.stock_type_name,ct.cat_name
                 from (
                 select a.*,b.pur_avg_price,b.pur_recent_price,
                 a.ttl_qty*b.pur_avg_price pur_avg_amt,a.ttl_qty*b.pur_recent_price pur_recent_amt
@@ -1303,11 +1311,17 @@ public class StockReportService {
                 and a.ttl_qty<>0
                 )c
                 join stock s on c.stock_code = s.stock_code
-                and c.comp_code = s.comp_code
+                and s.comp_code = s.comp_code
+                join stock_type st on s.stock_type_code = st.stock_type_code
+                and s.comp_code = st.comp_code
+                left join category ct on s.category_code= ct.cat_code
+                and s.comp_code = ct.comp_code
                 order by user_code
                 """;
         return client.sql(sql).bind("macId", macId)
                 .map((row, rowMetadata) -> StockValue.builder()
+                        .stockTypeName(row.get("stock_type_name", String.class))
+                        .catName(row.get("cat_name", String.class))
                         .stockUserCode(row.get("user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
                         .qty(row.get("ttl_qty", Double.class))
@@ -1315,18 +1329,12 @@ public class StockReportService {
                         .purAvgAmount(Util1.toNull(row.get("pur_avg_amt", Double.class)))
                         .recentPrice(Util1.toNull(row.get("pur_recent_price", Double.class)))
                         .recentAmt(Util1.toNull(row.get("pur_recent_amt", Double.class)))
-                        .build()).all().collectList()
-                .map(this::convertToJsonBytes)
-                .map(fileBytes -> ReturnObject.builder()
-                        .status("success")
-                        .message("Data fetched successfully")
-                        .file(fileBytes)
-                        .build());
+                        .build()).all();
     }
 
     private Mono<Long> calculatePrice(String toDate, String opDate, String stockCode,
                                       String typeCode, String catCode, String brandCode,
-                                      String compCode, Integer deptId, Integer macId) {
+                                      String compCode, Integer macId) {
         String delSql = """
                 delete from tmp_stock_price where mac_id =:macId
                 """;
@@ -1343,8 +1351,6 @@ public class StockReportService {
                 and (category_code =:catCode or '-' =:catCode)
                 and (brand_code =:brandCode or '-' =:brandCode)
                 and (stock_code =:stockCode or '-' =:stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
-                and loc_code in (select f_code from f_location where mac_id =:macId)
                 group by stock_code,pur_price
                 	union all
                 select 'OP',stock_code,price
@@ -1357,8 +1363,6 @@ public class StockReportService {
                 and (category_code =:catCode or '-' =:catCode)
                 and (brand_code =:brandCode or '-' =:brandCode)
                 and (stock_code =:stockCode or '-' =:stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
-                and loc_code in (select f_code from f_location where mac_id =:macId))a
                 group by stock_code
                 """;
         String purRecentSql = """
@@ -1376,8 +1380,6 @@ public class StockReportService {
                 and (category_code =:catCode or '-' =:catCode)
                 and (brand_code =:brandCode or '-' =:brandCode)
                 and (stock_code =:stockCode or '-' =:stockCode)
-                and (dept_id =:deptId or 0 =:deptId)
-                and loc_code in (select f_code from f_location where mac_id =:macId))
                 select stock_code,pur_price,comp_code
                 from rows_and_position
                 where position =1
@@ -1395,7 +1397,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("typeCode", typeCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         Mono<Long> purRecentMono = client.sql(purRecentSql)
                 .bind("toDate", toDate)
@@ -1406,7 +1407,6 @@ public class StockReportService {
                 .bind("brandCode", brandCode)
                 .bind("typeCode", typeCode)
                 .bind("stockCode", stockCode)
-                .bind("deptId", deptId)
                 .fetch().rowsUpdated();
         return delMono.then(purMono).then(purRecentMono);
     }

@@ -6,6 +6,7 @@ import cv.api.dao.OPHisDetailDao;
 import cv.api.dao.SeqTableDao;
 import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class OPHisServiceImpl implements OPHisService {
     private final OPHisDao opHisDao;
     private final OPHisDetailDao opHisDetailDao;
@@ -98,21 +100,20 @@ public class OPHisServiceImpl implements OPHisService {
 
     @Override
     public Mono<String> getOpeningDateByLocation(String compCode, String locCode) {
-        String defaultOpDate = "1998-10-07";
         String sql = """
                 select max(op_date) op_date
                 from op_his
                 where deleted = false
                 and comp_code =:compCode
-                and loc_code =:locCode
+                and (loc_code =:locCode or '-'=:locCode)
+                and (tran_source=1 or tran_source=3)
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
                 .bind("locCode", locCode)
-                .map((row, rowMetadata) -> {
-                    LocalDate opDate = row.get("op_date", LocalDate.class);
-                    return opDate != null ? Util1.toDateStr(opDate, "yyyy-MM-dd") : defaultOpDate;
-                }).one();
+                .map((row) -> row.get("op_date", String.class))
+                .one()
+                .switchIfEmpty(Mono.defer(() -> Mono.just("1998-10-07")));
     }
 
 }
