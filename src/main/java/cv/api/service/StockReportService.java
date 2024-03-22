@@ -1379,7 +1379,7 @@ public class StockReportService {
                 and (stock_type_code =:typeCode or '-' =:typeCode)
                 and (category_code =:catCode or '-' =:catCode)
                 and (brand_code =:brandCode or '-' =:brandCode)
-                and (stock_code =:stockCode or '-' =:stockCode)
+                and (stock_code =:stockCode or '-' =:stockCode))
                 select stock_code,pur_price,comp_code
                 from rows_and_position
                 where position =1
