@@ -1363,6 +1363,7 @@ public class StockReportService {
                 and (category_code =:catCode or '-' =:catCode)
                 and (brand_code =:brandCode or '-' =:brandCode)
                 and (stock_code =:stockCode or '-' =:stockCode)
+                )a
                 group by stock_code
                 """;
         String purRecentSql = """
