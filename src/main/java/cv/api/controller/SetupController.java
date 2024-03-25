@@ -55,10 +55,16 @@ public class SetupController {
     private final StockFormulaService stockFormulaService;
     private final OutputCostService outputCostService;
     private final StockColorService stockColorService;
+    private final CleanDataService cleanDataService;
 
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
         return Mono.just("Hello");
+    }
+
+    @DeleteMapping
+    public Mono<Boolean> cleanData() {
+        return cleanDataService.cleanData();
     }
 
     @PostMapping(path = "/saveCategory")
@@ -346,11 +352,11 @@ public class SetupController {
     public Flux<Trader> getUpdateTrader(@RequestParam String updatedDate) {
         return traderService.getUpdateTrader(Util1.toLocalDateTime(updatedDate));
     }
+
     @GetMapping(path = "/getUpdateCustomer")
     public Flux<Trader> getUpdateCustomer(@RequestParam String updatedDate) {
         return traderService.getUpdateCustomer(Util1.toLocalDateTime(updatedDate));
     }
-
 
 
     @GetMapping(path = "/getCustomer")
