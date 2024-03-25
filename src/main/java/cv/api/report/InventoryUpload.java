@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
 import java.time.LocalDate;
 
 @Component
@@ -54,7 +53,7 @@ public class InventoryUpload {
                                     .opDate(opDate)
                                     .toDate(Util1.toDateStr(LocalDate.now(), "yyyy-MM-dd"))
                                     .build();
-                            return stockReportService.getStockValue(filter)
+                            return stockReportService.getStockBalanceByLocation(filter)
                                     .map(v -> StockValueDto.builder()
                                             .tranDate(LocalDate.now())
                                             .compCode(headCode)
@@ -63,6 +62,7 @@ public class InventoryUpload {
                                             .stockCode(v.getStockUserCode())
                                             .stockName(v.getStockName())
                                             .qty(v.getQty())
+                                            .bag(v.getBag())
                                             .build())
                                     .collectList()
                                     .flatMap(logRepo::stockValue)

@@ -101,7 +101,8 @@ public class StockInOutDetailServiceImpl implements StockInOutDetailService {
                 select a.*,round( a.tot_weight / (in_tot_qty + out_tot_qty),3) avg_weight,
                 round( a.ttl_amt / (in_tot_qty + out_tot_qty),3) price
                 from (
-                select sum(op.total_weight) as tot_weight, sum(op.in_qty) as in_tot_qty, sum(op.out_qty) as out_tot_qty,
+                select sum(op.total_weight) as tot_weight, sum(iszero(op.in_qty,op.in_bag)) as in_tot_qty,
+                sum(iszero(op.out_qty,op.out_bag)) as out_tot_qty,
                 sum(amount) ttl_amt,
                 op.*,s.user_code,s.stock_name,st.finished_group
                 from stock_in_out_detail op

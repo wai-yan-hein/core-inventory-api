@@ -270,7 +270,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.getResultSql(sql, vouNo, compCode);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 p.setTraderName(rs.getString("trader_name"));
                 p.setRemark(rs.getString("remark"));
                 p.setVouNo(rs.getString("vou_no"));
@@ -331,7 +331,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = getResult(sql, vouNo, compCode);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase purchase = new VPurchase();
+                VPurchase purchase = VPurchase.builder().build();
                 purchase.setVouNo(rs.getString("vou_no"));
                 purchase.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 purchase.setLocationName(rs.getString("loc_name"));
@@ -635,7 +635,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase s = new VPurchase();
+                VPurchase s = VPurchase.builder().build();
                 String userCode = rs.getString("s_user_code");
                 String sCode = rs.getString("stock_code");
                 String traderUsr = rs.getString("user_code");
@@ -679,7 +679,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase s = new VPurchase();
+                VPurchase s = VPurchase.builder().build();
                 String userCode = rs.getString("s_user_code");
                 String sCode = rs.getString("stock_code");
                 String traderUsr = rs.getString("user_code");
@@ -717,7 +717,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 p.setVouNo(rs.getString("vou_no"));
                 p.setTraderCode(rs.getString("trader_code"));
@@ -752,7 +752,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 p.setVouNo(rs.getString("vou_no"));
                 p.setTraderCode(rs.getString("trader_code"));
@@ -1265,7 +1265,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 p.setVouNo(rs.getString("vou_no"));
                 p.setTraderCode(rs.getString("trader_code"));
@@ -1305,7 +1305,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 String relCode = rs.getString("rel_code");
                 double smallQty = rs.getDouble("smallest_qty");
                 p.setStockCode(rs.getString("s_user_code"));
@@ -1346,7 +1346,7 @@ public class ReportServiceImpl implements ReportService {
         ResultSet rs = reportDao.executeSql(sql);
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 //s_user_code, stock_name, qty, total_weight, pur_unit, weight_unit, comp_code, unit_name, weight_unit_name
                 p.setStockCode(rs.getString("stock_code"));
                 p.setStockUserCode(rs.getString("s_user_code"));
@@ -2908,7 +2908,7 @@ public class ReportServiceImpl implements ReportService {
         List<VPurchase> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase s = new VPurchase();
+                VPurchase s = VPurchase.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                 s.setVouNo(rs.getString("vou_no"));
@@ -3226,7 +3226,7 @@ public class ReportServiceImpl implements ReportService {
         List<VPurchase> purchaseList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VPurchase s = new VPurchase();
+                VPurchase s = VPurchase.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyy"));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setStockUserCode(rs.getString("s_user_code"));
@@ -3733,7 +3733,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = getResult(sql);
             if (rs != null) {
                 while (rs.next()) {
-                    VPurchase p = new VPurchase();
+                    VPurchase p = VPurchase.builder().build();
                     p.setGroupName(rs.getString("group_name"));
                     p.setStockUserCode(rs.getString("user_code"));
                     p.setStockName(rs.getString("stock_name"));
@@ -4698,7 +4698,7 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
                     catCode, catCode, locCode, locCode, stockCode, stockCode, labourGroupCode, labourGroupCode);
             while (rs.next()) {
-                VPurchase p = new VPurchase();
+                VPurchase p = VPurchase.builder().build();
                 p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 p.setVouNo(rs.getString("vou_no"));
                 p.setTraderCode(rs.getString("trader_code"));
@@ -4733,9 +4733,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VPurchase> getTopPurchasePaddy(String fromDate, String toDate, String compCode, String stockCode,
-                                               String groupCode, String catCode, String brandCode, String locCode) {
-        List<VPurchase> list = new ArrayList<>();
+    public Mono<ReturnObject> getTopPurchasePaddy(String fromDate, String toDate, String compCode, String stockCode,
+                                                  String groupCode, String catCode, String brandCode, String locCode) {
         String sql = """
                 select a.*,c.cat_name,round(sum(total_wet)/sum(qty),2) avg_wet,
                 round(sum(total_rice)/sum(qty),2) avg_rice,
@@ -4744,48 +4743,56 @@ public class ReportServiceImpl implements ReportService {
                 select category_code,stock_code,stock_name,wet,rice, qty,bag,pur_price,
                 wet*qty total_wet,rice*qty total_rice, pur_amt,comp_code,vou_no,vou_total
                 from v_purchase
-                where date(vou_date) between ? and ?
+                where date(vou_date) between :fromDate and :toDate
                 and deleted =false
-                and comp_code = ?
-                and (stock_type_code= ? or '-'=?)
-                and (brand_code= ? or '-'=?)
-                and (category_code=? or '-'=?)
-                and (loc_code= ? or '-'=?)
-                and (stock_code= ? or '-'=?)
+                and comp_code = :compCode
+                and (stock_type_code= :typeCode or '-'=:typeCode)
+                and (brand_code= :brandCode or '-'=:brandCode)
+                and (category_code=:catCode or '-'=:catCode)
+                and (loc_code= :locCode or '-'=:locCode)
+                and (stock_code= :stockCode or '-'=:stockCode)
                 )a
                 left join category c on a.category_code = c.cat_code
                 and a.comp_code = c.comp_code
                 group by stock_code
                 order by total_qty desc
                 """;
-        try {
-            ResultSet rs = getResult(sql, fromDate, toDate, compCode, groupCode, groupCode, brandCode, brandCode,
-                    catCode, catCode, locCode, locCode, stockCode, stockCode);
-            while (rs.next()) {
-                VPurchase p = new VPurchase();
-                p.setStockCode(rs.getString("stock_code"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setAvgWet(rs.getDouble("avg_wet"));
-                p.setAvgPrice(rs.getDouble("avg_price"));
-                p.setAvgRice(rs.getDouble("avg_rice"));
-                p.setGroupName(rs.getString("cat_name"));
-                p.setVouTotal(rs.getDouble("ttl_vou_total"));
-                p.setQty(rs.getDouble("total_qty"));
-                list.add(p);
-                //stock_type_code, stock_code, stock_name, wet, rice, qty,
-                // bag, vou_total, comp_code, stock_type_name, avg_wet, avg_rice, avg_price
-            }
-            double totalQty = list.stream()
-                    .filter(v -> Objects.nonNull(v.getQty())) // Filter out null values
-                    .mapToDouble(VPurchase::getQty) // Map to double
-                    .sum(); // Perform the sum operation
-            if (!list.isEmpty()) {
-                list.forEach(t -> t.setQtyPercent((t.getQty() / totalQty) * 100));
-            }
-        } catch (Exception e) {
-            log.error("TopPurchasePaddy : " + e.getMessage());
-        }
-        return list;
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", groupCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("locCode", locCode)
+                .bind("stockCode", stockCode)
+                .map((row) -> VPurchase.builder()
+                        .stockCode(row.get("stock_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .avgWet(row.get("avg_wet", Double.class))
+                        .avgPrice(row.get("avg_price", Double.class))
+                        .avgRice(row.get("avg_rice",Double.class))
+                        .groupName(row.get("cat_name", String.class))
+                        .vouTotal(row.get("ttl_vou_total", Double.class))
+                        .qty(row.get("total_qty", Double.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(list -> {
+                    double totalQty = list.stream()
+                            .filter(v -> Objects.nonNull(v.getQty())) // Filter out null values
+                            .mapToDouble(VPurchase::getQty) // Map to double
+                            .sum(); // Perform the sum operation
+                    if (!list.isEmpty()) {
+                        list.forEach(t -> t.setQtyPercent((t.getQty() / totalQty) * 100));
+                    }
+                    return list;
+                }).map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
     @Override

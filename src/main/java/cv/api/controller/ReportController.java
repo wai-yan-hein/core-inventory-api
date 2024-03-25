@@ -420,8 +420,7 @@ public class ReportController {
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "TopPurchaseQty" -> {
-                        List<VPurchase> list = reportService.getTopPurchasePaddy(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getTopPurchasePaddy(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
                     }
                     case "TransferSaleClosing" -> {
                         filter.setOpDate(opDate);

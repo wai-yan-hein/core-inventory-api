@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -615,7 +610,7 @@ public class StockReportService {
                 })
                 .all()
                 .collectList()
-                .map(this::convertToJsonBytes)
+                .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
                         .message("Data fetched successfully")
@@ -860,7 +855,7 @@ public class StockReportService {
                         .build())
                 .all()
                 .collectList()
-                .map(this::convertToJsonBytes)
+                .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
                         .message("Data fetched successfully")
@@ -980,17 +975,7 @@ public class StockReportService {
         return client.sql(delSql).bind("macId", macId).fetch().rowsUpdated();
     }
 
-    private byte[] convertToJsonBytes(Object data) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            try (Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-                Util1.gson.toJson(data, writer);
-            }
-            return outputStream.toByteArray();
-        } catch (IOException e) {
-            // Handle the exception according to your application's error handling strategy
-            return new byte[0]; // Or throw a custom exception
-        }
-    }
+
 
     private Mono<Long> calculateOpeningConsign(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
@@ -1187,7 +1172,7 @@ public class StockReportService {
                     //stock_code, trader_code, comp_code, op_bag, in_bag, out_bag, bal_bag,
                     // s_user_code, stock_name, st_user_code, stock_type_name, c_user_code, cat_name
                 }).all().collectList()
-                .map(this::convertToJsonBytes)
+                .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
                         .message("Data fetched successfully")
@@ -1203,7 +1188,7 @@ public class StockReportService {
 
     public Mono<ReturnObject> getStockValueRO(ReportFilter filter) {
         return getStockValue(filter).collectList()
-                .map(this::convertToJsonBytes)
+                .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
                         .message("Data fetched successfully")
@@ -1224,6 +1209,18 @@ public class StockReportService {
         Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return monoPrice.then(monoOp)
                 .thenMany(getStockValueResult(macId));
+    }
+    public Flux<StockValue> getStockBalanceByLocation(ReportFilter filter) {
+        String opDate = filter.getOpDate();
+        String toDate = Util1.addDay(filter.getToDate(), 1);
+        String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
+        String catCode = Util1.isNull(filter.getCatCode(), "-");
+        String brandCode = Util1.isNull(filter.getBrandCode(), "-");
+        String stockCode = Util1.isNull(filter.getStockCode(), "-");
+        String compCode = filter.getCompCode();
+        Integer macId = filter.getMacId();
+        Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        return monoOp.thenMany(getStockBalanceByLocation(macId));
     }
 
     public Flux<ClosingBalance> getStockBalance(ReportFilter filter) {
@@ -1329,6 +1326,35 @@ public class StockReportService {
                         .purAvgAmount(Util1.toNull(row.get("pur_avg_amt", Double.class)))
                         .recentPrice(Util1.toNull(row.get("pur_recent_price", Double.class)))
                         .recentAmt(Util1.toNull(row.get("pur_recent_amt", Double.class)))
+                        .build()).all();
+    }
+    private Flux<StockValue> getStockBalanceByLocation(Integer macId) {
+        String sql = """
+                select a.*,s.user_code,s.stock_name,st.stock_type_name,ct.cat_name,l.loc_name
+                from (
+                select stock_code,loc_code,comp_code,ttl_qty,ttl_bag
+                from tmp_stock_opening
+                where mac_id =:macId
+                )a
+                join location l on a.loc_code = l.loc_code
+                and a.comp_code = l.comp_code
+                join stock s on a.stock_code = s.stock_code
+                and s.comp_code = s.comp_code
+                join stock_type st on s.stock_type_code = st.stock_type_code
+                and s.comp_code = st.comp_code
+                left join category ct on s.category_code= ct.cat_code
+                and s.comp_code = ct.comp_code
+                """;
+        return client.sql(sql).bind("macId", macId)
+                //ttl_qty, ttl_bag, user_code, stock_name, stock_type_name, cat_name, loc_name
+                .map((row, rowMetadata) -> StockValue.builder()
+                        .qty(row.get("ttl_qty", Double.class))
+                        .bag(row.get("ttl_bag", Double.class))
+                        .stockUserCode(row.get("user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .stockTypeName(row.get("stock_type_name", String.class))
+                        .catName(row.get("cat_name", String.class))
+                        .locName(row.get("loc_name",String.class))
                         .build()).all();
     }
 

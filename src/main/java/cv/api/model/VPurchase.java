@@ -2,6 +2,7 @@ package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.LandingHisPrice;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@Builder
 public class VPurchase {
     private String pdCode;
     private Double balance;

@@ -14,6 +14,7 @@ public class StockValue {
     private String stockTypeUserCode;
     private String stockTypeName;
     private String catName;
+    private String locName;
     private String balRel;
     private Double purAvgPrice;
     private Double purAvgAmount;
@@ -30,5 +31,6 @@ public class StockValue {
     private Double ioRecentPrice;
     private Double ioRecentAmt;
     private Double qty;
+    private Double bag;
     private String relation;
 }

@@ -268,7 +268,7 @@ public interface ReportService {
     List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode, String stockCode,
                                     String groupCode, String catCode, String brandCode, String locCode, String labourGroupCode);
 
-    List<VPurchase> getTopPurchasePaddy(String fromDate, String toDate, String compCode,
+    Mono<ReturnObject> getTopPurchasePaddy(String fromDate, String toDate, String compCode,
                                         String stockCode, String groupCode, String catCode,
                                         String brandCode, String locCode);
 
