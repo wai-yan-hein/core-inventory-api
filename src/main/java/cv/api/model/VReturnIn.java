@@ -6,6 +6,7 @@
 package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
@@ -14,6 +15,7 @@ import java.time.ZonedDateTime;
  * @author wai yan
  */
 @Data
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VReturnIn {
 
@@ -24,21 +26,21 @@ public class VReturnIn {
     private ZonedDateTime vouDateTime;
     private String curCode;
     private String remark;
-    private Float vouTotal;
-    private Float discount;
-    private Float discountPrice;
+    private Double vouTotal;
+    private Double discount;
+    private Double discountPrice;
     private String createdBy;
-    private boolean deleted;
-    private Float paid;
-    private Float vouBalance;
+    private Boolean deleted;
+    private Double paid;
+    private Double vouBalance;
     private String compCode;
     private Integer macId;
     private String stockCode;
-    private Float qty;
-    private Float wt;
+    private Double qty;
+    private Double wt;
     private String unit;
-    private Float price;
-    private Float amount;
+    private Double price;
+    private Double amount;
     private String locCode;
     private Integer uniqueId;
     private String traderName;

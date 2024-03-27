@@ -8,23 +8,22 @@ package cv.api.service;
 import cv.api.entity.SaleDetailKey;
 import cv.api.entity.SaleHisDetail;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * @author wai yan
  */
 public interface SaleDetailService {
 
-    SaleHisDetail save(SaleHisDetail sdh);
+    Mono<SaleHisDetail> save(SaleHisDetail sdh);
 
-    List<SaleHisDetail> search(String vouNo, String compCode, Integer deptId);
+    Flux<SaleHisDetail> search(String vouNo, String compCode);
 
-    int delete(SaleDetailKey key);
 
-    List<SaleHisDetail> getSaleByBatch(String batchNo, String compCode, Integer depId);
+    Flux<SaleHisDetail> getSaleByBatch(String batchNo, String compCode);
 
-    List<SaleHisDetail> getSaleByBatchDetail(String batchNo, String compCode, Integer depId);
+    Flux<SaleHisDetail> getSaleByBatchDetail(String batchNo, String compCode);
+    Mono<Boolean> delete(String vouNo,String compCode);
 
 
 

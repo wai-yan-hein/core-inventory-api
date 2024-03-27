@@ -5,11 +5,15 @@
  */
 package cv.api.service;
 
+import cv.api.common.ReportFilter;
 import cv.api.entity.RetInHis;
+import cv.api.entity.RetInHisDetail;
 import cv.api.entity.RetInHisKey;
+import cv.api.model.VReturnIn;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,25 +21,19 @@ import java.util.List;
  */
 public interface RetInService {
 
-    RetInHis save(RetInHis ri);
-
-    RetInHis update(RetInHis ri);
-
-    List<RetInHis> search(String fromDate, String toDate, String cusCode,
-                          String vouNo, String remark, String userCode);
-
-    RetInHis findById(RetInHisKey id);
-
-    void delete(RetInHisKey key) throws Exception;
-
-    void restore(RetInHisKey key) throws Exception;
+    Mono<RetInHis> save(RetInHis ri);
 
 
-    List<RetInHis> unUploadVoucher(LocalDateTime syncDate);
+    Mono<RetInHis> findById(RetInHisKey id);
 
-    List<RetInHis> unUpload(String syncDate);
+    Mono<Boolean> delete(RetInHisKey key) ;
 
-    List<RetInHis> search(String updatedDate, List<String> keys);
+    Mono<Boolean> restore(RetInHisKey key);
 
-    void truncate(RetInHisKey key);
+
+    Flux<RetInHis> unUploadVoucher(LocalDateTime syncDate);
+    Flux<VReturnIn> getHistory(ReportFilter filter);
+
+
+    Flux<RetInHisDetail> search(String vouNo, String compCode);
 }

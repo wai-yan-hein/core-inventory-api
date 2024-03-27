@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisKey;
 import cv.api.model.VOrder;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ public interface OrderHisService {
     void truncate(OrderHisKey key);
 
     General getVoucherInfo(String vouDate, String compCode, Integer depId);
+    Mono<Boolean> updateOrder(OrderHisKey key, boolean post);
 
 
 }

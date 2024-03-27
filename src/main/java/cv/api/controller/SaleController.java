@@ -5,14 +5,14 @@
  */
 package cv.api.controller;
 
+import cv.api.common.General;
 import cv.api.common.ReportFilter;
-import cv.api.common.ReturnObject;
-import cv.api.common.Util1;
-import cv.api.dao.SaleOrderJoinDao;
 import cv.api.entity.*;
+import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
 import cv.api.service.SaleDetailService;
 import cv.api.service.SaleHisService;
+import cv.api.service.SaleOrderJoinService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -28,110 +28,63 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class SaleController {
 
-    private final ReturnObject ro = ReturnObject.builder().build();
     private final SaleHisService shService;
     private final SaleDetailService sdService;
     private final AccountRepo accountRepo;
-    private final SaleOrderJoinDao saleOrderJoinDao;
+    private final SaleOrderJoinService saleOrderJoinService;
 
     @PostMapping(path = "/saveSale")
-    public Mono<?> saveSale( @RequestBody SaleHis sale) {
-        sale.setUpdatedDate(Util1.getTodayLocalDate());
-        //if change location
-        if (isValidSale(sale, ro)) {
-            if (sale.getExpense() == null) {
-                sale.setExpense(0.0);
-            }
-            sale = shService.save(sale);
-        } else {
-            return Mono.justOrEmpty(ro);
-        }
-        //for account
-        accountRepo.sendSale(sale);
-        //for cloud
-        return Mono.justOrEmpty(sale);
+    public Mono<SaleHis> saveSale(@RequestBody SaleHis sale) {
+        return shService.save(sale).flatMap(obj -> accountRepo.sendSaleAsync(obj).thenReturn(obj));
     }
 
-    private boolean isValidSale( SaleHis sale, ReturnObject ro) {
-        boolean status = true;
-        if (Util1.isNullOrEmpty(sale.getTraderCode())) {
-            status = false;
-            ro.setMessage("Invalid Trader.");
-        } else if (Util1.isNullOrEmpty(sale.getVouDate())) {
-            status = false;
-            ro.setMessage("Invalid Voucher Date.");
-        } else if (Util1.isNullOrEmpty(sale.getCurCode())) {
-            status = false;
-            ro.setMessage("Invalid Currency.");
-        } else if (Util1.getFloat(sale.getVouTotal()) <= 0) {
-            status = false;
-            ro.setMessage("Invalid Voucher Total.");
-        } else if (Util1.isNullOrEmpty(sale.getLocCode())) {
-            status = false;
-            ro.setMessage("Invalid Location.");
-        } else if (Util1.isNullOrEmpty(sale.getCreatedBy())) {
-            status = false;
-            ro.setMessage("Invalid Created User.");
-        } else if (Util1.isNullOrEmpty(sale.getCreatedDate())) {
-            status = false;
-            ro.setMessage("Invalid Created Date.");
-        }
-        return status;
-    }
+
     @PostMapping(path = "/getSale")
-    public Flux<?> getSale( @RequestBody ReportFilter filter) {
-         return shService.getSale(filter);
+    public Flux<VSale> getSale(@RequestBody ReportFilter filter) {
+        return shService.getSale(filter);
     }
 
     @PostMapping(path = "/deleteSale")
-    public Mono<?> deleteSale(@RequestBody SaleHisKey key) {
-        shService.delete(key);
-        //delete in an account
-        accountRepo.deleteInvVoucher(key);
-        //delete in cloud
-        return Mono.just(true);
+    public Mono<Boolean> deleteSale(@RequestBody SaleHisKey key) {
+        return shService.delete(key).flatMap(aBoolean -> Mono.defer(() -> {
+            accountRepo.deleteInvVoucher(key);
+            return Mono.just(aBoolean);
+        }));
     }
+
     @PutMapping(path = "/updateSPay")
-    public Mono<Boolean> updateSPay(@RequestParam String vouNo,@RequestParam String compCode,@RequestParam boolean sPay) {
-        return shService.updateSPay(vouNo,compCode,sPay);
+    public Mono<Boolean> updateSPay(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam boolean sPay) {
+        return shService.updateSPay(vouNo, compCode, sPay);
     }
 
 
     @PostMapping(path = "/restoreSale")
-    public Mono<?> restoreSale(@RequestBody SaleHisKey key) throws Exception {
-        shService.restore(key);
-        return Mono.just(true);
+    public Mono<Boolean> restoreSale(@RequestBody SaleHisKey key) {
+        return shService.restore(key);
     }
 
     @PostMapping(path = "/findSale")
     public Mono<SaleHis> findSale(@RequestBody SaleHisKey key) {
-        SaleHis sh = shService.findById(key);
-        return Mono.justOrEmpty(sh);
+        return shService.findById(key);
     }
 
     @GetMapping(path = "/getSaleDetail")
-    public Flux<?> getSaleDetail(@RequestParam String vouNo,
-                                 @RequestParam String compCode,
-                                 @RequestParam Integer deptId) {
-        return Flux.fromIterable(sdService.search(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<SaleHisDetail> getSaleDetail(@RequestParam String vouNo,
+                                             @RequestParam String compCode) {
+        return sdService.search(vouNo, compCode);
     }
 
     @GetMapping(path = "/getSaleVoucherInfo")
-    public Mono<?> getSaleVoucherInfo(@RequestParam String vouDate,
-                                      @RequestParam String compCode,
-                                      @RequestParam Integer deptId) {
-        return Mono.justOrEmpty(shService.getVoucherInfo(vouDate, compCode, deptId));
+    public Mono<General> getSaleVoucherInfo(@RequestParam String vouDate,
+                                            @RequestParam String compCode) {
+        return shService.getVoucherInfo(vouDate,compCode);
     }
 
     @GetMapping(path = "/getSaleByBatch")
-    public Flux<?> getSaleByBatch(@RequestParam String batchNo,
-                                  @RequestParam String compCode,
-                                  @RequestParam Integer deptId,
-                                  @RequestParam boolean detail) {
-        if (detail) {
-            return Flux.fromIterable(sdService.getSaleByBatchDetail(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
-        }
-        return Flux.fromIterable(sdService.getSaleByBatch(batchNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<SaleHisDetail> getSaleByBatch(@RequestParam String batchNo,
+                                              @RequestParam String compCode,
+                                              @RequestParam boolean detail) {
+        return detail ? sdService.getSaleByBatchDetail(batchNo, compCode) : sdService.getSaleByBatch(batchNo, compCode);
     }
 
     @GetMapping(path = "/getVoucherDiscount")
@@ -139,22 +92,18 @@ public class SaleController {
                                                 @RequestParam String compCode) {
         return shService.getVoucherDiscount(vouNo, compCode);
     }
-    @GetMapping(path = "/getSaleNote")
-    public Flux<SaleNote> getSaleNote(@RequestParam String vouNo,
-                                      @RequestParam String compCode) {
-        return shService.getSaleNote(vouNo, compCode);
-    }
+
 
     @GetMapping(path = "/searchDiscountDescription")
-    public Flux<?> searchDiscountDescription(@RequestParam String str,
-                                             @RequestParam String compCode) {
-        return Flux.fromIterable(shService.searchDiscountDescription(str, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<VouDiscount> searchDiscountDescription(@RequestParam String str,
+                                                       @RequestParam String compCode) {
+        return shService.searchDiscountDescription(str, compCode);
     }
 
     @GetMapping(path = "/getSaleOrder")
     public Flux<SaleOrderJoin> getSaleOrder(@RequestParam String vouNo,
                                             @RequestParam String compCode) {
-        return Flux.fromIterable(saleOrderJoinDao.getSaleOrder(vouNo, compCode));
+        return saleOrderJoinService.getSaleOrder(vouNo, compCode);
     }
 
 

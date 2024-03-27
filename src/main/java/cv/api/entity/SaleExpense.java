@@ -5,16 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Entity
-@Table(name = "sale_expense")
+@Builder
 public class SaleExpense {
-    @EmbeddedId
     private SaleExpenseKey key;
-    @Column(name = "amount")
     private Double amount;
-    private transient String expenseName;
+    private String expenseName;
 }

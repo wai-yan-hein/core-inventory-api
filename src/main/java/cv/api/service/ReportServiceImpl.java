@@ -2954,15 +2954,15 @@ public class ReportServiceImpl implements ReportService {
         List<VReturnIn> returnInList = new ArrayList<>();
         if (!Objects.isNull(rs)) {
             while (rs.next()) {
-                VReturnIn s = new VReturnIn();
+                VReturnIn s = VReturnIn.builder().build();
                 s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
                 s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                 s.setVouNo(rs.getString("vou_no"));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setRemark(rs.getString("remark"));
                 s.setCreatedBy(rs.getString("created_by"));
-                s.setPaid(rs.getFloat("paid"));
-                s.setVouTotal(rs.getFloat("vou_total"));
+                s.setPaid(rs.getDouble("paid"));
+                s.setVouTotal(rs.getDouble("vou_total"));
                 s.setDeleted(rs.getBoolean("deleted"));
                 s.setDeptId(rs.getInt("dept_id"));
                 returnInList.add(s);
@@ -3407,17 +3407,17 @@ public class ReportServiceImpl implements ReportService {
             ResultSet rs = reportDao.getResultSql(sql, compCode, vouNo);
             if (!Objects.isNull(rs)) {
                 while (rs.next()) {
-                    VReturnIn in = new VReturnIn();
+                    VReturnIn in = VReturnIn.builder().build();
                     in.setStockName(rs.getString("stock_name"));
                     in.setUnit(rs.getString("unit"));
-                    in.setQty(rs.getFloat("qty"));
-                    in.setPrice(rs.getFloat("price"));
-                    in.setAmount(rs.getFloat("amt"));
+                    in.setQty(rs.getDouble("qty"));
+                    in.setPrice(rs.getDouble("price"));
+                    in.setAmount(rs.getDouble("amt"));
                     in.setRemark(rs.getString("remark"));
                     in.setVouDate(rs.getString("vou_date"));
-                    in.setVouTotal(rs.getFloat("vou_total"));
-                    in.setPaid(rs.getFloat("paid"));
-                    in.setVouBalance(rs.getFloat("balance"));
+                    in.setVouTotal(rs.getDouble("vou_total"));
+                    in.setPaid(rs.getDouble("paid"));
+                    in.setVouBalance(rs.getDouble("balance"));
                     in.setVouNo(rs.getString("r.vou_no"));
                     in.setTraderName(rs.getString("t.trader_name"));
                     riList.add(in);

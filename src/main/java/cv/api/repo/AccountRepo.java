@@ -4,7 +4,6 @@ import cv.api.auto.LocationSetting;
 import cv.api.common.Message;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
-import cv.api.dao.SaleExpenseDao;
 import cv.api.dto.LabourPaymentDto;
 import cv.api.entity.*;
 import cv.api.model.*;
@@ -16,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -34,16 +34,15 @@ public class AccountRepo {
     private final ReportService reportService;
     private final Environment environment;
     private final TraderService traderService;
-    private final TraderGroupService groupService;
     private final GRNService grnService;
     private final PurExpenseService purExpenseService;
     private final ExpenseService expenseService;
     private final AccSettingService settingService;
     private final LocationService locationService;
-    private final SaleExpenseDao saleExpenseDao;
+    private final SaleExpenseService saleExpenseService;
     private final LabourPaymentService labourPaymentService;
     private final UserRepo userRepo;
-
+    private final SaleHisService saleHisService;
 
 
     private void sendAccount(List<Gl> glList) {
@@ -287,6 +286,213 @@ public class AccountRepo {
                 .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
     }
 
+    public Mono<Void> sendSaleAsync(SaleHis obj) {
+        String vouNo = obj.getKey().getVouNo();
+        String compCode = obj.getKey().getCompCode();
+        return saleHisService.generateForAcc(vouNo, compCode)
+                .flatMapMany(sh -> {
+                    String tranSource = "SALE";
+                    String payAcc = sh.getCashAcc();
+                    String deptCode = sh.getDeptCode();
+                    String srcAcc = sh.getSaleAcc();
+                    String balAcc = sh.getDebtorAcc();
+                    String disAcc = sh.getDisAcc();
+                    String taxAcc = sh.getTaxAcc();
+                    LocalDateTime vouDate = sh.getVouDate();
+                    String curCode = sh.getCurCode();
+                    String traderCode = sh.getTraderCode();
+                    String batchNo = sh.getGrnVouNo();
+                    String remark = Util1.isNull(sh.getReference(), sh.getRemark());
+                    boolean deleted = sh.getDeleted();
+                    String projectNo = sh.getProjectNo();
+                    double vouTotal = Util1.getDouble(sh.getVouTotal());
+                    double vouDis = Util1.getDouble(sh.getDiscount());
+                    double vouPaid = Util1.getDouble(sh.getPaid());
+                    double vouTax = Util1.getDouble(sh.getTaxAmt());
+                    double taxPercent = Util1.getDouble(sh.getTaxPercent());
+                    double totalPayment = Util1.getDouble(sh.getTotalPayment());
+                    Integer deptId = sh.getDeptId();
+                    List<Gl> listGl = new ArrayList<>();
+                    //income
+                    if (vouTotal > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Sale Voucher Total");
+                        gl.setSrcAccCode(srcAcc);
+                        gl.setAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setCrAmt(vouTotal);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        gl.setBatchNo(batchNo);
+                        listGl.add(gl);
+                    }
+                    //discount
+                    if (vouDis > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setCrAmt(vouDis);
+                        gl.setAccCode(disAcc);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Sale Voucher Discount");
+                        gl.setTraderCode(traderCode);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        gl.setBatchNo(batchNo);
+                        listGl.add(gl);
+                    }
+                    //payment cash down
+                    if (vouPaid > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        if (vouPaid == vouTotal) {
+                            gl.setDescription("Sale Voucher Full Paid");
+                        } else {
+                            gl.setDescription("Sale Voucher Partial Paid");
+                        }
+                        gl.setSrcAccCode(payAcc);
+                        gl.setAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setDrAmt(vouPaid);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        gl.setBatchNo(batchNo);
+                        listGl.add(gl);
+                    }
+                    //tax
+                    if (vouTax > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setAccCode(taxAcc);
+                        gl.setDrAmt(vouTax);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription(String.format("Sale Voucher Tax (%s)", taxPercent));
+                        gl.setTraderCode(traderCode);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        gl.setBatchNo(batchNo);
+                        listGl.add(gl);
+                    }
+                    if (totalPayment > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription("Sale Voucher Received");
+                        gl.setSrcAccCode(payAcc);
+                        gl.setAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setDrAmt(totalPayment);
+                        gl.setCurCode(curCode);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        gl.setBatchNo(batchNo);
+                        listGl.add(gl);
+                    }
+                    return saleExpenseService.search(vouNo, compCode)
+                            .collectList()
+                            .map(list -> {
+                                for (SaleExpense e : list) {
+                                    String expCode = e.getKey().getExpenseCode();
+                                    ExpenseKey ek = ExpenseKey.builder().build();
+                                    ek.setExpenseCode(expCode);
+                                    ek.setCompCode(compCode);
+                                    Expense expense = expenseService.findById(ek).block();
+                                    if (expense != null) {
+                                        String account = expense.getAccountCode();
+                                        double amt = Util1.getDouble(e.getAmount());
+                                        if (!Util1.isNullOrEmpty(account)) {
+                                            Gl gl = new Gl();
+                                            GlKey key = new GlKey();
+                                            key.setCompCode(compCode);
+                                            key.setDeptId(deptId);
+                                            gl.setKey(key);
+                                            gl.setGlDate(vouDate);
+                                            gl.setSrcAccCode(account);
+                                            gl.setAccCode(balAcc);
+                                            gl.setDrAmt(amt);
+                                            gl.setTraderCode(traderCode);
+                                            gl.setCurCode(curCode);
+                                            gl.setDescription(expense.getExpenseName());
+                                            gl.setReference(remark);
+                                            gl.setDeptCode(deptCode);
+                                            gl.setCreatedDate(LocalDateTime.now());
+                                            gl.setCreatedBy(appName);
+                                            gl.setTranSource(tranSource);
+                                            gl.setRefNo(vouNo);
+                                            gl.setDeleted(deleted);
+                                            gl.setMacId(macId);
+                                            gl.setBatchNo(batchNo);
+                                            gl.setProjectNo(projectNo);
+                                            listGl.add(gl);
+                                        }
+                                    }
+                                }
+                                return listGl;
+                            });
+                }).doOnNext(this::sendAccount).then();
+    }
+
     public void sendSale(SaleHis sh) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
             String tranSource = "SALE";
@@ -298,7 +504,8 @@ public class AccountRepo {
                 TraderKey k = TraderKey.builder().build();
                 k.setCode(traderCode);
                 k.setCompCode(compCode);
-                traderService.findById(k).doOnNext(t -> {
+                Trader t = traderService.findById(k).block();
+                if (t != null) {
                     LocationSetting ls = getLocationSetting(locCode, compCode);
                     String payAcc = Util1.isNull(sh.getCashAcc(), Util1.isNull(ls.getCashAcc(), setting.getPayAcc()));
                     String deptCode = Util1.isNull(sh.getDeptCode(), Util1.isNull(ls.getDeptCode(), setting.getDeptCode()));
@@ -309,7 +516,7 @@ public class AccountRepo {
                     LocalDateTime vouDate = sh.getVouDate();
                     String curCode = sh.getCurCode();
                     String remark = Util1.isNull(sh.getReference(), sh.getRemark());
-                    boolean deleted = sh.isDeleted();
+                    boolean deleted = sh.getDeleted();
                     String vouNo = sh.getKey().getVouNo();
                     String projectNo = sh.getProjectNo();
                     double vouTotal = Util1.getDouble(sh.getVouTotal());
@@ -319,18 +526,6 @@ public class AccountRepo {
                     double taxPercent = Util1.getDouble(sh.getTaxPercent());
                     double totalPayment = Util1.getDouble(sh.getTotalPayment());
                     Integer deptId = sh.getDeptId();
-                    //income by trader group
-                    String groupCode = t.getGroupCode();
-                    TraderGroupKey groupKey = new TraderGroupKey();
-                    groupKey.setGroupCode(groupCode);
-                    groupKey.setCompCode(compCode);
-                    groupKey.setDeptId(deptId);
-                    TraderGroup g = groupService.findById(groupKey);
-                    if (g != null) {
-                        if (!Util1.isNullOrEmpty(g.getAccount())) {
-                            srcAcc = g.getAccount();
-                        }
-                    }
                     String batchNo = "";
                     String grnVouNo = sh.getGrnVouNo();
                     if (grnVouNo != null) {
@@ -474,49 +669,49 @@ public class AccountRepo {
                         gl.setProjectNo(projectNo);
                         listGl.add(gl);
                     }
-                    List<SaleExpense> listExp = saleExpenseDao.search(vouNo, compCode);
-                    for (SaleExpense e : listExp) {
-                        String expCode = e.getKey().getExpenseCode();
-                        ExpenseKey ek = new ExpenseKey();
-                        ek.setExpenseCode(expCode);
-                        ek.setCompCode(compCode);
-                        Expense expense = expenseService.findById(ek);
-                        if (expense != null) {
-                            String account = expense.getAccountCode();
-                            double amt = Util1.getDouble(e.getAmount());
-                            if (!Util1.isNullOrEmpty(account)) {
-                                Gl gl = new Gl();
-                                GlKey key = new GlKey();
-                                key.setCompCode(compCode);
-                                key.setDeptId(deptId);
-                                gl.setKey(key);
-                                gl.setGlDate(vouDate);
-                                gl.setSrcAccCode(account);
-                                gl.setAccCode(balAcc);
-                                gl.setDrAmt(amt);
-                                gl.setTraderCode(traderCode);
-                                gl.setCurCode(curCode);
-                                gl.setDescription(expense.getExpenseName());
-                                gl.setReference(remark);
-                                gl.setDeptCode(deptCode);
-                                gl.setCreatedDate(LocalDateTime.now());
-                                gl.setCreatedBy(appName);
-                                gl.setTranSource(tranSource);
-                                gl.setRefNo(vouNo);
-                                gl.setDeleted(deleted);
-                                gl.setMacId(macId);
-                                gl.setBatchNo(batchNo);
-                                gl.setProjectNo(projectNo);
-                                listGl.add(gl);
+                    List<SaleExpense> listExp = saleExpenseService.search(vouNo, compCode).collectList().block();
+                    if (listExp != null) {
+                        for (SaleExpense e : listExp) {
+                            String expCode = e.getKey().getExpenseCode();
+                            ExpenseKey ek = ExpenseKey.builder().build();
+                            ek.setExpenseCode(expCode);
+                            ek.setCompCode(compCode);
+                            Expense expense = expenseService.findById(ek).block();
+                            if (expense != null) {
+                                String account = expense.getAccountCode();
+                                double amt = Util1.getDouble(e.getAmount());
+                                if (!Util1.isNullOrEmpty(account)) {
+                                    Gl gl = new Gl();
+                                    GlKey key = new GlKey();
+                                    key.setCompCode(compCode);
+                                    key.setDeptId(deptId);
+                                    gl.setKey(key);
+                                    gl.setGlDate(vouDate);
+                                    gl.setSrcAccCode(account);
+                                    gl.setAccCode(balAcc);
+                                    gl.setDrAmt(amt);
+                                    gl.setTraderCode(traderCode);
+                                    gl.setCurCode(curCode);
+                                    gl.setDescription(expense.getExpenseName());
+                                    gl.setReference(remark);
+                                    gl.setDeptCode(deptCode);
+                                    gl.setCreatedDate(LocalDateTime.now());
+                                    gl.setCreatedBy(appName);
+                                    gl.setTranSource(tranSource);
+                                    gl.setRefNo(vouNo);
+                                    gl.setDeleted(deleted);
+                                    gl.setMacId(macId);
+                                    gl.setBatchNo(batchNo);
+                                    gl.setProjectNo(projectNo);
+                                    listGl.add(gl);
+                                }
                             }
                         }
                     }
-                    sendAccount(listGl);
-                }).subscribe();
+                }
             }
         }
     }
-
 
     public void sendPurchase(PurHis ph) {
         if (Util1.getBoolean(environment.getProperty("integration"))) {
@@ -661,40 +856,42 @@ public class AccountRepo {
                         gl.setProjectNo(projectNo);
                         listGl.add(gl);
                     }
-                    List<PurExpense> listExp = purExpenseService.search(vouNo, compCode);
-                    for (PurExpense e : listExp) {
-                        String expCode = e.getKey().getExpenseCode();
-                        ExpenseKey ek = new ExpenseKey();
-                        ek.setExpenseCode(expCode);
-                        ek.setCompCode(compCode);
-                        Expense expense = expenseService.findById(ek);
-                        if (expense != null) {
-                            String account = expense.getAccountCode();
-                            double amt = Util1.getDouble(e.getAmount());
-                            if (!Util1.isNullOrEmpty(account)) {
-                                Gl gl = new Gl();
-                                GlKey key = new GlKey();
-                                key.setCompCode(compCode);
-                                key.setDeptId(deptId);
-                                gl.setKey(key);
-                                gl.setGlDate(vouDate);
-                                //gl.setDescription("Purchase Voucher Paid : " + traderName);
-                                gl.setSrcAccCode(account);
-                                gl.setAccCode(balAcc);
-                                gl.setCrAmt(amt);
-                                gl.setTraderCode(traderCode);
-                                gl.setCurCode(curCode);
-                                gl.setReference(remark);
-                                gl.setDeptCode(deptCode);
-                                gl.setCreatedDate(LocalDateTime.now());
-                                gl.setCreatedBy(appName);
-                                gl.setTranSource(tranSource);
-                                gl.setRefNo(vouNo);
-                                gl.setDeleted(deleted);
-                                gl.setMacId(macId);
-                                gl.setBatchNo(batchNo);
-                                gl.setProjectNo(projectNo);
-                                listGl.add(gl);
+                    List<PurExpense> listExp = purExpenseService.search(vouNo, compCode).collectList().block();
+                    if (listExp != null) {
+                        for (PurExpense e : listExp) {
+                            String expCode = e.getKey().getExpenseCode();
+                            ExpenseKey ek = ExpenseKey.builder().build();
+                            ek.setExpenseCode(expCode);
+                            ek.setCompCode(compCode);
+                            Expense expense = expenseService.findById(ek).block();
+                            if (expense != null) {
+                                String account = expense.getAccountCode();
+                                double amt = Util1.getDouble(e.getAmount());
+                                if (!Util1.isNullOrEmpty(account)) {
+                                    Gl gl = new Gl();
+                                    GlKey key = new GlKey();
+                                    key.setCompCode(compCode);
+                                    key.setDeptId(deptId);
+                                    gl.setKey(key);
+                                    gl.setGlDate(vouDate);
+                                    //gl.setDescription("Purchase Voucher Paid : " + traderName);
+                                    gl.setSrcAccCode(account);
+                                    gl.setAccCode(balAcc);
+                                    gl.setCrAmt(amt);
+                                    gl.setTraderCode(traderCode);
+                                    gl.setCurCode(curCode);
+                                    gl.setReference(remark);
+                                    gl.setDeptCode(deptCode);
+                                    gl.setCreatedDate(LocalDateTime.now());
+                                    gl.setCreatedBy(appName);
+                                    gl.setTranSource(tranSource);
+                                    gl.setRefNo(vouNo);
+                                    gl.setDeleted(deleted);
+                                    gl.setMacId(macId);
+                                    gl.setBatchNo(batchNo);
+                                    gl.setProjectNo(projectNo);
+                                    listGl.add(gl);
+                                }
                             }
                         }
                     }
@@ -721,14 +918,20 @@ public class AccountRepo {
                     String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
                     String srcAcc = setting.getSourceAcc();
                     String balAcc = Util1.isNull(t.getAccount(), setting.getBalanceAcc());
+                    String taxAcc = setting.getTaxAcc();
+                    String disAcc = setting.getDiscountAcc();
                     LocalDateTime vouDate = ri.getVouDate();
                     String curCode = ri.getCurCode();
                     String remark = ri.getRemark();
-                    boolean deleted = ri.isDeleted();
+                    boolean deleted = ri.getDeleted();
                     String vouNo = ri.getKey().getVouNo();
                     String projectNo = ri.getProjectNo();
                     double vouTotal = Util1.getDouble(ri.getVouTotal());
                     double vouPaid = Util1.getDouble(ri.getPaid());
+                    double vouDis = Util1.getDouble(ri.getDiscount());
+                    double vouDisPercent = Util1.getDouble(ri.getDiscP());
+                    double vouTax = Util1.getDouble(ri.getTaxAmt());
+                    double vouTaxPercent = Util1.getDouble(ri.getTaxP());
                     Integer deptId = ri.getDeptId();
                     String traderName = t.getTraderName();
                     List<Gl> listGl = new ArrayList<>();
@@ -757,7 +960,7 @@ public class AccountRepo {
                         gl.setProjectNo(projectNo);
                         listGl.add(gl);
                     }
-                    //discount
+
                     //payment
                     if (vouPaid > 0) {
                         Gl gl = new Gl();
@@ -771,6 +974,58 @@ public class AccountRepo {
                         gl.setAccCode(balAcc);
                         gl.setTraderCode(traderCode);
                         gl.setCrAmt(vouPaid);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        listGl.add(gl);
+                    }
+
+                    //discount
+                    if (vouDis > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setDrAmt(vouDis);
+                        gl.setAccCode(disAcc);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription(String.format("Return In Voucher Discount (%s)", vouDisPercent));
+                        gl.setTraderCode(traderCode);
+                        gl.setCurCode(curCode);
+                        gl.setReference(remark);
+                        gl.setDeptCode(deptCode);
+                        gl.setCreatedDate(LocalDateTime.now());
+                        gl.setCreatedBy(appName);
+                        gl.setTranSource(tranSource);
+                        gl.setRefNo(vouNo);
+                        gl.setDeleted(deleted);
+                        gl.setMacId(macId);
+                        gl.setProjectNo(projectNo);
+                        listGl.add(gl);
+                    }
+                    if (vouTax > 0) {
+                        Gl gl = new Gl();
+                        GlKey key = new GlKey();
+                        key.setCompCode(compCode);
+                        key.setDeptId(deptId);
+                        gl.setKey(key);
+                        gl.setSrcAccCode(balAcc);
+                        gl.setTraderCode(traderCode);
+                        gl.setAccCode(taxAcc);
+                        gl.setCrAmt(vouTax);
+                        gl.setGlDate(vouDate);
+                        gl.setDescription(String.format("Return In Voucher Tax (%s)", vouTaxPercent));
+                        gl.setTraderCode(traderCode);
                         gl.setCurCode(curCode);
                         gl.setReference(remark);
                         gl.setDeptCode(deptCode);
