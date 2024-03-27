@@ -35,12 +35,10 @@ public class CleanDataService {
 
     private Mono<Boolean> truncateTable(String tableName) {
         if (!neglectTable().contains(tableName)) {
-            String sql = """
-                    truncate :tableName
-                    """;
+            String sql = "TRUNCATE " + tableName;
             return client.sql(sql)
-                    .bind("tableName", tableName)
-                    .fetch().rowsUpdated().thenReturn(true);
+                    .fetch().rowsUpdated()
+                    .thenReturn(true);
         }
         return Mono.just(false);
     }
@@ -52,7 +50,6 @@ public class CleanDataService {
 
     private List<String> neglectTable() {
         List<String> list = new ArrayList<>();
-        list.add("somethindg");
         return list;
     }
 }
