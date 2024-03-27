@@ -6,7 +6,10 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.dao.*;
+import cv.api.dao.LandingHisDao;
+import cv.api.dao.PurHisDao;
+import cv.api.dao.SeqTableDao;
+import cv.api.dao.WeightDao;
 import cv.api.entity.*;
 import cv.api.model.VDescription;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +32,7 @@ public class PurHisServiceImpl implements PurHisService {
     private final PurHisDao phDao;
     private final PurHisDetailService pdDao;
     private final SeqTableDao seqDao;
-    private final PurExpenseDao purExpenseDao;
+    private final PurExpenseService purExpenseService;
     private final WeightDao weightDao;
     private final LandingHisDao landingDao;
 
@@ -62,7 +64,7 @@ public class PurHisServiceImpl implements PurHisService {
                         }
                         e.getKey().setVouNo(vouNo);
                         e.setPercent(Util1.getDouble(e.getPercent()));
-                        purExpenseDao.save(e);
+                        //purExpenseDao.save(e);
                     }
                 }
             }

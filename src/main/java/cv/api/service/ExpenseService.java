@@ -2,14 +2,16 @@ package cv.api.service;
 
 import cv.api.entity.Expense;
 import cv.api.entity.ExpenseKey;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface ExpenseService {
-    Expense findById(ExpenseKey key);
-    Expense save(Expense exp);
+    Mono<Expense> findById(ExpenseKey key);
+    Mono<Expense> save(Expense exp);
 
-    List<Expense> getExpense(String compCode);
+    Flux<Expense> getExpense(String compCode);
 
-    void delete(ExpenseKey key);
+    Mono<Boolean> delete(ExpenseKey key);
 }

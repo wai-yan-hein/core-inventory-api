@@ -6,6 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -16,63 +17,34 @@ import java.util.Date;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "sale_his_detail")
+@Builder
 public class SaleHisDetail {
 
-    @EmbeddedId
     private SaleDetailKey key;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Temporal(TemporalType.DATE)
-    @Column(name = "expire_date")
     private Date expDate;
-    @Column(name = "qty", nullable = false)
     private Double qty;
-    @Column(name = "sale_unit")
     private String unitCode;
-    @Column(name = "sale_price", nullable = false)
     private Double price;
-    @Column(name = "sale_amt", nullable = false)
     private Double amount;
-    @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "batch_no")
     private String batchNo;
-    @Column(name = "weight")
     private Double weight;
-    @Column(name = "weight_unit")
     private String weightUnit;
-    @Column(name = "std_weight")
     private Double stdWeight;
-    @Column(name = "total_weight")
     private Double totalWeight;
-    @Column(name = "org_price")
     private Double orgPrice;
-    @Column(name = "weight_loss")
     private Double weightLoss;
-    @Column(name = "wet")
     private Double wet;
-    @Column(name = "rice")
     private Double rice;
-    @Column(name = "bag")
     private Double bag;
-    @Transient
     private String userCode;
-    @Transient
     private String stockName;
-    @Transient
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
-    @Transient
     private String relName;
-    @Transient
     private String locName;
-    @Transient
     private String traderName;
 }

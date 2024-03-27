@@ -1,7 +1,8 @@
 package cv.api.auto;
 
 import cv.api.common.Util1;
-import cv.api.entity.*;
+import cv.api.entity.PurHis;
+import cv.api.entity.RetOutHis;
 import cv.api.repo.AccountRepo;
 import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
@@ -58,19 +59,23 @@ public class AutoUpload {
 
 
     private void uploadSaleVoucher() {
-        List<SaleHis> vouchers = saleHisService.unUploadVoucher(Util1.toDate(syncDate));
-        if (!vouchers.isEmpty()) {
-            log.info(String.format("uploadSaleVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> {
-                if (vou.isDeleted()) {
-                    accountRepo.deleteInvVoucher(vou.getKey());
-                } else {
-                    accountRepo.sendSale(vou);
-                    sleep();
-                }
-            });
-            log.info(String.format("uploadSaleVoucher: %s", "done"));
-        }
+        saleHisService.unUploadVoucher(Util1.toDate(syncDate))
+                .collectList()
+                .map(vouchers -> {
+                    if (!vouchers.isEmpty()) {
+                        log.info(String.format("uploadSaleVoucher: %s", vouchers.size()));
+                        vouchers.forEach(vou -> {
+                            if (vou.getDeleted()) {
+                                accountRepo.deleteInvVoucher(vou.getKey());
+                            } else {
+                                accountRepo.sendSaleAsync(vou);
+                            }
+                        });
+                        log.info(String.format("uploadSaleVoucher: %s", "done"));
+                    }
+                    return true;
+                }).subscribe();
+
     }
 
     private void sleep() {
@@ -97,17 +102,22 @@ public class AutoUpload {
 
 
     private void uploadReturnInVoucher() {
-        List<RetInHis> vouchers = retInService.unUploadVoucher(Util1.toDate(syncDate));
-        if (!vouchers.isEmpty()) {
-            log.info(String.format("uploadReturnInVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> {
-                if (vou.isDeleted()) {
-                    accountRepo.deleteInvVoucher(vou.getKey());
-                } else {
-                    accountRepo.sendReturnIn(vou);
-                }
-            });
-        }
+        retInService.unUploadVoucher(Util1.toDate(syncDate))
+                .collectList()
+                .map(vouchers -> {
+                    if (!vouchers.isEmpty()) {
+                        log.info(String.format("uploadReturnInVoucher: %s", vouchers.size()));
+                        vouchers.forEach(vou -> {
+                            if (vou.getDeleted()) {
+                                accountRepo.deleteInvVoucher(vou.getKey());
+                            } else {
+                                accountRepo.sendReturnIn(vou);
+                            }
+                        });
+                    }
+                    return true;
+                }).subscribe();
+
     }
 
     private void uploadReturnOutVoucher() {
@@ -130,7 +140,7 @@ public class AutoUpload {
                 log.info("uploadPayment : " + vouchers.size());
                 vouchers.forEach(vou -> {
                     if (vou.getDeleted()) {
-                        accountRepo.deleteInvVoucher(vou.getVouNo(),vou.getCompCode());
+                        accountRepo.deleteInvVoucher(vou.getVouNo(), vou.getCompCode());
                     } else {
                         accountRepo.sendPayment(vou);
                     }

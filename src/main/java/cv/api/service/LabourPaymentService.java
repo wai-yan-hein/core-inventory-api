@@ -1,7 +1,6 @@
 package cv.api.service;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
 import cv.api.r2dbc.LabourPayment;
@@ -48,7 +47,6 @@ public class LabourPaymentService {
                 return Mono.just(payment);
             }
         }));
-
     }
 
     private Mono<LabourPaymentDto> saveOrUpdate(LabourPaymentDto dto) {

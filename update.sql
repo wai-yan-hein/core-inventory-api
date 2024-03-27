@@ -1033,7 +1033,6 @@ change column qty qty double(20,3) not null ,
 change column pur_price pur_price double(20,3) not null ,
 change column pur_amt pur_amt double(20,3) not null ,
 change column avg_qty avg_qty double(20,3) null default 0.000 ,
-change column avg_price avg_price double(20,3) null default null ,
 change column org_price org_price double(20,3) null default null ,
 change column weight weight double(20,3) null default null ,
 change column length length double(20,3) null default null ,
@@ -1797,6 +1796,10 @@ alter table pur_his
 add column outstanding double(20,3);
 alter table sale_his
 add column outstanding double(20,3);
+
+alter table ret_in_his
+add column tax_amt double(20,3) null,
+add column tax_p double(20,3) null;
 
 
 DELIMITER $$

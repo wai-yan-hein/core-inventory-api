@@ -14,13 +14,14 @@ import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
-import cv.api.model.VOrder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OrderHisServiceImpl implements OrderHisService {
 
     @Autowired
@@ -37,6 +39,7 @@ public class OrderHisServiceImpl implements OrderHisService {
     private OrderHisDetailDao sdDao;
     @Autowired
     private SeqTableDao seqDao;
+    private final DatabaseClient client;
 
     @Override
     public OrderHis save(OrderHis orderHis) {
@@ -84,8 +87,6 @@ public class OrderHisServiceImpl implements OrderHisService {
     }
 
 
-
-
     @Override
     public OrderHis findById(OrderHisKey id) {
         return shDao.findById(id);
@@ -128,6 +129,20 @@ public class OrderHisServiceImpl implements OrderHisService {
     @Override
     public General getVoucherInfo(String vouDate, String compCode, Integer depId) {
         return shDao.getVoucherInfo(vouDate, compCode, depId);
+    }
+
+    @Override
+    public Mono<Boolean> updateOrder(OrderHisKey key, boolean post) {
+        String sql = """
+                update order_his
+                set post = :post
+                where vou_no = :vouNo
+                and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", key.getVouNo())
+                .bind("compCode", key.getCompCode())
+                .fetch().rowsUpdated().thenReturn(true);
     }
 
 
