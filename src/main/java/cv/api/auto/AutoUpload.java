@@ -60,31 +60,13 @@ public class AutoUpload {
 
     private void uploadSaleVoucher() {
         saleHisService.unUploadVoucher(Util1.toDate(syncDate))
-                .collectList()
-                .map(vouchers -> {
-                    if (!vouchers.isEmpty()) {
-                        log.info(String.format("uploadSaleVoucher: %s", vouchers.size()));
-                        vouchers.forEach(vou -> {
-                            if (vou.getDeleted()) {
-                                accountRepo.deleteInvVoucher(vou.getKey());
-                            } else {
-                                accountRepo.sendSaleAsync(vou);
-                            }
-                        });
-                        log.info(String.format("uploadSaleVoucher: %s", "done"));
-                    }
-                    return true;
-                }).subscribe();
-
+                .doOnNext(vou -> accountRepo.sendSaleAsync(vou)
+                        .then()
+                        .subscribe())
+                .doOnComplete(() -> log.info("uploadSaleVoucher: done"))
+                .subscribe();
     }
 
-    private void sleep() {
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-    }
 
     private void uploadPurchaseVoucher() {
         List<PurHis> vouchers = purHisService.unUploadVoucher(Util1.toDate(syncDate));
