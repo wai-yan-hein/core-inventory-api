@@ -578,13 +578,13 @@ public class SaleHisService {
 
     public Mono<SaleHis> generateForAcc(String vouNo, String compCode) {
         String sql = """
-                select sh.vou_no,sh.comp_code,sh.vou_date,sh.trader_code,t.account,
+                select sh.vou_no,sh.comp_code,sh.vou_date,sh.trader_code,
                 sh.cur_code,sh.reference,sh.remark,sh.deleted,sh.project_no,g.batch_no,sh.vou_total,sh.disc_p,sh.discount,
                 sh.tax_p,sh.tax_amt,sh.paid,sh.vou_balance,sh.dept_id,
                 ifnull(sh.dept_code,ifnull(l.dept_code,a.dep_code)) dept_code,
                 ifnull(sh.account,a.source_acc) src_acc,
                 ifnull(sh.cash_acc,ifnull(l.cash_acc,a.pay_acc)) cash_acc,
-                ifnull(sh.debtor_acc,a.bal_acc) bal_acc,
+                ifnull(sh.debtor_acc,ifnull(t.account,a.bal_acc)) bal_acc,
                 a.dis_acc,a.tax_acc
                 from sale_his sh left join grn g
                 on sh.grn_vou_no = g.vou_no
@@ -611,7 +611,6 @@ public class SaleHisService {
                                 .build())
                         .vouDate(row.get("vou_date",LocalDateTime.class))
                         .traderCode(row.get("trader_code", String.class))
-                        .saleAcc(row.get("account", String.class))
                         .curCode(row.get("cur_code", String.class))
                         .reference(row.get("reference", String.class))
                         .remark(row.get("remark", String.class))

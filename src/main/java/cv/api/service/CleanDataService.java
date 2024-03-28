@@ -1,6 +1,7 @@
 package cv.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CleanDataService {
     private final DatabaseClient client;
@@ -35,6 +37,7 @@ public class CleanDataService {
 
     private Mono<Boolean> truncateTable(String tableName) {
         if (!neglectTable().contains(tableName)) {
+            log.info("truncate : " + tableName);
             String sql = """
                     truncate :tableName
                     """;
