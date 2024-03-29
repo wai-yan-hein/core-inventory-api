@@ -10,19 +10,16 @@ import cv.api.common.Util1;
 import cv.api.entity.PurHis;
 import cv.api.entity.PurHisDetail;
 import cv.api.entity.PurHisKey;
+import cv.api.model.VDescription;
 import cv.api.model.VPurchase;
 import cv.api.repo.AccountRepo;
 import cv.api.service.PurHisDetailService;
 import cv.api.service.PurHisService;
-import cv.api.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author wai yan
@@ -30,77 +27,50 @@ import java.util.List;
 @RestController
 @RequestMapping("/pur")
 @Slf4j
+@RequiredArgsConstructor
 public class PurchaseController {
 
-    @Autowired
-    private PurHisService phService;
-    @Autowired
-    private PurHisDetailService pdService;
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private AccountRepo accountRepo;
+    private final PurHisService phService;
+    private final PurHisDetailService pdService;
+    private final AccountRepo accountRepo;
 
     @PostMapping(path = "/savePurchase")
     public Mono<PurHis> savePurchase(@RequestBody PurHis pur) {
-        pur.setUpdatedDate(LocalDateTime.now());
-        pur = phService.save(pur);
-        //send message to service
-        accountRepo.sendPurchase(pur);
-        return Mono.justOrEmpty(pur);
+        return phService.save(pur).flatMap(obj -> accountRepo.sendPurchaseAsync(obj).thenReturn(obj));
+
     }
 
     @PostMapping(path = "/getPur")
-    public Flux<?> getPur(@RequestBody ReportFilter filter) throws Exception {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String cusCode = Util1.isNull(filter.getTraderCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String ref = Util1.isNull(filter.getReference(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String compCode = filter.getCompCode();
-        String deleted = String.valueOf(filter.isDeleted());
-        Integer deptId = filter.getDeptId();
-        String projectNo = Util1.isAll(filter.getProjectNo());
-        String curCode = Util1.isAll(filter.getCurCode());
-        List<VPurchase> listPur = reportService.getPurchaseHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
-                stockCode, locCode, compCode, deptId, deleted, projectNo,curCode);
-        return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
+    public Flux<VPurchase> getPur(@RequestBody ReportFilter filter) {
+        return phService.getPurchaseHistory(filter);
     }
 
     @PostMapping(path = "/deletePur")
-    public Mono<?> deletePur(@RequestBody PurHisKey key) throws Exception {
-        phService.delete(key);
-        //delete in account
-        accountRepo.deleteInvVoucher(key);
-        return Mono.just(true);
+    public Mono<Boolean> deletePur(@RequestBody PurHisKey key) {
+        return phService.delete(key).map(aBoolean -> {
+            accountRepo.deleteInvVoucher(key);
+            return aBoolean;
+        });
     }
 
     @PostMapping(path = "/restorePur")
-    public Mono<?> restorePur(@RequestBody PurHisKey key) throws Exception {
-        phService.restore(key);
-        return Mono.just(true);
+    public Mono<Boolean> restorePur(@RequestBody PurHisKey key) {
+        return phService.restore(key);
     }
 
     @PostMapping(path = "/findPur")
     public Mono<PurHis> findPur(@RequestBody PurHisKey key) {
-        PurHis sh = phService.findById(key);
-        return Mono.justOrEmpty(sh);
+        return phService.findById(key);
     }
 
     @GetMapping(path = "/getPurDetail")
     public Flux<PurHisDetail> getPurDetail(@RequestParam String vouNo,
-                                           @RequestParam String compCode,
-                                           @RequestParam Integer deptId) {
-        List<PurHisDetail> listSD = pdService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(listSD).onErrorResume(throwable -> Flux.empty());
+                                           @RequestParam String compCode) {
+        return pdService.search(vouNo, compCode);
     }
 
     @GetMapping(path = "/getDescription")
-    public Flux<?> getDescription(@RequestParam String str, @RequestParam String compCode, @RequestParam String tranType) {
-        return Flux.fromIterable(phService.getDescription(Util1.cleanStr(str), compCode, tranType));
+    public Flux<VDescription> getDescription(@RequestParam String str, @RequestParam String compCode, @RequestParam String tranType) {
+        return phService.getDescription(Util1.cleanStr(str), compCode, tranType);
     }
 }

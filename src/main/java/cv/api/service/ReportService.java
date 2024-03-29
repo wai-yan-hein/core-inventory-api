@@ -11,6 +11,7 @@ import cv.api.common.ReturnObject;
 import cv.api.common.StockValue;
 import cv.api.entity.*;
 import cv.api.model.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.sql.ResultSet;
@@ -160,15 +161,6 @@ public interface ReportService {
     List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
 
-    List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference,
-                                       String userCode, String stockCode, String locCode, String compCode,
-                                       Integer deptId, String deleted, String projectNo, String curCode) throws Exception;
-
-
-    List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
-                                       String userCode, String stockCode, String locCode, String compCode,
-                                       Integer deptId, String deleted, String projectNo, String curCode) throws Exception;
-
     List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                          String userCode, String stockCode, String locCode,
                                          String compCode, Integer deptId, String deleted,
@@ -190,7 +182,7 @@ public interface ReportService {
 
     General getSmallestQty(String stockCode, String unit, String compCode, Integer deptId);
 
-    List<General> isStockExist(String stockCode, String compCode);
+    Flux<General> isStockExist(String stockCode, String compCode);
 
 
     List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);

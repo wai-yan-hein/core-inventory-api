@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.common.General;
 import cv.api.entity.*;
 import cv.api.model.WeightColumn;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -32,6 +33,8 @@ public interface WeightService {
                                      boolean deleted,String compCode,String transSource,boolean draft);
     List<WeightHisDetail> getWeightDetail(String vouNo,String compCode);
     List<WeightColumn> getWeightColumn(String vouNo, String compCode);
+    Mono<Boolean> updatePost(WeightHisKey key, boolean post);
+
 
 
 }

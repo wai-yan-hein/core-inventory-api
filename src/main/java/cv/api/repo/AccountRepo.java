@@ -40,6 +40,7 @@ public class AccountRepo {
     private final LabourPaymentService labourPaymentService;
     private final UserRepo userRepo;
     private final SaleHisService saleHisService;
+    private final PurHisService purHisService;
 
 
     private void sendAccount(List<Gl> glList) {
@@ -495,37 +496,30 @@ public class AccountRepo {
                 }).doOnNext(this::sendAccount).then();
     }
 
-
-    public void sendPurchase(PurHis ph) {
-        if (Util1.getBoolean(environment.getProperty("integration"))) {
-            String tranSource = "PURCHASE";
-            String compCode = ph.getKey().getCompCode();
-            String traderCode = ph.getTraderCode();
-            String locCode = ph.getLocCode();
-            AccSetting setting = settingService.findByCode(new AccKey(tranSource, compCode));
-            if (setting != null) {
-                TraderKey k = TraderKey.builder().build();
-                k.setCode(traderCode);
-                k.setCompCode(compCode);
-                traderService.findById(k).doOnNext(t -> {
-                    LocationSetting ls = getLocationSetting(locCode, compCode);
-                    String payAcc = Util1.isNull(ph.getCashAcc(), Util1.isNull(ls.getCashAcc(), setting.getPayAcc()));
-                    String deptCode = Util1.isNull(ls.getDeptCode(), setting.getDeptCode());
-                    String srcAcc = Util1.isNull(ph.getPurchaseAcc(), setting.getSourceAcc());
-                    String balAcc = Util1.isNull(ph.getPayableAcc(), Util1.isNull(t.getAccount(), setting.getBalanceAcc()));
-                    String commAcc = setting.getCommAcc();
-                    String disAcc = setting.getDiscountAcc();
+    public Mono<Void> sendPurchaseAsync(PurHis obj) {
+        String vouNo = obj.getKey().getVouNo();
+        String compCode = obj.getKey().getCompCode();
+        String tranSource = "PURCHASE";
+        return purHisService.generateForAcc(vouNo, compCode)
+                .flatMap(ph -> {
+                    log.info(vouNo);
+                    String payAcc = ph.getCashAcc();
+                    String deptCode = ph.getDeptCode();
+                    String srcAcc = ph.getPurchaseAcc();
+                    String balAcc = ph.getPayableAcc();
+                    String commAcc = ph.getCommAcc();
+                    String disAcc = ph.getDisAcc();
                     LocalDateTime vouDate = ph.getVouDate();
                     String curCode = ph.getCurCode();
                     String remark = ph.getRemark();
-                    boolean deleted = ph.isDeleted();
+                    String traderCode = ph.getTraderCode();
+                    boolean deleted = ph.getDeleted();
                     double vouTotal = Util1.getDouble(ph.getVouTotal());
                     double grandTotal = Util1.getDouble(ph.getGrandTotal());
                     double vouPaid = Util1.getDouble(ph.getPaid());
                     double vouComm = Util1.getDouble(ph.getCommAmt());
                     double vouCommP = Util1.getDouble(ph.getCommP());
                     double vouDis = Util1.getDouble(ph.getDiscount());
-                    String vouNo = ph.getKey().getVouNo();
                     String batchNo = ph.getBatchNo();
                     String projectNo = ph.getProjectNo();
                     Integer deptId = ph.getDeptId();
@@ -639,49 +633,48 @@ public class AccountRepo {
                         gl.setProjectNo(projectNo);
                         listGl.add(gl);
                     }
-                    List<PurExpense> listExp = purExpenseService.search(vouNo, compCode).collectList().block();
-                    if (listExp != null) {
-                        for (PurExpense e : listExp) {
-                            String expCode = e.getKey().getExpenseCode();
-                            ExpenseKey ek = ExpenseKey.builder().build();
-                            ek.setExpenseCode(expCode);
-                            ek.setCompCode(compCode);
-                            Expense expense = expenseService.findById(ek).block();
-                            if (expense != null) {
-                                String account = expense.getAccountCode();
-                                double amt = Util1.getDouble(e.getAmount());
-                                if (!Util1.isNullOrEmpty(account)) {
-                                    Gl gl = new Gl();
-                                    GlKey key = new GlKey();
-                                    key.setCompCode(compCode);
-                                    key.setDeptId(deptId);
-                                    gl.setKey(key);
-                                    gl.setGlDate(vouDate);
-                                    //gl.setDescription("Purchase Voucher Paid : " + traderName);
-                                    gl.setSrcAccCode(account);
-                                    gl.setAccCode(balAcc);
-                                    gl.setCrAmt(amt);
-                                    gl.setTraderCode(traderCode);
-                                    gl.setCurCode(curCode);
-                                    gl.setReference(remark);
-                                    gl.setDeptCode(deptCode);
-                                    gl.setCreatedDate(LocalDateTime.now());
-                                    gl.setCreatedBy(appName);
-                                    gl.setTranSource(tranSource);
-                                    gl.setRefNo(vouNo);
-                                    gl.setDeleted(deleted);
-                                    gl.setMacId(macId);
-                                    gl.setBatchNo(batchNo);
-                                    gl.setProjectNo(projectNo);
-                                    listGl.add(gl);
+                    return purExpenseService.search(vouNo, compCode)
+                            .collectList()
+                            .map(list -> {
+                                for (PurExpense e : list) {
+                                    String expCode = e.getKey().getExpenseCode();
+                                    ExpenseKey ek = ExpenseKey.builder().build();
+                                    ek.setExpenseCode(expCode);
+                                    ek.setCompCode(compCode);
+                                    Expense expense = expenseService.findById(ek).block();
+                                    if (expense != null) {
+                                        String account = expense.getAccountCode();
+                                        double amt = Util1.getDouble(e.getAmount());
+                                        if (!Util1.isNullOrEmpty(account)) {
+                                            Gl gl = new Gl();
+                                            GlKey key = new GlKey();
+                                            key.setCompCode(compCode);
+                                            key.setDeptId(deptId);
+                                            gl.setKey(key);
+                                            gl.setGlDate(vouDate);
+                                            gl.setSrcAccCode(account);
+                                            gl.setAccCode(balAcc);
+                                            gl.setCrAmt(amt);
+                                            gl.setTraderCode(traderCode);
+                                            gl.setCurCode(curCode);
+                                            gl.setDescription(expense.getExpenseName());
+                                            gl.setReference(remark);
+                                            gl.setDeptCode(deptCode);
+                                            gl.setCreatedDate(LocalDateTime.now());
+                                            gl.setCreatedBy(appName);
+                                            gl.setTranSource(tranSource);
+                                            gl.setRefNo(vouNo);
+                                            gl.setDeleted(deleted);
+                                            gl.setMacId(macId);
+                                            gl.setBatchNo(batchNo);
+                                            gl.setProjectNo(projectNo);
+                                            listGl.add(gl);
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    }
-                    sendAccount(listGl);
-                }).subscribe();
-            }
-        }
+                                return listGl;
+                            });
+                }).doOnNext(this::sendAccount).then();
     }
 
     public void sendReturnIn(RetInHis ri) {

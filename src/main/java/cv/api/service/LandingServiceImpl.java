@@ -7,8 +7,10 @@ import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.LandingHisQtyDao;
 import cv.api.entity.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +25,7 @@ public class LandingServiceImpl implements LandingService {
     private final LandingHisPriceDao priceDao;
     private final LandingHisQtyDao qtyDao;
     private final LandingHisGradeDao gradeDao;
+    private final DatabaseClient client;
 
     @Override
     public LandingHis findByCode(LandingHisKey key) {
@@ -179,6 +182,26 @@ public class LandingServiceImpl implements LandingService {
     @Override
     public List<LandingHis> unUploadVoucher(LocalDateTime syncDate) {
         return dao.unUploadVoucher(syncDate);
+    }
+
+    @Override
+    public Mono<Boolean> updatePost(LandingHisKey key, boolean post) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        if (!Util1.isNullOrEmpty(vouNo)) {
+            String sql = """
+                    update landing_his
+                    set post=:post
+                    where comp_code=:compCode
+                    and vou_no=:vouNo
+                    """;
+            return client.sql(sql)
+                    .bind("post", post)
+                    .bind("compCode", compCode)
+                    .bind("vouNo", vouNo)
+                    .fetch().rowsUpdated().thenReturn(true);
+        }
+        return Mono.just(false);
     }
 
 

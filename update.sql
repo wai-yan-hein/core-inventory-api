@@ -1832,6 +1832,9 @@ add column total_payment double(20,3) null after tran_source,
 add column opening double(20,3) null after total_payment,
 add column total_balance double(20,3) null after opening;
 
+alter table pur_his
+add column grn_vou_no varchar(25) null;
+
 
 #view
 drop view if exists v_milling_output;

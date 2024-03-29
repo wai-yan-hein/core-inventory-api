@@ -1,6 +1,9 @@
 package cv.api.controller;
 
-import cv.api.common.*;
+import cv.api.common.General;
+import cv.api.common.ReportFilter;
+import cv.api.common.ReturnObject;
+import cv.api.common.Util1;
 import cv.api.entity.*;
 import cv.api.model.AccTraderKey;
 import cv.api.r2dbc.StockColor;
@@ -12,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -408,25 +410,22 @@ public class SetupController {
 
     @PostMapping(path = "/saveStock")
     public Mono<Stock> saveStock(@RequestBody Stock stock) {
-        stock.setUpdatedDate(LocalDateTime.now());
-        Stock b = stockService.save(stock);
-        return Mono.justOrEmpty(b);
+        return stockService.save(stock);
     }
 
     @PostMapping(path = "/updateStock")
-    public Mono<?> updateSaleClosed(@RequestBody Stock stock) {
-        return Mono.justOrEmpty(stockService.updateStock(stock));
+    public Mono<Boolean> updateSaleClosed(@RequestBody Stock stock) {
+        return stockService.update(stock).thenReturn(true);
     }
 
     @GetMapping(path = "/getStock")
     public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
-        List<Stock> listB = active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
-        return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
+        return active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
     }
 
     @GetMapping(path = "/getUpdateStock")
     public Flux<Stock> getUpdateStock(@RequestParam String updatedDate) {
-        return Flux.fromIterable(stockService.getStock(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+        return stockService.getStock(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUpdateStockFormula")
@@ -454,32 +453,23 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getService")
-    public Flux<?> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(stockService.getService(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Stock> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
+        return stockService.getService(compCode, deptId);
     }
 
     @PostMapping(path = "/searchStock")
-    public Flux<?> searchStock(@RequestBody ReportFilter filter) {
-        String stockCode = Util1.isAll(filter.getStockCode());
-        String typCode = Util1.isAll(filter.getStockTypeCode());
-        String catCode = Util1.isAll(filter.getCatCode());
-        String brandCode = Util1.isAll(filter.getBrandCode());
-        Integer deptId = filter.getDeptId();
-        String compCode = filter.getCompCode();
-        boolean deleted = filter.isDeleted();
-        boolean active = filter.isActive();
-        return Flux.fromIterable(stockService.search(stockCode, typCode, catCode, brandCode, compCode, deptId, active, deleted)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Stock> searchStock(@RequestBody ReportFilter filter) {
+        return stockService.search(filter);
     }
 
     @GetMapping(path = "/getStockList")
-    public Flux<?> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(stockService.getStock(Util1.cleanStr(text), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Stock> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
+        return stockService.getStock(text, compCode, deptId);
     }
 
     @PostMapping(path = "/deleteStock")
-    public Flux<?> deleteStock(@RequestBody StockKey key) {
-        List<General> str = stockService.delete(key);
-        return Flux.fromIterable(str);
+    public Flux<General> deleteStock(@RequestBody StockKey key) {
+        return stockService.delete(key);
     }
 
     @PostMapping(path = "/restoreStock")
@@ -489,8 +479,7 @@ public class SetupController {
 
     @PostMapping(path = "/findStock")
     public Mono<Stock> findStock(@RequestBody StockKey key) {
-        Stock b = stockService.findById(key);
-        return Mono.justOrEmpty(b);
+        return stockService.findById(key);
     }
 
 

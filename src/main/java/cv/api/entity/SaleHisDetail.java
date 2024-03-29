@@ -46,4 +46,5 @@ public class SaleHisDetail {
     private String relName;
     private String locName;
     private String traderName;
+    private Boolean calculate;
 }

@@ -4,6 +4,7 @@
  */
 package cv.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
@@ -17,6 +18,7 @@ import java.io.Serializable;
 @Data
 @Embeddable
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class LandingHisKey implements Serializable {
 
     @Column(name = "vou_no")

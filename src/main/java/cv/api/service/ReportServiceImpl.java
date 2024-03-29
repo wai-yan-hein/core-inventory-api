@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.sql.ResultSet;
@@ -2869,108 +2870,6 @@ public class ReportServiceImpl implements ReportService {
         return ioList;
     }
 
-
-    @Override
-    public List<VPurchase> getPurchaseHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
-                                              String compCode, Integer deptId, String deleted,
-                                              String projectNo, String curCode) throws Exception {
-        remark = remark.concat("%");
-        reference = reference.concat("%");
-        String sql = """
-                select a.*,t.trader_name
-                from (
-                select vou_date,vou_no,remark,reference,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id
-                from v_purchase
-                where comp_code = ?
-                and (dept_id = ? or 0 = ?)
-                and deleted =?
-                and date(vou_date) between ? and ?
-                and cur_code = ?
-                and (vou_no = ? or '-' = ?)
-                and (remark like ? or '-%'= ?)
-                and (reference like ? or '-%'= ?)
-                and (trader_code = ? or '-'= ?)
-                and (created_by = ? or '-'= ?)
-                and (stock_code =? or '-' =?)
-                and (loc_code =? or '-' =?)
-                and (project_no =? or '-' =?)
-                group by vou_no)a
-                join trader t on a.trader_code = t.code
-                and a.comp_code = t.comp_code
-                order by vou_date desc""";
-        ResultSet rs = getResult(sql, compCode, deptId, deptId, Util1.getBoolean(deleted), fromDate, toDate, curCode, vouNo, vouNo,
-                remark, remark, reference, reference,
-                traderCode, traderCode,
-                userCode, userCode,
-                stockCode, stockCode,
-                locCode, locCode,
-                projectNo, projectNo);
-        List<VPurchase> purchaseList = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase s = VPurchase.builder().build();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setRemark(rs.getString("remark"));
-                s.setReference(rs.getString("reference"));
-                s.setCreatedBy(rs.getString("created_by"));
-                s.setPaid(rs.getDouble("paid"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                s.setDeleted(rs.getBoolean("deleted"));
-                s.setDeptId(rs.getInt("dept_id"));
-                purchaseList.add(s);
-            }
-        }
-        return purchaseList;
-    }
-
-
-    @Override
-    public List<VReturnIn> getReturnInHistory(String fromDate, String toDate, String traderCode, String vouNo,
-                                              String remark, String userCode, String stockCode,
-                                              String locCode, String compCode, Integer deptId,
-                                              String deleted, String projectNo, String curCode) throws Exception {
-        String sql = "select a.*,t.trader_name\n" +
-                "from (\n" +
-                "select vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n" +
-                "from v_return_in \n" + "where comp_code = '" + compCode + "'\n" +
-                "and deleted = " + deleted + "\n" +
-                "and cur_code = '" + curCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
-                "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
-                "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n" +
-                "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n" +
-                "group by vou_no\n" + ")a\n" + "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "order by vou_date desc";
-        ResultSet rs = reportDao.executeSql(sql);
-        List<VReturnIn> returnInList = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VReturnIn s = VReturnIn.builder().build();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setRemark(rs.getString("remark"));
-                s.setCreatedBy(rs.getString("created_by"));
-                s.setPaid(rs.getDouble("paid"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                s.setDeleted(rs.getBoolean("deleted"));
-                s.setDeptId(rs.getInt("dept_id"));
-                returnInList.add(s);
-            }
-        }
-        return returnInList;
-    }
-
     @Override
     public List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
                                                 String userCode, String stockCode, String locCode, String compCode, Integer deptId,
@@ -3265,37 +3164,37 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<General> isStockExist(String stockCode, String compCode) {
+    public Flux<General> isStockExist(String stockCode, String compCode) {
         return searchDetail(stockCode, compCode);
     }
 
-    private List<General> searchDetail(String code, String compCode) {
-        List<General> str = new ArrayList<>();
-        HashMap<String, String> hm = new HashMap<>();
-        hm.put("sale_his_detail", "Sale");
-        hm.put("pur_his_detail", "Purchase");
-        hm.put("ret_in_his_detail", "Return In");
-        hm.put("ret_out_his_detail", "Return Out");
-        hm.put("stock_in_out_detail", "Stock In/Out");
-        hm.put("op_his_detail", "Opening");
-        hm.forEach((s, s2) -> {
-            String sql = "select exists(select " + "stock_code" + " from " + s + " where " + "stock_code" + " ='" + code + "' and comp_code ='" + compCode + "') exist";
-            try {
-                ResultSet rs = reportDao.executeSql(sql);
-                if (rs.next()) {
-                    if (rs.getBoolean("exist")) {
-                        General g = General.builder().build();
-                        g.setMessage("Transaction exist in " + s2);
-                        str.add(g);
-                    }
-                }
-            } catch (Exception e) {
-                log.error(String.format("searchTran: %s", e.getMessage()));
-            }
-
-        });
-        return str;
+    private Flux<General> searchDetail(String code, String compCode) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("sale_his_detail", "Sale");
+        map.put("pur_his_detail", "Purchase");
+        map.put("ret_in_his_detail", "Return In");
+        map.put("ret_out_his_detail", "Return Out");
+        map.put("stock_in_out_detail", "Stock In/Out");
+        map.put("op_his_detail", "Opening");
+        return Flux.fromIterable(map.entrySet())
+                .flatMap(entry -> {
+                    String table = entry.getKey();
+                    String type = entry.getValue();
+                    String sql = "SELECT EXISTS(SELECT stock_code FROM " + table + " WHERE stock_code = :code AND comp_code = :compCode) AS exist";
+                    return client.sql(sql)
+                            .bind("code", code)
+                            .bind("compCode", compCode)
+                            .map(row -> {
+                                if (Boolean.TRUE.equals(row.get("exist", Boolean.class))) {
+                                    return General.builder().message("Transaction exists in " + type).build();
+                                }
+                                return null;
+                            }).one();
+                });
     }
+
+
+
 
     private List<General> searchVoucher(String code, String compCode) {
         List<General> list = new ArrayList<>();

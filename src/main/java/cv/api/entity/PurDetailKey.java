@@ -5,23 +5,22 @@
  */
 package cv.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 /**
  * @author wai yan
  */
 @Data
-@Embeddable
-public class PurDetailKey implements Serializable {
+@Builder
+public class PurDetailKey {
 
-    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "unique_id")
-    private int uniqueId;
-    @Column(name = "comp_code")
+    private Integer uniqueId;
     private String compCode;
 
 

@@ -69,17 +69,12 @@ public class AutoUpload {
 
 
     private void uploadPurchaseVoucher() {
-        List<PurHis> vouchers = purHisService.unUploadVoucher(Util1.toDate(syncDate));
-        if (!vouchers.isEmpty()) {
-            log.info(String.format("uploadPurchaseVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> {
-                if (vou.isDeleted()) {
-                    accountRepo.deleteInvVoucher(vou.getKey());
-                } else {
-                    accountRepo.sendPurchase(vou);
-                }
-            });
-        }
+        purHisService.unUploadVoucher(Util1.toDate(syncDate))
+                .doOnNext(vou -> accountRepo.sendPurchaseAsync(vou)
+                        .then()
+                        .subscribe())
+                .doOnComplete(() -> log.info("uploadPurchaseVoucher: done"))
+                .subscribe();
     }
 
 

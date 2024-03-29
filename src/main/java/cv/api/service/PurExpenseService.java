@@ -41,7 +41,7 @@ public class PurExpenseService {
              SELECT a.*, e.expense_name
              FROM pur_expense a
              JOIN expense e ON a.expense_code = e.expense_code AND a.comp_code = e.comp_code
-             WHERE vou_no = :vouNo AND comp_code = :compCode
+             WHERE a.vou_no = :vouNo AND a.comp_code = :compCode
              ORDER BY a.unique_id
              """;
 

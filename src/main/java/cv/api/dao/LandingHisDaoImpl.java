@@ -96,7 +96,7 @@ public class LandingHisDaoImpl extends AbstractDao<LandingHisKey, LandingHis> im
             while (rs.next()) {
                 //select a.vou_no,a.comp_code,a.dept_id,a.vou_date,a.created_by,a.deleted,a.remark,a.cargo,t.trader_name,l.loc_name,s.stock_name
                 LandingHis l = new LandingHis();
-                LandingHisKey key = new LandingHisKey();
+                LandingHisKey key = LandingHisKey.builder().build();
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
                 l.setKey(key);

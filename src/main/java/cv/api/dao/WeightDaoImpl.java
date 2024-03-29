@@ -83,7 +83,7 @@ public class WeightDaoImpl extends AbstractDao<WeightHisKey, WeightHis> implemen
                     vouNo, vouNo, remark, remark, tranSource, tranSource);
             while (rs.next()) {
                 WeightHis h = new WeightHis();
-                WeightHisKey key = new WeightHisKey();
+                WeightHisKey key = WeightHisKey.builder().build();
                 key.setCompCode(rs.getString("comp_code"));
                 key.setVouNo(rs.getString("vou_no"));
                 h.setKey(key);

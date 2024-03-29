@@ -11,8 +11,10 @@ import cv.api.entity.WeightHisKey;
 import cv.api.model.WeightColumn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -24,6 +26,7 @@ public class WeightServiceImpl implements WeightService {
     private final WeightDao dao;
     public final WeightDetailDao detailDao;
     private final SeqTableDao seqDao;
+    private final DatabaseClient client;
 
 
     @Override
@@ -95,8 +98,8 @@ public class WeightServiceImpl implements WeightService {
     @Override
     public List<WeightHis> getWeightHistory(String fromDate, String toDate, String traderCode,
                                             String stockCode, String vouNo, String remark,
-                                            boolean deleted, String compCode, String tranSource,boolean draft) {
-        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode, tranSource,draft);
+                                            boolean deleted, String compCode, String tranSource, boolean draft) {
+        return dao.getWeightHistory(fromDate, toDate, traderCode, stockCode, vouNo, remark, deleted, compCode, tranSource, draft);
     }
 
     @Override
@@ -106,7 +109,27 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public List<WeightColumn> getWeightColumn(String vouNo, String compCode) {
-        return detailDao.getWeightColumn(vouNo,compCode);
+        return detailDao.getWeightColumn(vouNo, compCode);
+    }
+
+    @Override
+    public Mono<Boolean> updatePost(WeightHisKey key, boolean post) {
+        String vouNo = key.getVouNo();
+        String compCode = key.getCompCode();
+        if (!Util1.isNullOrEmpty(vouNo)) {
+            String sql = """
+                    update weight_his
+                    set post=:post
+                    where comp_code=:compCode
+                    and vou_no=:vouNo
+                    """;
+            return client.sql(sql)
+                    .bind("post", post)
+                    .bind("compCode", compCode)
+                    .bind("vouNo", vouNo)
+                    .fetch().rowsUpdated().thenReturn(true);
+        }
+        return Mono.just(false);
     }
 
     private String getVoucherNo(Integer deptId, Integer macId, String compCode) {

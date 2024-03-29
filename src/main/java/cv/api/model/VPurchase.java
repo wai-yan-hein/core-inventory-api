@@ -16,7 +16,7 @@ public class VPurchase {
     private Double balance;
     private String createdBy;
     private String createdDate;
-    private boolean deleted;
+    private Boolean deleted;
     private Double discount;
     private String dueDate;
     private Double total;
@@ -40,7 +40,7 @@ public class VPurchase {
     private String stockCode;
     private String expDate;
     private Double qty;
-    private double qtyPercent;
+    private Double qtyPercent;
     private Double stdWt;
     private Double avgPrice;
     private String purUnit;

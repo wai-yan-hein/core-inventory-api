@@ -6,72 +6,50 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * @author wai yan
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "pur_his_detail")
-public class PurHisDetail implements Serializable {
+@Builder
+public class PurHisDetail {
 
-    @EmbeddedId
     private PurDetailKey key;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "qty")
     private Double qty;
-    @Column(name = "avg_qty")
     private Double weightLoss;
-    @Column(name = "pur_unit")
     private String unitCode;
-    @Column(name = "org_price")
     private Double orgPrice;
-    @Column(name = "pur_price")
     private Double price;
-    @Column(name = "pur_amt")
     private Double amount;
-    @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "weight")
     private Double weight;
-    @Column(name = "weight_unit")
     private String weightUnit;
-    @Column(name = "std_weight")
     private Double stdWeight;
-    @Column(name = "length")
     private Double length;
-    @Column(name = "width")
     private Double width;
-    @Column(name = "total_weight")
     private Double totalWeight;
-    @Column(name = "m_percent")
     private String mPercent;
-    @Column(name = "wet")
     private Double wet;
-    @Column(name = "rice")
     private Double rice;
-    @Column(name = "bag")
     private Double bag;
-    @Transient
+    private Double avgQty;
+    private Double avgPrice;
+    private LocalDate expDate;
     private String userCode;
-    @Transient
     private String stockName;
-    @Transient
+    private Boolean calculate;
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
-    @Transient
     private String relName;
-    @Transient
     private String locName;
 }
