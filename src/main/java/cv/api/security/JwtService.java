@@ -12,11 +12,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -28,30 +26,10 @@ public class JwtService {
     private static final String AUTHORITIES_KEY = "auth";
 
 
-    public AuthenticationResponse generateToken(UserDetails userDetails) {
-        long expiration = Duration.ofDays(30).toMillis();
-        String token = buildToken(userDetails, expiration);
-        return AuthenticationResponse.builder().accessToken(token).accessTokenExpired(System.currentTimeMillis() + expiration).build();
-    }
-
-    public AuthenticationResponse generateRefreshToken(UserDetails userDetails) {
-        long expiration = Duration.ofDays(60).toMillis();
-        String token = buildToken(userDetails, expiration);
-        return AuthenticationResponse.builder().refreshToken(token).refreshTokenExpired(System.currentTimeMillis() + expiration).build();
-    }
-
-    private String buildToken(UserDetails userDetails, long expiration) {
-        String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
-        return Jwts.builder().subject(userDetails.getUsername()).claim(AUTHORITIES_KEY, authorities)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey())
-                .compact();
-    }
-
     public boolean isTokenValid(String token) {
-        return containsTwoPeriods(token) && !isTokenExpired(token);
+        return !containsTwoPeriods(token) || isTokenExpired(token);
     }
+
 
     public static boolean containsTwoPeriods(String token) {
         String[] parts = token.split("\\.");
@@ -64,8 +42,7 @@ public class JwtService {
             Date expirationDate = claims.getExpiration();
             return expirationDate.before(new Date());
         } catch (Exception e) {
-            log.error("invalid token" + e.getMessage());
-            return false;
+            return true;
         }
     }
 

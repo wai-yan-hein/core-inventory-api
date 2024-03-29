@@ -1,6 +1,7 @@
 package cv.api.security;
 
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.web.server.ServerWebExchange;
@@ -26,9 +27,18 @@ public class TokenAuthenticationConverter implements ServerAuthenticationConvert
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        return Mono.justOrEmpty(exchange).map(SecurityUtils::getTokenFromRequest)
-                .filter(Objects::nonNull).filter(matchBearerLength)
+        return Mono.justOrEmpty(exchange)
+                .map(SecurityUtils::getTokenFromRequest)
+                .filter(Objects::nonNull)
+                .filter(matchBearerLength)
                 .map(isolateBearerValue)
-                .filter(jwtService::isTokenValid).map(jwtService::getAuthentication)
-                .filter(Objects::nonNull);    }
+                .flatMap(token -> {
+                    if (jwtService.isTokenValid(token)) {
+                        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                        return Mono.empty();
+                    } else {
+                        return Mono.just(jwtService.getAuthentication(token));
+                    }
+                });
+    }
 }
