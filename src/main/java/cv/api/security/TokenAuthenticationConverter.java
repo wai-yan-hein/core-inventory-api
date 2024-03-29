@@ -34,11 +34,13 @@ public class TokenAuthenticationConverter implements ServerAuthenticationConvert
                 .map(isolateBearerValue)
                 .flatMap(token -> {
                     if (jwtService.isTokenValid(token)) {
+                        return Mono.just(jwtService.getAuthentication(token));
+                    } else {
                         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                         return Mono.empty();
-                    } else {
-                        return Mono.just(jwtService.getAuthentication(token));
                     }
                 });
     }
+
 }
+

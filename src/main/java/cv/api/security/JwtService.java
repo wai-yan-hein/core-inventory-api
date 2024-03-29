@@ -27,7 +27,7 @@ public class JwtService {
 
 
     public boolean isTokenValid(String token) {
-        return !containsTwoPeriods(token) || isTokenExpired(token);
+        return containsTwoPeriods(token) && !isTokenExpired(token);
     }
 
 
