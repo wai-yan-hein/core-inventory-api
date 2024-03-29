@@ -64,7 +64,7 @@ public class SetupController {
         return Mono.just("Hello");
     }
 
-    @DeleteMapping
+    @DeleteMapping(path = "/cleanData")
     public Mono<Boolean> cleanData() {
         return cleanDataService.cleanData();
     }
