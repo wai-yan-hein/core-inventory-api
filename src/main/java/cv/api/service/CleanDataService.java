@@ -29,6 +29,7 @@ public class CleanDataService {
                     information_schema.TABLES
                 WHERE
                     table_schema = :schemaName
+                    AND table_type = 'BASE TABLE';
                 """;
         return client.sql(sql)
                 .bind("schemaName", schemaName)
@@ -37,9 +38,8 @@ public class CleanDataService {
 
     private Mono<Boolean> truncateTable(String tableName) {
         if (!neglectTable().contains(tableName)) {
-            String sql = "TRUNCATE " + tableName;
+            String sql = "delete from " + tableName;
             return client.sql(sql)
-                    .bind("tableName", tableName)
                     .fetch().rowsUpdated().thenReturn(true);
         }
         return Mono.just(false);
