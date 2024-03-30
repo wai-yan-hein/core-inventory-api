@@ -104,6 +104,10 @@ public class StockService {
 
 
     public Mono<Stock> findById(StockKey key) {
+        String stockCode = key.getStockCode();
+        if (Util1.isNullOrEmpty(stockCode)) {
+            return Mono.empty();
+        }
         String sql = """
                 select *
                 from stock
@@ -112,7 +116,7 @@ public class StockService {
                 """;
         return client.sql(sql)
                 .bind("compCode", key.getCompCode())
-                .bind("stockCode", key.getStockCode())
+                .bind("stockCode", stockCode)
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
 
