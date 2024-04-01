@@ -157,6 +157,7 @@ public class StockService {
                 from stock
                 where comp_code=:compCode
                 and active = true
+                and deleted =false
                 and (dept_id =:deptId or 0 =:deptId)
                 """;
         return client.sql(sql)

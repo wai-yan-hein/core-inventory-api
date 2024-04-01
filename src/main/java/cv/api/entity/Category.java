@@ -10,6 +10,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,34 +20,20 @@ import java.time.LocalDateTime;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "category")
+@Builder
 public class Category {
 
-    @EmbeddedId
     private CategoryKey key;
-    @Column(name = "cat_name")
     private String catName;
-    @Column(name = "mig_id")
     private Integer migId;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
-    @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime createdDate;
-    @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "mac_id")
     private Integer macId;
-    @Column(name = "user_code")
     private String userCode;
-    @Column(name = "intg_upd_status")
     private String intgUpdStatus;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "deleted")
-    private boolean deleted;
-    @Column(name = "active")
-    private boolean active;
+    private Boolean deleted;
+    private Boolean active;
 }

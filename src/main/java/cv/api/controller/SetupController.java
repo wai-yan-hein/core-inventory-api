@@ -71,34 +71,29 @@ public class SetupController {
 
     @PostMapping(path = "/saveCategory")
     public Mono<Category> saveCategory(@RequestBody Category cat) {
-        cat.setUpdatedDate(Util1.getTodayLocalDate());
-        Category category = categoryService.save(cat);
-        return Mono.justOrEmpty(category);
+        return categoryService.saveOrUpdate(cat);
     }
 
     @GetMapping(path = "/getCategory")
-    public Flux<?> getCategory(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(categoryService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<?> getCategory(@RequestParam String compCode) {
+        return categoryService.findAll(compCode);
     }
 
 
     @GetMapping(path = "/getUpdateCategory")
-    public Flux<?> getUpdateCategory(@RequestParam String updatedDate) {
-        return Flux.fromIterable(categoryService.getCategory(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<Category> getUpdateCategory(@RequestParam String updatedDate) {
+        return categoryService.getCategory(Util1.toLocalDateTime(updatedDate));
     }
 
 
     @DeleteMapping(path = "/deleteCategory")
-    public Mono<?> deleteCategory(@RequestParam String code) {
-        categoryService.delete(code);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
+    public Mono<Boolean> deleteCategory(@RequestBody CategoryKey key) {
+        return categoryService.delete(key);
     }
 
     @PostMapping(path = "/findCategory")
     public Mono<Category> findCategory(@RequestBody CategoryKey key) {
-        Category cat = categoryService.findByCode(key);
-        return Mono.justOrEmpty(cat);
+        return categoryService.findByCode(key);
     }
 
     @PostMapping(path = "/saveStockCriteria")
@@ -240,33 +235,28 @@ public class SetupController {
 
     @PostMapping(path = "/saveType")
     public Mono<StockType> saveType(@RequestBody StockType type) {
-        type.setUpdatedDate(Util1.getTodayLocalDate());
-        StockType b = typeService.save(type);
-        return Mono.justOrEmpty(b);
+        return typeService.saveOrUpdate(type);
     }
 
     @GetMapping(path = "/getType")
-    public Flux<?> getType(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(typeService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockType> getType(@RequestParam String compCode) {
+        return typeService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateStockType")
-    public Flux<?> getUpdateStockType(@RequestParam String updatedDate) {
-        return Flux.fromIterable(typeService.getStockType(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockType> getUpdateStockType(@RequestParam String updatedDate) {
+        return typeService.getStockType(Util1.toLocalDateTime(updatedDate));
     }
 
 
     @DeleteMapping(path = "/deleteType")
-    public Mono<ReturnObject> deleteType(@RequestParam String code) {
-        typeService.delete(code);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
+    public Mono<Boolean> deleteType(@RequestParam StockTypeKey key) {
+        return typeService.delete(key);
     }
 
     @PostMapping(path = "/findType")
     public Mono<StockType> findType(@RequestBody StockTypeKey key) {
-        StockType b = typeService.findByCode(key);
-        return Mono.justOrEmpty(b);
+        return typeService.findByCode(key);
     }
 
     @PostMapping(path = "/saveUnit")
