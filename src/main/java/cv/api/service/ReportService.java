@@ -264,9 +264,6 @@ public interface ReportService {
                                         String stockCode, String groupCode, String catCode,
                                         String brandCode, String locCode);
 
-    List<VConsign> getStockIssueReceiveHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
-                                               String vouNo, String remark, String locCode, Integer deptId,
-                                               boolean deleted, String compCode, int transSource);
     List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
                                        String vouNo, String remark, Integer deptId,
                                        boolean deleted, String compCode);

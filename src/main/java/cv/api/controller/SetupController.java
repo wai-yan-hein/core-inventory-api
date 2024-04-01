@@ -464,6 +464,7 @@ public class SetupController {
 
     @GetMapping(path = "/getStockList")
     public Flux<Stock> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
+        log.info("getStockList");
         return stockService.getStock(text, compCode, deptId);
     }
 
@@ -480,6 +481,11 @@ public class SetupController {
     @PostMapping(path = "/findStock")
     public Mono<Stock> findStock(@RequestBody StockKey key) {
         return stockService.findById(key);
+    }
+
+    @PostMapping(path = "/findStockByBarcode")
+    public Mono<Stock> findStockByBarcode(@RequestBody StockKey key) {
+        return stockService.findByBarcode(key);
     }
 
 

@@ -217,10 +217,10 @@ public class RetInServiceImpl implements RetInService {
 
     @Override
     public Mono<Boolean> delete(RetInHisKey key) {
-        return updateDeleteStatus(true);
+        return updateDeleteStatus(key, true);
     }
 
-    private Mono<Boolean> updateDeleteStatus(boolean status) {
+    private Mono<Boolean> updateDeleteStatus(RetInHisKey key, boolean status) {
         String sql = """
                 update ret_in_his
                 set deleted =:status,updated_date=:updatedDate
@@ -230,12 +230,14 @@ public class RetInServiceImpl implements RetInService {
         return client.sql(sql)
                 .bind("status", status)
                 .bind("updatedDate", LocalDateTime.now())
+                .bind("vouNo", key.getVouNo())
+                .bind("compCode", key.getCompCode())
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
     @Override
     public Mono<Boolean> restore(RetInHisKey key) {
-        return updateDeleteStatus(false);
+        return updateDeleteStatus(key, false);
     }
 
     @Override

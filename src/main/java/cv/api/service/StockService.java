@@ -119,6 +119,22 @@ public class StockService {
                 .bind("stockCode", stockCode)
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
+    public Mono<Stock> findByBarcode(StockKey key) {
+        String barcode = key.getStockCode();
+        if (Util1.isNullOrEmpty(barcode)) {
+            return Mono.empty();
+        }
+        String sql = """
+                select *
+                from stock
+                where comp_code = :compCode
+                and barcode =:barCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", key.getCompCode())
+                .bind("barCode", barcode)
+                .map((row, rowMetadata) -> mapRow(row)).one();
+    }
 
 
     public Flux<Stock> findAll(String compCode, Integer deptId) {

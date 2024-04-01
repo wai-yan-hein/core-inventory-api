@@ -1,6 +1,7 @@
 package cv.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,12 +9,13 @@ import java.time.ZonedDateTime;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class VConsign {
     private String vouNo;
     private String vouDate;
     private String createdBy;
     private LocalDateTime createdDate;
-    private boolean deleted;
+    private Boolean deleted;
     private String location;
     private String remark;
     private String description;
@@ -33,6 +35,5 @@ public class VConsign {
     private Double weight;
     private Double price;
     private Double amount;
-    private boolean local;
     private ZonedDateTime vouDateTime;
 }
