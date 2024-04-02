@@ -10,6 +10,7 @@ import cv.api.entity.OPHis;
 import cv.api.entity.ReorderLevel;
 import cv.api.entity.VStockBalance;
 import cv.api.model.*;
+import cv.api.service.ReportR2dbcService;
 import cv.api.service.ReportService;
 import cv.api.service.StockReportService;
 import cv.api.service.TransferService;
@@ -33,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
+    private final ReportR2dbcService reportR2dbcService;
     private final StockReportService stockReportService;
     private final TransferService transferService;
 
@@ -420,7 +422,7 @@ public class ReportController {
                         Util1.writeJsonFile(list, exportPath);
                     }
                     case "TopPurchaseQty" -> {
-                        return reportService.getTopPurchasePaddy(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
+                        return reportR2dbcService.getTopPurchase(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
                     }
                     case "TransferSaleClosing" -> {
                         filter.setOpDate(opDate);

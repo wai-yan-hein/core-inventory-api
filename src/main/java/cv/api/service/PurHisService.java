@@ -345,7 +345,8 @@ public class PurHisService {
     public Mono<PurHis> generateForAcc(String vouNo, String compCode) {
         String sql = """
                 select sh.vou_no,sh.comp_code,sh.vou_date,sh.trader_code,
-                sh.cur_code,sh.reference,sh.remark,sh.deleted,sh.project_no,g.batch_no,sh.vou_total,sh.disc_p,sh.discount,
+                sh.cur_code,sh.reference,sh.remark,sh.deleted,sh.project_no,g.batch_no,
+                sh.vou_total,sh.grand_total,sh.disc_p,sh.discount,
                 sh.tax_p,sh.tax_amt,sh.paid,sh.balance,sh.dept_id,
                 ifnull(sh.dept_code,ifnull(l.dept_code,a.dep_code)) dept_code,
                 ifnull(sh.purchase_acc,a.source_acc) src_acc,
@@ -384,6 +385,7 @@ public class PurHisService {
                         .projectNo(row.get("project_no", String.class))
                         .grnVouNo(row.get("batch_no", String.class))
                         .vouTotal(row.get("vou_total", Double.class))
+                        .grandTotal(row.get("grand_total",Double.class))
                         .discP(row.get("disc_p", Double.class))
                         .discount(row.get("discount", Double.class))
                         .taxP(row.get("tax_p", Double.class))

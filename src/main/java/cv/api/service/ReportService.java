@@ -260,10 +260,6 @@ public interface ReportService {
     List<VPurchase> getPurchaseList(String fromDate, String toDate, String compCode, String stockCode,
                                     String groupCode, String catCode, String brandCode, String locCode, String labourGroupCode);
 
-    Mono<ReturnObject> getTopPurchasePaddy(String fromDate, String toDate, String compCode,
-                                        String stockCode, String groupCode, String catCode,
-                                        String brandCode, String locCode);
-
     List<VPurOrder> getPurOrderHistory(String fromDate, String toDate, String traderCode, String userCode, String stockCode,
                                        String vouNo, String remark, Integer deptId,
                                        boolean deleted, String compCode);

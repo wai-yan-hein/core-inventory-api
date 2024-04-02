@@ -8,16 +8,18 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class StockValueDto {
+public class TopPurchase {
     private String id;
-    private String compCode;
     private LocalDate tranDate;
-    private String groupName;
+    private String compCode;
     private String catName;
     private String stockCode;
     private String stockName;
-    private String locName;
+    private Double wet;
+    private Double rice;
+    private Double price;
     private Double qty;
-    private Double bag;
+    private Double qtyPercent;
+    private Double amount;
     private LocalDateTime updatedDate;
 }

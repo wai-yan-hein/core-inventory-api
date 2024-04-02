@@ -10,9 +10,7 @@ import java.io.Serializable;
 @Data
 @Embeddable
 @Builder
-public class WeightHisKey implements Serializable {
-    @Column(name = "vou_no")
+public class WeightHisKey  {
     private String vouNo;
-    @Column(name = "comp_code")
     private String compCode;
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class StockReportService {
     private final DatabaseClient client;
 
+    @Transactional
     private Mono<Long> calculateOpeningByPaddy(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String compCode, Integer macId) {
@@ -187,7 +189,7 @@ public class StockReportService {
                 .fetch()
                 .rowsUpdated());
     }
-
+    @Transactional
     private Mono<Long> calculateClosingByPaddy(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String compCode, Integer macId) {
@@ -773,12 +775,12 @@ public class StockReportService {
         }
         return list;
     }
-
+    @Transactional
     private Mono<Long> deleteTmpOpening(Integer macId) {
         String sql = "delete from tmp_stock_opening where mac_id =:macId";
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
     }
-
+    @Transactional
     private Mono<Long> deleteTmpIO(Integer macId) {
         String sql = "delete from tmp_stock_io_column where mac_id=:macId";
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
@@ -866,7 +868,7 @@ public class StockReportService {
                 .then(calStockBalanceQty(opDate, fromDate, locCode, compCode, macId, typeCode, catCode, brandCode, stockCode))
                 .then(monoReturn);
     }
-
+    @Transactional
     private Mono<Long> calStockBalanceQty(String opDate, String fromDate,
                                           String locCode, String compCode,
                                           Integer macId, String typeCode, String catCode,
@@ -969,14 +971,13 @@ public class StockReportService {
                 .fetch()
                 .rowsUpdated();
     }
-
+    @Transactional
     private Mono<Long> deleteTmpClosing(Integer macId) {
         String delSql = "delete from tmp_stock_balance where mac_id =:macId";
         return client.sql(delSql).bind("macId", macId).fetch().rowsUpdated();
     }
 
-
-
+    @Transactional
     private Mono<Long> calculateOpeningConsign(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String traderCode, String locCode, String compCode, Integer macId) {
@@ -1045,7 +1046,7 @@ public class StockReportService {
                 .fetch()
                 .rowsUpdated());
     }
-
+    @Transactional
     private Mono<Long> calculateClosingConsign(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String traderCode, String locCode, String compCode, Integer macId) {
@@ -1210,6 +1211,7 @@ public class StockReportService {
         return monoPrice.then(monoOp)
                 .thenMany(getStockValueResult(macId));
     }
+
     public Flux<StockValue> getStockBalanceByLocation(ReportFilter filter) {
         String opDate = filter.getOpDate();
         String toDate = Util1.addDay(filter.getToDate(), 1);
@@ -1328,6 +1330,7 @@ public class StockReportService {
                         .recentAmt(Util1.toNull(row.get("pur_recent_amt", Double.class)))
                         .build()).all();
     }
+
     private Flux<StockValue> getStockBalanceByLocation(Integer macId) {
         String sql = """
                 select a.*,s.user_code,s.stock_name,st.stock_type_name,ct.cat_name,l.loc_name
@@ -1354,7 +1357,7 @@ public class StockReportService {
                         .stockName(row.get("stock_name", String.class))
                         .stockTypeName(row.get("stock_type_name", String.class))
                         .catName(row.get("cat_name", String.class))
-                        .locName(row.get("loc_name",String.class))
+                        .locName(row.get("loc_name", String.class))
                         .build()).all();
     }
 
