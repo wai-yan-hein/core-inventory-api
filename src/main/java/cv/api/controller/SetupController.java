@@ -142,8 +142,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getLocation")
-    public Flux<?> getLocation(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(locationService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<?> getLocation(@RequestParam String compCode, @RequestParam String whCode) {
+        return Flux.fromIterable(locationService.findAll(compCode, whCode)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdateLocation")

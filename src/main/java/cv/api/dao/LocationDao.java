@@ -18,7 +18,7 @@ public interface LocationDao {
 
     Location save(Location loc);
 
-    List<Location> findAll(String compCode, Integer deptId);
+    List<Location> findAll(String compCode, String whCode);
 
     List<Location> findAll();
 
@@ -32,7 +32,5 @@ public interface LocationDao {
     
 
     List<Location> getLocation(LocalDateTime updatedDate);
-
-    List<String> getLocation(Integer deptId);
 
 }

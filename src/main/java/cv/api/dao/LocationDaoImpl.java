@@ -33,10 +33,10 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
     }
 
     @Override
-    public List<Location> findAll(String compCode, Integer deptId) {
+    public List<Location> findAll(String compCode, String whCode) {
         List<Location> list = new ArrayList<>();
 
-        String sql= """
+        String sql = """
                 select l.*,w.description
                 from location l left join warehouse w
                 on l.warehouse_code = w.code
@@ -44,10 +44,12 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
                 where l.deleted = false
                 and l.active = true
                 and l.comp_code =?
+                and (l.warehouse_code =? or'-'=?)
+                                
                 """;
         try {
-            ResultSet rs = getResult(sql,compCode);
-            while (rs.next()){
+            ResultSet rs = getResult(sql, compCode, whCode, whCode);
+            while (rs.next()) {
                 Location l = new Location();
                 LocationKey key = new LocationKey();
                 key.setCompCode(rs.getString("comp_code"));
@@ -68,13 +70,13 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
                 l.setWareHouseName(rs.getString("description"));
                 list.add(l);
             }
-        }catch (Exception e){
-            log.error("findAll : "+e.getMessage());
+        } catch (Exception e) {
+            log.error("findAll : " + e.getMessage());
         }
         //loc_code, comp_code, dept_id, mac_id, loc_name, parent, calc_stock,
         // updated_date, location_type, created_date, created_by, updated_by,
         // user_code, intg_upd_status, map_dept_id, dept_code, cash_acc, deleted, active, warehouse_code
-       return list;
+        return list;
     }
 
     @Override
@@ -109,16 +111,6 @@ public class LocationDaoImpl extends AbstractDao<LocationKey, Location> implemen
         return createQuery(hsql).setParameter("updatedDate", updatedDate).getResultList();
     }
 
-    @Override
-    public List<String> getLocation(Integer deptId) {
-        List<String> location = new ArrayList<>();
-        String hsql = "select o from Location o where o.mapDeptId =" + deptId + "";
-        List<Location> list = findHSQL(hsql);
-        list.forEach(l -> {
-            location.add(l.getKey().getLocCode());
-        });
-        return location;
-    }
 
     @Override
     public Location findByCode(LocationKey code) {

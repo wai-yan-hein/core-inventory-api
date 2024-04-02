@@ -21,7 +21,7 @@ public interface LocationService {
 
     Location save(Location loc);
 
-    List<Location> findAll(String compCode, Integer deptId);
+    List<Location> findAll(String compCode, String whCode);
 
     List<Location> findAll();
 
