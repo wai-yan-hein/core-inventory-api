@@ -1,15 +1,15 @@
 package cv.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 @Data
-@Embeddable
-public class StockBrandKey implements Serializable {
-    @Column(name = "brand_code")
+@Builder
+public class StockBrandKey {
     private String brandCode;
-    @Column(name = "comp_code")
     private String compCode;
 }

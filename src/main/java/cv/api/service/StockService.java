@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 /**
  * @author wai yan
  */
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class StockService {
@@ -151,18 +150,16 @@ public class StockService {
     }
 
 
-    public Flux<Stock> findActiveStock(String compCode, Integer deptId) {
+    public Flux<Stock> findActiveStock(String compCode) {
         String sql = """
                 select *
                 from stock
                 where comp_code=:compCode
                 and active = true
                 and deleted =false
-                and (dept_id =:deptId or 0 =:deptId)
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
 
@@ -182,6 +179,7 @@ public class StockService {
                 });
     }
 
+    @Transactional
 
     private Mono<Boolean> updateDeleteStatus(StockKey key, boolean status) {
         String sql = """
@@ -289,7 +287,7 @@ public class StockService {
                 .all();
     }
 
-
+    @Transactional
     public Mono<Stock> insert(Stock dto) {
         String sql = """
                 INSERT INTO stock (
@@ -308,7 +306,7 @@ public class StockService {
                 """;
         return executeUpdate(sql, dto);
     }
-
+    @Transactional
     public Mono<Stock> update(Stock dto) {
         String sql = """
                 UPDATE stock

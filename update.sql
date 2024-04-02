@@ -1835,6 +1835,18 @@ add column total_balance double(20,3) null after opening;
 alter table pur_his
 add column grn_vou_no varchar(25) null;
 
+alter table stock
+drop index stock_code;
+
+alter table stock_brand
+drop index brand_id;
+
+alter table unit_relation_detail
+change column comp_code comp_code varchar(15) not null default '0010010' after rel_code,
+change column unique_id unique_id int(11) not null after comp_code,
+drop primary key,
+add primary key (rel_code, comp_code, unique_id);
+
 
 #view
 drop view if exists v_milling_output;

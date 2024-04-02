@@ -199,38 +199,33 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveBrand")
-    public Mono<StockBrand> saveBrand(@RequestBody StockBrand brand) {
-        brand.setUpdatedDate(Util1.getTodayLocalDate());
-        StockBrand b = brandService.save(brand);
-        return Mono.justOrEmpty(b);
+    public Mono<StockBrand> saveBrand(@RequestBody StockBrand dto) {
+        return brandService.saveOrUpdate(dto);
     }
 
     @GetMapping(path = "/getBrand")
-    public Flux<?> getBrand(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(brandService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockBrand> getBrand(@RequestParam String compCode) {
+        return brandService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateBrand")
-    public Flux<?> getUpdateBrand(@RequestParam String updatedDate) {
-        return Flux.fromIterable(brandService.getBrand(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockBrand> getUpdateBrand(@RequestParam String updatedDate) {
+        return brandService.getStockBrand(Util1.toLocalDateTime(updatedDate));
     }
 
     @DeleteMapping(path = "/deleteBrand")
-    public Mono<?> deleteBrand(@RequestParam String code) {
-        brandService.delete(code);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
+    public Mono<Boolean> deleteBrand(@RequestBody StockBrandKey key) {
+        return brandService.delete(key);
     }
 
     @PostMapping(path = "/findBrand")
     public Mono<StockBrand> findBrand(@RequestBody StockBrandKey key) {
-        StockBrand b = brandService.findByCode(key);
-        return Mono.justOrEmpty(b);
+        return brandService.findByCode(key);
     }
 
     @PostMapping(path = "/findUnitRelation")
-    public Mono<?> findUnitRelation(@RequestBody RelationKey key) {
-        return Mono.justOrEmpty(unitRelationService.findByKey(key));
+    public Mono<UnitRelation> findUnitRelation(@RequestBody RelationKey key) {
+        return unitRelationService.findByCode(key);
     }
 
     @PostMapping(path = "/saveType")
@@ -261,31 +256,23 @@ public class SetupController {
 
     @PostMapping(path = "/saveUnit")
     public Mono<StockUnit> saveUnit(@RequestBody StockUnit unit) {
-        unit.setUpdatedDate(Util1.getTodayLocalDate());
-        StockUnit b = unitService.save(unit);
-        return Mono.justOrEmpty(b);
+        return unitService.insert(unit);
     }
 
     @GetMapping(path = "/getUnit")
-    public Flux<?> getUnit(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(unitService.findAll(compCode, deptId));
+    public Flux<StockUnit> getUnit(@RequestParam String compCode) {
+        return unitService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateUnit")
-    public Flux<?> getUpdateUnit(@RequestParam String updatedDate) {
-        return Flux.fromIterable(unitService.getUnit(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<StockUnit> getUpdateUnit(@RequestParam String updatedDate) {
+        return unitService.getUnit(Util1.toLocalDateTime(updatedDate));
     }
 
-    @DeleteMapping(path = "/deleteUnit")
-    public Mono<?> deleteUnit(@RequestParam String code) {
-        unitService.delete(code);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
-    }
 
     @PostMapping(path = "/findUnit")
     public Mono<StockUnit> findUnit(@RequestBody StockUnitKey key) {
-        return Mono.justOrEmpty(unitService.findByCode(key));
+        return unitService.findByCode(key);
     }
 
     @PostMapping(path = "/saveRegion")
@@ -367,8 +354,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getSupplier")
-    public Flux<Trader> getSupplier(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return traderService.getSupplier(compCode, deptId);
+    public Flux<Trader> getSupplier(@RequestParam String compCode) {
+        return traderService.getSupplier(compCode);
     }
 
 
@@ -410,7 +397,7 @@ public class SetupController {
 
     @GetMapping(path = "/getStock")
     public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
-        return active ? stockService.findActiveStock(compCode, deptId) : stockService.findAll(compCode, deptId);
+        return active ? stockService.findActiveStock(compCode) : stockService.findAll(compCode, deptId);
     }
 
     @GetMapping(path = "/getUpdateStock")
@@ -700,31 +687,23 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getUnitRelation")
-    public Flux<?> getUnitRelation(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<UnitRelation> listB = unitRelationService.findRelation(compCode, deptId);
-        return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
-    }
-
-    @GetMapping(path = "/getRelation")
-    public Flux<?> getRelation(@RequestParam String relCode, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(unitRelationService.getRelation(relCode, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<UnitRelation> getUnitRelation(@RequestParam String compCode) {
+        return unitRelationService.getRelation(compCode);
     }
 
     @GetMapping(path = "/getUpdateRelation")
-    public Flux<?> getUpdateRelation(@RequestParam String updatedDate) {
-        return Flux.fromIterable(unitRelationService.getRelation(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<UnitRelation> getUpdateRelation(@RequestParam String updatedDate) {
+        return unitRelationService.getUnitRelation(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUnitRelationDetail")
     public Flux<?> getUnitRelationDetail(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
-        List<UnitRelationDetail> listB = unitRelationService.getRelationDetail(code, compCode);
-        return Flux.fromIterable(listB).onErrorResume(throwable -> Flux.empty());
+        return unitRelationService.getRelationDetail(code, compCode);
     }
 
     @PostMapping(path = "/saveUnitRelation")
-    public Mono<UnitRelation> saveUnitRelation(@RequestBody UnitRelation relation) {
-        UnitRelation b = unitRelationService.save(relation);
-        return Mono.justOrEmpty(b);
+    public Mono<UnitRelation> saveUnitRelation(@RequestBody UnitRelation dto) {
+        return unitRelationService.save(dto);
     }
 
 

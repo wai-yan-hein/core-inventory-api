@@ -18,4 +18,5 @@ public class YearEnd {
     private String createBy;
     private LocalDateTime createdDate;
     private String message;
+    private String token;
 }

@@ -8,7 +8,6 @@ package cv.api.service;
 import cv.api.common.*;
 import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.ReportDao;
-import cv.api.dao.UnitRelationDetailDao;
 import cv.api.entity.*;
 import cv.api.model.*;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +33,11 @@ public class ReportServiceImpl implements ReportService {
     private final DecimalFormat formatter = new DecimalFormat("###.##");
     private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
     private final ReportDao reportDao;
-    private final UnitRelationDetailDao detailDao;
     private final LandingHisPriceDao landingHisPriceDao;
     private final DatabaseClient client;
     private final OPHisService opHisService;
+    private final UnitRelationService unitRelationService;
+
 
     @Override
     public void executeSql(String... sql) {
@@ -2009,7 +2009,7 @@ public class ReportServiceImpl implements ReportService {
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
             if (hmRelation.get(relCode) == null) {
-                hmRelation.put(relCode, detailDao.getRelationDetail(relCode, compCode));
+                hmRelation.put(relCode, unitRelationService.getRelationDetail(relCode, compCode).collectList().block());
             }
             List<UnitRelationDetail> detailList = hmRelation.get(relCode);
             if (detailList != null) {

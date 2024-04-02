@@ -6,6 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 import jakarta.persistence.*;
 
@@ -16,18 +17,12 @@ import java.io.Serializable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "unit_relation_detail")
-public class UnitRelationDetail implements Serializable {
+@Builder
+public class UnitRelationDetail {
 
-    @EmbeddedId
     private UnitRelationDetailKey key;
-    @Column(name = "qty")
-    private Float qty;
-    @Column(name = "unit")
+    private Double qty;
     private String unit;
-    @Column(name = "smallest_qty")
-    private Float smallestQty;
-    @Column(name = "dept_id")
+    private Double smallestQty;
     private Integer deptId;
 }
