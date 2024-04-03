@@ -34,7 +34,7 @@ public class OPHisService {
             List<OPHisDetail> list = dto.getDetailList();
             if (list != null && !list.isEmpty()) {
                 return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
                         .concatMap(detail -> {
                             if (detail.getKey() == null) {
                                 detail.setKey(OPHisDetailKey.builder().build());
@@ -325,7 +325,7 @@ public class OPHisService {
                 and (v.trader_code = :traderCode or '-' = :traderCode)
                 and v.tran_source = :type
                 group by v.vou_no
-                order by v.op_date desc
+                order by v.op_date desc,v.vou_no desc
                 """;
 
         return client.sql(sql)
