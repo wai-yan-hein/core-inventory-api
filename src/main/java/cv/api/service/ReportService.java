@@ -166,10 +166,6 @@ public interface ReportService {
                                          String compCode, Integer deptId, String deleted,
                                          String projectNo, String curCode) throws Exception;
 
-    List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark,
-                                  String userCode, String stockCode, String locCode, String compCode,
-                                  Integer deptId, String curCode, String deleted, int type, String traderCode) throws Exception;
-
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode, Integer deptId,
                                        String deleted, String traderCode) throws Exception;

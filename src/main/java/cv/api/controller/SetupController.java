@@ -40,7 +40,6 @@ public class SetupController {
     private final StockCriteriaService stockCriteriaService;
     private final VouStatusService vouStatusService;
     private final OPHisService opHisService;
-    private final OPHisDetailService opHisDetailService;
     private final PatternService patternService;
     private final ReorderService reorderService;
     private final PriceOptionService optionService;
@@ -554,67 +553,34 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveOpening")
-    public Mono<?> saveOpening(@RequestBody OPHis opHis) {
-        if (Util1.isNullOrEmpty(opHis.getVouDate())) {
-            ro.setMessage("Invalid Opening Date.");
-        } else if (Util1.isNullOrEmpty(opHis.getLocCode())) {
-            ro.setMessage("Invalid Location.");
-        } else if (opHis.getDetailList().size() <= 1) {
-            ro.setMessage("Invalid Opening Record.");
-        } else {
-            List<OPHisDetail> detailList = opHis.getDetailList();
-            detailList.forEach(op -> op.setLocCode(opHis.getLocCode()));
-            opHis.setDetailList(detailList);
-            try {
-                opHis.setUpdatedDate(Util1.getTodayLocalDate());
-                return Mono.just(opHisService.save(opHis));
-            } catch (Exception e) {
-                log.error(String.format("saveOpening : %s", e.getMessage()));
-            }
-        }
-        return Mono.just(ro);
+    public Mono<OPHis> saveOpening(@RequestBody OPHis dto) {
+        return opHisService.save(dto);
     }
 
     @PostMapping(path = "/getOpening")
-    public Flux<?> getOpening(@RequestBody ReportFilter filter) throws Exception {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String compCode = Util1.isNull(filter.getCompCode(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        Integer deptId = filter.getDeptId();
-        String curCode = Util1.isAll(filter.getCurCode());
-        String deleted = String.valueOf(filter.isDeleted());
-        int type = Integer.parseInt(filter.getTranSource());
-        String traderCode = String.valueOf(filter.getTraderCode());
-        List<OPHis> opHisList = reportService.getOpeningHistory(fromDate, toDate, vouNo, remark, userCode,
-                stockCode, locCode, compCode, deptId, curCode, deleted, type, traderCode);
-        return Flux.fromIterable(opHisList).onErrorResume(throwable -> Flux.empty());
+    public Flux<OPHis> getOpening(@RequestBody ReportFilter filter) {
+        return opHisService.getOpeningHistory(filter);
     }
 
     @PostMapping(path = "/findOpening")
     public Mono<OPHis> findOpening(@RequestBody OPHisKey key) {
-        return Mono.justOrEmpty(opHisService.findByCode(key));
+        return opHisService.findByCode(key);
     }
 
     @PostMapping(path = "/deleteOpening")
-    public Mono<?> deleteOpening(@RequestBody OPHisKey key) {
-        return Mono.just(opHisService.delete(key));
+    public Mono<Boolean> deleteOpening(@RequestBody OPHisKey key) {
+        return opHisService.delete(key);
     }
 
     @PostMapping(path = "/restoreOpening")
-    public Mono<?> restoreOpening(@RequestBody OPHisKey key) {
-        return Mono.just(opHisService.delete(key));
+    public Mono<Boolean> restoreOpening(@RequestBody OPHisKey key) {
+        return opHisService.restore(key);
     }
 
 
     @GetMapping(path = "/getOpeningDetail")
-    public Flux<OPHisDetail> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer deptId) {
-        List<OPHisDetail> opHis = opHisDetailService.search(vouNo, compCode, deptId);
-        return Flux.fromIterable(opHis).onErrorResume(throwable -> Flux.empty());
+    public Flux<OPHisDetail> getOpeningDetail(@RequestParam String vouNo, @RequestParam String compCode) {
+        return opHisService.getOpeningDetail(vouNo, compCode);
     }
 
     @PostMapping(path = "/savePattern")

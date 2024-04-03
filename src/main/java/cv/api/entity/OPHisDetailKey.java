@@ -1,17 +1,15 @@
 package cv.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
 
 @Data
-@Embeddable
-public class OPHisDetailKey implements java.io.Serializable {
-    @Column(name = "vou_no")
+@Builder
+public class OPHisDetailKey {
     private String vouNo;
-    @Column(name = "unique_id")
-    private int uniqueId;
-    @Column(name = "comp_code")
+    private Integer uniqueId;
     private String compCode;
 
 }

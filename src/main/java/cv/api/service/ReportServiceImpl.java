@@ -2915,55 +2915,6 @@ public class ReportServiceImpl implements ReportService {
         return returnInList;
     }
 
-    @Override
-    public List<OPHis> getOpeningHistory(String fromDate, String toDate, String vouNo, String remark, String userCode, String stockCode,
-                                         String locCode, String compCode, Integer deptId, String curCode, String deleted, int type, String traderCode) throws Exception {
-        String filter = "";
-        if (type == 2) {
-            filter = "and (v.trader_code ='" + traderCode + "' or '-' ='" + traderCode + "')\n";
-        }
-
-        String sql = "select sum(v.qty) qty,sum(v.bag) bag,sum(v.amount) amount,v.op_date,v.vou_no,v.remark,v.created_by," +
-                "v.deleted,l.loc_name,v.comp_code,v.dept_id \n" +
-                "from v_opening v join location l\n" +
-                "on v.loc_code = l.loc_code\n" +
-                "and v.comp_code = l.comp_code\n" +
-                "where v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and v.deleted = " + deleted + "\n" +
-                "and (v.dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and date(v.op_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (v.vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
-                "and (v.remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
-                "and (v.created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
-                "and (v.stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (v.loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "and v.tran_source = " + type + "\n" + filter +
-                "group by v.vou_no\n" +
-                "order by v.op_date,v.vou_no desc\n";
-        ResultSet rs = reportDao.executeSql(sql);
-        List<OPHis> list = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                OPHis s = new OPHis();
-                OPHisKey key = new OPHisKey();
-                key.setCompCode(rs.getString("comp_code"));
-                key.setVouNo(rs.getString("vou_no"));
-                s.setKey(key);
-                s.setDeptId(rs.getInt("dept_id"));
-                s.setQty(rs.getDouble("qty"));
-                s.setBag(rs.getDouble("bag"));
-                s.setOpAmt(rs.getFloat("amount"));
-                s.setVouDateStr(Util1.toDateStr(rs.getDate("op_date"), "dd/MM/yyyy"));
-                s.setRemark(rs.getString("remark"));
-                s.setCreatedBy(rs.getString("created_by"));
-                s.setDeleted(rs.getBoolean("deleted"));
-                s.setLocName(rs.getString("loc_name"));
-                list.add(s);
-            }
-        }
-        return list;
-    }
 
     @Override
     public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode,
