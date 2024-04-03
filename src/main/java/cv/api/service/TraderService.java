@@ -326,7 +326,7 @@ public class TraderService {
     }
 
     
-    public Flux<Trader> getCustomer(String compCode, Integer deptId) {
+    public Flux<Trader> getCustomer(String compCode) {
         String sql = """
                 select *
                 from trader

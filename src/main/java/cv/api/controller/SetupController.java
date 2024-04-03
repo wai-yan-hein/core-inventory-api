@@ -339,8 +339,8 @@ public class SetupController {
 
 
     @GetMapping(path = "/getCustomer")
-    public Flux<Trader> getCustomer(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return traderService.getCustomer(compCode, deptId);
+    public Flux<Trader> getCustomer(@RequestParam String compCode) {
+        return traderService.getCustomer(compCode);
     }
 
     @GetMapping(path = "/getEmployee")
