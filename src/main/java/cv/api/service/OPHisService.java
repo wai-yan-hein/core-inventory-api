@@ -325,7 +325,7 @@ public class OPHisService {
                 and (v.trader_code = :traderCode or '-' = :traderCode)
                 and v.tran_source = :type
                 group by v.vou_no
-                order by v.op_date,v.vou_no desc
+                order by v.op_date desc
                 """;
 
         return client.sql(sql)
