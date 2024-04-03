@@ -32,7 +32,7 @@ public class WeightService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
 
-   public Mono<WeightHis> save(WeightHis dto) {
+    public Mono<WeightHis> save(WeightHis dto) {
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
         return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
             List<WeightHisDetail> list = dto.getListDetail();
@@ -166,6 +166,8 @@ public class WeightService {
                         .description(row.get("description", String.class))
                         .draft(row.get("draft", Boolean.class))
                         .post(row.get("post", Boolean.class))
+                        .stockUserCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
                         .traderUserCode(row.get("t_user_code", String.class))
                         .traderName(row.get("trader_name", String.class))
                         .build())
