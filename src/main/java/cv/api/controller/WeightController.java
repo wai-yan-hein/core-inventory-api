@@ -1,7 +1,6 @@
 package cv.api.controller;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.Util1;
 import cv.api.entity.WeightHis;
 import cv.api.entity.WeightHisDetail;
 import cv.api.entity.WeightHisKey;
@@ -24,7 +23,6 @@ public class WeightController {
     public Mono<WeightHis> saveWeight(@RequestBody WeightHis obj) {
         return weightService.save(obj);
     }
-
     @PostMapping(path = "/findWeight")
     public Mono<?> saveWeight(@RequestBody WeightHisKey key) {
         return Mono.justOrEmpty(weightService.findById(key));
