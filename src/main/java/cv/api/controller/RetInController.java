@@ -9,11 +9,11 @@ import cv.api.common.ReportFilter;
 import cv.api.entity.RetInHis;
 import cv.api.entity.RetInHisDetail;
 import cv.api.entity.RetInHisKey;
-import cv.api.model.VReturnIn;
 import cv.api.repo.AccountRepo;
 import cv.api.service.RetInService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,14 +32,12 @@ public class RetInController {
 
     @PostMapping(path = "/saveReturnIn")
     public Mono<RetInHis> saveReturnIn(@RequestBody RetInHis ri) {
-        return riService.save(ri).flatMap(retInHis -> {
-            accountRepo.sendReturnIn(retInHis);
-            return Mono.just(retInHis);
-        });
+        return riService.save(ri).flatMap(obj -> accountRepo.sendReturnInSync(obj).thenReturn(obj));
+
     }
 
     @PostMapping(path = "/getReturnIn")
-    public Flux<VReturnIn> getReturnIn(@RequestBody ReportFilter filter) {
+    public Flux<RetInHis> getReturnIn(@RequestBody ReportFilter filter) {
         return riService.getHistory(filter);
     }
 
@@ -64,5 +62,10 @@ public class RetInController {
     @GetMapping(path = "/getReturnInDetail")
     public Flux<RetInHisDetail> getReturnInDetail(@RequestParam String vouNo, @RequestParam String compCode) {
         return riService.search(vouNo, compCode);
+    }
+
+    @GetMapping(value = "/getReturnInReport")
+    public Flux<RetInHisDetail> getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode) {
+        return riService.getReturnInVoucher(vouNo, compCode);
     }
 }

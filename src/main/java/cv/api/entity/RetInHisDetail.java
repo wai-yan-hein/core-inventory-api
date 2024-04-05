@@ -37,4 +37,12 @@ public class RetInHisDetail {
     private String catName;
     private String relName;
     private String locName;
+    private String unit;
+    private String remark;
+    private Double vouTotal;
+    private Double paid;
+    private String vouDate;
+    private Double vouBalance;
+    private String traderName;
+    private String vouNo;
 }

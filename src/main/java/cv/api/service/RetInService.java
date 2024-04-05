@@ -11,7 +11,6 @@ import cv.api.entity.RetInHis;
 import cv.api.entity.RetInHisDetail;
 import cv.api.entity.RetInHisKey;
 import cv.api.entity.RetInKey;
-import cv.api.model.VReturnIn;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -104,12 +102,12 @@ public class RetInService {
                     vou_no, comp_code, dept_id, balance, created_by, created_date, deleted, discount,
                     paid, vou_date, ref_no, remark, session_id, updated_by, updated_date, vou_total,
                     cur_code, trader_code, loc_code, disc_p, intg_upd_status, mac_id, vou_lock,
-                    project_no, print_count, tax_amt, tax_p
+                    project_no, print_count, tax_amt, tax_p, grand_total, dept_code, src_acc, cash_acc, debtor_acc
                 ) VALUES (
                     :vouNo, :compCode, :deptId, :balance, :createdBy, :createdDate, :deleted, :discount,
                     :paid, :vouDate, :refNo, :remark, :sessionId, :updatedBy, :updatedDate, :vouTotal,
                     :curCode, :traderCode, :locCode, :discP, :intgUpdStatus, :macId, :vouLock,
-                    :projectNo, :printCount, :taxAmt, :taxP
+                    :projectNo, :printCount, :taxAmt, :taxP, :grandTotal, :deptCode, :srcAcc, :cashAcc, :debtorAcc
                 )
                 """;
         return executeUpdate(sql, retInHis);
@@ -123,7 +121,9 @@ public class RetInService {
                     remark = :remark, session_id = :sessionId, updated_by = :updatedBy, updated_date = :updatedDate,
                     vou_total = :vouTotal, cur_code = :curCode, trader_code = :traderCode, loc_code = :locCode,
                     disc_p = :discP, intg_upd_status = :intgUpdStatus, mac_id = :macId, vou_lock = :vouLock,
-                    project_no = :projectNo, print_count = :printCount, tax_amt = :taxAmt, tax_p = :taxP
+                    project_no = :projectNo, print_count = :printCount, tax_amt = :taxAmt, tax_p = :taxP,
+                    grand_total = :grandTotal, dept_code = :deptCode, src_acc = :srcAcc, cash_acc = :cashAcc,
+                    debtor_acc = :debtorAcc
                 WHERE vou_no = :vouNo AND comp_code = :compCode
                 """;
         return executeUpdate(sql, retInHis);
@@ -158,13 +158,18 @@ public class RetInService {
                 .bind("printCount", Parameters.in(R2dbcType.VARCHAR, ri.getPrintCount()))
                 .bind("taxAmt", Parameters.in(R2dbcType.VARCHAR, ri.getTaxAmt()))
                 .bind("taxP", Parameters.in(R2dbcType.VARCHAR, ri.getTaxP()))
+                .bind("grandTotal", Parameters.in(R2dbcType.DOUBLE, ri.getGrandTotal()))
+                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, ri.getDeptCode()))
+                .bind("srcAcc", Parameters.in(R2dbcType.VARCHAR, ri.getSrcAcc()))
+                .bind("cashAcc", Parameters.in(R2dbcType.VARCHAR, ri.getCashAcc()))
+                .bind("debtorAcc", Parameters.in(R2dbcType.VARCHAR, ri.getDebtorAcc()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(ri);
     }
 
     @Transactional
-    public Mono<RetInHisDetail> insert(RetInHisDetail retInHisDetail) {
+    public Mono<RetInHisDetail> insert(RetInHisDetail dto) {
         String sql = """
                 INSERT INTO ret_in_his_detail (
                     vou_no, stock_code, qty, unit, price, amt, loc_code, unique_id, comp_code, dept_id,
@@ -174,7 +179,7 @@ public class RetInService {
                     :weight, :weightUnit, :totalWeight, :wet, :rice, :bag
                 )
                 """;
-        return executeUpdate(sql, retInHisDetail);
+        return executeUpdate(sql, dto);
     }
 
     private Mono<RetInHisDetail> executeUpdate(String sql, RetInHisDetail dto) {
@@ -202,6 +207,9 @@ public class RetInService {
 
 
     public Mono<RetInHis> findById(RetInHisKey key) {
+        if (Util1.isNullOrEmpty(key.getVouNo())) {
+            return Mono.empty();
+        }
         String sql = """
                 select *
                 from ret_in_his
@@ -272,6 +280,7 @@ public class RetInService {
                 .updatedBy(row.get("updated_by", String.class))
                 .updatedDate(row.get("updated_date", LocalDateTime.class))
                 .vouTotal(row.get("vou_total", Double.class))
+                .grandTotal(row.get("grand_total", Double.class))
                 .curCode(row.get("cur_code", String.class))
                 .traderCode(row.get("trader_code", String.class))
                 .locCode(row.get("loc_code", String.class))
@@ -287,11 +296,11 @@ public class RetInService {
     }
 
 
-    public Flux<VReturnIn> getHistory(ReportFilter filter) {
+    public Flux<RetInHis> getHistory(ReportFilter filter) {
         String sql = """
                 SELECT a.*, t.trader_name
                 FROM (
-                    SELECT vou_date, vou_no, remark, created_by, paid, vou_total, deleted, trader_code, comp_code, dept_id
+                    SELECT vou_date, vou_no,comp_code, remark, created_by, paid, vou_total, deleted, trader_code, dept_id
                     FROM v_return_in
                     WHERE comp_code = :compCode
                     AND deleted = :deleted
@@ -325,10 +334,13 @@ public class RetInService {
                 .bind("stockCode", Util1.isNull(filter.getStockCode(), "-"))
                 .bind("locCode", Util1.isNull(filter.getLocCode(), "-"))
                 .bind("projectNo", Util1.isAll(filter.getProjectNo()))
-                .map(row -> VReturnIn.builder()
-                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
+                .map(row -> RetInHis.builder()
+                        .key(RetInHisKey.builder()
+                                .vouNo(row.get("vou_no", String.class))
+                                .compCode(row.get("comp_code", String.class))
+                                .build())
+                        .vouDate(row.get("vou_date", LocalDateTime.class))
                         .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
-                        .vouNo(row.get("vou_no", String.class))
                         .traderName(row.get("trader_name", String.class))
                         .remark(row.get("remark", String.class))
                         .createdBy(row.get("created_by", String.class))
@@ -390,4 +402,90 @@ public class RetInService {
                 .all();
     }
 
+    public Mono<RetInHis> generateForAcc(String vouNo, String compCode) {
+        String sql = """
+                select sh.vou_no,sh.comp_code,sh.vou_date,sh.trader_code,
+                sh.cur_code,sh.remark,sh.deleted,sh.project_no,sh.reference,
+                sh.vou_total,sh.grand_total,sh.disc_p,sh.discount,
+                sh.tax_p,sh.tax_amt,sh.paid,sh.balance,sh.dept_id,
+                ifnull(sh.dept_code,ifnull(l.dept_code,a.dep_code)) dept_code,
+                ifnull(sh.src_acc,a.source_acc) src_acc,
+                ifnull(sh.cash_acc,ifnull(l.cash_acc,a.pay_acc)) cash_acc,
+                ifnull(sh.debtor_acc,ifnull(t.account,a.bal_acc)) bal_acc,
+                a.dis_acc,a.tax_acc,a.comm_acc
+                from ret_in_his sh
+                join location l
+                on sh.loc_code = l.loc_code
+                and sh.comp_code = l.comp_code
+                join trader t on sh.trader_code= t.code
+                and sh.comp_code = t.comp_code
+                and sh.comp_code =l.comp_code
+                join acc_setting a
+                on sh.comp_code = a.comp_code
+                and a.type ='RETURN_IN'
+                where sh.comp_code =:compCode
+                and sh.vou_no=:vouNo
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("vouNo", vouNo)
+                .map((row) -> RetInHis.builder()
+                        .key(RetInHisKey.builder()
+                                .vouNo(row.get("vou_no", String.class))
+                                .compCode(row.get("comp_code", String.class))
+                                .build())
+                        .vouDate(row.get("vou_date", LocalDateTime.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .curCode(row.get("cur_code", String.class))
+                        .refNo(row.get("reference", String.class))
+                        .remark(row.get("remark", String.class))
+                        .deleted(row.get("deleted", Boolean.class))
+                        .projectNo(row.get("project_no", String.class))
+                        .vouTotal(row.get("vou_total", Double.class))
+                        .grandTotal(row.get("grand_total", Double.class))
+                        .discP(row.get("disc_p", Double.class))
+                        .discount(row.get("discount", Double.class))
+                        .taxP(row.get("tax_p", Double.class))
+                        .taxAmt(row.get("tax_amt", Double.class))
+                        .paid(row.get("paid", Double.class))
+                        .balance(row.get("balance", Double.class))
+                        .deptId(row.get("dept_id", Integer.class))
+                        .deptCode(row.get("dept_code", String.class))
+                        .srcAcc(row.get("src_acc", String.class))
+                        .cashAcc(row.get("cash_acc", String.class))
+                        .debtorAcc(row.get("bal_acc", String.class))
+                        .disAcc(row.get("dis_acc", String.class))
+                        .taxAcc(row.get("tax_acc", String.class))
+                        .build()).one();
+    }
+
+    public Flux<RetInHisDetail> getReturnInVoucher(String vouNo, String compCode) {
+        String sql = """
+                SELECT stock_name, unit, qty, price, amt, t.trader_name, r.remark, DATE(vou_date) vou_date,
+                       r.vou_total, r.paid, r.balance, r.vou_no
+                FROM v_return_in r
+                JOIN trader t ON r.trader_code = t.code AND r.comp_code = t.comp_code
+                WHERE r.comp_code = :compCode AND vou_no = :vouNo
+                ORDER BY unique_id
+                """;
+        return client
+                .sql(sql)
+                .bind("compCode", compCode)
+                .bind("vouNo", vouNo)
+                .map((row, metadata) -> RetInHisDetail.builder()
+                        .stockName(row.get("stock_name", String.class))
+                        .unit(row.get("unit", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .price(row.get("price", Double.class))
+                        .amount(row.get("amt", Double.class))
+                        .remark(row.get("remark", String.class))
+                        .vouDate(row.get("vou_date", String.class))
+                        .vouTotal(row.get("vou_total", Double.class))
+                        .paid(row.get("paid", Double.class))
+                        .vouBalance(row.get("balance", Double.class))
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .build())
+                .all();
+    }
 }

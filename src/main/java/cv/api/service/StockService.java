@@ -180,7 +180,6 @@ public class StockService {
     }
 
     @Transactional
-
     private Mono<Boolean> updateDeleteStatus(StockKey key, boolean status) {
         String sql = """
                 update stock

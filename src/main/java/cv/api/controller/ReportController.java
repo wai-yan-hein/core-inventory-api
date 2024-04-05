@@ -97,14 +97,7 @@ public class ReportController {
         return Flux.fromIterable(list);
     }
 
-    @GetMapping(value = "/getReturnInReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getReturnInReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
-        String reportName = "ReturnInVoucher";
-        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VReturnIn> listRI = reportService.getReturnInVoucher(vouNo, compCode);
-        Util1.writeJsonFile(listRI, exportPath);
-        return new FileInputStream(exportPath).readAllBytes();
-    }
+
 
     @GetMapping(value = "/getTransferReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<VTransfer> getTransferReport(@RequestParam String vouNo,
@@ -119,14 +112,6 @@ public class ReportController {
         return Flux.fromIterable(listRI).onErrorResume(throwable -> Flux.empty());
     }
 
-    @GetMapping(value = "/getReturnOutReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getReturnOutReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam Integer macId) throws Exception {
-        String reportName = "ReturnOutVoucher";
-        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VReturnOut> listRO = reportService.getReturnOutVoucher(vouNo, compCode);
-        Util1.writeJsonFile(listRO, exportPath);
-        return new FileInputStream(exportPath).readAllBytes();
-    }
 
     @PostMapping(value = "/getReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ReturnObject> getReport(@RequestBody ReportFilter filter) {

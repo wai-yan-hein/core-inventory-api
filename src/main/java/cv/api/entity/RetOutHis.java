@@ -6,6 +6,7 @@ package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -17,64 +18,44 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "ret_out_his")
-public class RetOutHis implements java.io.Serializable {
+@Builder
+public class RetOutHis {
 
-    @EmbeddedId
     private RetOutHisKey key;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "trader_code")
     private String traderCode;
-    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime vouDate;
-    @Column(name = "loc_code")
     private String locCode;
-    @Column(name = "deleted")
-    private boolean deleted;
-    @Column(name = "vou_total")
-    private Float vouTotal;
-    @Column(name = "paid")
-    private Float paid;
-    @Column(name = "discount")
-    private Float discount;
-    @Column(name = "balance")
-    private Float balance;
-    @Column(name = "created_by")
+    private Boolean deleted;
+    private Double vouTotal;
+    private Double paid;
+    private Double discount;
+    private Double balance;
     private String createdBy;
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime createdDate;
-    @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
-    @Column(name = "remark")
     private String remark;
-    @Column(name = "session_id")
-    private Integer session;
-    @Column(name = "cur_code")
+    private Integer sessionId;
+    private String refNo;
     private String curCode;
-    @Column(name = "disc_p")
-    private Float discP;
-    @Column(name = "intg_upd_status")
+    private Double discP;
     private String intgUpdStatus;
-    @Column(name = "mac_id")
     private Integer macId;
-    @Transient
-    private String status = "STATUS";
-    @Column(name = "vou_lock")
-    private boolean vouLock;
-    @Column(name = "project_no")
+    private String status;
+    private Boolean vouLock;
     private String projectNo;
-    @Column(name = "print_count")
     private Integer printCount;
-    @Transient
+    private Double grandTotal;
+    private String deptCode;
+    private String srcAcc;
+    private String cashAcc;
+    private String payableAcc;
+    private String disAcc;
+    private String taxAcc;
+    private Double taxAmt;
+    private Double taxP;
     private List<RetOutHisDetail> listRD;
-    @Transient
-    private List<RetOutKey> listDel;
-    @Transient
-    private List<String> location;
-    @Transient
     private ZonedDateTime vouDateTime;
+    private String traderName;
 }

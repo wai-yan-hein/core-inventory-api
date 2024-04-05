@@ -1801,6 +1801,10 @@ alter table ret_in_his
 add column tax_amt double(20,3) null,
 add column tax_p double(20,3) null;
 
+alter table ret_out_his
+add column tax_amt double(20,3) null,
+add column tax_p double(20,3) null;
+
 
 DELIMITER $$
 create definer=root@localhost function iszero(input double, output double) returns double
@@ -1847,6 +1851,32 @@ change column unique_id unique_id int(11) not null after comp_code,
 drop primary key,
 add primary key (rel_code, comp_code, unique_id);
 
+alter table ret_in_his
+add column grand_total double(20,3) null;
+
+alter table ret_out_his
+add column grand_total double(20,3) null;
+
+alter table ret_in_his
+add column reference varchar(255) null,
+add column dept_code varchar(15) null,
+add column cash_acc varchar(15) null after dept_code,
+add column debtor_acc varchar(15) null after cash_acc
+add column src_acc varchar(15) null after debtor_acc;
+
+
+alter table ret_out_his
+add column reference varchar(255) null,
+add column dept_code varchar(15) null,
+add column cash_acc varchar(15) null after dept_code,
+add column payable_acc varchar(15) null after cash_acc
+add column src_acc varchar(15) after payable_acc;
+
+set sql_safe_updates =0;
+update ret_out_his
+set grand_total =(vou_total+tax_amt-discount);
+update ret_in_his
+set grand_total =(vou_total+tax_amt-discount);
 
 #view
 drop view if exists v_milling_output;

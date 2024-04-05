@@ -134,20 +134,18 @@ public class SetupController {
 
 
     @PostMapping(path = "/saveLocation")
-    public Mono<Location> saveLocation(@RequestBody Location location) {
-        location.setUpdatedDate(Util1.getTodayLocalDate());
-        Location loc = locationService.save(location);
-        return Mono.justOrEmpty(loc);
+    public Mono<Location> saveLocation(@RequestBody Location dto) {
+        return locationService.save(dto);
     }
 
     @GetMapping(path = "/getLocation")
-    public Flux<?> getLocation(@RequestParam String compCode, @RequestParam String whCode) {
-        return Flux.fromIterable(locationService.findAll(compCode, whCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Location> getLocation(@RequestParam String compCode, @RequestParam String whCode) {
+        return locationService.findAll(compCode, whCode);
     }
 
     @GetMapping(path = "/getUpdateLocation")
-    public Flux<?> getUpdateLocation(@RequestParam String updatedDate) {
-        return Flux.fromIterable(locationService.getLocation(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<Location> getUpdateLocation(@RequestParam String updatedDate) {
+        return locationService.getLocation(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUpdateLabourGroup")
@@ -156,15 +154,13 @@ public class SetupController {
     }
 
     @DeleteMapping(path = "/deleteLocation")
-    public Mono<ReturnObject> deleteLocation(@RequestParam String code) {
-        locationService.delete(code);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
+    public Mono<Boolean> deleteLocation(@RequestBody LocationKey key) {
+        return locationService.delete(key);
     }
 
     @PostMapping(path = "/findLocation")
     public Mono<Location> findLocation(@RequestBody LocationKey key) {
-        return Mono.justOrEmpty(locationService.findByCode(key));
+        return locationService.findByCode(key);
     }
 
     @PostMapping(path = "/saveSaleMan")
@@ -466,26 +462,23 @@ public class SetupController {
 
 
     @PostMapping(path = "/saveVoucherStatus")
-    public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus vouStatus) {
-        vouStatus.setUpdatedDate(Util1.getTodayLocalDate());
-        VouStatus b = vouStatusService.save(vouStatus);
-        return Mono.justOrEmpty(b);
+    public Mono<VouStatus> saveVoucherStatus(@RequestBody VouStatus dto) {
+        return vouStatusService.save(dto);
     }
 
     @GetMapping(path = "/getVouStatus")
-    public Flux<?> getVoucherStatus(@RequestParam String compCode) {
-        return Flux.fromIterable(vouStatusService.findAll(compCode));
+    public Flux<VouStatus> getVoucherStatus(@RequestParam String compCode) {
+        return vouStatusService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateVouStatus")
-    public Flux<?> getUpdateVouStatus(@RequestParam String updatedDate) {
-        return Flux.fromIterable(vouStatusService.getVouStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<VouStatus> getUpdateVouStatus(@RequestParam String updatedDate) {
+        return vouStatusService.getVouStatus(Util1.toLocalDateTime(updatedDate));
     }
 
     @PostMapping(path = "/findVouStatus")
     public Mono<VouStatus> findVouStatus(@RequestBody VouStatusKey key) {
-        VouStatus b = vouStatusService.findById(key);
-        return Mono.justOrEmpty(b);
+        return vouStatusService.findById(key);
     }
 
     @PostMapping(path = "/saveOrderStatus")
@@ -708,18 +701,18 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getAccSetting")
-    public Flux<?> getAccSetting(@RequestParam String compCode) {
-        return Flux.fromIterable(accSettingService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<AccSetting> getAccSetting(@RequestParam String compCode) {
+        return accSettingService.findAll(compCode);
     }
 
     @PostMapping(path = "/saveAccSetting")
-    public Mono<?> saveAccSetting(@RequestBody AccSetting setting) {
-        return Mono.just(accSettingService.save(setting));
+    public Mono<AccSetting> saveAccSetting(@RequestBody AccSetting setting) {
+        return accSettingService.save(setting);
     }
 
     @GetMapping(path = "/getUpdatedAccSetting")
-    public Flux<?> getUpdatedAccSetting(@RequestParam String updatedDate) {
-        return Flux.fromIterable(accSettingService.getAccSetting(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<AccSetting> getUpdatedAccSetting(@RequestParam String updatedDate) {
+        return accSettingService.getAccSetting(Util1.toLocalDateTime(updatedDate));
     }
 
     @PostMapping(path = "/saveStockFormula")

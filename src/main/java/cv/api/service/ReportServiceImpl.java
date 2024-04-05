@@ -2004,13 +2004,10 @@ public class ReportServiceImpl implements ReportService {
         reportDao.executeSql(delSql, sql);
     }
 
-    private String getRelStr(String relCode, String compCode, double smallestQty) {
+    private String getRelStr(String relCode, double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
-            if (hmRelation.get(relCode) == null) {
-                hmRelation.put(relCode, unitRelationService.getRelationDetail(relCode, compCode).collectList().block());
-            }
             List<UnitRelationDetail> detailList = hmRelation.get(relCode);
             if (detailList != null) {
                 for (UnitRelationDetail unitRelationDetail : detailList) {
@@ -2353,6 +2350,15 @@ public class ReportServiceImpl implements ReportService {
             log.error("getStockInOutSummary: " + Arrays.toString(e.getStackTrace()));
         }
         return balances;
+    }
+
+    private Mono<Boolean> initRelation(String compCode) {
+        return unitRelationService.getUnitRelationAndDetail(compCode)
+                .map(t -> {
+                    String relCode = t.getKey().getRelCode();
+                    hmRelation.put(relCode, t.getDetailList());
+                    return true;
+                }).then(Mono.just(true));
     }
 
     @Override
@@ -2870,51 +2876,6 @@ public class ReportServiceImpl implements ReportService {
         return ioList;
     }
 
-    @Override
-    public List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
-                                                String userCode, String stockCode, String locCode, String compCode, Integer deptId,
-                                                String deleted, String projectNo, String curCode) throws Exception {
-        String sql = "select a.*,t.trader_name\n" +
-                "from (\n" +
-                "select vou_date,vou_no,remark,created_by,paid,vou_total,deleted,trader_code,comp_code,dept_id \n" +
-                "from v_return_out \n" +
-                "where comp_code = '" + compCode + "'\n" +
-                "and deleted = " + deleted + "\n" +
-                "and cur_code = '" + curCode + "'\n" +
-                "and (dept_id = " + deptId + " or 0 =" + deptId + ")\n" +
-                "and date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and (vou_no = '" + vouNo + "' or '-' = '" + vouNo + "')\n" +
-                "and (remark like '" + remark + "%' or '-%'= '" + remark + "%')\n" +
-                "and (trader_code = '" + traderCode + "' or '-'= '" + traderCode + "')\n" +
-                "and (created_by = '" + userCode + "' or '-'='" + userCode + "')\n" +
-                "and (stock_code ='" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (loc_code ='" + locCode + "' or '-' ='" + locCode + "')\n" +
-                "and (project_no ='" + projectNo + "' or '-' ='" + projectNo + "')\n" +
-                "group by vou_no\n" + ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code= t.comp_code\n" +
-                "order by vou_date desc";
-        ResultSet rs = reportDao.executeSql(sql);
-        List<VReturnOut> returnInList = new ArrayList<>();
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VReturnOut s = new VReturnOut();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setRemark(rs.getString("remark"));
-                s.setCreatedBy(rs.getString("created_by"));
-                s.setPaid(rs.getFloat("paid"));
-                s.setVouTotal(rs.getFloat("vou_total"));
-                s.setDeleted(rs.getBoolean("deleted"));
-                s.setDeptId(rs.getInt("dept_id"));
-                returnInList.add(s);
-            }
-        }
-        return returnInList;
-    }
-
 
     @Override
     public List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark, String userCode, String stockCode,
@@ -3145,8 +3106,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-
-
     private List<General> searchVoucher(String code, String compCode) {
         List<General> list = new ArrayList<>();
         HashMap<String, String> hm = new HashMap<>();
@@ -3241,81 +3200,6 @@ public class ReportServiceImpl implements ReportService {
         return riList;
     }
 
-    @Override
-    public List<VReturnIn> getReturnInVoucher(String vouNo, String compCode) {
-        String sql = """
-                select stock_name,unit,qty,price,amt,t.trader_name,r.remark,date(vou_date) vou_date,
-                r.vou_total,r.paid,r.balance,r.vou_no
-                from v_return_in r join trader t
-                on r.trader_code = t.code
-                and r.comp_code = t.comp_code
-                where r.comp_code = ?
-                and vou_no =?
-                order by unique_id""";
-        List<VReturnIn> riList = new ArrayList<>();
-        try {
-            ResultSet rs = reportDao.getResultSql(sql, compCode, vouNo);
-            if (!Objects.isNull(rs)) {
-                while (rs.next()) {
-                    VReturnIn in = VReturnIn.builder().build();
-                    in.setStockName(rs.getString("stock_name"));
-                    in.setUnit(rs.getString("unit"));
-                    in.setQty(rs.getDouble("qty"));
-                    in.setPrice(rs.getDouble("price"));
-                    in.setAmount(rs.getDouble("amt"));
-                    in.setRemark(rs.getString("remark"));
-                    in.setVouDate(rs.getString("vou_date"));
-                    in.setVouTotal(rs.getDouble("vou_total"));
-                    in.setPaid(rs.getDouble("paid"));
-                    in.setVouBalance(rs.getDouble("balance"));
-                    in.setVouNo(rs.getString("r.vou_no"));
-                    in.setTraderName(rs.getString("t.trader_name"));
-                    riList.add(in);
-                }
-            }
-        } catch (Exception e) {
-            log.error(String.format("getReturnInVoucher: %s", e.getMessage()));
-        }
-        return riList;
-    }
-
-    @Override
-    public List<VReturnOut> getReturnOutVoucher(String vouNo, String compCode) {
-        String sql = """
-                select stock_name,unit,qty,price,amt,t.trader_name,r.remark,date(vou_date) vou_date,
-                r.vou_total,r.paid,r.balance,r.vou_no
-                from v_return_out r join trader t
-                on r.trader_code = t.code
-                and r.comp_code = t.comp_code
-                where r.comp_code = ?
-                and vou_no =?
-                order by unique_id""";
-        List<VReturnOut> riList = new ArrayList<>();
-        try {
-            ResultSet rs = reportDao.getResultSql(sql, compCode, vouNo);
-            if (!Objects.isNull(rs)) {
-                while (rs.next()) {
-                    VReturnOut in = new VReturnOut();
-                    in.setStockName(rs.getString("stock_name"));
-                    in.setUnit(rs.getString("unit"));
-                    in.setQty(rs.getFloat("qty"));
-                    in.setPrice(rs.getFloat("price"));
-                    in.setAmount(rs.getFloat("amt"));
-                    in.setRemark(rs.getString("remark"));
-                    in.setVouDate(rs.getString("vou_date"));
-                    in.setVouTotal(rs.getFloat("vou_total"));
-                    in.setPaid(rs.getFloat("paid"));
-                    in.setVouBalance(rs.getFloat("balance"));
-                    in.setVouNo(rs.getString("r.vou_no"));
-                    in.setTraderName(rs.getString("t.trader_name"));
-                    riList.add(in);
-                }
-            }
-        } catch (Exception e) {
-            log.error(String.format("getReturnInVoucher: %s", e.getMessage()));
-        }
-        return riList;
-    }
 
     @Override
     public List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId) {
@@ -4581,7 +4465,6 @@ public class ReportServiceImpl implements ReportService {
         }
         return list;
     }
-
 
 
     @Override

@@ -1,8 +1,6 @@
 package cv.api.auto;
 
 import cv.api.common.Util1;
-import cv.api.entity.PurHis;
-import cv.api.entity.RetOutHis;
 import cv.api.repo.AccountRepo;
 import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +10,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -80,35 +76,22 @@ public class AutoUpload {
 
     private void uploadReturnInVoucher() {
         retInService.unUploadVoucher(Util1.toDate(syncDate))
-                .collectList()
-                .map(vouchers -> {
-                    if (!vouchers.isEmpty()) {
-                        log.info(String.format("uploadReturnInVoucher: %s", vouchers.size()));
-                        vouchers.forEach(vou -> {
-                            if (vou.getDeleted()) {
-                                accountRepo.deleteInvVoucher(vou.getKey());
-                            } else {
-                                accountRepo.sendReturnIn(vou);
-                            }
-                        });
-                    }
-                    return true;
-                }).subscribe();
+                .doOnNext(vou -> accountRepo.sendReturnInSync(vou)
+                        .then()
+                        .subscribe())
+                .doOnComplete(() -> log.info("uploadReturnInVoucher: done"))
+                .subscribe();
 
     }
 
     private void uploadReturnOutVoucher() {
-        List<RetOutHis> vouchers = retOutService.unUploadVoucher(Util1.toDate(syncDate));
-        if (!vouchers.isEmpty()) {
-            log.info(String.format("uploadReturnOutVoucher: %s", vouchers.size()));
-            vouchers.forEach(vou -> {
-                if (vou.isDeleted()) {
-                    accountRepo.deleteInvVoucher(vou.getKey());
-                } else {
-                    accountRepo.sendReturnOut(vou);
-                }
-            });
-        }
+        retOutService.unUploadVoucher(Util1.toDate(syncDate))
+                .doOnNext(vou -> accountRepo.sendReturnOutSync(vou)
+                        .then()
+                        .subscribe())
+                .doOnComplete(() -> log.info("uploadReturnOutVoucher: done"))
+                .subscribe();
+
     }
 
     private void uploadPayment() {

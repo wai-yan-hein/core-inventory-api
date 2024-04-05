@@ -161,11 +161,6 @@ public interface ReportService {
     List<VStockIO> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws Exception;
 
 
-    List<VReturnOut> getReturnOutHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark,
-                                         String userCode, String stockCode, String locCode,
-                                         String compCode, Integer deptId, String deleted,
-                                         String projectNo, String curCode) throws Exception;
-
     List<VTransfer> getTransferHistory(String fromDate, String toDate, String refNo, String vouNo, String remark,
                                        String userCode, String stockCode, String locCode, String compCode, Integer deptId,
                                        String deleted, String traderCode) throws Exception;
@@ -181,12 +176,10 @@ public interface ReportService {
     Flux<General> isStockExist(String stockCode, String compCode);
 
 
-    List<VReturnIn> getReturnInVoucher(String vouNo, String compCode);
 
 
     List<VStockIO> getStockInOutVoucher(String vouNo, String compCode);
 
-    List<VReturnOut> getReturnOutVoucher(String vouNo, String compCode);
 
     List<VStockIO> getProcessOutputDetail(String fromDate, String toDate, String ptCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer deptId, Integer macId);
 

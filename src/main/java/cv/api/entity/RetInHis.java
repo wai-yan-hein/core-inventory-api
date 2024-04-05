@@ -5,7 +5,6 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -48,9 +47,16 @@ public class RetInHis {
     private Double taxP;
     private String refNo;
     private Integer sessionId;
-    private String status ;
+    private String status;
+    private Double grandTotal;
+    private String deptCode;
+    private String srcAcc;
+    private String cashAcc;
+    private String debtorAcc;
+    private String disAcc;
+    private String taxAcc;
     private List<RetInHisDetail> listRD;
-    private List<RetInKey> listDel;
     private List<String> location;
     private ZonedDateTime vouDateTime;
+    private String traderName;
 }

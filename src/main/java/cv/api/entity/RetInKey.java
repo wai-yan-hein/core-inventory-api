@@ -17,14 +17,10 @@ import java.io.Serializable;
  */
 @Data
 @Builder
-@Embeddable
-public class RetInKey implements Serializable {
+public class RetInKey {
 
-    @Column(name = "unique_id")
     private Integer uniqueId;
-    @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "vou_no")
     private String vouNo;
 
 

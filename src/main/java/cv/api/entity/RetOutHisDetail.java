@@ -6,6 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -15,46 +16,38 @@ import jakarta.persistence.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "ret_out_his_detail")
-public class RetOutHisDetail implements java.io.Serializable {
+@Builder
+public class RetOutHisDetail {
 
-    @EmbeddedId
     private RetOutKey key;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "qty", nullable = false)
-    private Float qty;
-    @Column(name = "unit")
+    private Double qty;
     private String unitCode;
-    @Column(name = "price", nullable = false)
-    private Float price;
-    @Column(name = "amt", nullable = false)
-    private Float amount;
-    @Column(name = "loc_code")
+    private Double price;
+    private Double amount;
     private String locCode;
-    @Column(name = "weight")
-    private Float weight;
-    @Column(name = "weight_unit")
+    private Double weight;
     private String weightUnit;
-    @Column(name = "total_weight")
-    private Float totalWeight;
-    @Transient
+    private Double totalWeight;
+    private Double wet;
+    private Double rice;
+    private Double bag;
     private String userCode;
-    @Transient
     private String stockName;
-    @Transient
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
-    @Transient
     private String relName;
-    @Transient
     private String locName;
+    private String unit;
+    private String remark;
+    private String vouDate;
+    private Double vouTotal;
+    private Double paid;
+    private Double vouBalance;
+    private String vouNo;
+    private String traderName;
 }
 
 

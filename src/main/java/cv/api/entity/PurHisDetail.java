@@ -52,4 +52,6 @@ public class PurHisDetail {
     private String catName;
     private String relName;
     private String locName;
+    private String landVouNo;
+    private double purQty;
 }
