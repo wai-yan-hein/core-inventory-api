@@ -1,5 +1,6 @@
 package cv.api.service;
 
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dao.SeqTableDao;
 import cv.api.dao.TransferHisDao;
@@ -8,15 +9,20 @@ import cv.api.entity.THDetailKey;
 import cv.api.entity.TransferHis;
 import cv.api.entity.TransferHisDetail;
 import cv.api.entity.TransferHisKey;
+import cv.api.model.VTransfer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 
 import java.util.Date;
 import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TransferHisServiceImpl implements TransferHisService {
     @Autowired
     private TransferHisDao dao;
@@ -24,6 +30,7 @@ public class TransferHisServiceImpl implements TransferHisService {
     private TransferHisDetailDao detailDao;
     @Autowired
     private SeqTableDao seqDao;
+    private final DatabaseClient client;
 
     @Override
     public TransferHis save(TransferHis th) {
@@ -102,4 +109,6 @@ public class TransferHisServiceImpl implements TransferHisService {
     public void truncate(TransferHisKey key) {
         dao.truncate(key);
     }
+
+
 }

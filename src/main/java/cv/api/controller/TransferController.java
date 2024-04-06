@@ -33,7 +33,6 @@ import java.util.List;
 public class TransferController {
 
     private final TransferHisService thService;
-    private final ReportService reportService;
     private final TransferHisDetailService detailService;
     private final TransferService transferService;
 
@@ -46,23 +45,8 @@ public class TransferController {
     }
 
     @PostMapping(path = "/getTransfer")
-    public Flux<?> getTransfer(@RequestBody ReportFilter filter) throws Exception {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String refNo = Util1.isNull(filter.getRefNo(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String compCode = filter.getCompCode();
-        Integer deptId = filter.getDeptId();
-        String deleted = String.valueOf(filter.isDeleted());
-        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        List<VTransfer> listStockIO = reportService.getTransferHistory(fromDate, toDate, refNo,
-                vouNo, remark, userCode,
-                stockCode, locCode, compCode, deptId, deleted, traderCode);
-        return Flux.fromIterable(listStockIO).onErrorResume(throwable -> Flux.empty());
+    public Flux<VTransfer> getTransfer(@RequestBody ReportFilter filter) {
+        return transferService.getTransferHistory(filter);
     }
 
     @PostMapping(path = "/findTransfer")

@@ -42,7 +42,10 @@ public class Util1 {
             status = obj.equals("1") || obj.equalsIgnoreCase("true");
         }
         return status;
+    }
 
+    public static boolean getBoolean(Boolean obj) {
+        return obj != null && obj;
     }
 
     public static boolean isNullOrEmpty(Object obj) {

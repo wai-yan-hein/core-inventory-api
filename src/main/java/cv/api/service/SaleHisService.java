@@ -388,7 +388,7 @@ public class SaleHisService {
                 .bind("taxP", sh.getTaxPercent())
                 .bind("createdDate", sh.getCreatedDate())
                 .bind("createdBy", sh.getCreatedBy())
-                .bind("deleted", sh.getDeleted())
+                .bind("deleted", Util1.getBoolean(sh.getDeleted()))
                 .bind("paid", sh.getPaid())
                 .bind("vouBalance", sh.getBalance())
                 .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, sh.getUpdatedBy()))
@@ -402,7 +402,7 @@ public class SaleHisService {
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, sh.getIntgUpdStatus()))
                 .bind("reference", Parameters.in(R2dbcType.VARCHAR, sh.getReference()))
                 .bind("deptId", sh.getDeptId())
-                .bind("vouLock", sh.getVouLock())
+                .bind("vouLock", Util1.getBoolean(sh.getVouLock()))
                 .bind("orderNo", Parameters.in(R2dbcType.VARCHAR, sh.getOrderNo()))
                 .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, sh.getProjectNo()))
                 .bind("carNo", Parameters.in(R2dbcType.VARCHAR, sh.getCarNo()))
@@ -415,8 +415,8 @@ public class SaleHisService {
                 .bind("cashAcc", Parameters.in(R2dbcType.VARCHAR, sh.getCashAcc()))
                 .bind("debtorAcc", Parameters.in(R2dbcType.VARCHAR, sh.getDebtorAcc()))
                 .bind("weightVouNo", Parameters.in(R2dbcType.VARCHAR, sh.getWeightVouNo()))
-                .bind("post", sh.getPost())
-                .bind("sPay", sh.getSPay())
+                .bind("post", Util1.getBoolean(sh.getPost()))
+                .bind("sPay", Util1.getBoolean(sh.getSPay()))
                 .bind("tranSource", Parameters.in(R2dbcType.VARCHAR, sh.getTranSource()))
                 .bind("totalPayment", Parameters.in(R2dbcType.DOUBLE, sh.getTotalPayment()))
                 .bind("opening", Parameters.in(R2dbcType.DOUBLE, sh.getOpening()))
@@ -581,7 +581,7 @@ public class SaleHisService {
                 select sh.vou_no,sh.comp_code,sh.vou_date,sh.trader_code,
                 sh.cur_code,sh.reference,sh.remark,sh.deleted,sh.project_no,g.batch_no,
                 sh.vou_total,sh.grand_total,sh.disc_p,sh.discount,
-                sh.tax_p,sh.tax_amt,sh.paid,sh.vou_balance,sh.dept_id,
+                sh.tax_p,sh.tax_amt,sh.paid,sh.vou_balance,sh.total_payment,sh.dept_id,
                 ifnull(sh.dept_code,ifnull(l.dept_code,a.dep_code)) dept_code,
                 ifnull(sh.account,a.source_acc) src_acc,
                 ifnull(sh.cash_acc,ifnull(l.cash_acc,a.pay_acc)) cash_acc,
@@ -626,6 +626,7 @@ public class SaleHisService {
                         .taxAmt(row.get("tax_amt", Double.class))
                         .paid(row.get("paid", Double.class))
                         .balance(row.get("vou_balance", Double.class))
+                        .totalPayment(row.get("total_payment", Double.class))
                         .deptId(row.get("dept_id", Integer.class))
                         .deptCode(row.get("dept_code", String.class))
                         .saleAcc(row.get("src_acc", String.class))
