@@ -27,7 +27,7 @@ public class VTransfer {
     private Double amount;
     private String stockTypeName;
     private String createdBy;
-    private boolean deleted;
+    private Boolean deleted;
     private Integer deptId;
     private Double weight;
     private String weightUnit;

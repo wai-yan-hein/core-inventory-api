@@ -2004,7 +2004,7 @@ public class ReportServiceImpl implements ReportService {
         reportDao.executeSql(delSql, sql);
     }
 
-    private String getRelStr(String relCode, double smallestQty) {
+    private String getRelStr(String relCode,String compCode,double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {

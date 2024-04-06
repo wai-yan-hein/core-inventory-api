@@ -1797,14 +1797,6 @@ add column outstanding double(20,3);
 alter table sale_his
 add column outstanding double(20,3);
 
-alter table ret_in_his
-add column tax_amt double(20,3) null,
-add column tax_p double(20,3) null;
-
-alter table ret_out_his
-add column tax_amt double(20,3) null,
-add column tax_p double(20,3) null;
-
 
 DELIMITER $$
 create definer=root@localhost function iszero(input double, output double) returns double
@@ -1835,6 +1827,14 @@ alter table sale_his
 add column total_payment double(20,3) null after tran_source,
 add column opening double(20,3) null after total_payment,
 add column total_balance double(20,3) null after opening;
+
+alter table ret_in_his
+add column tax_amt double(20,3) null,
+add column tax_p double(20,3) null;
+
+alter table ret_out_his
+add column tax_amt double(20,3) null,
+add column tax_p double(20,3) null;
 
 alter table pur_his
 add column grn_vou_no varchar(25) null;
