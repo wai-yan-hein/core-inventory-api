@@ -461,7 +461,7 @@ public class ReportServiceImpl implements ReportService {
                 String traderUsr = rs.getString("user_code");
                 String tCode = rs.getString("trader_code");
                 String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
+                double smallQty = rs.getDouble("smallest_qty");
                 s.setTraderCode(Util1.isNull(traderUsr, tCode));
                 s.setStockCode(Util1.isNull(userCode, sCode));
                 s.setStockName(rs.getString("stock_name"));
@@ -2004,7 +2004,7 @@ public class ReportServiceImpl implements ReportService {
         reportDao.executeSql(delSql, sql);
     }
 
-    private String getRelStr(String relCode,String compCode,double smallestQty) {
+    private String getRelStr(String relCode,double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
