@@ -417,7 +417,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockName(rs.getString("stock_name"));
                 s.setSaleAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                s.setQtyStr(getRelStr(relCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setAddress(rs.getString("address"));
                 s.setTotalQty(smallQty);
@@ -467,7 +467,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockName(rs.getString("stock_name"));
                 s.setSaleAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                s.setQtyStr(getRelStr(relCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setProjectNo(rs.getString("project_no"));
                 list.add(s);
@@ -515,7 +515,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockName(rs.getString("stock_name"));
                 s.setSaleAmount(rs.getFloat("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                s.setQtyStr(getRelStr(relCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setProjectNo(rs.getString("project_no"));
                 list.add(s);
@@ -562,7 +562,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockName(rs.getString("stock_name"));
                 s.setSaleAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                s.setQtyStr(getRelStr(relCode, smallQty));
                 s.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
                 s.setTotalQty(smallQty);
                 s.setSaleUnit(rs.getString("unit"));
@@ -648,7 +648,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockName(rs.getString("stock_name"));
                 s.setPurAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                s.setQtyStr(getRelStr(relCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setTotalQty(smallQty);
                 s.setPurUnit(rs.getString("unit"));
@@ -692,7 +692,7 @@ public class ReportServiceImpl implements ReportService {
                 s.setStockName(rs.getString("stock_name"));
                 s.setPurAmount(rs.getDouble("ttl_amt"));
                 s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                s.setQtyStr(getRelStr(relCode, smallQty));
                 s.setTraderName(rs.getString("trader_name"));
                 s.setProjectNo(rs.getString("project_no"));
                 list.add(s);
@@ -853,7 +853,7 @@ public class ReportServiceImpl implements ReportService {
                 sale.setStockName(rs.getString("stock_name"));
                 sale.setRelName(rs.getString("rel_name"));
                 sale.setSaleAmount(rs.getFloat("ttl_amt"));
-                sale.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                sale.setQtyStr(getRelStr(relCode, smallQty));
                 saleList.add(sale);
             }
         }
@@ -1313,7 +1313,7 @@ public class ReportServiceImpl implements ReportService {
                 p.setStockName(rs.getString("stock_name"));
                 p.setRelName(rs.getString("rel_name"));
                 p.setPurAmount(rs.getDouble("ttl_amt"));
-                p.setQtyStr(getRelStr(relCode, compCode, smallQty));
+                p.setQtyStr(getRelStr(relCode, smallQty));
                 p.setTotalQty(smallQty);
                 p.setPurUnit(rs.getString("unit"));
                 list.add(p);
@@ -1786,7 +1786,7 @@ public class ReportServiceImpl implements ReportService {
                                 .userCode(rs.getString("user_code"))
                                 .stockCode(rs.getString("stock_code"))
                                 .stockName(rs.getString("stock_name"))
-                                .unitName(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("qty")))
+                                .unitName(getRelStr(rs.getString("rel_code"), rs.getFloat("qty")))
                                 .locationName("All")
                                 .build();
                         balances.add(b);
@@ -1813,7 +1813,7 @@ public class ReportServiceImpl implements ReportService {
                                 .stockName(rs.getString("stock_name"))
                                 .locationName(rs.getString("loc_name"))
                                 .locCode(rs.getString("loc_code"))
-                                .unitName(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("smallest_qty")))
+                                .unitName(getRelStr(rs.getString("rel_code"), rs.getFloat("smallest_qty")))
                                 .build();
                         balances.add(b);
 
@@ -2151,7 +2151,7 @@ public class ReportServiceImpl implements ReportService {
                 r.setMinSmallQty(rs.getFloat("small_min_qty"));
                 //bal qty
                 float balSmallQty = rs.getFloat("small_bal_qty");
-                r.setBalUnit(getRelStr(relCode, compCode, balSmallQty));
+                r.setBalUnit(getRelStr(relCode, balSmallQty));
                 r.setBalSmallQty(balSmallQty);
                 reorderLevels.add(r);
             }
@@ -2329,17 +2329,17 @@ public class ReportServiceImpl implements ReportService {
                     double balQty = rs.getFloat("bal_qty");
                     String relCode = rs.getString("rel_code");
                     b.setOpenQty(opQty);
-                    b.setOpenRel(getRelStr(relCode, compCode, opQty));
+                    b.setOpenRel(getRelStr(relCode, opQty));
                     b.setPurQty(purQty);
-                    b.setPurRel(getRelStr(relCode, compCode, purQty));
+                    b.setPurRel(getRelStr(relCode, purQty));
                     b.setInQty(inQty);
-                    b.setInRel(getRelStr(relCode, compCode, inQty));
+                    b.setInRel(getRelStr(relCode, inQty));
                     b.setSaleQty(saleQty);
-                    b.setSaleRel(getRelStr(relCode, compCode, saleQty));
+                    b.setSaleRel(getRelStr(relCode, saleQty));
                     b.setOutQty(outQty);
-                    b.setOutRel(getRelStr(relCode, compCode, outQty));
+                    b.setOutRel(getRelStr(relCode, outQty));
                     b.setBalQty(balQty);
-                    b.setBalRel(getRelStr(relCode, compCode, balQty));
+                    b.setBalRel(getRelStr(relCode, balQty));
                     b.setStockUsrCode(rs.getString("s_user_code"));
                     b.setStockName(rs.getString("stock_name"));
                     b.setStockCode(rs.getString("stock_code"));
@@ -2436,12 +2436,12 @@ public class ReportServiceImpl implements ReportService {
                     double saleQty = c.getSaleQty();
                     double clQty = opQty + purQty + inQty + outQty + saleQty;
                     c.setBalQty(clQty);
-                    c.setOpenRel(getRelStr(relCode, compCode, opQty));
-                    c.setPurRel(getRelStr(relCode, compCode, purQty));
-                    c.setInRel(getRelStr(relCode, compCode, inQty));
-                    c.setSaleRel(getRelStr(relCode, compCode, saleQty));
-                    c.setOutRel(getRelStr(relCode, compCode, outQty));
-                    c.setBalRel(getRelStr(relCode, compCode, clQty));
+                    c.setOpenRel(getRelStr(relCode, opQty));
+                    c.setPurRel(getRelStr(relCode, purQty));
+                    c.setInRel(getRelStr(relCode, inQty));
+                    c.setSaleRel(getRelStr(relCode, saleQty));
+                    c.setOutRel(getRelStr(relCode, outQty));
+                    c.setBalRel(getRelStr(relCode, clQty));
                 } else {
                     ClosingBalance c = balances.get(i);
                     String relCode = c.getRelCode();
@@ -2451,12 +2451,12 @@ public class ReportServiceImpl implements ReportService {
                     double outQty = c.getOutQty();
                     double saleQty = c.getSaleQty();
                     double clQty = opQty + purQty + inQty + outQty + saleQty;
-                    c.setOpenRel(getRelStr(relCode, compCode, opQty));
-                    c.setPurRel(getRelStr(relCode, compCode, purQty));
-                    c.setInRel(getRelStr(relCode, compCode, inQty));
-                    c.setSaleRel(getRelStr(relCode, compCode, saleQty));
-                    c.setOutRel(getRelStr(relCode, compCode, outQty));
-                    c.setBalRel(getRelStr(relCode, compCode, clQty));
+                    c.setOpenRel(getRelStr(relCode, opQty));
+                    c.setPurRel(getRelStr(relCode, purQty));
+                    c.setInRel(getRelStr(relCode, inQty));
+                    c.setSaleRel(getRelStr(relCode, saleQty));
+                    c.setOutRel(getRelStr(relCode, outQty));
+                    c.setBalRel(getRelStr(relCode, clQty));
                 }
             }
         } catch (Exception e) {
@@ -2649,7 +2649,7 @@ public class ReportServiceImpl implements ReportService {
                     StockValue value = StockValue.builder().build();
                     value.setStockUserCode(rs.getString("s_user_code"));
                     value.setStockName(rs.getString("stock_name"));
-                    value.setBalRel(getRelStr(rs.getString("rel_code"), compCode, rs.getFloat("bal_qty")));
+                    value.setBalRel(getRelStr(rs.getString("rel_code"), rs.getFloat("bal_qty")));
                     value.setQty(rs.getDouble("bal_qty"));
                     value.setRelation(rs.getString("rel_name"));
                     value.setPurAvgPrice(rs.getDouble("pur_avg_price"));
