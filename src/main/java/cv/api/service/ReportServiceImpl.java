@@ -2004,7 +2004,7 @@ public class ReportServiceImpl implements ReportService {
         reportDao.executeSql(delSql, sql);
     }
 
-    private String getRelStr(String relCode,double smallestQty) {
+    private String getRelStr(String relCode, double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
@@ -2352,14 +2352,6 @@ public class ReportServiceImpl implements ReportService {
         return balances;
     }
 
-    private Mono<Boolean> initRelation(String compCode) {
-        return unitRelationService.getUnitRelationAndDetail(compCode)
-                .map(t -> {
-                    String relCode = t.getKey().getRelCode();
-                    hmRelation.put(relCode, t.getDetailList());
-                    return true;
-                }).then(Mono.just(true));
-    }
 
     @Override
     public void calculateStockInOutDetail(String opDate, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String vouStatus, boolean calSale, boolean calPur, boolean calRI, boolean calRO, String compCode, Integer deptId, Integer macId) {
@@ -3092,16 +3084,19 @@ public class ReportServiceImpl implements ReportService {
                 .flatMap(entry -> {
                     String table = entry.getKey();
                     String type = entry.getValue();
-                    String sql = "SELECT EXISTS(SELECT stock_code FROM " + table + " WHERE stock_code = :code AND comp_code = :compCode) AS exist";
+                    String sql = "SELECT count(*) count FROM " + table + " WHERE stock_code = :code AND comp_code = :compCode";
                     return client.sql(sql)
                             .bind("code", code)
                             .bind("compCode", compCode)
-                            .map(row -> {
-                                if (Boolean.TRUE.equals(row.get("exist", Boolean.class))) {
-                                    return General.builder().message("Transaction exists in " + type).build();
+                            .map((row) -> row.get("count", Integer.class))
+                            .one()
+                            .map(count -> count > 0)
+                            .flatMapMany(exist -> {
+                                if (exist) {
+                                    return Flux.just(General.builder().message("Transaction exists in " + type).build());
                                 }
-                                return null;
-                            }).one();
+                                return Flux.empty();
+                            });
                 });
     }
 

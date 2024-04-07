@@ -170,6 +170,8 @@ public class StockService {
         return reportService.isStockExist(stockCode, compCode)
                 .collectList()
                 .flatMapMany(generalList -> {
+
+
                     if (generalList.isEmpty()) {
                         return updateDeleteStatus(key, true)
                                 .thenMany(Flux.fromIterable(generalList));
@@ -516,14 +518,14 @@ public class StockService {
     }
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
-                SELECT COUNT(*)
+                SELECT count(*) count
                 FROM stock
                 WHERE comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .fetch()
-                .rowsUpdated()
+                .map((row) -> row.get("count",Integer.class))
+                .one()
                 .map(count -> count > 0);
     }
 }

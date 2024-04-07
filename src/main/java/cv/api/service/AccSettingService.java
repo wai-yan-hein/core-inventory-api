@@ -45,7 +45,7 @@ public class AccSettingService {
     }
 
     @Transactional
-    private Mono<AccSetting> insert(AccSetting dto) {
+    public Mono<AccSetting> insert(AccSetting dto) {
         String sql = """
                 INSERT INTO acc_setting (type, comp_code, dis_acc, pay_acc, tax_acc, dep_code, source_acc, bal_acc, comm_acc)
                 VALUES (:type, :compCode, :disAcc, :payAcc, :taxAcc, :depCode, :sourceAcc, :balAcc, :commAcc)
@@ -119,5 +119,17 @@ public class AccSettingService {
         return client.sql(sql)
                 .bind("updatedDate", updatedDate)
                 .map((row, rowMetadata) -> mapRow(row)).all();
+    }
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT count(*) count
+                FROM acc_setting
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .map((row) -> row.get("count",Integer.class))
+                .one()
+                .map(count -> count > 0);
     }
 }

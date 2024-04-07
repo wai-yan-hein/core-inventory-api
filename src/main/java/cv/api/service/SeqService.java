@@ -1,33 +1,24 @@
 package cv.api.service;
 
 import cv.api.r2dbc.SequenceTable;
+import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static org.springframework.data.relational.core.query.Criteria.where;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class SeqService {
 
-    private final R2dbcEntityTemplate template;
     private final DatabaseClient client;
 
     public Mono<String> getNextCode(String seqName, String compCode, int format) {
-        return template.select(SequenceTable.class)
-                .matching(Query.query(where("seq_option").is(seqName)
-                        .and("comp_code").is(compCode)
-                        .and("mac_id").is(1)
-                        .and("period").is("-")))
-                .one()
+        return findById(0, seqName, "-", compCode)
                 .flatMap(seqTable -> {
                     int nextValue = seqTable.getSeqNo() + 1;
                     seqTable.setSeqNo(nextValue);
@@ -37,7 +28,8 @@ public class SeqService {
                 }).switchIfEmpty(createNewSequence(seqName, compCode, format));
     }
 
-    private Mono<SequenceTable> update(SequenceTable table) {
+    @Transactional
+    public Mono<SequenceTable> update(SequenceTable dto) {
         String sql = """
                 update seq_table
                 set seq_no = :seqNo
@@ -46,16 +38,58 @@ public class SeqService {
                 and mac_id = :macId
                 and period = :period
                 """;
+        return executeUpdate(sql, dto);
+
+    }
+
+    @Transactional
+    public Mono<SequenceTable> insert(SequenceTable dto) {
+        String sql = """
+                insert into seq_table (seq_no, comp_code, seq_option, mac_id, period)
+                values (:seqNo, :compCode, :seqOption, :macId, :period)
+                """;
+        return executeUpdate(sql, dto);
+    }
+
+
+    private Mono<SequenceTable> executeUpdate(String sql, SequenceTable dto) {
         return client.sql(sql)
-                .bind("compCode", table.getCompCode())
-                .bind("seqOption", table.getSeqOption())
-                .bind("macId", table.getMacId())
-                .bind("period", table.getPeriod())
-                .bind("seqNo",table.getSeqNo())
+                .bind("compCode", dto.getCompCode())
+                .bind("seqOption", dto.getSeqOption())
+                .bind("macId", dto.getMacId())
+                .bind("period", dto.getPeriod())
+                .bind("seqNo", dto.getSeqNo())
                 .fetch()
                 .rowsUpdated()
-                .thenReturn(table);
+                .thenReturn(dto);
+    }
 
+    public Mono<SequenceTable> findById(Integer macId, String option, String period, String compCode) {
+        String sql = """
+                select mac_id, seq_option, period, comp_code, seq_no,
+                updated_date, created_date, created_by, updated_by, user_code
+                from seq_table
+                where mac_id=:macId
+                and seq_option=:option
+                and period=:period
+                and comp_code=:compCode
+                """;
+        return client.sql(sql)
+                .bind("macId", macId)
+                .bind("option", option)
+                .bind("period", period)
+                .bind("compCode", compCode)
+                .map((row, rowMetadata) -> mapRow(row)).one();
+    }
+
+    private SequenceTable mapRow(Row row) {
+        return SequenceTable.builder()
+                .seqNo(row.get("seq_no", Integer.class))
+                .compCode(row.get("comp_code", String.class))
+                .seqOption(row.get("seq_option", String.class))
+                .macId(row.get("mac_id", Integer.class))
+                .period(row.get("period", String.class))
+                .build();
     }
 
     private Mono<String> createNewSequence(String seqName, String compCode, int format) {
@@ -65,9 +99,30 @@ public class SeqService {
                 .macId(1)
                 .seqOption(seqName)
                 .seqNo(1).build();
-        return template.insert(seq)
+        return insert(seq)
                 .map(savedSeqTable -> String.format("%0" + format + "d", savedSeqTable.getSeqNo()));
     }
 
-
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT count(*) count
+                FROM seq_table
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .map((row) -> row.get("count",Integer.class))
+                .one()
+                .map(count -> count > 0);
+    }
+    public Flux<SequenceTable> findAll(String compCode) {
+        String sql = """
+                select *
+                from seq_table
+                where comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .map((row, rowMetadata) -> mapRow(row)).all();
+    }
 }

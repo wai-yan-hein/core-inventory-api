@@ -170,14 +170,14 @@ public class StockBrandService {
     }
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
-                SELECT COUNT(*)
+                SELECT count(*) count
                 FROM stock_brand
                 WHERE comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .fetch()
-                .rowsUpdated()
+                .map((row) -> row.get("count",Integer.class))
+                .one()
                 .map(count -> count > 0);
     }
 }

@@ -7,9 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Builder
 @Data
-@Table("seq_table")
 public class SequenceTable {
-    @Id
     private Integer macId;
     private String seqOption;
     private String period;

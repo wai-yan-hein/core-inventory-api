@@ -12,6 +12,7 @@ import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,31 +27,33 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LocationService {
 
     private final SeqService seqService;
     private final DatabaseClient client;
+
     @Transactional
     public Mono<Location> insert(Location dto) {
         String sql = """
-            INSERT INTO location (loc_code, comp_code, dept_id, loc_name, parent, calc_stock, updated_date, location_type, created_date, created_by, updated_by, user_code, intg_upd_status, map_dept_id, dept_code, cash_acc, deleted, active, warehouse_code)
-            VALUES (:locCode, :compCode, :deptId, :locName, :parent, :calcStock, :updatedDate, :locationType, :createdDate, :createdBy, :updatedBy, :userCode, :intgUpdStatus, :mapDeptId, :deptCode, :cashAcc, :deleted, :active, :warehouseCode)
-            """;
+                INSERT INTO location (loc_code, comp_code, dept_id, loc_name, parent, calc_stock, updated_date, location_type, created_date, created_by, updated_by, user_code, intg_upd_status, map_dept_id, dept_code, cash_acc, deleted, active, warehouse_code)
+                VALUES (:locCode, :compCode, :deptId, :locName, :parent, :calcStock, :updatedDate, :locationType, :createdDate, :createdBy, :updatedBy, :userCode, :intgUpdStatus, :mapDeptId, :deptCode, :cashAcc, :deleted, :active, :warehouseCode)
+                """;
         return executeUpdate(dto, sql);
     }
 
     @Transactional
     public Mono<Location> update(Location dto) {
         String sql = """
-            UPDATE location
-            SET dept_id = :deptId, loc_name = :locName, parent = :parent, calc_stock = :calcStock,
-                updated_date = :updatedDate, location_type = :locationType, created_date = :createdDate,
-                created_by = :createdBy, updated_by = :updatedBy, user_code = :userCode,
-                intg_upd_status = :intgUpdStatus, map_dept_id = :mapDeptId,
-                dept_code = :deptCode, cash_acc = :cashAcc, deleted = :deleted,
-                active = :active, warehouse_code = :warehouseCode
-            WHERE loc_code = :locCode AND comp_code = :compCode
-            """;
+                UPDATE location
+                SET dept_id = :deptId, loc_name = :locName, parent = :parent, calc_stock = :calcStock,
+                    updated_date = :updatedDate, location_type = :locationType, created_date = :createdDate,
+                    created_by = :createdBy, updated_by = :updatedBy, user_code = :userCode,
+                    intg_upd_status = :intgUpdStatus, map_dept_id = :mapDeptId,
+                    dept_code = :deptCode, cash_acc = :cashAcc, deleted = :deleted,
+                    active = :active, warehouse_code = :warehouseCode
+                WHERE loc_code = :locCode AND comp_code = :compCode
+                """;
         return executeUpdate(dto, sql);
     }
 
@@ -118,7 +121,7 @@ public class LocationService {
                         .macId(row.get("mac_id", Integer.class))
                         .locName(row.get("loc_name", String.class))
                         .calcStock(row.get("calc_stock", Boolean.class))
-                        .createdDate(row.get("created_date",LocalDateTime.class))
+                        .createdDate(row.get("created_date", LocalDateTime.class))
                         .createdBy(row.get("created_by", String.class))
                         .updatedBy(row.get("updated_by", String.class))
                         .userCode(row.get("user_code", String.class))
@@ -245,16 +248,17 @@ public class LocationService {
                 .bind("locCode", key.getLocCode())
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
-                SELECT COUNT(*)
+                SELECT count(*) count
                 FROM location
                 WHERE comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .fetch()
-                .rowsUpdated()
+                .map((row) -> row.get("count",Integer.class))
+                .one()
                 .map(count -> count > 0);
     }
 }

@@ -1567,7 +1567,6 @@ add column debtor_acc varchar(15) null after cash_acc;
 
 #tmp
 drop table if exists tmp_stock_io_column;
-
 create table tmp_stock_io_column (
   tran_option varchar(15) not null,
   tran_date date not null,
@@ -1630,7 +1629,7 @@ create table tmp_stock_opening (
   ttl_rice double(20,3) default null,
   ttl_bag double(20,3) default null,
   ttl_amt double(20,3) default null,
-  primary key (tran_date,stock_code,loc_code,mac_id,comp_code,trader_code)
+  primary key (tran_date,stock_code,loc_code,mac_id,comp_code,trader_code,unit)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci comment='	';
 
 

@@ -249,14 +249,14 @@ public class UnitRelationService {
     }
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
-                SELECT COUNT(*)
+                SELECT count(*) count
                 FROM unit_relation
                 WHERE comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .fetch()
-                .rowsUpdated()
+                .map((row) -> row.get("count",Integer.class))
+                .one()
                 .map(count -> count > 0);
     }
 }

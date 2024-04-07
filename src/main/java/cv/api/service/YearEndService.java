@@ -21,6 +21,8 @@ public class YearEndService {
     private final StockUnitService unitService;
     private final LocationService locationService;
     private final VouStatusService vouStatusService;
+    private final SeqService seqService;
+    private final AccSettingService accSettingService;
 
     public Mono<YearEnd> yearEnd(YearEnd end) {
         return copyStock(end)
@@ -32,13 +34,15 @@ public class YearEndService {
                 .then(copyTrader(end))
                 .then(copyLocation(end))
                 .then(copyVouStatus(end))
+                .then(copySequence(end))
+                .then(copyAccSetting(end))
                 .thenReturn(end);
     }
 
     private Mono<Boolean> copyUnit(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return unitService.isExist(yeCompCode).flatMap(exist -> {
+        return unitService.isExist(compCode).flatMap(exist -> {
             if (exist) {
                 log.info("unit exist.");
                 return Mono.just(true);
@@ -55,7 +59,7 @@ public class YearEndService {
     private Mono<Boolean> copyStock(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return stockService.isExist(yeCompCode)
+        return stockService.isExist(compCode)
                 .flatMap(exist -> {
                     if (exist) {
                         log.info("stock exist.");
@@ -73,7 +77,7 @@ public class YearEndService {
     private Mono<Boolean> copyStockGroup(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return stockTypeService.isExist(yeCompCode)
+        return stockTypeService.isExist(compCode)
                 .flatMap(exist -> {
                     if (exist) {
                         log.info("stock group exist.");
@@ -91,7 +95,7 @@ public class YearEndService {
     private Mono<Boolean> copyCategory(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return categoryService.isExist(yeCompCode)
+        return categoryService.isExist(compCode)
                 .flatMap(exist -> {
                     if (exist) {
                         log.info("category exists.");
@@ -109,7 +113,7 @@ public class YearEndService {
     private Mono<Boolean> copyBrand(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return brandService.isExist(yeCompCode)
+        return brandService.isExist(compCode)
                 .flatMap(exist -> {
                     if (exist) {
                         log.info("brand exist.");
@@ -127,7 +131,7 @@ public class YearEndService {
     private Mono<Boolean> copyRelation(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return relationService.isExist(yeCompCode)
+        return relationService.isExist(compCode)
                 .flatMap(exist -> {
                     if (exist) {
                         log.info("relation exist.");
@@ -150,7 +154,7 @@ public class YearEndService {
     private Mono<Boolean> copyTrader(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return traderService.isExist(yeCompCode).flatMap(exist -> {
+        return traderService.isExist(compCode).flatMap(exist -> {
             if (exist) {
                 log.info("trader exist.");
                 return Mono.just(true);
@@ -167,7 +171,7 @@ public class YearEndService {
     private Mono<Boolean> copyLocation(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return locationService.isExist(yeCompCode)
+        return locationService.isExist(compCode)
                 .flatMap(exist -> {
                     if (exist) {
                         log.info("location exist.");
@@ -186,7 +190,7 @@ public class YearEndService {
     private Mono<Boolean> copyVouStatus(YearEnd end) {
         String compCode = end.getCompCode();
         String yeCompCode = end.getYeCompCode();
-        return vouStatusService.isExist(yeCompCode).flatMap(exist -> {
+        return vouStatusService.isExist(compCode).flatMap(exist -> {
             if (exist) {
                 log.info("vou status exist.");
                 return Mono.just(true);
@@ -197,6 +201,43 @@ public class YearEndService {
                         return vouStatusService.insert(d);
                     })
                     .doOnComplete(() -> log.info("copyVouStatus."))
+                    .then(Mono.just(true));
+        });
+
+    }
+
+    private Mono<Boolean> copySequence(YearEnd end) {
+        String compCode = end.getCompCode();
+        String yeCompCode = end.getYeCompCode();
+        return seqService.isExist(compCode).flatMap(exist -> {
+            if (exist) {
+                log.info("sequence exist.");
+                return Mono.just(true);
+            }
+            return seqService.findAll(yeCompCode)
+                    .concatMap(d -> {
+                        d.setCompCode(compCode);
+                        return seqService.insert(d);
+                    })
+                    .doOnComplete(() -> log.info("copySequence."))
+                    .then(Mono.just(true));
+        });
+
+    }
+    private Mono<Boolean> copyAccSetting(YearEnd end) {
+        String compCode = end.getCompCode();
+        String yeCompCode = end.getYeCompCode();
+        return accSettingService.isExist(compCode).flatMap(exist -> {
+            if (exist) {
+                log.info("acc setting exist.");
+                return Mono.just(true);
+            }
+            return accSettingService.findAll(yeCompCode)
+                    .concatMap(d -> {
+                        d.getKey().setCompCode(compCode);
+                        return accSettingService.insert(d);
+                    })
+                    .doOnComplete(() -> log.info("copyAccSetting."))
                     .then(Mono.just(true));
         });
 
