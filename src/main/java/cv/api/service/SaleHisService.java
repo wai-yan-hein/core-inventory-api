@@ -417,7 +417,7 @@ public class SaleHisService {
                 .bind("weightVouNo", Parameters.in(R2dbcType.VARCHAR, sh.getWeightVouNo()))
                 .bind("post", Util1.getBoolean(sh.getPost()))
                 .bind("sPay", Util1.getBoolean(sh.getSPay()))
-                .bind("tranSource", Parameters.in(R2dbcType.VARCHAR, sh.getTranSource()))
+                .bind("tranSource", Util1.getInteger(sh.getTranSource(), 1))
                 .bind("totalPayment", Parameters.in(R2dbcType.DOUBLE, sh.getTotalPayment()))
                 .bind("opening", Parameters.in(R2dbcType.DOUBLE, sh.getOpening()))
                 .bind("totalBalance", Parameters.in(R2dbcType.DOUBLE, sh.getTotalBalance()))

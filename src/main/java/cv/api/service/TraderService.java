@@ -289,18 +289,6 @@ public class TraderService {
                 }).one();
     }
 
-    public Mono<String> getDMSMaxDate() {
-        String sql = """
-                select max(updated_date) updated_date
-                from trader
-                where mig_code ='DMS'
-                """;
-        return client.sql(sql)
-                .map((row, rowMetadata) -> {
-                    LocalDateTime date = row.get("updated_date", LocalDateTime.class);
-                    return date == null ? Util1.getOldDate() : Util1.toDateTimeStrMYSQL(date);
-                }).one();
-    }
 
     public Flux<Trader> getUpdateTrader(LocalDateTime updatedDate) {
         String sql = """
@@ -355,7 +343,7 @@ public class TraderService {
 
 
     
-    public Flux<Trader> getEmployee(String compCode, Integer deptId) {
+    public Flux<Trader> getEmployee(String compCode) {
         String sql = """
                 select *
                 from trader
@@ -470,5 +458,16 @@ public class TraderService {
                 .rowsUpdated()
                 .thenReturn(t);
     }
-
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM trader
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .map(count -> count > 0);
+    }
 }

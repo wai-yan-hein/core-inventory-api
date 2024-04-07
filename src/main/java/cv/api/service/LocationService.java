@@ -245,4 +245,16 @@ public class LocationService {
                 .bind("locCode", key.getLocCode())
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM location
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .map(count -> count > 0);
+    }
 }

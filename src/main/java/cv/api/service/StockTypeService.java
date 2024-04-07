@@ -175,4 +175,16 @@ public class StockTypeService {
                 .groupType(row.get("group_type", Integer.class))
                 .build();
     }
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM stock_type
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .map(count -> count > 0);
+    }
 }

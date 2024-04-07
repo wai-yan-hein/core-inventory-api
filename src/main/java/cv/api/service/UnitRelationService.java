@@ -247,4 +247,16 @@ public class UnitRelationService {
                 .bind("deptId", dto.getDeptId())
                 .fetch().rowsUpdated().thenReturn(dto);
     }
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM unit_relation
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .map(count -> count > 0);
+    }
 }

@@ -514,4 +514,16 @@ public class StockService {
                 .bind("updatedDate", updatedDate)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM stock
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .map(count -> count > 0);
+    }
 }

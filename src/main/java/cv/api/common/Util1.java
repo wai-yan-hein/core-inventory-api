@@ -48,6 +48,10 @@ public class Util1 {
         return obj != null && obj;
     }
 
+    public static int getInteger(Integer obj, int value) {
+        return obj == null ? value : obj;
+    }
+
     public static boolean isNullOrEmpty(Object obj) {
         return obj == null || obj.toString().isEmpty();
     }

@@ -127,4 +127,16 @@ public class StockUnitService {
                 .intgUpdStatus(row.get("intg_upd_status", String.class))
                 .build();
     }
+    public Mono<Boolean> isExist(String compCode) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM stock_unit
+                WHERE comp_code = :compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .map(count -> count > 0);
+    }
 }
