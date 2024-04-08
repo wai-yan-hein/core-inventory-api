@@ -49,7 +49,7 @@ public class SaleHisService {
             log.error("deptId is null from mac id : " + sh.getMacId());
             return Mono.empty();
         }
-        return saveSaleExpense(sh).then(saveVouDiscount(sh)).then(saveSaleOrderJoin(sh)).then(saveSale(sh));
+        return saveSale(sh).flatMap((saleHis) -> saveSaleExpense(saleHis).then(saveVouDiscount(saleHis)).then(saveSaleOrderJoin(saleHis)).thenReturn(saleHis));
     }
 
     private Mono<Boolean> saveSaleExpense(SaleHis sh) {
