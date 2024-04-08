@@ -983,8 +983,8 @@ public class StockReportService {
                                                String traderCode, String locCode, String compCode, Integer macId) {
         //opening
         String sql = """
-                insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_bag,comp_code,mac_id,dept_id)
-                select :opDate,trader_code,stock_code,loc_code,sum(bag) bag,comp_code,:macId,1
+                insert into tmp_stock_opening(tran_date,trader_code,stock_code,loc_code,ttl_bag,comp_code,mac_id,dept_id,unit)
+                select :opDate,trader_code,stock_code,loc_code,sum(bag) bag,comp_code,:macId,1,'-' unit
                 from (
                 select trader_code,stock_code,loc_code,comp_code,sum(bag) bag
                 from v_opening
