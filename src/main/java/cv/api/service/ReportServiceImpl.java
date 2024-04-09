@@ -1365,234 +1365,268 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override
-    public General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
-        General general = General.builder().build();
-        general.setAmount(0.0);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
-                "from (\n" +
-                "select pur_unit,pur_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
-                "from v_purchase pd\n" +
-                "join v_relation rel on pd.rel_code = rel.rel_code\n" +
-                "and pd.pur_unit =  rel.unit\n" +
-                "and pd.comp_code = rel.comp_code\n" +
-                "where pd.stock_code = '" + stockCode + "' and vou_no = (\n" +
-                "select ph.vou_no\n" +
-                "from pur_his ph, pur_his_detail pd\n" +
-                "where date(ph.vou_date)<= '" + purDate + "' \n" +
-                "and deleted = 0\n" +
-                "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "group by ph.vou_no\n" +
-                "order by ph.vou_date desc\n" +
-                "limit 1\n" + "))a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code =rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and rel.unit = '" + unit + "'";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (rs.next()) {
-                general.setAmount(rs.getDouble("price"));
-            }
-        } catch (Exception e) {
-            log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
-        }
-        return general;
+    public Mono<General> getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode) {
+        String sql = """
+                SELECT rel.smallest_qty * smallest_price price, rel.unit
+                FROM (
+                    SELECT pur_unit, pur_price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                    FROM v_purchase pd
+                    JOIN v_relation rel ON pd.rel_code = rel.rel_code
+                    AND pd.pur_unit = rel.unit
+                    AND pd.comp_code = rel.comp_code
+                    WHERE pd.stock_code = :stockCode AND vou_no = (
+                        SELECT ph.vou_no
+                        FROM pur_his ph, pur_his_detail pd
+                        WHERE DATE(ph.vou_date) <= :purDate
+                        AND deleted = 0
+                        AND ph.comp_code = :compCode AND ph.vou_no = pd.vou_no
+                        AND pd.stock_code = :stockCode
+                        GROUP BY ph.vou_no
+                        ORDER BY ph.vou_date DESC
+                        LIMIT 1
+                    )
+                ) a
+                JOIN v_relation rel
+                ON a.rel_code = rel.rel_code
+                AND a.comp_code = rel.comp_code
+                AND rel.unit = :unit
+                """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("purDate", purDate)
+                .bind("compCode", compCode)
+                .bind("unit", unit)
+                .map(row -> General.builder().amount(row.get("price", Double.class)).build()).one();
     }
 
     @Override
-    public General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode) {
-        General g = General.builder().build();
-        g.setAmount(0.0);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" + "select v.loss_price/rel.smallest_qty smallest_price,v.rel_code,v.comp_code,v.dept_id\n" + "from v_weight_loss v\n" + "join v_relation rel\n" + "on v.rel_code = rel.rel_code\n" + "and v.loss_unit = rel.unit\n" + "and v.comp_code = rel.comp_code\n" +
-                "and v.stock_code ='" + stockCode + "'\n" + "where vou_no =(\n" + "select ph.vou_no\n" + "from weight_loss_his ph, weight_loss_his_detail pd\n" + "where date(ph.vou_date)<= '" + vouDate + "' \n" + "and deleted = 0\n" + "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "group by ph.vou_no\n" +
-                "order by ph.vou_date desc\n" + "limit 1)\n" + ")a\n" +
-                "join v_relation rel\n" + "on a.rel_code = rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and rel.unit ='" + unit + "'";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (rs.next()) {
-                g.setAmount(rs.getDouble("price"));
-            }
-        } catch (Exception e) {
-            log.error(String.format("getWeightLossRecentPrice: %s", e.getMessage()));
-        }
-        return g;
+    public Mono<General> getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode) {
+        String sql = """
+                SELECT rel.smallest_qty * smallest_price price, rel.unit
+                FROM (
+                    SELECT v.loss_price / rel.smallest_qty smallest_price, v.rel_code, v.comp_code, v.dept_id
+                    FROM v_weight_loss v
+                    JOIN v_relation rel ON v.rel_code = rel.rel_code
+                    AND v.loss_unit = rel.unit
+                    AND v.comp_code = rel.comp_code
+                    WHERE v.stock_code = :stockCode AND vou_no = (
+                        SELECT ph.vou_no
+                        FROM weight_loss_his ph, weight_loss_his_detail pd
+                        WHERE DATE(ph.vou_date) <= :vouDate
+                        AND deleted = 0
+                        AND ph.comp_code = :compCode AND ph.vou_no = pd.vou_no
+                        AND pd.stock_code = :stockCode
+                        GROUP BY ph.vou_no
+                        ORDER BY ph.vou_date DESC
+                        LIMIT 1
+                    )
+                ) a
+                JOIN v_relation rel
+                ON a.rel_code = rel.rel_code
+                AND a.comp_code = rel.comp_code
+                AND rel.unit = :unit
+                """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("vouDate", vouDate)
+                .bind("compCode", compCode)
+                .bind("unit", unit)
+                .map(row -> General.builder().amount(row.get("price", Double.class)).build())
+                .one();
     }
 
-    @Override
-    public General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode) {
-        General general = General.builder().build();
-        general.setAmount(0.0);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" + "from (\n" +
-                "select pd.unit,price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
-                "from v_process_his pd\n" +
-                "join v_relation rel on pd.rel_code = rel.rel_code\n" +
-                "and pd.unit = rel.unit\n" +
-                "and pd.comp_code = rel.comp_code\n" +
-                "where pd.stock_code = '" + stockCode + "' \n" +
-                "and pd.comp_code ='" + compCode + "'\n" +
-                "and vou_no = (\n" +
-                "select ph.vou_no\n" +
-                "from process_his ph\n" +
-                "where date(ph.vou_date)<= '" + purDate + "' \n" +
-                "and deleted = false\n" +
-                "and ph.comp_code = '" + compCode + "' \n" +
-                "and ph.stock_code = '" + stockCode + "'\n" +
-                "group by ph.vou_no\n" +
-                "order by ph.vou_date desc\n" +
-                "limit 1\n" + "))a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code =rel.rel_code\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "and rel.unit = '" + unit + "'";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (rs.next()) {
-                general.setAmount(rs.getDouble("price"));
-            }
-        } catch (Exception e) {
-            log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
-        }
-        return general;
-    }
 
     @Override
-    public General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode) {
-        General g = General.builder().build();
-        String sql = "select stock_code,round(avg(avg_price)*rel.smallest_qty,2) price\n" +
-                "from (\n" +
-                "select 'PUR-AVG',pur.stock_code,avg(pur.pur_price/rel.smallest_qty) avg_price,pur.rel_code,pur.comp_code,pur.dept_id\n" +
-                "from v_purchase pur\n" +
-                "join v_relation rel\n" +
-                "on pur.rel_code = rel.rel_code\n" +
-                "and pur.pur_unit = rel.unit\n" +
-                "and pur.comp_code = rel.comp_code\n" +
-                "where deleted = false \n" +
-                "and pur.comp_code ='" + compCode + "'\n" +
-                "and pur.stock_code ='" + stockCode + "'\n" +
-                "and date(pur.vou_date) <= '" + purDate + "'\n" +
-                "group by pur.stock_code\n" + "\tunion all\n" +
-                "select 'OP',op.stock_code,avg(op.price/rel.smallest_qty) avg_price,op.rel_code,op.comp_code,op.dept_id\n" +
-                "from v_opening op\n" +
-                "join v_relation rel\n" +
-                "on op.rel_code = rel.rel_code\n" +
-                "and op.unit = rel.unit\n" +
-                "and op.comp_code = rel.comp_code\n" +
-                "where op.price > 0\n" + "and op.deleted = false \n" +
-                "and op.comp_code ='" + compCode + "'\n" +
-                "and date(op.op_date) = '" + purDate + "'\n" +
-                "and op.stock_code ='" + stockCode + "'\n" + "group by op.stock_code)a\n" +
-                "join v_relation rel on\n" +
-                "a.rel_code = rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and rel.unit ='" + unit + "'\n" +
-                "group by stock_code";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (rs != null) {
-                while (rs.next()) {
-                    g.setAmount(rs.getDouble("price"));
-                }
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return g;
+    public Mono<General> getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode) {
+        String sql = """
+            SELECT rel.smallest_qty * smallest_price price, rel.unit
+            FROM (
+                SELECT pd.unit, price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                FROM v_process_his pd
+                JOIN v_relation rel ON pd.rel_code = rel.rel_code
+                AND pd.unit = rel.unit
+                AND pd.comp_code = rel.comp_code
+                WHERE pd.stock_code = :stockCode
+                AND pd.comp_code = :compCode
+                AND vou_no = (
+                    SELECT ph.vou_no
+                    FROM process_his ph
+                    WHERE DATE(ph.vou_date) <= :purDate
+                    AND deleted = false
+                    AND ph.comp_code = :compCode
+                    AND ph.stock_code = :stockCode
+                    GROUP BY ph.vou_no
+                    ORDER BY ph.vou_date DESC
+                    LIMIT 1
+                )
+            ) a
+            JOIN v_relation rel
+            ON a.rel_code = rel.rel_code
+            AND a.comp_code = rel.comp_code
+            AND rel.unit = :unit
+            """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("purDate", purDate)
+                .bind("compCode", compCode)
+                .bind("unit", unit)
+                .map(row -> General.builder().amount(row.get("price", Double.class)).build())
+                .one();
     }
 
-    @Override
-    public General getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
-        General general = General.builder().build();
-        general.setAmount(0.0);
-        String sql = "select rel.smallest_qty * smallest_price price,rel.unit\n" +
-                "from (select sale_unit,sale_price/rel.smallest_qty smallest_price,pd.rel_code,pd.comp_code,pd.dept_id\n" +
-                "from v_sale pd\n" +
-                "join v_relation rel on pd.rel_code = rel.rel_code\n" +
-                "and pd.sale_unit = rel.unit\n" +
-                "and pd.comp_code = rel.comp_code\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "where vou_no = (\n" +
-                "select ph.vou_no\n" +
-                "from sale_his ph, sale_his_detail pd\n" +
-                "where date(ph.vou_date)<= '" + saleDate + "' and deleted = 0\n" +
-                "and ph.comp_code = '" + compCode + "' and ph.vou_no = pd.vou_no\n" +
-                "and pd.stock_code = '" + stockCode + "'\n" +
-                "order by ph.vou_date desc limit 1" + "))a\n" +
-                "join v_relation rel\n" +
-                "on a.rel_code =rel.rel_code\n" +
-                "and a.comp_code = rel.comp_code\n" +
-                "and rel.unit = '" + unit + "'";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (rs.next()) {
-                general.setAmount(rs.getDouble("price"));
-            }
-        } catch (Exception e) {
-            log.error(String.format("getPurchaseRecentPrice: %s", e.getMessage()));
-        }
-        return general;
-    }
 
     @Override
-    public General getStockIORecentPrice(String stockCode, String vouDate, String unit) {
-        General general = General.builder().build();
-        general.setAmount(0.0);
-        String sql = "select cost_price,stock_code,max(unique_id) \n" +
-                "from stock_in_out_detail\n" +
-                "where stock_code = '" + stockCode + "'and (in_unit = '" + unit + "' or out_unit = '" + unit + "')\n" +
-                "and vou_no = (select sio.vou_no \n" +
-                "from stock_in_out sio , stock_in_out_detail siod\n" +
-                "where date(vou_date) <= '" + vouDate + "' and deleted = false\n" +
-                "and sio.vou_no = siod.vou_no\n" +
-                "and cost_price <> 0\n" +
-                "and siod.stock_code = '" + stockCode + "' and (in_unit ='" + unit + "' or out_unit = '" + unit + "')\n" +
-                "order by sio.vou_date desc limit 1)\n";
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            if (rs.next()) {
-                general.setAmount(rs.getDouble("cost_price"));
-            }
-        } catch (Exception e) {
-            log.error(String.format("getStockIORecentPrice: %s", e.getMessage()));
-        }
-        return general;
+    public Mono<General> getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode) {
+        String sql = """
+            SELECT stock_code, ROUND(AVG(avg_price) * rel.smallest_qty, 2) price
+            FROM (
+                SELECT 'PUR-AVG' AS source, pur.stock_code, AVG(pur.pur_price / rel.smallest_qty) avg_price, pur.rel_code, pur.comp_code, pur.dept_id
+                FROM v_purchase pur
+                JOIN v_relation rel ON pur.rel_code = rel.rel_code
+                AND pur.pur_unit = rel.unit
+                AND pur.comp_code = rel.comp_code
+                WHERE deleted = false
+                AND pur.comp_code = :compCode
+                AND pur.stock_code = :stockCode
+                AND DATE(pur.vou_date) <= :purDate
+                GROUP BY pur.stock_code
+                
+                UNION ALL
+                
+                SELECT 'OP' AS source, op.stock_code, AVG(op.price / rel.smallest_qty) avg_price, op.rel_code, op.comp_code, op.dept_id
+                FROM v_opening op
+                JOIN v_relation rel ON op.rel_code = rel.rel_code
+                AND op.unit = rel.unit
+                AND op.comp_code = rel.comp_code
+                WHERE op.price > 0
+                AND op.deleted = false
+                AND op.comp_code = :compCode
+                AND DATE(op.op_date) = :purDate
+                AND op.stock_code = :stockCode
+                GROUP BY op.stock_code
+            ) a
+            JOIN v_relation rel ON a.rel_code = rel.rel_code
+            AND a.comp_code = rel.comp_code
+            AND rel.unit = :unit
+            GROUP BY stock_code
+            """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("purDate", purDate)
+                .bind("compCode", compCode)
+                .bind("unit", unit)
+                .map(row -> General.builder().amount(row.get("price", Double.class)).build())
+                .one();
     }
+
+
+    @Override
+    public Mono<General> getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
+        String sql = """
+            SELECT rel.smallest_qty * smallest_price price, rel.unit
+            FROM (
+                SELECT sale_unit, sale_price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                FROM v_sale pd
+                JOIN v_relation rel ON pd.rel_code = rel.rel_code
+                AND pd.sale_unit = rel.unit
+                AND pd.comp_code = rel.comp_code
+                WHERE pd.stock_code = :stockCode
+                AND vou_no = (
+                    SELECT ph.vou_no
+                    FROM sale_his ph, sale_his_detail pd
+                    WHERE DATE(ph.vou_date) <= :saleDate
+                    AND deleted = 0
+                    AND ph.comp_code = :compCode
+                    AND ph.vou_no = pd.vou_no
+                    AND pd.stock_code = :stockCode
+                    ORDER BY ph.vou_date DESC
+                    LIMIT 1
+                )
+            ) a
+            JOIN v_relation rel ON a.rel_code = rel.rel_code
+            AND a.comp_code = rel.comp_code
+            AND rel.unit = :unit
+            """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("saleDate", saleDate)
+                .bind("compCode", compCode)
+                .bind("unit", unit)
+                .map(row -> General.builder().amount(row.get("price", Double.class)).build())
+                .one();
+    }
+
+
+    @Override
+    public Mono<General> getStockIORecentPrice(String stockCode, String vouDate, String unit) {
+        String sql = """
+            SELECT cost_price, stock_code, MAX(unique_id)
+            FROM stock_in_out_detail
+            WHERE stock_code = :stockCode
+            AND (in_unit = :unit OR out_unit = :unit)
+            AND vou_no = (
+                SELECT sio.vou_no
+                FROM stock_in_out sio
+                JOIN stock_in_out_detail siod ON sio.vou_no = siod.vou_no
+                WHERE DATE(vou_date) <= :vouDate
+                AND deleted = false
+                AND siod.stock_code = :stockCode
+                AND (in_unit = :unit OR out_unit = :unit)
+                AND cost_price <> 0
+                ORDER BY sio.vou_date DESC
+                LIMIT 1
+            )
+            """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("vouDate", vouDate)
+                .bind("unit", unit)
+                .map(row -> General.builder().amount(row.get("cost_price", Double.class)).build())
+                .one();
+    }
+
 
     @Override
     public Mono<General> getWeightAvgPrice(String stockCode, String locCode, String compCode) {
         String sql = """
-                select stock_code,comp_code,sum(amount)/sum(qty) price
-                from  (
-                select stock_code,comp_code,sum(qty) qty,sum(amount) amount
-                from v_opening
-                where deleted =false
-                and date(op_date)=:opDate
-                and comp_code =:compCode
-                and stock_code =:stockCode
-                group by stock_code,comp_code
-                	union all
-                select stock_code,comp_code,sum(qty) qty,sum(pur_amt) amount
-                from v_purchase
-                where deleted =false
-                and comp_code =:compCode
-                and stock_code =:stockCode
-                group by stock_code,comp_code
-                )a
-                group by stock_code,comp_code
-                """;
+            SELECT stock_code, comp_code, SUM(amount) / SUM(qty) AS price
+            FROM (
+                SELECT stock_code, comp_code, SUM(qty) AS qty, SUM(amount) AS amount
+                FROM v_opening
+                WHERE deleted = false
+                AND DATE(op_date) = :opDate
+                AND comp_code = :compCode
+                AND stock_code = :stockCode
+                GROUP BY stock_code, comp_code
+                UNION ALL
+                SELECT stock_code, comp_code, SUM(qty) AS qty, SUM(pur_amt) AS amount
+                FROM v_purchase
+                WHERE deleted = false
+                AND comp_code = :compCode
+                AND stock_code = :stockCode
+                GROUP BY stock_code, comp_code
+            ) a
+            GROUP BY stock_code, comp_code
+            """;
         return opHisService.getOpeningDateByLocation(compCode, locCode)
                 .flatMap(opDate -> client.sql(sql)
                         .bind("opDate", opDate)
                         .bind("compCode", compCode)
                         .bind("stockCode", stockCode)
-                        .map((row) -> General.builder()
+                        .map(row -> General.builder()
                                 .amount(Util1.getDouble(row.get("price", Double.class)))
                                 .build())
-                        .one());
+                        .one())
+                .onErrorResume(e -> {
+                    log.error("Error in getWeightAvgPrice: {}", e.getMessage());
+                    return Mono.empty();
+                });
     }
 
     private void calStockBalanceByLocation(String opDate, String clDate, String typeCode, String cateCode,

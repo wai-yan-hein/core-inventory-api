@@ -436,7 +436,6 @@ public class SetupController {
 
     @GetMapping(path = "/getStockList")
     public Flux<Stock> getStockList(@RequestParam String text, @RequestParam String compCode, @RequestParam Integer deptId) {
-        log.info("getStockList");
         return stockService.getStock(text, compCode, deptId);
     }
 
@@ -577,51 +576,50 @@ public class SetupController {
     }
 
     @PostMapping(path = "/savePattern")
-    public Mono<?> savePattern(@RequestBody Pattern pattern) {
-        return Mono.justOrEmpty(patternService.save(pattern));
+    public Mono<Pattern> savePattern(@RequestBody Pattern dto) {
+        return patternService.save(dto);
     }
 
     @PostMapping(path = "/deletePattern")
-    public Mono<?> deletePattern(@RequestBody Pattern p) {
-        patternService.delete(p);
-        return Mono.just(true);
+    public Mono<Boolean> deletePattern(@RequestBody Pattern p) {
+        return patternService.delete(p.getKey());
     }
 
     @PostMapping(path = "/findPattern")
-    public Mono<?> findPattern(@RequestBody PatternKey p) {
-        return Mono.justOrEmpty(patternService.findByCode(p));
+    public Mono<Pattern> findPattern(@RequestBody PatternKey p) {
+        return patternService.findByCode(p);
     }
 
     @GetMapping(path = "/getPattern")
-    public Flux<?> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam String vouDate) {
-        List<Pattern> list = patternService.search(stockCode, compCode);
-        list.forEach(p -> {
+    public Flux<Pattern> getPattern(@RequestParam String stockCode, @RequestParam String compCode, @RequestParam String vouDate) {
+        return patternService.search(stockCode, compCode).flatMap(pattern -> {
             if (!Util1.isNullOrEmpty(vouDate)) {
-                String code = p.getKey().getStockCode();
-                String type = p.getPriceTypeCode();
+                String code = pattern.getKey().getStockCode();
+                String type = pattern.getPriceTypeCode();
                 if (type != null) {
-                    General g = getPrice(code, vouDate, p.getUnitCode(), p.getPriceTypeCode(), compCode);
-                    p.setPrice(g == null ? 0.0 : Util1.getDouble(g.getAmount()));
+                    return getPrice(code, vouDate, pattern.getUnitCode(), pattern.getPriceTypeCode(), compCode)
+                            .map(g -> {
+                                pattern.setPrice(g == null ? 0.0 : Util1.getDouble(g.getAmount()));
+                                return pattern;
+                            });
                 }
             }
-            p.setAmount(Util1.getDouble(p.getQty()) * Util1.getDouble(p.getPrice()));
+            return Mono.just(pattern);
         });
-
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdatePattern")
-    public Flux<?> getUpdatePattern(@RequestParam String updatedDate) {
-        return Flux.fromIterable(patternService.getPattern(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<Pattern> getUpdatePattern(@RequestParam String updatedDate) {
+        return patternService.getPattern(Util1.toLocalDateTime(updatedDate));
     }
 
-    public General getPrice(String stockCode, String vouDate, String unit, String type, String compCode) {
+    public Mono<General> getPrice(String stockCode, String vouDate, String unit, String type, String compCode) {
         return switch (type) {
             case "PUR-R" -> reportService.getPurchaseRecentPrice(stockCode, vouDate, unit, compCode);
             case "PUR-A" -> reportService.getPurchaseAvgPrice(stockCode, vouDate, unit, compCode);
             case "PRO-R" -> reportService.getProductionRecentPrice(stockCode, vouDate, unit, compCode);
             case "WL-R" -> reportService.getWeightLossRecentPrice(stockCode, vouDate, unit, compCode);
-            default -> null;
+            default -> Mono.empty();
         };
     }
 

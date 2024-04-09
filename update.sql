@@ -1877,6 +1877,19 @@ set grand_total =(vou_total+tax_amt-discount);
 update ret_in_his
 set grand_total =(vou_total+tax_amt-discount);
 
+alter table pattern
+add column amount double(20,3) null after price,
+change column f_stock_code f_stock_code varchar(15) not null after stock_code,
+change column unique_id unique_id int(11) not null after f_stock_code,
+change column comp_code comp_code varchar(15) not null after unique_id,
+change column dept_id dept_id int(11) not null default 1 after comp_code,
+drop primary key,
+add primary key (stock_code, f_stock_code, unique_id, comp_code);
+
+set sql_safe_updates=0;
+update pattern
+set amount = qty*price;
+
 #view
 drop view if exists v_milling_output;
 create  view v_milling_output as select sh.project_no as project_no,sh.vou_no as vou_no,sh.trader_code as trader_code,sh.vou_date as vou_date,sh.cur_code as cur_code,sh.remark as remark,sh.created_date as created_date,sh.created_by as created_by,sh.deleted as deleted,sh.updated_by as updated_by,sh.updated_date as updated_date,sh.comp_code as comp_code,sh.mac_id as mac_id,sh.reference as reference,sh.dept_id as dept_id,sd.stock_code as stock_code,sd.weight as weight,sd.weight_unit as weight_unit,sd.qty as qty,sd.unit as unit,sd.price as price,sd.amt as amt,sd.loc_code as loc_code,sd.tot_weight as tot_weight,sd.unique_id as unique_id,s.user_code as s_user_code,s.stock_name as stock_name,s.stock_type_code as stock_type_code,s.category_code as cat_code,s.brand_code as brand_code,s.rel_code as rel_code,s.calculate as calculate from ((milling_his sh join milling_output sd) join stock s) where sh.vou_no = sd.vou_no and sh.comp_code = sd.comp_code and sd.stock_code = s.stock_code and sd.comp_code = s.comp_code;

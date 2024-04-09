@@ -95,17 +95,17 @@ public interface ReportService {
 
     List<VPurchase> getPurchaseByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception;
 
-    General getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode);
+    Mono<General> getPurchaseRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
-    General getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode);
+    Mono<General> getWeightLossRecentPrice(String stockCode, String vouDate, String unit, String compCode);
 
-    General getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode);
+    Mono<General> getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
-    General getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode);
+    Mono<General> getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode);
 
-    General getSaleRecentPrice(String stockCode, String purDate, String unit, String compCode);
+    Mono<General> getSaleRecentPrice(String stockCode, String purDate, String unit, String compCode);
 
-    General getStockIORecentPrice(String stockCode, String purDate, String unit);
+    Mono<General> getStockIORecentPrice(String stockCode, String purDate, String unit);
     Mono<General> getWeightAvgPrice(String stockCode,String locCode, String compCode);
 
 
