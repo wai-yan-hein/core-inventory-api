@@ -456,46 +456,46 @@ public class AccountRepo {
                             listGl.add(gl);
                         }
                         return saleExpenseService.search(vouNo, compCode)
-                                .collectList()
-                                .map(list -> {
-                                    for (SaleExpense e : list) {
-                                        String expCode = e.getKey().getExpenseCode();
-                                        ExpenseKey ek = ExpenseKey.builder().build();
-                                        ek.setExpenseCode(expCode);
-                                        ek.setCompCode(compCode);
-                                        Expense expense = expenseService.findById(ek).block();
-                                        if (expense != null) {
-                                            String account = expense.getAccountCode();
-                                            double amt = Util1.getDouble(e.getAmount());
-                                            if (!Util1.isNullOrEmpty(account)) {
-                                                Gl gl = new Gl();
-                                                GlKey key = new GlKey();
-                                                key.setCompCode(compCode);
-                                                key.setDeptId(deptId);
-                                                gl.setKey(key);
-                                                gl.setGlDate(vouDate);
-                                                gl.setSrcAccCode(account);
-                                                gl.setAccCode(balAcc);
-                                                gl.setDrAmt(amt);
-                                                gl.setTraderCode(traderCode);
-                                                gl.setCurCode(curCode);
-                                                gl.setDescription(expense.getExpenseName());
-                                                gl.setReference(remark);
-                                                gl.setDeptCode(deptCode);
-                                                gl.setCreatedDate(LocalDateTime.now());
-                                                gl.setCreatedBy(appName);
-                                                gl.setTranSource(tranSource);
-                                                gl.setRefNo(vouNo);
-                                                gl.setDeleted(deleted);
-                                                gl.setMacId(macId);
-                                                gl.setBatchNo(batchNo);
-                                                gl.setProjectNo(projectNo);
-                                                listGl.add(gl);
-                                            }
-                                        }
-                                    }
-                                    return listGl;
-                                });
+                                .flatMap(se -> {
+                                    String expCode = se.getKey().getExpenseCode();
+                                    ExpenseKey ek = ExpenseKey.builder().build();
+                                    ek.setExpenseCode(expCode);
+                                    ek.setCompCode(compCode);
+                                    return expenseService.findById(ek)
+                                            .map(expense -> {
+                                                String account = expense.getAccountCode();
+                                                double amt = Util1.getDouble(se.getAmount());
+                                                if (!Util1.isNullOrEmpty(account)) {
+                                                    Gl gl = new Gl();
+                                                    GlKey key = new GlKey();
+                                                    key.setCompCode(compCode);
+                                                    key.setDeptId(deptId);
+                                                    gl.setKey(key);
+                                                    gl.setGlDate(vouDate);
+                                                    gl.setSrcAccCode(account);
+                                                    gl.setAccCode(balAcc);
+                                                    gl.setDrAmt(amt);
+                                                    gl.setTraderCode(traderCode);
+                                                    gl.setCurCode(curCode);
+                                                    gl.setDescription(expense.getExpenseName());
+                                                    gl.setReference(remark);
+                                                    gl.setDeptCode(deptCode);
+                                                    gl.setCreatedDate(LocalDateTime.now());
+                                                    gl.setCreatedBy(appName);
+                                                    gl.setTranSource(tranSource);
+                                                    gl.setRefNo(vouNo);
+                                                    gl.setDeleted(deleted);
+                                                    gl.setMacId(macId);
+                                                    gl.setBatchNo(batchNo);
+                                                    gl.setProjectNo(projectNo);
+                                                    return gl;
+                                                } else {
+                                                    return null; // Skip if account is null or empty
+                                                }
+                                            });
+                                })
+                                .collectList();
+
                     }).doOnNext(this::sendAccount).then();
         } else {
             return Mono.empty();
