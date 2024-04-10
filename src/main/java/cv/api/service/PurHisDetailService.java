@@ -19,12 +19,12 @@ public class PurHisDetailService {
                 INSERT INTO pur_his_detail (
                     vou_no, unique_id, comp_code, dept_id, stock_code, exp_date,
                     qty, pur_unit, pur_price, pur_amt, loc_code, org_price,
-                    avg_qty, avg_price, std_weight, weight_unit, weight,
+                    avg_qty, std_weight, weight_unit, weight,
                     length, width, total_weight, m_percent, rice, wet, bag
                 ) VALUES (
                     :vouNo, :uniqueId, :compCode, :deptId, :stockCode, :expDate,
                     :qty, :purUnit, :purPrice, :purAmt, :locCode, :orgPrice,
-                    :avgQty, :avgPrice, :stdWeight, :weightUnit, :weight,
+                    :avgQty, :stdWeight, :weightUnit, :weight,
                     :length, :width, :totalWeight, :mPercent, :rice, :wet, :bag
                 )
                 """;
@@ -43,7 +43,6 @@ public class PurHisDetailService {
                 .bind("locCode", dto.getLocCode())
                 .bind("orgPrice", Parameters.in(R2dbcType.DOUBLE,dto.getOrgPrice()))
                 .bind("avgQty", Parameters.in(R2dbcType.DOUBLE,dto.getAvgQty()))
-                .bind("avgPrice", Parameters.in(R2dbcType.DOUBLE,dto.getAvgPrice()))
                 .bind("stdWeight", Parameters.in(R2dbcType.DOUBLE,dto.getStdWeight()))
                 .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR,dto.getWeightUnit()))
                 .bind("weight", Parameters.in(R2dbcType.DOUBLE,dto.getWeight()))

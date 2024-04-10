@@ -13,23 +13,23 @@ public class ReorderLevel implements java.io.Serializable {
     @EmbeddedId
     private ReorderKey key;
     @Column(name = "min_qty")
-    private Float minQty;
+    private Double minQty;
     @Column(name = "min_unit")
     private String minUnitCode;
     @Column(name = "max_qty")
-    private Float maxQty;
+    private Double maxQty;
     @Column(name = "max_unit")
     private String maxUnitCode;
     @Transient
-    private Float orderQty;
+    private Double orderQty;
     @Transient
     private String orderUnit;
     @Transient
-    private float minSmallQty;
+    private Double minSmallQty;
     @Transient
-    private float maxSmallQty;
+    private Double maxSmallQty;
     @Transient
-    private float balSmallQty;
+    private Double balSmallQty;
     @Transient
     private String balUnit;
     @Transient

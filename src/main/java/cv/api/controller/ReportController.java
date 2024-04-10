@@ -149,95 +149,73 @@ public class ReportController {
                 log.info("op date : " + opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
-                        List<VSale> saleByCustomer = reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(saleByCustomer, exportPath);
+                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
                     }
                     case "SaleByCustomerSummary" -> {
-                        List<VSale> list = reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId);
                     }
                     case "SaleBySaleManDetail" -> {
-                        List<VSale> saleByCustomer = reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(saleByCustomer, exportPath);
+                        return reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode, macId);
                     }
                     case "SaleBySaleManSummary" -> {
-                        List<VSale> saleByCustomer = reportService.getSaleBySaleManSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, smCode, compCode, deptId);
-                        Util1.writeJsonFile(saleByCustomer, exportPath);
+                        return reportService.getSaleBySaleManSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, smCode, compCode, deptId);
                     }
                     case "SaleByStockSummary" -> {
                         return reportService.getSaleByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                     }
                     case "SaleByStockWeightSummary" -> {
-                        List<VSale> data = reportService.getSaleByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(data, exportPath);
+                        return reportService.getSaleByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                     }
                     case "SaleByStockDetail" -> {
-                        List<VSale> saleByStock = reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
-                        Util1.writeJsonFile(saleByStock, exportPath);
+                        return reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                     }
                     case "OrderByStockSummary" -> {
-                        List<VOrder> orderByStock = reportService.getOrderByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(orderByStock, exportPath);
+                        return reportService.getOrderByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                     }
                     case "OrderByStockDetail" -> {
-                        List<VOrder> orderByStock = reportService.getOrderByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
-                        Util1.writeJsonFile(orderByStock, exportPath);
+                        return reportService.getOrderByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                     }
                     case "SaleByVoucherDetail", "SaleByVoucherDetailExcel" -> {
-                        List<VSale> list = reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "SaleByVoucherSummary" -> {
-                        List<VSale> list = reportService.getSaleByVoucherSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByVoucherSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "SaleByBatchDetail" -> {
-                        List<VSale> list = reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "SaleByProjectDetail" -> {
-                        List<VSale> list = reportService.getSaleByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
                     }
                     case "SaleByProjectSummary" -> {
-                        List<VSale> list = reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
                     }
                     case "OrderByProjectDetail" -> {
-                        List<VOrder> list = reportService.getOrderByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getOrderByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
                     }
                     case "OrderByProjectSummary" -> {
-                        List<VOrder> list = reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
                     }
                     case "PurchaseBySupplierDetail" -> {
-                        List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(purchaseBySupplier, exportPath);
+                        return reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
                     }
                     case "PurchaseBySupplierSummary" -> {
-                        List<VPurchase> purchaseBySupplier = reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
-                        Util1.writeJsonFile(purchaseBySupplier, exportPath);
+                        return reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
                     }
                     case "PurchaseByProjectDetail" -> {
-                        List<VPurchase> purchaseByProject = reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
-                        Util1.writeJsonFile(purchaseByProject, exportPath);
+                        return reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
                     }
                     case "PurchaseByProjectSummary" -> {
-                        List<VPurchase> purchaseByProject = reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId, projectNo);
-                        Util1.writeJsonFile(purchaseByProject, exportPath);
+                        return reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId, projectNo);
                     }
                     case "PurchaseByStockSummary" -> {
-                        List<VPurchase> data = reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(data, exportPath);
+                        return reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                     }
                     case "PurchaseByStockWeightSummary" -> {
-                        List<VPurchase> data = reportService.getPurchaseByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(data, exportPath);
+                        return reportService.getPurchaseByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
                     }
                     case "PurchaseByStockDetail" -> {
-                        List<VPurchase> purchaseByStock = reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId, locCode);
-                        Util1.writeJsonFile(purchaseByStock, exportPath);
+                        return reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId, locCode);
                     }
                     case "PurchaseList" -> {
                         List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
@@ -314,7 +292,6 @@ public class ReportController {
                     }
                     case "StockValue" -> {
                         return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-//                        Util1.writeJsonFile(values, exportPath);
                     }
                     case "StockValueQty" -> {
                         return stockReportService.getStockValueRO(filter);

@@ -59,7 +59,7 @@ public class AutoUpload {
                 .doOnNext(vou -> accountRepo.sendSaleAsync(vou)
                         .then()
                         .subscribe())
-                .doOnComplete(() -> log.info("uploadSaleVoucher: done"))
+                //.doOnComplete(() -> log.info("uploadSaleVoucher: done"))
                 .subscribe();
     }
 
@@ -69,7 +69,7 @@ public class AutoUpload {
                 .doOnNext(vou -> accountRepo.sendPurchaseAsync(vou)
                         .then()
                         .subscribe())
-                .doOnComplete(() -> log.info("uploadPurchaseVoucher: done"))
+                //.doOnComplete(() -> log.info("uploadPurchaseVoucher: done"))
                 .subscribe();
     }
 
@@ -79,7 +79,7 @@ public class AutoUpload {
                 .doOnNext(vou -> accountRepo.sendReturnInSync(vou)
                         .then()
                         .subscribe())
-                .doOnComplete(() -> log.info("uploadReturnInVoucher: done"))
+                //.doOnComplete(() -> log.info("uploadReturnInVoucher: done"))
                 .subscribe();
 
     }
@@ -89,7 +89,7 @@ public class AutoUpload {
                 .doOnNext(vou -> accountRepo.sendReturnOutSync(vou)
                         .then()
                         .subscribe())
-                .doOnComplete(() -> log.info("uploadReturnOutVoucher: done"))
+                //.doOnComplete(() -> log.info("uploadReturnOutVoucher: done"))
                 .subscribe();
 
     }

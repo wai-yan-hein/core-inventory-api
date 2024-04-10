@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -355,420 +356,574 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override
-    public List<VSale> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) throws Exception {
-        List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.saleman_code,sm.saleman_name,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v left join sale_man sm on v.saleman_code = sm.saleman_code\n" +
-                "where (v.saleman_code = '" + smCode + "' or '-' = '" + smCode + "')\n" +
-                "and v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by sm.saleman_name,v.vou_date,v.vou_no";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VSale sale = VSale.builder().build();
-                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                sale.setVouNo(rs.getString("vou_no"));
-                sale.setSaleManCode(rs.getString("saleman_code"));
-                sale.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
-                sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getDouble("qty"));
-                sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSalePrice(rs.getDouble("sale_price"));
-                sale.setSaleAmount(rs.getDouble("sale_amt"));
-                saleList.add(sale);
-            }
-        }
-        return saleList;
+    public Mono<ReturnObject> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) {
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.saleman_code, sm.saleman_name, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
+                FROM v_sale v
+                LEFT JOIN sale_man sm ON v.saleman_code = sm.saleman_code
+                WHERE (v.saleman_code = :smCode OR '-' = :smCode)
+                AND v.deleted = false
+                AND v.comp_code = :compCode
+                AND (v.stock_code = :stockCode OR '-' = :stockCode)
+                AND v.cur_code = :curCode
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                ORDER BY sm.saleman_name, v.vou_date, v.vou_no
+                """;
+        return client.sql(sql)
+                .bind("smCode", smCode)
+                .bind("compCode", compCode)
+                .bind("stockCode", stockCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VSale sale = VSale.builder().build();
+                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
+                    sale.setVouNo(row.get("vou_no", String.class));
+                    sale.setSaleManCode(row.get("saleman_code", String.class));
+                    sale.setSaleManName(Util1.isNull(row.get("saleman_name", String.class), "Other"));
+                    sale.setStockName(row.get("stock_name", String.class));
+                    sale.setQty(row.get("qty", Double.class));
+                    sale.setSaleUnit(row.get("sale_unit", String.class));
+                    sale.setSalePrice(row.get("sale_price", Double.class));
+                    sale.setSaleAmount(row.get("sale_amt", Double.class));
+                    return sale;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
+
 
     @Override
-    public List<VSale> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name,t.address,rel.unit\n" +
-                "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and deleted = 0\n" + "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" + "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" + "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" + "group by stock_code,sale_unit,trader_code\n" + ")a\n" + "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" + "and a.comp_code =rel.comp_code\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "order by t.user_code,t.trader_name";
-        List<VSale> list = new ArrayList<>();
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            while (rs.next()) {
-                VSale s = VSale.builder().build();
-                //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
-                // rel_code, trader_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
-                String userCode = rs.getString("s_user_code");
-                String sCode = rs.getString("stock_code");
-                String traderUsr = rs.getString("user_code");
-                String tCode = rs.getString("trader_code");
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                s.setTraderCode(Util1.isNull(traderUsr, tCode));
-                s.setStockCode(Util1.isNull(userCode, sCode));
-                s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getDouble("ttl_amt"));
-                s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, smallQty));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setAddress(rs.getString("address"));
-                s.setTotalQty(smallQty);
-                s.setSaleUnit(rs.getString("unit"));
+    public Mono<ReturnObject> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) {
+        String sql = """
+                SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.trader_name, rel.rel_name, t.address, rel.unit
+                FROM (
+                    SELECT stock_code, s_user_code, stock_name, SUM(qty) ttl_qty, sale_unit, SUM(sale_amt) ttl_amt, rel_code, trader_code, comp_code, dept_id
+                    FROM v_sale
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                    AND comp_code = :compCode
+                    AND deleted = 0
+                    AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                    AND (brand_code = :brandCode OR '-' = :brandCode)
+                    AND (cat_code = :catCode OR '-' = :catCode)
+                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (trader_code = :traderCode OR '-' = :traderCode)
+                    GROUP BY stock_code, sale_unit, trader_code
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code AND a.sale_unit = rel.unit AND a.comp_code = rel.comp_code
+                JOIN trader t ON a.trader_code = t.code AND a.comp_code = t.comp_code
+                ORDER BY t.user_code, t.trader_name
+                """;
 
-                list.add(s);
-            }
-        } catch (Exception e) {
-            log.error(String.format("getSaleSummaryByStock : %s", e.getMessage()));
-        }
-        return list;
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    String userCode = row.get("s_user_code", String.class);
+                    String sCode = row.get("stock_code", String.class);
+                    String traderUsr = row.get("user_code", String.class);
+                    String tCode = row.get("trader_code", String.class);
+                    String relCode = row.get("rel_code", String.class);
+                    Double smallQty = row.get("smallest_qty", Double.class);
+                    s.setTraderCode(Util1.isNull(traderUsr, tCode));
+                    s.setStockCode(Util1.isNull(userCode, sCode));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setSaleAmount(row.get("ttl_amt", Double.class));
+                    s.setRelName(row.get("rel_name", String.class));
+                    s.setQtyStr(getRelStr(relCode, smallQty));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setAddress(row.get("address", String.class));
+                    s.setTotalQty(smallQty);
+                    s.setSaleUnit(row.get("unit", String.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
+
 
     @Override
-    public List<VSale> getSaleByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and (project_no = '" + projectNo + "' or '-' = '" + projectNo + "')\n" +
-                "and project_no is not null\n" + "group by stock_code,sale_unit,project_no\n" + ")a\n" +
-                "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" + "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "join trader t\n" +
-                "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "order by a.project_no";
-        List<VSale> list = new ArrayList<>();
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            while (rs.next()) {
-                VSale s = VSale.builder().build();
-                //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
-                // rel_code, trader_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
-                String userCode = rs.getString("s_user_code");
-                String sCode = rs.getString("stock_code");
-                String traderUsr = rs.getString("user_code");
-                String tCode = rs.getString("trader_code");
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                s.setTraderCode(Util1.isNull(traderUsr, tCode));
-                s.setStockCode(Util1.isNull(userCode, sCode));
-                s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getDouble("ttl_amt"));
-                s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, smallQty));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setProjectNo(rs.getString("project_no"));
-                list.add(s);
-            }
-        } catch (Exception e) {
-            log.error(String.format("getSaleSummaryByProject : %s", e.getMessage()));
-        }
-        return list;
+    public Mono<ReturnObject> getSaleByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+        String sql = """
+                SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.trader_name, rel.rel_name
+                FROM (
+                    SELECT stock_code, s_user_code, stock_name, SUM(qty) ttl_qty, sale_unit, SUM(sale_amt) ttl_amt, rel_code, trader_code, comp_code, dept_id, project_no
+                    FROM v_sale
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                    AND comp_code = :compCode
+                    AND (dept_id = :deptId OR 0 = :deptId)
+                    AND deleted = 0
+                    AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                    AND (brand_code = :brandCode OR '-' = :brandCode)
+                    AND (cat_code = :catCode OR '-' = :catCode)
+                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (trader_code = :traderCode OR '-' = :traderCode)
+                    AND (project_no = :projectNo OR '-' = :projectNo)
+                    AND project_no IS NOT NULL
+                    GROUP BY stock_code, sale_unit, project_no
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code
+                AND a.sale_unit = rel.unit
+                AND a.comp_code = rel.comp_code
+                JOIN trader t ON a.trader_code = t.code
+                AND a.comp_code = t.comp_code
+                ORDER BY a.project_no
+                """;
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .bind("projectNo", projectNo)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    String userCode = row.get("s_user_code", String.class);
+                    String sCode = row.get("stock_code", String.class);
+                    String traderUsr = row.get("user_code", String.class);
+                    String tCode = row.get("trader_code", String.class);
+                    String relCode = row.get("rel_code", String.class);
+                    Double smallQty = row.get("smallest_qty", Double.class);
+                    s.setTraderCode(Util1.isNull(traderUsr, tCode));
+                    s.setStockCode(Util1.isNull(userCode, sCode));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setSaleAmount(row.get("ttl_amt", Double.class));
+                    s.setRelName(row.get("rel_name", String.class));
+                    s.setQtyStr(getRelStr(relCode, smallQty));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setProjectNo(row.get("project_no", String.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
+
 
     @Override
-    public List<VOrder> getOrderByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,user_code as s_user_code,stock_name,sum(qty) ttl_qty,unit,sum(amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" + "from v_order\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and project_no is not null\n" +
-                "group by stock_code,unit,project_no\n" + ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "join trader t\n" + "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "order by a.project_no";
-        List<VOrder> list = new ArrayList<>();
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            while (rs.next()) {
-                VOrder s = new VOrder();
-                //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
-                // rel_code, trader_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
-                String userCode = rs.getString("s_user_code");
-                String sCode = rs.getString("stock_code");
-                String traderUsr = rs.getString("user_code");
-                String tCode = rs.getString("trader_code");
-                String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
-                s.setTraderCode(Util1.isNull(traderUsr, tCode));
-                s.setStockCode(Util1.isNull(userCode, sCode));
-                s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getFloat("ttl_amt"));
-                s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, smallQty));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setProjectNo(rs.getString("project_no"));
-                list.add(s);
-            }
-        } catch (Exception e) {
-            log.error(String.format("getOrderSummaryByProject : %s", e.getMessage()));
-        }
-        return list;
+    public Mono<ReturnObject> getOrderByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+        String sql = """
+                SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.trader_name, rel.rel_name
+                FROM (
+                    SELECT stock_code, user_code AS s_user_code, stock_name, SUM(qty) ttl_qty, unit, SUM(amt) ttl_amt, rel_code, trader_code, comp_code, dept_id, project_no
+                    FROM v_order
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                        AND comp_code = :compCode
+                        AND (dept_id = :deptId OR 0 = :deptId)
+                        AND deleted = 0
+                        AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                        AND (brand_code = :brandCode OR '-' = :brandCode)
+                        AND (category_code = :catCode OR '-' = :catCode)
+                        AND (stock_code = :stockCode OR '-' = :stockCode)
+                        AND (trader_code = :traderCode OR '-' = :traderCode)
+                        AND project_no IS NOT NULL
+                    GROUP BY stock_code, unit, project_no
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code AND a.unit = rel.unit AND a.comp_code = rel.comp_code
+                JOIN trader t ON a.trader_code = t.code AND a.comp_code = t.comp_code
+                ORDER BY a.project_no
+                """;
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .map(row -> {
+                    VOrder s = new VOrder();
+                    String userCode = row.get("s_user_code", String.class);
+                    String sCode = row.get("stock_code", String.class);
+                    String traderUsr = row.get("user_code", String.class);
+                    String tCode = row.get("trader_code", String.class);
+                    String relCode = row.get("rel_code", String.class);
+                    Double smallQty = row.get("smallest_qty", Double.class);
+                    s.setTraderCode(Util1.isNull(traderUsr, tCode));
+                    s.setStockCode(Util1.isNull(userCode, sCode));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setSaleAmount(row.get("ttl_amt", Float.class));
+                    s.setRelName(row.get("rel_name", String.class));
+                    s.setQtyStr(getRelStr(relCode, smallQty));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setProjectNo(row.get("project_no", String.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
+
 
     @Override
-    public List<VSale> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String smCode, String compCode, Integer deptId) {
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.saleman_name,rel.rel_name,rel.unit\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,sale_unit,sum(sale_amt) ttl_amt,rel_code,saleman_code,comp_code,dept_id\n" + "from v_sale\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (saleman_code = '" + smCode + "' or '-' = '" + smCode + "')\n" +
-                "group by stock_code,sale_unit,saleman_code\n" + ")a\n" +
-                "join v_relation rel \n" + "on a.rel_code = rel.rel_code\n" +
-                "and a.sale_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "left join sale_man t\n" +
-                "on a.saleman_code = t.saleman_code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "order by t.user_code,t.saleman_name";
-        List<VSale> list = new ArrayList<>();
-        try {
-            ResultSet rs = reportDao.executeSql(sql);
-            while (rs.next()) {
-                VSale s = VSale.builder().build();
-                //stock_code, s_user_code, stock_name, ttl_qty, sale_unit, ttl_amt,
-                // rel_code, saleman_code, comp_code, dept_id, ttl_amt, smallest_qty, user_code, trader_name
-                String userCode = rs.getString("s_user_code");
-                String sCode = rs.getString("stock_code");
-                String smUsr = rs.getString("user_code");
-                String tCode = rs.getString("saleman_code");
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                s.setSaleManCode(Util1.isNull(smUsr, tCode));
-                s.setStockCode(Util1.isNull(userCode, sCode));
-                s.setStockName(rs.getString("stock_name"));
-                s.setSaleAmount(rs.getDouble("ttl_amt"));
-                s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, smallQty));
-                s.setSaleManName(Util1.isNull(rs.getString("saleman_name"), "Other"));
-                s.setTotalQty(smallQty);
-                s.setSaleUnit(rs.getString("unit"));
+    public Mono<ReturnObject> getSaleBySaleManSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String smCode, String compCode, Integer deptId) {
+        String sql = """
+                SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.saleman_name, rel.rel_name, rel.unit
+                FROM (
+                    SELECT stock_code, s_user_code, stock_name, SUM(qty) ttl_qty, sale_unit, SUM(sale_amt) ttl_amt, rel_code, saleman_code, comp_code, dept_id
+                    FROM v_sale
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                    AND comp_code = :compCode
+                    AND (dept_id = :deptId OR 0 = :deptId)
+                    AND deleted = 0
+                    AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                    AND (brand_code = :brandCode OR '-' = :brandCode)
+                    AND (cat_code = :catCode OR '-' = :catCode)
+                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (saleman_code = :smCode OR '-' = :smCode)
+                    GROUP BY stock_code, sale_unit, saleman_code
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code
+                AND a.sale_unit = rel.unit
+                AND a.comp_code = rel.comp_code
+                LEFT JOIN sale_man t ON a.saleman_code = t.saleman_code
+                AND a.comp_code = t.comp_code
+                ORDER BY t.user_code, t.saleman_name
+                """;
 
-                list.add(s);
-            }
-        } catch (Exception e) {
-            log.error(String.format("getSaleSummaryByStock : %s", e.getMessage()));
-        }
-        return list;
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("smCode", smCode)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    String userCode = row.get("s_user_code", String.class);
+                    String sCode = row.get("stock_code", String.class);
+                    String smUsr = row.get("user_code", String.class);
+                    String tCode = row.get("saleman_code", String.class);
+                    String relCode = row.get("rel_code", String.class);
+                    Double smallQty = row.get("smallest_qty", Double.class);
+                    s.setSaleManCode(Util1.isNull(smUsr, tCode));
+                    s.setStockCode(Util1.isNull(userCode, sCode));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setSaleAmount(row.get("ttl_amt", Double.class));
+                    s.setRelName(row.get("rel_name", String.class));
+                    s.setQtyStr(getRelStr(relCode, smallQty));
+                    s.setSaleManName(Util1.isNull(row.get("saleman_name", String.class), "Other"));
+                    s.setTotalQty(smallQty);
+                    s.setSaleUnit(row.get("unit", String.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
-    @Override
-    public List<VSale> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception {
-        List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,t.address,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "where (v.trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (v.cur_code = '" + curCode + "' or '-' = '" + curCode + "')\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by t.trader_name,v.vou_date,v.vou_no";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VSale sale = VSale.builder().build();
-                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                sale.setVouNo(rs.getString("vou_no"));
-                sale.setTraderCode(rs.getString("trader_code"));
-                sale.setTraderName(rs.getString("trader_name"));
-                sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getDouble("qty"));
-                sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSalePrice(rs.getDouble("sale_price"));
-                sale.setSaleAmount(rs.getDouble("sale_amt"));
-                sale.setAddress(rs.getString("address"));
-                saleList.add(sale);
-            }
-        }
-        return saleList;
-    }
 
     @Override
-    public List<VPurchase> getPurchaseBySupplierSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId) throws Exception {
-        List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name,rel.unit, t.address\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id\n" +
-                "from v_purchase\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typCode + "' or '-' = '" + typCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "group by stock_code,pur_unit,trader_code\n" + ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.pur_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "join trader t\n" + "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "order by t.user_code,t.trader_name";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase s = VPurchase.builder().build();
-                String userCode = rs.getString("s_user_code");
-                String sCode = rs.getString("stock_code");
-                String traderUsr = rs.getString("user_code");
-                String tCode = rs.getString("trader_code");
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                s.setTraderCode(Util1.isNull(traderUsr, tCode));
-                s.setStockCode(Util1.isNull(userCode, sCode));
-                s.setStockName(rs.getString("stock_name"));
-                s.setPurAmount(rs.getDouble("ttl_amt"));
-                s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, smallQty));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setTotalQty(smallQty);
-                s.setPurUnit(rs.getString("unit"));
-                s.setAddress(rs.getString("address"));
-                list.add(s);
-            }
-        }
-        return list;
+    public Mono<ReturnObject> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) {
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, t.address, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
+                FROM v_sale v JOIN trader t
+                ON v.trader_code = t.code
+                AND v.comp_code = t.comp_code
+                WHERE (v.trader_code = :traderCode OR '-' = :traderCode)
+                AND v.deleted = false
+                AND v.comp_code = :compCode
+                AND (v.stock_code = :stockCode OR '-' = :stockCode)
+                AND (v.cur_code = :curCode OR '-' = :curCode)
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                ORDER BY t.trader_name, v.vou_date, v.vou_no
+                """;
+
+        return client.sql(sql)
+                .bind("traderCode", traderCode)
+                .bind("compCode", compCode)
+                .bind("stockCode", stockCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> VSale.builder()
+                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .saleUnit(row.get("sale_unit", String.class))
+                        .salePrice(row.get("sale_price", Double.class))
+                        .saleAmount(row.get("sale_amt", Double.class))
+                        .address(row.get("address", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
-    @Override
-    public List<VPurchase> getPurchaseByProjectSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) throws Exception {
-        List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name\n" + "from (\n" + "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no\n" + "from v_purchase\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" +
-                "and (stock_type_code = '" + typCode + "' or '-' = '" + typCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (trader_code = '" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "group by stock_code,pur_unit,project_no\n" + ")a\n" + "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" +
-                "and a.pur_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "join trader t\n" + "on a.trader_code = t.code\n" +
-                "and a.comp_code =t.comp_code\n" +
-                "order by t.user_code,t.trader_name";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase s = VPurchase.builder().build();
-                String userCode = rs.getString("s_user_code");
-                String sCode = rs.getString("stock_code");
-                String traderUsr = rs.getString("user_code");
-                String tCode = rs.getString("trader_code");
-                String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
-                s.setTraderCode(Util1.isNull(traderUsr, tCode));
-                s.setStockCode(Util1.isNull(userCode, sCode));
-                s.setStockName(rs.getString("stock_name"));
-                s.setPurAmount(rs.getDouble("ttl_amt"));
-                s.setRelName(rs.getString("rel_name"));
-                s.setQtyStr(getRelStr(relCode, smallQty));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setProjectNo(rs.getString("project_no"));
-                list.add(s);
-            }
-        }
-        return list;
-    }
 
     @Override
-    public List<VPurchase> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) throws Exception {
-        List<VPurchase> purchaseList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,t.address,\n" +
-                "v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
-                "from v_purchase v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "where (v.trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
-                "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (v.cur_code = '" + curCode + "' or '-' ='" + curCode + "')\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by t.trader_name,v.vou_no;";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase p = VPurchase.builder().build();
-                p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                p.setVouNo(rs.getString("vou_no"));
-                p.setTraderCode(rs.getString("trader_code"));
-                p.setTraderName(rs.getString("trader_name"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getDouble("qty"));
-                p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getDouble("pur_price"));
-                p.setPurAmount(rs.getDouble("pur_amt"));
-                p.setAddress(rs.getString("address"));
-                purchaseList.add(p);
-            }
-        }
-        return purchaseList;
+    public Mono<ReturnObject> getPurchaseBySupplierSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId) {
+        String sql = """
+                select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name,rel.unit, t.address
+                from (
+                select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id
+                from v_purchase
+                where date(vou_date) between :fromDate and :toDate
+                and comp_code = :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                and deleted = 0
+                and (stock_type_code = :typCode or '-' = :typCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by stock_code,pur_unit,trader_code
+                )a
+                join v_relation rel 
+                on a.rel_code = rel.rel_code
+                and a.pur_unit = rel.unit
+                and a.comp_code =rel.comp_code
+                join trader t
+                on a.trader_code = t.code
+                and a.comp_code =t.comp_code
+                order by t.user_code,t.trader_name
+                """;
+        return client
+                .sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("typCode", typCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .map(row -> VPurchase.builder()
+                        .traderCode(Util1.isNull(row.get("s_user_code", String.class), row.get("stock_code", String.class)))
+                        .stockCode(Util1.isNull(row.get("user_code", String.class), row.get("trader_code", String.class)))
+                        .stockName(row.get("stock_name", String.class))
+                        .purAmount(row.get("ttl_amt", Double.class))
+                        .relName(row.get("rel_name", String.class))
+                        .qtyStr(getRelStr(row.get("rel_code", String.class), row.get("smallest_qty", Double.class)))
+                        .traderName(row.get("trader_name", String.class))
+                        .totalQty(row.get("smallest_qty", Double.class))
+                        .purUnit(row.get("unit", String.class))
+                        .address(row.get("address", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VPurchase> getPurchaseByProjectDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId, String projectNo) throws Exception {
-        List<VPurchase> purchaseList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
-                "v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt,v.project_no\n" +
-                "from v_purchase v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "where (v.trader_code ='" + traderCode + "' or '-' = '" + traderCode + "')\n" +
-                "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
-                "and (v.stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and (v.cur_code = '" + curCode + "' or '-' ='" + curCode + "')\n" +
-                "and (v.project_no = '" + projectNo + "' or '-' ='" + projectNo + "')\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.project_no is not null\n order by t.trader_name,v.vou_no;";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase p = VPurchase.builder().build();
-                p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                p.setVouNo(rs.getString("vou_no"));
-                p.setTraderCode(rs.getString("trader_code"));
-                p.setTraderName(rs.getString("trader_name"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getDouble("qty"));
-                p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getDouble("pur_price"));
-                p.setPurAmount(rs.getDouble("pur_amt"));
-                p.setProjectNo(rs.getString("project_no"));
-                purchaseList.add(p);
-            }
-        }
-        return purchaseList;
+    public Mono<ReturnObject> getPurchaseByProjectSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) throws Exception {
+        String sql = """
+                select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name
+                from (
+                select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id,project_no
+                from v_purchase
+                where date(vou_date) between :fromDate and :toDate
+                and comp_code = :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                and deleted = 0
+                and (stock_type_code = :typCode or '-' = :typCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                and (trader_code = :traderCode or '-' = :traderCode)
+                group by stock_code,pur_unit,project_no
+                )a
+                join v_relation rel 
+                on a.rel_code = rel.rel_code
+                and a.pur_unit = rel.unit
+                and a.comp_code =rel.comp_code
+                join trader t
+                on a.trader_code = t.code
+                and a.comp_code =t.comp_code
+                order by t.user_code,t.trader_name
+                """;
+
+        return client
+                .sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("typCode", typCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("traderCode", traderCode)
+                .map(row -> VPurchase.builder()
+                        .traderCode(Util1.isNull(row.get("s_user_code", String.class), row.get("stock_code", String.class)))
+                        .stockCode(Util1.isNull(row.get("user_code", String.class), row.get("trader_code", String.class)))
+                        .stockName(row.get("stock_name", String.class))
+                        .purAmount(row.get("ttl_amt", Double.class))
+                        .relName(row.get("rel_name", String.class))
+                        .qtyStr(getRelStr(row.get("rel_code", String.class), row.get("smallest_qty", Double.class)))
+                        .traderName(row.get("trader_name", String.class))
+                        .projectNo(row.get("project_no", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
+
+
+    @Override
+    public Mono<ReturnObject> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId){
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, t.address,
+                       v.stock_name, v.qty, v.pur_unit, v.pur_price, v.pur_amt
+                FROM v_purchase v JOIN trader t
+                     ON v.trader_code = t.code
+                     AND v.comp_code = t.comp_code
+                WHERE (v.trader_code = :traderCode OR '-' = :traderCode)
+                    AND v.deleted = false
+                    AND v.comp_code = :compCode
+                    AND (v.stock_code = :stockCode OR '-' = :stockCode)
+                    AND (v.cur_code = :curCode OR '-' = :curCode)
+                    AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                ORDER BY t.trader_name, v.vou_no
+                """;
+
+        return client.sql(sql)
+                .bind("traderCode", traderCode)
+                .bind("compCode", compCode)
+                .bind("stockCode", stockCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    return VPurchase.builder()
+                            .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                            .vouNo(row.get("vou_no", String.class))
+                            .traderCode(row.get("trader_code", String.class))
+                            .traderName(row.get("trader_name", String.class))
+                            .stockName(row.get("stock_name", String.class))
+                            .qty(row.get("qty", Double.class))
+                            .purUnit(row.get("pur_unit", String.class))
+                            .purPrice(row.get("pur_price", Double.class))
+                            .purAmount(row.get("pur_amt", Double.class))
+                            .address(row.get("address", String.class))
+                            .build();
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+
+    @Override
+    public Mono<ReturnObject> getPurchaseByProjectDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId, String projectNo) throws Exception {
+        String sql = """
+        select v.vou_date,v.vou_no,v.trader_code,t.trader_name,
+        v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt,v.project_no
+        from v_purchase v join trader t
+        on v.trader_code = t.code
+        and v.comp_code = t.comp_code
+        where (v.trader_code = :traderCode or '-' = :traderCode)
+        and v.deleted = false
+        and v.comp_code = :compCode
+        and (v.stock_code = :stockCode or '-' = :stockCode)
+        and (v.cur_code = :curCode or '-' = :curCode)
+        and (v.project_no = :projectNo or '-' = :projectNo)
+        and date(v.vou_date) between :fromDate and :toDate
+        and v.project_no is not null order by t.trader_name,v.vou_no;
+        """;
+
+        return client
+                .sql(sql)
+                .bind("traderCode", traderCode)
+                .bind("compCode", compCode)
+                .bind("stockCode", stockCode)
+                .bind("curCode", curCode)
+                .bind("projectNo", projectNo)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> VPurchase.builder()
+                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .purUnit(row.get("pur_unit", String.class))
+                        .purPrice(row.get("pur_price", Double.class))
+                        .purAmount(row.get("pur_amt", Double.class))
+                        .projectNo(row.get("project_no", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
 
     @Override
     public Mono<ReturnObject> getSaleByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode,
@@ -829,538 +984,712 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VOrder> getOrderByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
-        List<VOrder> saleList = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name\n" + "from (\n" + "select stock_code,user_code,stock_name,sum(qty) ttl_qty,unit,sum(amt) ttl_amt,rel_code,comp_code,dept_id\n" + "from v_order\n" + "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + "and comp_code = '" + compCode + "'\n" +
-                "and (dept_id =" + deptId + " or 0 =" + deptId + ")\n" +
-                "and deleted = 0\n" + "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,unit\n" + ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" + "and a.unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "order by user_code";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VOrder sale = new VOrder();
-                String relCode = rs.getString("rel_code");
-                float smallQty = rs.getFloat("smallest_qty");
-                sale.setStockCode(rs.getString("user_code"));
-                sale.setStockName(rs.getString("stock_name"));
-                sale.setRelName(rs.getString("rel_name"));
-                sale.setSaleAmount(rs.getFloat("ttl_amt"));
-                sale.setQtyStr(getRelStr(relCode, smallQty));
-                saleList.add(sale);
-            }
-        }
-        return saleList;
+    public Mono<ReturnObject> getOrderByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) {
+        String sql = """
+                SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, rel.rel_name
+                FROM (
+                    SELECT stock_code, user_code, stock_name, SUM(qty) ttl_qty, unit, SUM(amt) ttl_amt, rel_code, comp_code, dept_id
+                    FROM v_order
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                    AND comp_code = :compCode
+                    AND (dept_id = :deptId OR 0 = :deptId)
+                    AND deleted = 0
+                    AND (loc_code = :locCode OR '-' = :locCode)
+                    AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                    AND (brand_code = :brandCode OR '-' = :brandCode)
+                    AND (category_code = :catCode OR '-' = :catCode)
+                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    GROUP BY stock_code, unit
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code
+                AND a.unit = rel.unit
+                AND a.comp_code = rel.comp_code
+                ORDER BY user_code
+                """;
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("locCode", locCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .map(row -> {
+                    VOrder sale = new VOrder();
+                    String relCode = row.get("rel_code", String.class);
+                    Double smallQty = row.get("smallest_qty", Double.class);
+                    sale.setStockCode(row.get("user_code", String.class));
+                    sale.setStockName(row.get("stock_name", String.class));
+                    sale.setRelName(row.get("rel_name", String.class));
+                    sale.setSaleAmount(row.get("ttl_amt", Float.class));
+                    sale.setQtyStr(getRelStr(relCode, smallQty));
+                    return sale;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VSale> getSaleByVoucherDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
-        String filter = "";
+    public Mono<ReturnObject> getSaleByVoucherDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) {
+        StringBuilder filter = new StringBuilder();
         if (!typeCode.equals("-")) {
-            filter += "and stock_type_code='" + typeCode + "'\n";
+            filter.append("and stock_type_code=:typeCode\n");
         }
         if (!brandCode.equals("-")) {
-            filter += "and brand_code='" + brandCode + "'\n";
+            filter.append("and brand_code=:brandCode\n");
         }
         if (!catCode.equals("-")) {
-            filter += "and cat_code='" + catCode + "'\n";
+            filter.append("and cat_code=:catCode\n");
         }
         if (!stockCode.equals("-")) {
-            filter += "and stock_code='" + stockCode + "'\n";
+            filter.append("and stock_code=:stockCode\n");
         }
         if (!batchNo.equals("-")) {
-            filter += "and batch_no='" + batchNo + "'\n";
+            filter.append("and batch_no=:batchNo\n");
         }
         if (!locCode.equals("-")) {
-            filter += "and v.loc_code='" + locCode + "'\n";
+            filter.append("and v.loc_code=:locCode\n");
         }
-        List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "left join grn g\n" +
-                "on v.batch_no = g.batch_no\n" +
-                "and v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" + filter +
-                "order by v.vou_date,v.vou_no,v.unique_id";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
-                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = VSale.builder().build();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setRemark(rs.getString("remark"));
-                s.setReference(rs.getString("reference"));
-                s.setBatchNo(rs.getString("batch_no"));
-                s.setSupplierName(rs.getString("sup_name"));
-                s.setTraderCode((rs.getString("user_code")));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setCusAddress(rs.getString("address"));
-                s.setStockUserCode(rs.getString("s_user_code"));
-                s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getDouble("qty"));
-                s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getDouble("sale_price"));
-                s.setSaleAmount(rs.getDouble("sale_amt"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                s.setPaid(rs.getDouble("paid"));
-                list.add(s);
-            }
-        }
-        return list;
+
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.vou_total, v.paid, v.remark, v.reference, v.batch_no, sup.trader_name sup_name,
+                t.user_code, t.trader_name, t.address, v.s_user_code, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
+                FROM v_sale v
+                JOIN trader t ON v.trader_code = t.code
+                AND v.comp_code = t.comp_code
+                LEFT JOIN grn g ON v.batch_no = g.batch_no
+                AND v.comp_code = g.comp_code
+                LEFT JOIN trader sup ON g.trader_code = sup.code
+                AND g.comp_code = sup.comp_code
+                WHERE v.deleted = false
+                AND v.comp_code = :compCode
+                AND v.cur_code = :curCode
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                """ + filter + """
+                ORDER BY v.vou_date, v.vou_no, v.unique_id
+                """;
+
+        return client.sql(sql)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("batchNo", batchNo)
+                .bind("locCode", locCode)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouNo(row.get("vou_no", String.class));
+                    s.setRemark(row.get("remark", String.class));
+                    s.setReference(row.get("reference", String.class));
+                    s.setBatchNo(row.get("batch_no", String.class));
+                    s.setSupplierName(row.get("sup_name", String.class));
+                    s.setTraderCode(row.get("user_code", String.class));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setCusAddress(row.get("address", String.class));
+                    s.setStockUserCode(row.get("s_user_code", String.class));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setQty(row.get("qty", Double.class));
+                    s.setSaleUnit(row.get("sale_unit", String.class));
+                    s.setSalePrice(row.get("sale_price", Double.class));
+                    s.setSaleAmount(row.get("sale_amt", Double.class));
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setPaid(row.get("paid", Double.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VSale> getSaleByVoucherSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
-        String filter = "";
+    public Mono<ReturnObject> getSaleByVoucherSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) {
+        StringBuilder filter = new StringBuilder();
         if (!typeCode.equals("-")) {
-            filter += "and stock_type_code='" + typeCode + "'\n";
+            filter.append("AND stock_type_code=:typeCode\n");
         }
         if (!brandCode.equals("-")) {
-            filter += "and brand_code='" + brandCode + "'\n";
+            filter.append("AND brand_code=:brandCode\n");
         }
         if (!catCode.equals("-")) {
-            filter += "and cat_code='" + catCode + "'\n";
+            filter.append("AND cat_code=:catCode\n");
         }
         if (!stockCode.equals("-")) {
-            filter += "and stock_code='" + stockCode + "'\n";
+            filter.append("AND stock_code=:stockCode\n");
         }
         if (!batchNo.equals("-")) {
-            filter += "and batch_no='" + batchNo + "'\n";
+            filter.append("AND batch_no=:batchNo\n");
         }
         if (!locCode.equals("-")) {
-            filter += "and loc_code='" + locCode + "'\n";
+            filter.append("AND loc_code=:locCode\n");
         }
-        List<VSale> list = new ArrayList<>();
-        String sql = "select a.*,t.trader_name\n" +
-                "from (\n" +
-                "select vou_no,vou_date,trader_code,vou_total,comp_code\n" +
-                "from sale_his\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and deleted = false\n" +
-                "and comp_code ='" + compCode + "'\n" +
-                "and cur_code ='" + curCode + "'\n" + filter + "\n" + ")a\n" +
-                "join trader t on a.trader_code = t.code\n" +
-                "and a.comp_code = t.comp_code\n" +
-                "order by vou_date,vou_no";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
-                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = VSale.builder().build();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                list.add(s);
-            }
-        }
-        return list;
+
+        String sql = """
+                SELECT a.*, t.trader_name
+                FROM (
+                    SELECT vou_no, vou_date, trader_code, vou_total, comp_code
+                    FROM sale_his
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                    AND deleted = false
+                    AND comp_code = :compCode
+                    AND cur_code = :curCode
+                    """ + filter + """
+                ) a
+                JOIN trader t ON a.trader_code = t.code
+                AND a.comp_code = t.comp_code
+                ORDER BY vou_date, vou_no
+                """;
+
+        return client.sql(sql)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("batchNo", batchNo)
+                .bind("locCode", locCode)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouNo(row.get("vou_no", String.class));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VSale> getSaleByBatchDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) throws Exception {
-        String filter = "";
+    public Mono<ReturnObject> getSaleByBatchDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId) {
+        StringBuilder filter = new StringBuilder();
         if (!typeCode.equals("-")) {
-            filter += "and stock_type_code='" + typeCode + "'\n";
+            filter.append("AND stock_type_code=:typeCode\n");
         }
         if (!brandCode.equals("-")) {
-            filter += "and brand_code='" + brandCode + "'\n";
+            filter.append("AND brand_code=:brandCode\n");
         }
         if (!catCode.equals("-")) {
-            filter += "and cat_code='" + catCode + "'\n";
+            filter.append("AND cat_code=:catCode\n");
         }
         if (!stockCode.equals("-")) {
-            filter += "and stock_code='" + stockCode + "'\n";
+            filter.append("AND stock_code=:stockCode\n");
         }
         if (!batchNo.equals("-")) {
-            filter += "and v.batch_no='" + batchNo + "'\n";
+            filter.append("AND v.batch_no=:batchNo\n");
         }
-        List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "left join grn g\n" + "on v.batch_no = g.batch_no\n" +
-                "and v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.batch_no is not null\n" + filter +
-                "order by v.vou_date,v.batch_no,v.unique_id";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
-                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = VSale.builder().build();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setRemark(rs.getString("remark"));
-                s.setReference(rs.getString("reference"));
-                s.setBatchNo(rs.getString("batch_no"));
-                s.setSupplierName(rs.getString("sup_name"));
-                s.setTraderCode((rs.getString("user_code")));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setCusAddress(rs.getString("address"));
-                s.setStockUserCode(rs.getString("s_user_code"));
-                s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getDouble("qty"));
-                s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getDouble("sale_price"));
-                s.setSaleAmount(rs.getDouble("sale_amt"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                s.setPaid(rs.getDouble("paid"));
-                list.add(s);
-            }
-        }
-        return list;
+
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.vou_total, v.paid, v.remark, v.reference, v.batch_no, sup.trader_name sup_name,
+                    t.user_code, t.trader_name, t.address, v.s_user_code, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
+                FROM v_sale v
+                JOIN trader t ON v.trader_code = t.code AND v.comp_code = t.comp_code
+                LEFT JOIN grn g ON v.batch_no = g.batch_no AND v.comp_code = g.comp_code
+                LEFT JOIN trader sup ON g.trader_code = sup.code AND g.comp_code = sup.comp_code
+                WHERE v.deleted = false
+                AND v.comp_code = :compCode
+                AND v.cur_code = :curCode
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                AND v.batch_no IS NOT NULL
+                """ + filter.toString() + """
+                ORDER BY v.vou_date, v.batch_no, v.unique_id
+                """;
+
+        return client.sql(sql)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("batchNo", batchNo)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouNo(row.get("vou_no", String.class));
+                    s.setRemark(row.get("remark", String.class));
+                    s.setReference(row.get("reference", String.class));
+                    s.setBatchNo(row.get("batch_no", String.class));
+                    s.setSupplierName(row.get("sup_name", String.class));
+                    s.setTraderCode(row.get("user_code", String.class));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setCusAddress(row.get("address", String.class));
+                    s.setStockUserCode(row.get("s_user_code", String.class));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setQty(row.get("qty", Double.class));
+                    s.setSaleUnit(row.get("sale_unit", String.class));
+                    s.setSalePrice(row.get("sale_price", Double.class));
+                    s.setSaleAmount(row.get("sale_amt", Double.class));
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setPaid(row.get("paid", Double.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VSale> getSaleByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception {
-        String filter = "";
+    public Mono<ReturnObject> getSaleByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) {
+        StringBuilder filter = new StringBuilder();
         if (!typeCode.equals("-")) {
-            filter += "and stock_type_code='" + typeCode + "'\n";
+            filter.append("AND stock_type_code=:typeCode\n");
         }
         if (!brandCode.equals("-")) {
-            filter += "and brand_code='" + brandCode + "'\n";
+            filter.append("AND brand_code=:brandCode\n");
         }
         if (!catCode.equals("-")) {
-            filter += "and cat_code='" + catCode + "'\n";
+            filter.append("AND cat_code=:catCode\n");
         }
         if (!stockCode.equals("-")) {
-            filter += "and stock_code='" + stockCode + "'\n";
+            filter.append("AND stock_code=:stockCode\n");
         }
         if (!batchNo.equals("-")) {
-            filter += "and v.batch_no='" + batchNo + "'\n";
+            filter.append("AND v.batch_no=:batchNo\n");
         }
         if (!projectNo.equals("-")) {
-            filter += "and v.project_no='" + projectNo + "'\n";
+            filter.append("AND v.project_no=:projectNo\n");
         }
-        List<VSale> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,v.batch_no,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt,v.project_no\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "left join grn g\n" + "on v.batch_no = g.batch_no\n" +
-                "and v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.project_no is not null\n" + filter +
-                "order by v.vou_date,v.project_no,v.unique_id";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
-                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VSale s = VSale.builder().build();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setRemark(rs.getString("remark"));
-                s.setReference(rs.getString("reference"));
-                s.setBatchNo(rs.getString("batch_no"));
-                s.setProjectNo(rs.getString("project_no"));
-                s.setSupplierName(rs.getString("sup_name"));
-                s.setTraderCode((rs.getString("user_code")));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setCusAddress(rs.getString("address"));
-                s.setStockUserCode(rs.getString("s_user_code"));
-                s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getDouble("qty"));
-                s.setSaleUnit(rs.getString("sale_unit"));
-                s.setSalePrice(rs.getDouble("sale_price"));
-                s.setSaleAmount(rs.getDouble("sale_amt"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                s.setPaid(rs.getDouble("paid"));
-                list.add(s);
-            }
-        }
-        return list;
+
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.vou_total, v.paid, v.remark, v.reference, v.batch_no, sup.trader_name sup_name,
+                    t.user_code, t.trader_name, t.address, v.s_user_code, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt, v.project_no
+                FROM v_sale v
+                JOIN trader t ON v.trader_code = t.code AND v.comp_code = t.comp_code
+                LEFT JOIN grn g ON v.batch_no = g.batch_no AND v.comp_code = g.comp_code
+                LEFT JOIN trader sup ON g.trader_code = sup.code AND g.comp_code = sup.comp_code
+                WHERE v.deleted = false
+                AND v.comp_code = :compCode
+                AND v.cur_code = :curCode
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                AND v.project_no IS NOT NULL
+                """ + filter + """
+                ORDER BY v.vou_date, v.project_no, v.unique_id
+                """;
+
+        return client.sql(sql)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("batchNo", batchNo)
+                .bind("projectNo", projectNo)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouNo(row.get("vou_no", String.class));
+                    s.setRemark(row.get("remark", String.class));
+                    s.setReference(row.get("reference", String.class));
+                    s.setBatchNo(row.get("batch_no", String.class));
+                    s.setProjectNo(row.get("project_no", String.class));
+                    s.setSupplierName(row.get("sup_name", String.class));
+                    s.setTraderCode(row.get("user_code", String.class));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setCusAddress(row.get("address", String.class));
+                    s.setStockUserCode(row.get("s_user_code", String.class));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setQty(row.get("qty", Double.class));
+                    s.setSaleUnit(row.get("sale_unit", String.class));
+                    s.setSalePrice(row.get("sale_price", Double.class));
+                    s.setSaleAmount(row.get("sale_amt", Double.class));
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setPaid(row.get("paid", Double.class));
+                    return s;
+                }).all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VOrder> getOrderByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) throws Exception {
+    public Mono<ReturnObject> getOrderByProjectDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String batchNo, String compCode, Integer deptId, Integer macId, String projectNo) {
         String filter = "";
         if (!typeCode.equals("-")) {
-            filter += "and stock_type_code='" + typeCode + "'\n";
+            filter += "AND stock_type_code=:typeCode\n";
         }
         if (!brandCode.equals("-")) {
-            filter += "and brand_code='" + brandCode + "'\n";
+            filter += "AND brand_code=:brandCode\n";
         }
         if (!catCode.equals("-")) {
-            filter += "and cat_code='" + catCode + "'\n";
+            filter += "AND cat_code=:catCode\n";
         }
         if (!stockCode.equals("-")) {
-            filter += "and stock_code='" + stockCode + "'\n";
+            filter += "AND stock_code=:stockCode\n";
         }
         if (!projectNo.equals("-")) {
-            filter += "and v.project_no='" + projectNo + "'\n";
+            filter += "AND v.project_no=:projectNo\n";
         }
-        List<VOrder> list = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.vou_total,v.paid,v.remark,v.reference,sup.trader_name sup_name,\n" +
-                "t.user_code,t.trader_name,t.address,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt,v.project_no\n" +
-                "from v_order v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "left join grn g\n" +
-                "on v.comp_code = g.comp_code\n" +
-                "left join trader sup\n" +
-                "on g.trader_code = sup.code\n" +
-                "and g.comp_code = sup.comp_code\n" +
-                "where v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and v.project_no is not null\n" + filter +
-                "order by v.vou_date,v.project_no,v.unique_id";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                //vou_date, vou_no, remark, reference, batch_no, sup_name, trader_code,
-                // trader_name, s_user_code, stock_name, qty, sale_unit, sale_price, sale_amt
-                VOrder s = new VOrder();
-                s.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                s.setVouNo(rs.getString("vou_no"));
-                s.setRemark(rs.getString("remark"));
-                s.setReference(rs.getString("reference"));
-//                s.setBatchNo(rs.getString("batch_no"));
-                s.setProjectNo(rs.getString("project_no"));
-                s.setSupplierName(rs.getString("sup_name"));
-                s.setTraderCode((rs.getString("user_code")));
-                s.setTraderName(rs.getString("trader_name"));
-                s.setCusAddress(rs.getString("address"));
-                s.setStockUserCode(rs.getString("user_code"));
-                s.setStockName(rs.getString("stock_name"));
-                s.setQty(rs.getFloat("qty"));
-                s.setSaleUnit(rs.getString("unit"));
-                s.setSalePrice(rs.getFloat("price"));
-                s.setSaleAmount(rs.getFloat("amt"));
-                s.setVouTotal(rs.getDouble("vou_total"));
-                s.setPaid(rs.getDouble("paid"));
-                list.add(s);
-            }
-        }
-        return list;
+
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.vou_total, v.paid, v.remark, v.reference, sup.trader_name sup_name,
+                    t.user_code, t.trader_name, t.address, v.user_code, v.stock_name, v.qty, v.unit, v.price, v.amt, v.project_no
+                FROM v_order v
+                JOIN trader t ON v.trader_code = t.code AND v.comp_code = t.comp_code
+                LEFT JOIN grn g ON v.comp_code = g.comp_code
+                LEFT JOIN trader sup ON g.trader_code = sup.code AND g.comp_code = sup.comp_code
+                WHERE v.deleted = false
+                    AND v.comp_code = :compCode
+                    AND v.cur_code = :curCode
+                    AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                    AND v.project_no IS NOT NULL
+                """ + filter + """
+                ORDER BY v.vou_date, v.project_no, v.unique_id
+                """;
+
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("projectNo", projectNo)
+                .map(row -> {
+                    VOrder s = new VOrder();
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouNo(row.get("vou_no", String.class));
+                    s.setRemark(row.get("remark", String.class));
+                    s.setReference(row.get("reference", String.class));
+//                  s.setBatchNo(row.get("batch_no", String.class));
+                    s.setProjectNo(row.get("project_no", String.class));
+                    s.setSupplierName(row.get("sup_name", String.class));
+                    s.setTraderCode(row.get("user_code", String.class));
+                    s.setTraderName(row.get("trader_name", String.class));
+                    s.setCusAddress(row.get("address", String.class));
+                    s.setStockUserCode(row.get("user_code", String.class));
+                    s.setStockName(row.get("stock_name", String.class));
+                    s.setQty(row.get("qty", Float.class));
+                    s.setSaleUnit(row.get("unit", String.class));
+                    s.setSalePrice(row.get("price", Float.class));
+                    s.setSaleAmount(row.get("amt", Float.class));
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setPaid(row.get("paid", Double.class));
+                    return s;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
-    @Override
-    public List<VSale> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception {
-        List<VSale> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.s_user_code,v.stock_name,v.qty,v.sale_unit,v.sale_price,v.sale_amt\n" +
-                "from v_sale v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by v.s_user_code,v.vou_no";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VSale sale = VSale.builder().build();
-                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                sale.setVouNo(rs.getString("vou_no"));
-                sale.setTraderCode(rs.getString("trader_code"));
-                sale.setTraderName(rs.getString("trader_name"));
-                sale.setStockUserCode(rs.getString("s_user_code"));
-                sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getDouble("qty"));
-                sale.setSaleUnit(rs.getString("sale_unit"));
-                sale.setSalePrice(rs.getDouble("sale_price"));
-                sale.setSaleAmount(rs.getDouble("sale_amt"));
-                saleList.add(sale);
-            }
-        }
-        return saleList;
-    }
 
     @Override
-    public List<VOrder> getOrderByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) throws Exception {
-        List<VOrder> saleList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,v.user_code,v.stock_name,v.qty,v.unit,v.price,v.amt\n" +
-                "from v_order v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "where (v.stock_code = '" + stockCode + "' or '-' ='" + stockCode + "')\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (loc_code = '" + locCode + "' or '-' = '" + locCode + "')\n" +
-                "and v.deleted = false\n" +
-                "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by v.user_code,v.vou_no";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VOrder sale = new VOrder();
-                sale.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                sale.setVouNo(rs.getString("vou_no"));
-                sale.setTraderCode(rs.getString("trader_code"));
-                sale.setTraderName(rs.getString("trader_name"));
-                sale.setStockUserCode(rs.getString("user_code"));
-                sale.setStockName(rs.getString("stock_name"));
-                sale.setQty(rs.getFloat("qty"));
-                sale.setSaleUnit(rs.getString("unit"));
-                sale.setSalePrice(rs.getFloat("price"));
-                sale.setSaleAmount(rs.getFloat("amt"));
-                saleList.add(sale);
-            }
-        }
-        return saleList;
+    public Mono<ReturnObject> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) {
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, v.s_user_code, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
+                FROM v_sale v
+                JOIN trader t ON v.trader_code = t.code AND v.comp_code = t.comp_code
+                WHERE (v.stock_code = :stockCode OR '-' = :stockCode)
+                AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                AND (brand_code = :brandCode OR '-' = :brandCode)
+                AND (cat_code = :catCode OR '-' = :catCode)
+                AND (loc_code = :locCode OR '-' = :locCode)
+                AND v.deleted = false
+                AND v.comp_code = :compCode
+                AND v.cur_code = :curCode
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                ORDER BY v.s_user_code, v.vou_no
+                """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("locCode", locCode)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VSale sale = VSale.builder().build();
+                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    sale.setVouNo(row.get("vou_no", String.class));
+                    sale.setTraderCode(row.get("trader_code", String.class));
+                    sale.setTraderName(row.get("trader_name", String.class));
+                    sale.setStockUserCode(row.get("s_user_code", String.class));
+                    sale.setStockName(row.get("stock_name", String.class));
+                    sale.setQty(row.get("qty", Double.class));
+                    sale.setSaleUnit(row.get("sale_unit", String.class));
+                    sale.setSalePrice(row.get("sale_price", Double.class));
+                    sale.setSaleAmount(row.get("sale_amt", Double.class));
+                    return sale;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
-    @Override
-    public List<VPurchase> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId, String locCode) throws Exception {
-        List<VPurchase> purchaseList = new ArrayList<>();
-        String sql = "select v.vou_date,v.vou_no,v.trader_code,t.trader_name,\n" +
-                "v.s_user_code,v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt\n" +
-                "from v_purchase v join trader t\n" +
-                "on v.trader_code = t.code\n" +
-                "and v.comp_code = t.comp_code\n" +
-                "where (v.stock_code = '" + stockCode + "' or '-'='" + stockCode + "')\n" +
-                "and (v.stock_type_code = '" + typeCode + "' or '-'='" + typeCode + "')\n" +
-                "and (v.brand_code = '" + brandCode + "' or '-'='" + brandCode + "')\n" +
-                "and v.loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "and (v.category_code = '" + catCode + "' or '-'='" + catCode + "')\n" +
-                "and v.deleted = false\n" + "and v.comp_code = '" + compCode + "'\n" +
-                "and v.cur_code = '" + curCode + "'\n" +
-                "and date(v.vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "order by v.s_user_code,v.vou_date,v.vou_no;";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase p = VPurchase.builder().build();
-                p.setVouDate(Util1.toDateStr(rs.getDate("vou_date"), "dd/MM/yyyy"));
-                p.setVouNo(rs.getString("vou_no"));
-                p.setTraderCode(rs.getString("trader_code"));
-                p.setTraderName(rs.getString("trader_name"));
-                p.setStockUserCode(rs.getString("s_user_code"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setQty(rs.getDouble("qty"));
-                p.setPurUnit(rs.getString("pur_unit"));
-                p.setPurPrice(rs.getDouble("pur_price"));
-                p.setPurAmount(rs.getDouble("pur_amt"));
-                purchaseList.add(p);
-            }
-        }
-        return purchaseList;
-    }
 
     @Override
-    public List<VPurchase> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
-        List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id\n" +
-                "from v_purchase\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and deleted = false\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "and loc_code in (select f_code from f_location where mac_id =  " + macId + " )\n" +
-                "group by stock_code,pur_unit\n" + ")a\n" +
-                "join v_relation rel \n" +
-                "on a.rel_code = rel.rel_code\n" + "and a.pur_unit = rel.unit\n" +
-                "and a.comp_code =rel.comp_code\n" +
-                "order by s_user_code";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase p = VPurchase.builder().build();
-                String relCode = rs.getString("rel_code");
-                double smallQty = rs.getDouble("smallest_qty");
-                p.setStockCode(rs.getString("s_user_code"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setRelName(rs.getString("rel_name"));
-                p.setPurAmount(rs.getDouble("ttl_amt"));
-                p.setQtyStr(getRelStr(relCode, smallQty));
-                p.setTotalQty(smallQty);
-                p.setPurUnit(rs.getString("unit"));
-                list.add(p);
-            }
-        }
-        return list;
+    public Mono<ReturnObject> getOrderByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) {
+        String sql = """
+                SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, v.user_code, v.stock_name, v.qty, v.unit, v.price, v.amt
+                FROM v_order v
+                JOIN trader t ON v.trader_code = t.code
+                AND v.comp_code = t.comp_code
+                WHERE (v.stock_code = :stockCode OR '-' = :stockCode)
+                AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                AND (brand_code = :brandCode OR '-' = :brandCode)
+                AND (category_code = :catCode OR '-' = :catCode)
+                AND (loc_code = :locCode OR '-' = :locCode)
+                AND v.deleted = false
+                AND v.comp_code = :compCode
+                AND v.cur_code = :curCode
+                AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
+                ORDER BY v.user_code, v.vou_no
+                """;
+
+        return client.sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("locCode", locCode)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> {
+                    VOrder sale = new VOrder();
+                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    sale.setVouNo(row.get("vou_no", String.class));
+                    sale.setTraderCode(row.get("trader_code", String.class));
+                    sale.setTraderName(row.get("trader_name", String.class));
+                    sale.setStockUserCode(row.get("user_code", String.class));
+                    sale.setStockName(row.get("stock_name", String.class));
+                    sale.setQty(row.get("qty", Float.class));
+                    sale.setSaleUnit(row.get("unit", String.class));
+                    sale.setSalePrice(row.get("price", Float.class));
+                    sale.setSaleAmount(row.get("amt", Float.class));
+                    return sale;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
+
     @Override
-    public List<VPurchase> getPurchaseByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
-        List<VPurchase> list = new ArrayList<>();
-        String sql = "select a.*,u1.unit_name,u2.unit_name weight_unit_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) qty,sum(ifnull(total_weight,0)) total_weight,\n" +
-                "sum(pur_amt) pur_amt,pur_unit,weight_unit,comp_code\n" +
-                "from v_purchase\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and deleted = false\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (category_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit,pur_unit\n" +
-                ")a\n" +
-                "join stock_unit u1 on a.pur_unit = u1.unit_code\n" +
-                "and a.comp_code = u1.comp_code\n" +
-                "join stock_unit u2 on a.weight_unit = u2.unit_code\n" +
-                "and a.comp_code = u2.comp_code\n" +
-                "order by s_user_code";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VPurchase p = VPurchase.builder().build();
-                //s_user_code, stock_name, qty, total_weight, pur_unit, weight_unit, comp_code, unit_name, weight_unit_name
-                p.setStockCode(rs.getString("stock_code"));
-                p.setStockUserCode(rs.getString("s_user_code"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setPurAmount(rs.getDouble("pur_amt"));
-                p.setTotalQty(rs.getDouble("qty"));
-                p.setTotalWeight(rs.getDouble("total_weight"));
-                p.setPurUnitName(rs.getString("unit_name"));
-                p.setWeightUnitName(rs.getString("weight_unit_name"));
-                list.add(p);
-            }
-        }
-        return list;
+    public Mono<ReturnObject> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId, String locCode) throws Exception {
+        String sql = """
+        select v.vou_date,v.vou_no,v.trader_code,t.trader_name,
+        v.s_user_code,v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt
+        from v_purchase v join trader t
+        on v.trader_code = t.code
+        and v.comp_code = t.comp_code
+        where (v.stock_code = :stockCode or '-'=:stockCode)
+        and (v.stock_type_code = :typeCode or '-'=:typeCode)
+        and (v.brand_code = :brandCode or '-'=:brandCode)
+        and v.loc_code in (select f_code from f_location where mac_id = :macId)
+        and (v.category_code = :catCode or '-'=:catCode)
+        and v.deleted = false
+        and v.comp_code = :compCode
+        and v.cur_code = :curCode
+        and date(v.vou_date) between :fromDate and :toDate
+        order by v.s_user_code,v.vou_date,v.vou_no;
+        """;
+        return client
+                .sql(sql)
+                .bind("stockCode", stockCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("macId", macId)
+                .bind("catCode", catCode)
+                .bind("compCode", compCode)
+                .bind("curCode", curCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map(row -> VPurchase.builder()
+                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .stockUserCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .purUnit(row.get("pur_unit", String.class))
+                        .purPrice(row.get("pur_price", Double.class))
+                        .purAmount(row.get("pur_amt", Double.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+
+    @Override
+    public Mono<ReturnObject> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+        String sql = """
+        select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit
+        from (
+        select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id
+        from v_purchase
+        where date(vou_date) between :fromDate and :toDate
+        and comp_code = :compCode
+        and deleted = false
+        and (stock_type_code = :typeCode or '-' = :typeCode)
+        and (brand_code = :brandCode or '-' = :brandCode)
+        and (category_code = :catCode or '-' = :catCode)
+        and (stock_code = :stockCode or '-' = :stockCode)
+        and loc_code in (select f_code from f_location where mac_id = :macId)
+        group by stock_code,pur_unit
+        )a
+        join v_relation rel 
+        on a.rel_code = rel.rel_code
+        and a.pur_unit = rel.unit
+        and a.comp_code =rel.comp_code
+        order by s_user_code;
+        """;
+
+        return client
+                .sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .bind("macId", macId)
+                .map(row -> VPurchase.builder()
+                        .stockCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .relName(row.get("rel_name", String.class))
+                        .purAmount(row.get("ttl_amt", Double.class))
+                        .qtyStr(getRelStr(row.get("rel_code", String.class), row.get("smallest_qty", Double.class)))
+                        .totalQty(row.get("smallest_qty", Double.class))
+                        .purUnit(row.get("unit", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
+
+    @Override
+    public Mono<ReturnObject> getPurchaseByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
+        String sql = """
+        select a.*,u1.unit_name,u2.unit_name weight_unit_name
+        from (
+        select stock_code,s_user_code,stock_name,sum(qty) qty,sum(ifnull(total_weight,0)) total_weight,
+        sum(pur_amt) pur_amt,pur_unit,weight_unit,comp_code
+        from v_purchase
+        where date(vou_date) between :fromDate and :toDate
+        and comp_code = :compCode
+        and deleted = false
+        and (stock_type_code = :typeCode or '-' = :typeCode)
+        and (brand_code = :brandCode or '-' = :brandCode)
+        and (category_code = :catCode or '-' = :catCode)
+        and (stock_code = :stockCode or '-' = :stockCode)
+        group by stock_code,weight_unit,pur_unit
+        )a
+        join stock_unit u1 on a.pur_unit = u1.unit_code
+        and a.comp_code = u1.comp_code
+        join stock_unit u2 on a.weight_unit = u2.unit_code
+        and a.comp_code = u2.comp_code
+        order by s_user_code;
+        """;
+        return client
+                .sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .map(row -> VPurchase.builder()
+                        .stockCode(row.get("stock_code", String.class))
+                        .stockUserCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .purAmount(row.get("pur_amt", Double.class))
+                        .totalQty(row.get("qty", Double.class))
+                        .totalWeight(row.get("total_weight", Double.class))
+                        .purUnitName(row.get("unit_name", String.class))
+                        .weightUnitName(row.get("weight_unit_name", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
 
@@ -1441,32 +1770,32 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Mono<General> getProductionRecentPrice(String stockCode, String purDate, String unit, String compCode) {
         String sql = """
-            SELECT rel.smallest_qty * smallest_price price, rel.unit
-            FROM (
-                SELECT pd.unit, price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
-                FROM v_process_his pd
-                JOIN v_relation rel ON pd.rel_code = rel.rel_code
-                AND pd.unit = rel.unit
-                AND pd.comp_code = rel.comp_code
-                WHERE pd.stock_code = :stockCode
-                AND pd.comp_code = :compCode
-                AND vou_no = (
-                    SELECT ph.vou_no
-                    FROM process_his ph
-                    WHERE DATE(ph.vou_date) <= :purDate
-                    AND deleted = false
-                    AND ph.comp_code = :compCode
-                    AND ph.stock_code = :stockCode
-                    GROUP BY ph.vou_no
-                    ORDER BY ph.vou_date DESC
-                    LIMIT 1
-                )
-            ) a
-            JOIN v_relation rel
-            ON a.rel_code = rel.rel_code
-            AND a.comp_code = rel.comp_code
-            AND rel.unit = :unit
-            """;
+                SELECT rel.smallest_qty * smallest_price price, rel.unit
+                FROM (
+                    SELECT pd.unit, price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                    FROM v_process_his pd
+                    JOIN v_relation rel ON pd.rel_code = rel.rel_code
+                    AND pd.unit = rel.unit
+                    AND pd.comp_code = rel.comp_code
+                    WHERE pd.stock_code = :stockCode
+                    AND pd.comp_code = :compCode
+                    AND vou_no = (
+                        SELECT ph.vou_no
+                        FROM process_his ph
+                        WHERE DATE(ph.vou_date) <= :purDate
+                        AND deleted = false
+                        AND ph.comp_code = :compCode
+                        AND ph.stock_code = :stockCode
+                        GROUP BY ph.vou_no
+                        ORDER BY ph.vou_date DESC
+                        LIMIT 1
+                    )
+                ) a
+                JOIN v_relation rel
+                ON a.rel_code = rel.rel_code
+                AND a.comp_code = rel.comp_code
+                AND rel.unit = :unit
+                """;
 
         return client.sql(sql)
                 .bind("stockCode", stockCode)
@@ -1481,38 +1810,38 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Mono<General> getPurchaseAvgPrice(String stockCode, String purDate, String unit, String compCode) {
         String sql = """
-            SELECT stock_code, ROUND(AVG(avg_price) * rel.smallest_qty, 2) price
-            FROM (
-                SELECT 'PUR-AVG' AS source, pur.stock_code, AVG(pur.pur_price / rel.smallest_qty) avg_price, pur.rel_code, pur.comp_code, pur.dept_id
-                FROM v_purchase pur
-                JOIN v_relation rel ON pur.rel_code = rel.rel_code
-                AND pur.pur_unit = rel.unit
-                AND pur.comp_code = rel.comp_code
-                WHERE deleted = false
-                AND pur.comp_code = :compCode
-                AND pur.stock_code = :stockCode
-                AND DATE(pur.vou_date) <= :purDate
-                GROUP BY pur.stock_code
-                
-                UNION ALL
-                
-                SELECT 'OP' AS source, op.stock_code, AVG(op.price / rel.smallest_qty) avg_price, op.rel_code, op.comp_code, op.dept_id
-                FROM v_opening op
-                JOIN v_relation rel ON op.rel_code = rel.rel_code
-                AND op.unit = rel.unit
-                AND op.comp_code = rel.comp_code
-                WHERE op.price > 0
-                AND op.deleted = false
-                AND op.comp_code = :compCode
-                AND DATE(op.op_date) = :purDate
-                AND op.stock_code = :stockCode
-                GROUP BY op.stock_code
-            ) a
-            JOIN v_relation rel ON a.rel_code = rel.rel_code
-            AND a.comp_code = rel.comp_code
-            AND rel.unit = :unit
-            GROUP BY stock_code
-            """;
+                SELECT stock_code, ROUND(AVG(avg_price) * rel.smallest_qty, 2) price
+                FROM (
+                    SELECT 'PUR-AVG' AS source, pur.stock_code, AVG(pur.pur_price / rel.smallest_qty) avg_price, pur.rel_code, pur.comp_code, pur.dept_id
+                    FROM v_purchase pur
+                    JOIN v_relation rel ON pur.rel_code = rel.rel_code
+                    AND pur.pur_unit = rel.unit
+                    AND pur.comp_code = rel.comp_code
+                    WHERE deleted = false
+                    AND pur.comp_code = :compCode
+                    AND pur.stock_code = :stockCode
+                    AND DATE(pur.vou_date) <= :purDate
+                    GROUP BY pur.stock_code
+                    
+                    UNION ALL
+                    
+                    SELECT 'OP' AS source, op.stock_code, AVG(op.price / rel.smallest_qty) avg_price, op.rel_code, op.comp_code, op.dept_id
+                    FROM v_opening op
+                    JOIN v_relation rel ON op.rel_code = rel.rel_code
+                    AND op.unit = rel.unit
+                    AND op.comp_code = rel.comp_code
+                    WHERE op.price > 0
+                    AND op.deleted = false
+                    AND op.comp_code = :compCode
+                    AND DATE(op.op_date) = :purDate
+                    AND op.stock_code = :stockCode
+                    GROUP BY op.stock_code
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code
+                AND a.comp_code = rel.comp_code
+                AND rel.unit = :unit
+                GROUP BY stock_code
+                """;
 
         return client.sql(sql)
                 .bind("stockCode", stockCode)
@@ -1527,30 +1856,30 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Mono<General> getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
         String sql = """
-            SELECT rel.smallest_qty * smallest_price price, rel.unit
-            FROM (
-                SELECT sale_unit, sale_price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
-                FROM v_sale pd
-                JOIN v_relation rel ON pd.rel_code = rel.rel_code
-                AND pd.sale_unit = rel.unit
-                AND pd.comp_code = rel.comp_code
-                WHERE pd.stock_code = :stockCode
-                AND vou_no = (
-                    SELECT ph.vou_no
-                    FROM sale_his ph, sale_his_detail pd
-                    WHERE DATE(ph.vou_date) <= :saleDate
-                    AND deleted = 0
-                    AND ph.comp_code = :compCode
-                    AND ph.vou_no = pd.vou_no
-                    AND pd.stock_code = :stockCode
-                    ORDER BY ph.vou_date DESC
-                    LIMIT 1
-                )
-            ) a
-            JOIN v_relation rel ON a.rel_code = rel.rel_code
-            AND a.comp_code = rel.comp_code
-            AND rel.unit = :unit
-            """;
+                SELECT rel.smallest_qty * smallest_price price, rel.unit
+                FROM (
+                    SELECT sale_unit, sale_price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                    FROM v_sale pd
+                    JOIN v_relation rel ON pd.rel_code = rel.rel_code
+                    AND pd.sale_unit = rel.unit
+                    AND pd.comp_code = rel.comp_code
+                    WHERE pd.stock_code = :stockCode
+                    AND vou_no = (
+                        SELECT ph.vou_no
+                        FROM sale_his ph, sale_his_detail pd
+                        WHERE DATE(ph.vou_date) <= :saleDate
+                        AND deleted = 0
+                        AND ph.comp_code = :compCode
+                        AND ph.vou_no = pd.vou_no
+                        AND pd.stock_code = :stockCode
+                        ORDER BY ph.vou_date DESC
+                        LIMIT 1
+                    )
+                ) a
+                JOIN v_relation rel ON a.rel_code = rel.rel_code
+                AND a.comp_code = rel.comp_code
+                AND rel.unit = :unit
+                """;
 
         return client.sql(sql)
                 .bind("stockCode", stockCode)
@@ -1565,23 +1894,23 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Mono<General> getStockIORecentPrice(String stockCode, String vouDate, String unit) {
         String sql = """
-            SELECT cost_price, stock_code, MAX(unique_id)
-            FROM stock_in_out_detail
-            WHERE stock_code = :stockCode
-            AND (in_unit = :unit OR out_unit = :unit)
-            AND vou_no = (
-                SELECT sio.vou_no
-                FROM stock_in_out sio
-                JOIN stock_in_out_detail siod ON sio.vou_no = siod.vou_no
-                WHERE DATE(vou_date) <= :vouDate
-                AND deleted = false
-                AND siod.stock_code = :stockCode
+                SELECT cost_price, stock_code, MAX(unique_id)
+                FROM stock_in_out_detail
+                WHERE stock_code = :stockCode
                 AND (in_unit = :unit OR out_unit = :unit)
-                AND cost_price <> 0
-                ORDER BY sio.vou_date DESC
-                LIMIT 1
-            )
-            """;
+                AND vou_no = (
+                    SELECT sio.vou_no
+                    FROM stock_in_out sio
+                    JOIN stock_in_out_detail siod ON sio.vou_no = siod.vou_no
+                    WHERE DATE(vou_date) <= :vouDate
+                    AND deleted = false
+                    AND siod.stock_code = :stockCode
+                    AND (in_unit = :unit OR out_unit = :unit)
+                    AND cost_price <> 0
+                    ORDER BY sio.vou_date DESC
+                    LIMIT 1
+                )
+                """;
 
         return client.sql(sql)
                 .bind("stockCode", stockCode)
@@ -1595,25 +1924,25 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Mono<General> getWeightAvgPrice(String stockCode, String locCode, String compCode) {
         String sql = """
-            SELECT stock_code, comp_code, SUM(amount) / SUM(qty) AS price
-            FROM (
-                SELECT stock_code, comp_code, SUM(qty) AS qty, SUM(amount) AS amount
-                FROM v_opening
-                WHERE deleted = false
-                AND DATE(op_date) = :opDate
-                AND comp_code = :compCode
-                AND stock_code = :stockCode
+                SELECT stock_code, comp_code, SUM(amount) / SUM(qty) AS price
+                FROM (
+                    SELECT stock_code, comp_code, SUM(qty) AS qty, SUM(amount) AS amount
+                    FROM v_opening
+                    WHERE deleted = false
+                    AND DATE(op_date) = :opDate
+                    AND comp_code = :compCode
+                    AND stock_code = :stockCode
+                    GROUP BY stock_code, comp_code
+                    UNION ALL
+                    SELECT stock_code, comp_code, SUM(qty) AS qty, SUM(pur_amt) AS amount
+                    FROM v_purchase
+                    WHERE deleted = false
+                    AND comp_code = :compCode
+                    AND stock_code = :stockCode
+                    GROUP BY stock_code, comp_code
+                ) a
                 GROUP BY stock_code, comp_code
-                UNION ALL
-                SELECT stock_code, comp_code, SUM(qty) AS qty, SUM(pur_amt) AS amount
-                FROM v_purchase
-                WHERE deleted = false
-                AND comp_code = :compCode
-                AND stock_code = :stockCode
-                GROUP BY stock_code, comp_code
-            ) a
-            GROUP BY stock_code, comp_code
-            """;
+                """;
         return opHisService.getOpeningDateByLocation(compCode, locCode)
                 .flatMap(opDate -> client.sql(sql)
                         .bind("opDate", opDate)
@@ -1820,7 +2149,7 @@ public class ReportServiceImpl implements ReportService {
                                 .userCode(rs.getString("user_code"))
                                 .stockCode(rs.getString("stock_code"))
                                 .stockName(rs.getString("stock_name"))
-                                .unitName(getRelStr(rs.getString("rel_code"), rs.getFloat("qty")))
+                                .unitName(getRelStr(rs.getString("rel_code"), rs.getDouble("qty")))
                                 .locationName("All")
                                 .build();
                         balances.add(b);
@@ -1847,7 +2176,7 @@ public class ReportServiceImpl implements ReportService {
                                 .stockName(rs.getString("stock_name"))
                                 .locationName(rs.getString("loc_name"))
                                 .locCode(rs.getString("loc_code"))
-                                .unitName(getRelStr(rs.getString("rel_code"), rs.getFloat("smallest_qty")))
+                                .unitName(getRelStr(rs.getString("rel_code"), rs.getDouble("smallest_qty")))
                                 .build();
                         balances.add(b);
 
@@ -2038,7 +2367,7 @@ public class ReportServiceImpl implements ReportService {
         reportDao.executeSql(delSql, sql);
     }
 
-    private String getRelStr(String relCode, double smallestQty) {
+    private String getRelStr(String relCode, Double smallestQty) {
         //generate unit relation.
         StringBuilder relStr = new StringBuilder();
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
@@ -2174,17 +2503,17 @@ public class ReportServiceImpl implements ReportService {
                 r.setUserCode(rs.getString("user_code"));
                 r.setRelName(rs.getString("rel_name"));
                 r.setLocName(rs.getString("loc_name"));
-                r.setMinQty(rs.getFloat("min_qty"));
+                r.setMinQty(rs.getDouble("min_qty"));
                 r.setMinUnitCode(rs.getString("min_unit"));
-                r.setMaxQty(rs.getFloat("max_qty"));
+                r.setMaxQty(rs.getDouble("max_qty"));
                 r.setPosition(rs.getInt("position"));
                 r.setMaxUnitCode(rs.getString("max_unit"));
                 //max qty
-                r.setMaxSmallQty(rs.getFloat("small_max_qty"));
+                r.setMaxSmallQty(rs.getDouble("small_max_qty"));
                 //min qty
-                r.setMinSmallQty(rs.getFloat("small_min_qty"));
+                r.setMinSmallQty(rs.getDouble("small_min_qty"));
                 //bal qty
-                float balSmallQty = rs.getFloat("small_bal_qty");
+                Double balSmallQty = rs.getDouble("small_bal_qty");
                 r.setBalUnit(getRelStr(relCode, balSmallQty));
                 r.setBalSmallQty(balSmallQty);
                 reorderLevels.add(r);
@@ -2675,7 +3004,7 @@ public class ReportServiceImpl implements ReportService {
                     StockValue value = StockValue.builder().build();
                     value.setStockUserCode(rs.getString("s_user_code"));
                     value.setStockName(rs.getString("stock_name"));
-                    value.setBalRel(getRelStr(rs.getString("rel_code"), rs.getFloat("bal_qty")));
+                    value.setBalRel(getRelStr(rs.getString("rel_code"), rs.getDouble("bal_qty")));
                     value.setQty(rs.getDouble("bal_qty"));
                     value.setRelation(rs.getString("rel_name"));
                     value.setPurAvgPrice(rs.getDouble("pur_avg_price"));
@@ -4234,44 +4563,57 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<VSale> getSaleByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) throws Exception {
-        List<VSale> list = new ArrayList<>();
-        String sql = "select a.*,u1.unit_name,u2.unit_name weight_unit_name\n" +
-                "from (\n" +
-                "select stock_code,s_user_code,stock_name,sum(qty) qty,sum(ifnull(total_weight,0)) total_weight,\n" +
-                "sum(sale_amt) sale_amt,sale_unit,weight_unit,comp_code\n" +
-                "from v_sale\n" +
-                "where date(vou_date) between '" + fromDate + "' and '" + toDate + "'\n" +
-                "and comp_code = '" + compCode + "'\n" +
-                "and deleted = false\n" +
-                "and (stock_type_code = '" + typeCode + "' or '-' = '" + typeCode + "')\n" +
-                "and (brand_code = '" + brandCode + "' or '-' = '" + brandCode + "')\n" +
-                "and (cat_code = '" + catCode + "' or '-' = '" + catCode + "')\n" +
-                "and (stock_code = '" + stockCode + "' or '-' = '" + stockCode + "')\n" +
-                "group by stock_code,weight_unit,sale_unit\n" +
-                ")a\n" +
-                "join stock_unit u1 on a.sale_unit = u1.unit_code\n" +
-                "and a.comp_code = u1.comp_code\n" +
-                "join stock_unit u2 on a.weight_unit = u2.unit_code\n" +
-                "and a.comp_code = u2.comp_code\n" +
-                "order by s_user_code";
-        ResultSet rs = reportDao.executeSql(sql);
-        if (!Objects.isNull(rs)) {
-            while (rs.next()) {
-                VSale p = VSale.builder().build();
-                //s_user_code, stock_name, qty, total_weight, pur_unit, weight_unit, comp_code, unit_name, weight_unit_name
-                p.setStockCode(rs.getString("stock_code"));
-                p.setStockUserCode(rs.getString("s_user_code"));
-                p.setStockName(rs.getString("stock_name"));
-                p.setSaleAmount(rs.getDouble("sale_amt"));
-                p.setTotalQty(rs.getDouble("qty"));
-                p.setTotalWeight(rs.getDouble("total_weight"));
-                p.setSaleUnitName(rs.getString("unit_name"));
-                p.setWeightUnitName(rs.getString("weight_unit_name"));
-                list.add(p);
-            }
-        }
-        return list;
+    public Mono<ReturnObject> getSaleByStockWeightSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) {
+        String sql = """
+                SELECT a.*, u1.unit_name, u2.unit_name weight_unit_name
+                FROM (
+                    SELECT stock_code, s_user_code, stock_name, SUM(qty) qty, SUM(IFNULL(total_weight, 0)) total_weight,
+                    SUM(sale_amt) sale_amt, sale_unit, weight_unit, comp_code
+                    FROM v_sale
+                    WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
+                    AND comp_code = :compCode
+                    AND deleted = false
+                    AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                    AND (brand_code = :brandCode OR '-' = :brandCode)
+                    AND (cat_code = :catCode OR '-' = :catCode)
+                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    GROUP BY stock_code, weight_unit, sale_unit
+                ) a
+                JOIN stock_unit u1 ON a.sale_unit = u1.unit_code
+                AND a.comp_code = u1.comp_code
+                JOIN stock_unit u2 ON a.weight_unit = u2.unit_code
+                AND a.comp_code = u2.comp_code
+                ORDER BY s_user_code
+                """;
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .map(row -> {
+                    VSale p = VSale.builder().build();
+                    p.setStockCode(row.get("stock_code", String.class));
+                    p.setStockUserCode(row.get("s_user_code", String.class));
+                    p.setStockName(row.get("stock_name", String.class));
+                    p.setSaleAmount(row.get("sale_amt", Double.class));
+                    p.setTotalQty(row.get("qty", Double.class));
+                    p.setTotalWeight(row.get("total_weight", Double.class));
+                    p.setSaleUnitName(row.get("unit_name", String.class));
+                    p.setWeightUnitName(row.get("weight_unit_name", String.class));
+                    return p;
+                })
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
     }
 
     @Override
