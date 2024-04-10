@@ -683,7 +683,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .map(row -> VSale.builder()
-                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
                         .vouNo(row.get("vou_no", String.class))
                         .traderCode(row.get("trader_code", String.class))
                         .traderName(row.get("trader_name", String.class))
@@ -850,20 +850,18 @@ public class ReportServiceImpl implements ReportService {
                 .bind("curCode", curCode)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .map(row -> {
-                    return VPurchase.builder()
-                            .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
-                            .vouNo(row.get("vou_no", String.class))
-                            .traderCode(row.get("trader_code", String.class))
-                            .traderName(row.get("trader_name", String.class))
-                            .stockName(row.get("stock_name", String.class))
-                            .qty(row.get("qty", Double.class))
-                            .purUnit(row.get("pur_unit", String.class))
-                            .purPrice(row.get("pur_price", Double.class))
-                            .purAmount(row.get("pur_amt", Double.class))
-                            .address(row.get("address", String.class))
-                            .build();
-                })
+                .map(row -> VPurchase.builder()
+                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
+                        .vouNo(row.get("vou_no", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .purUnit(row.get("pur_unit", String.class))
+                        .purPrice(row.get("pur_price", Double.class))
+                        .purAmount(row.get("pur_amt", Double.class))
+                        .address(row.get("address", String.class))
+                        .build())
                 .all()
                 .collectList()
                 .map(Util1::convertToJsonBytes)
@@ -903,7 +901,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .map(row -> VPurchase.builder()
-                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
                         .vouNo(row.get("vou_no", String.class))
                         .traderCode(row.get("trader_code", String.class))
                         .traderName(row.get("trader_name", String.class))
@@ -1092,7 +1090,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("toDate", toDate)
                 .map(row -> {
                     VSale s = VSale.builder().build();
-                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     s.setVouNo(row.get("vou_no", String.class));
                     s.setRemark(row.get("remark", String.class));
                     s.setReference(row.get("reference", String.class));
@@ -1173,7 +1171,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("toDate", toDate)
                 .map(row -> {
                     VSale s = VSale.builder().build();
-                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     s.setVouNo(row.get("vou_no", String.class));
                     s.setTraderName(row.get("trader_name", String.class));
                     s.setVouTotal(row.get("vou_total", Double.class));
@@ -1237,7 +1235,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("toDate", toDate)
                 .map(row -> {
                     VSale s = VSale.builder().build();
-                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     s.setVouNo(row.get("vou_no", String.class));
                     s.setRemark(row.get("remark", String.class));
                     s.setReference(row.get("reference", String.class));
@@ -1318,7 +1316,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("toDate", toDate)
                 .map(row -> {
                     VSale s = VSale.builder().build();
-                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     s.setVouNo(row.get("vou_no", String.class));
                     s.setRemark(row.get("remark", String.class));
                     s.setReference(row.get("reference", String.class));
@@ -1395,7 +1393,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("projectNo", projectNo)
                 .map(row -> {
                     VOrder s = new VOrder();
-                    s.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    s.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     s.setVouNo(row.get("vou_no", String.class));
                     s.setRemark(row.get("remark", String.class));
                     s.setReference(row.get("reference", String.class));
@@ -1456,7 +1454,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("toDate", toDate)
                 .map(row -> {
                     VSale sale = VSale.builder().build();
-                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     sale.setVouNo(row.get("vou_no", String.class));
                     sale.setTraderCode(row.get("trader_code", String.class));
                     sale.setTraderName(row.get("trader_name", String.class));
@@ -1510,7 +1508,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("toDate", toDate)
                 .map(row -> {
                     VOrder sale = new VOrder();
-                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"));
+                    sale.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     sale.setVouNo(row.get("vou_no", String.class));
                     sale.setTraderCode(row.get("trader_code", String.class));
                     sale.setTraderName(row.get("trader_name", String.class));
@@ -1564,7 +1562,7 @@ public class ReportServiceImpl implements ReportService {
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .map(row -> VPurchase.builder()
-                        .vouDate(Util1.toDateStr(row.get("vou_date", Date.class), "dd/MM/yyyy"))
+                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
                         .vouNo(row.get("vou_no", String.class))
                         .traderCode(row.get("trader_code", String.class))
                         .traderName(row.get("trader_name", String.class))
