@@ -7,7 +7,6 @@ package cv.api.controller;
 
 import cv.api.common.*;
 import cv.api.entity.OPHis;
-import cv.api.entity.ReorderLevel;
 import cv.api.entity.VStockBalance;
 import cv.api.model.*;
 import cv.api.service.*;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 
 /**
@@ -35,64 +32,42 @@ public class ReportController {
     private final StockReportService stockReportService;
     private final TransferService transferService;
     private final StockRelationService stockRelationService;
+    private final LocationService locationService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getSaleReport(@RequestParam String vouNo,
-                                 @RequestParam String compCode,
-                                 @RequestParam Integer macId) throws Exception {
-        String reportName = "SaleVoucher";
-        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        createFilePath(exportPath);
-        List<VSale> listVSale = reportService.getSaleVoucher(vouNo, compCode);
-        return Flux.fromIterable(listVSale).onErrorResume(throwable -> Flux.empty());
+    public Flux<VSale> getSaleReport(@RequestParam String vouNo,
+                                     @RequestParam String compCode,
+                                     @RequestParam Integer macId) {
+        return reportService.getSaleVoucher(vouNo, compCode);
     }
 
     @GetMapping(value = "/getSaleByBatchReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Flux<VSale> getSaleByBatchReport(@RequestParam String vouNo,
-                                                          @RequestParam String grnVouNo,
-                                                          @RequestParam String compCode) {
-        return Flux.fromIterable(reportService.getSaleByBatchReport(vouNo, grnVouNo, compCode)).onErrorResume(throwable -> Flux.empty());
-    }
-
-    private void createFilePath(String path) {
-        File file = new File(path);
-        File parentDir = file.getParentFile();
-        if (!parentDir.exists()) {
-            if (parentDir.mkdirs()) {
-                log.info("Directory path created: " + parentDir.getAbsolutePath());
-            } else {
-                log.error("Failed to create directory path: " + parentDir.getAbsolutePath());
-            }
-        }
+    public Flux<VSale> getSaleByBatchReport(@RequestParam String vouNo,
+                                            @RequestParam String grnVouNo,
+                                            @RequestParam String compCode) {
+        return reportService.getSaleByBatchReport(vouNo, grnVouNo, compCode);
     }
 
     @GetMapping(value = "/getOrderReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody byte[] getOrderReport(@RequestParam String vouNo,
-                                               @RequestParam String compCode,
-                                               @RequestParam Integer macId) throws Exception {
-        String reportName = "OrderVoucher";
-        String exportPath = String.format("temp%s%s.json", File.separator, reportName + macId);
-        List<VOrder> listVSale = reportService.getOrderVoucher(vouNo, compCode);
-        Util1.writeJsonFile(listVSale, exportPath);
-        return new FileInputStream(exportPath).readAllBytes();
+    public Flux<VOrder> getOrderReport(@RequestParam String vouNo,
+                                       @RequestParam String compCode,
+                                       @RequestParam Integer macId) {
+        return reportService.getOrderVoucher(vouNo, compCode);
     }
 
     @GetMapping(value = "/getPurchaseReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
-        List<VPurchase> listPur = reportService.getPurchaseVoucher(vouNo, compCode);
-        return Flux.fromIterable(listPur);
+    public Flux<VPurchase> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) {
+        return reportService.getPurchaseVoucher(vouNo, compCode);
     }
 
     @GetMapping(value = "/getGRNReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getGRNReport(@RequestParam String vouNo, @RequestParam String compCode) throws Exception {
-        List<VPurchase> listPur = reportService.getGRNVoucher(vouNo, compCode);
-        return Flux.fromIterable(listPur);
+    public Flux<VPurchase> getGRNReport(@RequestParam String vouNo, @RequestParam String compCode) {
+        return reportService.getGRNVoucher(vouNo, compCode);
     }
 
     @GetMapping(value = "/getPurWeightReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> getPurWeightReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam String batchNo) {
-        List<VPurchase> list = reportService.getPurchaseByWeightVoucher(vouNo, Util1.isNull(batchNo, "-"), compCode);
-        return Flux.fromIterable(list);
+    public Flux<VPurchase> getPurWeightReport(@RequestParam String vouNo, @RequestParam String compCode, @RequestParam String batchNo) {
+        return reportService.getPurchaseByWeightVoucher(vouNo, Util1.isNull(batchNo, "-"), compCode);
     }
 
 
@@ -103,28 +78,28 @@ public class ReportController {
     }
 
     @GetMapping(value = "/getStockInOutVoucher", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<?> setStockInOutReport(@RequestParam String vouNo,
-                                       @RequestParam String compCode) {
-        List<VStockIO> listRI = reportService.getStockInOutVoucher(vouNo, compCode);
-        return Flux.fromIterable(listRI).onErrorResume(throwable -> Flux.empty());
+    public Flux<VStockIO> setStockInOutReport(@RequestParam String vouNo,
+                                              @RequestParam String compCode) {
+        return reportService.getStockInOutVoucher(vouNo, compCode);
     }
 
 
     @PostMapping(value = "/getReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ReturnObject> getReport(@RequestBody ReportFilter filter) {
         ReturnObject ro = ReturnObject.builder().build();
-        String exportPath = String.format("temp%s%s.json", File.separator, filter.getReportName() + filter.getMacId());
-        try {
-            if (isValidReportFilter(filter, ro)) {
-                String compCode = filter.getCompCode();
-                Integer deptId = filter.getDeptId();
+        if (isValidReportFilter(filter, ro)) {
+            String compCode = filter.getCompCode();
+            int macId = filter.getMacId();
+            int deptId = filter.getDeptId();
+            String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
+            List<String> listLocation = filter.getListLocation();
+            return locationService.insertTmp(listLocation, compCode, macId, warehouse).flatMap(aBoolean -> {
                 String locCode = Util1.isNull(filter.getLocCode(), "-");
                 String opDate = reportService.getOpeningDateByLocation(compCode, locCode);
                 String opPayableDate = reportService.getOpeningDate(compCode, OPHis.PAYABLE);
                 String fromDate = filter.getFromDate();
                 String toDate = filter.getToDate();
                 String curCode = filter.getCurCode();
-                int macId = filter.getMacId();
                 String stockCode = Util1.isNull(filter.getStockCode(), "-");
                 String brandCode = Util1.isNull(filter.getBrandCode(), "-");
                 String catCode = Util1.isNull(filter.getCatCode(), "-");
@@ -144,8 +119,6 @@ public class ReportController {
                 String fromDueDate = filter.getFromDueDate();
                 String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
-                String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
-                reportService.insertTmp(filter.getListLocation(), macId, "f_location", warehouse);
                 log.info("op date : " + opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
@@ -218,49 +191,37 @@ public class ReportController {
                         return reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId, locCode);
                     }
                     case "PurchaseList" -> {
-                        List<VPurchase> list = reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
+                        return reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
                                 typeCode, catCode, brandCode, locCode, labourGroupCode);
-                        Util1.writeJsonFile(list, exportPath);
-                    }
-                    case "InventoryClosingSummary" -> {
-                        List<ClosingBalance> balances = reportService.getClosingStock(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(balances, exportPath);
                     }
                     case "StockListByGroup" -> {
-                        List<General> generalList = reportService.getStockListByGroup(typeCode, compCode, macId);
-                        Util1.writeJsonFile(generalList, exportPath);
+                        return reportService.getStockListByGroup(typeCode, compCode, macId);
                     }
                     case "TopSaleByCustomer" -> {
                         return reportService.getTopSaleByCustomer(fromDate, toDate, deptId, compCode);
                     }
                     case "TopSaleBySaleMan" -> {
-                        List<General> sale = reportService.getTopSaleBySaleMan(fromDate, toDate, compCode);
-                        Util1.writeJsonFile(sale, exportPath);
+                        return reportService.getTopSaleBySaleMan(fromDate, toDate, compCode);
                     }
                     case "TopSaleByStock" -> {
                         return reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode, deptId);
                     }
                     case "OpeningByLocation" -> {
-                        List<VOpening> opening = reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode, deptId);
-                        Util1.writeJsonFile(opening, exportPath);
+                        return reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode, deptId);
                     }
                     case "OpeningByGroup" -> {
-                        List<VOpening> opGroup = reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
-                        Util1.writeJsonFile(opGroup, exportPath);
+                        return reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
                     }
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
                         return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-//                        Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockInOutDetail" -> {
-//                        reportService.calculateStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                         return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                    }
+//                    case "StockInOutSummaryByWeight" -> {
+//                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
 //                        Util1.writeJsonFile(listBalance, exportPath);
-                    }
-                    case "StockInOutSummaryByWeight" -> {
-                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
-                        Util1.writeJsonFile(listBalance, exportPath);
-                    }
+//                    }
                     case "StockInOutQtySummary", "StockInOutQtySummaryByStock" -> {
                         filter.setOpDate(opDate);
                         return stockReportService.getStockInOutPaddy(filter, false);
@@ -286,9 +247,9 @@ public class ReportController {
                         return stockReportService.getStockInOutPaddy(filter, false);
                     }
                     case "StockInOutDetailByWeight" -> {
-                        reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
-                        List<ClosingBalance> listBalance = reportService.getStockInOutDetailByWeight(typeCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(listBalance, exportPath);
+//                    reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
+//                    List<ClosingBalance> listBalance = reportService.getStockInOutDetailByWeight(typeCode, compCode, deptId, macId);
+//                    Util1.writeJsonFile(listBalance, exportPath);
                     }
                     case "StockValue" -> {
                         return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
@@ -297,88 +258,67 @@ public class ReportController {
                         return stockReportService.getStockValueRO(filter);
                     }
                     case "StockOutByVoucherTypeDetail" -> {
-                        List<VStockIO> values = reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                     }
                     case "StockInOutPriceCalender" -> {
-                        List<VStockIO> values = reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId);
                     }
                     case "SalePriceCalender" -> {
-                        List<VSale> values = reportService.getSalePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getSalePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                     }
                     case "PurchasePriceCalender" -> {
-                        List<VPurchase> values = reportService.getPurchasePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getPurchasePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                     }
                     case "ProductionOutputDetail" -> {
-                        List<VStockIO> values = reportService.getProcessOutputDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getProcessOutputDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                     }
                     case "ProductionOutputSummary" -> {
-                        List<VStockIO> values = reportService.getProcessOutputSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getProcessOutputSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                     }
                     case "ProductionUsageSummary" -> {
-                        List<VStockIO> values = reportService.getProcessUsageSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getProcessUsageSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                     }
                     case "ProductionUsageDetail" -> {
-                        List<VStockIO> values = reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
                     }
                     case "ProfitMarginByStock" -> {
-                        List<VSale> values = reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
                     }
                     case "CustomerBalanceDetail" -> {
-                        List<VSale> values = reportService.getCustomerBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getCustomerBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
                     }
                     case "CustomerBalanceSummary" -> {
-                        List<VSale> values = reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
                     }
                     case "SupplierBalanceDetail" -> {
-                        List<VSale> values = reportService.getSupplierBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getSupplierBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
                     }
                     case "SupplierBalanceSummary" -> {
-                        List<VSale> values = reportService.getSupplierBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
-                        Util1.writeJsonFile(values, exportPath);
+                        return reportService.getSupplierBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
                     }
                     case "SaleByDueDateSummary" -> {
-                        List<VSale> list = reportService.getSaleByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "SaleByDueDateDetail" -> {
-                        List<VSale> list = reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "OrderByDueDateSummary" -> {
-                        List<VOrder> list = reportService.getOrderByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getOrderByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "OrderByDueDateDetail" -> {
-                        List<VOrder> list = reportService.getOrderByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                        Util1.writeJsonFile(list, exportPath);
+                        return reportService.getOrderByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "StockPayableCustomerSummary" -> {
-                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
-                        Util1.writeJsonFile(list, exportPath);
+                        //return  reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
                     }
                     case "StockPayableCustomerDetail" -> {
-                        List<ClosingBalance> list = reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
-                        Util1.writeJsonFile(list, exportPath);
+                        //return reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
                     }
                     case "StockPayableConsignorSummary" -> {
-                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
-                        Util1.writeJsonFile(list, exportPath);
+                        //return reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
                     }
                     case "StockPayableConsignorDetail" -> {
-                        List<ClosingBalance> list = reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
-                        Util1.writeJsonFile(list, exportPath);
+                        //return reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
                     }
                     case "TopPurchaseQty" -> {
                         return reportR2dbcService.getTopPurchase(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
@@ -392,16 +332,12 @@ public class ReportController {
                         filter.setOpDate(opConsingDate);
                         return stockReportService.getStockInOutConsign(filter);
                     }
-                    default -> ro.setMessage("Report Not Exists.");
                 }
-                byte[] bytes = new FileInputStream(exportPath).readAllBytes();
-                ro.setFile(bytes);
-            }
-        } catch (Exception e) {
-            log.error(String.format("getReport : %s", e));
-            ro.setMessage(e.getMessage());
+                ro.setMessage("Report Not Exists.");
+                return Mono.just(ro);
+            });
         }
-        return Mono.justOrEmpty(ro);
+        return Mono.just(ro);
     }
 
 
@@ -517,7 +453,7 @@ public class ReportController {
 
 
     @PostMapping(path = "/getReorderLevel")
-    public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) throws Exception {
+    public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) {
         String compCode = filter.getCompCode();
         String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
         String catCode = Util1.isNull(filter.getCatCode(), "-");
@@ -532,9 +468,8 @@ public class ReportController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        List<ReorderLevel> reorderLevels = reportService.getReorderLevel(opDate, clDate, typeCode, catCode,
+        return reportService.getReorderLevel(opDate, clDate, typeCode, catCode,
                 brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
-        return Flux.fromIterable(reorderLevels).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getSmallQty")
@@ -543,19 +478,19 @@ public class ReportController {
     }
 
     @PostMapping(path = "/getSaleSummaryByDepartment")
-    public Flux<?> getSaleSummaryByDepartment(@RequestBody ReportFilter filter) {
+    public Flux<VSale> getSaleSummaryByDepartment(@RequestBody ReportFilter filter) {
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();
-        return Flux.fromIterable(reportService.getSaleSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
+        return reportService.getSaleSummaryByDepartment(fromDate, toDate, compCode);
     }
 
     @PostMapping(path = "/getOrderSummaryByDepartment")
-    public Flux<?> getOrderSummaryByDepartment(@RequestBody ReportFilter filter) {
+    public Flux<VOrder> getOrderSummaryByDepartment(@RequestBody ReportFilter filter) {
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();
-        return Flux.fromIterable(reportService.getOrderSummaryByDepartment(fromDate, toDate, compCode)).onErrorResume(throwable -> Flux.empty());
+        return reportService.getOrderSummaryByDepartment(fromDate, toDate, compCode);
     }
 
     @GetMapping(path = "/getLandingReport")

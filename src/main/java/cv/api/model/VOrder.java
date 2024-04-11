@@ -26,11 +26,11 @@ public class VOrder {
     private String curCode;
     private String remark;
     private Double vouTotal;
-    private Float grandTotal;
-    private Float discount;
-    private Float discountPrice;
-    private Float taxAmt;
-    private Float taxPrice;
+    private Double grandTotal;
+    private Double discount;
+    private Double discountPrice;
+    private Double taxAmt;
+    private Double taxPrice;
     private String createdDate;
     private String createdBy;
     private boolean deleted;
@@ -47,10 +47,10 @@ public class VOrder {
     private String stockUserCode;
     private String stockCode;
     private String expiredDate;
-    private Float qty;
+    private Double qty;
     private String saleUnit;
-    private Float salePrice;
-    private Float saleAmount;
+    private Double salePrice;
+    private Double saleAmount;
     private String locCode;
     private Integer uniqueId;
     private String traderName;
@@ -68,7 +68,7 @@ public class VOrder {
     private String regionName;
     private String stockTypeName;
     private String refNo;
-    private float lastBalance;
+    private Double lastBalance;
     private String compCode;
     private String relName;
     private String qtyStr;
@@ -76,7 +76,7 @@ public class VOrder {
     private String batchNo;
     private String reference;
     private String supplierName;
-    private Float weight;
+    private Double weight;
     private String weightUnit;
     private String phoneNo;
     private String address;

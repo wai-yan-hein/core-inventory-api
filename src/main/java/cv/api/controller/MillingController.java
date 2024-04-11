@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 /**
  * @author wai yan
  */
@@ -83,9 +81,8 @@ public class MillingController {
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
         String jobNo = Util1.isNull(filter.getJobNo(), "-");
-        List<MillingHis> listPur = reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
-                stockCode, locCode, compCode, deptId, deleted, projectNo,curCode, jobNo);
-        return Flux.fromIterable(listPur).onErrorResume(throwable -> Flux.empty());
+        return reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
+                stockCode, locCode, compCode, deptId, deleted, projectNo, curCode, jobNo);
     }
 
     @PostMapping(path = "/deleteMilling")
@@ -111,8 +108,8 @@ public class MillingController {
 
     @GetMapping(path = "/getRawDetail")
     public Flux<?> getRawDetail(@RequestParam String vouNo,
-                                 @RequestParam String compCode,
-                                 @RequestParam Integer deptId) {
+                                @RequestParam String compCode,
+                                @RequestParam Integer deptId) {
         return Flux.fromIterable(millingHisService.getMillingRaw(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
@@ -124,13 +121,14 @@ public class MillingController {
 
     @GetMapping(path = "/getOutputDetail")
     public Flux<?> getOutputDetail(@RequestParam String vouNo,
-                                    @RequestParam String compCode,
-                                    @RequestParam Integer deptId) {
+                                   @RequestParam String compCode,
+                                   @RequestParam Integer deptId) {
         return Flux.fromIterable(millingHisService.getMillingOut(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
+
     @GetMapping(path = "/getUsageDetail")
     public Flux<?> getUsageDetail(@RequestParam String vouNo,
-                                   @RequestParam String compCode) {
+                                  @RequestParam String compCode) {
         return Flux.fromIterable(millingHisService.getMillingUsage(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
     }
 }
