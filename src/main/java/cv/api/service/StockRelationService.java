@@ -732,7 +732,8 @@ public class StockRelationService {
                                             boolean calRO, String compCode, Integer deptId, Integer macId) {
         Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        return op.then(cl).then(initRelation(compCode).then(getStkValue(macId, compCode)));
+        Mono<Boolean> price = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, macId);
+        return op.then(cl).then(price).then(initRelation(compCode).then(getStkValue(macId, compCode)));
     }
 
     private Mono<ReturnObject> getStkInOutSummary(Integer macId) {
@@ -951,4 +952,178 @@ public class StockRelationService {
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
+    @Transactional
+    private Mono<Boolean> calculatePrice(String toDate, String opDate, String stockCode,
+                                         String typeCode, String catCode, String brandCode,
+                                         String compCode, Integer macId) {
+        String delSql = """
+                delete from tmp_stock_price where mac_id = :macId
+                """;
+        String purSql = """
+                insert into tmp_stock_price(tran_option,stock_code,pur_avg_price,mac_id)
+                select 'PUR-AVG',stock_code,avg(small_price),:macId
+                from (
+                select 'PUR-AVG',pur.stock_code,(pur.pur_price/rel.smallest_qty) small_price
+                from v_purchase pur
+                join v_relation rel
+                on pur.rel_code = rel.rel_code
+                and pur.comp_code = rel.comp_code
+                and pur.pur_unit = rel.unit
+                where deleted = false
+                and date(vou_date) <=:toDate
+                and pur.comp_code =:compCode
+                and (pur.stock_code = :stockCode or '-' =:stockCode)
+                and (pur.stock_type_code = :typeCode or '-' =:typeCode)
+                and (pur.brand_code = :brandCode or '-' =:brandCode)
+                and (pur.category_code = :catCode or '-' =:catCode)
+                group by pur.stock_code,small_price
+                    union all
+                select 'OP',op.stock_code,(op.price/rel.smallest_qty) small_price
+                from v_opening op
+                join v_relation rel
+                on op.rel_code = rel.rel_code
+                and op.comp_code = rel.comp_code
+                and op.unit = rel.unit
+                where op.price > 0
+                and deleted = false
+                and date(op_date) <=:toDate
+                and op.comp_code =:compCode
+                and (op.stock_code = :stockCode or '-' =:stockCode)
+                and (op.stock_type_code = :typeCode or '-' =:typeCode)
+                and (op.brand_code = :brandCode or '-' =:brandCode)
+                and (op.category_code = :catCode or '-' =:catCode)
+                group by op.stock_code,small_price)a
+                group by stock_code""";
+        String sInSql = """
+                insert into tmp_stock_price(tran_option,stock_code,in_avg_price,mac_id)
+                select 'SIN-AVG',stock_code,avg(small_price),:macId
+                from(
+                select 'SIN-AVG',a.stock_code,(a.cost_price/rel.smallest_qty) small_price
+                from (
+                select stock_code,cost_price,ifnull(in_unit,out_unit) unit,comp_code,rel_code
+                from v_stock_io
+                where cost_price >0
+                and deleted = false
+                and date(vou_date) <=:toDate
+                and comp_code =:compCode
+                and (stock_code = :stockCode or '-' =:stockCode)
+                and (stock_type_code = :typeCode or '-' =:typeCode)
+                and (brand_code = :brandCode or '-' =:brandCode)
+                and (category_code = :catCode or '-' =:catCode)
+                group by stock_code,cost_price,ifnull(in_unit,out_unit)
+                )a
+                join v_relation rel on a.rel_code =rel.rel_code
+                and a.unit =rel.unit
+                and a.comp_code =rel.comp_code
+                group by stock_code,small_price
+                    union all
+                select 'OP',op.stock_code,(op.price/rel.smallest_qty) small_price
+                from v_opening op
+                join v_relation rel
+                on op.rel_code = rel.rel_code
+                and op.comp_code = rel.comp_code
+                and op.unit = rel.unit
+                where op.price > 0
+                and op.deleted = false
+                and date(op_date) =:opDate
+                and op.comp_code =:compCode
+                and (op.stock_code = :stockCode or '-' =:stockCode)
+                and (op.stock_type_code = :typeCode or '-' =:typeCode)
+                and (op.brand_code = :brandCode or '-' =:brandCode)
+                and (op.category_code = :catCode or '-' =:catCode)
+                group by op.stock_code,small_price
+                )a
+                group by stock_code""";
+        String purRecentSql = """
+                insert into tmp_stock_price(stock_code,tran_option,pur_recent_price,mac_id)
+                select a.stock_code,'PUR_RECENT',a.pur_price/rel.smallest_qty pur_price,:macId
+                from (
+                with rows_and_position as
+                (
+                select stock_code, pur_price,pur_unit,row_number() over (partition by stock_code order by vou_date desc) as position,rel_code,comp_code,dept_id
+                from v_purchase
+                where date(vou_date) <=:toDate
+                and comp_code =:compCode
+                and deleted = false
+                and (stock_code = :stockCode or '-' =:stockCode)
+                and (stock_type_code = :typeCode or '-' =:typeCode)
+                and (brand_code = :brandCode or '-' =:brandCode)
+                and (category_code = :catCode or '-' =:catCode)
+                  )
+                select stock_code, pur_price,pur_unit,rel_code,comp_code,dept_id
+                from  rows_and_position
+                where position =1
+                )a
+                join v_relation rel
+                on a.rel_code = rel.rel_code
+                and a.pur_unit = rel.unit
+                and a.comp_code = rel.comp_code
+                """;
+        String ioRecent = """
+                insert into tmp_stock_price(stock_code,tran_option,io_recent_price,mac_id)
+                select a.stock_code,'IO_RECENT',a.cost_price/rel.smallest_qty price,:macId
+                from (
+                with rows_and_position as
+                  (
+                    select stock_code, cost_price,ifnull(in_unit,out_unit) unit,row_number() over (partition by stock_code order by vou_date desc) as position,rel_code,comp_code,dept_id
+                    from v_stock_io
+                    where date(vou_date) <=:toDate
+                    and comp_code =:compCode
+                    and deleted = false
+                    and cost_price>0
+                    and (stock_code = :stockCode or '-' =:stockCode)
+                    and (stock_type_code = :typeCode or '-' =:typeCode)
+                    and (brand_code = :brandCode or '-' =:brandCode)
+                    and (category_code = :catCode or '-' =:catCode)
+                  )
+                select stock_code, cost_price,unit,rel_code,comp_code,dept_id
+                from  rows_and_position
+                where position =1
+                )a
+                join v_relation rel
+                on a.rel_code = rel.rel_code
+                and a.unit = rel.unit
+                and a.comp_code = rel.comp_code""";
+        Mono<Boolean> deleteMono = client.sql(delSql)
+                .bind("macId", macId)
+                .fetch().rowsUpdated().thenReturn(true);
+        Mono<Boolean> purMono = client.sql(purSql)
+                .bind("macId", macId)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated().thenReturn(true);
+        Mono<Boolean> ioMono = client.sql(sInSql)
+                .bind("macId", macId)
+                .bind("opDate", opDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated().thenReturn(true);
+        Mono<Boolean> purRecentMono = client.sql(purRecentSql)
+                .bind("macId", macId)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated().thenReturn(true);
+        Mono<Boolean> ioRecentMono = client.sql(ioRecent)
+                .bind("macId", macId)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated().thenReturn(true);
+        return deleteMono.then(purMono).then(ioMono).then(purRecentMono).then(ioRecentMono);
+    }
 }
