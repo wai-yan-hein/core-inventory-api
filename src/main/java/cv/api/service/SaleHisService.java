@@ -46,7 +46,7 @@ public class SaleHisService {
     public Mono<SaleHis> save(SaleHis sh) {
         Integer deptId = sh.getDeptId();
         if (deptId == null) {
-            log.error("deptId is null from mac id : " + sh.getMacId());
+            log.error("deptId is null from mac id : {}", sh.getMacId());
             return Mono.empty();
         }
         return saveSale(sh).flatMap((saleHis) -> saveSaleExpense(saleHis).then(saveVouDiscount(saleHis)).then(saveSaleOrderJoin(saleHis)).thenReturn(saleHis));
@@ -57,7 +57,7 @@ public class SaleHisService {
         String compCode = sh.getKey().getCompCode();
         List<SaleExpense> list = sh.getListExpense();
         if (list != null) {
-            return Flux.fromIterable(list)
+            return saleExpenseService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
                     .filter(e -> Util1.getDouble(e.getAmount()) > 0 && e.getKey().getExpenseCode() != null)
                     .flatMap(e -> {
                         if (e.getKey().getUniqueId() == 0) {
@@ -69,7 +69,7 @@ public class SaleHisService {
                         return saleExpenseService.insert(e).thenReturn(true);
                     })
                     .next()
-                    .defaultIfEmpty(false);
+                    .defaultIfEmpty(false));
         } else {
             return Mono.just(false);
         }
@@ -635,6 +635,17 @@ public class SaleHisService {
                         .disAcc(row.get("dis_acc", String.class))
                         .taxAcc(row.get("tax_acc", String.class))
                         .build()).one();
+    }
+
+    public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
+        String sql = """
+                update sale_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("ACK", Parameters.in(R2dbcType.VARCHAR, ack))
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
     }
 
 

@@ -483,4 +483,14 @@ public class RetOutService {
                         .build())
                 .all();
     }
+    public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
+        String sql = """
+                update ret_out_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("ACK", Parameters.in(R2dbcType.VARCHAR, ack))
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
 }

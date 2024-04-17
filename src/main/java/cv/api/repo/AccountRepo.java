@@ -32,7 +32,6 @@ public class AccountRepo {
     private final Environment environment;
     private final TraderService traderService;
     private final PurExpenseService purExpenseService;
-    private final ExpenseService expenseService;
     private final AccSettingService settingService;
     private final SaleExpenseService saleExpenseService;
     private final LabourPaymentService labourPaymentService;
@@ -41,6 +40,7 @@ public class AccountRepo {
     private final PurHisService purHisService;
     private final RetInService retInService;
     private final RetOutService retOutService;
+
 
     private boolean isIntegrate() {
         return Util1.getBoolean(environment.getProperty("integration"));
@@ -57,10 +57,10 @@ public class AccountRepo {
                             String vouNo = response.getVouNo();
                             String compCode = response.getCompCode();
                             switch (response.getTranSource()) {
-                                case "SALE" -> updateSale(vouNo, compCode);
-                                case "PURCHASE" -> updatePurchase(vouNo, compCode);
-                                case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
-                                case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+                                case "SALE" -> updateSale(ACK, vouNo, compCode);
+                                case "PURCHASE" -> updatePurchase(ACK, vouNo, compCode);
+                                case "RETURN_IN" -> updateReturnIn(ACK, vouNo, compCode);
+                                case "RETURN_OUT" -> updateReturnOut(ACK, vouNo, compCode);
                                 case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
                                 case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
                             }
@@ -71,10 +71,10 @@ public class AccountRepo {
                         String compCode = gl.getKey().getCompCode();
                         String tranSource = gl.getTranSource();
                         switch (tranSource) {
-                            case "SALE" -> updateSaleNull(vouNo, compCode);
-                            case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
-                            case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
-                            case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+                            case "SALE" -> updateSale(null, vouNo, compCode);
+                            case "PURCHASE" -> updatePurchase(null, vouNo, compCode);
+                            case "RETURN_IN" -> updateReturnIn(null, vouNo, compCode);
+                            case "RETURN_OUT" -> updateReturnOut(null, vouNo, compCode);
                             case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
                             case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
                         }
@@ -96,74 +96,21 @@ public class AccountRepo {
                 .bodyToMono(String.class);
     }
 
-    private void updateSale(String vouNo, String compCode) {
-        String sql = "update sale_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateSale: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateSale: %s", e.getMessage()));
-        }
+    private void updateSale(String ack, String vouNo, String compCode) {
+        saleHisService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-    private void updateSaleNull(String vouNo, String compCode) {
-        String sql = "update sale_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-        } catch (Exception e) {
-            log.error(String.format("updateSale: %s", e.getMessage()));
-        }
+    private void updatePurchase(String ack, String vouNo, String compCode) {
+        saleHisService.updateACK(ack, vouNo, compCode).subscribe();
+
     }
 
-    private void updatePurchase(String vouNo, String compCode) {
-        String sql = "update pur_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updatePurchase: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updatePurchase: %s", e.getMessage()));
-        }
+    private void updateReturnIn(String ack, String vouNo, String compCode) {
+        retInService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-
-    private void updatePurchaseNull(String vouNo, String compCode) {
-        String sql = "update pur_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updatePurchase: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updatePurchase: %s", e.getMessage()));
-        }
-    }
-
-    private void updateReturnInNull(String vouNo, String compCode) {
-        String sql = "update ret_in_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnIn: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnIn: %s", e.getMessage()));
-        }
-    }
-
-    private void updateReturnIn(String vouNo, String compCode) {
-        String sql = "update ret_in_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnIn: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnIn: %s", e.getMessage()));
-        }
-    }
-
-    private void updateReturnOutNull(String vouNo, String compCode) {
-        String sql = "update ret_out_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnOut: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnOut: %s", e.getMessage()));
-        }
+    private void updateReturnOut(String ack, String vouNo, String compCode) {
+        retOutService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
     private void updatePaymentNull(String vouNo, String compCode) {
@@ -175,24 +122,9 @@ public class AccountRepo {
         }
     }
 
-    private void updateReturnOut(String vouNo, String compCode) {
-        String sql = "update ret_out_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnOut: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnOut: %s", e.getMessage()));
-        }
-    }
 
     private void updateTrader(String traderCode, String account, String compCode) {
-        String sql = "update trader set intg_upd_status = '" + ACK + "',account = '" + account + "' where code ='" + traderCode + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateTrader: %s", traderCode));
-        } catch (Exception e) {
-            log.error(String.format("updateTrader: %s", e.getMessage()));
-        }
+        traderService.updateACK(traderCode, account, compCode).subscribe();
     }
 
     private void updatePayment(String vouNo, String compCode, String status) {
@@ -200,17 +132,12 @@ public class AccountRepo {
         try {
             reportService.executeSql(sql);
         } catch (Exception e) {
-            log.error("updatePayment : " + e.getMessage());
+            log.error("updatePayment : {}", e.getMessage());
         }
     }
 
     private void updateLabourPayment(String vouNo, String compCode, String status) {
-        labourPaymentService.update(vouNo, compCode, status).doOnSuccess(update -> {
-            if (update) {
-                log.info("updateLabourPayment : " + vouNo);
-            }
-        }).subscribe();
-
+        labourPaymentService.update(vouNo, compCode, status).subscribe();
     }
 
 
@@ -260,7 +187,7 @@ public class AccountRepo {
                 .body(Mono.just(t), AccTrader.class)
                 .retrieve().bodyToMono(AccTrader.class)
                 .onErrorResume(e -> {
-                    log.error("saveTrader :" + e.getMessage());
+                    log.error("saveTrader :{}", e.getMessage());
                     return Mono.empty();
                 }).doOnSuccess(response -> {
                     if (response != null) {
@@ -284,7 +211,7 @@ public class AccountRepo {
                 .body(Mono.just(key), AccTraderKey.class)
                 .retrieve()
                 .bodyToMono(ReturnObject.class)
-                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
+                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : {}", e.getMessage()));
     }
 
     public Mono<Void> sendSaleAsync(SaleHis obj) {
@@ -456,46 +383,43 @@ public class AccountRepo {
                             listGl.add(gl);
                         }
                         return saleExpenseService.search(vouNo, compCode)
-                                .flatMap(se -> {
-                                    String expCode = se.getKey().getExpenseCode();
-                                    ExpenseKey ek = ExpenseKey.builder().build();
-                                    ek.setExpenseCode(expCode);
-                                    ek.setCompCode(compCode);
-                                    return expenseService.findById(ek)
-                                            .map(expense -> {
-                                                String account = expense.getAccountCode();
-                                                double amt = Util1.getDouble(se.getAmount());
-                                                if (!Util1.isNullOrEmpty(account)) {
-                                                    Gl gl = new Gl();
-                                                    GlKey key = new GlKey();
-                                                    key.setCompCode(compCode);
-                                                    key.setDeptId(deptId);
-                                                    gl.setKey(key);
-                                                    gl.setGlDate(vouDate);
-                                                    gl.setSrcAccCode(account);
-                                                    gl.setAccCode(balAcc);
-                                                    gl.setDrAmt(amt);
-                                                    gl.setTraderCode(traderCode);
-                                                    gl.setCurCode(curCode);
-                                                    gl.setDescription(expense.getExpenseName());
-                                                    gl.setReference(remark);
-                                                    gl.setDeptCode(deptCode);
-                                                    gl.setCreatedDate(LocalDateTime.now());
-                                                    gl.setCreatedBy(appName);
-                                                    gl.setTranSource(tranSource);
-                                                    gl.setRefNo(vouNo);
-                                                    gl.setDeleted(deleted);
-                                                    gl.setMacId(macId);
-                                                    gl.setBatchNo(batchNo);
-                                                    gl.setProjectNo(projectNo);
-                                                    return gl;
-                                                } else {
-                                                    return null; // Skip if account is null or empty
-                                                }
-                                            });
+                                .flatMap(e -> {
+                                    String account = e.getAccount();
+                                    double amt = e.getAmount();
+                                    if (!Util1.isNullOrEmpty(account)) {
+                                        Gl gl = new Gl();
+                                        GlKey key = new GlKey();
+                                        key.setCompCode(compCode);
+                                        key.setDeptId(deptId);
+                                        gl.setKey(key);
+                                        gl.setGlDate(vouDate);
+                                        gl.setSrcAccCode(account);
+                                        gl.setAccCode(balAcc);
+                                        gl.setDrAmt(amt);
+                                        gl.setTraderCode(traderCode);
+                                        gl.setCurCode(curCode);
+                                        gl.setDescription(e.getExpenseName());
+                                        gl.setReference(remark);
+                                        gl.setDeptCode(deptCode);
+                                        gl.setCreatedDate(LocalDateTime.now());
+                                        gl.setCreatedBy(appName);
+                                        gl.setTranSource(tranSource);
+                                        gl.setRefNo(vouNo);
+                                        gl.setDeleted(deleted);
+                                        gl.setMacId(macId);
+                                        gl.setBatchNo(batchNo);
+                                        gl.setProjectNo(projectNo);
+                                        return Mono.just(gl);
+                                    } else {
+                                        return Mono.empty();
+                                    }
                                 })
-                                .collectList();
-
+                                .collectList()
+                                .map(listExp -> {
+                                    listGl.addAll(listExp);
+                                    return listGl;
+                                })
+                                .switchIfEmpty(Mono.just(listGl));
                     }).doOnNext(this::sendAccount).then();
         } else {
             return Mono.empty();
@@ -644,46 +568,45 @@ public class AccountRepo {
                             listGl.add(gl);
                         }
                         return purExpenseService.search(vouNo, compCode)
-                                .collectList()
-                                .map(list -> {
-                                    for (PurExpense e : list) {
-                                        String expCode = e.getKey().getExpenseCode();
-                                        ExpenseKey ek = ExpenseKey.builder().build();
-                                        ek.setExpenseCode(expCode);
-                                        ek.setCompCode(compCode);
-                                        Expense expense = expenseService.findById(ek).block();
-                                        if (expense != null) {
-                                            String account = expense.getAccountCode();
-                                            double amt = Util1.getDouble(e.getAmount());
-                                            if (!Util1.isNullOrEmpty(account)) {
-                                                Gl gl = new Gl();
-                                                GlKey key = new GlKey();
-                                                key.setCompCode(compCode);
-                                                key.setDeptId(deptId);
-                                                gl.setKey(key);
-                                                gl.setGlDate(vouDate);
-                                                gl.setSrcAccCode(account);
-                                                gl.setAccCode(balAcc);
-                                                gl.setCrAmt(amt);
-                                                gl.setTraderCode(traderCode);
-                                                gl.setCurCode(curCode);
-                                                gl.setDescription(expense.getExpenseName());
-                                                gl.setReference(remark);
-                                                gl.setDeptCode(deptCode);
-                                                gl.setCreatedDate(LocalDateTime.now());
-                                                gl.setCreatedBy(appName);
-                                                gl.setTranSource(tranSource);
-                                                gl.setRefNo(vouNo);
-                                                gl.setDeleted(deleted);
-                                                gl.setMacId(macId);
-                                                gl.setBatchNo(batchNo);
-                                                gl.setProjectNo(projectNo);
-                                                listGl.add(gl);
-                                            }
-                                        }
+                                .flatMap(e -> {
+                                    String expCode = e.getKey().getExpenseCode();
+                                    ExpenseKey ek = ExpenseKey.builder().build();
+                                    ek.setExpenseCode(expCode);
+                                    ek.setCompCode(compCode);
+                                    String account = e.getAccount();
+                                    double amt = Util1.getDouble(e.getAmount());
+                                    if (!Util1.isNullOrEmpty(account)) {
+                                        Gl gl = new Gl();
+                                        GlKey key = new GlKey();
+                                        key.setCompCode(compCode);
+                                        key.setDeptId(deptId);
+                                        gl.setKey(key);
+                                        gl.setGlDate(vouDate);
+                                        gl.setSrcAccCode(account);
+                                        gl.setAccCode(balAcc);
+                                        gl.setCrAmt(amt);
+                                        gl.setTraderCode(traderCode);
+                                        gl.setCurCode(curCode);
+                                        gl.setDescription(e.getExpenseName());
+                                        gl.setReference(remark);
+                                        gl.setDeptCode(deptCode);
+                                        gl.setCreatedDate(LocalDateTime.now());
+                                        gl.setCreatedBy(appName);
+                                        gl.setTranSource(tranSource);
+                                        gl.setRefNo(vouNo);
+                                        gl.setDeleted(deleted);
+                                        gl.setMacId(macId);
+                                        gl.setBatchNo(batchNo);
+                                        gl.setProjectNo(projectNo);
+                                        return Mono.just(gl);
+                                    } else {
+                                        return Mono.empty();
                                     }
+                                })
+                                .collectList().map(listExp -> {
+                                    listGl.addAll(listExp);
                                     return listGl;
-                                });
+                                }).switchIfEmpty(Mono.just(listGl));
                     }).doOnNext(this::sendAccount).then();
         } else {
             return Mono.empty();
@@ -1155,10 +1078,10 @@ public class AccountRepo {
                     String vouNo = gl.getRefNo();
                     String compCode = gl.getKey().getCompCode();
                     switch (gl.getTranSource()) {
-                        case "SALE" -> updateSale(vouNo, compCode);
-                        case "PURCHASE" -> updatePurchase(vouNo, compCode);
-                        case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
-                        case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
+                        case "SALE" -> updateSale(ACK, vouNo, compCode);
+                        case "PURCHASE" -> updatePurchase(ACK, vouNo, compCode);
+                        case "RETURN_IN" -> updateReturnIn(ACK, vouNo, compCode);
+                        case "RETURN_OUT" -> updateReturnOut(ACK, vouNo, compCode);
                         case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
                     }
                 }).doOnError(e -> {
@@ -1166,13 +1089,13 @@ public class AccountRepo {
                     String compCode = gl.getKey().getCompCode();
                     String tranSource = gl.getTranSource();
                     switch (tranSource) {
-                        case "SALE" -> updateSaleNull(vouNo, compCode);
-                        case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
-                        case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
-                        case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
+                        case "SALE" -> updateSale(null, vouNo, compCode);
+                        case "PURCHASE" -> updatePurchase(null, vouNo, compCode);
+                        case "RETURN_IN" -> updateReturnIn(null, vouNo, compCode);
+                        case "RETURN_OUT" -> updateReturnOut(null, vouNo, compCode);
                         case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
                     }
-                    log.error("deleteGlByVoucher : " + e.getMessage());
+                    log.error("deleteGlByVoucher : {}", e.getMessage());
                 }).subscribe();
     }
 

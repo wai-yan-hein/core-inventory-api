@@ -1,9 +1,8 @@
 package cv.api.service;
 
+import cv.api.common.Util1;
 import cv.api.entity.PurExpense;
 import cv.api.entity.PurExpenseKey;
-import io.r2dbc.spi.Parameters;
-import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -17,11 +16,11 @@ import reactor.core.publisher.Mono;
 public class PurExpenseService {
     private final DatabaseClient client;
 
-    public Mono<PurExpense> save(PurExpense dto) {
+    public Mono<PurExpense> insert(PurExpense dto) {
         String sql = """
-                 INSERT INTO pur_expense (expense_code, vou_no, comp_code, unique_id, amount, percent)
-                 VALUES (:expenseCode, :vouNo, :compCode, :uniqueId, :amount, :percent)
-                 """;
+                INSERT INTO pur_expense (expense_code, vou_no, comp_code, unique_id, amount, percent)
+                VALUES (:expenseCode, :vouNo, :compCode, :uniqueId, :amount, :percent)
+                """;
         return client
                 .sql(sql)
                 .bind("expenseCode", dto.getKey().getExpenseCode())
@@ -29,21 +28,30 @@ public class PurExpenseService {
                 .bind("compCode", dto.getKey().getCompCode())
                 .bind("uniqueId", dto.getKey().getUniqueId())
                 .bind("amount", dto.getAmount())
-                .bind("percent", Parameters.in(R2dbcType.DOUBLE,dto.getPercent()))
+                .bind("percent", Util1.getDouble(dto.getPercent()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
     }
 
+    public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
+        String sql = """
+                delete from pur_expense where vou_no =:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
 
     public Flux<PurExpense> search(String vouNo, String compCode) {
         String sql = """
-             SELECT a.*, e.expense_name
-             FROM pur_expense a
-             JOIN expense e ON a.expense_code = e.expense_code AND a.comp_code = e.comp_code
-             WHERE a.vou_no = :vouNo AND a.comp_code = :compCode
-             ORDER BY a.unique_id
-             """;
+                SELECT a.*, e.account_code,e.expense_name
+                FROM pur_expense a
+                JOIN expense e ON a.expense_code = e.expense_code AND a.comp_code = e.comp_code
+                WHERE a.vou_no = :vouNo AND a.comp_code = :compCode
+                ORDER BY a.unique_id
+                """;
 
         return client.sql(sql)
                 .bind("vouNo", vouNo)
@@ -58,6 +66,7 @@ public class PurExpenseService {
                         .expenseName(row.get("expense_name", String.class))
                         .amount(row.get("amount", Double.class))
                         .percent(row.get("percent", Double.class))
+                        .account(row.get("account_code", String.class))
                         .build())
                 .all();
     }

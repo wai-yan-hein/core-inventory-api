@@ -65,14 +65,13 @@ public class MillingController {
     }
 
     @PostMapping(path = "/getMilling")
-    public Flux<?> getMilling(@RequestBody ReportFilter filter) throws Exception {
+    public Flux<?> getMilling(@RequestBody ReportFilter filter)  {
         String fromDate = Util1.isNull(filter.getFromDate(), "-");
         String toDate = Util1.isNull(filter.getToDate(), "-");
         String vouNo = Util1.isNull(filter.getVouNo(), "-");
         String userCode = Util1.isNull(filter.getUserCode(), "-");
         String cusCode = Util1.isNull(filter.getTraderCode(), "-");
         String remark = Util1.isNull(filter.getRemark(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
         String ref = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
@@ -82,7 +81,7 @@ public class MillingController {
         String curCode = Util1.isAll(filter.getCurCode());
         String jobNo = Util1.isNull(filter.getJobNo(), "-");
         return reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
-                stockCode, locCode, compCode, deptId, deleted, projectNo, curCode, jobNo);
+                locCode, compCode, deptId, deleted, projectNo, curCode, jobNo);
     }
 
     @PostMapping(path = "/deleteMilling")

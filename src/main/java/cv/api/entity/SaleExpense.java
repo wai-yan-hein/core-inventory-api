@@ -15,4 +15,5 @@ public class SaleExpense {
     private SaleExpenseKey key;
     private Double amount;
     private String expenseName;
+    private String account;
 }

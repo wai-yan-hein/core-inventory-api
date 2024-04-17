@@ -30,7 +30,7 @@ public class SaleExpenseService {
     }
     public Flux<SaleExpense> search(String vouNo, String compCode) {
         String sql = """
-            SELECT a.*, e.expense_name
+            SELECT a.*,e.account_code, e.expense_name
             FROM (
                 SELECT *
                 FROM sale_expense
@@ -55,8 +55,18 @@ public class SaleExpenseService {
                                 .build())
                         .expenseName(row.get("expense_name", String.class))
                         .amount(row.get("amount", Double.class))
+                        .account(row.get("account_code",String.class))
                         .build())
                 .all();
+    }
+    public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
+        String sql = """
+                delete from sale_expense where vou_no =:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
     }
 
 

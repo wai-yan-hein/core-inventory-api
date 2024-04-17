@@ -122,13 +122,13 @@ public class ReportController {
                 log.info("op date : " + opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
-                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
+                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
                     }
                     case "SaleByCustomerSummary" -> {
-                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId);
+                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode);
                     }
                     case "SaleBySaleManDetail" -> {
-                        return reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode, macId);
+                        return reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode);
                     }
                     case "SaleBySaleManSummary" -> {
                         return reportService.getSaleBySaleManSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, smCode, compCode, deptId);
@@ -167,10 +167,10 @@ public class ReportController {
                         return reportService.getOrderByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
                     }
                     case "OrderByProjectSummary" -> {
-                        return reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        return reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId);
                     }
                     case "PurchaseBySupplierDetail" -> {
-                        return reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId);
+                        return reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
                     }
                     case "PurchaseBySupplierSummary" -> {
                         return reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
@@ -179,7 +179,7 @@ public class ReportController {
                         return reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
                     }
                     case "PurchaseByProjectSummary" -> {
-                        return reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId, projectNo);
+                        return reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
                     }
                     case "PurchaseByStockSummary" -> {
                         return reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);

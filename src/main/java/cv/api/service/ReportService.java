@@ -34,12 +34,9 @@ import java.util.*;
 @Slf4j
 public class ReportService {
     private final DecimalFormat formatter = new DecimalFormat("###.##");
-    private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
     private final ReportDao reportDao;
-    private final LandingHisPriceDao landingHisPriceDao;
     private final DatabaseClient client;
     private final OPHisService opHisService;
-    private final UnitRelationService unitRelationService;
 
 
     public void executeSql(String... sql) {
@@ -185,7 +182,7 @@ public class ReportService {
                     sale.setRegionName(row.get("reg_name", String.class));
                     sale.setSaleUnitName(row.get("sale_unit_name", String.class));
                     sale.setWeightUnitName(row.get("weight_unit_name", String.class));
-                    Double weight = row.get("weight", Double.class);
+                    double weight = Util1.getDouble(row.get("weight", Double.class));
                     if (weight > 0) {
                         sale.setWeight(weight);
                         sale.setWeightUnit(row.get("weight_unit", String.class));
@@ -210,37 +207,36 @@ public class ReportService {
                 and v.comp_code = os.comp_code
                 where v.vou_no = :vouNo
                 and v.comp_code = :compCode""";
-        return null;
-//        return client.sql(sql)
-//                .bind("vouNo", vouNo)
-//                .bind("compCode", compCode)
-//                .map(row -> {
-//                    VOrder order = new VOrder();
-//                    String remark = row.get("remark", String.class);
-//                    order.setTraderCode(row.get("t_user_code", String.class));
-//                    order.setTraderName(row.get("trader_name", String.class));
-//                    order.setRemark(remark);
-//                    order.setPhoneNo(row.get("phone", String.class));
-//                    order.setAddress(row.get("address", String.class));
-//                    order.setRfId(row.get("rfid", String.class));
-//                    order.setVouNo(row.get("vou_no", String.class));
-//                    order.setVouDate(Util1.toDateStr(row.get("vou_date", java.sql.Date.class), "dd/MM/yyyy"));
-//                    order.setStockName(row.get("stock_name", String.class));
-//                    order.setQty(row.get("qty", Double.class));
-//                    order.setSalePrice(row.get("price", Double.class));
-//                    order.setSaleAmount(row.get("amt", Double.class));
-//                    order.setSaleUnit(row.get("unit", String.class));
-//                    order.setLocationName(row.get("loc_name", String.class));
-//                    order.setCreatedBy(row.get("created_by", String.class));
-//                    order.setCompCode(row.get("comp_code", String.class));
-//                    Double weight = row.get("weight", Double.class);
-//                    if (weight > 0) {
-//                        order.setWeight(weight);
-//                        order.setWeightUnit(row.get("weight_unit", String.class));
-//                    }
-//                    order.setOrderStatusName(row.get("description", String.class));
-//                    return order;
-//                }).all();
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .map(row -> {
+                    VOrder order = new VOrder();
+                    String remark = row.get("remark", String.class);
+                    order.setTraderCode(row.get("t_user_code", String.class));
+                    order.setTraderName(row.get("trader_name", String.class));
+                    order.setRemark(remark);
+                    order.setPhoneNo(row.get("phone", String.class));
+                    order.setAddress(row.get("address", String.class));
+                    order.setRfId(row.get("rfid", String.class));
+                    order.setVouNo(row.get("vou_no", String.class));
+                    order.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
+                    order.setStockName(row.get("stock_name", String.class));
+                    order.setQty(row.get("qty", Double.class));
+                    order.setSalePrice(row.get("price", Double.class));
+                    order.setSaleAmount(row.get("amt", Double.class));
+                    order.setSaleUnit(row.get("unit", String.class));
+                    order.setLocationName(row.get("loc_name", String.class));
+                    order.setCreatedBy(row.get("created_by", String.class));
+                    order.setCompCode(row.get("comp_code", String.class));
+                    Double weight = Util1.getDouble(row.get("weight", Double.class));
+                    if (weight > 0) {
+                        order.setWeight(weight);
+                        order.setWeightUnit(row.get("weight_unit", String.class));
+                    }
+                    order.setOrderStatusName(row.get("description", String.class));
+                    return order;
+                }).all();
     }
 
 
@@ -326,28 +322,28 @@ public class ReportService {
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
                 .map(row -> {
-                    VPurchase purchase = VPurchase.builder().build();
-                    purchase.setVouNo(row.get("vou_no", String.class));
-                    purchase.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
-                    purchase.setLocationName(row.get("loc_name", String.class));
-                    purchase.setTraderName(row.get("trader_name", String.class));
-                    purchase.setCompAddress(row.get("address", String.class));
-                    purchase.setRemark(row.get("remark", String.class));
-                    purchase.setBatchNo(row.get("batch_no", String.class));
-                    purchase.setStockCode(row.get("stock_code", String.class));
-                    purchase.setStockName(row.get("stock_name", String.class));
-                    purchase.setQty(row.get("qty", Double.class));
-                    purchase.setPurUnit(row.get("unit", String.class));
-                    purchase.setWeight(row.get("weight", Double.class));
-                    purchase.setWeightUnit(row.get("weight_unit", String.class));
-                    purchase.setTotal(row.get("weight", Double.class) * row.get("qty", Double.class));
-                    return purchase;
+                    VPurchase p = VPurchase.builder().build();
+                    p.setVouNo(row.get("vou_no", String.class));
+                    p.setVouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
+                    p.setLocationName(row.get("loc_name", String.class));
+                    p.setTraderName(row.get("trader_name", String.class));
+                    p.setCompAddress(row.get("address", String.class));
+                    p.setRemark(row.get("remark", String.class));
+                    p.setBatchNo(row.get("batch_no", String.class));
+                    p.setStockCode(row.get("stock_code", String.class));
+                    p.setStockName(row.get("stock_name", String.class));
+                    p.setQty(row.get("qty", Double.class));
+                    p.setPurUnit(row.get("unit", String.class));
+                    p.setWeight(row.get("weight", Double.class));
+                    p.setWeightUnit(row.get("weight_unit", String.class));
+                    p.setTotal(Util1.getDouble(row.get("weight", Double.class)) * Util1.getDouble(row.get("qty", Double.class)));
+                    return p;
                 })
                 .all();
     }
 
 
-    public Mono<ReturnObject> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode, Integer macId) {
+    public Mono<ReturnObject> getSaleBySaleManDetail(String fromDate, String toDate, String curCode, String smCode, String stockCode, String compCode) {
         String sql = """
                 SELECT v.vou_date, v.vou_no, v.saleman_code, sm.saleman_name, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
                 FROM v_sale v
@@ -391,7 +387,7 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) {
+    public Mono<ReturnObject> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode) {
         String sql = """
                 SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.trader_name, rel.rel_name, t.address, rel.unit
                 FROM (
@@ -519,7 +515,7 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getOrderByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+    public Mono<ReturnObject> getOrderByProjectSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode, Integer deptId) {
         String sql = """
                 SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.trader_name, rel.rel_name
                 FROM (
@@ -646,7 +642,7 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) {
+    public Mono<ReturnObject> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode) {
         String sql = """
                 SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, t.address, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
                 FROM v_sale v JOIN trader t
@@ -708,7 +704,7 @@ public class ReportService {
                 and (trader_code = :traderCode or '-' = :traderCode)
                 group by stock_code,pur_unit,trader_code
                 )a
-                join v_relation rel 
+                join v_relation rel
                 on a.rel_code = rel.rel_code
                 and a.pur_unit = rel.unit
                 and a.comp_code =rel.comp_code
@@ -751,7 +747,7 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getPurchaseByProjectSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId, String projectNo) {
+    public Mono<ReturnObject> getPurchaseByProjectSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId) {
         String sql = """
                 select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name
                 from (
@@ -768,7 +764,7 @@ public class ReportService {
                 and (trader_code = :traderCode or '-' = :traderCode)
                 group by stock_code,pur_unit,project_no
                 )a
-                join v_relation rel 
+                join v_relation rel
                 on a.rel_code = rel.rel_code
                 and a.pur_unit = rel.unit
                 and a.comp_code =rel.comp_code
@@ -810,7 +806,7 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode, Integer macId) {
+    public Mono<ReturnObject> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode) {
         String sql = """
                 SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, t.address,
                        v.stock_name, v.qty, v.pur_unit, v.pur_price, v.pur_amt
@@ -2331,47 +2327,7 @@ public class ReportService {
     }
 
     private String getRelStr(String relCode, Double smallestQty) {
-        //generate unit relation.
-        StringBuilder relStr = new StringBuilder();
-        if (smallestQty != 0 && !Objects.isNull(relCode)) {
-            List<UnitRelationDetail> detailList = hmRelation.get(relCode);
-            if (detailList != null) {
-                for (UnitRelationDetail unitRelationDetail : detailList) {
-                    double smallQty = unitRelationDetail.getSmallestQty();
-                    double divider = smallestQty / smallQty;
-                    smallestQty = smallestQty % smallQty;
-                    String str;
-                    if (smallQty == 1) {
-                        if (divider != 0) {
-                            str = formatter.format(divider);
-                            relStr.append(String.format("%s %s%s", str, unitRelationDetail.getUnit(), "*"));
-                        }
-                    } else {
-                        int first = (int) divider;
-                        if (first != 0) {
-                            str = formatter.format(first);
-                            relStr.append(String.format("%s %s%s", str, unitRelationDetail.getUnit(), "*"));
-                        }
-                    }
-                }
-            } else {
-                log.info(String.format("non relation: %s", relCode));
-            }
-        }
-        String str = relStr.toString();
-        if (str.contains("-")) {
-            str = str.replaceAll("-", "");
-            str = String.format("%s%s", "-", str);
-        }
-        if (str.isEmpty()) {
-            str = "*";
-        }
-        str = str.substring(0, str.length() - 1);
-        if (str.contains("-")) {
-            str = str.replaceAll("-", "");
-            str = String.format("(%s)", str);
-        }
-        return str;
+        return null;
 
     }
 
@@ -5437,7 +5393,7 @@ public class ReportService {
         }
 
         String sql = """
-                select sh.vou_date, b.vou_no, b.cur_code, sh.vou_total, sh.vou_balance, sh.remark, 
+                select sh.vou_date, b.vou_no, b.cur_code, sh.vou_total, sh.vou_balance, sh.remark,
                 sh.reference, b.outstanding,sh.trader_code, t.user_code, t.address, t.trader_name
                 from (
                 select vou_no,cur_code,sum(vou_balance) outstanding,comp_code
@@ -6246,7 +6202,8 @@ public class ReportService {
     }
 
 
-    public Flux<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo, String remark, String reference, String userCode, String stockCode, String locCode,
+    public Flux<MillingHis> getMillingHistory(String fromDate, String toDate, String traderCode, String vouNo,
+                                              String remark, String reference, String userCode, String locCode,
                                               String compCode, Integer deptId, boolean deleted,
                                               String projectNo, String curCode, String jobNo) {
         String sql = """
@@ -6263,6 +6220,7 @@ public class ReportService {
                 and (remark LIKE CONCAT(:remark, '%') or '-'= :remark)
                 and (reference LIKE CONCAT(:reference, '%') or '-'= :reference)
                 and (trader_code = :traderCode or '-'= :traderCode)
+                and (loc_code = :locCode or '-'= :locCode)
                 and (created_by = :userCode or '-'= :userCode)
                 and (project_no = :projectNo or '-' = :projectNo)
                 and (job_no = :jobNo or '-' = :jobNo)
@@ -6284,6 +6242,7 @@ public class ReportService {
                 .bind("remark", remark)
                 .bind("reference", reference)
                 .bind("traderCode", traderCode)
+                .bind("locCode", locCode)
                 .bind("userCode", userCode)
                 .bind("projectNo", projectNo)
                 .bind("jobNo", jobNo)
