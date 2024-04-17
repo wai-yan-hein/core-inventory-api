@@ -61,7 +61,6 @@ public class AutoUpload {
                 .doOnNext(vou -> accountRepo.sendSaleAsync(vou)
                         .then()
                         .subscribe())
-                .doOnComplete(() -> log.info("uploadSaleVoucher: done"))
                 .delayElements(Duration.ofMillis(500))
                 .subscribe();
     }
