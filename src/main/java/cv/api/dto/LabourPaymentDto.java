@@ -1,7 +1,6 @@
 package cv.api.dto;
 
-import cv.api.r2dbc.LabourPayment;
-import cv.api.r2dbc.LabourPaymentDetail;
+import cv.api.entity.LabourPaymentDetail;
 import lombok.Builder;
 import lombok.Data;
 
@@ -25,7 +24,7 @@ public class LabourPaymentDto {
     private String createdBy;
     private String updatedBy;
     private Boolean deleted;
-    private int macId;
+    private Integer macId;
     private Integer memberCount;
     private ZonedDateTime vouDateTime;
     private Double payTotal;
@@ -36,35 +35,6 @@ public class LabourPaymentDto {
     private String labourName;
     private String deptCode;
     private Boolean post;
-
-
     private List<LabourPaymentDetail> listDetail;
-
-    public LabourPayment toEntity() {
-        return LabourPayment.builder()
-                .vouNo(getVouNo())
-                .compCode(getCompCode())
-                .deptId(getDeptId())
-                .vouDate(getVouDate())
-                .labourGroupCode(getLabourGroupCode())
-                .curCode(getCurCode())
-                .remark(getRemark())
-                .createdDate(getCreatedDate())
-                .updatedDate(getUpdatedDate())
-                .createdBy(getCreatedBy())
-                .updatedBy(getUpdatedBy())
-                .deleted(getDeleted())
-                .macId(getMacId())
-                .memberCount(getMemberCount())
-                .payTotal(getPayTotal())
-                .fromDate(getFromDate())
-                .toDate(getToDate())
-                .sourceAcc(getSourceAcc())
-                .expenseAcc(getExpenseAcc())
-                .deptCode(getDeptCode())
-                .post(getPost())
-                .build();
-    }
-
 
 }

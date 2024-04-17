@@ -1,9 +1,8 @@
 package cv.api.controller;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.ReportFilter;
 import cv.api.dto.LabourPaymentDto;
-import cv.api.r2dbc.LabourPaymentDetail;
+import cv.api.entity.LabourPaymentDetail;
 import cv.api.repo.AccountRepo;
 import cv.api.service.LabourPaymentService;
 import lombok.RequiredArgsConstructor;

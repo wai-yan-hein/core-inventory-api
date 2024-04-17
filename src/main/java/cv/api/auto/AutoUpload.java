@@ -100,35 +100,25 @@ public class AutoUpload {
     }
 
     private void uploadPayment() {
-        paymentHisService.unUploadVoucher(Util1.toDate(syncDate)).collectList().doOnNext(vouchers -> {
-            if (!vouchers.isEmpty()) {
-                log.info("uploadPayment : {}", vouchers.size());
-                vouchers.forEach(vou -> {
-                    if (vou.getDeleted()) {
-                        accountRepo.deleteInvVoucher(vou.getVouNo(), vou.getCompCode());
-                    } else {
-                        accountRepo.sendPayment(vou);
-                    }
-                });
-            }
-        }).subscribe();
+        paymentHisService.unUploadVoucher(Util1.toDate(syncDate))
+                .doOnNext(vou -> accountRepo.sendPayment(vou)
+                        .then()
+                        .subscribe())
+                .delayElements(Duration.ofMillis(500))
+                //.doOnComplete(() -> log.info("uploadReturnOutVoucher: done"))
+                .subscribe();
+
     }
 
     private void uploadLabourPayment() {
         labourPaymentService.unUploadVoucher(Util1.toDate(syncDate))
-                .collectList()
-                .doOnNext(vouList -> {
-                    if (!vouList.isEmpty()) {
-                        log.info("uploadLabourPayment : {}", vouList.size());
-                        vouList.forEach(vou -> {
-                            if (vou.isDeleted()) {
-                                accountRepo.deleteVoucher(vou.getVouNo(), vou.getCompCode(), "LABOUR_PAYMENT");
-                            } else {
-                                accountRepo.sendLabourPayment(vou.buildDto());
-                            }
-                        });
-                    }
-                }).subscribe();
+                .doOnNext(vou -> accountRepo.sendLabourPayment(vou)
+                        .then()
+                        .subscribe())
+                .delayElements(Duration.ofMillis(500))
+                //.doOnComplete(() -> log.info("uploadReturnOutVoucher: done"))
+                .subscribe();
+
     }
 
 }
