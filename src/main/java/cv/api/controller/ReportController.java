@@ -119,7 +119,7 @@ public class ReportController {
                 String fromDueDate = filter.getFromDueDate();
                 String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
-                log.info("op date : " + opDate);
+                log.info("op date : {}", opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
