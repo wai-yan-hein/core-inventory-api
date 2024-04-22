@@ -93,7 +93,7 @@ public class ReportR2dbcService {
 
     public Flux<Income> getIncome(String fromDate, String toDate, String compCode,String headCode) {
         String sql = """
-                select 'IC' tran_group,'SALE' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) paid,count(*) vou_count,cur_code,comp_code
+                select 'IC' tran_group,'SALE' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) vou_paid,count(*) vou_count,cur_code,comp_code
                 from sale_his
                 where deleted =false
                 and comp_code =:compCode
@@ -129,12 +129,11 @@ public class ReportR2dbcService {
                         .compCode(headCode)
                         .tranGroup(row.get("tran_group", String.class))
                         .tranOption(row.get("tran_option", String.class))
-                        .currency(row.get("currency_id", String.class))
+                        .currency(row.get("cur_code", String.class))
                         .tranDate(row.get("vou_date", LocalDate.class))
                         .vouTotal(row.get("vou_total", Double.class))
                         .vouPaid(row.get("vou_paid", Double.class))
                         .vouCount(row.get("vou_count", Integer.class))
-                        .patientCount(row.get("patient_count", Integer.class))
                         .build()).all();
     }
 

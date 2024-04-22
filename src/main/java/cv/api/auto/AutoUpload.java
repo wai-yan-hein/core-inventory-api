@@ -52,6 +52,7 @@ public class AutoUpload {
     private void uploadTrader() {
         traderService.unUploadTrader()
                 .doOnNext(accountRepo::sendTrader)
+                .delayElements(Duration.ofMillis(500))
                 .subscribe();
     }
 
