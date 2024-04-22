@@ -35,6 +35,7 @@ public class LabourPaymentDto {
     private String labourName;
     private String deptCode;
     private Boolean post;
+    private String intgUpdStatus;
     private List<LabourPaymentDetail> listDetail;
 
 }

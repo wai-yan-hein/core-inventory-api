@@ -69,13 +69,13 @@ public class LabourPaymentService {
     public Mono<LabourPaymentDto> insert(LabourPaymentDto dto) {
         String sql = """
                 INSERT INTO labour_payment (
-                    vou_no, comp_code, vou_date, labour_group_code, cur_code, remark, pay_total,
-                    created_date, created_by, updated_date, updated_by, deleted, mac_id,
-                    member_count, source_acc, expense_acc, dept_code, post
+                   vou_no, comp_code, dept_id, vou_date, labour_group_code, cur_code, remark,pay_total,
+                   created_date, created_by, updated_date, updated_by, deleted, mac_id,
+                   member_count, source_acc, expense_acc, from_date, to_date, dept_code, intg_upd_status, post
                 ) VALUES (
-                    :vouNo, :compCode, :vouDate, :labourGroupCode, :curCode, :remark, :payTotal,
+                    :vouNo, :compCode,:deptId, :vouDate, :labourGroupCode, :curCode, :remark, :payTotal,
                     :createdDate, :createdBy, :updatedDate, :updatedBy, :deleted, :macId,
-                    :memberCount, :sourceAcc, :expenseAcc, :deptCode, :post
+                    :memberCount, :sourceAcc, :expenseAcc,:fromDate,:toDate, :deptCode,:intgUpdStatus, :post
                 )
                 """;
         return executeUpdate(sql, dto);
@@ -84,9 +84,9 @@ public class LabourPaymentService {
     public Mono<LabourPaymentDetail> insert(LabourPaymentDetail dto) {
         String sql = """
                 INSERT INTO labour_payment_detail (
-                    vou_no, comp_code, unique_id, description, qty, price, amount, account
+                    vou_no, comp_code, unique_id, description, qty, price, amount, account,dept_code
                 ) VALUES (
-                    :vouNo, :compCode, :uniqueId, :description, :qty, :price, :amount, :account
+                    :vouNo, :compCode, :uniqueId, :description, :qty, :price, :amount, :account,:deptCode
                 )
                 """;
         return client.sql(sql)
@@ -98,6 +98,7 @@ public class LabourPaymentService {
                 .bind("price", dto.getPrice())
                 .bind("amount", dto.getAmount())
                 .bind("account", dto.getAccount())
+                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, dto.getDeptCode()))
                 .fetch().rowsUpdated().map(rowsUpdated -> dto);
     }
 
@@ -121,6 +122,7 @@ public class LabourPaymentService {
                 SET
                   vou_no = :vouNo,
                   comp_code = :compCode,
+                  dept_id = :deptId,
                   vou_date = :vouDate,
                   labour_group_code = :labourGroupCode,
                   cur_code = :curCode,
@@ -135,6 +137,9 @@ public class LabourPaymentService {
                   member_count =:memberCount,
                   source_acc = :sourceAcc,
                   expense_acc =:expenseAcc,
+                  from_date =:fromDate,
+                  to_date =:toDate,
+                  intg_upd_status =:intgUpdStatus,
                   dept_code=:deptCode,
                   post=:post
                 WHERE vou_no = :vouNo AND comp_code = :compCode""";
@@ -145,6 +150,7 @@ public class LabourPaymentService {
         return client.sql(sql)
                 .bind("vouNo", dto.getVouNo())
                 .bind("compCode", dto.getCompCode())
+                .bind("deptId", dto.getDeptId())
                 .bind("vouDate", dto.getVouDate())
                 .bind("labourGroupCode", dto.getLabourGroupCode())
                 .bind("curCode", dto.getCurCode())
@@ -159,8 +165,9 @@ public class LabourPaymentService {
                 .bind("memberCount", Parameters.in(R2dbcType.INTEGER, dto.getMemberCount()))
                 .bind("sourceAcc", Parameters.in(R2dbcType.VARCHAR, dto.getSourceAcc()))
                 .bind("expenseAcc", Parameters.in(R2dbcType.VARCHAR, dto.getExpenseAcc()))
-                .bind("vouNo", dto.getVouNo())
-                .bind("compCode", dto.getCompCode())
+                .bind("fromDate", dto.getFromDate())
+                .bind("toDate", dto.getToDate())
+                .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
                 .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, dto.getDeptCode()))
                 .bind("post", Util1.getBoolean(dto.getPost()))
                 .fetch()

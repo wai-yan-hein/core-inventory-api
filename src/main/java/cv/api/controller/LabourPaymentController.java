@@ -21,10 +21,8 @@ public class LabourPaymentController {
 
     @PostMapping
     public Mono<LabourPaymentDto> savePayment(@RequestBody LabourPaymentDto dto) {
-        return labourPaymentService.save(dto).flatMap(payment -> {
-            accountRepo.sendLabourPayment(payment);
-            return Mono.just(payment);
-        });
+        return labourPaymentService.save(dto).flatMap(obj -> accountRepo.sendLabourPayment(obj).thenReturn(obj));
+
     }
 
     @PostMapping("/calculatePayment")
