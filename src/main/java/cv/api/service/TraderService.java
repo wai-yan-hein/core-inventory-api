@@ -255,13 +255,14 @@ public class TraderService {
     private Mono<Boolean> deleteTrader(TraderKey key) {
         String sql = """
                 update trader
-                set deleted = true
+                set deleted = true,updated_date = :updatedDate
                 where code =:code
                 and comp_code=:compCode
                 """;
         return client.sql(sql)
                 .bind("code", key.getCode())
                 .bind("compCode", key.getCompCode())
+                .bind("updatedDate", LocalDateTime.now())
                 .fetch()
                 .rowsUpdated().thenReturn(true);
     }

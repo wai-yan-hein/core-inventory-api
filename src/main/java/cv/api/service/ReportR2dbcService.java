@@ -3,12 +3,15 @@ package cv.api.service;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.model.VPurchase;
+import cv.api.report.model.Income;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -87,4 +90,52 @@ public class ReportR2dbcService {
                 });
 
     }
+
+    public Flux<Income> getIncome(String fromDate, String toDate, String compCode,String headCode) {
+        String sql = """
+                select 'IC' tran_group,'SALE' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) paid,count(*) vou_count,cur_code,comp_code
+                from sale_his
+                where deleted =false
+                and comp_code =:compCode
+                and date(vou_date) between :fromDate and :toDate
+                group by date(vou_date),cur_code,comp_code
+                	union
+                select 'PC','PURCHASE' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) paid,count(*) vou_count,cur_code,comp_code
+                from pur_his
+                where deleted =false
+                and comp_code =:compCode
+                and date(vou_date) between :fromDate and :toDate
+                group by date(vou_date),cur_code,comp_code
+                	union
+                select 'RI','RETURN_IN' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) paid,count(*) vou_count,cur_code,comp_code
+                from ret_in_his
+                where deleted =false
+                and comp_code =:compCode
+                and date(vou_date) between :fromDate and :toDate
+                group by date(vou_date),cur_code,comp_code
+                	union
+                select 'RO','RETURN_OUT' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) paid,count(*) vou_count,cur_code,comp_code
+                from ret_out_his
+                where deleted =false
+                and comp_code =:compCode
+                and date(vou_date) between :fromDate and :toDate
+                group by date(vou_date),cur_code,comp_code
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .map((row) -> Income.builder()
+                        .compCode(headCode)
+                        .tranGroup(row.get("tran_group", String.class))
+                        .tranOption(row.get("tran_option", String.class))
+                        .currency(row.get("currency_id", String.class))
+                        .tranDate(row.get("vou_date", LocalDate.class))
+                        .vouTotal(row.get("vou_total", Double.class))
+                        .vouPaid(row.get("vou_paid", Double.class))
+                        .vouCount(row.get("vou_count", Integer.class))
+                        .patientCount(row.get("patient_count", Integer.class))
+                        .build()).all();
+    }
+
 }

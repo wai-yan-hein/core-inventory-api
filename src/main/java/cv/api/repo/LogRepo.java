@@ -1,6 +1,7 @@
 package cv.api.repo;
 
 
+import cv.api.report.model.Income;
 import cv.api.report.model.StockValueDto;
 import cv.api.report.model.TopPurchase;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,14 @@ public class LogRepo {
     public Mono<Boolean> topPurchase(List<TopPurchase> list) {
         return logApi.post()
                 .uri("/report/topPurchase")
+                .body(Mono.just(list), List.class)
+                .retrieve()
+                .bodyToMono(Boolean.class);
+
+    }
+    public Mono<Boolean> income(List<Income> list) {
+        return logApi.post()
+                .uri("/report/income")
                 .body(Mono.just(list), List.class)
                 .retrieve()
                 .bodyToMono(Boolean.class);
