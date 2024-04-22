@@ -36,6 +36,7 @@ public class LabourPaymentService {
                             detail.setUniqueId(uniqueId);
                             detail.setVouNo(payment.getVouNo());
                             detail.setCompCode(payment.getCompCode());
+                            detail.setDeptId(payment.getDeptId());
                             return insert(detail);
                         })
                         .then(Mono.just(payment));
@@ -53,7 +54,7 @@ public class LabourPaymentService {
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
         if (vouNo == null) {
-            return vouNoService.getVouNo(deptId, "LabourPaymentDto", compCode, macId)
+            return vouNoService.getVouNo(deptId, "LabourPayment", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.setVouNo(seqNo);
                         dto.setCreatedDate(LocalDateTime.now());
