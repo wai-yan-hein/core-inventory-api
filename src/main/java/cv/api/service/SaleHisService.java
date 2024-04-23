@@ -139,7 +139,7 @@ public class SaleHisService {
                         key.setCompCode(compCode);
                         obj.setKey(key);
                         return saleOrderJoinService.insert(obj).flatMap(saleOrderJoin -> {
-                            OrderHisKey orderKey = new OrderHisKey();
+                            OrderHisKey orderKey = OrderHisKey.builder().build();
                             orderKey.setVouNo(orderNo);
                             orderKey.setCompCode(compCode);
                             return orderHisService.updateOrder(orderKey, true);
@@ -168,7 +168,7 @@ public class SaleHisService {
         return updateDeleteStatus(key, true)
                 .thenMany(saleOrderJoinService.getSaleOrder(key.getVouNo(), key.getCompCode())
                         .flatMap(order -> {
-                            OrderHisKey orderKey = new OrderHisKey();
+                            OrderHisKey orderKey = OrderHisKey.builder().build();
                             orderKey.setVouNo(order.getKey().getOrderVouNo());
                             orderKey.setCompCode(order.getKey().getCompCode());
                             return orderHisService.updateOrder(orderKey, false);

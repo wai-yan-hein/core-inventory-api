@@ -8,7 +8,10 @@ package cv.api.controller;
 import cv.api.common.*;
 import cv.api.entity.OPHis;
 import cv.api.entity.VStockBalance;
-import cv.api.model.*;
+import cv.api.model.VPurchase;
+import cv.api.model.VSale;
+import cv.api.model.VStockIO;
+import cv.api.model.VTransfer;
 import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +51,7 @@ public class ReportController {
         return reportService.getSaleByBatchReport(vouNo, grnVouNo, compCode);
     }
 
-    @GetMapping(value = "/getOrderReport", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<VOrder> getOrderReport(@RequestParam String vouNo,
-                                       @RequestParam String compCode,
-                                       @RequestParam Integer macId) {
-        return reportService.getOrderVoucher(vouNo, compCode);
-    }
+
 
     @GetMapping(value = "/getPurchaseReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<VPurchase> getPurchaseReport(@RequestParam String vouNo, @RequestParam String compCode) {
@@ -142,12 +140,6 @@ public class ReportController {
                     case "SaleByStockDetail" -> {
                         return reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
                     }
-                    case "OrderByStockSummary" -> {
-                        return reportService.getOrderByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                    }
-                    case "OrderByStockDetail" -> {
-                        return reportService.getOrderByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
-                    }
                     case "SaleByVoucherDetail", "SaleByVoucherDetailExcel" -> {
                         return reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
@@ -162,12 +154,6 @@ public class ReportController {
                     }
                     case "SaleByProjectSummary" -> {
                         return reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
-                    }
-                    case "OrderByProjectDetail" -> {
-                        return reportService.getOrderByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
-                    }
-                    case "OrderByProjectSummary" -> {
-                        return reportService.getOrderByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId);
                     }
                     case "PurchaseBySupplierDetail" -> {
                         return reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
@@ -301,12 +287,6 @@ public class ReportController {
                     }
                     case "SaleByDueDateDetail" -> {
                         return reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "OrderByDueDateSummary" -> {
-                        return reportService.getOrderByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "OrderByDueDateDetail" -> {
-                        return reportService.getOrderByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
                     }
                     case "StockPayableCustomerSummary" -> {
                         //return  reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
@@ -483,14 +463,6 @@ public class ReportController {
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();
         return reportService.getSaleSummaryByDepartment(fromDate, toDate, compCode);
-    }
-
-    @PostMapping(path = "/getOrderSummaryByDepartment")
-    public Flux<VOrder> getOrderSummaryByDepartment(@RequestBody ReportFilter filter) {
-        String fromDate = filter.getFromDate();
-        String toDate = filter.getToDate();
-        String compCode = filter.getCompCode();
-        return reportService.getOrderSummaryByDepartment(fromDate, toDate, compCode);
     }
 
     @GetMapping(path = "/getLandingReport")

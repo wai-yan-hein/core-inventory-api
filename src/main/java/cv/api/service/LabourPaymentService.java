@@ -319,6 +319,7 @@ public class LabourPaymentService {
         return LabourPaymentDto.builder()
                 .vouNo(row.get("vou_no", String.class))
                 .compCode(row.get("comp_code", String.class))
+                .deptId(row.get("dept_id",Integer.class))
                 .vouDate(row.get("vou_date", LocalDateTime.class))
                 .labourGroupCode(row.get("labour_group_code", String.class))
                 .curCode(row.get("cur_code", String.class))

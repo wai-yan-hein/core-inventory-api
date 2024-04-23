@@ -934,11 +934,10 @@ public class AccountRepo {
                                 gl.setMacId(macId);
                                 gl.setProjectNo(projectNo);
                                 list.add(gl);
-                                return list;
                             } else {
                                 log.info(String.format("sendPayment : %s debtor account empty", traderCode));
-                                return list;
                             }
+                            return list;
                         } else {
                             updatePayment(ph.getVouNo(), ph.getCompCode(), "NN");
                             return list;
