@@ -648,5 +648,29 @@ public class SaleHisService {
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
+    public Flux<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode) {
+        String sql = """
+                select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count
+                from sale_his
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and comp_code = :compCode
+                group by dept_id,cur_code""";
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setVouBalance(row.get("vou_balance", Double.class));
+                    s.setPaid(row.get("paid", Double.class));
+                    s.setDeptId(row.get("dept_id", Integer.class));
+                    s.setVouCount(row.get("vou_count", Integer.class));
+                    return s;
+                })
+                .all();
+    }
 
 }

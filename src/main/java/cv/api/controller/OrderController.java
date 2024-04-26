@@ -9,6 +9,7 @@ import cv.api.common.ReportFilter;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
+import cv.api.model.VSale;
 import cv.api.service.OrderHisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,10 +59,19 @@ public class OrderController {
                                                @RequestParam String compCode) {
         return ohService.searchDetail(vouNo, compCode);
     }
+
     @GetMapping(value = "/getOrderReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<OrderHisDetail> getOrderReport(@RequestParam String vouNo,
-                                       @RequestParam String compCode,
-                                       @RequestParam Integer macId) {
+                                               @RequestParam String compCode,
+                                               @RequestParam Integer macId) {
         return ohService.getOrderVoucher(vouNo, compCode);
+    }
+
+    @PostMapping(path = "/getOrderSummaryByDepartment")
+    public Flux<OrderHis> getOrderSummaryByDepartment(@RequestBody ReportFilter filter) {
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String compCode = filter.getCompCode();
+        return ohService.getOrderSummaryByDepartment(fromDate, toDate, compCode);
     }
 }

@@ -101,12 +101,12 @@ public class RetOutService {
                 INSERT INTO ret_out_his (
                     vou_no, comp_code, dept_id, balance, created_by, created_date, deleted, discount,
                     paid, vou_date, ref_no, remark, session_id, updated_by, updated_date, vou_total,
-                    cur_code, trader_code, loc_code, disc_p, intg_upd_status, mac_id, vou_lock,
+                    cur_code, trader_code, loc_code, disc_p, intg_upd_status, mac_id, vou_lock, s_pay,
                     project_no, print_count, tax_amt, tax_p, grand_total, dept_code, src_acc, cash_acc, payable_acc
                 ) VALUES (
                     :vouNo, :compCode, :deptId, :balance, :createdBy, :createdDate, :deleted, :discount,
                     :paid, :vouDate, :refNo, :remark, :sessionId, :updatedBy, :updatedDate, :vouTotal,
-                    :curCode, :traderCode, :locCode, :discP, :intgUpdStatus, :macId, :vouLock,
+                    :curCode, :traderCode, :locCode, :discP, :intgUpdStatus, :macId, :vouLock, :sPay,
                     :projectNo, :printCount, :taxAmt, :taxP, :grandTotal, :deptCode, :srcAcc, :cashAcc, :payableAcc
                 )
                 """;
@@ -120,7 +120,7 @@ public class RetOutService {
                     deleted = :deleted, discount = :discount, paid = :paid, vou_date = :vouDate, ref_no = :refNo,
                     remark = :remark, session_id = :sessionId, updated_by = :updatedBy, updated_date = :updatedDate,
                     vou_total = :vouTotal, cur_code = :curCode, trader_code = :traderCode, loc_code = :locCode,
-                    disc_p = :discP, intg_upd_status = :intgUpdStatus, mac_id = :macId, vou_lock = :vouLock,
+                    disc_p = :discP, intg_upd_status = :intgUpdStatus, mac_id = :macId, vou_lock = :vouLock, s_pay = :sPay,
                     project_no = :projectNo, print_count = :printCount, tax_amt = :taxAmt, tax_p = :taxP,
                     grand_total=:grandTotal, dept_code=:deptCode, src_acc=:srcAcc, cash_acc=:cashAcc, payable_acc=:payableAcc
                 WHERE vou_no = :vouNo AND comp_code = :compCode
@@ -152,7 +152,8 @@ public class RetOutService {
                 .bind("discP", Parameters.in(R2dbcType.VARCHAR, ri.getDiscP()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, ri.getIntgUpdStatus()))
                 .bind("macId", ri.getMacId())
-                .bind("vouLock", Parameters.in(R2dbcType.VARCHAR, ri.getVouLock()))
+                .bind("vouLock", Util1.getBoolean(ri.getVouLock()))
+                .bind("sPay", Util1.getBoolean(ri.getSPay()))
                 .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, ri.getProjectNo()))
                 .bind("printCount", Parameters.in(R2dbcType.VARCHAR, ri.getPrintCount()))
                 .bind("taxAmt", Parameters.in(R2dbcType.VARCHAR, ri.getTaxAmt()))
@@ -284,6 +285,7 @@ public class RetOutService {
                 .intgUpdStatus(row.get("intg_upd_status", String.class))
                 .macId(row.get("mac_id", Integer.class))
                 .vouLock(row.get("vou_lock", Boolean.class))
+                .sPay(row.get("s_pay", Boolean.class))
                 .projectNo(row.get("project_no", String.class))
                 .printCount(row.get("print_count", Integer.class))
                 .taxAmt(row.get("tax_amt", Double.class))
@@ -454,15 +456,16 @@ public class RetOutService {
                         .taxAcc(row.get("tax_acc", String.class))
                         .build()).one();
     }
+
     public Flux<RetOutHisDetail> getReturnOutVoucher(String vouNo, String compCode) {
-        String sql="""
-                        SELECT stock_name, unit, qty, price, amt, t.trader_name, r.remark, DATE(vou_date) vou_date,
-                               r.vou_total, r.paid, r.balance, r.vou_no
-                        FROM v_return_out r
-                        JOIN trader t ON r.trader_code = t.code AND r.comp_code = t.comp_code
-                        WHERE r.comp_code = :compCode AND vou_no = :vouNo
-                        ORDER BY unique_id
-                        """;
+        String sql = """
+                SELECT stock_name, unit, qty, price, amt, t.trader_name, r.remark, DATE(vou_date) vou_date,
+                       r.vou_total, r.paid, r.balance, r.vou_no
+                FROM v_return_out r
+                JOIN trader t ON r.trader_code = t.code AND r.comp_code = t.comp_code
+                WHERE r.comp_code = :compCode AND vou_no = :vouNo
+                ORDER BY unique_id
+                """;
         return client
                 .sql(sql)
                 .bind("compCode", compCode)
@@ -483,6 +486,7 @@ public class RetOutService {
                         .build())
                 .all();
     }
+
     public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
         String sql = """
                 update ret_out_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode

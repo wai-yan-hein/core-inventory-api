@@ -341,13 +341,13 @@ public class ReportService {
 
     public Mono<ReturnObject> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode) {
         String sql = """
-                SELECT a.*, a.ttl_qty * rel.smallest_qty smallest_qty, t.user_code, t.trader_name, rel.rel_name, t.address, rel.unit
+                SELECT a.*, a.ttl_qty * ifnull(rel.smallest_qty,1) smallest_qty, t.user_code, t.trader_name, rel.rel_name, t.address, rel.unit
                 FROM (
                     SELECT stock_code, s_user_code, stock_name, SUM(qty) ttl_qty, sale_unit, SUM(sale_amt) ttl_amt, rel_code, trader_code, comp_code, dept_id
                     FROM v_sale
                     WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
                     AND comp_code = :compCode
-                    AND deleted = 0
+                    AND deleted = false
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (cat_code = :catCode OR '-' = :catCode)
@@ -355,7 +355,7 @@ public class ReportService {
                     AND (trader_code = :traderCode OR '-' = :traderCode)
                     GROUP BY stock_code, sale_unit, trader_code
                 ) a
-                JOIN v_relation rel ON a.rel_code = rel.rel_code AND a.sale_unit = rel.unit AND a.comp_code = rel.comp_code
+                LEFT JOIN v_relation rel ON a.rel_code = rel.rel_code AND a.sale_unit = rel.unit AND a.comp_code = rel.comp_code
                 JOIN trader t ON a.trader_code = t.code AND a.comp_code = t.comp_code
                 ORDER BY t.user_code, t.trader_name
                 """;
@@ -375,14 +375,12 @@ public class ReportService {
                     String sCode = row.get("stock_code", String.class);
                     String traderUsr = row.get("user_code", String.class);
                     String tCode = row.get("trader_code", String.class);
-                    String relCode = row.get("rel_code", String.class);
                     Double smallQty = row.get("smallest_qty", Double.class);
                     s.setTraderCode(Util1.isNull(traderUsr, tCode));
                     s.setStockCode(Util1.isNull(userCode, sCode));
                     s.setStockName(row.get("stock_name", String.class));
                     s.setSaleAmount(row.get("ttl_amt", Double.class));
                     s.setRelName(row.get("rel_name", String.class));
-                    s.setQtyStr(getRelStr(relCode, smallQty));
                     s.setTraderName(row.get("trader_name", String.class));
                     s.setAddress(row.get("address", String.class));
                     s.setTotalQty(smallQty);
@@ -578,14 +576,14 @@ public class ReportService {
 
     public Mono<ReturnObject> getPurchaseBySupplierSummary(String fromDate, String toDate, String typCode, String brandCode, String catCode, String stockCode, String traderCode, String compCode, Integer deptId) {
         String sql = """
-                select a.*,a.ttl_qty*rel.smallest_qty smallest_qty, t.user_code,t.trader_name,rel.rel_name,rel.unit, t.address
+                select a.*,a.ttl_qty*ifnull(rel.smallest_qty,1) smallest_qty, t.user_code,t.trader_name,rel.rel_name,rel.unit, t.address
                 from (
                 select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id
                 from v_purchase
                 where date(vou_date) between :fromDate and :toDate
                 and comp_code = :compCode
                 and (dept_id = :deptId or 0 = :deptId)
-                and deleted = 0
+                and deleted = false
                 and (stock_type_code = :typCode or '-' = :typCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
@@ -593,7 +591,7 @@ public class ReportService {
                 and (trader_code = :traderCode or '-' = :traderCode)
                 group by stock_code,pur_unit,trader_code
                 )a
-                join v_relation rel
+                left join v_relation rel
                 on a.rel_code = rel.rel_code
                 and a.pur_unit = rel.unit
                 and a.comp_code =rel.comp_code
@@ -614,12 +612,11 @@ public class ReportService {
                 .bind("stockCode", stockCode)
                 .bind("traderCode", traderCode)
                 .map(row -> VPurchase.builder()
-                        .traderCode(Util1.isNull(row.get("s_user_code", String.class), row.get("stock_code", String.class)))
-                        .stockCode(Util1.isNull(row.get("user_code", String.class), row.get("trader_code", String.class)))
+                        .traderCode(row.get("user_code", String.class))
+                        .stockCode(row.get("s_user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
                         .purAmount(row.get("ttl_amt", Double.class))
                         .relName(row.get("rel_name", String.class))
-                        .qtyStr(getRelStr(row.get("rel_code", String.class), row.get("smallest_qty", Double.class)))
                         .traderName(row.get("trader_name", String.class))
                         .totalQty(row.get("smallest_qty", Double.class))
                         .purUnit(row.get("unit", String.class))
@@ -1886,7 +1883,7 @@ public class ReportService {
 
                 }
             } catch (Exception e) {
-                log.error("getStockBalanceByWeight : " + e.getMessage());
+                log.error("getStockBalanceByWeight : {}", e.getMessage());
             }
         } else {
             String sql = """
@@ -2033,7 +2030,6 @@ public class ReportService {
 
     private String getRelStr(String relCode, Double smallestQty) {
         return null;
-
     }
 
     public List<ClosingBalance> getClosingStock(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) throws SQLException {

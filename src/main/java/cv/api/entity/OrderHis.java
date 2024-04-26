@@ -6,7 +6,6 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -53,4 +52,5 @@ public class OrderHis {
     private String traderName;
     private String userCode;
     private String orderStatusName;
+    private Integer vouCount;
 }

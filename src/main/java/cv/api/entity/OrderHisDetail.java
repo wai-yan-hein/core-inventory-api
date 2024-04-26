@@ -44,10 +44,9 @@ public class OrderHisDetail {
     private String vouDateStr;
     private String traderCode;
     private String remark;
-    private Double salePrice;
-    private Double saleAmount;
-    private String saleUnit;
     private String locationName;
     private String createdBy;
     private String orderStatusName;
+    private String saleManName;
+    private String vouNo;
 }

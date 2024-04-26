@@ -457,13 +457,7 @@ public class ReportController {
         return Mono.justOrEmpty(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
     }
 
-    @PostMapping(path = "/getSaleSummaryByDepartment")
-    public Flux<VSale> getSaleSummaryByDepartment(@RequestBody ReportFilter filter) {
-        String fromDate = filter.getFromDate();
-        String toDate = filter.getToDate();
-        String compCode = filter.getCompCode();
-        return reportService.getSaleSummaryByDepartment(fromDate, toDate, compCode);
-    }
+
 
     @GetMapping(path = "/getLandingReport")
     public Mono<?> getLandingReport(@RequestParam String vouNo, @RequestParam String compCode) {

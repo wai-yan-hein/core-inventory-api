@@ -124,13 +124,13 @@ public class OrderHisService {
                 .bind("uniqueId", dto.getKey().getUniqueId())
                 .bind("deptId", dto.getDeptId())
                 .bind("stockCode", dto.getStockCode())
-                .bind("orderQty", dto.getOrderQty())
+                .bind("orderQty", Parameters.in(R2dbcType.DOUBLE,dto.getOrderQty()))
                 .bind("qty", dto.getQty())
                 .bind("unit", dto.getUnitCode())
-                .bind("price", dto.getPrice())
-                .bind("amt", dto.getAmount())
+                .bind("price", Parameters.in(R2dbcType.DOUBLE,dto.getPrice()))
+                .bind("amt", Parameters.in(R2dbcType.DOUBLE,dto.getAmount()))
                 .bind("locCode", dto.getLocCode())
-                .bind("weight", dto.getWeight())
+                .bind("weight", Parameters.in(R2dbcType.DOUBLE,dto.getWeight()))
                 .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR, dto.getWeightUnit()))
                 .bind("design", Parameters.in(R2dbcType.VARCHAR, dto.getDesign()))
                 .bind("size", Parameters.in(R2dbcType.VARCHAR, dto.getSize()))
@@ -183,7 +183,7 @@ public class OrderHisService {
                 .bind("creditTerm", Parameters.in(R2dbcType.DATE, dto.getCreditTerm()))
                 .bind("curCode", Parameters.in(R2dbcType.VARCHAR, dto.getCurCode()))
                 .bind("remark", Parameters.in(R2dbcType.VARCHAR, dto.getRemark()))
-                .bind("vouTotal", Parameters.in(R2dbcType.DOUBLE, dto.getVouTotal()))
+                .bind("vouTotal", Util1.getDouble(dto.getVouTotal()))
                 .bind("createdDate", dto.getCreatedDate())
                 .bind("createdBy", dto.getCreatedBy())
                 .bind("deleted", Util1.getBoolean(dto.getDeleted()))
@@ -196,7 +196,7 @@ public class OrderHisService {
                 .bind("reference", Parameters.in(R2dbcType.VARCHAR, dto.getReference()))
                 .bind("vouLock", Util1.getBoolean(dto.getVouLock()))
                 .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, dto.getProjectNo()))
-                .bind("orderStatus", Parameters.in(R2dbcType.VARCHAR,dto.getOrderStatus()))
+                .bind("orderStatus", Parameters.in(R2dbcType.VARCHAR, dto.getOrderStatus()))
                 .bind("post", Util1.getBoolean(dto.getPost()))
                 .fetch()
                 .rowsUpdated()
@@ -430,8 +430,8 @@ public class OrderHisService {
     public Flux<OrderHisDetail> getOrderVoucher(String vouNo, String compCode) {
         String sql = """
                 select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
-                v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,t.user_code t_user_code,t.phone,t.address,
-                l.loc_name,v.created_by,v.comp_code,os.description
+                v.order_qty,v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,t.user_code t_user_code,t.phone,t.address,
+                l.loc_name,v.created_by,v.comp_code,os.description,sm.saleman_name
                 from v_order v join trader t
                 on v.trader_code = t.code
                 and v.comp_code = t.comp_code
@@ -439,6 +439,8 @@ public class OrderHisService {
                 and  v.comp_code = l.comp_code
                 join order_status os on v.order_status = os.code
                 and v.comp_code = os.comp_code
+                left join sale_man sm on v.saleman_code = sm.saleman_code
+                and v.comp_code = sm.comp_code
                 where v.vou_no = :vouNo
                 and v.comp_code = :compCode""";
         return client.sql(sql)
@@ -450,6 +452,7 @@ public class OrderHisService {
                             .vouNo(row.get("vou_no", String.class))
                             .compCode(row.get("comp_code", String.class))
                             .build());
+                    order.setVouNo(row.get("vou_no", String.class));
                     String remark = row.get("remark", String.class);
                     order.setTraderCode(row.get("t_user_code", String.class));
                     order.setTraderName(row.get("trader_name", String.class));
@@ -459,10 +462,11 @@ public class OrderHisService {
                     order.setRfId(row.get("rfid", String.class));
                     order.setVouDateStr(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"));
                     order.setStockName(row.get("stock_name", String.class));
+                    order.setOrderQty(row.get("order_qty", Double.class));
                     order.setQty(row.get("qty", Double.class));
-                    order.setSalePrice(row.get("price", Double.class));
-                    order.setSaleAmount(row.get("amt", Double.class));
-                    order.setSaleUnit(row.get("unit", String.class));
+                    order.setPrice(row.get("price", Double.class));
+                    order.setAmount(row.get("amt", Double.class));
+                    order.setUnitCode(row.get("unit", String.class));
                     order.setLocationName(row.get("loc_name", String.class));
                     order.setCreatedBy(row.get("created_by", String.class));
                     double weight = Util1.getDouble(row.get("weight", Double.class));
@@ -471,7 +475,31 @@ public class OrderHisService {
                         order.setWeightUnit(row.get("weight_unit", String.class));
                     }
                     order.setOrderStatusName(row.get("description", String.class));
+                    order.setSaleManName(row.get("saleman_name", String.class));
                     return order;
                 }).all();
+    }
+
+    public Flux<OrderHis> getOrderSummaryByDepartment(String fromDate, String toDate, String compCode) {
+        String sql = """
+                select sum(vou_total) vou_total,cur_code,dept_id,count(*) vou_count
+                from order_his
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and comp_code = :compCode
+                group by dept_id,cur_code""";
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .map(row -> {
+                    OrderHis s = OrderHis.builder().build();
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setDeptId(row.get("dept_id", Integer.class));
+                    s.setVouCount(row.get("vou_count", Integer.class));
+                    return s;
+                })
+                .all();
     }
 }

@@ -11,3 +11,14 @@ where TABLE_SCHEMA = @SchemaName and DATA_TYPE = @OldDataType;
 
 -- Print the generated SQL statements
 select @SqlQuery;
+
+
+set sql_safe_updates =0;
+update sale_his
+set s_pay =true;
+update pur_his
+set s_rec =true;
+update ret_in_his
+set s_rec =true;
+update ret_out_his
+set s_pay =true;

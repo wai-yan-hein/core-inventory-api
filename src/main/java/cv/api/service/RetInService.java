@@ -101,12 +101,12 @@ public class RetInService {
                 INSERT INTO ret_in_his (
                     vou_no, comp_code, dept_id, balance, created_by, created_date, deleted, discount,
                     paid, vou_date, ref_no, remark, session_id, updated_by, updated_date, vou_total,
-                    cur_code, trader_code, loc_code, disc_p, intg_upd_status, mac_id, vou_lock,
+                    cur_code, trader_code, loc_code, disc_p, intg_upd_status, mac_id, vou_lock,s_rec,
                     project_no, print_count, tax_amt, tax_p, grand_total, dept_code, src_acc, cash_acc, debtor_acc
                 ) VALUES (
                     :vouNo, :compCode, :deptId, :balance, :createdBy, :createdDate, :deleted, :discount,
                     :paid, :vouDate, :refNo, :remark, :sessionId, :updatedBy, :updatedDate, :vouTotal,
-                    :curCode, :traderCode, :locCode, :discP, :intgUpdStatus, :macId, :vouLock,
+                    :curCode, :traderCode, :locCode, :discP, :intgUpdStatus, :macId, :vouLock,:sRec,
                     :projectNo, :printCount, :taxAmt, :taxP, :grandTotal, :deptCode, :srcAcc, :cashAcc, :debtorAcc
                 )
                 """;
@@ -120,7 +120,7 @@ public class RetInService {
                     deleted = :deleted, discount = :discount, paid = :paid, vou_date = :vouDate, ref_no = :refNo,
                     remark = :remark, session_id = :sessionId, updated_by = :updatedBy, updated_date = :updatedDate,
                     vou_total = :vouTotal, cur_code = :curCode, trader_code = :traderCode, loc_code = :locCode,
-                    disc_p = :discP, intg_upd_status = :intgUpdStatus, mac_id = :macId, vou_lock = :vouLock,
+                    disc_p = :discP, intg_upd_status = :intgUpdStatus, mac_id = :macId, vou_lock = :vouLock, s_rec=:sRec,
                     project_no = :projectNo, print_count = :printCount, tax_amt = :taxAmt, tax_p = :taxP,
                     grand_total = :grandTotal, dept_code = :deptCode, src_acc = :srcAcc, cash_acc = :cashAcc,
                     debtor_acc = :debtorAcc
@@ -153,7 +153,8 @@ public class RetInService {
                 .bind("discP", Parameters.in(R2dbcType.VARCHAR, ri.getDiscP()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, ri.getIntgUpdStatus()))
                 .bind("macId", ri.getMacId())
-                .bind("vouLock", Parameters.in(R2dbcType.VARCHAR, ri.getVouLock()))
+                .bind("vouLock", Util1.getBoolean(ri.getVouLock()))
+                .bind("sRec", Util1.getBoolean(ri.getSRec()))
                 .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, ri.getProjectNo()))
                 .bind("printCount", Parameters.in(R2dbcType.VARCHAR, ri.getPrintCount()))
                 .bind("taxAmt", Parameters.in(R2dbcType.VARCHAR, ri.getTaxAmt()))
@@ -288,6 +289,7 @@ public class RetInService {
                 .intgUpdStatus(row.get("intg_upd_status", String.class))
                 .macId(row.get("mac_id", Integer.class))
                 .vouLock(row.get("vou_lock", Boolean.class))
+                .sRec(row.get("s_rec",Boolean.class))
                 .projectNo(row.get("project_no", String.class))
                 .printCount(row.get("print_count", Integer.class))
                 .taxAmt(row.get("tax_amt", Double.class))
@@ -488,6 +490,7 @@ public class RetInService {
                         .build())
                 .all();
     }
+
     public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
         String sql = """
                 update ret_in_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode
