@@ -438,7 +438,7 @@ public class PurHisService {
         String reference = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        String deleted = String.valueOf(filter.isDeleted());
+        boolean deleted =filter.isDeleted();
         Integer deptId = filter.getDeptId();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());

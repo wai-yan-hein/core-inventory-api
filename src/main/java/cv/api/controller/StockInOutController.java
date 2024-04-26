@@ -6,12 +6,10 @@
 package cv.api.controller;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.Util1;
 import cv.api.dto.StockInOutDetailDto;
 import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
 import cv.api.model.VStockIO;
-import cv.api.service.StockInOutDetailService;
 import cv.api.service.StockInOutService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +27,10 @@ import reactor.core.publisher.Mono;
 public class StockInOutController {
 
     private final StockInOutService ioService;
-    private final StockInOutDetailService iodService;
 
     @PostMapping(path = "/saveStockIO")
-    public Mono<StockInOut> saveStockIO(@RequestBody StockInOut stockio) {
-        stockio.setUpdatedDate(Util1.getTodayLocalDate());
-        stockio = ioService.save(stockio);
-        return Mono.justOrEmpty(stockio);
+    public Mono<StockInOut> saveStockIO(@RequestBody StockInOut dto) {
+        return ioService.saveStockIO(dto);
     }
 
     @PostMapping(path = "/getStockIO")
@@ -44,30 +39,27 @@ public class StockInOutController {
     }
 
     @PostMapping(path = "/deleteStockIO")
-    public Mono<?> deleteStockIO(@RequestBody StockIOKey key) throws Exception {
-        ioService.delete(key);
-        return Mono.just(true);
+    public Mono<Boolean> deleteStockIO(@RequestBody StockIOKey key) {
+        return ioService.delete(key);
     }
 
     @PostMapping(path = "/restoreStockIO")
-    public Mono<?> restoreStockIO(@RequestBody StockIOKey key) throws Exception {
-        ioService.restore(key);
-        return Mono.just(true);
+    public Mono<Boolean> restoreStockIO(@RequestBody StockIOKey key) {
+        return ioService.restore(key);
     }
 
     @PostMapping(path = "/findStockIO")
     public Mono<StockInOut> findStockIO(@RequestBody StockIOKey key) {
-        StockInOut sh = ioService.findById(key);
-        return Mono.justOrEmpty(sh);
+        return ioService.findById(key);
     }
 
     @GetMapping(path = "/getStockIODetail")
     public Flux<StockInOutDetailDto> getStockIODetail(@RequestParam String vouNo, @RequestParam String compCode) {
-        return iodService.search(vouNo, compCode);
+        return ioService.search(vouNo, compCode);
     }
 
     @GetMapping(path = "/getStockIODetailByJob")
     public Flux<StockInOutDetailDto> getStockIODetailByJob(@RequestParam String jobId, @RequestParam String compCode) {
-        return iodService.searchByJob(jobId, compCode);
+        return ioService.searchByJob(jobId, compCode);
     }
 }

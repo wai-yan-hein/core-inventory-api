@@ -33,7 +33,7 @@ public class ReportController {
     private final ReportService reportService;
     private final ReportR2dbcService reportR2dbcService;
     private final StockReportService stockReportService;
-    private final TransferService transferService;
+    private final TransferHisService transferService;
     private final StockRelationService stockRelationService;
     private final LocationService locationService;
 

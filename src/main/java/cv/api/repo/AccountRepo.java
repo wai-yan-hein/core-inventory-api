@@ -98,8 +98,7 @@ public class AccountRepo {
     }
 
     private void updatePurchase(String ack, String vouNo, String compCode) {
-        saleHisService.updateACK(ack, vouNo, compCode).subscribe();
-
+        purHisService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
     private void updateReturnIn(String ack, String vouNo, String compCode) {
