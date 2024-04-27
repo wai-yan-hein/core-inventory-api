@@ -96,7 +96,7 @@ public class SeqService {
         var seq = SequenceTable.builder()
                 .compCode(compCode)
                 .period("-")
-                .macId(1)
+                .macId(0)
                 .seqOption(seqName)
                 .seqNo(1).build();
         return insert(seq)
