@@ -170,8 +170,6 @@ public class StockService {
         return reportService.isStockExist(stockCode, compCode)
                 .collectList()
                 .flatMapMany(generalList -> {
-
-
                     if (generalList.isEmpty()) {
                         return updateDeleteStatus(key, true)
                                 .thenMany(Flux.fromIterable(generalList));

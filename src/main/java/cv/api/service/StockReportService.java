@@ -62,6 +62,7 @@ public class StockReportService {
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
+                 and s_rec = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -75,6 +76,7 @@ public class StockReportService {
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
+                 and s_pay = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -236,6 +238,7 @@ public class StockReportService {
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
                 and calculate = true
+                and s_rec = false
                 and comp_code =:compCode
                 and loc_code in (select f_code from f_location where mac_id =:macId)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
@@ -250,6 +253,7 @@ public class StockReportService {
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
                 and calculate = true
+                and s_pay = false
                 and comp_code =:compCode
                 and loc_code in (select f_code from f_location where mac_id =:macId)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
@@ -797,7 +801,7 @@ public class StockReportService {
         String catCode = filter.getCatCode();
         String brandCode = filter.getBrandCode();
         String stockCode = filter.getStockCode();
-        log.info("opDate Location : " + opDate);
+        log.info("opDate Location : {}", opDate);
         String sql = """
                 select a.stock_code,s.user_code,s.stock_name,s.sale_price_n,
                 sum(a.op_qty) op_qty,sum(a.sale_qty) sale_qty,sum(a.transfer_qty) transfer_qty
@@ -1122,7 +1126,7 @@ public class StockReportService {
                 .then(opMono)
                 .then(inMono)
                 .then(outMono)
-                .doOnError(e -> log.error("calculateClosingConsign : " + e.getMessage()));
+                .doOnError(e -> log.error("calculateClosingConsign : {}", e.getMessage()));
 
     }
 

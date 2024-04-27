@@ -39,23 +39,47 @@ public class PurHisService {
     private final VouNoService vouNoService;
     private final WeightService weightService;
     private final LandingService landingService;
+    private final PurExpenseService purExpenseService;
 
     public Mono<PurHis> save(PurHis dto) {
         Integer deptId = dto.getDeptId();
         String compCode = dto.getKey().getCompCode();
         if (deptId == null) {
-            log.error("deptId is null from mac id : " + dto.getMacId());
+            log.error("deptId is null from mac id : {}", dto.getMacId());
             return Mono.empty();
         }
-        return landingService.updatePost(LandingHisKey.builder()
-                        .vouNo(dto.getLandVouNo())
-                        .compCode(compCode)
-                        .build(), true)
-                .then(weightService.updatePost(WeightHisKey.builder()
-                        .vouNo(dto.getWeightVouNo())
-                        .compCode(compCode)
-                        .build(), true))
-                .then(savePurchase(dto));
+        return savePurchase(dto).flatMap((pur) -> savePurExpense(pur)
+                .then(landingService.updatePost(LandingHisKey.builder()
+                                .vouNo(dto.getLandVouNo())
+                                .compCode(compCode)
+                                .build(), true)
+                        .then(weightService.updatePost(WeightHisKey.builder()
+                                .vouNo(dto.getWeightVouNo())
+                                .compCode(compCode)
+                                .build(), true))).thenReturn(pur));
+    }
+
+    private Mono<Boolean> savePurExpense(PurHis ph) {
+        String vouNo = ph.getKey().getVouNo();
+        String compCode = ph.getKey().getCompCode();
+        List<PurExpense> list = ph.getListExpense();
+        if (list != null) {
+            return purExpenseService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
+                    .filter(e -> Util1.getDouble(e.getAmount()) > 0 && e.getKey().getExpenseCode() != null)
+                    .flatMap(e -> {
+                        if (e.getKey().getUniqueId() == 0) {
+                            int uniqueId = list.indexOf(e) + 1;
+                            e.getKey().setUniqueId(uniqueId);
+                        }
+                        e.getKey().setVouNo(vouNo);
+                        e.getKey().setCompCode(compCode);
+                        return purExpenseService.insert(e).thenReturn(true);
+                    })
+                    .next()
+                    .defaultIfEmpty(false));
+        } else {
+            return Mono.just(false);
+        }
     }
 
     public Mono<PurHis> findById(PurHisKey key) {
@@ -326,7 +350,7 @@ public class PurHisService {
                 .bind("carNo", Parameters.in(R2dbcType.VARCHAR, dto.getCarNo()))
                 .bind("labourGroupCode", Parameters.in(R2dbcType.VARCHAR, dto.getLabourGroupCode()))
                 .bind("landVouNo", Parameters.in(R2dbcType.VARCHAR, dto.getLandVouNo()))
-                .bind("printCount", Parameters.in(R2dbcType.INTEGER,dto.getPrintCount()))
+                .bind("printCount", Parameters.in(R2dbcType.INTEGER, dto.getPrintCount()))
                 .bind("weightVouNo", Parameters.in(R2dbcType.VARCHAR, dto.getWeightVouNo()))
                 .bind("cashAcc", Parameters.in(R2dbcType.VARCHAR, dto.getCashAcc()))
                 .bind("purchaseAcc", Parameters.in(R2dbcType.VARCHAR, dto.getPurchaseAcc()))
@@ -334,7 +358,7 @@ public class PurHisService {
                 .bind("payableAcc", Parameters.in(R2dbcType.VARCHAR, dto.getPayableAcc()))
                 .bind("grandTotal", Parameters.in(R2dbcType.VARCHAR, dto.getGrandTotal()))
                 .bind("sRec", Util1.getBoolean(dto.getSRec()))
-                .bind("tranSource", Util1.getInteger(dto.getTranSource(),1))
+                .bind("tranSource", Util1.getInteger(dto.getTranSource(), 1))
                 .bind("outstanding", Parameters.in(R2dbcType.DOUBLE, dto.getOutstanding()))
                 .bind("grnVouNo", Parameters.in(R2dbcType.VARCHAR, dto.getGrnVouNo()))
                 .fetch()
@@ -385,7 +409,7 @@ public class PurHisService {
                         .projectNo(row.get("project_no", String.class))
                         .grnVouNo(row.get("batch_no", String.class))
                         .vouTotal(row.get("vou_total", Double.class))
-                        .grandTotal(row.get("grand_total",Double.class))
+                        .grandTotal(row.get("grand_total", Double.class))
                         .discP(row.get("disc_p", Double.class))
                         .discount(row.get("discount", Double.class))
                         .taxP(row.get("tax_p", Double.class))
@@ -414,7 +438,7 @@ public class PurHisService {
         String reference = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        String deleted = String.valueOf(filter.isDeleted());
+        boolean deleted =filter.isDeleted();
         Integer deptId = filter.getDeptId();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
@@ -473,5 +497,15 @@ public class PurHisService {
                         .deptId(row.get("dept_id", Integer.class))
                         .build())
                 .all();
+    }
+    public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
+        String sql = """
+                update pur_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("ACK", Parameters.in(R2dbcType.VARCHAR, ack))
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
     }
 }

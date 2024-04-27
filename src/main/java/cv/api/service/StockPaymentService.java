@@ -4,14 +4,10 @@ import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.StockPayment;
 import cv.api.dto.StockPaymentDetail;
-import cv.api.r2dbc.LabourPayment;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Criteria;
-import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -25,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class StockPaymentService {
-    private final R2dbcEntityTemplate template;
     private final DatabaseClient client;
     private final VouNoService vouNoService;
 
@@ -543,13 +538,6 @@ public class StockPaymentService {
                 .all();
     }
 
-    public Flux<LabourPayment> unUploadVoucher(LocalDateTime syncDate) {
-        return template.select(LabourPayment.class)
-                .matching(Query.query(Criteria.where("intg_upd_status")
-                        .isNull()
-                        .and("vou_date").greaterThanOrEquals(syncDate))).all();
-
-    }
 
     public Mono<Boolean> update(String vouNo, String compCode, boolean deleted) {
         String sql = """

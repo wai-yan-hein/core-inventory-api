@@ -16,9 +16,10 @@ import reactor.core.publisher.Mono;
 public class SeqService {
 
     private final DatabaseClient client;
+    private final int MAC_ID=0;
 
     public Mono<String> getNextCode(String seqName, String compCode, int format) {
-        return findById(0, seqName, "-", compCode)
+        return findById(MAC_ID, seqName, "-", compCode)
                 .flatMap(seqTable -> {
                     int nextValue = seqTable.getSeqNo() + 1;
                     seqTable.setSeqNo(nextValue);
@@ -96,7 +97,7 @@ public class SeqService {
         var seq = SequenceTable.builder()
                 .compCode(compCode)
                 .period("-")
-                .macId(0)
+                .macId(MAC_ID)
                 .seqOption(seqName)
                 .seqNo(1).build();
         return insert(seq)

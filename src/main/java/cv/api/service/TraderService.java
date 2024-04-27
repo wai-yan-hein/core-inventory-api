@@ -36,7 +36,6 @@ public class TraderService {
     private final DatabaseClient client;
 
 
-    
     public Mono<Trader> findById(TraderKey key) {
         String sql = """
                 select *
@@ -90,7 +89,7 @@ public class TraderService {
                 .build();
     }
 
-    
+
     public Mono<Trader> findByRFID(String rfId, String compCode, Integer deptId) {
         String sql = """
                 select code,user_code,trader_name,price_type,type
@@ -117,7 +116,7 @@ public class TraderService {
                         .build()).one();
     }
 
-    
+
     public Flux<Trader> searchTrader(String text, String type, String compCode, Integer deptId) {
         text = Util1.cleanStr(text);
         text = text + "%";
@@ -176,7 +175,7 @@ public class TraderService {
         return option.toUpperCase() + String.format("%0" + 6 + "d", seqNo);
     }
 
-    
+
     public Flux<Trader> findAll(String compCode) {
         String sql = """
                 select *
@@ -189,6 +188,7 @@ public class TraderService {
                 .map((row, rowMetadata) -> mapToTrader(row)).all();
 
     }
+
     public Flux<Trader> findAllActive(String compCode) {
         String sql = """
                 select *
@@ -204,7 +204,6 @@ public class TraderService {
     }
 
 
-    
     public Flux<General> delete(TraderKey key) {
         return searchVoucher(key.getCode(), key.getCompCode())
                 .collectList()
@@ -256,13 +255,14 @@ public class TraderService {
     private Mono<Boolean> deleteTrader(TraderKey key) {
         String sql = """
                 update trader
-                set deleted = true
+                set deleted = true,updated_date = :updatedDate
                 where code =:code
                 and comp_code=:compCode
                 """;
         return client.sql(sql)
                 .bind("code", key.getCode())
                 .bind("compCode", key.getCompCode())
+                .bind("updatedDate", LocalDateTime.now())
                 .fetch()
                 .rowsUpdated().thenReturn(true);
     }
@@ -276,7 +276,6 @@ public class TraderService {
         return client.sql(sql)
                 .map((row, rowMetadata) -> mapToTrader(row)).all();
     }
-
 
 
     public Flux<Trader> getUpdateTrader(LocalDateTime updatedDate) {
@@ -302,7 +301,7 @@ public class TraderService {
                 .map((row, rowMetadata) -> mapToTrader(row)).all();
     }
 
-    
+
     public Flux<Trader> getCustomer(String compCode) {
         String sql = """
                 select *
@@ -316,7 +315,7 @@ public class TraderService {
                 .map((row, rowMetadata) -> mapToTrader(row)).all();
     }
 
-    
+
     public Flux<Trader> getSupplier(String compCode) {
         String sql = """
                 select *
@@ -331,7 +330,6 @@ public class TraderService {
     }
 
 
-    
     public Flux<Trader> getEmployee(String compCode) {
         String sql = """
                 select *
@@ -447,6 +445,7 @@ public class TraderService {
                 .rowsUpdated()
                 .thenReturn(t);
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -455,8 +454,19 @@ public class TraderService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
+    }
+
+    public Mono<Boolean> updateACK(String traderCode, String account, String compCode) {
+        String sql = """
+                update trader set intg_upd_status = ACK,account =:account where  code =:traderCode and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("account", Parameters.in(R2dbcType.VARCHAR, account))
+                .bind("traderCode", traderCode)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
     }
 }

@@ -39,13 +39,14 @@ public class InventoryUpload {
             String url = company.getReportUrl();
             String compCode = company.getCompCode();
             String headCode = company.getReportCompany();
-            log.info("url : " + url);
-            log.info("companyId : " + headCode);
+            log.info("url : {}", url);
+            log.info("companyId : {}", headCode);
             logRepo.createWebClient(url);
             uploadStockValue(headCode, compCode);
             uploadPurchase(headCode, compCode);
+            uploadIncome(headCode,compCode);
         })).onErrorResume(e -> {
-            log.error("getCompanySync : " + e.getMessage());
+            log.error("getCompanySync : {}", e.getMessage());
             return Mono.empty();
         }).subscribe();
     }
@@ -76,7 +77,7 @@ public class InventoryUpload {
                                     .flatMap(logRepo::stockValue)
                                     .doOnSuccess(success -> log.info("uploadStockValue"))
                                     .onErrorResume(throwable -> {
-                                        log.error("uploadStockValue : " + throwable.getMessage());
+                                        log.error("uploadStockValue : {}", throwable.getMessage());
                                         return Mono.empty();
                                     });
                         }))
@@ -103,7 +104,18 @@ public class InventoryUpload {
                 ).flatMap(logRepo::topPurchase)
                 .doOnSuccess(success -> log.info("uploadPurchase"))
                 .onErrorResume(throwable -> {
-                    log.error("uploadPurchase : " + throwable.getMessage());
+                    log.error("uploadPurchase : {}", throwable.getMessage());
+                    return Mono.empty();
+                }).subscribe();
+    }
+
+    private void uploadIncome(String headCode, String compCode) {
+        reportService.getIncome(yesterDayDate(), toDayDate(), compCode, headCode)
+                .collectList()
+                .flatMap(logRepo::income)
+                .doOnSuccess(success -> log.info("uploadIncome"))
+                .onErrorResume(throwable -> {
+                    log.error("uploadIncome : {}", throwable.getMessage());
                     return Mono.empty();
                 }).subscribe();
     }
@@ -113,6 +125,12 @@ public class InventoryUpload {
         LocalDate today = LocalDate.now();
         // Format today's date as "yyyy-MM-dd"
         return today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    private String yesterDayDate() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        return yesterday.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
 

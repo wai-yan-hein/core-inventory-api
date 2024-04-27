@@ -59,4 +59,6 @@ public class RetInHis {
     private List<String> location;
     private ZonedDateTime vouDateTime;
     private String traderName;
+    private Boolean sRec;
+
 }

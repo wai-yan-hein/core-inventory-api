@@ -46,7 +46,7 @@ public class SaleHisService {
     public Mono<SaleHis> save(SaleHis sh) {
         Integer deptId = sh.getDeptId();
         if (deptId == null) {
-            log.error("deptId is null from mac id : " + sh.getMacId());
+            log.error("deptId is null from mac id : {}", sh.getMacId());
             return Mono.empty();
         }
         return saveSale(sh).flatMap((saleHis) -> saveSaleExpense(saleHis).then(saveVouDiscount(saleHis)).then(saveSaleOrderJoin(saleHis)).thenReturn(saleHis));
@@ -57,7 +57,7 @@ public class SaleHisService {
         String compCode = sh.getKey().getCompCode();
         List<SaleExpense> list = sh.getListExpense();
         if (list != null) {
-            return Flux.fromIterable(list)
+            return saleExpenseService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
                     .filter(e -> Util1.getDouble(e.getAmount()) > 0 && e.getKey().getExpenseCode() != null)
                     .flatMap(e -> {
                         if (e.getKey().getUniqueId() == 0) {
@@ -69,7 +69,7 @@ public class SaleHisService {
                         return saleExpenseService.insert(e).thenReturn(true);
                     })
                     .next()
-                    .defaultIfEmpty(false);
+                    .defaultIfEmpty(false));
         } else {
             return Mono.just(false);
         }
@@ -139,7 +139,7 @@ public class SaleHisService {
                         key.setCompCode(compCode);
                         obj.setKey(key);
                         return saleOrderJoinService.insert(obj).flatMap(saleOrderJoin -> {
-                            OrderHisKey orderKey = new OrderHisKey();
+                            OrderHisKey orderKey = OrderHisKey.builder().build();
                             orderKey.setVouNo(orderNo);
                             orderKey.setCompCode(compCode);
                             return orderHisService.updateOrder(orderKey, true);
@@ -168,7 +168,7 @@ public class SaleHisService {
         return updateDeleteStatus(key, true)
                 .thenMany(saleOrderJoinService.getSaleOrder(key.getVouNo(), key.getCompCode())
                         .flatMap(order -> {
-                            OrderHisKey orderKey = new OrderHisKey();
+                            OrderHisKey orderKey = OrderHisKey.builder().build();
                             orderKey.setVouNo(order.getKey().getOrderVouNo());
                             orderKey.setCompCode(order.getKey().getCompCode());
                             return orderHisService.updateOrder(orderKey, false);
@@ -491,7 +491,7 @@ public class SaleHisService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "SALE", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.getKey().setVouNo(seqNo);
@@ -637,5 +637,40 @@ public class SaleHisService {
                         .build()).one();
     }
 
+    public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
+        String sql = """
+                update sale_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("ACK", Parameters.in(R2dbcType.VARCHAR, ack))
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
+
+    public Flux<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode) {
+        String sql = """
+                select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count
+                from sale_his
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and comp_code = :compCode
+                group by dept_id,cur_code""";
+
+        return client.sql(sql)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .map(row -> {
+                    VSale s = VSale.builder().build();
+                    s.setVouTotal(row.get("vou_total", Double.class));
+                    s.setVouBalance(row.get("vou_balance", Double.class));
+                    s.setPaid(row.get("paid", Double.class));
+                    s.setDeptId(row.get("dept_id", Integer.class));
+                    s.setVouCount(row.get("vou_count", Integer.class));
+                    return s;
+                })
+                .all();
+    }
 
 }

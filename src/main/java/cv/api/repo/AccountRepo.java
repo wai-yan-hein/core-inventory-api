@@ -28,19 +28,18 @@ public class AccountRepo {
     private final String appName = "SM";
     private final Integer macId = 98;
     private final WebClient accountApi;
-    private final ReportService reportService;
     private final Environment environment;
     private final TraderService traderService;
     private final PurExpenseService purExpenseService;
-    private final ExpenseService expenseService;
-    private final AccSettingService settingService;
     private final SaleExpenseService saleExpenseService;
     private final LabourPaymentService labourPaymentService;
+    private final PaymentHisService paymentHisService;
     private final UserRepo userRepo;
     private final SaleHisService saleHisService;
     private final PurHisService purHisService;
     private final RetInService retInService;
     private final RetOutService retOutService;
+
 
     private boolean isIntegrate() {
         return Util1.getBoolean(environment.getProperty("integration"));
@@ -56,31 +55,29 @@ public class AccountRepo {
                         if (response != null) {
                             String vouNo = response.getVouNo();
                             String compCode = response.getCompCode();
-                            switch (response.getTranSource()) {
-                                case "SALE" -> updateSale(vouNo, compCode);
-                                case "PURCHASE" -> updatePurchase(vouNo, compCode);
-                                case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
-                                case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
-                                case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
-                                case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, ACK);
-                            }
+                            String tranSource = response.getTranSource();
+                            updateAck(ACK, tranSource, vouNo, compCode);
                         }
                     }).onErrorResume(e -> {
                         Gl gl = glList.getFirst();
                         String vouNo = gl.getRefNo();
                         String compCode = gl.getKey().getCompCode();
                         String tranSource = gl.getTranSource();
-                        switch (tranSource) {
-                            case "SALE" -> updateSaleNull(vouNo, compCode);
-                            case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
-                            case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
-                            case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
-                            case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
-                            case "LABOUR_PAYMENT" -> updateLabourPayment(vouNo, compCode, null);
-                        }
+                        updateAck(null, tranSource, vouNo, compCode);
                         log.error(e.getMessage());
                         return Mono.empty();
                     }).subscribe();
+        }
+    }
+
+    private void updateAck(String ack, String tranSource, String vouNo, String compCode) {
+        switch (tranSource) {
+            case "SALE" -> updateSale(ack, vouNo, compCode);
+            case "PURCHASE" -> updatePurchase(ack, vouNo, compCode);
+            case "RETURN_IN" -> updateReturnIn(ack, vouNo, compCode);
+            case "RETURN_OUT" -> updateReturnOut(ack, vouNo, compCode);
+            case "PAYMENT" -> updatePayment(ack, vouNo, compCode);
+            case "LABOUR_PAYMENT" -> updateLabourPayment(ack, vouNo, compCode);
         }
     }
 
@@ -96,121 +93,33 @@ public class AccountRepo {
                 .bodyToMono(String.class);
     }
 
-    private void updateSale(String vouNo, String compCode) {
-        String sql = "update sale_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateSale: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateSale: %s", e.getMessage()));
-        }
+    private void updateSale(String ack, String vouNo, String compCode) {
+        saleHisService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-    private void updateSaleNull(String vouNo, String compCode) {
-        String sql = "update sale_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-        } catch (Exception e) {
-            log.error(String.format("updateSale: %s", e.getMessage()));
-        }
+    private void updatePurchase(String ack, String vouNo, String compCode) {
+        purHisService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-    private void updatePurchase(String vouNo, String compCode) {
-        String sql = "update pur_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updatePurchase: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updatePurchase: %s", e.getMessage()));
-        }
+    private void updateReturnIn(String ack, String vouNo, String compCode) {
+        retInService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-
-    private void updatePurchaseNull(String vouNo, String compCode) {
-        String sql = "update pur_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updatePurchase: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updatePurchase: %s", e.getMessage()));
-        }
+    private void updateReturnOut(String ack, String vouNo, String compCode) {
+        retOutService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-    private void updateReturnInNull(String vouNo, String compCode) {
-        String sql = "update ret_in_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnIn: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnIn: %s", e.getMessage()));
-        }
-    }
-
-    private void updateReturnIn(String vouNo, String compCode) {
-        String sql = "update ret_in_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code ='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnIn: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnIn: %s", e.getMessage()));
-        }
-    }
-
-    private void updateReturnOutNull(String vouNo, String compCode) {
-        String sql = "update ret_out_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnOut: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnOut: %s", e.getMessage()));
-        }
-    }
-
-    private void updatePaymentNull(String vouNo, String compCode) {
-        String sql = "update payment_his set intg_upd_status = null where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-        } catch (Exception e) {
-            log.error(String.format("updatePaymentNull: %s", e.getMessage()));
-        }
-    }
-
-    private void updateReturnOut(String vouNo, String compCode) {
-        String sql = "update ret_out_his set intg_upd_status = '" + ACK + "' where vou_no ='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateReturnOut: %s", vouNo));
-        } catch (Exception e) {
-            log.error(String.format("updateReturnOut: %s", e.getMessage()));
-        }
-    }
 
     private void updateTrader(String traderCode, String account, String compCode) {
-        String sql = "update trader set intg_upd_status = '" + ACK + "',account = '" + account + "' where code ='" + traderCode + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-            //log.info(String.format("updateTrader: %s", traderCode));
-        } catch (Exception e) {
-            log.error(String.format("updateTrader: %s", e.getMessage()));
-        }
+        traderService.updateACK(traderCode, account, compCode).subscribe();
     }
 
-    private void updatePayment(String vouNo, String compCode, String status) {
-        String sql = "update payment_his set intg_upd_status ='" + status + "' where vou_no='" + vouNo + "' and comp_code='" + compCode + "'";
-        try {
-            reportService.executeSql(sql);
-        } catch (Exception e) {
-            log.error("updatePayment : " + e.getMessage());
-        }
+    private void updatePayment(String ack, String vouNo, String compCode) {
+        paymentHisService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
-    private void updateLabourPayment(String vouNo, String compCode, String status) {
-        labourPaymentService.update(vouNo, compCode, status).doOnSuccess(update -> {
-            if (update) {
-                log.info("updateLabourPayment : " + vouNo);
-            }
-        }).subscribe();
-
+    private void updateLabourPayment(String ack, String vouNo, String compCode) {
+        labourPaymentService.updateACK(ack, vouNo, compCode).subscribe();
     }
 
 
@@ -260,7 +169,7 @@ public class AccountRepo {
                 .body(Mono.just(t), AccTrader.class)
                 .retrieve().bodyToMono(AccTrader.class)
                 .onErrorResume(e -> {
-                    log.error("saveTrader :" + e.getMessage());
+                    log.error("saveTrader :{}", e.getMessage());
                     return Mono.empty();
                 }).doOnSuccess(response -> {
                     if (response != null) {
@@ -284,7 +193,7 @@ public class AccountRepo {
                 .body(Mono.just(key), AccTraderKey.class)
                 .retrieve()
                 .bodyToMono(ReturnObject.class)
-                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : " + e.getMessage()));
+                .subscribe((t) -> log.info("deleted."), (e) -> log.error("deleteTrader : {}", e.getMessage()));
     }
 
     public Mono<Void> sendSaleAsync(SaleHis obj) {
@@ -456,46 +365,43 @@ public class AccountRepo {
                             listGl.add(gl);
                         }
                         return saleExpenseService.search(vouNo, compCode)
-                                .flatMap(se -> {
-                                    String expCode = se.getKey().getExpenseCode();
-                                    ExpenseKey ek = ExpenseKey.builder().build();
-                                    ek.setExpenseCode(expCode);
-                                    ek.setCompCode(compCode);
-                                    return expenseService.findById(ek)
-                                            .map(expense -> {
-                                                String account = expense.getAccountCode();
-                                                double amt = Util1.getDouble(se.getAmount());
-                                                if (!Util1.isNullOrEmpty(account)) {
-                                                    Gl gl = new Gl();
-                                                    GlKey key = new GlKey();
-                                                    key.setCompCode(compCode);
-                                                    key.setDeptId(deptId);
-                                                    gl.setKey(key);
-                                                    gl.setGlDate(vouDate);
-                                                    gl.setSrcAccCode(account);
-                                                    gl.setAccCode(balAcc);
-                                                    gl.setDrAmt(amt);
-                                                    gl.setTraderCode(traderCode);
-                                                    gl.setCurCode(curCode);
-                                                    gl.setDescription(expense.getExpenseName());
-                                                    gl.setReference(remark);
-                                                    gl.setDeptCode(deptCode);
-                                                    gl.setCreatedDate(LocalDateTime.now());
-                                                    gl.setCreatedBy(appName);
-                                                    gl.setTranSource(tranSource);
-                                                    gl.setRefNo(vouNo);
-                                                    gl.setDeleted(deleted);
-                                                    gl.setMacId(macId);
-                                                    gl.setBatchNo(batchNo);
-                                                    gl.setProjectNo(projectNo);
-                                                    return gl;
-                                                } else {
-                                                    return null; // Skip if account is null or empty
-                                                }
-                                            });
+                                .flatMap(e -> {
+                                    String account = e.getAccount();
+                                    double amt = e.getAmount();
+                                    if (!Util1.isNullOrEmpty(account)) {
+                                        Gl gl = new Gl();
+                                        GlKey key = new GlKey();
+                                        key.setCompCode(compCode);
+                                        key.setDeptId(deptId);
+                                        gl.setKey(key);
+                                        gl.setGlDate(vouDate);
+                                        gl.setSrcAccCode(account);
+                                        gl.setAccCode(balAcc);
+                                        gl.setDrAmt(amt);
+                                        gl.setTraderCode(traderCode);
+                                        gl.setCurCode(curCode);
+                                        gl.setDescription(e.getExpenseName());
+                                        gl.setReference(remark);
+                                        gl.setDeptCode(deptCode);
+                                        gl.setCreatedDate(LocalDateTime.now());
+                                        gl.setCreatedBy(appName);
+                                        gl.setTranSource(tranSource);
+                                        gl.setRefNo(vouNo);
+                                        gl.setDeleted(deleted);
+                                        gl.setMacId(macId);
+                                        gl.setBatchNo(batchNo);
+                                        gl.setProjectNo(projectNo);
+                                        return Mono.just(gl);
+                                    } else {
+                                        return Mono.empty();
+                                    }
                                 })
-                                .collectList();
-
+                                .collectList()
+                                .map(listExp -> {
+                                    listGl.addAll(listExp);
+                                    return listGl;
+                                })
+                                .switchIfEmpty(Mono.just(listGl));
                     }).doOnNext(this::sendAccount).then();
         } else {
             return Mono.empty();
@@ -644,46 +550,45 @@ public class AccountRepo {
                             listGl.add(gl);
                         }
                         return purExpenseService.search(vouNo, compCode)
-                                .collectList()
-                                .map(list -> {
-                                    for (PurExpense e : list) {
-                                        String expCode = e.getKey().getExpenseCode();
-                                        ExpenseKey ek = ExpenseKey.builder().build();
-                                        ek.setExpenseCode(expCode);
-                                        ek.setCompCode(compCode);
-                                        Expense expense = expenseService.findById(ek).block();
-                                        if (expense != null) {
-                                            String account = expense.getAccountCode();
-                                            double amt = Util1.getDouble(e.getAmount());
-                                            if (!Util1.isNullOrEmpty(account)) {
-                                                Gl gl = new Gl();
-                                                GlKey key = new GlKey();
-                                                key.setCompCode(compCode);
-                                                key.setDeptId(deptId);
-                                                gl.setKey(key);
-                                                gl.setGlDate(vouDate);
-                                                gl.setSrcAccCode(account);
-                                                gl.setAccCode(balAcc);
-                                                gl.setCrAmt(amt);
-                                                gl.setTraderCode(traderCode);
-                                                gl.setCurCode(curCode);
-                                                gl.setDescription(expense.getExpenseName());
-                                                gl.setReference(remark);
-                                                gl.setDeptCode(deptCode);
-                                                gl.setCreatedDate(LocalDateTime.now());
-                                                gl.setCreatedBy(appName);
-                                                gl.setTranSource(tranSource);
-                                                gl.setRefNo(vouNo);
-                                                gl.setDeleted(deleted);
-                                                gl.setMacId(macId);
-                                                gl.setBatchNo(batchNo);
-                                                gl.setProjectNo(projectNo);
-                                                listGl.add(gl);
-                                            }
-                                        }
+                                .flatMap(e -> {
+                                    String expCode = e.getKey().getExpenseCode();
+                                    ExpenseKey ek = ExpenseKey.builder().build();
+                                    ek.setExpenseCode(expCode);
+                                    ek.setCompCode(compCode);
+                                    String account = e.getAccount();
+                                    double amt = Util1.getDouble(e.getAmount());
+                                    if (!Util1.isNullOrEmpty(account)) {
+                                        Gl gl = new Gl();
+                                        GlKey key = new GlKey();
+                                        key.setCompCode(compCode);
+                                        key.setDeptId(deptId);
+                                        gl.setKey(key);
+                                        gl.setGlDate(vouDate);
+                                        gl.setSrcAccCode(account);
+                                        gl.setAccCode(balAcc);
+                                        gl.setCrAmt(amt);
+                                        gl.setTraderCode(traderCode);
+                                        gl.setCurCode(curCode);
+                                        gl.setDescription(e.getExpenseName());
+                                        gl.setReference(remark);
+                                        gl.setDeptCode(deptCode);
+                                        gl.setCreatedDate(LocalDateTime.now());
+                                        gl.setCreatedBy(appName);
+                                        gl.setTranSource(tranSource);
+                                        gl.setRefNo(vouNo);
+                                        gl.setDeleted(deleted);
+                                        gl.setMacId(macId);
+                                        gl.setBatchNo(batchNo);
+                                        gl.setProjectNo(projectNo);
+                                        return Mono.just(gl);
+                                    } else {
+                                        return Mono.empty();
                                     }
+                                })
+                                .collectList().map(listExp -> {
+                                    listGl.addAll(listExp);
                                     return listGl;
-                                });
+                                }).switchIfEmpty(Mono.just(listGl));
                     }).doOnNext(this::sendAccount).then();
         } else {
             return Mono.empty();
@@ -973,113 +878,121 @@ public class AccountRepo {
         }
     }
 
-    public void sendPayment(PaymentHis ph) {
-        if (Util1.getBoolean(environment.getProperty("integration"))) {
-            if (ph != null) {
-                String account = ph.getAccount();
-                if (!Util1.isNullOrEmpty(account)) {
-                    String compCode = ph.getCompCode();
-                    Integer deptId = ph.getDeptId();
-                    String traderCode = ph.getTraderCode();
-                    LocalDateTime vouDate = ph.getVouDate();
-                    double payAmt = ph.getAmount();
-                    String curCode = ph.getCurCode();
-                    String remark = ph.getRemark();
-                    String vouNo = ph.getVouNo();
-                    String tranOption = ph.getTranOption();
-                    boolean deleted = ph.getDeleted();
-                    String projectNo = ph.getProjectNo();
-                    TraderKey k = TraderKey.builder().build();
-                    k.setCode(traderCode);
-                    k.setCompCode(compCode);
-                    traderService.findById(k).doOnNext(t -> {
-                        AccSetting setting = settingService.findByCode(new AccKey("SALE", compCode)).block();
-                        if (!Util1.isNullOrEmpty(t.getAccount())) {
-                            List<Gl> list = new ArrayList<>();
-                            Gl gl = new Gl();
-                            GlKey key = new GlKey();
-                            key.setCompCode(compCode);
-                            key.setDeptId(deptId);
-                            gl.setKey(key);
-                            gl.setGlDate(vouDate);
-                            if (tranOption.equals("C")) {
-                                gl.setDescription("Cash Received.");
-                                gl.setSrcAccCode(account);
-                                gl.setAccCode(t.getAccount());
-                                gl.setTraderCode(traderCode);
-                                gl.setDrAmt(payAmt);
-                            } else if (tranOption.equals("S")) {
-                                gl.setDescription("Cash Payment.");
-                                gl.setSrcAccCode(account);
-                                gl.setAccCode(t.getAccount());
-                                gl.setTraderCode(traderCode);
-                                gl.setCrAmt(payAmt);
-                            }
-                            gl.setCurCode(curCode);
-                            gl.setReference(remark);
-                            gl.setDeptCode(setting != null ? setting.getDeptCode() : null);
-                            gl.setCreatedDate(LocalDateTime.now());
-                            gl.setCreatedBy(appName);
-                            gl.setTranSource("PAYMENT");
-                            gl.setRefNo(vouNo);
-                            gl.setDeleted(deleted);
-                            gl.setMacId(macId);
-                            gl.setProjectNo(projectNo);
-                            list.add(gl);
-                            sendAccount(list);
-                        } else {
-                            log.info(String.format("sendPayment : %s debtor account empty", traderCode));
-                        }
-                    }).subscribe();
-                } else {
-                    updatePayment(ph.getVouNo(), ph.getCompCode(), "NN");
-                }
+    public Mono<Void> sendPayment(PaymentHis obj) {
+        if (isIntegrate()) {
+            String vouNo = obj.getVouNo();
+            String compCode = obj.getCompCode();
+            if (obj.getDeleted()) {
+                deletePayment(vouNo, compCode);
+                return Mono.empty();
             }
-        }
-    }
-
-    public void sendLabourPayment(LabourPaymentDto ph) {
-        if (Util1.getBoolean(environment.getProperty("integration"))) {
-            if (ph != null) {
-                String sourceAcc = ph.getSourceAcc();
-                String compCode = ph.getCompCode();
-                String vouNo = ph.getVouNo();
-                if (!Util1.isNullOrEmpty(sourceAcc) && ph.getPost()) {
-                    Integer deptId = ph.getDeptId();
-                    LocalDateTime vouDate = ph.getVouDate();
-                    String curCode = ph.getCurCode();
-                    String remark = ph.getRemark();
-                    boolean deleted = ph.getDeleted();
-                    labourPaymentService.getDetail(vouNo, compCode)
-                            .flatMap(detail -> {
+            return paymentHisService.generateForAcc(vouNo, compCode)
+                    .map(ph -> {
+                        String account = ph.getAccount();
+                        List<Gl> list = new ArrayList<>();
+                        if (!Util1.isNullOrEmpty(account)) {
+                            Integer deptId = ph.getDeptId();
+                            String traderCode = ph.getTraderCode();
+                            LocalDateTime vouDate = ph.getVouDate();
+                            double payAmt = ph.getAmount();
+                            String curCode = ph.getCurCode();
+                            String remark = ph.getRemark();
+                            String tranOption = ph.getTranOption();
+                            boolean deleted = ph.getDeleted();
+                            String projectNo = ph.getProjectNo();
+                            String deptCode = ph.getDeptCode();
+                            String debtorAcc = ph.getDebtorAcc();
+                            if (!Util1.isNullOrEmpty(debtorAcc)) {
                                 Gl gl = new Gl();
                                 GlKey key = new GlKey();
                                 key.setCompCode(compCode);
                                 key.setDeptId(deptId);
                                 gl.setKey(key);
                                 gl.setGlDate(vouDate);
-                                gl.setDescription(detail.getDescription());
-                                gl.setSrcAccCode(sourceAcc);
-                                gl.setAccCode(Util1.isNull(detail.getAccount(), ph.getExpenseAcc()));
-                                gl.setCrAmt(detail.getAmount());
+                                if (tranOption.equals("C")) {
+                                    gl.setDescription("Cash Received.");
+                                    gl.setSrcAccCode(account);
+                                    gl.setAccCode(ph.getAccount());
+                                    gl.setTraderCode(traderCode);
+                                    gl.setDrAmt(payAmt);
+                                } else if (tranOption.equals("S")) {
+                                    gl.setDescription("Cash Payment.");
+                                    gl.setSrcAccCode(account);
+                                    gl.setAccCode(account);
+                                    gl.setTraderCode(traderCode);
+                                    gl.setCrAmt(payAmt);
+                                }
                                 gl.setCurCode(curCode);
                                 gl.setReference(remark);
-                                gl.setDeptCode(Util1.isNull(detail.getDeptCode(), ph.getDeptCode()));
+                                gl.setDeptCode(deptCode);
                                 gl.setCreatedDate(LocalDateTime.now());
                                 gl.setCreatedBy(appName);
-                                gl.setTranSource("LABOUR_PAYMENT");
+                                gl.setTranSource("PAYMENT");
                                 gl.setRefNo(vouNo);
                                 gl.setDeleted(deleted);
                                 gl.setMacId(macId);
-                                return Mono.just(gl);
-                            }).collectList()
-                            .subscribe(this::sendAccount);
+                                gl.setProjectNo(projectNo);
+                                list.add(gl);
+                            } else {
+                                log.info(String.format("sendPayment : %s debtor account empty", traderCode));
+                            }
+                            return list;
+                        } else {
+                            updatePayment(ph.getVouNo(), ph.getCompCode(), "NN");
+                            return list;
+                        }
+                    }).doOnNext(this::sendAccount).then();
+        } else {
+            return Mono.empty();
+        }
+    }
 
 
-                } else {
-                    updateLabourPayment(vouNo, compCode, "IGNORE");
-                }
+    public Mono<Void> sendLabourPayment(LabourPaymentDto obj) {
+        if (isIntegrate()) {
+            String sourceAcc = obj.getSourceAcc();
+            String compCode = obj.getCompCode();
+            String vouNo = obj.getVouNo();
+            if (obj.getDeleted()) {
+                deleteLabourPayment(vouNo, compCode);
+                return Mono.empty();
             }
+            if (!Util1.isNullOrEmpty(sourceAcc) && obj.getPost()) {
+                Integer deptId = obj.getDeptId();
+                LocalDateTime vouDate = obj.getVouDate();
+                String curCode = obj.getCurCode();
+                String remark = obj.getRemark();
+                boolean deleted = obj.getDeleted();
+                return labourPaymentService.getDetail(vouNo, compCode)
+                        .flatMap(detail -> {
+                            Gl gl = new Gl();
+                            GlKey key = new GlKey();
+                            key.setCompCode(compCode);
+                            key.setDeptId(deptId);
+                            gl.setKey(key);
+                            gl.setGlDate(vouDate);
+                            gl.setDescription(detail.getDescription());
+                            gl.setSrcAccCode(sourceAcc);
+                            gl.setAccCode(Util1.isNull(detail.getAccount(), obj.getExpenseAcc()));
+                            gl.setCrAmt(detail.getAmount());
+                            gl.setCurCode(curCode);
+                            gl.setReference(remark);
+                            gl.setDeptCode(Util1.isNull(detail.getDeptCode(), obj.getDeptCode()));
+                            gl.setCreatedDate(LocalDateTime.now());
+                            gl.setCreatedBy(appName);
+                            gl.setTranSource("LABOUR_PAYMENT");
+                            gl.setRefNo(vouNo);
+                            gl.setDeleted(deleted);
+                            gl.setMacId(macId);
+                            return Mono.just(gl);
+                        }).collectList()
+                        .doOnNext(this::sendAccount).then();
+            } else {
+                updateLabourPayment("IGNORE", vouNo, compCode);
+                return Mono.empty();
+            }
+        } else {
+            return Mono.empty();
         }
     }
 
@@ -1134,7 +1047,7 @@ public class AccountRepo {
         deleteGlByVoucher(gl);
     }
 
-    public void deleteInvVoucher(String vouNo, String compCode) {
+    public void deletePayment(String vouNo, String compCode) {
         Gl gl = new Gl();
         GlKey glKey = new GlKey();
         glKey.setCompCode(compCode);
@@ -1144,6 +1057,15 @@ public class AccountRepo {
         deleteGlByVoucher(gl);
     }
 
+    public void deleteLabourPayment(String vouNo, String compCode) {
+        Gl gl = new Gl();
+        GlKey glKey = new GlKey();
+        glKey.setCompCode(compCode);
+        gl.setKey(glKey);
+        gl.setTranSource("LABOUR_PAYMENT");
+        gl.setRefNo(vouNo);
+        deleteGlByVoucher(gl);
+    }
 
     private void deleteGlByVoucher(Gl gl) {
         accountApi.post()
@@ -1154,25 +1076,14 @@ public class AccountRepo {
                 .doOnSuccess(s -> {
                     String vouNo = gl.getRefNo();
                     String compCode = gl.getKey().getCompCode();
-                    switch (gl.getTranSource()) {
-                        case "SALE" -> updateSale(vouNo, compCode);
-                        case "PURCHASE" -> updatePurchase(vouNo, compCode);
-                        case "RETURN_IN" -> updateReturnIn(vouNo, compCode);
-                        case "RETURN_OUT" -> updateReturnOut(vouNo, compCode);
-                        case "PAYMENT" -> updatePayment(vouNo, compCode, ACK);
-                    }
+                    String tranSource = gl.getTranSource();
+                    updateAck(ACK, tranSource, vouNo, compCode);
                 }).doOnError(e -> {
                     String vouNo = gl.getRefNo();
                     String compCode = gl.getKey().getCompCode();
                     String tranSource = gl.getTranSource();
-                    switch (tranSource) {
-                        case "SALE" -> updateSaleNull(vouNo, compCode);
-                        case "PURCHASE" -> updatePurchaseNull(vouNo, compCode);
-                        case "RETURN_IN" -> updateReturnInNull(vouNo, compCode);
-                        case "RETURN_OUT" -> updateReturnOutNull(vouNo, compCode);
-                        case "PAYMENT" -> updatePaymentNull(vouNo, compCode);
-                    }
-                    log.error("deleteGlByVoucher : " + e.getMessage());
+                    updateAck(null, tranSource, vouNo, compCode);
+                    log.error("deleteGlByVoucher : {}", e.getMessage());
                 }).subscribe();
     }
 

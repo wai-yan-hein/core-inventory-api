@@ -38,7 +38,6 @@ public class SaleController {
         return shService.save(sale).flatMap(obj -> accountRepo.sendSaleAsync(obj).thenReturn(obj));
     }
 
-
     @PostMapping(path = "/getSale")
     public Flux<VSale> getSale(@RequestBody ReportFilter filter) {
         return shService.getSale(filter);
@@ -106,5 +105,11 @@ public class SaleController {
         return saleOrderJoinService.getSaleOrder(vouNo, compCode);
     }
 
-
+    @PostMapping(path = "/getSaleSummaryByDepartment")
+    public Flux<VSale> getSaleSummaryByDepartment(@RequestBody ReportFilter filter) {
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String compCode = filter.getCompCode();
+        return shService.getSaleSummaryByDepartment(fromDate, toDate, compCode);
+    }
 }

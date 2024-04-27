@@ -24,10 +24,12 @@ public class PaymentHis {
     private String updatedBy;
     private Integer macId;
     private String account;
+    private String debtorAcc;
     private String projectNo;
     private String curCode;
     private String intgUpdStatus;
     private String tranOption;
+    private String deptCode;
     private List<PaymentHisDetail> listDetail;
     private String traderName;
     private ZonedDateTime vouDateTime;

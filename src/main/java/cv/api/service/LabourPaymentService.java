@@ -3,15 +3,12 @@ package cv.api.service;
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
-import cv.api.r2dbc.LabourPayment;
-import cv.api.r2dbc.LabourPaymentDetail;
+import cv.api.entity.LabourPaymentDetail;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
+import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Criteria;
-import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -25,8 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class LabourPaymentService {
-    private final R2dbcEntityTemplate template;
-    private final DatabaseClient databaseClient;
+    private final DatabaseClient client;
     private final VouNoService vouNoService;
 
     public Mono<LabourPaymentDto> save(LabourPaymentDto dto) {
@@ -40,7 +36,8 @@ public class LabourPaymentService {
                             detail.setUniqueId(uniqueId);
                             detail.setVouNo(payment.getVouNo());
                             detail.setCompCode(payment.getCompCode());
-                            return template.insert(detail);
+                            detail.setDeptId(payment.getDeptId());
+                            return insert(detail);
                         })
                         .then(Mono.just(payment));
             } else {
@@ -49,24 +46,60 @@ public class LabourPaymentService {
         }));
     }
 
+
     private Mono<LabourPaymentDto> saveOrUpdate(LabourPaymentDto dto) {
         String vouNo = dto.getVouNo();
         String compCode = dto.getCompCode();
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
-        LabourPayment payment = dto.toEntity();
-        payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
+        dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
         if (vouNo == null) {
             return vouNoService.getVouNo(deptId, "LabourPayment", compCode, macId)
                     .flatMap(seqNo -> {
-                        payment.setVouNo(seqNo);
-                        payment.setCreatedDate(LocalDateTime.now());
-                        payment.setUpdatedDate(LocalDateTime.now());
-                        return template.insert(payment).map(LabourPayment::buildDto);
+                        dto.setVouNo(seqNo);
+                        dto.setCreatedDate(LocalDateTime.now());
+                        dto.setUpdatedDate(LocalDateTime.now());
+                        return insert(dto);
                     });
         } else {
-            return update(payment).map(LabourPayment::buildDto);
+            return update(dto);
         }
+    }
+
+    public Mono<LabourPaymentDto> insert(LabourPaymentDto dto) {
+        String sql = """
+                INSERT INTO labour_payment (
+                   vou_no, comp_code, dept_id, vou_date, labour_group_code, cur_code, remark,pay_total,
+                   created_date, created_by, updated_date, updated_by, deleted, mac_id,
+                   member_count, source_acc, expense_acc, from_date, to_date, dept_code, intg_upd_status, post
+                ) VALUES (
+                    :vouNo, :compCode,:deptId, :vouDate, :labourGroupCode, :curCode, :remark, :payTotal,
+                    :createdDate, :createdBy, :updatedDate, :updatedBy, :deleted, :macId,
+                    :memberCount, :sourceAcc, :expenseAcc,:fromDate,:toDate, :deptCode,:intgUpdStatus, :post
+                )
+                """;
+        return executeUpdate(sql, dto);
+    }
+
+    public Mono<LabourPaymentDetail> insert(LabourPaymentDetail dto) {
+        String sql = """
+                INSERT INTO labour_payment_detail (
+                    vou_no, comp_code, unique_id, description, qty, price, amount, account,dept_code
+                ) VALUES (
+                    :vouNo, :compCode, :uniqueId, :description, :qty, :price, :amount, :account,:deptCode
+                )
+                """;
+        return client.sql(sql)
+                .bind("vouNo", dto.getVouNo())
+                .bind("compCode", dto.getCompCode())
+                .bind("uniqueId", dto.getUniqueId())
+                .bind("description", Parameters.in(R2dbcType.VARCHAR, dto.getDescription()))
+                .bind("qty", dto.getQty())
+                .bind("price", dto.getPrice())
+                .bind("amount", dto.getAmount())
+                .bind("account", dto.getAccount())
+                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, dto.getDeptCode()))
+                .fetch().rowsUpdated().map(rowsUpdated -> dto);
     }
 
     private Mono<Boolean> deleteDetail(String vouNo, String compCode) {
@@ -74,7 +107,7 @@ public class LabourPaymentService {
                 delete from labour_payment_detail
                 where vou_no=:vouNo and comp_code=:compCode
                 """;
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
                 .fetch()
@@ -83,12 +116,13 @@ public class LabourPaymentService {
                 .defaultIfEmpty(false);
     }
 
-    public Mono<LabourPayment> update(LabourPayment data) {
+    public Mono<LabourPaymentDto> update(LabourPaymentDto dto) {
         String sql = """
                 UPDATE labour_payment
                 SET
                   vou_no = :vouNo,
                   comp_code = :compCode,
+                  dept_id = :deptId,
                   vou_date = :vouDate,
                   labour_group_code = :labourGroupCode,
                   cur_code = :curCode,
@@ -103,34 +137,42 @@ public class LabourPaymentService {
                   member_count =:memberCount,
                   source_acc = :sourceAcc,
                   expense_acc =:expenseAcc,
+                  from_date =:fromDate,
+                  to_date =:toDate,
+                  intg_upd_status =:intgUpdStatus,
                   dept_code=:deptCode,
                   post=:post
                 WHERE vou_no = :vouNo AND comp_code = :compCode""";
+        return executeUpdate(sql, dto);
+    }
 
-        return databaseClient.sql(sql)
-                .bind("vouNo", data.getVouNo())
-                .bind("compCode", data.getCompCode())
-                .bind("vouDate", data.getVouDate())
-                .bind("labourGroupCode", data.getLabourGroupCode())
-                .bind("curCode", data.getCurCode())
-                .bind("remark", data.getRemark())
-                .bind("payTotal",data.getPayTotal())
-                .bind("createdDate", data.getCreatedDate())
-                .bind("createdBy", data.getCreatedBy())
+    private Mono<LabourPaymentDto> executeUpdate(String sql, LabourPaymentDto dto) {
+        return client.sql(sql)
+                .bind("vouNo", dto.getVouNo())
+                .bind("compCode", dto.getCompCode())
+                .bind("deptId", dto.getDeptId())
+                .bind("vouDate", dto.getVouDate())
+                .bind("labourGroupCode", dto.getLabourGroupCode())
+                .bind("curCode", dto.getCurCode())
+                .bind("remark", Parameters.in(R2dbcType.VARCHAR, dto.getRemark()))
+                .bind("payTotal", dto.getPayTotal())
+                .bind("createdDate", dto.getCreatedDate())
+                .bind("createdBy", dto.getCreatedBy())
                 .bind("updatedDate", LocalDateTime.now())
-                .bind("updatedBy", data.getUpdatedBy())
-                .bind("deleted", data.isDeleted())
-                .bind("macId", data.getMacId())
-                .bind("memberCount", data.getMemberCount())
-                .bind("sourceAcc", Parameters.in(R2dbcType.VARCHAR, data.getSourceAcc()))
-                .bind("expenseAcc", Parameters.in(R2dbcType.VARCHAR, data.getExpenseAcc()))
-                .bind("vouNo", data.getVouNo())
-                .bind("compCode", data.getCompCode())
-                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, data.getDeptCode()))
-                .bind("post", data.isPost())
+                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
+                .bind("macId", dto.getMacId())
+                .bind("memberCount", Parameters.in(R2dbcType.INTEGER, dto.getMemberCount()))
+                .bind("sourceAcc", Parameters.in(R2dbcType.VARCHAR, dto.getSourceAcc()))
+                .bind("expenseAcc", Parameters.in(R2dbcType.VARCHAR, dto.getExpenseAcc()))
+                .bind("fromDate", dto.getFromDate())
+                .bind("toDate", dto.getToDate())
+                .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
+                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, dto.getDeptCode()))
+                .bind("post", Util1.getBoolean(dto.getPost()))
                 .fetch()
                 .rowsUpdated()
-                .thenReturn(data);
+                .thenReturn(dto);
     }
 
 
@@ -162,7 +204,7 @@ public class LabourPaymentService {
                 join labour_group l on a.labour_group_code = l.code
                 and a.comp_code = l.comp_code
                 """;
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("startDate", startDate)
                 .bind("endDate", enDate)
                 .bind("compCode", compCode)
@@ -199,7 +241,7 @@ public class LabourPaymentService {
                 and a.comp_code = l.comp_code
                 order by a.vou_date desc
                 """;
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("deleted", deleted)
                 .bind("compCode", compCode)
                 .bind("fromDate", fromDate)
@@ -244,7 +286,7 @@ public class LabourPaymentService {
                 where vou_no=:vouNo
                 and comp_code=:compCode
                 """;
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
                 .map((row) -> LabourPaymentDetail.builder()
@@ -261,25 +303,53 @@ public class LabourPaymentService {
                 .all();
     }
 
-    public Flux<LabourPayment> unUploadVoucher(LocalDateTime syncDate) {
-        return template.select(LabourPayment.class)
-                .matching(Query.query(Criteria.where("intg_upd_status")
-                        .isNull()
-                        .and("vou_date").greaterThanOrEquals(syncDate))).all();
-
+    public Flux<LabourPaymentDto> unUploadVoucher(LocalDateTime syncDate) {
+        String sql = """
+                select *
+                from labour_payment
+                where intg_upd_status is null
+                and vou_date >= :syncDate
+                """;
+        return client.sql(sql)
+                .bind("syncDate", syncDate)
+                .map((row, rowMetadata) -> mapToRow(row)).all();
     }
 
-    public Mono<Boolean> update(String vouNo, String compCode, String status) {
+    public LabourPaymentDto mapToRow(Row row) {
+        return LabourPaymentDto.builder()
+                .vouNo(row.get("vou_no", String.class))
+                .compCode(row.get("comp_code", String.class))
+                .deptId(row.get("dept_id",Integer.class))
+                .vouDate(row.get("vou_date", LocalDateTime.class))
+                .labourGroupCode(row.get("labour_group_code", String.class))
+                .curCode(row.get("cur_code", String.class))
+                .remark(row.get("remark", String.class))
+                .payTotal(row.get("pay_total", Double.class))
+                .createdDate(row.get("created_date", LocalDateTime.class))
+                .createdBy(row.get("created_by", String.class))
+                .updatedDate(row.get("updated_date", LocalDateTime.class))
+                .updatedBy(row.get("updated_by", String.class))
+                .deleted(row.get("deleted", Boolean.class))
+                .macId(row.get("mac_id", Integer.class))
+                .memberCount(row.get("member_count", Integer.class))
+                .sourceAcc(row.get("source_acc", String.class))
+                .expenseAcc(row.get("expense_acc", String.class))
+                .deptCode(row.get("dept_code", String.class))
+                .post(row.get("post", Boolean.class))
+                .build();
+    }
+
+    public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
         String sql = """
                 update labour_payment
-                set intg_upd_status = :status
+                set intg_upd_status = :ACK
                 where vou_no =:vouNo
                 and comp_code = :compCode
                 """;
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
-                .bind("status", Parameters.in(R2dbcType.VARCHAR, status))
+                .bind("ACK", Parameters.in(R2dbcType.VARCHAR, ack))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(true);
@@ -292,7 +362,7 @@ public class LabourPaymentService {
                 where vou_no =:vouNo
                 and comp_code = :compCode
                 """;
-        return databaseClient.sql(sql)
+        return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
                 .bind("deleted", deleted)

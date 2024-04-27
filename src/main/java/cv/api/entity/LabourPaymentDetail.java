@@ -1,12 +1,10 @@
-package cv.api.r2dbc;
+package cv.api.entity;
 
-import jakarta.persistence.Entity;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-@Entity
 public class LabourPaymentDetail {
     private String vouNo;
     private String compCode;

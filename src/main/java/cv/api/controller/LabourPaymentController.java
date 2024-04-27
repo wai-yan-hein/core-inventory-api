@@ -1,9 +1,8 @@
 package cv.api.controller;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.ReportFilter;
 import cv.api.dto.LabourPaymentDto;
-import cv.api.r2dbc.LabourPaymentDetail;
+import cv.api.entity.LabourPaymentDetail;
 import cv.api.repo.AccountRepo;
 import cv.api.service.LabourPaymentService;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +21,8 @@ public class LabourPaymentController {
 
     @PostMapping
     public Mono<LabourPaymentDto> savePayment(@RequestBody LabourPaymentDto dto) {
-        return labourPaymentService.save(dto).flatMap(payment -> {
-            accountRepo.sendLabourPayment(payment);
-            return Mono.just(payment);
-        });
+        return labourPaymentService.save(dto).flatMap(obj -> accountRepo.sendLabourPayment(obj).thenReturn(obj));
+
     }
 
     @PostMapping("/calculatePayment")

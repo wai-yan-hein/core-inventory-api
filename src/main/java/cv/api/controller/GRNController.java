@@ -59,7 +59,8 @@ public class GRNController {
     }
 
     @GetMapping(path = "/getGRNDetailBatch")
-    public Flux<?> getGRNDetailBatch(@RequestParam String batchNo, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getGRNDetailBatch(@RequestParam String batchNo,
+                                     @RequestParam String compCode, @RequestParam Integer deptId) {
         List<GRN> list = grnService.search(batchNo, compCode, deptId);
         if (!list.isEmpty()) {
             String vouNo = list.get(0).getKey().getVouNo();

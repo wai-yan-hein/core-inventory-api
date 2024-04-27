@@ -58,4 +58,6 @@ public class RetOutHis {
     private List<RetOutHisDetail> listRD;
     private ZonedDateTime vouDateTime;
     private String traderName;
+    private Boolean sPay;
+
 }

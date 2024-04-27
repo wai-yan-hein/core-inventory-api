@@ -7,6 +7,7 @@ package cv.api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,13 +16,10 @@ import java.io.Serializable;
  * @author wai yan
  */
 @Data
-@Embeddable
-public class THDetailKey implements Serializable {
+@Builder
+public class THDetailKey {
 
-    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "unique_id")
-    private int uniqueId;
-    @Column(name = "comp_code")
+    private Integer uniqueId;
     private String compCode;
 }

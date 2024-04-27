@@ -14,9 +14,9 @@ public class VOpening {
     private String stockUserCode;
     private String stockName;
     private String unit;
-    private Float qty;
-    private Float price;
-    private Float amount;
+    private Double qty;
+    private Double price;
+    private Double amount;
     private String stockTypeName;
     private String createdBy;
     private boolean deleted;
