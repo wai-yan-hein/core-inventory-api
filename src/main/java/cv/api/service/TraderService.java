@@ -461,7 +461,7 @@ public class TraderService {
 
     public Mono<Boolean> updateACK(String traderCode, String account, String compCode) {
         String sql = """
-                update trader set intg_upd_status = ACK,account =:account where  code =:traderCode and comp_code =:compCode
+                update trader set intg_upd_status = 'ACK',account =:account where  code =:traderCode and comp_code =:compCode
                 """;
         return client.sql(sql)
                 .bind("account", Parameters.in(R2dbcType.VARCHAR, account))

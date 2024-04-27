@@ -1,8 +1,10 @@
 package cv.api.service;
 
+import cv.api.common.Util1;
 import cv.api.entity.PurHisDetail;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
+import jdk.jshell.execution.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -88,7 +90,7 @@ public class PurHisDetailService {
                         .weightLoss(row.get("avg_qty", Double.class))
                         .orgPrice(row.get("org_price", Double.class))
                         .weight(row.get("weight", Double.class))
-                        .stdWeight(row.get("std_weight", Double.class))
+                        .stdWeight(Util1.toNull(row.get("std_weight", Double.class)))
                         .weightUnit(row.get("weight_unit", String.class))
                         .totalWeight(row.get("total_weight", Double.class))
                         .price(row.get("pur_price", Double.class))
