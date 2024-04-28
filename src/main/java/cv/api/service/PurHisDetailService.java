@@ -79,7 +79,6 @@ public class PurHisDetailService {
                 and op.comp_code = :compCode
                 order by unique_id
                 """;
-
         return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
