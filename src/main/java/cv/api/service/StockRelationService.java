@@ -818,12 +818,86 @@ public class StockRelationService {
                         .build())
                 .all()
                 .collectList()
-                .map(Util1::convertToJsonBytes)
-                .map(fileBytes -> ReturnObject.builder()
-                        .status("success")
-                        .message("Data fetched successfully")
-                        .file(fileBytes)
-                        .build());
+                .flatMap((closingBalances -> {
+                    for (int i = 0; i < closingBalances.size(); i++) {
+                        if (i > 0) {
+                            ClosingBalance prv = closingBalances.get(i - 1);
+                            double prvCl = Util1.getDouble(prv.getBalQty());
+                            double prvWCl = Util1.getDouble(prv.getBalWeight());
+                            ClosingBalance c = closingBalances.get(i);
+                            c.setOpenQty(prvCl);
+                            c.setOpenWeight(prvWCl);
+                            double opQty = Util1.getDouble(c.getOpenQty());
+                            double purQty = Util1.getDouble(c.getPurQty());
+                            double inQty = Util1.getDouble(c.getInQty());
+                            double outQty = Util1.getDouble(c.getOutQty());
+                            double saleQty = Util1.getDouble(c.getSaleQty());
+                            double clQty = opQty + purQty + inQty + outQty + saleQty;
+
+                            double opWeight = Util1.getDouble(c.getOpenWeight());
+                            double purWeight = Util1.getDouble(c.getPurWeight());
+                            double inWeight = Util1.getDouble(c.getInWeight());
+                            double outWeight = Util1.getDouble(c.getOutWeight());
+                            double saleWeight = Util1.getDouble(c.getSaleWeight());
+                            double clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
+                            c.setOpenQty(opQty);
+                            c.setOpenRel(opQty == 0 ? null : Util1.format(opQty));
+                            c.setPurQty(purQty);
+                            c.setPurRel(purQty == 0 ? null : Util1.format(purQty));
+                            c.setInQty(inQty);
+                            c.setInRel(inQty == 0 ? null : Util1.format(inQty));
+                            c.setSaleQty(saleQty);
+                            c.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty));
+                            c.setOutQty(outQty);
+                            c.setOutRel(outQty == 0 ? null : Util1.format(outQty));
+                            c.setBalQty(clQty);
+                            c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
+
+                            c.setOpenWeight(opWeight);
+                            c.setPurWeight(purWeight);
+                            c.setInWeight(inWeight);
+                            c.setSaleWeight(saleWeight);
+                            c.setOutWeight(outWeight);
+                            c.setBalWeight(clWeight);
+                        } else {
+                            ClosingBalance c = closingBalances.get(i);
+                            double opQty = Util1.getDouble(c.getOpenQty());
+                            double purQty = Util1.getDouble(c.getPurQty());
+                            double inQty = Util1.getDouble(c.getInQty());
+                            double outQty = Util1.getDouble(c.getOutQty());
+                            double saleQty = Util1.getDouble(c.getSaleQty());
+                            double clQty = opQty + purQty + inQty + outQty + saleQty;
+
+                            double opWeight = Util1.getDouble(c.getOpenWeight());
+                            double purWeight = Util1.getDouble(c.getPurWeight());
+                            double inWeight = Util1.getDouble(c.getInWeight());
+                            double outWeight = Util1.getDouble(c.getOutWeight());
+                            double saleWeight = Util1.getDouble(c.getSaleWeight());
+                            double clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
+                            c.setOpenQty(opQty);
+                            c.setOpenRel(opQty == 0 ? null : Util1.format(opQty));
+                            c.setPurQty(purQty);
+                            c.setPurRel(purQty == 0 ? null : Util1.format(purQty));
+                            c.setInQty(inQty);
+                            c.setInRel(inQty == 0 ? null : Util1.format(inQty));
+                            c.setSaleQty(saleQty);
+                            c.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty));
+                            c.setOutQty(outQty);
+                            c.setOutRel(outQty == 0 ? null : Util1.format(outQty));
+                            c.setBalQty(clQty);
+                            c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
+                            c.setOpenWeight(opWeight);
+                            c.setPurWeight(purWeight);
+                            c.setInWeight(inWeight);
+                            c.setSaleWeight(saleWeight);
+                            c.setOutWeight(outWeight);
+                            c.setBalWeight(clWeight);
+                        }
+                    }
+                    ReturnObject ro = ReturnObject.builder().build();
+                    ro.setFile(Util1.convertToJsonBytes(closingBalances));
+                    return Mono.just(ro);
+                }));
     }
 
     private Mono<ReturnObject> getStkValue(Integer macId, String compCode) {
