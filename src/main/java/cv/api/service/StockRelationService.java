@@ -23,6 +23,7 @@ import java.util.Objects;
 @Slf4j
 public class StockRelationService {
     private final HashMap<String, List<UnitRelationDetail>> hmRelation = new HashMap<>();
+    private final HashMap<String, String> hmRelationName = new HashMap<>();
     private final DecimalFormat formatter = new DecimalFormat("###.##");
     private final DatabaseClient client;
     private final UnitRelationService unitRelationService;
@@ -722,7 +723,7 @@ public class StockRelationService {
                                                   boolean calRO, String compCode, Integer deptId, Integer macId) {
         Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
         Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        return op.then(cl).then(getStkInOutDetail(macId, compCode));
+        return op.then(cl).then(initRelation(compCode)).then(getStkInOutDetail(macId, compCode));
     }
 
     public Mono<ReturnObject> getStockValue(String opDate, String fromDate, String toDate,
@@ -818,15 +819,16 @@ public class StockRelationService {
                         .build())
                 .all()
                 .collectList()
-                .flatMap((closingBalances -> {
-                    for (int i = 0; i < closingBalances.size(); i++) {
+                .flatMap((balances -> {
+                    for (int i = 0; i < balances.size(); i++) {
                         if (i > 0) {
-                            ClosingBalance prv = closingBalances.get(i - 1);
+                            ClosingBalance prv = balances.get(i - 1);
                             double prvCl = Util1.getDouble(prv.getBalQty());
                             double prvWCl = Util1.getDouble(prv.getBalWeight());
-                            ClosingBalance c = closingBalances.get(i);
+                            ClosingBalance c = balances.get(i);
                             c.setOpenQty(prvCl);
                             c.setOpenWeight(prvWCl);
+                            String relCode = c.getRelCode();
                             double opQty = Util1.getDouble(c.getOpenQty());
                             double purQty = Util1.getDouble(c.getPurQty());
                             double inQty = Util1.getDouble(c.getInQty());
@@ -841,18 +843,18 @@ public class StockRelationService {
                             double saleWeight = Util1.getDouble(c.getSaleWeight());
                             double clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
                             c.setOpenQty(opQty);
-                            c.setOpenRel(opQty == 0 ? null : Util1.format(opQty));
+                            c.setOpenRel(getRelStr(relCode, opQty));
                             c.setPurQty(purQty);
-                            c.setPurRel(purQty == 0 ? null : Util1.format(purQty));
+                            c.setPurRel(getRelStr(relCode, purQty));
                             c.setInQty(inQty);
-                            c.setInRel(inQty == 0 ? null : Util1.format(inQty));
+                            c.setInRel(getRelStr(relCode, inQty));
                             c.setSaleQty(saleQty);
-                            c.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty));
+                            c.setSaleRel(getRelStr(relCode, saleQty));
                             c.setOutQty(outQty);
-                            c.setOutRel(outQty == 0 ? null : Util1.format(outQty));
+                            c.setOutRel(getRelStr(relCode, outQty));
                             c.setBalQty(clQty);
-                            c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
-
+                            c.setBalRel(getRelStr(relCode, clQty));
+                            //weight
                             c.setOpenWeight(opWeight);
                             c.setPurWeight(purWeight);
                             c.setInWeight(inWeight);
@@ -860,7 +862,8 @@ public class StockRelationService {
                             c.setOutWeight(outWeight);
                             c.setBalWeight(clWeight);
                         } else {
-                            ClosingBalance c = closingBalances.get(i);
+                            ClosingBalance c = balances.get(i);
+                            String relCode = c.getRelCode();
                             double opQty = Util1.getDouble(c.getOpenQty());
                             double purQty = Util1.getDouble(c.getPurQty());
                             double inQty = Util1.getDouble(c.getInQty());
@@ -875,17 +878,17 @@ public class StockRelationService {
                             double saleWeight = Util1.getDouble(c.getSaleWeight());
                             double clWeight = opWeight + purWeight + inWeight + outWeight + saleWeight;
                             c.setOpenQty(opQty);
-                            c.setOpenRel(opQty == 0 ? null : Util1.format(opQty));
+                            c.setOpenRel(getRelStr(relCode, opQty));
                             c.setPurQty(purQty);
-                            c.setPurRel(purQty == 0 ? null : Util1.format(purQty));
+                            c.setPurRel(getRelStr(relCode, purQty));
                             c.setInQty(inQty);
-                            c.setInRel(inQty == 0 ? null : Util1.format(inQty));
+                            c.setInRel(getRelStr(relCode, inQty));
                             c.setSaleQty(saleQty);
-                            c.setSaleRel(saleQty == 0 ? null : Util1.format(saleQty));
+                            c.setSaleRel(getRelStr(relCode, saleQty));
                             c.setOutQty(outQty);
-                            c.setOutRel(outQty == 0 ? null : Util1.format(outQty));
+                            c.setOutRel(getRelStr(relCode, outQty));
                             c.setBalQty(clQty);
-                            c.setBalRel(clQty == 0 ? null : Util1.format(clQty));
+                            c.setBalRel(getRelStr(relCode, clQty));
                             c.setOpenWeight(opWeight);
                             c.setPurWeight(purWeight);
                             c.setInWeight(inWeight);
@@ -894,8 +897,18 @@ public class StockRelationService {
                             c.setBalWeight(clWeight);
                         }
                     }
+                    String relCode = balances.getFirst().getRelCode();
+                    double purQty = balances.stream().mapToDouble(t -> Util1.getDouble(t.getPurQty())).sum();
+                    double saleQty = balances.stream().mapToDouble(t -> Util1.getDouble(t.getSaleQty())).sum();
+                    double inQty = balances.stream().mapToDouble(t -> Util1.getDouble(t.getInQty())).sum();
+                    double outQty = balances.stream().mapToDouble(t -> Util1.getDouble(t.getOutQty())).sum();
                     ReturnObject ro = ReturnObject.builder().build();
-                    ro.setFile(Util1.convertToJsonBytes(closingBalances));
+                    ro.setFile(Util1.convertToJsonBytes(balances));
+                    ro.setRelName(hmRelationName.get(relCode));
+                    ro.setPurRel(getRelStr(relCode, purQty));
+                    ro.setSaleRel(getRelStr(relCode, saleQty));
+                    ro.setInRel(getRelStr(relCode, inQty));
+                    ro.setOutRel(getRelStr(relCode, outQty));
                     return Mono.just(ro);
                 }));
     }
@@ -967,6 +980,7 @@ public class StockRelationService {
                 .map(t -> {
                     String relCode = t.getKey().getRelCode();
                     hmRelation.put(relCode, t.getDetailList());
+                    hmRelationName.put(relCode, t.getRelName());
                     return true;
                 }).then(Mono.just(true));
     }
@@ -977,21 +991,21 @@ public class StockRelationService {
         if (smallestQty != 0 && !Objects.isNull(relCode)) {
             List<UnitRelationDetail> detailList = hmRelation.get(relCode);
             if (detailList != null) {
-                for (UnitRelationDetail unitRelationDetail : detailList) {
-                    double smallQty = unitRelationDetail.getSmallestQty();
+                for (UnitRelationDetail detail : detailList) {
+                    double smallQty = detail.getSmallestQty();
                     double divider = smallestQty / smallQty;
                     smallestQty = smallestQty % smallQty;
                     String str;
                     if (smallQty == 1) {
                         if (divider != 0) {
                             str = formatter.format(divider);
-                            relStr.append(String.format("%s %s%s", str, unitRelationDetail.getUnit(), "*"));
+                            relStr.append(String.format("%s %s%s", str, detail.getUnit(), "*"));
                         }
                     } else {
                         int first = (int) divider;
                         if (first != 0) {
                             str = formatter.format(first);
-                            relStr.append(String.format("%s %s%s", str, unitRelationDetail.getUnit(), "*"));
+                            relStr.append(String.format("%s %s%s", str, detail.getUnit(), "*"));
                         }
                     }
                 }

@@ -201,7 +201,7 @@ public class ReportController {
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
                         return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                     }
-                    case "StockInOutDetail" -> {
+                    case "StockInOutDetail","StockInOutDetailUnit" -> {
                         return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                     }
 //                    case "StockInOutSummaryByWeight" -> {

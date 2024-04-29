@@ -24,4 +24,9 @@ public class ReturnObject {
     private List<Object> list;
     private Object data;
     private byte[] file;
+    private String relName;
+    private String saleRel;
+    private String inRel;
+    private String outRel;
+    private String purRel;
 }

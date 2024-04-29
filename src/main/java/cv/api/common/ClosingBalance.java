@@ -100,4 +100,6 @@ public class ClosingBalance {
     private double weight;
     private double totalQty;
 
+
+
 }
