@@ -6,7 +6,6 @@
 package cv.api.service;
 
 import cv.api.common.*;
-import cv.api.dao.LandingHisPriceDao;
 import cv.api.dao.ReportDao;
 import cv.api.entity.*;
 import cv.api.model.*;
@@ -824,7 +823,7 @@ public class ReportService {
                         .bag(Util1.toNull(row.get("bag", Double.class)))
                         .build()).all()
                 .collectList()
-                .map(this::calPercent)
+                .map(this::calPercentSale)
                 .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
@@ -833,7 +832,7 @@ public class ReportService {
                         .build());
     }
 
-    private List<VSale> calPercent(List<VSale> list) {
+    private List<VSale> calPercentSale(List<VSale> list) {
         double totalQty = list.stream()
                 .filter(v -> Objects.nonNull(v.getQty())) // Filter out null values
                 .mapToDouble(VSale::getQty) // Map to double
@@ -1150,8 +1149,6 @@ public class ReportService {
     }
 
 
-
-
     public Mono<ReturnObject> getSaleByStockDetail(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer macId) {
         String sql = """
                 SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, v.s_user_code, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
@@ -1257,54 +1254,58 @@ public class ReportService {
 
     public Mono<ReturnObject> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) {
         String sql = """
-                select a.*,a.ttl_qty*rel.smallest_qty smallest_qty,rel.rel_name, rel.unit
-                from (
-                select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,comp_code,dept_id
+                select stock_code,s_user_code,stock_name,sum(qty) qty,sum(bag) bag,sum(pur_amt) amount,comp_code,dept_id
                 from v_purchase
-                where date(vou_date) between :fromDate and :toDate
+                where deleted = false
+                and date(vou_date) between :fromDate and :toDate
                 and comp_code = :compCode
-                and deleted = false
+                and cur_code = :curCode
+                and (dept_id =:deptId or 0 =:deptId)
+                and (loc_code = :locCode or '-' = :locCode)
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and loc_code in (select f_code from f_location where mac_id = :macId)
-                group by stock_code,pur_unit
-                )a
-                join v_relation rel 
-                on a.rel_code = rel.rel_code
-                and a.pur_unit = rel.unit
-                and a.comp_code =rel.comp_code
+                group by stock_code
                 order by s_user_code;
                 """;
-
-        return client
-                .sql(sql)
+        return client.sql(sql)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
+                .bind("curCode", curCode)
                 .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("locCode", locCode)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .bind("macId", macId)
-                .map(row -> VPurchase.builder()
+                .map((row) -> VSale.builder()
                         .stockCode(row.get("s_user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
-                        .relName(row.get("rel_name", String.class))
-                        .purAmount(row.get("ttl_amt", Double.class))
-                        .qtyStr(getRelStr(row.get("rel_code", String.class), row.get("smallest_qty", Double.class)))
-                        .totalQty(row.get("smallest_qty", Double.class))
-                        .purUnit(row.get("unit", String.class))
-                        .build())
-                .all()
+                        .saleAmount(row.get("amount", Double.class))
+                        .qty(Util1.toNull(row.get("qty", Double.class)))
+                        .bag(Util1.toNull(row.get("bag", Double.class)))
+                        .build()).all()
                 .collectList()
+                .map(this::calPercentSale)
                 .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
                         .message("Data fetched successfully")
                         .file(fileBytes)
                         .build());
+    }
+
+    private List<VPurchase> calPercent(List<VPurchase> list) {
+        double totalQty = list.stream()
+                .filter(v -> Objects.nonNull(v.getQty())) // Filter out null values
+                .mapToDouble(VPurchase::getQty) // Map to double
+                .sum(); // Perform the sum operation
+        if (!list.isEmpty()) {
+            list.forEach(t -> t.setQtyPercent((t.getQty() / totalQty) * 100));
+        }
+        return list;
     }
 
 
@@ -2302,7 +2303,7 @@ public class ReportService {
                         .bag(Util1.toNull(row.get("bag", Double.class)))
                         .build()).all()
                 .collectList()
-                .map(this::calPercent)
+                .map(this::calPercentSale)
                 .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
@@ -3875,8 +3876,6 @@ public class ReportService {
     }
 
 
-
-
     public Flux<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode) {
         String sql = """
                 select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count
@@ -3901,7 +3900,6 @@ public class ReportService {
                 })
                 .all();
     }
-
 
 
     public Flux<VSale> getSaleByBatchReport(String vouNo, String grnVouNo, String compCode) {
