@@ -146,8 +146,8 @@ public class StockTypeService {
                 .bind("createdBy", dto.getCreatedBy())
                 .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
-                .bind("deleted", dto.getDeleted())
-                .bind("active", dto.getActive())
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
+                .bind("active", Util1.getBoolean(dto.getActive()))
                 .bind("finishedGroup", dto.getFinishedGroup())
                 .bind("groupType", Parameters.in(R2dbcType.VARCHAR, dto.getGroupType()))
                 .fetch().rowsUpdated().thenReturn(dto);

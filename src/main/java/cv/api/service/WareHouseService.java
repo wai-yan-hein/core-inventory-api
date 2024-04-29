@@ -49,8 +49,8 @@ public class WareHouseService {
                 .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("updatedDate", LocalDateTime.now())
                 .bind("userCode", Parameters.in(R2dbcType.VARCHAR, dto.getUserCode()))
-                .bind("active", dto.getActive())
-                .bind("deleted", dto.getDeleted())
+                .bind("active", Util1.getBoolean(dto.getActive()))
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);

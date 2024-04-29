@@ -144,8 +144,8 @@ public class StockBrandService {
                 .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("userCode", Parameters.in(R2dbcType.VARCHAR, dto.getUserCode()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
-                .bind("deleted", dto.getDeleted())
-                .bind("active", dto.getActive())
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
+                .bind("active", Util1.getBoolean(dto.getActive()))
                 .fetch().rowsUpdated().thenReturn(dto);
     }
     private StockBrand mapRow(Row row){
