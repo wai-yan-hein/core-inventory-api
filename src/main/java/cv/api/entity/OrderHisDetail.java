@@ -30,6 +30,7 @@ public class OrderHisDetail {
     private String weightUnit;
     private String design;
     private String size;
+    private Double heatPressQty;
     private String userCode;
     private String stockName;
     private String groupName;

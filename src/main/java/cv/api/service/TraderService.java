@@ -117,7 +117,7 @@ public class TraderService {
     }
 
 
-    public Flux<Trader> searchTrader(String text, String type, String compCode, Integer deptId) {
+    public Flux<Trader> searchTrader(String text, String type, String compCode) {
         text = Util1.cleanStr(text);
         text = text + "%";
         String sql = """
@@ -126,15 +126,13 @@ public class TraderService {
                 where active = true
                 and deleted = false
                 and comp_code =:compCode
-                and (dept_id =:deptId or 0 =:deptId)
                 and (LOWER(REPLACE(user_code, ' ', '')) like :text or LOWER(REPLACE(trader_name, ' ', '')) like :text)
-                and (multi =1 or :type =:type)
+                and (multi =true or type =:type)
                 order by user_code,trader_name
                 limit 100
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("text", text)
                 .bind("type", type)
                 .map((row) -> Trader.builder()
@@ -413,7 +411,7 @@ public class TraderService {
                 .bind("deptId", t.getDeptId())
                 .bind("macId", Parameters.in(R2dbcType.INTEGER, t.getMacId()))
                 .bind("type", t.getType())
-                .bind("active", Util1.getDouble(t.getActive()))
+                .bind("active", Util1.getBoolean(t.getActive()))
                 .bind("address", Parameters.in(R2dbcType.VARCHAR, t.getAddress()))
                 .bind("createdDate", t.getCreatedDate())
                 .bind("email", Parameters.in(R2dbcType.VARCHAR, t.getEmail()))

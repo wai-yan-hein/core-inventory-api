@@ -11,6 +11,7 @@ import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
+import cv.api.model.VDescription;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -44,7 +45,7 @@ public class OrderHisService {
             List<OrderHisDetail> list = dto.getListSH();
             if (list != null && !list.isEmpty()) {
                 return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                        .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
                         .concatMap(detail -> {
                             if (detail.getKey() == null) {
                                 detail.setKey(OrderDetailKey.builder().build());
@@ -98,11 +99,11 @@ public class OrderHisService {
                 INSERT INTO order_his
                 (vou_no, comp_code, dept_id, trader_code, saleman_code, vou_date, credit_term, cur_code,
                  remark, vou_total, created_date, created_by, deleted, vou_balance, updated_by, updated_date,
-                 loc_code, mac_id, intg_upd_status, reference, vou_lock, project_no, order_status, post)
+                 loc_code, mac_id, intg_upd_status, reference, vou_lock, project_no, order_status, post, ref_no)
                 VALUES
                 (:vouNo, :compCode, :deptId, :traderCode, :salemanCode, :vouDate, :creditTerm, :curCode,
                  :remark, :vouTotal, :createdDate, :createdBy, :deleted, :vouBalance, :updatedBy, :updatedDate,
-                 :locCode, :macId, :intgUpdStatus, :reference, :vouLock, :projectNo, :orderStatus, :post)
+                 :locCode, :macId, :intgUpdStatus, :reference, :vouLock, :projectNo, :orderStatus, :post,:refNo)
                 """;
         return executeUpdate(sql, dto);
     }
@@ -112,10 +113,10 @@ public class OrderHisService {
         String sql = """
                 INSERT INTO order_his_detail
                 (vou_no, comp_code, unique_id, dept_id, stock_code, order_qty, qty, unit, price, amt,
-                 loc_code, weight, weight_unit, design, size)
+                 loc_code, weight, weight_unit, design, size, heat_press_qty)
                 VALUES
                 (:vouNo, :compCode, :uniqueId, :deptId, :stockCode, :orderQty, :qty, :unit, :price, :amt,
-                 :locCode, :weight, :weightUnit, :design, :size)
+                 :locCode, :weight, :weightUnit, :design, :size, :heatPressQty)
                 """;
 
         return client.sql(sql)
@@ -124,16 +125,17 @@ public class OrderHisService {
                 .bind("uniqueId", dto.getKey().getUniqueId())
                 .bind("deptId", dto.getDeptId())
                 .bind("stockCode", dto.getStockCode())
-                .bind("orderQty", Parameters.in(R2dbcType.DOUBLE,dto.getOrderQty()))
+                .bind("orderQty", Parameters.in(R2dbcType.DOUBLE, dto.getOrderQty()))
                 .bind("qty", dto.getQty())
                 .bind("unit", dto.getUnitCode())
-                .bind("price", Parameters.in(R2dbcType.DOUBLE,dto.getPrice()))
-                .bind("amt", Parameters.in(R2dbcType.DOUBLE,dto.getAmount()))
+                .bind("price", Parameters.in(R2dbcType.DOUBLE, dto.getPrice()))
+                .bind("amt", Parameters.in(R2dbcType.DOUBLE, dto.getAmount()))
                 .bind("locCode", dto.getLocCode())
-                .bind("weight", Parameters.in(R2dbcType.DOUBLE,dto.getWeight()))
+                .bind("weight", Parameters.in(R2dbcType.DOUBLE, dto.getWeight()))
                 .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR, dto.getWeightUnit()))
                 .bind("design", Parameters.in(R2dbcType.VARCHAR, dto.getDesign()))
                 .bind("size", Parameters.in(R2dbcType.VARCHAR, dto.getSize()))
+                .bind("heatPressQty", Parameters.in(R2dbcType.DOUBLE, dto.getHeatPressQty()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -165,7 +167,8 @@ public class OrderHisService {
                     vou_lock = :vouLock,
                     project_no = :projectNo,
                     order_status = :orderStatus,
-                    post = :post
+                    post = :post,
+                    ref_no = :refNo
                 WHERE vou_no = :vouNo
                 AND comp_code = :compCode
                 """;
@@ -198,6 +201,7 @@ public class OrderHisService {
                 .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, dto.getProjectNo()))
                 .bind("orderStatus", Parameters.in(R2dbcType.VARCHAR, dto.getOrderStatus()))
                 .bind("post", Util1.getBoolean(dto.getPost()))
+                .bind("refNo", Parameters.in(R2dbcType.VARCHAR, dto.getRefNo()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -231,6 +235,7 @@ public class OrderHisService {
                 .projectNo(row.get("project_no", String.class))
                 .orderStatus(row.get("order_status", String.class))
                 .post(row.get("post", Boolean.class))
+                .refNo(row.get("ref_no",String.class))
                 .build();
     }
 
@@ -378,7 +383,7 @@ public class OrderHisService {
                 from order_his_detail op
                 join location l on op.loc_code = l.loc_code
                 and op.comp_code = l.comp_code
-                join stock s on op.stock_code = s.stock_code
+                left join stock s on op.stock_code = s.stock_code
                 and op.comp_code = s.comp_code
                 left join unit_relation rel on s.rel_code = rel.rel_code
                 and op.comp_code = rel.comp_code
@@ -423,6 +428,9 @@ public class OrderHisService {
                         .brandName(row.get("brand_name", String.class))
                         .relName(row.get("rel_name", String.class))
                         .traderName(row.get("trader_name", String.class))
+                        .design(row.get("design", String.class))
+                        .size(row.get("size", String.class))
+                        .heatPressQty(row.get("heat_press_qty", Double.class))
                         .build())
                 .all();
     }
@@ -501,5 +509,57 @@ public class OrderHisService {
                     return s;
                 })
                 .all();
+    }
+
+    public Flux<VDescription> getDesign(String str, String compCode) {
+        String sql = """
+                select distinct design
+                from order_his_detail
+                where comp_code =:compCode
+                and design regexp :str
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("str", str)
+                .map((row) -> VDescription.builder()
+                        .description(row.get("design", String.class))
+                        .build()).all();
+    }
+
+    public Flux<VDescription> getSize(String str, String compCode) {
+        String sql = """
+                select distinct size
+                from order_his_detail
+                where comp_code =:compCode
+                and size regexp :str
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("str", str)
+                .map((row) -> VDescription.builder()
+                        .description(row.get("design", String.class))
+                        .build()).all();
+    }
+
+    public Flux<OrderHis> searchByRefNo(String refNo, String compCode) {
+        String sql = """
+                select o.vou_no,o.vou_date,o.ref_no,o.trader_code,t.trader_name
+                from order_his o join trader t on o.trader_code = t.code
+                and o.comp_code = t.comp_code
+                where o.comp_code =:compCode
+                and o.ref_no regexp :refNo
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("refNo", refNo)
+                .map((row) -> OrderHis.builder()
+                        .key(OrderHisKey.builder()
+                                .vouNo(row.get("vou_no", String.class))
+                                .build())
+                        .vouDate(row.get("vou_date", LocalDateTime.class))
+                        .refNo(row.get("ref_no", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .build()).all();
     }
 }

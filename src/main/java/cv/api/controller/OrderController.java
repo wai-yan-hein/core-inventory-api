@@ -9,7 +9,7 @@ import cv.api.common.ReportFilter;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
-import cv.api.model.VSale;
+import cv.api.model.VDescription;
 import cv.api.service.OrderHisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,5 +73,22 @@ public class OrderController {
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();
         return ohService.getOrderSummaryByDepartment(fromDate, toDate, compCode);
+    }
+
+    @GetMapping(path = "/getDesign")
+    public Flux<VDescription> getDesign(@RequestParam String str,
+                                        @RequestParam String compCode) {
+        return ohService.getDesign(str, compCode);
+    }
+
+    @GetMapping(path = "/getSize")
+    public Flux<VDescription> getSize(@RequestParam String str,
+                                      @RequestParam String compCode) {
+        return ohService.getSize(str, compCode);
+    }
+    @GetMapping(path = "/searchByRefNo")
+    public Flux<OrderHis> searchByRefNo(@RequestParam String refNo,
+                                      @RequestParam String compCode) {
+        return ohService.searchByRefNo(refNo, compCode);
     }
 }

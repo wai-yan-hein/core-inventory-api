@@ -2,15 +2,14 @@ package cv.api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@Embeddable
-public class JobKey implements Serializable {
-    @Column(name = "job_no")
+@Builder
+public class JobKey {
     private String jobNo;
-    @Column(name = "comp_code")
     private String compCode;
 }

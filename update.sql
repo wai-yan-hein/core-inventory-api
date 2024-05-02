@@ -1468,21 +1468,6 @@ add column warehouse_code varchar(15) null after active;
 alter table landing_his
 add column post bit(1) not null default b'0';
 
-CREATE TABLE output_cost (
-  code VARCHAR(15) NOT NULL,
-  comp_code VARCHAR(15) NOT NULL,
-  user_code NVARCHAR(15) NOT NULL,
-  name VARCHAR(20) NULL,
-  price DOUBLE NULL,
-  updated_date TIMESTAMP NULL,
-  updated_by VARCHAR(15) NULL,
-  created_date TIMESTAMP NULL,
-  created_by VARCHAR(15) NULL,
-  intg_upd_status VARCHAR(15) NULL,
-  active BIT(1) NULL,
-  PRIMARY KEY (code, comp_code))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
 
 alter table acc_setting
 add column updated_date timestamp null after comm_acc;
@@ -1895,6 +1880,16 @@ add column s_rec bit(1) not null default 0;
 
 alter table ret_out_his
 add column s_pay bit(1) not null default 0;
+
+alter table order_his
+add column ref_no varchar(255) null after post;
+alter table order_his_detail
+add column heat_press_qty double(20,3) null after size;
+
+alter table job
+add column output_qty double(20,3) null after dept_id,
+add column output_cost double(20,3) null after output_qty;
+
 
 #view
 drop view if exists v_milling_output;

@@ -122,13 +122,14 @@ public class VouStatusService {
     public Mono<Boolean> delete(VouStatusKey key) {
         String sql = """
                 update vou_status
-                set deleted = true
+                set deleted = true,updated_date = :updatedDate
                 where comp_code =:compCode
                 and code =:code
                 """;
         return client.sql(sql)
                 .bind("compCode", key.getCompCode())
                 .bind("code", key.getCode())
+                .bind("updatedDate", LocalDateTime.now())
                 .fetch().rowsUpdated().thenReturn(true);
     }
 

@@ -54,7 +54,6 @@ public class SetupController {
     private final LabourGroupService labourGroupService;
     private final JobService jobService;
     private final StockFormulaService stockFormulaService;
-    private final OutputCostService outputCostService;
     private final StockColorService stockColorService;
     private final CleanDataService cleanDataService;
 
@@ -344,8 +343,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getTraderList")
-    public Flux<Trader> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return traderService.searchTrader(Util1.cleanStr(text), type, compCode, deptId);
+    public Flux<Trader> getTraderList(@RequestParam String text, @RequestParam String type, @RequestParam String compCode) {
+        return traderService.searchTrader(Util1.cleanStr(text), type, compCode);
     }
 
     @GetMapping(path = "/getSupplier")
@@ -496,9 +495,7 @@ public class SetupController {
 
     @PostMapping(path = "/saveJob")
     public Mono<Job> saveJob(@RequestBody Job job) {
-        job.setUpdatedDate(Util1.getTodayLocalDate());
-        Job b = jobService.save(job);
-        return Mono.justOrEmpty(b);
+        return jobService.save(job);
     }
 
     @GetMapping(path = "/getOrderStatus")
@@ -512,13 +509,18 @@ public class SetupController {
     }
 
     @PostMapping(path = "/getJob")
-    public Flux<?> getJob(@RequestBody ReportFilter filterObject) {
-        return Flux.fromIterable(jobService.findAll(filterObject));
+    public Flux<Job> getJob(@RequestBody ReportFilter filter) {
+        return jobService.findAll(filter);
+    }
+
+    @GetMapping(path = "/getActiveJob")
+    public Flux<Job> getJob(@RequestParam String compCode) {
+        return jobService.getActiveJob(compCode);
     }
 
     @GetMapping(path = "/getUpdateJob")
-    public Flux<?> getUpdateJob(@RequestParam String updatedDate) {
-        return Flux.fromIterable(jobService.getJob(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<Job> getUpdateJob(@RequestParam String updatedDate) {
+        return jobService.getJob(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUpdateOrderStatus")
@@ -540,8 +542,7 @@ public class SetupController {
 
     @PostMapping(path = "/findJob")
     public Mono<Job> findOrderStatus(@RequestBody JobKey key) {
-        Job b = jobService.findById(key);
-        return Mono.justOrEmpty(b);
+        return jobService.findById(key);
     }
 
     @PostMapping(path = "/saveOpening")
@@ -781,34 +782,6 @@ public class SetupController {
     @PostMapping(path = "/deleteFormula")
     public Mono<?> deleteFormula(@RequestBody StockFormulaKey key) {
         return Mono.just(stockFormulaService.delete(key));
-    }
-
-    @PostMapping(path = "/saveOutputCost")
-    public Mono<OutputCost> saveOutputCost(@RequestBody OutputCost outputCost) {
-        outputCost.setUpdatedDate(Util1.getTodayLocalDate());
-        OutputCost b = outputCostService.save(outputCost);
-        return Mono.justOrEmpty(b);
-    }
-
-    @GetMapping(path = "/getOutputCost")
-    public Flux<?> getOutputCost(@RequestParam String compCode) {
-        return Flux.fromIterable(outputCostService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
-    }
-
-    @PostMapping(path = "/deleteOutputCost")
-    public Mono<?> deleteOutputCost(@RequestBody OutputCostKey key) {
-        return Mono.just(outputCostService.delete(key));
-    }
-
-    @PostMapping(path = "/findOutputCost")
-    public Mono<OutputCost> findOutputCost(@RequestBody OutputCostKey key) {
-        OutputCost b = outputCostService.findByCode(key);
-        return Mono.justOrEmpty(b);
-    }
-
-    @GetMapping(path = "/getUpdateOutputCost")
-    public Flux<?> getUpdateOutputCost(@RequestParam String updatedDate) {
-        return Flux.fromIterable(outputCostService.getOutputCost(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/saveStockColor")

@@ -44,8 +44,8 @@ public class OrderHis {
     private String projectNo;
     private String orderStatus;
     private Boolean post;
+    private String refNo;
     private List<OrderHisDetail> listSH;
-    private List<OrderDetailKey> listDel;
     private Boolean backup;
     private List<String> location;
     private ZonedDateTime vouDateTime;
