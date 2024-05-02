@@ -36,6 +36,7 @@ public class ReportController {
     private final TransferHisService transferService;
     private final StockRelationService stockRelationService;
     private final LocationService locationService;
+    private final LabourOutputService labourOutputService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<VSale> getSaleReport(@RequestParam String vouNo,
@@ -50,7 +51,6 @@ public class ReportController {
                                             @RequestParam String compCode) {
         return reportService.getSaleByBatchReport(vouNo, grnVouNo, compCode);
     }
-
 
 
     @GetMapping(value = "/getPurchaseReport", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -201,7 +201,7 @@ public class ReportController {
                     case "StockInOutSummary", "StockIOMovementSummary" -> {
                         return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                     }
-                    case "StockInOutDetail","StockInOutDetailUnit" -> {
+                    case "StockInOutDetail", "StockInOutDetailUnit" -> {
                         return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
                     }
 //                    case "StockInOutSummaryByWeight" -> {
@@ -311,6 +311,9 @@ public class ReportController {
                         String opConsingDate = reportService.getOpeningDate(compCode, OPHis.CONSIGN);
                         filter.setOpDate(opConsingDate);
                         return stockReportService.getStockInOutConsign(filter);
+                    }
+                    case "LabourOutputPayableDetail" -> {
+                        return labourOutputService.getLabourPaymentDetailResult(filter);
                     }
                 }
                 ro.setMessage("Report Not Exists.");
@@ -456,7 +459,6 @@ public class ReportController {
     public Mono<?> getSmallQty(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
         return Mono.justOrEmpty(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
     }
-
 
 
     @GetMapping(path = "/getLandingReport")

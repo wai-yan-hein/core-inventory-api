@@ -49,6 +49,7 @@ public class ReportFilter {
     private boolean deleted;
     private boolean active;
     private String labourGroupCode;
+    private String labourCode;
     private String warehouseCode;
     private int reportType;
     private boolean summary;

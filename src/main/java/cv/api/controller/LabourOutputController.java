@@ -33,7 +33,7 @@ public class LabourOutputController {
 
     @PostMapping(path = "/getHistory")
     public Flux<LabourOutput> getHistory(@RequestBody ReportFilter filter) {
-        return outputService.getOrderHistory(filter);
+        return outputService.getHistory(filter);
     }
 
     @DeleteMapping

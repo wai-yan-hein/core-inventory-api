@@ -26,4 +26,5 @@ public class LabourOutputDetail {
     private String jobName;
     private String vouStatusName;
     private String labourName;
+    private String vouDateStr;
 }
