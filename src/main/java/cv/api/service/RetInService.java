@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,29 +37,32 @@ public class RetInService {
 
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<RetInHis> save(RetInHis dto) {
-        return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
-            List<RetInHisDetail> list = dto.getListRD();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(RetInKey.builder().build());
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+                .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
+                        .flatMap(delete -> {
+                            List<RetInHisDetail> list = dto.getListRD();
+                            if (list != null && !list.isEmpty()) {
+                                return Flux.fromIterable(list)
+                                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                                        .concatMap(detail -> {
+                                            if (detail.getKey() == null) {
+                                                detail.setKey(RetInKey.builder().build());
+                                            }
+                                            int uniqueId = list.indexOf(detail) + 1;
+                                            detail.getKey().setUniqueId(uniqueId);
+                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                            detail.setDeptId(ri.getDeptId());
+                                            return insert(detail);
+                                        })
+                                        .then(Mono.just(ri));
+                            } else {
+                                return Mono.just(ri);
                             }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            detail.setDeptId(ri.getDeptId());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
-        }));
+                        }))));
     }
 
     private Mono<RetInHis> saveOrUpdate(RetInHis dto) {
@@ -289,7 +293,7 @@ public class RetInService {
                 .intgUpdStatus(row.get("intg_upd_status", String.class))
                 .macId(row.get("mac_id", Integer.class))
                 .vouLock(row.get("vou_lock", Boolean.class))
-                .sRec(row.get("s_rec",Boolean.class))
+                .sRec(row.get("s_rec", Boolean.class))
                 .projectNo(row.get("project_no", String.class))
                 .printCount(row.get("print_count", Integer.class))
                 .taxAmt(row.get("tax_amt", Double.class))

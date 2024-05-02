@@ -10,6 +10,7 @@ public class LabourOutputDetail {
     private String compCode;
     private Integer uniqueId;
     private String jobNo;
+    private String traderCode;
     private String labourCode;
     private String description;
     private String orderVouNo;
@@ -20,4 +21,8 @@ public class LabourOutputDetail {
     private Double rejectQty;
     private Double price;
     private Double amount;
+    private String traderName;
+    private String jobName;
+    private String vouStatusName;
+    private String labourName;
 }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,25 +29,27 @@ public class PaymentHisService {
     private final SaleHisService saleHisService;
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
 
     public Mono<PaymentHis> save(PaymentHis dto) {
-        return saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
-            List<PaymentHisDetail> list = dto.getListDetail();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getPayAmt()) != 0)
-                        .concatMap(detail -> {
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.setUniqueId(uniqueId);
-                            detail.setVouNo(payment.getVouNo());
-                            detail.setCompCode(payment.getCompCode());
-                            detail.setDeptId(payment.getDeptId());
-                            return updateSale(detail, true).then(insertDetail(detail));
-                        }).then(Mono.just(payment));
-            }
-            return Mono.empty();
-        }));
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode())
+                .flatMap(delete -> {
+                    List<PaymentHisDetail> list = dto.getListDetail();
+                    if (list != null && !list.isEmpty()) {
+                        return Flux.fromIterable(list)
+                                .filter(detail -> Util1.getDouble(detail.getPayAmt()) != 0)
+                                .concatMap(detail -> {
+                                    int uniqueId = list.indexOf(detail) + 1;
+                                    detail.setUniqueId(uniqueId);
+                                    detail.setVouNo(payment.getVouNo());
+                                    detail.setCompCode(payment.getCompCode());
+                                    detail.setDeptId(payment.getDeptId());
+                                    return updateSale(detail, true).then(insertDetail(detail));
+                                }).then(Mono.just(payment));
+                    }
+                    return Mono.empty();
+                }))));
     }
 
     public Mono<PaymentHisDetail> insertDetail(PaymentHisDetail his) {
@@ -602,8 +605,8 @@ public class PaymentHisService {
                         .vouNo(row.get("vou_no", String.class))
                         .account(row.get("account", String.class))
                         .debtorAcc(row.get("debtor_acc", String.class))
-                        .deptCode(row.get("dep_code",String.class))
-                        .tranOption(row.get("tran_option",String.class))
+                        .deptCode(row.get("dep_code", String.class))
+                        .tranOption(row.get("tran_option", String.class))
                         .build()).one();
     }
 }

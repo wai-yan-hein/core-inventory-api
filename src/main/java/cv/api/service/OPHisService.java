@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,30 +29,33 @@ import java.util.List;
 public class OPHisService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<OPHis> save(OPHis dto) {
-        return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
-            List<OPHisDetail> list = dto.getDetailList();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(OPHisDetailKey.builder().build());
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+                .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
+                        .flatMap(delete -> {
+                            List<OPHisDetail> list = dto.getDetailList();
+                            if (list != null && !list.isEmpty()) {
+                                return Flux.fromIterable(list)
+                                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
+                                        .concatMap(detail -> {
+                                            if (detail.getKey() == null) {
+                                                detail.setKey(OPHisDetailKey.builder().build());
+                                            }
+                                            int uniqueId = list.indexOf(detail) + 1;
+                                            detail.getKey().setUniqueId(uniqueId);
+                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                            detail.setDeptId(ri.getDeptId());
+                                            detail.setLocCode(ri.getLocCode());
+                                            return insert(detail);
+                                        })
+                                        .then(Mono.just(ri));
+                            } else {
+                                return Mono.just(ri);
                             }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            detail.setDeptId(ri.getDeptId());
-                            detail.setLocCode(ri.getLocCode());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
-        }));
+                        }))));
     }
 
     private Mono<OPHis> saveOrUpdate(OPHis dto) {
@@ -208,7 +212,7 @@ public class OPHisService {
                 .bind("opAmt", dto.getOpAmt())
                 .bind("curCode", dto.getCurCode())
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
-                .bind("traderCode", Parameters.in(R2dbcType.VARCHAR,dto.getTraderCode()))
+                .bind("traderCode", Parameters.in(R2dbcType.VARCHAR, dto.getTraderCode()))
                 .bind("tranSource", Parameters.in(R2dbcType.VARCHAR, dto.getTranSource()))
                 .fetch()
                 .rowsUpdated()

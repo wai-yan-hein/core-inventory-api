@@ -5,11 +5,14 @@
  */
 package cv.api.controller;
 
+import cv.api.common.ReportFilter;
 import cv.api.entity.LabourOutput;
+import cv.api.entity.LabourOutputDetail;
 import cv.api.service.LabourOutputService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -28,10 +31,10 @@ public class LabourOutputController {
         return outputService.saveLabourOutput(dto);
     }
 
-//    @PostMapping(path = "/getHistory")
-//    public Flux<LabourOutput> getHistory(@RequestBody ReportFilter filter) {
-//        return outputService.getOrderHistory(filter);
-//    }
+    @PostMapping(path = "/getHistory")
+    public Flux<LabourOutput> getHistory(@RequestBody ReportFilter filter) {
+        return outputService.getOrderHistory(filter);
+    }
 
     @DeleteMapping
     public Mono<Boolean> delete(@RequestParam String vouNo, @RequestParam String compCode) {
@@ -48,9 +51,9 @@ public class LabourOutputController {
         return outputService.findById(vouNo, compCode);
     }
 
-//    @GetMapping(path = "/getLabourOutputDetail")
-//    public Flux<OrderHisDetail> getLabourOutputDetail(@RequestParam String vouNo,
-//                                                      @RequestParam String compCode) {
-//        return outputService.searchDetail(vouNo, compCode);
-//    }
+    @GetMapping(path = "/getLabourOutputDetail")
+    public Flux<LabourOutputDetail> getLabourOutputDetail(@RequestParam String vouNo,
+                                                          @RequestParam String compCode) {
+        return outputService.getLabourOutputDetail(vouNo, compCode);
+    }
 }

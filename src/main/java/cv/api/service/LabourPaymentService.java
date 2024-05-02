@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,26 +25,29 @@ import java.util.List;
 public class LabourPaymentService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<LabourPaymentDto> save(LabourPaymentDto dto) {
-        return saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
-            List<LabourPaymentDetail> list = dto.getListDetail();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                        .concatMap(detail -> {
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.setUniqueId(uniqueId);
-                            detail.setVouNo(payment.getVouNo());
-                            detail.setCompCode(payment.getCompCode());
-                            detail.setDeptId(payment.getDeptId());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(payment));
-            } else {
-                return Mono.just(payment);
-            }
-        }));
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+                .flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode())
+                        .flatMap(delete -> {
+                            List<LabourPaymentDetail> list = dto.getListDetail();
+                            if (list != null && !list.isEmpty()) {
+                                return Flux.fromIterable(list)
+                                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                                        .concatMap(detail -> {
+                                            int uniqueId = list.indexOf(detail) + 1;
+                                            detail.setUniqueId(uniqueId);
+                                            detail.setVouNo(payment.getVouNo());
+                                            detail.setCompCode(payment.getCompCode());
+                                            detail.setDeptId(payment.getDeptId());
+                                            return insert(detail);
+                                        })
+                                        .then(Mono.just(payment));
+                            } else {
+                                return Mono.just(payment);
+                            }
+                        }))));
     }
 
 
@@ -319,7 +323,7 @@ public class LabourPaymentService {
         return LabourPaymentDto.builder()
                 .vouNo(row.get("vou_no", String.class))
                 .compCode(row.get("comp_code", String.class))
-                .deptId(row.get("dept_id",Integer.class))
+                .deptId(row.get("dept_id", Integer.class))
                 .vouDate(row.get("vou_date", LocalDateTime.class))
                 .labourGroupCode(row.get("labour_group_code", String.class))
                 .curCode(row.get("cur_code", String.class))

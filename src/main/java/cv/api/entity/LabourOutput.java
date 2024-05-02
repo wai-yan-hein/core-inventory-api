@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -20,5 +21,9 @@ public class LabourOutput {
     private String updatedBy;
     private Integer macId;
     private Boolean deleted;
+    private Double outputQty;
+    private Double rejectQty;
+    private Double amount;
+    private ZonedDateTime vouDateTime;
     private List<LabourOutputDetail> listDetail;
 }

@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -40,6 +41,7 @@ public class PurHisService {
     private final WeightService weightService;
     private final LandingService landingService;
     private final PurExpenseService purExpenseService;
+    private final TransactionalOperator operator;
 
     public Mono<PurHis> save(PurHis dto) {
         Integer deptId = dto.getDeptId();
@@ -48,7 +50,7 @@ public class PurHisService {
             log.error("deptId is null from mac id : {}", dto.getMacId());
             return Mono.empty();
         }
-        return savePurchase(dto).flatMap((pur) -> savePurExpense(pur)
+        return operator.transactional(Mono.defer(() -> savePurchase(dto).flatMap((pur) -> savePurExpense(pur)
                 .then(landingService.updatePost(LandingHisKey.builder()
                                 .vouNo(dto.getLandVouNo())
                                 .compCode(compCode)
@@ -56,7 +58,7 @@ public class PurHisService {
                         .then(weightService.updatePost(WeightHisKey.builder()
                                 .vouNo(dto.getWeightVouNo())
                                 .compCode(compCode)
-                                .build(), true))).thenReturn(pur));
+                                .build(), true))).thenReturn(pur))));
     }
 
     private Mono<Boolean> savePurExpense(PurHis ph) {

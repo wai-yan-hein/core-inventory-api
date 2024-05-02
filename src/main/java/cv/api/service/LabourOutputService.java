@@ -1,5 +1,6 @@
 package cv.api.service;
 
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.LabourOutput;
 import cv.api.entity.LabourOutputDetail;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,26 +25,30 @@ import java.util.List;
 public class LabourOutputService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<LabourOutput> saveLabourOutput(LabourOutput dto) {
-        dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getVouNo(), ri.getCompCode()).flatMap(delete -> {
-            List<LabourOutputDetail> list = dto.getListDetail();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getOutputQty()) != 0)
-                        .concatMap(detail -> {
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.setUniqueId(uniqueId);
-                            detail.setVouNo(ri.getVouNo());
-                            detail.setCompCode(ri.getCompCode());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
+        return operator.transactional(Mono.defer(() -> {
+            dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
+            return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getVouNo(), ri.getCompCode()).flatMap(delete -> {
+                List<LabourOutputDetail> list = dto.getListDetail();
+                if (list != null && !list.isEmpty()) {
+                    return Flux.fromIterable(list)
+                            .filter(detail -> Util1.getDouble(detail.getOutputQty()) != 0)
+                            .concatMap(detail -> {
+                                int uniqueId = list.indexOf(detail) + 1;
+                                detail.setUniqueId(uniqueId);
+                                detail.setVouNo(ri.getVouNo());
+                                detail.setCompCode(ri.getCompCode());
+                                return insert(detail);
+                            })
+                            .then(Mono.just(ri));
+                } else {
+                    return Mono.just(ri);
+                }
+            }));
         }));
+
     }
 
     private Mono<LabourOutput> saveOrUpdate(LabourOutput dto) {
@@ -64,6 +70,7 @@ public class LabourOutputService {
         }
     }
 
+    @Transactional
     private Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
                 delete from labour_output_detail where vou_no=:vouNo and comp_code =:compCode
@@ -74,23 +81,25 @@ public class LabourOutputService {
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
+    @Transactional
     public Mono<LabourOutput> insert(LabourOutput dto) {
         String sql = """
                 INSERT INTO labour_output (vou_no, comp_code, dept_id, vou_date, remark, created_date,
-                created_by, updated_date, updated_by, mac_id, deleted)
+                created_by, updated_date, updated_by, mac_id, deleted, output_qty, reject_qty, amount)
                 VALUES (:vouNo, :compCode, :deptId, :vouDate, :remark, :createdDate,
-                :createdBy, :updatedDate, :updatedBy, :macId, :deleted)
+                :createdBy, :updatedDate, :updatedBy, :macId, :deleted, :outputQty, :rejectQty, :amount)
                 """;
         return executeUpdate(sql, dto);
     }
 
+    @Transactional
     public Mono<LabourOutput> update(LabourOutput dto) {
         String sql = """
                 UPDATE labour_output
                 SET dept_id = :deptId, vou_date = :vouDate, remark = :remark,
                 created_date = :createdDate, created_by = :createdBy,
                 updated_date = :updatedDate, updated_by = :updatedBy, mac_id = :macId,
-                deleted= :deleted
+                deleted= :deleted, output_qty = :outputQty, reject_qty= :rejectQty, amount = :amount
                 WHERE vou_no = :vouNo AND comp_code = :compCode
                 """;
         return executeUpdate(sql, dto);
@@ -102,6 +111,7 @@ public class LabourOutputService {
                 .compCode(row.get("comp_code", String.class))
                 .deptId(row.get("dept_id", Integer.class))
                 .vouDate(row.get("vou_date", LocalDateTime.class))
+                .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
                 .remark(row.get("remark", String.class))
                 .createdDate(row.get("created_date", LocalDateTime.class))
                 .createdBy(row.get("created_by", String.class))
@@ -109,6 +119,9 @@ public class LabourOutputService {
                 .updatedBy(row.get("updated_by", String.class))
                 .macId(row.get("mac_id", Integer.class))
                 .deleted(row.get("deleted", Boolean.class))
+                .outputQty(row.get("output_qty", Double.class))
+                .rejectQty(row.get("reject_qty", Double.class))
+                .amount(row.get("amount", Double.class))
                 .build();
     }
 
@@ -125,16 +138,20 @@ public class LabourOutputService {
                 .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("macId", dto.getMacId())
                 .bind("deleted", Util1.getBoolean(dto.getDeleted()))
+                .bind("outputQty", Parameters.in(R2dbcType.DOUBLE, dto.getOutputQty()))
+                .bind("rejectQty", Parameters.in(R2dbcType.DOUBLE, dto.getRejectQty()))
+                .bind("amount", Parameters.in(R2dbcType.DOUBLE, dto.getAmount()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
     }
 
+    @Transactional
     public Mono<LabourOutputDetail> insert(LabourOutputDetail dto) {
         String sql = """
-                INSERT INTO labour_output_detail (vou_no, comp_code, unique_id, job_no, labour_code,
+                INSERT INTO labour_output_detail (vou_no, comp_code, unique_id, job_no, labour_code, trader_code,
                 description, output_qty, reject_qty, order_vou_no, ref_no, vou_status_code, remark, price, amount)
-                VALUES (:vouNo, :compCode, :uniqueId, :jobNo, :labourCode, :description,
+                VALUES (:vouNo, :compCode, :uniqueId, :jobNo, :labourCode, :traderCode, :description,
                 :outputQty, :rejectQty, :orderVouNo, :refNo, :vouStatusCode, :remark, :price, :amount)
                 """;
         return executeUpdate(sql, dto);
@@ -147,6 +164,7 @@ public class LabourOutputService {
                 .bind("uniqueId", dto.getUniqueId())
                 .bind("jobNo", dto.getJobNo())
                 .bind("labourCode", dto.getLabourCode())
+                .bind("traderCode", dto.getTraderCode())
                 .bind("description", Parameters.in(R2dbcType.VARCHAR, dto.getDescription()))
                 .bind("outputQty", dto.getOutputQty())
                 .bind("rejectQty", Parameters.in(R2dbcType.DOUBLE, dto.getRejectQty()))
@@ -199,4 +217,67 @@ public class LabourOutputService {
     }
 
 
+    public Flux<LabourOutput> getOrderHistory(ReportFilter filter) {
+        String fromDate = filter.getFromDate();
+        String toDate = filter.getToDate();
+        String compCode = filter.getCompCode();
+        boolean deleted = filter.isDeleted();
+        String vouNo = Util1.isAll(filter.getVouNo());
+        String sql = """
+                select *
+                from labour_output
+                where comp_code = :compCode
+                and deleted = :deleted
+                and date(vou_date)=:fromDate and :toDate
+                and (vou_no = :vouNo or '-' = :vouNo)
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("deleted", deleted)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("vouNo", vouNo)
+                .map((row, rowMetadata) -> mapRow(row)).all();
+    }
+
+    public Flux<LabourOutputDetail> getLabourOutputDetail(String vouNo, String compCode) {
+        String sql = """
+                select l.*,j.job_name,t.trader_name labour_name,tt.trader_name,v.description
+                from labour_output_detail l join job j on l.job_no = j.job_no
+                and l.comp_code = j.comp_code
+                join trader t on l.labour_code = t.code
+                and l.comp_code = t.comp_code
+                left join vou_status v on l.vou_status_code = v.code
+                and l.comp_code = v.comp_code
+                join trader tt on l.trader_code = tt.code
+                and l.comp_code = tt.comp_code
+                where l.vou_no =:vouNo
+                and l.comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", vouNo)
+                .bind("compCode", compCode)
+                .map((row, rowMetadata) -> LabourOutputDetail.builder()
+                        .vouNo(row.get("vou_no", String.class))
+                        .compCode(row.get("comp_code", String.class))
+                        .uniqueId(row.get("unique_id", Integer.class))
+                        .jobNo(row.get("job_no", String.class))
+                        .labourCode(row.get("labour_code", String.class))
+                        .traderCode(row.get("trader_code", String.class))
+                        .description(row.get("description", String.class))
+                        .outputQty(row.get("output_qty", Double.class))
+                        .rejectQty(row.get("reject_qty", Double.class))
+                        .orderVouNo(row.get("order_vou_no", String.class))
+                        .refNo(row.get("ref_no", String.class))
+                        .vouStatusCode(row.get("vou_status_code", String.class))
+                        .remark(row.get("remark", String.class))
+                        .price(row.get("price", Double.class))
+                        .amount(row.get("amount", Double.class))
+                        .jobName(row.get("job_name", String.class))
+                        .labourName(row.get("labour_name", String.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .vouStatusName(row.get("description", String.class))
+                        .build()).all();
+
+    }
 }

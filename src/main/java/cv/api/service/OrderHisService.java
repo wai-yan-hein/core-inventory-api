@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -38,30 +39,32 @@ public class OrderHisService {
 
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<OrderHis> saveOrder(OrderHis dto) {
-        dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
-            List<OrderHisDetail> list = dto.getListSH();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(OrderDetailKey.builder().build());
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+                .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
+                        .flatMap(delete -> {
+                            List<OrderHisDetail> list = dto.getListSH();
+                            if (list != null && !list.isEmpty()) {
+                                return Flux.fromIterable(list)
+                                        .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
+                                        .concatMap(detail -> {
+                                            if (detail.getKey() == null) {
+                                                detail.setKey(OrderDetailKey.builder().build());
+                                            }
+                                            int uniqueId = list.indexOf(detail) + 1;
+                                            detail.getKey().setUniqueId(uniqueId);
+                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                            detail.setDeptId(ri.getDeptId());
+                                            return insert(detail);
+                                        })
+                                        .then(Mono.just(ri));
+                            } else {
+                                return Mono.just(ri);
                             }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            detail.setDeptId(ri.getDeptId());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
-        }));
+                        }))));
     }
 
     private Mono<Boolean> deleteDetail(String vouNo, String compCode) {
@@ -235,7 +238,7 @@ public class OrderHisService {
                 .projectNo(row.get("project_no", String.class))
                 .orderStatus(row.get("order_status", String.class))
                 .post(row.get("post", Boolean.class))
-                .refNo(row.get("ref_no",String.class))
+                .refNo(row.get("ref_no", String.class))
                 .build();
     }
 

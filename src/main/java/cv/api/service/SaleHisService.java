@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -41,6 +42,7 @@ public class SaleHisService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
     private final SaleDetailService saleDetailService;
+    private final TransactionalOperator operator;
 
 
     public Mono<SaleHis> save(SaleHis sh) {
@@ -49,7 +51,11 @@ public class SaleHisService {
             log.error("deptId is null from mac id : {}", sh.getMacId());
             return Mono.empty();
         }
-        return saveSale(sh).flatMap((saleHis) -> saveSaleExpense(saleHis).then(saveVouDiscount(saleHis)).then(saveSaleOrderJoin(saleHis)).thenReturn(saleHis));
+        return operator.transactional(Mono.defer(() -> saveSale(sh)
+                .flatMap((saleHis) -> saveSaleExpense(saleHis)
+                        .then(saveVouDiscount(saleHis))
+                        .then(saveSaleOrderJoin(saleHis))
+                        .thenReturn(saleHis))));
     }
 
     private Mono<Boolean> saveSaleExpense(SaleHis sh) {

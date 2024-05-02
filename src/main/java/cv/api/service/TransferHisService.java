@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,29 +28,32 @@ import java.util.List;
 public class TransferHisService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<TransferHis> saveTransfer(TransferHis dto) {
-        return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
-            List<TransferHisDetail> list = dto.getListTD();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(THDetailKey.builder().build());
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+                .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
+                        .flatMap(delete -> {
+                            List<TransferHisDetail> list = dto.getListTD();
+                            if (list != null && !list.isEmpty()) {
+                                return Flux.fromIterable(list)
+                                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
+                                        .concatMap(detail -> {
+                                            if (detail.getKey() == null) {
+                                                detail.setKey(THDetailKey.builder().build());
+                                            }
+                                            int uniqueId = list.indexOf(detail) + 1;
+                                            detail.getKey().setUniqueId(uniqueId);
+                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                            detail.setDeptId(ri.getDeptId());
+                                            return insert(detail);
+                                        })
+                                        .then(Mono.just(ri));
+                            } else {
+                                return Mono.just(ri);
                             }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            detail.setDeptId(ri.getDeptId());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
-        }));
+                        }))));
     }
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
@@ -145,7 +149,6 @@ public class TransferHisService {
                 .bind("compCode", key.getCompCode())
                 .fetch().rowsUpdated().thenReturn(true);
     }
-
 
 
     public Mono<TransferHisDetail> insert(TransferHisDetail dto) {

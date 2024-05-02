@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,9 +24,10 @@ import java.util.List;
 public class StockPaymentService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<StockPayment> save(StockPayment dto) {
-        return saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
+        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
             List<StockPaymentDetail> list = dto.getListDetail();
             if (list != null && !list.isEmpty()) {
                 return Flux.fromIterable(list)
@@ -41,7 +43,7 @@ public class StockPaymentService {
             } else {
                 return Mono.just(payment);
             }
-        }));
+        }))));
 
     }
 
