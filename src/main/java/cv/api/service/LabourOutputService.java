@@ -150,8 +150,8 @@ public class LabourOutputService {
     public Mono<LabourOutputDetail> insert(LabourOutputDetail dto) {
         String sql = """
                 INSERT INTO labour_output_detail (vou_no, comp_code, unique_id, job_no, labour_code, trader_code,
-                description, output_qty, reject_qty, order_vou_no, ref_no, vou_status_code, remark, price, amount)
-                VALUES (:vouNo, :compCode, :uniqueId, :jobNo, :labourCode, :traderCode, :description,
+                description, print_qty, output_qty, reject_qty, order_vou_no, ref_no, vou_status_code, remark, price, amount)
+                VALUES (:vouNo, :compCode, :uniqueId, :jobNo, :labourCode, :traderCode, :description, :printQty,
                 :outputQty, :rejectQty, :orderVouNo, :refNo, :vouStatusCode, :remark, :price, :amount)
                 """;
         return executeUpdate(sql, dto);
@@ -166,6 +166,7 @@ public class LabourOutputService {
                 .bind("labourCode", dto.getLabourCode())
                 .bind("traderCode", dto.getTraderCode())
                 .bind("description", Parameters.in(R2dbcType.VARCHAR, dto.getDescription()))
+                .bind("printQty", Parameters.in(R2dbcType.DOUBLE, dto.getPrintQty()))
                 .bind("outputQty", dto.getOutputQty())
                 .bind("rejectQty", Parameters.in(R2dbcType.DOUBLE, dto.getRejectQty()))
                 .bind("orderVouNo", Parameters.in(R2dbcType.VARCHAR, dto.getOrderVouNo()))
@@ -203,7 +204,7 @@ public class LabourOutputService {
     @Transactional
     private Mono<Boolean> updateDeleteStatus(String vouNo, String compCode, boolean status) {
         String sql = """
-                update labour_payment
+                update labour_output
                 set deleted =:status,updated_date=:updatedDate
                 where vou_no=:vouNo
                 and comp_code=:compCode
@@ -242,7 +243,7 @@ public class LabourOutputService {
 
     public Flux<LabourOutputDetail> getLabourOutputDetail(String vouNo, String compCode) {
         String sql = """
-                select l.*,j.job_name,t.trader_name labour_name,tt.trader_name,v.description
+                select l.*,j.job_name,t.trader_name labour_name,tt.trader_name,v.description vou_status_name
                 from labour_output_detail l join job j on l.job_no = j.job_no
                 and l.comp_code = j.comp_code
                 join trader t on l.labour_code = t.code
@@ -265,6 +266,7 @@ public class LabourOutputService {
                         .labourCode(row.get("labour_code", String.class))
                         .traderCode(row.get("trader_code", String.class))
                         .description(row.get("description", String.class))
+                        .printQty(row.get("print_qty", Double.class))
                         .outputQty(row.get("output_qty", Double.class))
                         .rejectQty(row.get("reject_qty", Double.class))
                         .orderVouNo(row.get("order_vou_no", String.class))
@@ -276,7 +278,7 @@ public class LabourOutputService {
                         .jobName(row.get("job_name", String.class))
                         .labourName(row.get("labour_name", String.class))
                         .traderName(row.get("trader_name", String.class))
-                        .vouStatusName(row.get("description", String.class))
+                        .vouStatusName(row.get("vou_status_name", String.class))
                         .build()).all();
 
     }

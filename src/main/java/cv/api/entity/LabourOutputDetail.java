@@ -17,6 +17,7 @@ public class LabourOutputDetail {
     private String refNo;
     private String remark;
     private String vouStatusCode;
+    private Double printQty;
     private Double outputQty;
     private Double rejectQty;
     private Double price;
