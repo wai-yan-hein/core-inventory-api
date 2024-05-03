@@ -47,4 +47,6 @@ public class SaleHisDetail {
     private String locName;
     private String traderName;
     private Boolean calculate;
+    private String design;
+    private String size;
 }
