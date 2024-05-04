@@ -43,7 +43,8 @@ public class VouStatusService {
     public Mono<VouStatus> update(VouStatus dto) {
         String sql = """
                 UPDATE vou_status
-                SET description = :description, updated_by = :updatedBy, updated_date = :updatedDate,
+                SET description = :description, created_by = :createdBy, created_date = :createdDate,
+                updated_by = :updatedBy, updated_date = :updatedDate,
                 mac_id = :macId, user_code = :userCode, dept_id = :deptId, intg_upd_status = :intgUpdStatus,
                 deleted = :deleted, active = :active, report_name = :reportName, mill_report_name = :millReportName
                 WHERE code = :code AND comp_code = :compCode

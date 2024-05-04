@@ -22,3 +22,13 @@ update ret_in_his
 set s_rec =true;
 update ret_out_his
 set s_pay =true;
+
+SELECT
+    table_name AS `Table`,
+    round(((data_length + index_length) / 1024 / 1024), 2) AS `Size (MB)`
+FROM
+    information_schema.tables
+WHERE
+    table_schema = 'cv_acc_myatt'
+ORDER BY
+    (data_length + index_length) DESC;

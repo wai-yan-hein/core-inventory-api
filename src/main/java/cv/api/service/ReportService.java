@@ -1365,7 +1365,7 @@ public class ReportService {
         String sql = """
                 SELECT rel.smallest_qty * smallest_price price, rel.unit
                 FROM (
-                    SELECT pur_unit, pur_price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                    SELECT pur_unit, pur_price / ifnull(rel.smallest_qty,1) smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
                     FROM v_purchase pd
                     JOIN v_relation rel ON pd.rel_code = rel.rel_code
                     AND pd.pur_unit = rel.unit
@@ -1382,7 +1382,7 @@ public class ReportService {
                         LIMIT 1
                     )
                 ) a
-                JOIN v_relation rel
+                LEFT JOIN v_relation rel
                 ON a.rel_code = rel.rel_code
                 AND a.comp_code = rel.comp_code
                 AND rel.unit = :unit
