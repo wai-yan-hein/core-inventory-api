@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,6 +35,7 @@ public class UnitRelationService {
     private final DecimalFormat formatter = new DecimalFormat(Util1.DECIMAL_FORMAT);
     private final SeqService seqService;
     private final DatabaseClient client;
+    private final TransactionalOperator operator;
 
     private Mono<UnitRelation> saveOrUpdate(UnitRelation dto) {
         String relCode = dto.getKey().getRelCode();
@@ -51,9 +53,21 @@ public class UnitRelationService {
     }
 
     public Mono<UnitRelation> save(UnitRelation dto) {
-        List<UnitRelationDetail> detail = generateDetail(dto);
-        dto.setRelName(getRelStr(detail));
-        return saveOrUpdate(dto).thenMany(Flux.fromIterable(detail).flatMap(this::insert)).then(Mono.just(dto));
+        return operator.transactional(Mono.defer(() -> {
+            List<UnitRelationDetail> detail = generateDetail(dto);
+            dto.setRelName(getRelStr(detail));
+            return saveOrUpdate(dto).flatMap(ur -> {
+                String relCode = ur.getKey().getRelCode();
+                String compCode = ur.getKey().getCompCode();
+                return deleteRelationDetail(relCode, compCode)
+                        .flatMap(success -> Flux.fromIterable(detail)
+                                .flatMap(d -> {
+                                    d.getKey().setRelCode(relCode);
+                                    d.getKey().setCompCode(compCode);
+                                    return insert(d);
+                                }).then(Mono.just(dto)));
+            });
+        }));
     }
 
     private List<UnitRelationDetail> generateDetail(UnitRelation dto) {
@@ -87,7 +101,6 @@ public class UnitRelationService {
     }
 
 
-
     private String getRelStr(List<UnitRelationDetail> listRD) {
         StringBuilder relStr = new StringBuilder();
         for (UnitRelationDetail ud : listRD) {
@@ -108,6 +121,17 @@ public class UnitRelationService {
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
 
+    private Mono<Boolean> deleteRelationDetail(String relCode, String compCode) {
+        String sql = """
+                delete from unit_relation_detail
+                where comp_code = :compCode
+                and rel_code = :relCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("relCode", relCode)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
 
     public Flux<UnitRelationDetail> getRelationDetail(String relCode, String compCode) {
         String sql = """
@@ -170,6 +194,7 @@ public class UnitRelationService {
                             });
                 });
     }
+
     public Flux<UnitRelation> getUnitRelationAndDetail(String compCode) {
         String sql = """
                 SELECT *
@@ -247,6 +272,7 @@ public class UnitRelationService {
                 .bind("deptId", dto.getDeptId())
                 .fetch().rowsUpdated().thenReturn(dto);
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -255,7 +281,7 @@ public class UnitRelationService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }

@@ -655,7 +655,7 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getUnitRelationDetail")
-    public Flux<?> getUnitRelationDetail(@RequestParam String code, @RequestParam String compCode, @RequestParam Integer deptId) {
+    public Flux<?> getUnitRelationDetail(@RequestParam String code, @RequestParam String compCode) {
         return unitRelationService.getRelationDetail(code, compCode);
     }
 
