@@ -29,9 +29,9 @@ public class SaleDetailService {
     public Mono<SaleHisDetail> save(SaleHisDetail sh) {
         String sql = """
                     INSERT INTO sale_his_detail
-                    (vou_no,comp_code,unique_id, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, dept_id, batch_no, weight, weight_unit, std_weight, total_weight, org_price, weight_loss, wet, rice, bag)
+                    (vou_no,comp_code,unique_id, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, dept_id, batch_no, weight, weight_unit, design, size, std_weight, total_weight, org_price, weight_loss, wet, rice, bag)
                     VALUES
-                    (:vouNo,:compCode,:uniqueId, :stockCode, :expireDate, :qty, :saleUnit, :salePrice, :saleAmt, :locCode,   :deptId, :batchNo, :weight, :weightUnit, :stdWeight, :totalWeight, :orgPrice, :weightLoss, :wet, :rice, :bag)
+                    (:vouNo,:compCode,:uniqueId, :stockCode, :expireDate, :qty, :saleUnit, :salePrice, :saleAmt, :locCode,   :deptId, :batchNo, :weight, :weightUnit, :design, :size, :stdWeight, :totalWeight, :orgPrice, :weightLoss, :wet, :rice, :bag)
                 """;
 
         return client.sql(sql)
@@ -49,6 +49,8 @@ public class SaleDetailService {
                 .bind("batchNo", Parameters.in(R2dbcType.VARCHAR, sh.getBatchNo()))
                 .bind("weight", Parameters.in(R2dbcType.DOUBLE, sh.getWeight()))
                 .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR, sh.getWeightUnit()))
+                .bind("design", Parameters.in(R2dbcType.VARCHAR, sh.getDesign()))
+                .bind("size", Parameters.in(R2dbcType.VARCHAR, sh.getSize()))
                 .bind("stdWeight", Parameters.in(R2dbcType.DOUBLE, sh.getStdWeight()))
                 .bind("totalWeight", Parameters.in(R2dbcType.DOUBLE, sh.getTotalWeight()))
                 .bind("orgPrice", Parameters.in(R2dbcType.DOUBLE, sh.getOrgPrice()))
@@ -68,7 +70,7 @@ public class SaleDetailService {
                     SELECT op.*, s.user_code, s.stock_name,s.calculate, cat.cat_name, st.stock_type_name, sb.brand_name, rel.rel_name, l.loc_name, t.trader_name
                     FROM sale_his_detail op
                     JOIN location l ON op.loc_code = l.loc_code AND op.comp_code = l.comp_code
-                    JOIN stock s ON op.stock_code = s.stock_code AND op.comp_code = s.comp_code
+                    left JOIN stock s ON op.stock_code = s.stock_code AND op.comp_code = s.comp_code
                     LEFT JOIN unit_relation rel ON s.rel_code = rel.rel_code AND op.comp_code = rel.comp_code
                     LEFT JOIN stock_type st ON s.stock_type_code = st.stock_type_code AND op.comp_code = st.comp_code
                     LEFT JOIN category cat ON s.category_code = cat.cat_code AND op.comp_code = cat.comp_code
@@ -102,7 +104,7 @@ public class SaleDetailService {
                         .unitCode(row.get("sale_unit", String.class))
                         .userCode(row.get("user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
-                        .calculate(row.get("calculate",Boolean.class))
+                        .calculate(row.get("calculate", Boolean.class))
                         .catName(row.get("cat_name", String.class))
                         .groupName(row.get("stock_type_name", String.class))
                         .brandName(row.get("brand_name", String.class))
@@ -114,6 +116,8 @@ public class SaleDetailService {
                         .wet(row.get("wet", Double.class))
                         .rice(row.get("rice", Double.class))
                         .bag(row.get("bag", Double.class))
+                        .design(row.get("design", String.class))
+                        .size(row.get("size", String.class))
                         .build())
                 .all();
     }

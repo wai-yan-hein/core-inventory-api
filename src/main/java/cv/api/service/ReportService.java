@@ -119,7 +119,7 @@ public class ReportService {
                 select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.reference,v.vou_no,v.vou_date,v.stock_name,
                 v.qty,v.bag,v.weight,v.weight_unit,v.sale_price,v.sale_unit,v.sale_amt,v.vou_total,v.discount,
                 v.paid,v.vou_balance,t.user_code t_user_code,t.phone,t.address,l.loc_name,v.created_by,
-                v.comp_code,c.cat_name,r.reg_name,u1.unit_name sale_unit_name,u2.unit_name weight_unit_name
+                v.comp_code,c.cat_name,r.reg_name,u1.unit_name sale_unit_name,u2.unit_name weight_unit_name,design,size
                 from v_sale v join trader t
                 on v.trader_code = t.code
                 and v.comp_code = t.comp_code
@@ -181,6 +181,8 @@ public class ReportService {
                     sale.setRegionName(row.get("reg_name", String.class));
                     sale.setSaleUnitName(row.get("sale_unit_name", String.class));
                     sale.setWeightUnitName(row.get("weight_unit_name", String.class));
+                    sale.setDesign(row.get("design", String.class));
+                    sale.setSize(row.get("size", String.class));
                     double weight = Util1.getDouble(row.get("weight", Double.class));
                     if (weight > 0) {
                         sale.setWeight(weight);

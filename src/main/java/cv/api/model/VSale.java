@@ -108,6 +108,8 @@ public class VSale {
     private Double opening;
     private Double totalBalance;
     private Boolean sPay;
+    private String design;
+    private String size;
 
     List<VouDiscount> listDiscount;
 }

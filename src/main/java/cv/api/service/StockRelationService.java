@@ -820,6 +820,12 @@ public class StockRelationService {
                 .all()
                 .collectList()
                 .flatMap((balances -> {
+                    if (balances.isEmpty()) {
+                        ReturnObject ro = ReturnObject.builder().build();
+                        ro.setMessage("No Records.");
+                        ro.setFile(Util1.convertToJsonBytes(balances));
+                        return Mono.just(ro);
+                    }
                     for (int i = 0; i < balances.size(); i++) {
                         if (i > 0) {
                             ClosingBalance prv = balances.get(i - 1);
