@@ -1890,6 +1890,10 @@ alter table job
 add column output_qty double(20,3) null after dept_id,
 add column output_cost double(20,3) null after output_qty;
 
+alter table sale_his_detail
+add column design text null after bag,
+add column size text null after design;
+
 
 #view
 drop view if exists v_milling_output;

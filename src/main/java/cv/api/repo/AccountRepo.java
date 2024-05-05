@@ -174,7 +174,6 @@ public class AccountRepo {
                 }).doOnSuccess(response -> {
                     if (response != null) {
                         updateTrader(response.getKey().getCode(), response.getAccount(), response.getKey().getCompCode());
-                        sendDownloadMessage("TRADER_ACC", response.getTraderName()).subscribe();
                     }
                 });
     }
