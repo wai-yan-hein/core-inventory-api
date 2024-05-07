@@ -233,24 +233,24 @@ public class SaleHisService {
         return discountService.getDescription(str, compCode);
     }
 
-    public Flux<VSale> getSale(ReportFilter filterObject) {
-        String fromDate = Util1.isNull(filterObject.getFromDate(), "-");
-        String toDate = Util1.isNull(filterObject.getToDate(), "-");
-        String vouNo = Util1.isNull(filterObject.getVouNo(), "-");
-        String userCode = Util1.isNull(filterObject.getUserCode(), "-");
-        String traderCode = Util1.isNull(filterObject.getTraderCode(), "-");
-        String remark = Util1.isNull(filterObject.getRemark(), "-");
-        String stockCode = Util1.isNull(filterObject.getStockCode(), "-");
-        String saleManCode = Util1.isNull(filterObject.getSaleManCode(), "-");
-        String reference = Util1.isNull(filterObject.getReference(), "-");
-        String compCode = filterObject.getCompCode();
-        String locCode = Util1.isNull(filterObject.getLocCode(), "-");
-        Integer deptId = filterObject.getDeptId();
-        String deleted = String.valueOf(filterObject.isDeleted());
-        String nullBatch = String.valueOf(filterObject.isNullBatch());
-        String batchNo = Util1.isNull(filterObject.getBatchNo(), "-");
-        String projectNo = Util1.isAll(filterObject.getProjectNo());
-        String curCode = Util1.isAll(filterObject.getCurCode());
+    public Flux<VSale> getSale(ReportFilter f) {
+        String fromDate = Util1.isNull(f.getFromDate(), "-");
+        String toDate = Util1.isNull(f.getToDate(), "-");
+        String vouNo = Util1.isNull(f.getVouNo(), "-");
+        String userCode = Util1.isNull(f.getUserCode(), "-");
+        String traderCode = Util1.isNull(f.getTraderCode(), "-");
+        String remark = Util1.isNull(f.getRemark(), "-");
+        String stockCode = Util1.isNull(f.getStockCode(), "-");
+        String saleManCode = Util1.isNull(f.getSaleManCode(), "-");
+        String reference = Util1.isNull(f.getReference(), "-");
+        String compCode = f.getCompCode();
+        String locCode = Util1.isNull(f.getLocCode(), "-");
+        Integer deptId = f.getDeptId();
+        boolean deleted = f.isDeleted();
+        String nullBatch = String.valueOf(f.isNullBatch());
+        String batchNo = Util1.isNull(f.getBatchNo(), "-");
+        String projectNo = Util1.isAll(f.getProjectNo());
+        String curCode = Util1.isAll(f.getCurCode());
         StringBuilder filter = new StringBuilder();
         if (Boolean.parseBoolean(nullBatch)) {
             filter.append(" and (batch_no is null or batch_no ='')\n");

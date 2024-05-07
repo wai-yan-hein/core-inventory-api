@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockReportService {
     private final DatabaseClient client;
+    private final LocationService locationService;
+    private final OPHisService opHisService;
+    private final TransactionalOperator operator;
 
     @Transactional
     private Mono<Long> calculateOpeningByPaddy(String opDate, String fromDate, String typeCode,
@@ -191,6 +195,7 @@ public class StockReportService {
                 .fetch()
                 .rowsUpdated());
     }
+
     @Transactional
     private Mono<Long> calculateClosingByPaddy(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
@@ -779,11 +784,13 @@ public class StockReportService {
         }
         return list;
     }
+
     @Transactional
     private Mono<Long> deleteTmpOpening(Integer macId) {
         String sql = "delete from tmp_stock_opening where mac_id =:macId";
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
     }
+
     @Transactional
     private Mono<Long> deleteTmpIO(Integer macId) {
         String sql = "delete from tmp_stock_io_column where mac_id=:macId";
@@ -872,6 +879,7 @@ public class StockReportService {
                 .then(calStockBalanceQty(opDate, fromDate, locCode, compCode, macId, typeCode, catCode, brandCode, stockCode))
                 .then(monoReturn);
     }
+
     @Transactional
     private Mono<Long> calStockBalanceQty(String opDate, String fromDate,
                                           String locCode, String compCode,
@@ -975,6 +983,7 @@ public class StockReportService {
                 .fetch()
                 .rowsUpdated();
     }
+
     @Transactional
     private Mono<Long> deleteTmpClosing(Integer macId) {
         String delSql = "delete from tmp_stock_balance where mac_id =:macId";
@@ -1050,6 +1059,7 @@ public class StockReportService {
                 .fetch()
                 .rowsUpdated());
     }
+
     @Transactional
     private Mono<Long> calculateClosingConsign(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
@@ -1443,5 +1453,16 @@ public class StockReportService {
                 .bind("stockCode", stockCode)
                 .fetch().rowsUpdated();
         return delMono.then(purMono).then(purRecentMono);
+    }
+
+    public Flux<ClosingBalance> getStockBalanceQty(ReportFilter filter) {
+        String compCode = filter.getCompCode();
+        Integer macId = filter.getMacId();
+        return operator.transactional(Flux.defer(() -> locationService.insertTmp(filter.getListLocation(), compCode, macId, "-")
+                .flatMapMany(aBoolean -> opHisService.getOpeningDateByLocation(compCode, "-")
+                        .flatMapMany(opDate -> {
+                            filter.setOpDate(opDate);
+                            return getStockBalance(filter);
+                        }))));
     }
 }

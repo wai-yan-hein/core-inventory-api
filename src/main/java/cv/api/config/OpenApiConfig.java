@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                         email = "corevaulemyanmar@gmail.com",
                         url = "https://corevaulemyanmar.com"
                 ),
-                description = "Core Inventory Api documentation",
-                title = "Core Inventory Api documentation",
+                description = "Core Inventory Api Documentation",
+                title = "Core Inventory Api Documentation",
                 version = "1.0",
                 license = @License(
                         name = "Licence name",
@@ -25,12 +25,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                 ),
                 termsOfService = "Terms of service"
         ),
-        /*servers = {
-                @Server(
-                        description = "Local ENV",
-                        url = "http://localhost:8080"
-                )
-        },*/
         security = {
                 @SecurityRequirement(
                         name = "bearerAuth"

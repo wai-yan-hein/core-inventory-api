@@ -117,7 +117,7 @@ public class ReportController {
                 String fromDueDate = filter.getFromDueDate();
                 String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
-                log.info("op date : {}", opDate);
+                //log.info("op date : {}", opDate);
                 switch (reportName) {
                     case "SaleByCustomerDetail" -> {
                         return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
@@ -408,11 +408,7 @@ public class ReportController {
 
     @PostMapping(path = "/getStockBalanceQty")
     public Flux<ClosingBalance> getStockBalance(@RequestBody ReportFilter filter) {
-        reportService.insertTmp(filter.getListLocation(), filter.getMacId(), "f_location", "-");
-        String opDate = reportService.getOpeningDateByLocation(filter.getCompCode(), "-");
-        filter.setOpDate(opDate);
-        filter.setDeptId(0);
-        return stockReportService.getStockBalance(filter);
+        return stockReportService.getStockBalanceQty(filter);
     }
 
     @GetMapping(path = "/getStockBalanceByWeight")

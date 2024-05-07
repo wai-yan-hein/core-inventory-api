@@ -3,12 +3,8 @@ package cv.api.service;
 import cv.api.common.Util1;
 import cv.api.r2dbc.SequenceTable;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
