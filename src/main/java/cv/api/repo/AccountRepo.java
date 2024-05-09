@@ -1,6 +1,5 @@
 package cv.api.repo;
 
-import cv.api.common.Message;
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
@@ -81,17 +80,6 @@ public class AccountRepo {
         }
     }
 
-    public Mono<String> sendDownloadMessage(String entity, String message) {
-        Message mg = new Message();
-        mg.setHeader("DOWNLOAD");
-        mg.setEntity(entity);
-        mg.setMessage(message);
-        return accountApi.post()
-                .uri("/message/send")
-                .body(Mono.just(mg), Message.class)
-                .retrieve()
-                .bodyToMono(String.class);
-    }
 
     private void updateSale(String ack, String vouNo, String compCode) {
         saleHisService.updateACK(ack, vouNo, compCode).subscribe();
@@ -216,7 +204,9 @@ public class AccountRepo {
                         String curCode = sh.getCurCode();
                         String traderCode = sh.getTraderCode();
                         String batchNo = sh.getGrnVouNo();
-                        String remark = Util1.isNull(sh.getReference(), sh.getRemark());
+                        String remark = Util1.isNull(sh.getRemark(), "");
+                        String ref = Util1.isNull(sh.getReference(), "");
+                        String reference = String.format("%s : %s", remark, ref);
                         boolean deleted = sh.getDeleted();
                         String projectNo = sh.getProjectNo();
                         double vouTotal = Util1.getDouble(sh.getVouTotal());
@@ -241,7 +231,7 @@ public class AccountRepo {
                             gl.setTraderCode(traderCode);
                             gl.setCrAmt(vouTotal);
                             gl.setCurCode(curCode);
-                            gl.setReference(remark);
+                            gl.setReference(reference);
                             gl.setDeptCode(deptCode);
                             gl.setCreatedDate(LocalDateTime.now());
                             gl.setCreatedBy(appName);
@@ -268,7 +258,7 @@ public class AccountRepo {
                             gl.setDescription("Sale Voucher Discount");
                             gl.setTraderCode(traderCode);
                             gl.setCurCode(curCode);
-                            gl.setReference(remark);
+                            gl.setReference(reference);
                             gl.setDeptCode(deptCode);
                             gl.setCreatedDate(LocalDateTime.now());
                             gl.setCreatedBy(appName);
@@ -298,7 +288,7 @@ public class AccountRepo {
                             gl.setTraderCode(traderCode);
                             gl.setDrAmt(vouPaid);
                             gl.setCurCode(curCode);
-                            gl.setReference(remark);
+                            gl.setReference(reference);
                             gl.setDeptCode(deptCode);
                             gl.setCreatedDate(LocalDateTime.now());
                             gl.setCreatedBy(appName);
@@ -325,7 +315,7 @@ public class AccountRepo {
                             gl.setDescription(String.format("Sale Voucher Tax (%s)", taxPercent));
                             gl.setTraderCode(traderCode);
                             gl.setCurCode(curCode);
-                            gl.setReference(remark);
+                            gl.setReference(reference);
                             gl.setDeptCode(deptCode);
                             gl.setCreatedDate(LocalDateTime.now());
                             gl.setCreatedBy(appName);
@@ -351,7 +341,7 @@ public class AccountRepo {
                             gl.setDrAmt(totalPayment);
                             gl.setCurCode(curCode);
                             gl.setCurCode(curCode);
-                            gl.setReference(remark);
+                            gl.setReference(reference);
                             gl.setDeptCode(deptCode);
                             gl.setCreatedDate(LocalDateTime.now());
                             gl.setCreatedBy(appName);
@@ -380,7 +370,7 @@ public class AccountRepo {
                                         gl.setTraderCode(traderCode);
                                         gl.setCurCode(curCode);
                                         gl.setDescription(e.getExpenseName());
-                                        gl.setReference(remark);
+                                        gl.setReference(reference);
                                         gl.setDeptCode(deptCode);
                                         gl.setCreatedDate(LocalDateTime.now());
                                         gl.setCreatedBy(appName);
@@ -935,11 +925,10 @@ public class AccountRepo {
                             } else {
                                 log.info(String.format("sendPayment : %s debtor account empty", traderCode));
                             }
-                            return list;
                         } else {
                             updatePayment(ph.getVouNo(), ph.getCompCode(), "NN");
-                            return list;
                         }
+                        return list;
                     }).doOnNext(this::sendAccount).then();
         } else {
             return Mono.empty();
