@@ -29,9 +29,9 @@ public class SaleDetailService {
     public Mono<SaleHisDetail> save(SaleHisDetail sh) {
         String sql = """
                     INSERT INTO sale_his_detail
-                    (vou_no,comp_code,unique_id, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, dept_id, batch_no, weight, weight_unit, design, size, std_weight, total_weight, org_price, weight_loss, wet, rice, bag)
+                    (vou_no,comp_code,unique_id, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, dept_id, batch_no, weight, weight_unit, design, size, std_weight, total_weight, org_price, weight_loss, wet, rice, bag, length, height, divider, total_sqft)
                     VALUES
-                    (:vouNo,:compCode,:uniqueId, :stockCode, :expireDate, :qty, :saleUnit, :salePrice, :saleAmt, :locCode,   :deptId, :batchNo, :weight, :weightUnit, :design, :size, :stdWeight, :totalWeight, :orgPrice, :weightLoss, :wet, :rice, :bag)
+                    (:vouNo,:compCode,:uniqueId, :stockCode, :expireDate, :qty, :saleUnit, :salePrice, :saleAmt, :locCode,   :deptId, :batchNo, :weight, :weightUnit, :design, :size, :stdWeight, :totalWeight, :orgPrice, :weightLoss, :wet, :rice, :bag, :length, :height, :divider, :totalSqft)
                 """;
 
         return client.sql(sql)
@@ -58,6 +58,10 @@ public class SaleDetailService {
                 .bind("wet", Parameters.in(R2dbcType.DOUBLE, sh.getWet()))
                 .bind("rice", Parameters.in(R2dbcType.DOUBLE, sh.getRice()))
                 .bind("bag", Parameters.in(R2dbcType.DOUBLE, sh.getBag()))
+                .bind("length", Parameters.in(R2dbcType.DOUBLE, sh.getLength()))
+                .bind("height", Parameters.in(R2dbcType.DOUBLE, sh.getHeight()))
+                .bind("divider", Parameters.in(R2dbcType.DOUBLE, sh.getDivider()))
+                .bind("totalSqft", Parameters.in(R2dbcType.DOUBLE, sh.getTotalSqft()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(sh);
@@ -118,6 +122,10 @@ public class SaleDetailService {
                         .bag(row.get("bag", Double.class))
                         .design(row.get("design", String.class))
                         .size(row.get("size", String.class))
+                        .length(row.get("length", Double.class))
+                        .height(row.get("height", Double.class))
+                        .divider(row.get("divider", Double.class))
+                        .totalSqft(row.get("total_sqft", Double.class))
                         .build())
                 .all();
     }

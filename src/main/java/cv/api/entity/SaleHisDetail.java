@@ -49,4 +49,8 @@ public class SaleHisDetail {
     private Boolean calculate;
     private String design;
     private String size;
+    private Double length;
+    private Double height;
+    private Double divider;
+    private Double totalSqft;
 }
