@@ -441,7 +441,7 @@ public class OrderHisService {
     public Flux<OrderHisDetail> getOrderVoucher(String vouNo, String compCode) {
         String sql = """
                 select t.trader_name,t.rfid,t.phone,t.address,v.remark,v.vou_no,v.vou_date,v.stock_name,
-                v.order_qty,v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,t.user_code t_user_code,t.phone,t.address,
+                v.order_qty,v.qty,v.weight,v.weight_unit,v.price,v.unit,v.amt,v.design,v.size,t.user_code t_user_code,t.phone,t.address,
                 l.loc_name,v.created_by,v.comp_code,os.description,sm.saleman_name
                 from v_order v join trader t
                 on v.trader_code = t.code

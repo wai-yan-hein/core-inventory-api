@@ -142,6 +142,7 @@ public class PatternService {
                 .bind("qty", dto.getQty())
                 .bind("unit", dto.getUnitCode())
                 .bind("price", dto.getPrice())
+                .bind("amount",dto.getAmount())
                 .bind("explode", Util1.getBoolean(dto.getExplode()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
                 .bind("priceType", Parameters.in(R2dbcType.VARCHAR, dto.getPriceTypeCode()))
@@ -151,7 +152,7 @@ public class PatternService {
                 .thenReturn(dto);
     }
 
-    public static Pattern mapRow(Row row) {
+    private Pattern mapRow(Row row) {
         return Pattern.builder()
                 .key(PatternKey.builder()
                         .compCode(row.get("comp_code", String.class))
@@ -164,6 +165,7 @@ public class PatternService {
                 .qty(row.get("qty", Double.class))
                 .price(row.get("price", Double.class))
                 .unitCode(row.get("unit", String.class))
+                .amount(row.get("amount",Double.class))
                 .priceTypeCode(row.get("price_type", String.class))
                 .build();
     }
