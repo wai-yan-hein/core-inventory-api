@@ -1894,7 +1894,7 @@ alter table sale_his_detail
 add column design text null after bag,
 add column size text null after design;
 
-alter table cv_inv_pc.sale_his_detail
+alter table sale_his_detail
 add column length double(20,3) null after bag,
 add column height double(20,3) null after length,
 add column divider double(20,3) null after height,
