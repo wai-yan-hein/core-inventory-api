@@ -144,6 +144,7 @@ public class StockRelationService {
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
+                    and skip_inv = false
                     GROUP BY stock_code, unit
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code_to, unit
@@ -157,6 +158,7 @@ public class StockRelationService {
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
+                    and skip_inv = false
                     GROUP BY stock_code, unit
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
@@ -385,6 +387,7 @@ public class StockRelationService {
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
+                        and skip_inv = false
                         group by date(vou_date),stock_code,unit,vou_no
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -409,6 +412,7 @@ public class StockRelationService {
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
+                        and skip_inv = false
                         group by date(vou_date),stock_code,unit,vou_no
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code

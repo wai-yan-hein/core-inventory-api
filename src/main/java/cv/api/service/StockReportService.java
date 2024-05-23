@@ -141,6 +141,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and skip_inv = false
                  group by stock_code,loc_code_from
                  union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code_to, weight_unit, sum(amount) ttl_amt
@@ -154,6 +155,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
+                 and skip_inv = false
                  group by stock_code,loc_code_to
                  union all
                  select stock_code,sum(total_weight) weight,sum(in_qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(in_bag) bag, loc_code, weight_unit, sum(amount) ttl_amt
@@ -279,6 +281,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and skip_inv = false
                 group by date(vou_date),vou_no,stock_code,loc_code_from""";
         String ttSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -293,6 +296,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and skip_inv = false
                 group by date(vou_date),vou_no,stock_code,loc_code_to""";
         String stockIn = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,in_wet,in_rice,in_bag,in_weight,in_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -840,6 +844,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and skip_inv = false
                 group by stock_code
                 )a
                 join stock s on a.stock_code = s.stock_code
@@ -954,6 +959,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and skip_inv = false
                 group by stock_code
                 	union all
                 select stock_code,sum(qty),loc_code_to,comp_code
@@ -966,6 +972,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
+                and skip_inv = false
                 group by stock_code
                 )a
                 group by stock_code
