@@ -44,6 +44,7 @@ public class OrderHis {
     private String projectNo;
     private String orderStatus;
     private Boolean post;
+    private Boolean invUpdate;
     private String refNo;
     private List<OrderHisDetail> listSH;
     private Boolean backup;
@@ -53,4 +54,5 @@ public class OrderHis {
     private String userCode;
     private String orderStatusName;
     private Integer vouCount;
+
 }

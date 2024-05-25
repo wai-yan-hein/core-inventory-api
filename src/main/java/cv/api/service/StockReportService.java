@@ -102,6 +102,20 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code,loc_code
                     union all
+                 select stock_code,0 weight,sum(qty)*-1 qty,0 wet, 0 rice, 0 bag, loc_code, weight_unit,0 ttl_amt
+                 from v_order
+                 where inv_update = true
+                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 and comp_code =:compCode
+                 and deleted = false
+                 and calculate = true
+                 and loc_code in (select f_code from f_location where mac_id =:macId )
+                 and (stock_type_code = :typeCode or '-' = :typeCode)
+                 and (brand_code = :brandCode or '-' = :brandCode)
+                 and (category_code = :catCode or '-' = :catCode)
+                 and (stock_code = :stockCode or '-' = :stockCode)
+                 group by stock_code,loc_code
+                    union all
                  select stock_code,0,sum(pay_qty)*-1 qty,0,0,sum(pay_bag)*-1, loc_code, '-',0
                  from v_stock_payment
                  where deleted = false
@@ -234,6 +248,21 @@ public class StockReportService {
                 and (stock_type_code = :typeCode or '-' = :typeCode)
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (cat_code = :catCode or '-' = :catCode)
+                and (stock_code = :stockCode or '-' = :stockCode)
+                group by date(vou_date),vou_no,stock_code,loc_code""";
+        String orderSql = """
+                insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
+                select 'Sale-Order',vou_date vou_date,vou_no,remark,stock_code,sum(qty)*-1 ttl_qty,0 ttl_wet, 0 ttl_rice, 0 ttl_bag, 0 ttl_weight,0 ttl_amt,loc_code,:macId,comp_code,dept_id
+                from v_order
+                where inv_update = true
+                and date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and calculate = true
+                and comp_code =:compCode
+                and loc_code in (select f_code from f_location where mac_id =:macId)
+                and (stock_type_code = :typeCode or '-' = :typeCode)
+                and (brand_code = :brandCode or '-' = :brandCode)
+                and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String retInSql = """
@@ -380,6 +409,16 @@ public class StockReportService {
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .fetch().rowsUpdated();
+        Mono<Long> orderMono = client.sql(orderSql)
+                .bind("macId", macId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("compCode", compCode)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch().rowsUpdated();
         Mono<Long> retInMono = client.sql(retInSql)
                 .bind("macId", macId)
                 .bind("fromDate", fromDate)
@@ -475,6 +514,7 @@ public class StockReportService {
                 .then(retInMono)
                 .then(retOutMono)
                 .then(saleMono)
+                .then(orderMono)
                 .then(tfMono)
                 .then(ttMono)
                 .then(stockInMono)

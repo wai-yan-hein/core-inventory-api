@@ -133,6 +133,20 @@ public class StockRelationService {
                     AND (stock_code = :stockCode OR '-' = :stockCode)
                     GROUP BY stock_code, sale_unit
                     UNION ALL
+                    SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
+                    FROM v_order
+                    WHERE inv_update = true
+                    AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
+                    AND deleted = false
+                    AND calculate = true
+                    AND comp_code = :compCode
+                    AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
+                    AND (stock_type_code = :typeCode OR '-' = :typeCode)
+                    AND (brand_code = :brandCode OR '-' = :brandCode)
+                    AND (category_code = :catCode OR '-' = :catCode)
+                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    GROUP BY stock_code, unit
+                    UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code_from, unit
                     FROM v_transfer
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
@@ -319,6 +333,29 @@ public class StockRelationService {
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
                     and a.sale_unit = rel.unit
+                    group by a.vou_date,a.stock_code,a.vou_no
+                """;
+        String orderSql = """
+                    insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)
+                    select 'Sale-Order',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    from (
+                        select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
+                        from v_order
+                        where inv_update = true
+                        and date(vou_date) between :fromDate and :toDate
+                        and deleted = false
+                        and calculate = true
+                        and comp_code = :compCode
+                        and loc_code in (select f_code from f_location where mac_id = :macId)
+                        and (stock_type_code = :typeCode or '-' = :typeCode)
+                        and (brand_code = :brandCode or '-' = :brandCode)
+                        and (category_code = :catCode or '-' = :catCode)
+                        and (stock_code = :stockCode or '-' = :stockCode)
+                        group by date(vou_date),stock_code,unit,vou_no
+                    ) a
+                    join v_relation rel on a.rel_code = rel.rel_code
+                    and a.comp_code = rel.comp_code
+                    and a.unit = rel.unit
                     group by a.vou_date,a.stock_code,a.vou_no
                 """;
         String returnOutSql = """
@@ -560,6 +597,18 @@ public class StockRelationService {
                 .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
+        Mono<Long> orderMono = client.sql(orderSql)
+                .bind("macId", macId)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("typeCode", typeCode)
+                .bind("brandCode", brandCode)
+                .bind("catCode", catCode)
+                .bind("stockCode", stockCode)
+                .fetch()
+                .rowsUpdated();
 
         Mono<Long> returnOutMono = client.sql(returnOutSql)
                 .bind("macId", macId)
@@ -686,6 +735,7 @@ public class StockRelationService {
                 .then(opMono)
                 .then(monoPur)
                 .then(saleMono)
+                .then(orderMono)
                 .then(retInMono)
                 .then(returnOutMono)
                 .then(stockInMono)

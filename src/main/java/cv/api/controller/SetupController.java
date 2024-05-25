@@ -386,7 +386,7 @@ public class SetupController {
 
     @PostMapping(path = "/updateStock")
     public Mono<Boolean> updateSaleClosed(@RequestBody Stock stock) {
-        return stockService.update(stock).thenReturn(true);
+        return stockService.updateStock(stock);
     }
 
     @GetMapping(path = "/getStock")

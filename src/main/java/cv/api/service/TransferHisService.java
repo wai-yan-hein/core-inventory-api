@@ -305,7 +305,7 @@ public class TransferHisService {
                     select a.*,l.loc_name from_loc_name,ll.loc_name to_loc_name,t.trader_name
                     from (
                     select vou_date,vou_no,comp_code,remark,ref_no,loc_code_from,loc_code_to,
-                    created_by,deleted,dept_id, labour_group_code,trader_code
+                    created_by,deleted,dept_id, labour_group_code,trader_code,sum(qty) qty,sum(bag) bag
                     from v_transfer v
                     where comp_code = :compCode
                     and deleted = :deleted
@@ -355,6 +355,8 @@ public class TransferHisService {
                         .toLocationName(row.get("to_loc_name", String.class))
                         .deptId(row.get("dept_id", Integer.class))
                         .traderName(row.get("trader_name", String.class))
+                        .qty(row.get("qty", Double.class))
+                        .bag(row.get("bag", Double.class))
                         .build())
                 .all();
     }

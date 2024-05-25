@@ -407,7 +407,7 @@ public class ReportController {
     }
 
     @PostMapping(path = "/getStockBalanceQty")
-    public Flux<ClosingBalance> getStockBalance(@RequestBody ReportFilter filter) {
+    public Flux<ClosingBalance> getStockBalanceQty(@RequestBody ReportFilter filter) {
         return stockReportService.getStockBalanceQty(filter);
     }
 

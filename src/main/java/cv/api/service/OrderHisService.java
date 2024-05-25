@@ -102,11 +102,11 @@ public class OrderHisService {
                 INSERT INTO order_his
                 (vou_no, comp_code, dept_id, trader_code, saleman_code, vou_date, credit_term, cur_code,
                  remark, vou_total, created_date, created_by, deleted, vou_balance, updated_by, updated_date,
-                 loc_code, mac_id, intg_upd_status, reference, vou_lock, project_no, order_status, post, ref_no)
+                 loc_code, mac_id, intg_upd_status, reference, vou_lock, project_no, order_status, post, ref_no, inv_update)
                 VALUES
                 (:vouNo, :compCode, :deptId, :traderCode, :salemanCode, :vouDate, :creditTerm, :curCode,
                  :remark, :vouTotal, :createdDate, :createdBy, :deleted, :vouBalance, :updatedBy, :updatedDate,
-                 :locCode, :macId, :intgUpdStatus, :reference, :vouLock, :projectNo, :orderStatus, :post,:refNo)
+                 :locCode, :macId, :intgUpdStatus, :reference, :vouLock, :projectNo, :orderStatus, :post, :refNo, :invUpdate)
                 """;
         return executeUpdate(sql, dto);
     }
@@ -171,7 +171,8 @@ public class OrderHisService {
                     project_no = :projectNo,
                     order_status = :orderStatus,
                     post = :post,
-                    ref_no = :refNo
+                    ref_no = :refNo,
+                    inv_update = :invUpdate
                 WHERE vou_no = :vouNo
                 AND comp_code = :compCode
                 """;
@@ -205,6 +206,7 @@ public class OrderHisService {
                 .bind("orderStatus", Parameters.in(R2dbcType.VARCHAR, dto.getOrderStatus()))
                 .bind("post", Util1.getBoolean(dto.getPost()))
                 .bind("refNo", Parameters.in(R2dbcType.VARCHAR, dto.getRefNo()))
+                .bind("invUpdate", Util1.getBoolean(dto.getInvUpdate()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -239,6 +241,7 @@ public class OrderHisService {
                 .orderStatus(row.get("order_status", String.class))
                 .post(row.get("post", Boolean.class))
                 .refNo(row.get("ref_no", String.class))
+                .invUpdate(row.get("inv_update", Boolean.class))
                 .build();
     }
 
@@ -286,7 +289,7 @@ public class OrderHisService {
     public Mono<Boolean> updateOrder(OrderHisKey key, boolean post) {
         String sql = """
                 update order_his
-                set post = :post
+                set post = :post, inv_update = :invUpdate
                 where vou_no = :vouNo
                 and comp_code =:compCode
                 """;
@@ -294,6 +297,7 @@ public class OrderHisService {
                 .bind("vouNo", key.getVouNo())
                 .bind("compCode", key.getCompCode())
                 .bind("post", post)
+                .bind("invUpdate", !post)
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
@@ -309,7 +313,7 @@ public class OrderHisService {
         String compCode = filter.getCompCode();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         Integer deptId = filter.getDeptId();
-        String deleted = String.valueOf(filter.isDeleted());
+        boolean deleted = filter.isDeleted();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
         String orderStatus = Util1.isNull(filter.getOrderStatus(), "-");
@@ -317,7 +321,7 @@ public class OrderHisService {
                 select a.*,t.trader_name,t.user_code,os.description order_status_name
                 from (
                 select  vou_no,vou_date,remark,reference,created_by,vou_total,deleted,trader_code,loc_code,
-                comp_code,dept_id,order_status,post
+                comp_code,dept_id,order_status,post,inv_update
                 from v_order s
                 where comp_code = :compCode
                 and (dept_id = :deptId or 0 =:deptId)
@@ -373,6 +377,7 @@ public class OrderHisService {
                         .deptId(row.get("dept_id", Integer.class))
                         .orderStatus(row.get("order_status", String.class))
                         .post(row.get("post", Boolean.class))
+                        .invUpdate(row.get("inv_update", Boolean.class))
                         .traderName(row.get("trader_name", String.class))
                         .userCode(row.get("user_code", String.class))
                         .orderStatusName(row.get("order_status_name", String.class))

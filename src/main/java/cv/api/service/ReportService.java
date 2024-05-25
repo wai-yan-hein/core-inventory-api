@@ -1522,11 +1522,11 @@ public class ReportService {
 
     public Mono<General> getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
         String sql = """
-                SELECT rel.smallest_qty * smallest_price price, rel.unit
+                SELECT ifnull(rel.smallest_qty,1) * smallest_price price, rel.unit
                 FROM (
-                    SELECT sale_unit, sale_price / rel.smallest_qty smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
+                    SELECT sale_unit, sale_price / ifnull(rel.smallest_qty,1) smallest_price, pd.rel_code, pd.comp_code, pd.dept_id
                     FROM v_sale pd
-                    JOIN v_relation rel ON pd.rel_code = rel.rel_code
+                    LEFT JOIN v_relation rel ON pd.rel_code = rel.rel_code
                     AND pd.sale_unit = rel.unit
                     AND pd.comp_code = rel.comp_code
                     WHERE pd.stock_code = :stockCode
@@ -1534,7 +1534,7 @@ public class ReportService {
                         SELECT ph.vou_no
                         FROM sale_his ph, sale_his_detail pd
                         WHERE DATE(ph.vou_date) <= :saleDate
-                        AND deleted = 0
+                        AND deleted = false
                         AND ph.comp_code = :compCode
                         AND ph.vou_no = pd.vou_no
                         AND pd.stock_code = :stockCode
@@ -1542,7 +1542,7 @@ public class ReportService {
                         LIMIT 1
                     )
                 ) a
-                JOIN v_relation rel ON a.rel_code = rel.rel_code
+                LEFT JOIN v_relation rel ON a.rel_code = rel.rel_code
                 AND a.comp_code = rel.comp_code
                 AND rel.unit = :unit
                 """;

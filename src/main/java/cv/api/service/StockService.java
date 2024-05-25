@@ -50,6 +50,15 @@ public class StockService {
         return update(dto);
     }
 
+    public Mono<Boolean> updateStock(Stock s) {
+        return findById(s.getKey())
+                .flatMap(stock -> {
+                    stock.setSaleClosed(s.getSaleClosed());
+                    stock.setSaleQty(s.getSaleQty());
+                    return update(stock).thenReturn(true);
+                });
+    }
+
     public Stock mapRow(Row row) {
         return Stock.builder()
                 .key(StockKey.builder()
@@ -118,6 +127,7 @@ public class StockService {
                 .bind("stockCode", stockCode)
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
+
     public Mono<Stock> findByBarcode(StockKey key) {
         String barcode = key.getStockCode();
         if (Util1.isNullOrEmpty(barcode)) {
@@ -305,6 +315,7 @@ public class StockService {
                 """;
         return executeUpdate(sql, dto);
     }
+
     @Transactional
     public Mono<Stock> update(Stock dto) {
         String sql = """
@@ -363,7 +374,7 @@ public class StockService {
         return client.sql(sql)
                 .bind("stockCode", dto.getKey().getStockCode())
                 .bind("compCode", dto.getKey().getCompCode())
-                .bind("active", dto.getActive())
+                .bind("active", Util1.getBoolean(dto.getActive()))
                 .bind("brandCode", Parameters.in(R2dbcType.VARCHAR, dto.getBrandCode()))
                 .bind("stockName", dto.getStockName())
                 .bind("categoryCode", Parameters.in(R2dbcType.VARCHAR, dto.getCatCode()))
@@ -391,15 +402,15 @@ public class StockService {
                 .bind("userCode", Parameters.in(R2dbcType.VARCHAR, dto.getUserCode()))
                 .bind("macId", dto.getMacId())
                 .bind("relCode", Parameters.in(R2dbcType.VARCHAR, dto.getRelCode()))
-                .bind("calculate", Parameters.in(R2dbcType.BOOLEAN, dto.getCalculate()))
+                .bind("calculate", Util1.getBoolean(dto.getCalculate()))
                 .bind("deptId", dto.getDeptId())
-                .bind("explode", Parameters.in(R2dbcType.BOOLEAN, dto.getExplode()))
+                .bind("explode", Util1.getBoolean(dto.getExplode()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
                 .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR, dto.getWeightUnit()))
                 .bind("weight", Parameters.in(R2dbcType.DOUBLE, dto.getWeight()))
-                .bind("favorite", Parameters.in(R2dbcType.BOOLEAN, dto.getFavorite()))
-                .bind("saleClosed", Parameters.in(R2dbcType.BOOLEAN, dto.getSaleClosed()))
-                .bind("deleted", Parameters.in(R2dbcType.BOOLEAN, dto.getDeleted()))
+                .bind("favorite", Util1.getBoolean(dto.getFavorite()))
+                .bind("saleClosed", Util1.getBoolean(dto.getSaleClosed()))
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
                 .bind("saleQty", Parameters.in(R2dbcType.DOUBLE, dto.getSaleQty()))
                 .bind("formulaCode", Parameters.in(R2dbcType.VARCHAR, dto.getFormulaCode()))
                 .bind("saleAmt", Parameters.in(R2dbcType.DOUBLE, dto.getSaleAmt()))
@@ -514,6 +525,7 @@ public class StockService {
                 .bind("updatedDate", updatedDate)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -522,7 +534,7 @@ public class StockService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }
