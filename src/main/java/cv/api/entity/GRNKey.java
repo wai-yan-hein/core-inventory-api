@@ -2,16 +2,15 @@ package cv.api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@Embeddable
-public class GRNKey implements Serializable {
-    @Column(name = "vou_no")
+@Builder
+public class GRNKey {
     private String vouNo;
-    @Column(name = "comp_code")
     private String compCode;
 
 }

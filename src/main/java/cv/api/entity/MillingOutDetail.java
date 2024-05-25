@@ -16,6 +16,7 @@ import jakarta.persistence.Transient;
 
 import java.util.Date;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -23,59 +24,32 @@ import lombok.Data;
  * @author wai yan
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Entity
-@Table(name = "milling_output")
+@Builder
 public class MillingOutDetail {
 
-    @EmbeddedId
     private MillingOutDetailKey key;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "qty", nullable = false)
-    private double qty;
-    @Column(name = "unit")
+    private Double qty;
     private String unitCode;
-    @Column(name = "price", nullable = false)
-    private double price;
-    @Column(name = "amt", nullable = false)
-    private double amount;
-    @Column(name = "loc_code")
+    private Double price;
+    private Double amount;
     private String locCode;
-    @Column(name = "weight")
-    private double weight;
-    @Column(name = "weight_unit")
+    private Double weight;
     private String weightUnit;
-    @Column(name = "percent")
-    private double percent;
-    @Column(name = "tot_weight")
-    private double totalWeight;
-    @Column(name = "percent_qty")
-    private double percentQty;
-    @Column(name = "sort_id")
+    private Double percent;
+    private Double totalWeight;
+    private Double percentQty;
     private Integer sortId;
-    @Transient
     private String userCode;
-    @Transient
     private String stockName;
-    @Transient
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
-    @Transient
     private String relName;
-    @Transient
     private String locName;
-    @Transient
     private String traderName;
-    @Transient
     private Stock stock;
-    @Transient
     private String unitName;
-    @Transient
     private String weightUnitName;
 }

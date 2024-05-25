@@ -1,18 +1,12 @@
 package cv.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
-import jakarta.persistence.*;
-import java.io.Serializable;
-
 @Data
-@Embeddable
-public class GRNDetailKey implements Serializable {
-    @Column(name = "vou_no")
+@Builder
+public class GRNDetailKey {
     private String vouNo;
-    @Column(name = "unique_id")
-    private int uniqueId;
-    @Column(name = "comp_code")
+    private Integer uniqueId;
     private String compCode;
 }

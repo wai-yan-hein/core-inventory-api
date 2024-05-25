@@ -5,11 +5,9 @@
  */
 package cv.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import java.io.Serializable;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
+import lombok.Data;
 
 
 /**
@@ -18,13 +16,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Embeddable
-public class MillingRawDetailKey implements Serializable {
-    @Column(name = "comp_code")
+@Builder
+public class MillingRawDetailKey {
     private String compCode;
-    @Column(name = "unique_id")
-    private int uniqueId;
-    @Column(name = "vou_no")
+    private Integer uniqueId;
     private String vouNo;
 
 

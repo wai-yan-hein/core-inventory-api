@@ -148,8 +148,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getUpdateLabourGroup")
-    public Flux<?> getUpdateLabourGroup(@RequestParam String updatedDate) {
-        return Flux.fromIterable(labourGroupService.getLabourGroup(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<LabourGroup> getUpdateLabourGroup(@RequestParam String updatedDate) {
+        return labourGroupService.getLabourGroup(Util1.toLocalDateTime(updatedDate));
     }
 
     @DeleteMapping(path = "/deleteLocation")
@@ -487,10 +487,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveLabourGroup")
-    public Mono<LabourGroup> saveLabourGroup(@RequestBody LabourGroup labourGroup) {
-        labourGroup.setUpdatedDate(Util1.getTodayLocalDate());
-        LabourGroup b = labourGroupService.save(labourGroup);
-        return Mono.justOrEmpty(b);
+    public Mono<LabourGroup> saveLabourGroup(@RequestBody LabourGroup dto) {
+        return labourGroupService.save(dto);
     }
 
     @PostMapping(path = "/saveJob")
@@ -504,8 +502,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getLabourGroup")
-    public Flux<?> getLabourGroup(@RequestParam String compCode) {
-        return Flux.fromIterable(labourGroupService.findAll(compCode));
+    public Flux<LabourGroup> getLabourGroup(@RequestParam String compCode) {
+        return labourGroupService.findAll(compCode);
     }
 
     @PostMapping(path = "/getJob")
@@ -536,8 +534,7 @@ public class SetupController {
 
     @PostMapping(path = "/findLabourGroup")
     public Mono<LabourGroup> findLabourGroup(@RequestBody LabourGroupKey key) {
-        LabourGroup b = labourGroupService.findById(key);
-        return Mono.justOrEmpty(b);
+        return labourGroupService.findById(key);
     }
 
     @PostMapping(path = "/findJob")
@@ -692,11 +689,6 @@ public class SetupController {
     public Mono<?> convertTrader() {
         converterService.trader();
         return Mono.justOrEmpty("converted.");
-    }
-
-    @GetMapping(path = "/getBatch")
-    public Flux<?> getBatch(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(batchService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getAccSetting")

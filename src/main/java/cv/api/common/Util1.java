@@ -298,5 +298,13 @@ public class Util1 {
         LocalDate minusDays = date.plusDays(day);
         return minusDays.toString();
     }
-
+    public static int getInteger(Object number) {
+        int value = 0;
+        if (number != null) {
+            if (!number.toString().isEmpty()) {
+                value = Integer.parseInt(number.toString());
+            }
+        }
+        return value;
+    }
 }

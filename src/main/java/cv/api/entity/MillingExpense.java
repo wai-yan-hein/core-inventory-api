@@ -4,12 +4,9 @@
  */
 package cv.api.entity;
 
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Data;
 
 /**
  *
@@ -17,18 +14,12 @@ import jakarta.persistence.Table;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Entity
-@Table(name = "milling_expense")
+@Builder
 public class MillingExpense {
 
-    @EmbeddedId
     private MillingExpenseKey key;
-    @Column(name = "expense_name")
     private String expenseName;
-    @Column(name = "qty")
-    private Float qty;
-    @Column(name = "price")
-    private Float price;
-    @Column(name = "amount")
-    private Float amount;
+    private Double qty;
+    private Double price;
+    private Double amount;
 }

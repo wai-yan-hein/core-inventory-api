@@ -3,6 +3,9 @@ package cv.api.config;
 import cv.api.common.Util1;
 import cv.api.security.AuthenticationRequest;
 import cv.api.security.AuthenticationResponse;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
+import javax.net.ssl.SSLException;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -29,7 +33,7 @@ public class WebClientConfig {
 
     @Bean
     public WebClient dmsApi() {
-        log.info("dms api : " + environment.getProperty("dms.url"));
+        log.info("dms api : {}", environment.getProperty("dms.url"));
         return WebClient.builder()
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(config -> config
@@ -43,7 +47,7 @@ public class WebClientConfig {
 
     @Bean
     public WebClient accountApi() {
-        log.info("account : " + environment.getProperty("account.url"));
+        log.info("account : {}", environment.getProperty("account.url"));
         return WebClient.builder()
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(config -> config
@@ -54,7 +58,6 @@ public class WebClientConfig {
                 .clientConnector(reactorClientHttpConnector())
                 .build();
     }
-
 
 
     @Bean
@@ -70,7 +73,14 @@ public class WebClientConfig {
 
     @Bean
     public HttpClient httpClient() {
-        return HttpClient.create(connectionProvider());
+        try {
+            SslContext sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+            return HttpClient.create(connectionProvider())
+                    .secure(sslContextSpec -> sslContextSpec.sslContext(sslContext));
+        } catch (SSLException ex) {
+            log.error("Error creating HttpClient: {}", ex.getMessage());
+        }
+        return HttpClient.create(); // Return a default HttpClient if an error occurs    }
     }
 
     @Bean
@@ -78,31 +88,4 @@ public class WebClientConfig {
         return new ReactorClientHttpConnector(httpClient());
     }
 
-    @Bean
-    public String getToken() {
-        log.info("getToken.");
-        return authenticate();
-    }
-
-    private String authenticate() {
-        String programName = "core-inventory-api";
-        var auth = AuthenticationRequest.builder()
-                .programName(programName)
-                .password(Util1.getPassword())
-                .build();
-        WebClient client = WebClient.builder()
-                .baseUrl(Objects.requireNonNull(environment.getProperty("user.url")))
-                .clientConnector(reactorClientHttpConnector())
-                .build();
-        return client.post()
-                .uri("/auth/getToken")
-                .body(Mono.just(auth), AuthenticationRequest.class)
-                .retrieve()
-                .bodyToMono(AuthenticationResponse.class)
-                .map(AuthenticationResponse::getAccessToken) // Extract and return the access token
-                .onErrorResume(throwable -> {
-                    log.error("authenticate : " + throwable.getMessage());
-                    return Mono.empty();
-                }).block();
-    }
 }

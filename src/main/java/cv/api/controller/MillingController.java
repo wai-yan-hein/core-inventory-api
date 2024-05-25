@@ -6,12 +6,8 @@
 package cv.api.controller;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.ReturnObject;
-import cv.api.common.Util1;
-import cv.api.entity.MillingHis;
-import cv.api.entity.MillingHisKey;
-import cv.api.service.MillingHisService;
-import cv.api.service.ReportService;
+import cv.api.entity.*;
+import cv.api.service.MillingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -27,107 +23,54 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MillingController {
 
-    private final ReturnObject ro = ReturnObject.builder().build();
-    private final MillingHisService millingHisService;
-    private final ReportService reportService;
+    private final MillingService millingService;
 
     @PostMapping(path = "/saveMilling")
-    public Mono<?> saveMilling(@RequestBody MillingHis sale) {
-        sale.setUpdatedDate(Util1.getTodayLocalDate());
-        //if change location
-        if (isValidSale(sale, ro)) {
-            sale = millingHisService.save(sale);
-        } else {
-            return Mono.justOrEmpty(ro);
-        }
-        return Mono.justOrEmpty(sale);
-    }
-
-    private boolean isValidSale(MillingHis sale, ReturnObject ro) {
-        boolean status = true;
-        if (Util1.isNullOrEmpty(sale.getTraderCode())) {
-            status = false;
-            ro.setMessage("Invalid Trader.");
-        } else if (Util1.isNullOrEmpty(sale.getVouDate())) {
-            status = false;
-            ro.setMessage("Invalid Voucher Date.");
-        } else if (Util1.isNullOrEmpty(sale.getCurCode())) {
-            status = false;
-            ro.setMessage("Invalid Currency.");
-        } else if (Util1.isNullOrEmpty(sale.getCreatedBy())) {
-            status = false;
-            ro.setMessage("Invalid Created User.");
-        } else if (Util1.isNullOrEmpty(sale.getCreatedDate())) {
-            status = false;
-            ro.setMessage("Invalid Created Date.");
-        }
-        return status;
+    public Mono<MillingHis> saveMilling(@RequestBody MillingHis dto) {
+        return millingService.save(dto);
     }
 
     @PostMapping(path = "/getMilling")
-    public Flux<?> getMilling(@RequestBody ReportFilter filter)  {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String cusCode = Util1.isNull(filter.getTraderCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String ref = Util1.isNull(filter.getReference(), "-");
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String compCode = filter.getCompCode();
-        boolean deleted = filter.isDeleted();
-        Integer deptId = filter.getDeptId();
-        String projectNo = Util1.isAll(filter.getProjectNo());
-        String curCode = Util1.isAll(filter.getCurCode());
-        String jobNo = Util1.isNull(filter.getJobNo(), "-");
-        return reportService.getMillingHistory(fromDate, toDate, cusCode, vouNo, remark, ref, userCode,
-                locCode, compCode, deptId, deleted, projectNo, curCode, jobNo);
+    public Flux<MillingHis> getMilling(@RequestBody ReportFilter filter) {
+        return millingService.getMillingHistory(filter);
     }
 
     @PostMapping(path = "/deleteMilling")
-    public Mono<?> deleteSale(@RequestBody MillingHisKey key) throws Exception {
-        millingHisService.delete(key);
-        //delete in account
-//        accountRepo.deleteInvVoucher(key);
-        //delete in cloud
-        return Mono.just(true);
+    public Mono<Boolean> deleteMilling(@RequestBody MillingHisKey key) {
+        return millingService.delete(key);
     }
 
     @PostMapping(path = "/restoreMilling")
-    public Mono<?> restoreMilling(@RequestBody MillingHisKey key) throws Exception {
-        millingHisService.restore(key);
-        return Mono.just(true);
+    public Mono<Boolean> restoreMilling(@RequestBody MillingHisKey key) {
+        return millingService.restore(key);
     }
 
     @PostMapping(path = "/findMilling")
     public Mono<MillingHis> findMilling(@RequestBody MillingHisKey key) {
-        MillingHis sh = millingHisService.findById(key);
-        return Mono.justOrEmpty(sh);
+        return millingService.findById(key);
     }
 
     @GetMapping(path = "/getRawDetail")
-    public Flux<?> getRawDetail(@RequestParam String vouNo,
-                                @RequestParam String compCode,
-                                @RequestParam Integer deptId) {
-        return Flux.fromIterable(millingHisService.getMillingRaw(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<MillingRawDetail> getRawDetail(@RequestParam String vouNo,
+                                               @RequestParam String compCode) {
+        return millingService.getRawDetail(vouNo, compCode);
     }
 
     @GetMapping(path = "/getMillingExpense")
-    public Flux<?> getExpenseDetail(@RequestParam String vouNo,
-                                    @RequestParam String compCode) {
-        return Flux.fromIterable(millingHisService.getMillingExpense(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<MillingExpense> getMillingExpense(@RequestParam String vouNo,
+                                                  @RequestParam String compCode) {
+        return millingService.getMillingExpense(vouNo, compCode);
     }
 
     @GetMapping(path = "/getOutputDetail")
-    public Flux<?> getOutputDetail(@RequestParam String vouNo,
-                                   @RequestParam String compCode,
-                                   @RequestParam Integer deptId) {
-        return Flux.fromIterable(millingHisService.getMillingOut(vouNo, compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<MillingOutDetail> getOutputDetail(@RequestParam String vouNo,
+                                                  @RequestParam String compCode) {
+        return millingService.getOutputDetail(vouNo, compCode);
     }
 
     @GetMapping(path = "/getUsageDetail")
-    public Flux<?> getUsageDetail(@RequestParam String vouNo,
-                                  @RequestParam String compCode) {
-        return Flux.fromIterable(millingHisService.getMillingUsage(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<MillingUsage> getUsageDetail(@RequestParam String vouNo,
+                                             @RequestParam String compCode) {
+        return millingService.getUsageDetail(vouNo, compCode);
     }
 }

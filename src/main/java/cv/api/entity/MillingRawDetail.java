@@ -14,6 +14,8 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import java.util.Date;
+
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -22,54 +24,30 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Entity
-@Table(name = "milling_raw")
+@Builder
 public class MillingRawDetail {
 
-    @EmbeddedId
     private MillingRawDetailKey key;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "qty", nullable = false)
-    private double qty;
-    @Column(name = "unit")
+    private Double qty;
     private String unitCode;
-    @Column(name = "price", nullable = false)
-    private double price;
-    @Column(name = "amt", nullable = false)
-    private double amount;
-    @Column(name = "loc_code")
+    private Double price;
+    private Double amount;
     private String locCode;
-    @Column(name = "weight")
-    private double weight;
-    @Column(name = "weight_unit")
+    private Double weight;
     private String weightUnit;
-    @Column(name = "tot_weight")
-    private double totalWeight;
-    @Transient
-    private double totalAmount;
-    @Transient
+    private Double totalWeight;
+    private Double totalAmount;
     private String userCode;
-    @Transient
     private String stockName;
-    @Transient
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
-    @Transient
     private String relName;
-    @Transient
     private String locName;
-    @Transient
     private String traderName;
-    @Transient
     private Stock stock;
-    @Transient
     private String unitName;
-    @Transient
     private String weightUnitName;
 }
