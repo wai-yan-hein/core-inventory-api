@@ -32,6 +32,7 @@ public class TransferHis {
     private String labourGroupCode;
     private String jobCode;
     private Integer printCount;
+    private Boolean skipInv;
     private List<TransferHisDetail> listTD;
     private List<THDetailKey> delList;
     private List<String> location;

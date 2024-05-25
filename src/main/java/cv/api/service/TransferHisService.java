@@ -110,6 +110,7 @@ public class TransferHisService {
                 .vouLock(row.get("vou_lock", Boolean.class))
                 .traderCode(row.get("trader_code", String.class))
                 .printCount(row.get("print_count", Integer.class))
+                .skipInv(row.get("skip_inv", Boolean.class))
                 .build();
     }
 
@@ -184,10 +185,10 @@ public class TransferHisService {
         String sql = """
                 INSERT INTO transfer_his (vou_no, created_by, created_date, deleted, vou_date, ref_no, remark,
                 updated_by, updated_date, loc_code_from, loc_code_to, mac_id, comp_code, dept_id, intg_upd_status,
-                labour_group_code, job_code, vou_lock, trader_code, print_count) VALUES
+                labour_group_code, job_code, vou_lock, trader_code, print_count, skip_inv) VALUES
                 (:vouNo, :createdBy, :createdDate, :deleted, :vouDate, :refNo, :remark, :updatedBy, :updatedDate,
                 :locCodeFrom, :locCodeTo, :macId, :compCode, :deptId, :intgUpdStatus, :labourGroupCode, :jobCode,
-                :vouLock, :traderCode, :printCount)
+                :vouLock, :traderCode, :printCount, :skipInv)
                 """;
         return executeUpdate(sql, dto);
 
@@ -243,6 +244,7 @@ public class TransferHisService {
                 .bind("vouLock", Util1.getBoolean(dto.getVouLock()))
                 .bind("traderCode", Parameters.in(R2dbcType.VARCHAR, dto.getTraderCode()))
                 .bind("printCount", Parameters.in(R2dbcType.INTEGER, dto.getPrintCount()))
+                .bind("skipInv", Parameters.in(R2dbcType.INTEGER, dto.getSkipInv()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
