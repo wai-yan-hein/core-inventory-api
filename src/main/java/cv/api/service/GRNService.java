@@ -209,7 +209,7 @@ public class GRNService {
         String batchNo = Util1.isNull(filter.getBatchNo(), "-");
         Integer deptId = filter.getDeptId();
         boolean deleted = filter.isDeleted();
-        String close = String.valueOf(filter.isClose());
+        boolean close = filter.isClose();
         String sql = """
                 select a.*,t.user_code,t.trader_name
                 from (
