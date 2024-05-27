@@ -215,7 +215,8 @@ public class TransferHisService {
                     job_code = :jobCode,
                     vou_lock = :vouLock,
                     trader_code = :traderCode,
-                    print_count = :printCount
+                    print_count = :printCount,
+                    skip_inv = :skipInv
                 WHERE vou_no = :vouNo AND comp_code = :compCode
                 """;
         return executeUpdate(sql, dto);
