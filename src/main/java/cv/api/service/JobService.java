@@ -161,6 +161,9 @@ public class JobService {
 
 
     public Mono<Job> findById(JobKey key) {
+        if(Util1.isNullOrEmpty(key.getJobNo())){
+            return Mono.empty();
+        }
         String sql = """
                 select *
                 from job

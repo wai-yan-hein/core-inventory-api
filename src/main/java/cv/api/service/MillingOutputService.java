@@ -1,5 +1,6 @@
 package cv.api.service;
 
+import cv.api.common.Util1;
 import cv.api.entity.MillingOutDetail;
 import cv.api.entity.MillingOutDetailKey;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class MillingOutputService {
                 .bind("percent", dto.getPercent())
                 .bind("totWeight", dto.getTotalWeight())
                 .bind("percentQty", dto.getPercentQty())
-                .bind("sortId", dto.getSortId())
+                .bind("sortId", Util1.getInteger(dto.getSortId()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -58,7 +59,7 @@ public class MillingOutputService {
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
-                delete from milling_output where vou_no = :vouNo and compCode = :compCode
+                delete from milling_output where vou_no = :vouNo and comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("vouNo", vouNo)

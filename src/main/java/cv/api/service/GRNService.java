@@ -6,11 +6,15 @@ import cv.api.entity.GRN;
 import cv.api.entity.GRNDetail;
 import cv.api.entity.GRNDetailKey;
 import cv.api.entity.GRNKey;
+import io.r2dbc.spi.Parameters;
+import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,11 +25,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GRNService {
     private final DatabaseClient client;
-    private GRNDetailService detailService;
+    private final GRNDetailService detailService;
     private final VouNoService vouNoService;
     private final TransactionalOperator operator;
 
-    public Mono<GRN> save(GRN dto) {
+    public Mono<GRN> validSave(GRN dto) {
+        return isDuplicateBatchNo(dto)
+                .flatMap(duplicate -> {
+                    if (duplicate) {
+                        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate Batch No : " + dto.getBatchNo()));
+                    }
+                    return save(dto);
+                });
+    }
+
+    private Mono<GRN> save(GRN dto) {
         return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
                 .flatMap(grn -> detailService.deleteDetail(grn.getKey().getVouNo(), grn.getKey().getCompCode())
                         .flatMap(delete -> {
@@ -57,7 +71,7 @@ public class GRNService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "GRN", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.getKey().setVouNo(seqNo);
@@ -113,11 +127,11 @@ public class GRNService {
                 .bind("closed", Util1.getBoolean(dto.getClosed()))
                 .bind("createdDate", dto.getCreatedDate())
                 .bind("createdBy", dto.getCreatedBy())
-                .bind("updatedDate", dto.getUpdatedDate())
-                .bind("updatedBy", dto.getUpdatedBy())
+                .bind("updatedDate", LocalDateTime.now())
+                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("deleted", Util1.getBoolean(dto.getDeleted()))
-                .bind("batchNo", dto.getBatchNo())
-                .bind("remark", dto.getRemark())
+                .bind("batchNo", Parameters.in(R2dbcType.VARCHAR, dto.getBatchNo()))
+                .bind("remark", Parameters.in(R2dbcType.VARCHAR, dto.getRemark()))
                 .bind("macId", dto.getMacId())
                 .bind("locCode", dto.getLocCode())
                 .fetch()
@@ -199,7 +213,8 @@ public class GRNService {
         String sql = """
                 select a.*,t.user_code,t.trader_name
                 from (
-                select vou_date,g.vou_no,g.comp_code,g.dept_id,g.loc_code,g.created_by,g.batch_no,remark,g.trader_code,g.deleted,g.closed
+                select vou_date,g.vou_no,g.comp_code,g.dept_id,g.loc_code,g.created_by,g.created_date,
+                g.batch_no,remark,g.trader_code,g.deleted,g.closed
                 from grn g join grn_detail gd
                 on g.vou_no = gd.vou_no
                 and g.comp_code = gd.comp_code
@@ -220,7 +235,7 @@ public class GRNService {
                 )a
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code
-                order by g.vou_date desc
+                order by a.vou_date desc
                 """;
 
         return client.sql(sql)
@@ -254,6 +269,7 @@ public class GRNService {
                         .closed(row.get("closed", Boolean.class))
                         .createdBy(row.get("created_by", String.class))
                         .locCode(row.get("loc_code", String.class))
+                        .createdDate(row.get("created_date", LocalDateTime.class))
                         .build())
                 .all();
     }
@@ -292,6 +308,29 @@ public class GRNService {
     }
 
     public Flux<GRNDetail> getGRNDetail(String vouNo, String compCode) {
-        return detailService.getDetail(vouNo,compCode);
+        return detailService.getDetail(vouNo, compCode);
+    }
+
+    private Mono<Boolean> isDuplicateBatchNo(GRN dto) {
+        String vouNo = dto.getKey().getVouNo();
+        //not check in update mode
+        if (!Util1.isNullOrEmpty(vouNo)) {
+            return Mono.just(false);
+        }
+        String batchNo = dto.getBatchNo();
+        String compCode = dto.getKey().getCompCode();
+        if (Util1.isNullOrEmpty(batchNo)) {
+            return Mono.just(false);
+        } else {
+            String sql = """
+                    select count(*) count from grn where deleted = false and  batch_no = :batchNo and comp_code = :compCode
+                    """;
+            return client.sql(sql)
+                    .bind("batchNo", batchNo)
+                    .bind("compCode", compCode)
+                    .map((row, rowMetadata) -> row.get("count", Integer.class))
+                    .one()
+                    .map(integer -> integer > 0);
+        }
     }
 }

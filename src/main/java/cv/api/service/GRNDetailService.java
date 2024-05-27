@@ -41,7 +41,7 @@ public class GRNDetailService {
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
-                delete from grn_detail where vou_no = :vouNo and compCode = :compCode
+                delete from grn_detail where vou_no = :vouNo and comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("vouNo", vouNo)
@@ -63,9 +63,8 @@ public class GRNDetailService {
                 and g.comp_code =l.comp_code
                 where g.vou_no=:vouNo
                 and g.comp_code =:compCode
-                order by unique_id;
+                order by unique_id
                 """;
-
         return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)

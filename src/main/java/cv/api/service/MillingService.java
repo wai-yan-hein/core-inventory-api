@@ -3,6 +3,8 @@ package cv.api.service;
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.*;
+import io.r2dbc.spi.Parameters;
+import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,12 +72,15 @@ public class MillingService {
             return outputService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
                     .filter(e -> !Util1.isNullOrEmpty(e.getStockCode()))
                     .flatMap(e -> {
-                        if (e.getKey().getUniqueId() == 0) {
-                            int uniqueId = list.indexOf(e) + 1;
-                            e.getKey().setUniqueId(uniqueId);
+                        if (e.getKey() == null) {
+                            e.setKey(MillingOutDetailKey.builder().build());
                         }
+                        int uniqueId = list.indexOf(e) + 1;
+                        e.getKey().setUniqueId(uniqueId);
                         e.getKey().setVouNo(vouNo);
                         e.getKey().setCompCode(compCode);
+                        e.setDeptId(sh.getDeptId());
+                        e.setLocCode(sh.getLocCode());
                         return outputService.insert(e).thenReturn(true);
                     })
                     .next()
@@ -93,12 +98,15 @@ public class MillingService {
             return rawService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
                     .filter(e -> !Util1.isNullOrEmpty(e.getStockCode()))
                     .flatMap(e -> {
-                        if (e.getKey().getUniqueId() == 0) {
-                            int uniqueId = list.indexOf(e) + 1;
-                            e.getKey().setUniqueId(uniqueId);
+                        if (e.getKey() == null) {
+                            e.setKey(MillingRawDetailKey.builder().build());
                         }
+                        int uniqueId = list.indexOf(e) + 1;
+                        e.getKey().setUniqueId(uniqueId);
                         e.getKey().setVouNo(vouNo);
                         e.getKey().setCompCode(compCode);
+                        e.setDeptId(sh.getDeptId());
+                        e.setLocCode(sh.getLocCode());
                         return rawService.insert(e).thenReturn(true);
                     })
                     .next()
@@ -116,10 +124,11 @@ public class MillingService {
             return usageService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
                     .filter(e -> !Util1.isNullOrEmpty(e.getStockCode()))
                     .flatMap(e -> {
-                        if (e.getKey().getUniqueId() == 0) {
-                            int uniqueId = list.indexOf(e) + 1;
-                            e.getKey().setUniqueId(uniqueId);
+                        if (e.getKey() == null) {
+                            e.setKey(MillingUsageKey.builder().build());
                         }
+                        int uniqueId = list.indexOf(e) + 1;
+                        e.getKey().setUniqueId(uniqueId);
                         e.getKey().setVouNo(vouNo);
                         e.getKey().setCompCode(compCode);
                         return usageService.insert(e).thenReturn(true);
@@ -139,10 +148,11 @@ public class MillingService {
             return expenseService.deleteDetail(vouNo, compCode).flatMap(aBoolean -> Flux.fromIterable(list)
                     .filter(e -> Util1.getDouble(e.getAmount()) > 0 && e.getKey().getExpenseCode() != null)
                     .flatMap(e -> {
-                        if (e.getKey().getUniqueId() == 0) {
-                            int uniqueId = list.indexOf(e) + 1;
-                            e.getKey().setUniqueId(uniqueId);
+                        if (e.getKey() == null) {
+                            e.setKey(MillingExpenseKey.builder().build());
                         }
+                        int uniqueId = list.indexOf(e) + 1;
+                        e.getKey().setUniqueId(uniqueId);
                         e.getKey().setVouNo(vouNo);
                         e.getKey().setCompCode(compCode);
                         return expenseService.insert(e).thenReturn(true);
@@ -181,16 +191,16 @@ public class MillingService {
                 .bind("remark", dto.getRemark())
                 .bind("createdDate", dto.getCreatedDate())
                 .bind("createdBy", dto.getCreatedBy())
-                .bind("deleted", dto.getDeleted())
-                .bind("updatedBy", dto.getUpdatedBy())
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
+                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("macId", dto.getMacId())
-                .bind("intgUpdStatus", dto.getIntgUpdStatus())
+                .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
                 .bind("reference", dto.getReference())
                 .bind("deptId", dto.getDeptId())
-                .bind("vouLock", dto.getVouLock())
-                .bind("projectNo", dto.getProjectNo())
-                .bind("carNo", dto.getCarNo())
-                .bind("vouStatusId", dto.getVouStatusId())
+                .bind("vouLock", Util1.getBoolean(dto.getVouLock()))
+                .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, dto.getProjectNo()))
+                .bind("carNo", Parameters.in(R2dbcType.VARCHAR, dto.getCarNo()))
+                .bind("vouStatusId", Parameters.in(R2dbcType.VARCHAR, dto.getVouStatusId()))
                 .bind("loadQty", dto.getLoadQty())
                 .bind("loadWeight", dto.getLoadWeight())
                 .bind("loadAmount", dto.getLoadAmount())
@@ -204,8 +214,8 @@ public class MillingService {
                 .bind("diffQty", dto.getDiffQty())
                 .bind("percentWeight", dto.getPercentWeight())
                 .bind("percentQty", dto.getPercentQty())
-                .bind("jobNo", dto.getJobNo())
-                .bind("printCount", dto.getPrintCount())
+                .bind("jobNo", Parameters.in(R2dbcType.VARCHAR, dto.getJobNo()))
+                .bind("printCount", Util1.getInteger(dto.getPrintCount()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -304,6 +314,7 @@ public class MillingService {
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
         String jobNo = Util1.isNull(filter.getJobNo(), "-");
+        String locCode = Util1.isNull(filter.getLocCode(), "-");
         String sql = """
                 select a.*,t.trader_name, v.description
                  from (
@@ -343,6 +354,7 @@ public class MillingService {
                 .bind("userCode", userCode)
                 .bind("projectNo", projectNo)
                 .bind("jobNo", jobNo)
+                .bind("locCode", locCode)
                 .map((row, rowMetadata) -> MillingHis.builder()
                         .key(MillingHisKey.builder()
                                 .vouNo(row.get("vou_no", String.class))

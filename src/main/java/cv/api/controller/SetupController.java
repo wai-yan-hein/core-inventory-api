@@ -538,7 +538,7 @@ public class SetupController {
     }
 
     @PostMapping(path = "/findJob")
-    public Mono<Job> findOrderStatus(@RequestBody JobKey key) {
+    public Mono<Job> findJob(@RequestBody JobKey key) {
         return jobService.findById(key);
     }
 
