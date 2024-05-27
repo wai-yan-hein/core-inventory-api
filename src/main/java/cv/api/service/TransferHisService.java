@@ -205,7 +205,7 @@ public class TransferHisService {
                     remark = :remark,
                     updated_by = :updatedBy,
                     updated_date = :updatedDate,
-                    loc_code_from = :locCodeFrom,
+                    loc_code_from = :locCodeFrom,6
                     loc_code_to = :locCodeTo,
                     mac_id = :macId,
                     comp_code = :compCode,
@@ -245,7 +245,7 @@ public class TransferHisService {
                 .bind("vouLock", Util1.getBoolean(dto.getVouLock()))
                 .bind("traderCode", Parameters.in(R2dbcType.VARCHAR, dto.getTraderCode()))
                 .bind("printCount", Parameters.in(R2dbcType.INTEGER, dto.getPrintCount()))
-                .bind("skipInv", Parameters.in(R2dbcType.INTEGER, dto.getSkipInv()))
+                .bind("skipInv", Util1.getBoolean(dto.getSkipInv()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
