@@ -49,7 +49,7 @@ public class RegionService {
                 SET reg_name = :regName, created_by = :createdBy, created_date = :createdDate,
                 updated_by = :updatedBy, updated_date = :updatedDate,
                 comp_code = :compCode, user_code = :userCode, dept_id = :deptId,
-                deleted = :deleted, active = :active
+                deleted = :deleted, active = :active, mac_id = :macId
                 WHERE reg_code = :regCode AND comp_code = :compCode
                 """;
         return executeUpdate(sql, dto);
