@@ -41,7 +41,7 @@ public class SetupController {
     private final VouStatusService vouStatusService;
     private final OPHisService opHisService;
     private final PatternService patternService;
-    private final ReorderService reorderService;
+    private final ReorderLevelService reorderService;
     private final PriceOptionService optionService;
     private final UnitRelationService unitRelationService;
     private final ReportService reportService;
@@ -162,33 +162,28 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveSaleMan")
-    public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan saleMan) {
-        saleMan.setUpdatedDate(Util1.getTodayLocalDate());
-        SaleMan sm = saleManService.save(saleMan);
-        return Mono.justOrEmpty(sm);
+    public Mono<SaleMan> saveSaleMan(@RequestBody SaleMan dto) {
+        return saleManService.save(dto);
     }
 
     @GetMapping(path = "/getSaleMan")
-    public Flux<?> getSaleMan(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(saleManService.findAll(compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+    public Flux<SaleMan> getSaleMan(@RequestParam String compCode) {
+        return saleManService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateSaleMan")
-    public Flux<?> getSaleMan(@RequestParam String updatedDate) {
-        return Flux.fromIterable(saleManService.getSaleMan(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<SaleMan> getUpdateSaleMan(@RequestParam String updatedDate) {
+        return saleManService.getSaleMan(Util1.toLocalDateTime(updatedDate));
     }
 
     @DeleteMapping(path = "/deleteSaleMan")
-    public Mono<ReturnObject> deleteSaleMan(@RequestParam String code) {
-        saleManService.delete(code);
-        ro.setMessage("Deleted.");
-        return Mono.justOrEmpty(ro);
+    public Mono<Boolean> deleteSaleMan(@RequestParam SaleManKey key) {
+        return saleManService.delete(key);
     }
 
     @PostMapping(path = "/findSaleMan")
     public Mono<SaleMan> findSaleMan(@RequestBody SaleManKey key) {
-        SaleMan sm = saleManService.findByCode(key);
-        return Mono.justOrEmpty(sm);
+        return saleManService.findById(key);
     }
 
     @PostMapping(path = "/saveBrand")
@@ -262,7 +257,6 @@ public class SetupController {
         return unitService.getUnit(Util1.toLocalDateTime(updatedDate));
     }
 
-
     @PostMapping(path = "/findUnit")
     public Mono<StockUnit> findUnit(@RequestBody StockUnitKey key) {
         return unitService.findByCode(key);
@@ -327,7 +321,6 @@ public class SetupController {
     public Flux<Trader> getUpdateCustomer(@RequestParam String updatedDate) {
         return traderService.getUpdateCustomer(Util1.toLocalDateTime(updatedDate));
     }
-
 
     @GetMapping(path = "/getCustomer")
     public Flux<Trader> getCustomer(@RequestParam String compCode) {
@@ -478,9 +471,7 @@ public class SetupController {
 
     @PostMapping(path = "/saveOrderStatus")
     public Mono<OrderStatus> saveOrderStatus(@RequestBody OrderStatus orderStatus) {
-        orderStatus.setUpdatedDate(Util1.getTodayLocalDate());
-        OrderStatus b = orderStatusService.save(orderStatus);
-        return Mono.justOrEmpty(b);
+        return orderStatusService.save(orderStatus);
     }
 
     @PostMapping(path = "/saveLabourGroup")
@@ -495,7 +486,7 @@ public class SetupController {
 
     @GetMapping(path = "/getOrderStatus")
     public Flux<?> getOrderStatus(@RequestParam String compCode) {
-        return Flux.fromIterable(orderStatusService.findAll(compCode));
+        return orderStatusService.findAll(compCode);
     }
 
     @GetMapping(path = "/getLabourGroup")
@@ -519,14 +510,13 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getUpdateOrderStatus")
-    public Flux<?> getUpdateOrderStatus(@RequestParam String updatedDate) {
-        return Flux.fromIterable(orderStatusService.getOrderStatus(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<OrderStatus> getUpdateOrderStatus(@RequestParam String updatedDate) {
+        return orderStatusService.getOrderStatus(Util1.toLocalDateTime(updatedDate));
     }
 
     @PostMapping(path = "/findOrderStatus")
     public Mono<OrderStatus> findOrderStatus(@RequestBody OrderStatusKey key) {
-        OrderStatus b = orderStatusService.findById(key);
-        return Mono.justOrEmpty(b);
+        return orderStatusService.findById(key);
     }
 
     @PostMapping(path = "/findLabourGroup")
@@ -619,8 +609,8 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveReorder")
-    public Mono<?> saveReorder(@RequestBody ReorderLevel rl) {
-        return Mono.justOrEmpty(reorderService.save(rl));
+    public Mono<ReorderLevel> saveReorder(@RequestBody ReorderLevel dto) {
+        return reorderService.saveOrUpdate(dto);
     }
 
     @PostMapping(path = "/savePriceOption")
@@ -660,20 +650,18 @@ public class SetupController {
 
 
     @PostMapping(path = "/saveTraderGroup")
-    public Mono<?> saveTraderGroup(@RequestBody TraderGroup group) {
-        TraderGroup g = traderGroupService.save(group);
-        return Mono.justOrEmpty(g);
+    public Mono<?> saveTraderGroup(@RequestBody TraderGroup dto) {
+        return traderGroupService.save(dto);
     }
 
     @PostMapping(path = "/findTraderGroup")
-    public Mono<?> findTraderGroup(@RequestBody TraderGroupKey key) {
-        return Mono.justOrEmpty(traderGroupService.findById(key));
+    public Mono<TraderGroup> findTraderGroup(@RequestBody TraderGroupKey key) {
+        return traderGroupService.findById(key);
     }
 
     @GetMapping(path = "/getTraderGroup")
-    public Flux<?> getTraderGroup(@RequestParam String compCode, @RequestParam Integer deptId) {
-        List<TraderGroup> g = traderGroupService.getTraderGroup(compCode, deptId);
-        return Flux.fromIterable(g).onErrorResume(throwable -> Flux.empty());
+    public Flux<TraderGroup> getTraderGroup(@RequestParam String compCode) {
+        return traderGroupService.findAll(compCode);
     }
 
     @GetMapping(path = "/convert-to-unicode")
