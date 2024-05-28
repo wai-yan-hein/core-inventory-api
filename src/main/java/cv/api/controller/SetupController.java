@@ -46,7 +46,6 @@ public class SetupController {
     private final UnitRelationService unitRelationService;
     private final ReportService reportService;
     private final TraderGroupService traderGroupService;
-    private final GRNService batchService;
     private final ConverterService converterService;
     private final AccountRepo accountRepo;
     private final AccSettingService accSettingService;
@@ -270,31 +269,29 @@ public class SetupController {
     }
 
     @PostMapping(path = "/saveRegion")
-    public Mono<Region> saveRegion(@RequestBody Region region) throws Exception {
-        region.setUpdatedDate(Util1.getTodayLocalDate());
-        Region b = regionService.save(region);
-        return Mono.justOrEmpty(b);
+    public Mono<Region> saveRegion(@RequestBody Region dto) {
+        return regionService.save(dto);
     }
 
     @GetMapping(path = "/getRegion")
-    public Flux<?> getRegion(@RequestParam String compCode) {
-        return Flux.fromIterable(regionService.findAll(compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<Region> getRegion(@RequestParam String compCode) {
+        return regionService.findAll(compCode);
     }
 
     @PostMapping(path = "/deleteRegion")
-    public Mono<?> deleteRegion(@RequestBody RegionKey key) {
-        return Mono.just(regionService.delete(key));
+    public Mono<Boolean> deleteRegion(@RequestBody RegionKey key) {
+        return regionService.delete(key);
     }
 
     @PostMapping(path = "/findRegion")
     public Mono<Region> findRegion(@RequestBody RegionKey key) {
-        Region b = regionService.findByCode(key);
-        return Mono.justOrEmpty(b);
+        return regionService.findById(key);
+
     }
 
     @GetMapping(path = "/getUpdateRegion")
-    public Flux<?> getUpdateRegion(@RequestParam String updatedDate) {
-        return Flux.fromIterable(regionService.getRegion(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+    public Flux<Region> getUpdateRegion(@RequestParam String updatedDate) {
+        return regionService.getRegion(Util1.toLocalDateTime(updatedDate));
     }
 
     @PostMapping(path = "/saveCustomer")

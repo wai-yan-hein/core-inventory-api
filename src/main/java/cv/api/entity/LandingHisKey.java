@@ -16,13 +16,10 @@ import java.io.Serializable;
  * @author DELL
  */
 @Data
-@Embeddable
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-public class LandingHisKey implements Serializable {
+public class LandingHisKey {
 
-    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "comp_code")
     private String compCode;
 }
