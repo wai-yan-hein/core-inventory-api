@@ -4,26 +4,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Entity
-@Table(name = "stock_formula_price")
+@Builder
 public class StockFormulaPrice {
-    @EmbeddedId
     private StockFormulaPriceKey key;
-    @Column(name = "criteria_code")
     private String criteriaCode;
-    @Column(name = "percent")
     private Double percent;
-    @Column(name = "price")
     private Double price;
-    @Column(name = "percent_allow")
     private double percentAllow;
-    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
     private transient String criteriaName;
     private transient String userCode;

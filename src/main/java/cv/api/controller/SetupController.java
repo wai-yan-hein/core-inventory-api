@@ -54,6 +54,9 @@ public class SetupController {
     private final LabourGroupService labourGroupService;
     private final JobService jobService;
     private final StockFormulaService stockFormulaService;
+    private final StockFormulaPriceService stockFormulaPriceService;
+    private final StockFormulaQtyService stockFormulaQtyService;
+    private final GradeDetailService gradeDetailService;
     private final StockColorService stockColorService;
     private final CleanDataService cleanDataService;
 
@@ -401,26 +404,22 @@ public class SetupController {
 
     @GetMapping(path = "/getUpdateStockFormula")
     public Flux<StockFormula> getUpdateStockFormula(@RequestParam String updatedDate) {
-        List<StockFormula> list = stockFormulaService.getStockFormula(Util1.toLocalDateTime(updatedDate));
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+        return stockFormulaService.getStockFormula(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUpdateStockFormulaPrice")
     public Flux<StockFormulaPrice> getUpdateStockFormulaPrice(@RequestParam String updatedDate) {
-        List<StockFormulaPrice> list = stockFormulaService.getStockFormulaPrice(Util1.toLocalDateTime(updatedDate));
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+        return stockFormulaPriceService.getStockFormulaPrice(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUpdateStockFormulaQty")
     public Flux<StockFormulaQty> getUpdateStockFormulaQty(@RequestParam String updatedDate) {
-        List<StockFormulaQty> list = stockFormulaService.getStockFormulaQty(Util1.toLocalDateTime(updatedDate));
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+        return stockFormulaQtyService.getStockFormulaQty(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getUpdateGradeDetail")
     public Flux<GradeDetail> getUpdateGradeDetail(@RequestParam String updatedDate) {
-        List<GradeDetail> list = stockFormulaService.getGradeDetail(Util1.toLocalDateTime(updatedDate));
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+        return gradeDetailService.getGradeDetail(Util1.toLocalDateTime(updatedDate));
     }
 
     @GetMapping(path = "/getService")
@@ -708,7 +707,7 @@ public class SetupController {
 
     @PostMapping(path = "/saveStockFormula")
     public Mono<?> saveStockFormula(@RequestBody StockFormula f) {
-        return Mono.just(stockFormulaService.save(f));
+        return stockFormulaService.save(f);
     }
 
     @PostMapping(path = "/deleteStockFormula")
@@ -718,57 +717,57 @@ public class SetupController {
 
     @PostMapping(path = "/deleteGradeDetail")
     public Mono<?> deleteGradeDetail(@RequestBody GradeDetailKey key) {
-        return Mono.just(stockFormulaService.delete(key));
+        return Mono.just(gradeDetailService.delete(key));
     }
 
     @PostMapping(path = "/findStockFormula")
     public Mono<?> findStockFormula(@RequestBody StockFormulaKey key) {
-        return Mono.justOrEmpty(stockFormulaService.find(key));
+        return Mono.justOrEmpty(stockFormulaService.findById(key));
     }
 
     @GetMapping(path = "/getStockFormula")
     public Mono<?> getStockFormula(@RequestParam String compCode) {
-        return Mono.just(stockFormulaService.getFormula(compCode));
+        return Mono.just(stockFormulaService.findAll(compCode));
     }
 
     @GetMapping(path = "/getStockFormulaPrice")
     public Flux<?> getStockFormulaPrice(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getStockFormulaPrice(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+        return stockFormulaPriceService.getStockFormulaPrice(formulaCode, compCode).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getStockFormulaQty")
     public Flux<?> getStockFormulaQty(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getStockFormulaQty(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+        return stockFormulaQtyService.getStockFormulaQty(formulaCode, compCode).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getGradeDetail")
     public Flux<?> getGradeDetail(@RequestParam String formulaCode, @RequestParam String criteriaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getGradeDetail(formulaCode, criteriaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+        return gradeDetailService.getGradeDetail(formulaCode, criteriaCode, compCode).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getStockFormulaGrade")
     public Flux<?> getStockFormulaGrade(@RequestParam String formulaCode, @RequestParam String compCode) {
-        return Flux.fromIterable(stockFormulaService.getStockFormulaGrade(formulaCode, compCode)).onErrorResume(throwable -> Flux.empty());
+        return gradeDetailService.getStockFormulaGrade(formulaCode, compCode).onErrorResume(throwable -> Flux.empty());
     }
 
     @PostMapping(path = "/saveStockFormulaPrice")
     public Mono<?> saveStockFormulaPrice(@RequestBody StockFormulaPrice f) {
-        return Mono.just(stockFormulaService.save(f));
+        return Mono.just(stockFormulaPriceService.save(f));
     }
 
     @PostMapping(path = "/saveStockFormulaQty")
     public Mono<?> saveStockFormulaQty(@RequestBody StockFormulaQty f) {
-        return Mono.just(stockFormulaService.save(f));
+        return Mono.just(stockFormulaQtyService.save(f));
     }
 
     @PostMapping(path = "/saveGradeDetail")
     public Mono<?> saveGradeDetail(@RequestBody GradeDetail f) {
-        return Mono.just(stockFormulaService.save(f));
+        return Mono.just(gradeDetailService.save(f));
     }
 
     @PostMapping(path = "/deleteStockFormulaDetail")
     public Mono<?> deleteStockFormulaDetail(@RequestBody StockFormulaPriceKey key) {
-        return Mono.justOrEmpty(stockFormulaService.delete(key));
+        return Mono.justOrEmpty(stockFormulaPriceService.delete(key));
     }
 
     @PostMapping(path = "/deleteFormula")
