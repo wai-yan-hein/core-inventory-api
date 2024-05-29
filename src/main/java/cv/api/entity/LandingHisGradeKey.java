@@ -4,25 +4,19 @@
  */
 package cv.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import lombok.Builder;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  *
  * @author Lenovo
  */
-@Embeddable
+@Builder
 @Data
-public class LandingHisGradeKey implements Serializable {
+public class LandingHisGradeKey {
 
-    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "unique_id")
-    private int uniqueId;
+    private Integer uniqueId;
 
 }

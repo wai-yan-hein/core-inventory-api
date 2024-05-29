@@ -1,16 +1,11 @@
 package cv.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serializable;
-
+@Builder
 @Data
-@Embeddable
-public class SaleManKey implements Serializable {
-    @Column(name = "saleman_code")
+public class SaleManKey {
     private String saleManCode;
-    @Column(name = "comp_code")
     private String compCode;
 }

@@ -113,11 +113,12 @@ public class VouStatusService {
         String sql = """
                 select *
                 from vou_status
-                where comp_code=:compCode
+                where comp_code= :compCode
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row, rowMetadata) -> mapRow(row)).all();
+                .map((row, rowMetadata) -> mapRow(row))
+                .all();
     }
 
     public Mono<Boolean> delete(VouStatusKey key) {

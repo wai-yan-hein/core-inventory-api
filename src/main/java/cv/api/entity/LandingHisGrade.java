@@ -4,7 +4,7 @@
  */
 package cv.api.entity;
 
-import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -12,23 +12,15 @@ import lombok.Data;
  * @author Lenovo
  */
 @Data
-@Entity
-@Table(name = "landing_his_grade")
+@Builder
 public class LandingHisGrade {
 
-    @EmbeddedId
     private LandingHisGradeKey key;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "match_count")
-    private double matchCount;
-    @Column(name = "match_percent")
-    private double matchPercent;
-    @Column(name = "choose")
-    private boolean choose;
-    @Transient
+    private Double matchCount;
+    private Double matchPercent;
+    private Boolean choose;
     private String stockName;
-    @Transient
     private String userCode;
 
 }

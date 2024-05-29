@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,28 +32,31 @@ import java.util.Objects;
 public class WeightService {
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+    private final TransactionalOperator operator;
 
     public Mono<WeightHis> save(WeightHis dto) {
-        dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
-            List<WeightHisDetail> list = dto.getListDetail();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getWeight()) != 0)
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(WeightHisDetailKey.builder().build());
-                            }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            return insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
+        return operator.transactional(Mono.defer(() -> {
+            dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
+            return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
+                List<WeightHisDetail> list = dto.getListDetail();
+                if (list != null && !list.isEmpty()) {
+                    return Flux.fromIterable(list)
+                            .filter(detail -> Util1.getDouble(detail.getWeight()) != 0)
+                            .concatMap(detail -> {
+                                if (detail.getKey() == null) {
+                                    detail.setKey(WeightHisDetailKey.builder().build());
+                                }
+                                int uniqueId = list.indexOf(detail) + 1;
+                                detail.getKey().setUniqueId(uniqueId);
+                                detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                return insert(detail);
+                            })
+                            .then(Mono.just(ri));
+                } else {
+                    return Mono.just(ri);
+                }
+            }));
         }));
     }
 
@@ -359,7 +363,6 @@ public class WeightService {
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
-    @Transactional
     private Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
                 delete from weight_his_detail where comp_code=:compCode and vou_no=:vouNo

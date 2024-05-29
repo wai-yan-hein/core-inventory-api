@@ -113,7 +113,6 @@ public class ReportController {
                 boolean calPur = filter.isCalPur();
                 boolean calRI = filter.isCalRI();
                 boolean calRO = filter.isCalRO();
-                boolean calMill = filter.isCalMill();
                 String fromDueDate = filter.getFromDueDate();
                 String toDueDate = filter.getToDueDate();
                 String reportName = filter.getReportName();
@@ -447,7 +446,7 @@ public class ReportController {
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        return reportService.getReorderLevel(opDate, clDate, typeCode, catCode,
+        return reportR2dbcService.getReorderLevel(opDate, clDate, typeCode, catCode,
                 brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
     }
 

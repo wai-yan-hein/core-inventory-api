@@ -20,7 +20,7 @@ public class GRNController {
 
     @PostMapping
     public Mono<GRN> saveGRN(@RequestBody GRN dto) {
-        return grnService.save(dto);
+        return grnService.validSave(dto);
     }
 
     @PostMapping(path = "/history")

@@ -2,6 +2,8 @@ package cv.api.service;
 
 import cv.api.common.ReturnObject;
 import cv.api.common.Util1;
+import cv.api.entity.ReorderKey;
+import cv.api.entity.ReorderLevel;
 import cv.api.model.VPurchase;
 import cv.api.report.model.Income;
 import lombok.RequiredArgsConstructor;
@@ -136,5 +138,66 @@ public class ReportR2dbcService {
                         .vouCount(row.get("vou_count", Integer.class))
                         .build()).all();
     }
+    public Flux<ReorderLevel> getReorderLevel(String opDate, String clDate, String typeCode, String catCode, String brandCode,
+                                              String stockCode, boolean calSale, boolean calPur, boolean calRI,
+                                              boolean calRo, String locCode, String compCode,
+                                              Integer deptId, Integer macId) {
+        String sql = """
+                select *,if(small_bal_qty<small_min_qty,1,if(small_bal_qty>small_min_qty,2,if(small_bal_qty<small_max_qty,3,if(small_bal_qty> small_max_qty,4,5)))) position
+                from (
+                select a.*,rel.rel_name,bal_qty*rel.smallest_qty small_bal_qty,min_qty*ifnull(rel1.smallest_qty,0) small_min_qty,max_qty*ifnull(rel2.smallest_qty,0) small_max_qty
+                from (
+                select tmp.stock_code,tmp.loc_code,tmp.smallest_qty bal_qty, tmp.unit bal_unit,ifnull(min_qty,0) min_qty,min_unit,
+                ifnull(max_qty,0) max_qty,max_unit,tmp.comp_code,tmp.dept_id,s.rel_code,s.user_code,s.stock_name,l.loc_name
+                from tmp_stock_balance tmp
+                left join reorder_level r
+                on tmp.stock_code= r.stock_code
+                and tmp.comp_code = r.comp_code
+                and tmp.loc_code = r.loc_code
+                and tmp.mac_id = :macId
+                and tmp.comp_code = :compCode
+                join stock s on tmp.stock_code = s.stock_code
+                and tmp.comp_code = s.comp_code
+                join location l on tmp.loc_code = l.loc_code
+                and tmp.comp_code = l.comp_code ) a
+                join v_relation rel
+                on a.rel_code = rel.rel_code
+                and a.bal_unit = rel.unit
+                and a.comp_code = rel.comp_code
+                left join v_relation rel1
+                on a.rel_code = rel1.rel_code
+                and a.min_unit = rel1.unit
+                and a.comp_code = rel1.comp_code
+                left join v_relation rel2
+                on a.rel_code = rel2.rel_code
+                and a.max_unit = rel2.unit
+                and a.comp_code = rel2.comp_code )b
+                order by position,small_bal_qty
+                """;
 
+        return client.sql(sql)
+                .bind("macId", macId)
+                .bind("compCode", compCode)
+                .map(row -> ReorderLevel.builder()
+                        .key(ReorderKey.builder()
+                                .compCode(compCode)
+                                .stockCode(row.get("stock_code", String.class))
+                                .locCode(row.get("loc_code", String.class))
+                                .build())
+                        .deptId(deptId)
+                        .stockName(row.get("stock_name", String.class))
+                        .userCode(row.get("user_code", String.class))
+                        .relName(row.get("rel_name", String.class))
+                        .locName(row.get("loc_name", String.class))
+                        .minQty(row.get("min_qty", Double.class))
+                        .minUnitCode(row.get("min_unit", String.class))
+                        .maxQty(row.get("max_qty", Double.class))
+                        .position(row.get("position", Integer.class))
+                        .maxUnitCode(row.get("max_unit", String.class))
+                        .maxSmallQty(row.get("small_max_qty", Double.class))
+                        .minSmallQty(row.get("small_min_qty", Double.class))
+                        .balSmallQty(row.get("small_bal_qty", Double.class))
+                        .build())
+                .all();
+    }
 }

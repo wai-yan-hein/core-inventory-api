@@ -1,17 +1,13 @@
 package cv.api.controller;
 
 import cv.api.common.ReportFilter;
-import cv.api.common.Util1;
-import cv.api.entity.LandingHis;
-import cv.api.entity.LandingHisKey;
+import cv.api.entity.*;
 import cv.api.service.LandingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/landing")
@@ -31,47 +27,38 @@ public class LandingController {
     }
 
     @PostMapping(path = "/deleteLanding")
-    public Mono<?> deleteLanding(@RequestBody LandingHisKey key) {
-        return Mono.justOrEmpty(landingService.delete(key));
+    public Mono<Boolean> deleteLanding(@RequestBody LandingHisKey key) {
+        return landingService.delete(key);
     }
 
     @PostMapping(path = "/restoreLanding")
-    public Mono<?> restoreLanding(@RequestBody LandingHisKey key) {
-        return Mono.justOrEmpty(landingService.restore(key));
+    public Mono<Boolean> restoreLanding(@RequestBody LandingHisKey key) {
+        return landingService.restore(key);
     }
 
 
     @GetMapping(path = "/getLandingHisPrice")
-    public Flux<?> getLandingHisPrice(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Flux.fromIterable(landingService.getLandingPrice(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<LandingHisPrice> getLandingHisPrice(@RequestParam String vouNo, @RequestParam String compCode) {
+        return landingService.getLandingPrice(vouNo, compCode);
     }
+
     @GetMapping(path = "/getLandingHisQty")
-    public Flux<?> getLandingQty(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Flux.fromIterable(landingService.getLandingQty(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<LandingHisQty> getLandingQty(@RequestParam String vouNo, @RequestParam String compCode) {
+        return landingService.getLandingQty(vouNo, compCode);
     }
+
     @GetMapping(path = "/getLandingChooseGrade")
-    public Mono<?> getLandingChooseQty(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Mono.justOrEmpty(landingService.getLandingChooseGrade(vouNo, compCode)).onErrorResume(throwable -> Mono.empty());
+    public Mono<LandingHisGrade> getLandingChooseQty(@RequestParam String vouNo, @RequestParam String compCode) {
+        return landingService.getLandingChooseGrade(vouNo, compCode);
     }
+
     @GetMapping(path = "/getLandingHisGrade")
-    public Flux<?> getLandingGrade(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Flux.fromIterable(landingService.getLandingGrade(vouNo, compCode)).onErrorResume(throwable -> Flux.empty());
+    public Flux<LandingHisGrade> getLandingGrade(@RequestParam String vouNo, @RequestParam String compCode) {
+        return landingService.getLandingGrade(vouNo, compCode);
     }
 
     @PostMapping(path = "/history")
-    public Flux<?> getHistory(@RequestBody ReportFilter filter) {
-        String fromDate = Util1.isNull(filter.getFromDate(), "-");
-        String toDate = Util1.isNull(filter.getToDate(), "-");
-        String vouNo = Util1.isNull(filter.getVouNo(), "-");
-        String userCode = Util1.isNull(filter.getUserCode(), "-");
-        String remark = Util1.isNull(filter.getRemark(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        String compCode = filter.getCompCode();
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-        Integer deptId = filter.getDeptId();
-        boolean deleted = filter.isDeleted();
-        List<LandingHis> list = landingService.getLandingHistory(fromDate, toDate, traderCode, vouNo, remark, userCode, stockCode, locCode, compCode, deptId, deleted);
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
+    public Flux<LandingHis> getHistory(@RequestBody ReportFilter filter) {
+        return landingService.getLandingHistory(filter);
     }
 }

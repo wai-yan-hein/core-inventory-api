@@ -82,7 +82,7 @@ public class MillingExpenseService {
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
-                delete from milling_expense where vou_no = :vouNo and compCode = :compCode
+                delete from milling_expense where vou_no = :vouNo and comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("vouNo", vouNo)

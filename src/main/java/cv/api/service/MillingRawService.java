@@ -2,6 +2,8 @@ package cv.api.service;
 
 import cv.api.entity.MillingRawDetail;
 import cv.api.entity.MillingRawDetailKey;
+import io.r2dbc.spi.Parameters;
+import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -42,7 +44,7 @@ public class MillingRawService {
                 .bind("unit", dto.getUnitCode())
                 .bind("price", dto.getPrice())
                 .bind("amt", dto.getAmount())
-                .bind("locCode", dto.getLocCode())
+                .bind("locCode", Parameters.in(R2dbcType.VARCHAR,dto.getLocCode()))
                 .bind("deptId", dto.getDeptId())
                 .bind("weight", dto.getWeight())
                 .bind("weightUnit", dto.getWeightUnit())
@@ -54,7 +56,7 @@ public class MillingRawService {
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
-                delete from milling_raw where vou_no = :vouNo and compCode = :compCode
+                delete from milling_raw where vou_no = :vouNo and comp_code = :compCode
                 """;
         return client.sql(sql)
                 .bind("vouNo", vouNo)

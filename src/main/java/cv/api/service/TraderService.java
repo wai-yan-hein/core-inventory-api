@@ -127,7 +127,7 @@ public class TraderService {
                 and deleted = false
                 and comp_code =:compCode
                 and (LOWER(REPLACE(user_code, ' ', '')) like :text or LOWER(REPLACE(trader_name, ' ', '')) like :text)
-                and (multi =true or type =:type)
+                and (multi =true or type = :type or '-' = :type)
                 order by user_code,trader_name
                 limit 100
                 """;
