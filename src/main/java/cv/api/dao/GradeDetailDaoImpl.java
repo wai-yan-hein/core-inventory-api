@@ -32,16 +32,16 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
                 select g.*,s.stock_name
                 from grade_detail g left join stock s on g.grade_stock_code = s.stock_code
                 and g.comp_code = s.comp_code
-                where g.comp_code =?
-                and g.formula_code =?
-                and g.criteria_code = ?
+                where g.comp_code = :compCode
+                and g.formula_code = :formulaCode
+                and g.criteria_code = :criteriaCode
                 order by g.unique_id
                 """;
         try {
             ResultSet rs = getResult(sql, compCode, formulaCode, criteriaCode);
             while (rs.next()) {
-                GradeDetail d = new GradeDetail();
-                GradeDetailKey key = new GradeDetailKey();
+                GradeDetail d = GradeDetail.builder().build();
+                GradeDetailKey key = GradeDetailKey.builder().build();
                 key.setFormulaCode(rs.getString("formula_code"));
                 key.setCriteriaCode(rs.getString("criteria_code"));
                 key.setCompCode(rs.getString("comp_code"));
@@ -73,8 +73,8 @@ public class GradeDetailDaoImpl extends AbstractDao<GradeDetailKey, GradeDetail>
         try {
             ResultSet rs = getResult(sql, formulaCode, compCode);
             while (rs.next()) {
-                GradeDetail d = new GradeDetail();
-                GradeDetailKey key = new GradeDetailKey();
+                GradeDetail d = GradeDetail.builder().build();
+                GradeDetailKey key = GradeDetailKey.builder().build();
                 key.setFormulaCode(rs.getString("formula_code"));
                 key.setCriteriaCode(rs.getString("criteria_code"));
                 key.setCompCode(rs.getString("comp_code"));
