@@ -1,6 +1,7 @@
 package cv.api.security;
 
 
+import io.netty.handler.ssl.NotSslRecordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;

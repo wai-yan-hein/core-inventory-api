@@ -5,6 +5,7 @@ import cv.api.report.model.Income;
 import cv.api.report.model.StockValueDto;
 import cv.api.report.model.TopPurchase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogRepo {
     private WebClient logApi;
+    private final ReactorClientHttpConnector reactorClientHttpConnector;
 
     public void createWebClient(String url) {
         if (this.logApi == null) {
@@ -25,6 +27,7 @@ public class LogRepo {
                                     .defaultCodecs()
                                     .maxInMemorySize(100 * 1024 * 1024))
                             .build())
+                    .clientConnector(reactorClientHttpConnector)
                     .baseUrl(url)
                     .build();
         }
@@ -47,6 +50,7 @@ public class LogRepo {
                 .bodyToMono(Boolean.class);
 
     }
+
     public Mono<Boolean> income(List<Income> list) {
         return logApi.post()
                 .uri("/report/income")
