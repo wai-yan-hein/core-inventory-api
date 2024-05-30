@@ -579,7 +579,7 @@ public class ReportService {
         String sql = """
                 select a.*,a.ttl_qty*ifnull(rel.smallest_qty,1) smallest_qty, t.user_code,t.trader_name,rel.rel_name,rel.unit, t.address
                 from (
-                select stock_code,s_user_code,stock_name,sum(qty) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id
+                select stock_code,s_user_code,stock_name,sum(iszero(qty,bag)) ttl_qty,pur_unit,sum(pur_amt) ttl_amt,rel_code,trader_code,comp_code,dept_id
                 from v_purchase
                 where date(vou_date) between :fromDate and :toDate
                 and comp_code = :compCode
@@ -696,7 +696,7 @@ public class ReportService {
     public Mono<ReturnObject> getPurchaseBySupplierDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode) {
         String sql = """
                 SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, t.address,
-                       v.stock_name, v.qty, v.pur_unit, v.pur_price, v.pur_amt
+                       v.stock_name, iszero(v.qty,v.bag) qty, v.pur_unit, v.pur_price, v.pur_amt
                 FROM v_purchase v JOIN trader t
                      ON v.trader_code = t.code
                      AND v.comp_code = t.comp_code
@@ -836,7 +836,6 @@ public class ReportService {
 
     private List<VSale> calPercentSale(List<VSale> list) {
         double totalQty = list.stream()
-                .filter(v -> Objects.nonNull(v.getQty())) // Filter out null values
                 .mapToDouble(VSale::getQty) // Map to double
                 .sum(); // Perform the sum operation
         if (!list.isEmpty()) {
@@ -958,7 +957,7 @@ public class ReportService {
                     AND deleted = false
                     AND comp_code = :compCode
                     AND cur_code = :curCode
-                    """ + filter + """
+                   """ + filter + """
                 ) a
                 JOIN trader t ON a.trader_code = t.code
                 AND a.comp_code = t.comp_code
@@ -1205,7 +1204,7 @@ public class ReportService {
     public Mono<ReturnObject> getPurchaseByStockDetail(String fromDate, String toDate, String curCode, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId, String locCode) {
         String sql = """
                 select v.vou_date,v.vou_no,v.trader_code,t.trader_name,
-                v.s_user_code,v.stock_name,v.qty,v.pur_unit,v.pur_price,v.pur_amt
+                v.s_user_code,v.stock_name,iszero(v.qty,v.bag) qty,v.pur_unit,v.pur_price,v.pur_amt
                 from v_purchase v join trader t
                 on v.trader_code = t.code
                 and v.comp_code = t.comp_code
@@ -1256,7 +1255,7 @@ public class ReportService {
 
     public Mono<ReturnObject> getPurchaseByStockSummary(String fromDate, String toDate, String curCode, String stockCode, String typeCode, String brandCode, String catCode, String locCode, String compCode, Integer deptId, Integer macId) {
         String sql = """
-                select stock_code,s_user_code,stock_name,sum(qty) qty,sum(bag) bag,sum(pur_amt) amount,comp_code,dept_id
+                select stock_code,s_user_code,stock_name,sum(iszero(qty,bag)) qty,sum(pur_amt) amount,comp_code,dept_id
                 from v_purchase
                 where deleted = false
                 and date(vou_date) between :fromDate and :toDate
@@ -1282,15 +1281,14 @@ public class ReportService {
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
-                .map((row) -> VSale.builder()
+                .map((row) -> VPurchase.builder()
                         .stockCode(row.get("s_user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
-                        .saleAmount(row.get("amount", Double.class))
+                        .purAmount(row.get("amount", Double.class))
                         .qty(Util1.toNull(row.get("qty", Double.class)))
-                        .bag(Util1.toNull(row.get("bag", Double.class)))
                         .build()).all()
                 .collectList()
-                .map(this::calPercentSale)
+                .map(this::calPercent)
                 .map(Util1::convertToJsonBytes)
                 .map(fileBytes -> ReturnObject.builder()
                         .status("success")
@@ -2609,12 +2607,12 @@ public class ReportService {
     public Mono<ReturnObject> getOpeningByLocation(String typeCode, String brandCode, String catCode, String stockCode, Integer macId, String compCode, Integer deptId) {
         String sql = """
                 select v.op_date,v.vou_no,v.remark,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,
-                v.unit,v.qty,v.price,v.amount,v.comp_code,v.dept_id
+                v.unit,iszero(v.qty,v.bag) qty,v.price,v.amount,v.comp_code,v.dept_id
                 from v_opening v join location l
                 on v.loc_code = l.loc_code
                 and v.comp_code = l.comp_code
                 where v.deleted = false
-                and v.tran_source = 1
+                and (v.tran_source = 1 or v.tran_source =3)
                 and (v.stock_code = :stockCode or '-' = :stockCode)
                 and (v.stock_type_code = :typeCode or '-' = :typeCode)
                 and (v.category_code = :catCode or '-' = :catCode)
@@ -2661,13 +2659,14 @@ public class ReportService {
     public Mono<ReturnObject> getOpeningByGroup(String typeCode, String stockCode, String catCode, String brandCode, Integer macId, String compCode, Integer deptId) {
         String sql = """
                 select a.*,t.stock_type_name
-                from (select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,
-                unit,qty,price,amount,v.comp_code
+                from (
+                select v.op_date,v.remark,v.stock_type_code,v.stock_code,v.stock_user_code,v.stock_name,l.loc_name,
+                unit,iszero(qty,bag) qty,price,amount,v.comp_code
                 from v_opening v join location l
                 on v.loc_code = l.loc_code
                 and v.comp_code = l.comp_code
                 where v.deleted = false
-                and v.tran_source = 1
+                and (v.tran_source = 1 or v.tran_source =3)
                 and v.comp_code = :compCode
                 and (v.dept_id = :deptId or 0 = :deptId)
                 and (v.stock_code = :stockCode or '-' = :stockCode)
@@ -4229,10 +4228,11 @@ public class ReportService {
                 select a.*,t.trader_name,l.loc_name
                 from (
                 select date(vou_date) vou_date,trader_code,stock_code,stock_name,loc_code,wet,rice, qty,bag,pur_price,
-                wet*qty total_wet,rice*qty total_rice, vou_total,grand_total,paid,balance,comp_code,vou_no,reference
+                wet*iszero(qty,bag) total_wet,rice*iszero(qty,bag) total_rice, vou_total,grand_total,paid,balance,comp_code,vou_no,reference
                 from v_purchase
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
+                and calculate = true
                 and comp_code = :compCode
                 and (stock_type_code = :groupCode or '-' = :groupCode)
                 and (brand_code = :brandCode or '-' = :brandCode)

@@ -41,11 +41,12 @@ public class ReportR2dbcService {
                 round(sum(total_rice)/sum(qty),2) avg_rice,
                 round(sum(vou_total)/sum(qty),2) avg_price,sum(vou_total) ttl_vou_total,sum(qty) total_qty
                 from (
-                select category_code,stock_code,s_user_code,stock_name,wet,rice, qty,bag,pur_price,
-                wet*qty total_wet,rice*qty total_rice, pur_amt,comp_code,vou_no,vou_total
+                select category_code,stock_code,s_user_code,stock_name,wet,rice, iszero(qty,bag)qty,bag,pur_price,
+                wet*iszero(qty,bag) total_wet,rice*iszero(qty,bag) total_rice, pur_amt,comp_code,vou_no,vou_total
                 from v_purchase
                 where date(vou_date) between :fromDate and :toDate
                 and deleted =false
+                and calculate = true
                 and comp_code = :compCode
                 and (stock_type_code= :typeCode or '-'=:typeCode)
                 and (brand_code= :brandCode or '-'=:brandCode)
