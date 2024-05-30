@@ -57,9 +57,9 @@ public class StockFormulaService {
     }
 
     public Mono<StockFormula> save(StockFormula dto) {
-        String formulaCode = dto.getKey().getFormulaCode();
-        String compCode = dto.getKey().getCompCode();
+        String formulaCode = dto.getKey() == null ? null : dto.getKey().getFormulaCode();
         if (Util1.isNullOrEmpty(formulaCode)) {
+            String compCode = dto.getKey().getCompCode();
             return seqService.getNextCode("StockFormula", compCode, 5)
                     .flatMap(seqNo -> {
                         dto.getKey().setFormulaCode(seqNo);
