@@ -1,18 +1,16 @@
 package cv.api.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
-@Embeddable
+@Builder
 @Data
 public class ProcessHisKey implements Serializable {
-    @Column(name = "vou_no")
     private String vouNo;
-    @Column(name = "comp_code")
     private String compCode;
-    @Column(name = "dept_id")
     private Integer deptId;
-
+    private String stockCode;
+    private String locCode;
 }

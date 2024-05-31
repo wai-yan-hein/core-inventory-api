@@ -59,8 +59,8 @@ public class StockCriteriaDaoImpl extends AbstractDao<StockCriteriaKey, StockCri
         try {
             ResultSet rs = getResult(sql, text, text,   compCode);
             while (rs.next()) {
-                StockCriteria sc = new StockCriteria();
-                StockCriteriaKey key = new StockCriteriaKey();
+                StockCriteria sc = StockCriteria.builder().build();
+                StockCriteriaKey key = StockCriteriaKey.builder().build();
                 key.setCriteriaCode(rs.getString("criteria_code"));
                 key.setCompCode(rs.getString("comp_code"));
                 sc.setKey(key);

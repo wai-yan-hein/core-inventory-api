@@ -75,20 +75,20 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                 // unit, avg_qty, price, remark, process_no,
                 // pt_code, finished, deleted, created_by, updated_by, mac_id, user_code, stock_name, loc_name, description
                 while (rs.next()) {
-                    ProcessHis p = new ProcessHis();
-                    ProcessHisKey key = new ProcessHisKey();
+                    ProcessHis p = ProcessHis.builder().build();
+                    ProcessHisKey key = ProcessHisKey.builder().build();
                     key.setCompCode(rs.getString("comp_code"));
                     key.setDeptId(rs.getInt("dept_id"));
                     key.setVouNo(rs.getString("vou_no"));
                     p.setKey(key);
-                    p.setStockCode(rs.getString("stock_code"));
-                    p.setLocCode(rs.getString("loc_code"));
+                    key.setStockCode(rs.getString("stock_code"));
+                    key.setLocCode(rs.getString("loc_code"));
                     p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                     p.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                     p.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
-                    p.setQty(rs.getFloat("qty"));
+                    p.setQty(rs.getDouble("qty"));
                     p.setUnit(rs.getString("unit"));
-                    p.setPrice(rs.getFloat("price"));
+                    p.setPrice(rs.getDouble("price"));
                     p.setFinished(rs.getBoolean("finished"));
                     p.setRemark(rs.getString("remark"));
                     p.setProcessNo(rs.getString("process_no"));

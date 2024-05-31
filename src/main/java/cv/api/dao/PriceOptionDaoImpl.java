@@ -39,8 +39,8 @@ public class PriceOptionDaoImpl extends AbstractDao<PriceOptionKey, PriceOption>
             try {
                 while (rs.next()) {
                     //tran_type, desp, comp_code, unique_id, dept_id, tran_option
-                    PriceOption op = new PriceOption();
-                    PriceOptionKey key = new PriceOptionKey();
+                    PriceOption op = PriceOption.builder().build();
+                    PriceOptionKey key = PriceOptionKey.builder().build();
                     key.setPriceType(rs.getString("type"));
                     key.setCompCode(rs.getString("comp_code"));
                     key.setDeptId(rs.getInt("dept_id"));
