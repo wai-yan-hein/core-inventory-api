@@ -42,8 +42,8 @@ public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, Pr
         ResultSet rs = getResult(sql);
         try {
             while (rs.next()) {
-                ProcessHisDetail p = ProcessHisDetail.builder().build();
-                ProcessHisDetailKey key = ProcessHisDetailKey.builder().build();
+                ProcessHisDetail p = new ProcessHisDetail();
+                ProcessHisDetailKey key = new ProcessHisDetailKey();
                 key.setCompCode(compCode);
                 key.setVouNo(vouNo);
                 key.setDeptId(deptId);
@@ -54,8 +54,8 @@ public class ProcessHisDetailDaoImpl extends AbstractDao<ProcessHisDetailKey, Pr
                 p.setLocName(rs.getString("loc_name"));
                 p.setStockName(rs.getString("stock_name"));
                 p.setStockUsrCode(rs.getString("user_code"));
-                p.setQty(rs.getDouble("qty"));
-                p.setPrice(rs.getDouble("price"));
+                p.setQty(rs.getFloat("qty"));
+                p.setPrice(rs.getFloat("price"));
                 p.setUnit(rs.getString("unit"));
                 p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                 list.add(p);

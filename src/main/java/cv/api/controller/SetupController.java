@@ -99,19 +99,18 @@ public class SetupController {
     @PostMapping(path = "/saveStockCriteria")
     public Mono<StockCriteria> saveStockCriteria(@RequestBody StockCriteria cat) {
         cat.setUpdatedDate(Util1.getTodayLocalDate());
-        StockCriteria category = stockCriteriaService.save(cat);
-        return Mono.justOrEmpty(category);
+        return stockCriteriaService.save(cat);
     }
 
     @GetMapping(path = "/getStockCriteria")
     public Flux<?> getStockCriteria(@RequestParam String compCode, @RequestParam boolean active) {
-        return Flux.fromIterable(stockCriteriaService.findAll(compCode, active)).onErrorResume(throwable -> Flux.empty());
+        return stockCriteriaService.findAll(compCode, active).onErrorResume(throwable -> Flux.empty());
     }
 
 
     @GetMapping(path = "/getUpdateStockCriteria")
     public Flux<?> getUpdateStockCriteria(@RequestParam String updatedDate) {
-        return Flux.fromIterable(stockCriteriaService.getCriteria(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+        return stockCriteriaService.getStockCriteria(Util1.toLocalDateTime(updatedDate)).onErrorResume(throwable -> Flux.empty());
     }
 
 
@@ -124,13 +123,12 @@ public class SetupController {
 
     @PostMapping(path = "/findStockCriteria")
     public Mono<StockCriteria> findStockCriteria(@RequestBody StockCriteriaKey key) {
-        StockCriteria cat = stockCriteriaService.findByCode(key);
-        return Mono.justOrEmpty(cat);
+        return stockCriteriaService.findById(key);
     }
 
     @GetMapping(path = "/searchStockCriteria")
     public Mono<?> searchStockCriteria(@RequestParam String text, @RequestParam String compCode) {
-        return Mono.just(stockCriteriaService.search(compCode, text));
+        return stockCriteriaService.search(compCode, text);
     }
 
 
@@ -619,12 +617,12 @@ public class SetupController {
 
     @GetMapping(path = "/getPriceOption")
     public Flux<?> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Flux.fromIterable(optionService.getPriceOption(Util1.isNull(option, "-"), compCode, deptId)).onErrorResume(throwable -> Flux.empty());
+        return optionService.getPriceOptions(Util1.isNull(option, "-"), compCode, deptId).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUpdatePriceOption")
     public Flux<?> getUpdatePriceOption(@RequestParam String updatedDate) {
-        return Flux.fromIterable(optionService.getPriceOption(Util1.toLocalDateTime(updatedDate))).onErrorResume(throwable -> Flux.empty());
+        return optionService.getPriceOption(Util1.toLocalDateTime(updatedDate)).onErrorResume(throwable -> Flux.empty());
     }
 
     @GetMapping(path = "/getUnitRelation")

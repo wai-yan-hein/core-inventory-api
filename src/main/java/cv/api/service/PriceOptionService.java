@@ -107,7 +107,22 @@ public class PriceOptionService {
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
 
-    public Flux<PriceOption> getPriceOptions(LocalDateTime updatedDate) {
+    public Flux<PriceOption> getPriceOptions(String option, String compCode, Integer deptId) {
+        String sql = """
+                SELECT *
+                FROM price_option
+                WHERE tran_option = :option
+                and compCode = :compCode
+                and deptId = :deptId
+                """;
+        return client.sql(sql)
+                .bind("option", option)
+                .bind("compCode", compCode)
+                .bind("deptId", deptId)
+                .map((row, rowMetadata) -> mapRow(row)).all();
+    }
+
+    public Flux<PriceOption> getPriceOption(LocalDateTime updatedDate) {
         String sql = """
                 SELECT *
                 FROM price_option

@@ -1,6 +1,7 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
+import cv.api.entity.Stock;
 import cv.api.entity.StockCriteria;
 import cv.api.entity.StockCriteriaKey;
 import io.r2dbc.spi.Parameters;
@@ -87,16 +88,34 @@ public class StockCriteriaService {
                 .build();
     }
 
-    public Flux<StockCriteria> findAll(String compCode) {
+    public Flux<StockCriteria> findAll(String compCode, Boolean active) {
         String sql = """
                 select *
                 from stock_criteria
                 where comp_code = :compCode
+                and active = :active
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
+                .bind("active", active)
                 .map((row, rowMetadata) -> mapRow(row))
                 .all();
+    }
+
+    public Mono<StockCriteria> search(String compCode, String text) {
+        return Mono.empty();
+    }
+
+    public Mono<Boolean> delete(String code) {
+        String sql = """
+                update stock_criteria
+                set deleted = true, updated_date = :updatedDate
+                where criteria_code = :criteriaCode
+                """;
+        return client.sql(sql)
+                .bind("criteriaCode", code)
+                .bind("updatedDate", LocalDateTime.now())
+                .fetch().rowsUpdated().thenReturn(true);
     }
 
     public Mono<Boolean> delete(StockCriteriaKey key) {
