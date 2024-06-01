@@ -30,11 +30,11 @@ public class ProcessHis {
     @Column(name = "process_no")
     private String processNo;
     @Column(name = "qty")
-    private Float qty;
+    private Double qty;
     @Column(name = "unit")
     private String unit;
     @Column(name = "price")
-    private Float price;
+    private Double price;
     @Column(name = "finished")
     private boolean finished;
     @Column(name = "deleted")

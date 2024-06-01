@@ -86,9 +86,9 @@ public class ProcessHisDaoImpl extends AbstractDao<ProcessHisKey, ProcessHis> im
                     p.setVouDate(rs.getTimestamp("vou_date").toLocalDateTime());
                     p.setVouDateTime(Util1.toZonedDateTime(rs.getTimestamp("vou_date").toLocalDateTime()));
                     p.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
-                    p.setQty(rs.getFloat("qty"));
+                    p.setQty(rs.getDouble("qty"));
                     p.setUnit(rs.getString("unit"));
-                    p.setPrice(rs.getFloat("price"));
+                    p.setPrice(rs.getDouble("price"));
                     p.setFinished(rs.getBoolean("finished"));
                     p.setRemark(rs.getString("remark"));
                     p.setProcessNo(rs.getString("process_no"));
