@@ -23,7 +23,6 @@ public class StockReportService {
     private final OPHisService opHisService;
     private final TransactionalOperator operator;
 
-    @Transactional
     private Mono<Long> calculateOpeningByPaddy(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String compCode, Integer macId) {
@@ -144,7 +143,7 @@ public class StockReportService {
                  and (stock_code = :stockCode or '-' = :stockCode)
                  group by stock_code,loc_code
                     union all
-                 select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag) bag, loc_code_from, weight_unit, sum(amount) ttl_amt
+                 select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code_from, weight_unit, sum(amount) ttl_amt
                  from v_transfer
                  where date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
@@ -212,7 +211,6 @@ public class StockReportService {
                 .rowsUpdated());
     }
 
-    @Transactional
     private Mono<Long> calculateClosingByPaddy(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String compCode, Integer macId) {
@@ -594,6 +592,8 @@ public class StockReportService {
                 sum(ifnull(sale_ttl_amt,0)) sale_ttl_amt
                 from tmp_stock_io_column
                 where mac_id = :macId
+                and tran_option <> 'Transfer-F'
+                and tran_option <> 'Transfer-T'
                 group by stock_code
                 )i)a
                 join stock s on a.stock_code = s.stock_code
@@ -1285,6 +1285,17 @@ public class StockReportService {
         Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return monoOp.thenMany(getStockBalanceByLocation(macId));
     }
+    public Mono<ReturnObject> getStockBalanceByLocationRO(ReportFilter filter){
+        return getStockBalanceQty(filter)
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+
+    }
 
     public Flux<ClosingBalance> getStockBalance(ReportFilter filter) {
         String opDate = filter.getOpDate();
@@ -1315,7 +1326,7 @@ public class StockReportService {
                     """;
         } else {
             sql = """
-                    select a.*,s.stock_name,l.loc_name
+                    select a.*,s.stock_name,l.loc_name,wh.description wh_name
                     from (
                     select stock_code,loc_code,ttl_weight,ttl_qty,ttl_wet,ttl_rice,ttl_bag,ttl_amt,comp_code
                     from tmp_stock_opening
@@ -1325,6 +1336,9 @@ public class StockReportService {
                     and a.comp_code = s.comp_code
                     join location l on a.loc_code = l.loc_code
                     and a.comp_code = l.comp_code
+                    left join warehouse wh on l.warehouse_code = wh.code
+                    and a.comp_code = wh.comp_code
+                    order by l.loc_name
                     """;
         }
         Flux<ClosingBalance> flux = client.sql(sql)
@@ -1339,6 +1353,7 @@ public class StockReportService {
                         .balRice(row.get("ttl_rice", Double.class))
                         .balBag(row.get("ttl_bag", Double.class))
                         .balAmount(row.get("ttl_amt", Double.class))
+                        .whName(row.get("wh_name",String.class))
                         .build()).all()
                 .switchIfEmpty(Flux.defer(() -> Flux.just(ClosingBalance.builder()
                         .stockName("No Stock.")

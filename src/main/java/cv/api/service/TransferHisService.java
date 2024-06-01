@@ -400,6 +400,8 @@ public class TransferHisService {
                         .wet(row.get("wet", Double.class))
                         .rice(row.get("rice", Double.class))
                         .bag(row.get("bag", Double.class))
+                        .price(row.get("price",Double.class))
+                        .amount(row.get("amount",Double.class))
                         .build()).all();
 
     }

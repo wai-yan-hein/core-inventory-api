@@ -4245,7 +4245,7 @@ public class ReportService {
                 and a.comp_code = l.comp_code
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code
-                order by date(vou_date), qty desc
+                order by date(vou_date), iszero(qty,bag) desc
                 """;
 
         return client.sql(sql)

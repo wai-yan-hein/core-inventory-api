@@ -314,6 +314,9 @@ public class ReportController {
                     case "LabourOutputPayableDetail" -> {
                         return labourOutputService.getLabourPaymentDetailResult(filter);
                     }
+                    case "StockBalanceByLocation" -> {
+                        return stockReportService.getStockBalanceByLocationRO(filter);
+                    }
                 }
                 ro.setMessage("Report Not Exists.");
                 return Mono.just(ro);

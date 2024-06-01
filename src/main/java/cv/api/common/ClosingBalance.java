@@ -78,7 +78,7 @@ public class ClosingBalance {
     private String locName;
     private Double bag;
     private Double price;
-    private String warehouse;
+    private String whName;
     private String tranOption;
 
     private Double opPrice;

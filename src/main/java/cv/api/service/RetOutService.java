@@ -424,7 +424,7 @@ public class RetOutService {
                 and sh.comp_code =l.comp_code
                 join acc_setting a
                 on sh.comp_code = a.comp_code
-                and a.type ='RETURN_IN'
+                and a.type ='RETURN_OUT'
                 where sh.comp_code =:compCode
                 and sh.vou_no=:vouNo
                 """;

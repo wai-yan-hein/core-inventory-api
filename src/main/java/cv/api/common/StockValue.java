@@ -15,6 +15,7 @@ public class StockValue {
     private String stockTypeName;
     private String catName;
     private String locName;
+    private String whName;
     private String balRel;
     private Double purAvgPrice;
     private Double purAvgAmount;
