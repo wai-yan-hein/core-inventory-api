@@ -154,7 +154,7 @@ public class OPHisService {
 
     public Mono<String> getOpeningDateByLocation(String compCode, String locCode) {
         String sql = """
-                select max(op_date) op_date
+                select max(ifnull(op_date,1998-10-07)) op_date
                 from op_his
                 where deleted = false
                 and comp_code =:compCode
@@ -165,8 +165,7 @@ public class OPHisService {
                 .bind("compCode", compCode)
                 .bind("locCode", locCode)
                 .map((row) -> row.get("op_date", String.class))
-                .one()
-                .switchIfEmpty(Mono.defer(() -> Mono.just("1998-10-07")));
+                .one();
     }
 
     public Mono<String> getOpeningDate(String compCode, int tranSource) {
