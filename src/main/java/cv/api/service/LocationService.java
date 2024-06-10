@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -33,9 +31,7 @@ public class LocationService {
 
     private final SeqService seqService;
     private final DatabaseClient client;
-    private final TransactionalOperator operator;
 
-    @Transactional
     public Mono<Location> insert(Location dto) {
         String sql = """
                 INSERT INTO location (loc_code, comp_code, dept_id, loc_name, parent, calc_stock, updated_date, location_type, created_date, created_by, updated_by, user_code, intg_upd_status, map_dept_id, dept_code, cash_acc, deleted, active, warehouse_code)
@@ -44,7 +40,6 @@ public class LocationService {
         return executeUpdate(dto, sql);
     }
 
-    @Transactional
     public Mono<Location> update(Location dto) {
         String sql = """
                 UPDATE location
@@ -168,38 +163,36 @@ public class LocationService {
     }
 
     public Mono<Boolean> insertTmp(List<String> listLocation, String compCode, Integer macId, String warehouse) {
-        return operator.transactional(Mono.defer(() -> {
-            if (listLocation == null || listLocation.isEmpty() || !warehouse.equals("-")) {
-                String sql = """
+        if (listLocation == null || listLocation.isEmpty() || !warehouse.equals("-")) {
+            String sql = """
                         insert into f_location(f_code,mac_id)
                         select loc_code,:macId
                         from location
                         where comp_code =:compCode
                         and (warehouse_code =:whCode or '-' =:whCode)
                         """;
-                return deleteTmp(macId).then(client.sql(sql)
-                        .bind("compCode", compCode)
-                        .bind("whCode", warehouse)
-                        .bind("macId", macId)
-                        .fetch().rowsUpdated().thenReturn(true));
-            } else {
-                return deleteTmp(macId)
-                        .flatMap(aBoolean -> Flux.fromIterable(listLocation)
-                                .flatMap(locCode -> {
-                                    String sql = """
+            return deleteTmp(macId).then(client.sql(sql)
+                    .bind("compCode", compCode)
+                    .bind("whCode", warehouse)
+                    .bind("macId", macId)
+                    .fetch().rowsUpdated().thenReturn(true));
+        } else {
+            return deleteTmp(macId)
+                    .flatMap(aBoolean -> Flux.fromIterable(listLocation)
+                            .flatMap(locCode -> {
+                                String sql = """
                                             insert into f_location (f_code,mac_id)
                                             values (:locCode,:macId);
                                             """;
-                                    return client.sql(sql)
-                                            .bind("locCode", locCode)
-                                            .bind("macId", macId)
-                                            .fetch()
-                                            .rowsUpdated()
-                                            .thenReturn(true);
-                                }).then(Mono.just(true)));
+                                return client.sql(sql)
+                                        .bind("locCode", locCode)
+                                        .bind("macId", macId)
+                                        .fetch()
+                                        .rowsUpdated()
+                                        .thenReturn(true);
+                            }).then(Mono.just(true)));
 
-            }
-        }));
+        }
     }
 
     private Mono<Boolean> deleteTmp(int macId) {
