@@ -101,5 +101,4 @@ public class ClosingBalance {
     private double totalQty;
 
 
-
 }

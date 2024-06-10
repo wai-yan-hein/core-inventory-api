@@ -6,7 +6,7 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -14,41 +14,23 @@ import lombok.Data;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Entity
-@Table(name = "pur_order_his_detail")
+@Builder
 public class PurOrderHisDetail {
-    @EmbeddedId
     private PurOrderHisDetailKey key;
-    @Column(name = "dept_id")
     private Integer deptId;
-    @Column(name = "stock_code")
     private String stockCode;
-    @Column(name = "wet")
-    private double wet;
-    @Column(name = "bag")
-    private double bag;
-    @Column(name = "qty")
-    private double qty;
-    @Column(name = "weight")
-    private double weight;
-    @Column(name = "rice")
-    private double rice;
-    @Column(name = "price")
-    private double price;
-    @Column(name = "amount")
-    private double amount;
-    @Transient
+    private Double wet;
+    private Double bag;
+    private Double qty;
+    private Double weight;
+    private Double rice;
+    private Double price;
+    private Double amount;
     private String userCode;
-    @Transient
     private String stockName;
-    @Transient
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
-    @Transient
     private String relName;
-    @Transient
     private String locName;
 }

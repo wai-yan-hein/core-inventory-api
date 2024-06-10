@@ -44,7 +44,7 @@ public class MillingRawService {
                 .bind("unit", dto.getUnitCode())
                 .bind("price", dto.getPrice())
                 .bind("amt", dto.getAmount())
-                .bind("locCode", Parameters.in(R2dbcType.VARCHAR,dto.getLocCode()))
+                .bind("locCode", Parameters.in(R2dbcType.VARCHAR, dto.getLocCode()))
                 .bind("deptId", dto.getDeptId())
                 .bind("weight", dto.getWeight())
                 .bind("weightUnit", dto.getWeightUnit())

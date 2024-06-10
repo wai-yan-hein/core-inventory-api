@@ -119,14 +119,15 @@ public class StockBrandService {
                 """;
         return executeUpdate(sql, dto);
     }
+
     public Mono<StockBrand> update(StockBrand dto) {
         String sql = """
-            UPDATE stock_brand
-            SET dept_id = :deptId, mac_id = :macId, brand_name = :brandName, mig_id = :migId, updated_date = :updatedDate,
-            created_date = :createdDate, created_by = :createdBy, updated_by = :updatedBy, user_code = :userCode,
-            intg_upd_status = :intgUpdStatus, deleted = :deleted, active = :active
-            WHERE brand_code = :brandCode AND comp_code = :compCode
-            """;
+                UPDATE stock_brand
+                SET dept_id = :deptId, mac_id = :macId, brand_name = :brandName, mig_id = :migId, updated_date = :updatedDate,
+                created_date = :createdDate, created_by = :createdBy, updated_by = :updatedBy, user_code = :userCode,
+                intg_upd_status = :intgUpdStatus, deleted = :deleted, active = :active
+                WHERE brand_code = :brandCode AND comp_code = :compCode
+                """;
         return executeUpdate(sql, dto);
     }
 
@@ -148,7 +149,8 @@ public class StockBrandService {
                 .bind("active", Util1.getBoolean(dto.getActive()))
                 .fetch().rowsUpdated().thenReturn(dto);
     }
-    private StockBrand mapRow(Row row){
+
+    private StockBrand mapRow(Row row) {
         return StockBrand.builder()
                 .key(StockBrandKey.builder()
                         .brandCode(row.get("brand_code", String.class))
@@ -168,6 +170,7 @@ public class StockBrandService {
                 .active(row.get("active", Boolean.class))
                 .build();
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -176,7 +179,7 @@ public class StockBrandService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }

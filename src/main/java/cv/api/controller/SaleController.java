@@ -76,7 +76,7 @@ public class SaleController {
     @GetMapping(path = "/getSaleVoucherInfo")
     public Mono<General> getSaleVoucherInfo(@RequestParam String vouDate,
                                             @RequestParam String compCode) {
-        return shService.getVoucherInfo(vouDate,compCode);
+        return shService.getVoucherInfo(vouDate, compCode);
     }
 
     @GetMapping(path = "/getSaleByBatch")

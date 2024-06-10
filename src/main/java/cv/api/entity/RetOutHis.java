@@ -5,7 +5,6 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 

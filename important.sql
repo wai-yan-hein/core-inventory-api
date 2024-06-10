@@ -1,5 +1,5 @@
 
-#sql for change float to double every table
+#sql for change float to Double every table
 set @SchemaName = 'cv_inv_kps';
 set @OldDataType = 'FLOAT';
 set @NewDataType = 'DOUBLE(20,3)';

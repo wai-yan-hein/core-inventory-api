@@ -925,7 +925,6 @@ public class StockReportService {
                 .then(monoReturn);
     }
 
-    @Transactional
     private Mono<Long> calStockBalanceQty(String opDate, String fromDate,
                                           String locCode, String compCode,
                                           Integer macId, String typeCode, String catCode,
@@ -950,7 +949,7 @@ public class StockReportService {
                 	union all
                 select stock_code,sum(qty) * - 1 as qty,loc_code,comp_code
                 from v_sale
-                where deleted = 0
+                where deleted = false
                 and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
                 and (loc_code=:locCode or '-' =:locCode)
@@ -1285,7 +1284,8 @@ public class StockReportService {
         Mono<Long> monoOp = calculateOpeningByPaddy(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return monoOp.thenMany(getStockBalanceByLocation(macId));
     }
-    public Mono<ReturnObject> getStockBalanceByLocationRO(ReportFilter filter){
+
+    public Mono<ReturnObject> getStockBalanceByLocationRO(ReportFilter filter) {
         return getStockBalanceQty(filter)
                 .collectList()
                 .map(Util1::convertToJsonBytes)
@@ -1353,7 +1353,7 @@ public class StockReportService {
                         .balRice(row.get("ttl_rice", Double.class))
                         .balBag(row.get("ttl_bag", Double.class))
                         .balAmount(row.get("ttl_amt", Double.class))
-                        .whName(row.get("wh_name",String.class))
+                        .whName(row.get("wh_name", String.class))
                         .build()).all()
                 .switchIfEmpty(Flux.defer(() -> Flux.just(ClosingBalance.builder()
                         .stockName("No Stock.")

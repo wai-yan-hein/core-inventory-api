@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Builder
-public class Pattern  {
+public class Pattern {
     private PatternKey key;
     private Integer deptId;
     private Double qty;

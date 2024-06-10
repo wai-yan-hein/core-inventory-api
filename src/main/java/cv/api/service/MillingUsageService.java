@@ -45,6 +45,7 @@ public class MillingUsageService {
                 .rowsUpdated()
                 .thenReturn(dto);
     }
+
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
                 delete from milling_usage where vou_no = :vouNo and comp_code = :compCode
@@ -54,6 +55,7 @@ public class MillingUsageService {
                 .bind("compCode", compCode)
                 .fetch().rowsUpdated().thenReturn(true);
     }
+
     public Flux<MillingUsage> getMillingUsage(String vouNo, String compCode) {
         String sql = """
                 SELECT u.*, s.user_code, s.stock_name, l.loc_name

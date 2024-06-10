@@ -32,7 +32,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class TraderService {
 
-    private final SeqTableService seqService;
+    private final SeqService seqService;
     private final DatabaseClient client;
 
 
@@ -152,25 +152,23 @@ public class TraderService {
     }
 
 
-    public Mono<Trader> saveTrader(Trader td) {
-        TraderKey key = td.getKey();
+    public Mono<Trader> saveTrader(Trader dto) {
+        TraderKey key = dto.getKey();
         if (Util1.isNull(key.getCode())) {
-            String compCode = td.getKey().getCompCode();
-            String type = td.getType();
-            String code = getTraderCode(type, compCode);
-            td.getKey().setCode(code);
-            return insert(td);
+            String compCode = dto.getKey().getCompCode();
+            String type = dto.getType();
+            return seqService.getNextCode(type, compCode, 5)
+                    .flatMap(seqNo -> {
+                        String code = type + "-" + seqNo;
+                        dto.getKey().setCode(code);
+                        return insert(dto);
+                    });
         } else {
-            td.setUpdatedDate(LocalDateTime.now());
+            dto.setUpdatedDate(LocalDateTime.now());
             return findById(key)
-                    .flatMap(trader -> update(td))
-                    .switchIfEmpty(insert(td));
+                    .flatMap(trader -> update(dto))
+                    .switchIfEmpty(insert(dto));
         }
-    }
-
-    private String getTraderCode(String option, String compCode) {
-        int seqNo = seqService.getSequence(0, option, "-", compCode);
-        return option.toUpperCase() + String.format("%0" + 6 + "d", seqNo);
     }
 
 
@@ -418,7 +416,7 @@ public class TraderService {
                 .bind("phone", Parameters.in(R2dbcType.VARCHAR, t.getPhone()))
                 .bind("township", Parameters.in(R2dbcType.VARCHAR, t.getTownShip()))
                 .bind("traderName", Parameters.in(R2dbcType.VARCHAR, t.getTraderName()))
-                .bind("updatedDate", Parameters.in(R2dbcType.TIMESTAMP, t.getUpdatedDate()))
+                .bind("updatedDate", LocalDateTime.now())
                 .bind("creditDays", Parameters.in(R2dbcType.INTEGER, t.getCreditDays()))
                 .bind("creditLimit", Parameters.in(R2dbcType.INTEGER, t.getCreditLimit()))
                 .bind("remark", Parameters.in(R2dbcType.VARCHAR, t.getRemark()))

@@ -245,7 +245,7 @@ public class TransferHisService {
                 .bind("vouLock", Util1.getBoolean(dto.getVouLock()))
                 .bind("traderCode", Parameters.in(R2dbcType.VARCHAR, dto.getTraderCode()))
                 .bind("printCount", Parameters.in(R2dbcType.INTEGER, dto.getPrintCount()))
-                .bind("skipInv", Util1.getBoolean(dto.getSkipInv()))
+                .bind("skipInv", false)
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -400,8 +400,8 @@ public class TransferHisService {
                         .wet(row.get("wet", Double.class))
                         .rice(row.get("rice", Double.class))
                         .bag(row.get("bag", Double.class))
-                        .price(row.get("price",Double.class))
-                        .amount(row.get("amount",Double.class))
+                        .price(row.get("price", Double.class))
+                        .amount(row.get("amount", Double.class))
                         .build()).all();
 
     }

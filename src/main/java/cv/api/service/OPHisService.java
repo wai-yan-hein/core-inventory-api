@@ -169,6 +169,30 @@ public class OPHisService {
                 .switchIfEmpty(Mono.defer(() -> Mono.just("1998-10-07")));
     }
 
+    public Mono<String> getOpeningDate(String compCode, int tranSource) {
+        String sql = """
+                select
+                case
+                when exists (
+                            select 1 from op_his
+                            where deleted = false
+                            and comp_code =:compCode
+                            and tran_source =:tranSource
+                        ) then op_date
+                        else max(op_date)
+                    end as op_date
+                from op_his
+                where deleted = false
+                and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .bind("tranSource", tranSource)
+                .map((row) -> row.get("op_date", String.class))
+                .one()
+                .switchIfEmpty(Mono.defer(() -> Mono.just("1998-10-07")));
+    }
+
     private Mono<OPHis> insert(OPHis dto) {
         String sql = """
                 INSERT INTO op_his (vou_no, comp_code, dept_id, op_date, remark, created_by, created_date,

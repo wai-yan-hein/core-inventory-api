@@ -12,7 +12,7 @@ import java.sql.SQLSyntaxErrorException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ SQLSyntaxErrorException.class, DataAccessException.class })
+    @ExceptionHandler({SQLSyntaxErrorException.class, DataAccessException.class})
     public void handleException(Exception ex) {
         // Send email with error detail
         log.error("GlobalExceptionHandler : " + ex.getMessage());

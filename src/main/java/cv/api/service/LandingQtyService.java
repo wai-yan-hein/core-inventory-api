@@ -64,6 +64,7 @@ public class LandingQtyService {
                         .build())
                 .all();
     }
+
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
                 delete from labour_his_qty

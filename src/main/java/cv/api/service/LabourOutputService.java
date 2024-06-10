@@ -242,7 +242,7 @@ public class LabourOutputService {
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .bind("vouNo", vouNo)
-                .bind("deptId",deptId)
+                .bind("deptId", deptId)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
 

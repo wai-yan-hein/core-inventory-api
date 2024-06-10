@@ -17,7 +17,7 @@ public class GlobalWebExceptionHandler {
     public WebExceptionHandler webExceptionHandler() {
         return (exchange, ex) -> {
             if (ex instanceof ResponseStatusException) {
-                log.error("webExceptionHandler : " + ex.getMessage());
+                log.error("webExceptionHandler : {}", ex.getMessage());
                 return Mono.error(ex);
             }
             return handleOtherExceptions(exchange, ex);

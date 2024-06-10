@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RelationKey{
+public class RelationKey {
     private String relCode;
     private String compCode;
 }

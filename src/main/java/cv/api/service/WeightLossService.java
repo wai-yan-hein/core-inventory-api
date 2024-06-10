@@ -2,7 +2,10 @@ package cv.api.service;
 
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
-import cv.api.entity.*;
+import cv.api.entity.WeightLossHis;
+import cv.api.entity.WeightLossHisDetail;
+import cv.api.entity.WeightLossHisDetailKey;
+import cv.api.entity.WeightLossHisKey;
 import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -16,7 +16,7 @@ import java.time.Duration;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@PropertySource("file:config/application.properties")
+@PropertySource("file:config/application.yaml")
 public class AutoUpload {
     @Value("${sync.date}")
     private String syncDate;

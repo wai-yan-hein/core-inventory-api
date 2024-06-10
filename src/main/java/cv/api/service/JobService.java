@@ -77,8 +77,8 @@ public class JobService {
                 .bind("deleted", Util1.getBoolean(dto.getDeleted()))
                 .bind("finished", Util1.getBoolean(dto.getFinished()))
                 .bind("deptId", dto.getDeptId())
-                .bind("outputQty",dto.getOutputQty())
-                .bind("outputCost",dto.getOutputCost())
+                .bind("outputQty", dto.getOutputQty())
+                .bind("outputCost", dto.getOutputCost())
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -100,8 +100,8 @@ public class JobService {
                 .deleted(row.get("deleted", Boolean.class))
                 .finished(row.get("finished", Boolean.class))
                 .deptId(row.get("dept_id", Integer.class))
-                .outputCost(row.get("output_cost",Double.class))
-                .outputQty(row.get("output_qty",Double.class))
+                .outputCost(row.get("output_cost", Double.class))
+                .outputQty(row.get("output_qty", Double.class))
                 .build();
     }
 
@@ -109,19 +109,19 @@ public class JobService {
     public Flux<Job> findAll(ReportFilter filter) {
         String compCode = filter.getCompCode();
         Integer deptId = filter.getDeptId();
-        String fromDate = Util1.isNull(filter.getFromDate(),Util1.getOldDate());
-        String toDate = Util1.isNull(filter.getToDate(),Util1.toDateStr(Util1.getTodayDate(),"yyyy-MM-dd"));
+        String fromDate = Util1.isNull(filter.getFromDate(), Util1.getOldDate());
+        String toDate = Util1.isNull(filter.getToDate(), Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd"));
         boolean finished = filter.isFinished();
         String sql = """
-            select *
-            from job
-            where deleted = false
-            and dept_id = :deptId
-            and comp_code = :compCode
-            and finished = :finished
-            and date(start_date) between :fromDate and :toDate
-            and date(end_date) between :fromDate and :toDate
-            """;
+                select *
+                from job
+                where deleted = false
+                and dept_id = :deptId
+                and comp_code = :compCode
+                and finished = :finished
+                and date(start_date) between :fromDate and :toDate
+                and date(end_date) between :fromDate and :toDate
+                """;
         return client.sql(sql)
                 .bind("deptId", deptId)
                 .bind("compCode", compCode)
@@ -131,18 +131,18 @@ public class JobService {
                 .map((row, rowMetadata) -> mapRow(row))
                 .all();
     }
-    public Flux<Job> getActiveJob(String compCode){
-        String sql= """
+
+    public Flux<Job> getActiveJob(String compCode) {
+        String sql = """
                 select *
                 from job
                 where comp_code =:compCode
                 and deleted = false
                 """;
         return client.sql(sql)
-                .bind("compCode",compCode)
+                .bind("compCode", compCode)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
-
 
 
     public Mono<Boolean> delete(JobKey key) {
@@ -161,7 +161,7 @@ public class JobService {
 
 
     public Mono<Job> findById(JobKey key) {
-        if(Util1.isNullOrEmpty(key.getJobNo())){
+        if (Util1.isNullOrEmpty(key.getJobNo())) {
             return Mono.empty();
         }
         String sql = """

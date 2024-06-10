@@ -1,6 +1,5 @@
 package cv.api.entity;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 

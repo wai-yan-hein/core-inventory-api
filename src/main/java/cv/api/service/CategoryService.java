@@ -180,7 +180,7 @@ public class CategoryService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }

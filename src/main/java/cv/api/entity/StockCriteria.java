@@ -1,6 +1,5 @@
 package cv.api.entity;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,14 +15,10 @@ public class StockCriteria {
     private String updatedBy;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
-    private boolean deleted;
-    private boolean active;
-    @Transient
+    private Boolean deleted;
+    private Boolean active;
     private String relName;
-    @Transient
     private String groupName;
-    @Transient
     private String brandName;
-    @Transient
     private String catName;
 }

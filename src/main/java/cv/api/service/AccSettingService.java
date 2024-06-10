@@ -120,6 +120,7 @@ public class AccSettingService {
                 .bind("updatedDate", updatedDate)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -128,7 +129,7 @@ public class AccSettingService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }

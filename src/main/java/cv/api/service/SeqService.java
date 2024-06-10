@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class SeqService {
 
     private final DatabaseClient client;
-    private final int MAC_ID=0;
+    private final int MAC_ID = 0;
 
     public Mono<String> getNextCode(String seqName, String compCode, int format) {
         return findById(MAC_ID, seqName, "-", compCode)
@@ -112,10 +112,11 @@ public class SeqService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }
+
     public Flux<SequenceTable> findAll(String compCode) {
         String sql = """
                 select *

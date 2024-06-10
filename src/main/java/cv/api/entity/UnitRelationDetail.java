@@ -8,9 +8,6 @@ package cv.api.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import jakarta.persistence.*;
-
-import java.io.Serializable;
 
 /**
  * @author wai yan

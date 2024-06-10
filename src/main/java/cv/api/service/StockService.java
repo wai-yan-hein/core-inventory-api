@@ -413,8 +413,8 @@ public class StockService {
                 .bind("deleted", Util1.getBoolean(dto.getDeleted()))
                 .bind("saleQty", Parameters.in(R2dbcType.DOUBLE, dto.getSaleQty()))
                 .bind("formulaCode", Parameters.in(R2dbcType.VARCHAR, dto.getFormulaCode()))
-                .bind("saleAmt", Parameters.in(R2dbcType.DOUBLE, dto.getSaleAmt()))
-                .bind("purAmt", Parameters.in(R2dbcType.DOUBLE, dto.getPurAmt()))
+                .bind("saleAmt", Util1.getDouble(dto.getSaleAmt()))
+                .bind("purAmt", Util1.getDouble(dto.getPurAmt()))
                 .bind("purQty", Parameters.in(R2dbcType.DOUBLE, dto.getPurQty()))
                 .fetch()
                 .rowsUpdated().thenReturn(dto);

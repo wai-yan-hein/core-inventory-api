@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class WeightHisDetail  {
+public class WeightHisDetail {
     private WeightHisDetailKey key;
     private Double weight;
 }

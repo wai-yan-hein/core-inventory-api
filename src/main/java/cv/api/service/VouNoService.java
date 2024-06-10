@@ -30,7 +30,7 @@ public class VouNoService {
     }
 
     private Mono<SequenceTable> createNewSequence(String option, String period, Integer macId, String compCode) {
-        var seq =SequenceTable.builder()
+        var seq = SequenceTable.builder()
                 .seqOption(option)
                 .period(period)
                 .macId(macId)

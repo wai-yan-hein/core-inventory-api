@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
-import jakarta.persistence.*;
-
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-public class ReorderLevel  {
+public class ReorderLevel {
     private ReorderKey key;
     private Integer deptId;
     private Double minQty;

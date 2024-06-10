@@ -34,6 +34,7 @@ public class LandingGradeService {
                 .rowsUpdated()
                 .thenReturn(dto);
     }
+
     public Flux<LandingHisGrade> getLandingGrade(String vouNo, String compCode) {
         String sql = """
                 SELECT g.*, s.stock_name, s.user_code
@@ -61,6 +62,7 @@ public class LandingGradeService {
                         .build())
                 .all();
     }
+
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
                 delete from labour_his_grade

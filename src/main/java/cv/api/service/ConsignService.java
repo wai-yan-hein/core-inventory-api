@@ -30,6 +30,7 @@ public class ConsignService {
     public final ConsignDetailService detailService;
     private final DatabaseClient client;
     private final VouNoService vouNoService;
+
     public Mono<ConsignHis> save(ConsignHis dto) {
         return saveOrUpdate(dto).flatMap(ri -> detailService.deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
             List<ConsignHisDetail> list = dto.getListDetail();

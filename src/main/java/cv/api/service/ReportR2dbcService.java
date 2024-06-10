@@ -94,7 +94,7 @@ public class ReportR2dbcService {
 
     }
 
-    public Flux<Income> getIncome(String fromDate, String toDate, String compCode,String headCode) {
+    public Flux<Income> getIncome(String fromDate, String toDate, String compCode, String headCode) {
         String sql = """
                 select 'IC' tran_group,'SALE' tran_option,date(vou_date) vou_date,sum(vou_total) vou_total,sum(paid) vou_paid,count(*) vou_count,cur_code,comp_code
                 from sale_his
@@ -139,6 +139,7 @@ public class ReportR2dbcService {
                         .vouCount(row.get("vou_count", Integer.class))
                         .build()).all();
     }
+
     public Flux<ReorderLevel> getReorderLevel(String opDate, String clDate, String typeCode, String catCode, String brandCode,
                                               String stockCode, boolean calSale, boolean calPur, boolean calRI,
                                               boolean calRo, String locCode, String compCode,

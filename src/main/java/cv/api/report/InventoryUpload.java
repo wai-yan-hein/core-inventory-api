@@ -44,7 +44,7 @@ public class InventoryUpload {
             logRepo.createWebClient(url);
             uploadStockValue(headCode, compCode);
             uploadPurchase(headCode, compCode);
-            uploadIncome(headCode,compCode);
+            uploadIncome(headCode, compCode);
         })).onErrorResume(e -> {
             log.error("getCompanySync : {}", e.getMessage());
             return Mono.empty();

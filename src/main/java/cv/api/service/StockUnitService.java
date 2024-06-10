@@ -14,7 +14,6 @@ import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -69,7 +68,6 @@ public class StockUnitService {
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
 
-    @Transactional
     public Mono<StockUnit> insert(StockUnit dto) {
         String sql = """
                 INSERT INTO stock_unit (unit_code, unit_name, updated_date, comp_code, created_date, mac_id,
@@ -80,7 +78,6 @@ public class StockUnitService {
         return executeUpdate(sql, dto);
     }
 
-    @Transactional
     public Mono<StockUnit> update(StockUnit dto) {
         String sql = """
                 UPDATE stock_unit
@@ -99,7 +96,7 @@ public class StockUnitService {
                 .bind("unitCode", dto.getKey().getUnitCode())
                 .bind("compCode", dto.getKey().getCompCode())
                 .bind("unitName", Parameters.in(R2dbcType.VARCHAR, dto.getUnitName()))
-                .bind("updatedDate", dto.getUpdatedDate())
+                .bind("updatedDate", LocalDateTime.now())
                 .bind("createdDate", dto.getCreatedDate())
                 .bind("macId", dto.getMacId())
                 .bind("createdBy", dto.getCreatedBy())
@@ -127,6 +124,7 @@ public class StockUnitService {
                 .intgUpdStatus(row.get("intg_upd_status", String.class))
                 .build();
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -135,7 +133,7 @@ public class StockUnitService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }

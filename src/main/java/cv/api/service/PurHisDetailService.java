@@ -4,7 +4,6 @@ import cv.api.common.Util1;
 import cv.api.entity.PurHisDetail;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
-import jdk.jshell.execution.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PurHisDetailService {
     private final DatabaseClient client;
+
     public Mono<PurHisDetail> insert(PurHisDetail dto) {
         String sql = """
                 INSERT INTO pur_his_detail (
@@ -37,28 +37,29 @@ public class PurHisDetailService {
                 .bind("compCode", dto.getKey().getCompCode())
                 .bind("deptId", dto.getDeptId())
                 .bind("stockCode", dto.getStockCode())
-                .bind("expDate", Parameters.in(R2dbcType.DATE,dto.getExpDate()))
+                .bind("expDate", Parameters.in(R2dbcType.DATE, dto.getExpDate()))
                 .bind("qty", dto.getQty())
                 .bind("purUnit", dto.getUnitCode())
                 .bind("purPrice", dto.getPrice())
                 .bind("purAmt", dto.getAmount())
                 .bind("locCode", dto.getLocCode())
-                .bind("orgPrice", Parameters.in(R2dbcType.DOUBLE,dto.getOrgPrice()))
-                .bind("avgQty", Parameters.in(R2dbcType.DOUBLE,dto.getAvgQty()))
-                .bind("stdWeight", Parameters.in(R2dbcType.DOUBLE,dto.getStdWeight()))
-                .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR,dto.getWeightUnit()))
-                .bind("weight", Parameters.in(R2dbcType.DOUBLE,dto.getWeight()))
-                .bind("length", Parameters.in(R2dbcType.DOUBLE,dto.getLength()))
-                .bind("width", Parameters.in(R2dbcType.DOUBLE,dto.getWidth()))
-                .bind("totalWeight", Parameters.in(R2dbcType.DOUBLE,dto.getTotalWeight()))
-                .bind("mPercent", Parameters.in(R2dbcType.DOUBLE,dto.getMPercent()))
-                .bind("rice",Parameters.in(R2dbcType.DOUBLE, dto.getRice()))
-                .bind("wet", Parameters.in(R2dbcType.DOUBLE,dto.getWet()))
-                .bind("bag", Parameters.in(R2dbcType.DOUBLE,dto.getBag()))
+                .bind("orgPrice", Parameters.in(R2dbcType.DOUBLE, dto.getOrgPrice()))
+                .bind("avgQty", Parameters.in(R2dbcType.DOUBLE, dto.getAvgQty()))
+                .bind("stdWeight", Parameters.in(R2dbcType.DOUBLE, dto.getStdWeight()))
+                .bind("weightUnit", Parameters.in(R2dbcType.VARCHAR, dto.getWeightUnit()))
+                .bind("weight", Parameters.in(R2dbcType.DOUBLE, dto.getWeight()))
+                .bind("length", Parameters.in(R2dbcType.DOUBLE, dto.getLength()))
+                .bind("width", Parameters.in(R2dbcType.DOUBLE, dto.getWidth()))
+                .bind("totalWeight", Parameters.in(R2dbcType.DOUBLE, dto.getTotalWeight()))
+                .bind("mPercent", Parameters.in(R2dbcType.DOUBLE, dto.getMPercent()))
+                .bind("rice", Parameters.in(R2dbcType.DOUBLE, dto.getRice()))
+                .bind("wet", Parameters.in(R2dbcType.DOUBLE, dto.getWet()))
+                .bind("bag", Parameters.in(R2dbcType.DOUBLE, dto.getBag()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
     }
+
     public Flux<PurHisDetail> search(String vouNo, String compCode) {
         String sql = """
                 select op.*,s.user_code,s.stock_name,s.calculate,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name
@@ -99,7 +100,7 @@ public class PurHisDetailService {
                         .unitCode(row.get("pur_unit", String.class))
                         .userCode(row.get("user_code", String.class))
                         .stockName(row.get("stock_name", String.class))
-                        .calculate(row.get("calculate",Boolean.class))
+                        .calculate(row.get("calculate", Boolean.class))
                         .catName(row.get("cat_name", String.class))
                         .groupName(row.get("stock_type_name", String.class))
                         .brandName(row.get("brand_name", String.class))
@@ -113,6 +114,7 @@ public class PurHisDetailService {
                         .build())
                 .all();
     }
+
     @Transactional
     public Mono<Boolean> delete(String vouNo, String compCode) {
         String sql = """

@@ -28,20 +28,21 @@ public class SaleExpenseService {
                 .rowsUpdated()
                 .thenReturn(dto);
     }
+
     public Flux<SaleExpense> search(String vouNo, String compCode) {
         String sql = """
-            SELECT a.*,e.account_code, e.expense_name
-            FROM (
-                SELECT *
-                FROM sale_expense
-                WHERE vou_no = :vouNo
-                AND comp_code = :compCode
-            ) a
-            JOIN expense e
-            ON a.expense_code = e.expense_code
-            AND a.comp_code = e.comp_code
-            ORDER BY a.unique_id
-            """;
+                SELECT a.*,e.account_code, e.expense_name
+                FROM (
+                    SELECT *
+                    FROM sale_expense
+                    WHERE vou_no = :vouNo
+                    AND comp_code = :compCode
+                ) a
+                JOIN expense e
+                ON a.expense_code = e.expense_code
+                AND a.comp_code = e.comp_code
+                ORDER BY a.unique_id
+                """;
 
         return client.sql(sql)
                 .bind("vouNo", vouNo)
@@ -55,10 +56,11 @@ public class SaleExpenseService {
                                 .build())
                         .expenseName(row.get("expense_name", String.class))
                         .amount(row.get("amount", Double.class))
-                        .account(row.get("account_code",String.class))
+                        .account(row.get("account_code", String.class))
                         .build())
                 .all();
     }
+
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """
                 delete from sale_expense where vou_no =:vouNo and comp_code =:compCode

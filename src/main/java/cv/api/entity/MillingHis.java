@@ -5,7 +5,6 @@
  */
 package cv.api.entity;
 
-import jakarta.persistence.Transient;
 import lombok.Builder;
 import lombok.Data;
 

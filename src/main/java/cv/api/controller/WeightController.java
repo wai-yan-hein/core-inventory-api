@@ -23,6 +23,7 @@ public class WeightController {
     public Mono<WeightHis> saveWeight(@RequestBody WeightHis obj) {
         return weightService.save(obj);
     }
+
     @PostMapping(path = "/findWeight")
     public Mono<?> saveWeight(@RequestBody WeightHisKey key) {
         return Mono.justOrEmpty(weightService.findById(key));

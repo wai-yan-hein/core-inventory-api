@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SaleOrderJoinKey{
+public class SaleOrderJoinKey {
     private String saleVouNo;
     private String orderVouNo;
     private String compCode;

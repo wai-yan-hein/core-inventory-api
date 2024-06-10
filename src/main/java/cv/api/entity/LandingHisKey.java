@@ -4,12 +4,9 @@
  */
 package cv.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import java.io.Serializable;
 
 /**
  *

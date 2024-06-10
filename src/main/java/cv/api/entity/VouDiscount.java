@@ -1,6 +1,5 @@
 package cv.api.entity;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,6 +12,6 @@ public class VouDiscount {
     private Double price;
     private Double amount;
     private String unit;
-    private  String unitName;
+    private String unitName;
 
 }

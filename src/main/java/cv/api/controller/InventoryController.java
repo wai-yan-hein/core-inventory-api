@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class InventoryController {
     private final YearEndService yearEndService;
+
     @PostMapping(path = "/yearEnd")
     public Mono<YearEnd> yearEnd(@RequestBody YearEnd yearEnd) {
         return yearEndService.yearEnd(yearEnd);

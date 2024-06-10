@@ -22,7 +22,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@PropertySource(value = {"file:config/application.properties"})
+@PropertySource(value = {"file:config/application.yaml"})
 @Slf4j
 public class UserRepo {
     private String token;
@@ -33,12 +33,12 @@ public class UserRepo {
         if (token == null) {
             token = getToken();
         }
-        log.info("token : {}", token);
+        //log.info("token : {}", token);
 
     }
 
     private WebClient userApi(String token) {
-        String url = environment.getRequiredProperty("user.url");
+        String url = environment.getRequiredProperty("cloud.user.url");
         WebClient.Builder builder = WebClient.builder()
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(configure -> configure
@@ -68,7 +68,7 @@ public class UserRepo {
                 .bodyToMono(AuthenticationResponse.class)
                 .map(AuthenticationResponse::getAccessToken) // Extract and return the access token
                 .onErrorResume(throwable -> {
-                    log.error("authenticate : {}", throwable.getMessage());
+                    //log.error("authenticate : {}", throwable.getMessage());
                     return Mono.empty();
                 }).block();
     }
@@ -84,7 +84,6 @@ public class UserRepo {
     }
 
     public Mono<SystemPropertyDto> findSystemProperty(SystemPropertyKey key) {
-        createWebClient();
         return userApi(token).post()
                 .uri("/user/findSystemProperty")
                 .body(Mono.just(key), SystemPropertyDto.class)

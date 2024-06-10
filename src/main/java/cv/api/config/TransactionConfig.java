@@ -1,22 +1,24 @@
 package cv.api.config;
 
-import jakarta.persistence.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.reactive.TransactionalOperator;
+
 @Configuration
 @EnableTransactionManagement
-@ComponentScan("cv.api.entity")
 public class TransactionConfig {
-    @Primary
-    @Bean(name = "transactionManager")
-    @Qualifier("transactionManager")
-    public PlatformTransactionManager jpaTransactionManager(@Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
+
+    @Bean
+    public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+        return new R2dbcTransactionManager(connectionFactory);
+    }
+
+    @Bean
+    public TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
+        return TransactionalOperator.create(transactionManager);
     }
 }

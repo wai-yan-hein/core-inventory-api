@@ -9,8 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
-import jakarta.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDate;
 
 /**

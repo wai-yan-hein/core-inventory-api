@@ -64,6 +64,7 @@ public class SecurityConfig {
         authenticationWebFilter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance());
         return authenticationWebFilter;
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -81,11 +82,11 @@ public class SecurityConfig {
     public ServerSecurityContextRepository securityContextRepository() {
         return NoOpServerSecurityContextRepository.getInstance(); // Use NoOpServerSecurityContextRepository to disable session management
     }
+
     @Bean
     public JWTReactiveAuthenticationManager repositoryReactiveAuthenticationManager() {
         return new JWTReactiveAuthenticationManager(null, passwordEncoder());
     }
-
 
 
     @Bean

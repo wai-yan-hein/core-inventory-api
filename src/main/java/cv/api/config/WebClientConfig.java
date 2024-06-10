@@ -22,35 +22,37 @@ import java.util.Objects;
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-@PropertySource(value = {"file:config/application.properties"})
+@PropertySource(value = {"file:config/application.yaml"})
 public class WebClientConfig {
 
     private final Environment environment;
 
     @Bean
     public WebClient dmsApi() {
-        log.info("dms api : {}", environment.getProperty("dms.url"));
+        String url = environment.getProperty("cloud.dms.url");
+        log.info("dms api : {}", url);
         return WebClient.builder()
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(config -> config
                                 .defaultCodecs()
                                 .maxInMemorySize(16 * 1024 * 1024))
                         .build())
-                .baseUrl(Objects.requireNonNull(environment.getProperty("dms.url")))
+                .baseUrl(Objects.requireNonNull(url))
                 .clientConnector(reactorClientHttpConnector())
                 .build();
     }
 
     @Bean
     public WebClient accountApi() {
-        log.info("account : {}", environment.getProperty("account.url"));
+        String url = environment.getProperty("cloud.account.url");
+        log.info("account : {}", url);
         return WebClient.builder()
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(config -> config
                                 .defaultCodecs()
                                 .maxInMemorySize(16 * 1024 * 1024))
                         .build())
-                .baseUrl(Objects.requireNonNull(environment.getProperty("account.url")))
+                .baseUrl(Objects.requireNonNull(url))
                 .clientConnector(reactorClientHttpConnector())
                 .build();
     }

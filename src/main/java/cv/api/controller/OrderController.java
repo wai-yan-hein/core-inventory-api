@@ -86,9 +86,10 @@ public class OrderController {
                                       @RequestParam String compCode) {
         return ohService.getSize(str, compCode);
     }
+
     @GetMapping(path = "/searchByRefNo")
     public Flux<OrderHis> searchByRefNo(@RequestParam String refNo,
-                                      @RequestParam String compCode) {
+                                        @RequestParam String compCode) {
         return ohService.searchByRefNo(refNo, compCode);
     }
 }

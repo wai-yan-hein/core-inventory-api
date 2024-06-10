@@ -440,7 +440,7 @@ public class PurHisService {
         String reference = Util1.isNull(filter.getReference(), "-");
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String compCode = filter.getCompCode();
-        boolean deleted =filter.isDeleted();
+        boolean deleted = filter.isDeleted();
         Integer deptId = filter.getDeptId();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
@@ -500,6 +500,7 @@ public class PurHisService {
                         .build())
                 .all();
     }
+
     public Mono<Boolean> updateACK(String ack, String vouNo, String compCode) {
         String sql = """
                 update pur_his set intg_upd_status = :ACK where vou_no =:vouNo and comp_code =:compCode

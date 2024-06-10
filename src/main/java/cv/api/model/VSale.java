@@ -5,12 +5,9 @@
  */
 package cv.api.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.VouDiscount;
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.ZonedDateTime;
 import java.util.List;

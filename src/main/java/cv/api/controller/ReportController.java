@@ -7,7 +7,6 @@ package cv.api.controller;
 
 import cv.api.common.*;
 import cv.api.entity.OPHis;
-import cv.api.entity.VStockBalance;
 import cv.api.model.VPurchase;
 import cv.api.model.VSale;
 import cv.api.model.VStockIO;
@@ -37,6 +36,7 @@ public class ReportController {
     private final StockRelationService stockRelationService;
     private final LocationService locationService;
     private final LabourOutputService labourOutputService;
+    private final OPHisService opHisService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<VSale> getSaleReport(@RequestParam String vouNo,
@@ -91,236 +91,237 @@ public class ReportController {
             int deptId = filter.getDeptId();
             String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
             List<String> listLocation = filter.getListLocation();
-            return locationService.insertTmp(listLocation, compCode, macId, warehouse).flatMap(aBoolean -> {
-                String locCode = Util1.isNull(filter.getLocCode(), "-");
-                String opDate = reportService.getOpeningDateByLocation(compCode, locCode);
-                String opPayableDate = reportService.getOpeningDate(compCode, OPHis.PAYABLE);
-                String fromDate = filter.getFromDate();
-                String toDate = filter.getToDate();
-                String curCode = filter.getCurCode();
-                String stockCode = Util1.isNull(filter.getStockCode(), "-");
-                String brandCode = Util1.isNull(filter.getBrandCode(), "-");
-                String catCode = Util1.isNull(filter.getCatCode(), "-");
-                String traderCode = Util1.isNull(filter.getTraderCode(), "-");
-                String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
-                String vouTypeCode = Util1.isNull(filter.getVouTypeCode(), "-");
-                String smCode = Util1.isNull(filter.getSaleManCode(), "-");
-                String batchNo = Util1.isNull(filter.getBatchNo(), "-");
-                String projectNo = Util1.isAll(filter.getProjectNo());
-                String labourGroupCode = Util1.isAll(filter.getLabourGroupCode());
-                double creditAmt = filter.getCreditAmt();
-                boolean calSale = filter.isCalSale();
-                boolean calPur = filter.isCalPur();
-                boolean calRI = filter.isCalRI();
-                boolean calRO = filter.isCalRO();
-                String fromDueDate = filter.getFromDueDate();
-                String toDueDate = filter.getToDueDate();
-                String reportName = filter.getReportName();
-                //log.info("op date : {}", opDate);
-                switch (reportName) {
-                    case "SaleByCustomerDetail" -> {
-                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
-                    }
-                    case "SaleByCustomerSummary" -> {
-                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode);
-                    }
-                    case "SaleBySaleManDetail" -> {
-                        return reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode);
-                    }
-                    case "SaleBySaleManSummary" -> {
-                        return reportService.getSaleBySaleManSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, smCode, compCode, deptId);
-                    }
-                    case "SaleByStockSummary" -> {
-                        return reportService.getSaleByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                    }
-                    case "SaleByStockWeightSummary" -> {
-                        return reportService.getSaleByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                    }
-                    case "SaleByStockDetail" -> {
-                        return reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
-                    }
-                    case "SaleByVoucherDetail", "SaleByVoucherDetailExcel" -> {
-                        return reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "SaleByVoucherSummary" -> {
-                        return reportService.getSaleByVoucherSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "SaleByBatchDetail" -> {
-                        return reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "SaleByProjectDetail" -> {
-                        return reportService.getSaleByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
-                    }
-                    case "SaleByProjectSummary" -> {
-                        return reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
-                    }
-                    case "PurchaseBySupplierDetail" -> {
-                        return reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
-                    }
-                    case "PurchaseBySupplierSummary" -> {
-                        return reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
-                    }
-                    case "PurchaseByProjectDetail" -> {
-                        return reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
-                    }
-                    case "PurchaseByProjectSummary" -> {
-                        return reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
-                    }
-                    case "PurchaseByStockSummary" -> {
-                        return reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                    }
-                    case "PurchaseByStockWeightSummary" -> {
-                        return reportService.getPurchaseByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
-                    }
-                    case "PurchaseByStockDetail" -> {
-                        return reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId, locCode);
-                    }
-                    case "PurchaseList" -> {
-                        return reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
-                                typeCode, catCode, brandCode, locCode, labourGroupCode);
-                    }
-                    case "StockListByGroup" -> {
-                        return reportService.getStockListByGroup(typeCode, compCode, macId);
-                    }
-                    case "TopSaleByCustomer" -> {
-                        return reportService.getTopSaleByCustomer(fromDate, toDate, deptId, compCode);
-                    }
-                    case "TopSaleBySaleMan" -> {
-                        return reportService.getTopSaleBySaleMan(fromDate, toDate, compCode);
-                    }
-                    case "TopSaleByStock" -> {
-                        return reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode, deptId);
-                    }
-                    case "OpeningByLocation" -> {
-                        return reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode, deptId);
-                    }
-                    case "OpeningByGroup" -> {
-                        return reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
-                    }
-                    case "StockInOutSummary", "StockIOMovementSummary" -> {
-                        return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-                    }
-                    case "StockInOutDetail", "StockInOutDetailUnit" -> {
-                        return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-                    }
+            String locCode = Util1.isNull(filter.getLocCode(), "-");
+            return opHisService.getOpeningDateByLocation(compCode, locCode)
+                    .flatMap(opDate -> locationService.insertTmp(listLocation, compCode, macId, warehouse)
+                            .flatMap(aBoolean -> {
+                                String fromDate = filter.getFromDate();
+                                String toDate = filter.getToDate();
+                                String curCode = filter.getCurCode();
+                                String stockCode = Util1.isNull(filter.getStockCode(), "-");
+                                String brandCode = Util1.isNull(filter.getBrandCode(), "-");
+                                String catCode = Util1.isNull(filter.getCatCode(), "-");
+                                String traderCode = Util1.isNull(filter.getTraderCode(), "-");
+                                String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
+                                String vouTypeCode = Util1.isNull(filter.getVouTypeCode(), "-");
+                                String smCode = Util1.isNull(filter.getSaleManCode(), "-");
+                                String batchNo = Util1.isNull(filter.getBatchNo(), "-");
+                                String projectNo = Util1.isAll(filter.getProjectNo());
+                                String labourGroupCode = Util1.isAll(filter.getLabourGroupCode());
+                                double creditAmt = filter.getCreditAmt();
+                                boolean calSale = filter.isCalSale();
+                                boolean calPur = filter.isCalPur();
+                                boolean calRI = filter.isCalRI();
+                                boolean calRO = filter.isCalRO();
+                                String fromDueDate = filter.getFromDueDate();
+                                String toDueDate = filter.getToDueDate();
+                                String reportName = filter.getReportName();
+                                //log.info("op date : {}", opDate);
+                                switch (reportName) {
+                                    case "SaleByCustomerDetail" -> {
+                                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
+                                    }
+                                    case "SaleByCustomerSummary" -> {
+                                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode);
+                                    }
+                                    case "SaleBySaleManDetail" -> {
+                                        return reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode);
+                                    }
+                                    case "SaleBySaleManSummary" -> {
+                                        return reportService.getSaleBySaleManSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, smCode, compCode, deptId);
+                                    }
+                                    case "SaleByStockSummary" -> {
+                                        return reportService.getSaleByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                                    }
+                                    case "SaleByStockWeightSummary" -> {
+                                        return reportService.getSaleByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                                    }
+                                    case "SaleByStockDetail" -> {
+                                        return reportService.getSaleByStockDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, macId);
+                                    }
+                                    case "SaleByVoucherDetail", "SaleByVoucherDetailExcel" -> {
+                                        return reportService.getSaleByVoucherDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                                    }
+                                    case "SaleByVoucherSummary" -> {
+                                        return reportService.getSaleByVoucherSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                                    }
+                                    case "SaleByBatchDetail" -> {
+                                        return reportService.getSaleByBatchDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                                    }
+                                    case "SaleByProjectDetail" -> {
+                                        return reportService.getSaleByProjectDetail(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId, projectNo);
+                                    }
+                                    case "SaleByProjectSummary" -> {
+                                        return reportService.getSaleByProjectSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode, deptId, projectNo);
+                                    }
+                                    case "PurchaseBySupplierDetail" -> {
+                                        return reportService.getPurchaseBySupplierDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
+                                    }
+                                    case "PurchaseBySupplierSummary" -> {
+                                        return reportService.getPurchaseBySupplierSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
+                                    }
+                                    case "PurchaseByProjectDetail" -> {
+                                        return reportService.getPurchaseByProjectDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode, macId, projectNo);
+                                    }
+                                    case "PurchaseByProjectSummary" -> {
+                                        return reportService.getPurchaseByProjectSummary(fromDate, toDate, typeCode, brandCode, catCode, stockCode, traderCode, compCode, deptId);
+                                    }
+                                    case "PurchaseByStockSummary" -> {
+                                        return reportService.getPurchaseByStockSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                                    }
+                                    case "PurchaseByStockWeightSummary" -> {
+                                        return reportService.getPurchaseByStockWeightSummary(fromDate, toDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, compCode, deptId, macId);
+                                    }
+                                    case "PurchaseByStockDetail" -> {
+                                        return reportService.getPurchaseByStockDetail(fromDate, toDate, curCode, typeCode, catCode, brandCode, stockCode, compCode, macId, locCode);
+                                    }
+                                    case "PurchaseList" -> {
+                                        return reportService.getPurchaseList(fromDate, toDate, compCode, stockCode,
+                                                typeCode, catCode, brandCode, locCode, labourGroupCode);
+                                    }
+                                    case "StockListByGroup" -> {
+                                        return reportService.getStockListByGroup(typeCode, compCode, macId);
+                                    }
+                                    case "TopSaleByCustomer" -> {
+                                        return reportService.getTopSaleByCustomer(fromDate, toDate, deptId, compCode);
+                                    }
+                                    case "TopSaleBySaleMan" -> {
+                                        return reportService.getTopSaleBySaleMan(fromDate, toDate, compCode);
+                                    }
+                                    case "TopSaleByStock" -> {
+                                        return reportService.getTopSaleByStock(fromDate, toDate, typeCode, brandCode, catCode, compCode, deptId);
+                                    }
+                                    case "OpeningByLocation" -> {
+                                        return reportService.getOpeningByLocation(typeCode, brandCode, catCode, stockCode, macId, compCode, deptId);
+                                    }
+                                    case "OpeningByGroup" -> {
+                                        return reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
+                                    }
+                                    case "StockInOutSummary", "StockIOMovementSummary" -> {
+                                        return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                    }
+                                    case "StockInOutDetail", "StockInOutDetailUnit" -> {
+                                        return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                    }
 //                    case "StockInOutSummaryByWeight" -> {
 //                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
 //                        Util1.writeJsonFile(listBalance, exportPath);
 //                    }
-                    case "StockInOutQtySummary", "StockInOutQtySummaryByStock" -> {
-                        filter.setOpDate(opDate);
-                        return stockReportService.getStockInOutPaddy(filter, false);
-                    }
-                    case "StockInOutQtySummaryWetRice" -> {
-                        filter.setReportType(2);
-                        filter.setOpDate(opDate);
-                        return stockReportService.getStockInOutPaddy(filter, false);
-                    }
-                    case "StockInOutQtyDetailWetRice", "StockInOutQtyBagDetail" -> {
-                        filter.setReportType(2);
-                        filter.setOpDate(opDate);
-                        return stockReportService.getStockInOutPaddy(filter, true);
-                    }
-                    case "StockInOutQtyDetail" -> {
-                        filter.setReportType(0);
-                        filter.setOpDate(opDate);
-                        return stockReportService.getStockInOutPaddy(filter, true);
-                    }
-                    case "StockInOutBagSummary" -> {
-                        filter.setOpDate(opDate);
-                        filter.setReportType(1);
-                        return stockReportService.getStockInOutPaddy(filter, false);
-                    }
-                    case "StockInOutDetailByWeight" -> {
+                                    case "StockInOutQtySummary", "StockInOutQtySummaryByStock" -> {
+                                        filter.setOpDate(opDate);
+                                        return stockReportService.getStockInOutPaddy(filter, false);
+                                    }
+                                    case "StockInOutQtySummaryWetRice" -> {
+                                        filter.setReportType(2);
+                                        filter.setOpDate(opDate);
+                                        return stockReportService.getStockInOutPaddy(filter, false);
+                                    }
+                                    case "StockInOutQtyDetailWetRice", "StockInOutQtyBagDetail" -> {
+                                        filter.setReportType(2);
+                                        filter.setOpDate(opDate);
+                                        return stockReportService.getStockInOutPaddy(filter, true);
+                                    }
+                                    case "StockInOutQtyDetail" -> {
+                                        filter.setReportType(0);
+                                        filter.setOpDate(opDate);
+                                        return stockReportService.getStockInOutPaddy(filter, true);
+                                    }
+                                    case "StockInOutBagSummary" -> {
+                                        filter.setOpDate(opDate);
+                                        filter.setReportType(1);
+                                        return stockReportService.getStockInOutPaddy(filter, false);
+                                    }
+                                    case "StockInOutDetailByWeight" -> {
 //                    reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
 //                    List<ClosingBalance> listBalance = reportService.getStockInOutDetailByWeight(typeCode, compCode, deptId, macId);
 //                    Util1.writeJsonFile(listBalance, exportPath);
-                    }
-                    case "StockValue" -> {
-                        return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-                    }
-                    case "StockValueQty" -> {
-                        return stockReportService.getStockValueRO(filter);
-                    }
-                    case "StockOutByVoucherTypeDetail" -> {
-                        return reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                    }
-                    case "StockInOutPriceCalender" -> {
-                        return reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId);
-                    }
-                    case "SalePriceCalender" -> {
-                        return reportService.getSalePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                    }
-                    case "PurchasePriceCalender" -> {
-                        return reportService.getPurchasePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-                    }
-                    case "ProductionOutputDetail" -> {
-                        return reportService.getProcessOutputDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                    }
-                    case "ProductionOutputSummary" -> {
-                        return reportService.getProcessOutputSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                    }
-                    case "ProductionUsageSummary" -> {
-                        return reportService.getProcessUsageSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                    }
-                    case "ProductionUsageDetail" -> {
-                        return reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
-                    }
-                    case "ProfitMarginByStock" -> {
-                        return reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
-                    }
-                    case "CustomerBalanceDetail" -> {
-                        return reportService.getCustomerBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
-                    }
-                    case "CustomerBalanceSummary" -> {
-                        return reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
-                    }
-                    case "SupplierBalanceDetail" -> {
-                        return reportService.getSupplierBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
-                    }
-                    case "SupplierBalanceSummary" -> {
-                        return reportService.getSupplierBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
-                    }
-                    case "SaleByDueDateSummary" -> {
-                        return reportService.getSaleByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "SaleByDueDateDetail" -> {
-                        return reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
-                    }
-                    case "StockPayableCustomerSummary" -> {
-                        //return  reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
-                    }
-                    case "StockPayableCustomerDetail" -> {
-                        //return reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
-                    }
-                    case "StockPayableConsignorSummary" -> {
-                        //return reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
-                    }
-                    case "StockPayableConsignorDetail" -> {
-                        //return reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
-                    }
-                    case "TopPurchaseQty" -> {
-                        return reportR2dbcService.getTopPurchase(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
-                    }
-                    case "TransferSaleClosing" -> {
-                        filter.setOpDate(opDate);
-                        return stockReportService.getTransferSaleClosing(filter);
-                    }
-                    case "ConsignBalanceSummary" -> {
-                        String opConsingDate = reportService.getOpeningDate(compCode, OPHis.CONSIGN);
-                        filter.setOpDate(opConsingDate);
-                        return stockReportService.getStockInOutConsign(filter);
-                    }
-                    case "LabourOutputPayableDetail" -> {
-                        return labourOutputService.getLabourPaymentDetailResult(filter);
-                    }
-                    case "StockBalanceByLocation" -> {
-                        return stockReportService.getStockBalanceByLocationRO(filter);
-                    }
-                }
-                ro.setMessage("Report Not Exists.");
-                return Mono.just(ro);
-            });
+                                    }
+                                    case "StockValue" -> {
+                                        return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                    }
+                                    case "StockValueQty" -> {
+                                        return stockReportService.getStockValueRO(filter);
+                                    }
+                                    case "StockOutByVoucherTypeDetail" -> {
+                                        return reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                    }
+                                    case "StockInOutPriceCalender" -> {
+                                        return reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId);
+                                    }
+                                    case "SalePriceCalender" -> {
+                                        return reportService.getSalePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                    }
+                                    case "PurchasePriceCalender" -> {
+                                        return reportService.getPurchasePriceCalender(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                    }
+                                    case "ProductionOutputDetail" -> {
+                                        return reportService.getProcessOutputDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                                    }
+                                    case "ProductionOutputSummary" -> {
+                                        return reportService.getProcessOutputSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                                    }
+                                    case "ProductionUsageSummary" -> {
+                                        return reportService.getProcessUsageSummary(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                                    }
+                                    case "ProductionUsageDetail" -> {
+                                        return reportService.getProcessUsageDetail(fromDate, toDate, vouTypeCode, typeCode, catCode, brandCode, stockCode, compCode, deptId, macId);
+                                    }
+                                    case "ProfitMarginByStock" -> {
+                                        return reportService.getProfitMarginByStock(fromDate, toDate, curCode, stockCode, compCode, deptId);
+                                    }
+                                    case "CustomerBalanceDetail" -> {
+                                        return reportService.getCustomerBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
+                                    }
+                                    case "CustomerBalanceSummary" -> {
+                                        return reportService.getCustomerBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
+                                    }
+                                    case "SupplierBalanceDetail" -> {
+                                        return reportService.getSupplierBalanceDetail(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode);
+                                    }
+                                    case "SupplierBalanceSummary" -> {
+                                        return reportService.getSupplierBalanceSummary(fromDate, toDate, compCode, curCode, traderCode, batchNo, projectNo, locCode, creditAmt);
+                                    }
+                                    case "SaleByDueDateSummary" -> {
+                                        return reportService.getSaleByDueDate(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                                    }
+                                    case "SaleByDueDateDetail" -> {
+                                        return reportService.getSaleByDueDateDetail(fromDueDate, toDueDate, curCode, stockCode, typeCode, brandCode, catCode, locCode, batchNo, compCode, deptId, macId);
+                                    }
+                                    case "StockPayableCustomerSummary" -> {
+                                        //return  reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
+                                    }
+                                    case "StockPayableCustomerDetail" -> {
+                                        //return reportService.getStockPayableByTrader(opPayableDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
+                                    }
+                                    case "StockPayableConsignorSummary" -> {
+                                        //return reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, true);
+                                    }
+                                    case "StockPayableConsignorDetail" -> {
+                                        //return reportService.getStockPayableConsignor(opDate, fromDate, toDate, traderCode, stockCode, compCode, macId, false);
+                                    }
+                                    case "TopPurchaseQty" -> {
+                                        return reportR2dbcService.getTopPurchase(fromDate, toDate, compCode, stockCode, typeCode, catCode, brandCode, locCode);
+                                    }
+                                    case "TransferSaleClosing" -> {
+                                        filter.setOpDate(opDate);
+                                        return stockReportService.getTransferSaleClosing(filter);
+                                    }
+                                    case "ConsignBalanceSummary" -> {
+                                        return opHisService.getOpeningDate(compCode, OPHis.CONSIGN).flatMap(opConsingDate -> {
+                                            filter.setOpDate(opConsingDate);
+                                            return stockReportService.getStockInOutConsign(filter);
+                                        });
+                                    }
+                                    case "LabourOutputPayableDetail" -> {
+                                        return labourOutputService.getLabourPaymentDetailResult(filter);
+                                    }
+                                    case "StockBalanceByLocation" -> {
+                                        return stockReportService.getStockBalanceByLocationRO(filter);
+                                    }
+                                }
+                                ro.setMessage("Report Not Exists.");
+                                return Mono.just(ro);
+                            }));
         }
         return Mono.just(ro);
     }
@@ -389,49 +390,11 @@ public class ReportController {
         return reportService.getWeightAvgPrice(stockCode, locCode, compCode);
     }
 
-    @GetMapping(path = "/getStockBalance")
-    public Flux<VStockBalance> getStockBalance(@RequestParam String stockCode,
-                                               @RequestParam boolean calSale, @RequestParam boolean calPur,
-                                               @RequestParam boolean calRI, @RequestParam boolean calRO,
-                                               @RequestParam String compCode, @RequestParam Integer deptId,
-                                               @RequestParam Integer macId, @RequestParam boolean summary) {
-        String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
-        String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        List<VStockBalance> list = reportService.getStockBalance(opDate, clDate, "-", "-", "-",
-                stockCode, calSale, calPur, calRI, calRO, "-", compCode, deptId, macId, summary);
-        if (list.isEmpty()) {
-            VStockBalance b = VStockBalance.builder()
-                    .locationName("No Stock")
-                    .unitName("No Stock.").build();
-            list.add(b);
-        }
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
-    }
 
     @PostMapping(path = "/getStockBalanceQty")
     public Flux<ClosingBalance> getStockBalanceQty(@RequestBody ReportFilter filter) {
         return stockReportService.getStockBalanceQty(filter);
     }
-
-    @GetMapping(path = "/getStockBalanceByWeight")
-    public Flux<?> getStockBalanceByWeight(@RequestParam String stockCode,
-                                           @RequestParam boolean calSale, @RequestParam boolean calPur,
-                                           @RequestParam boolean calRI, @RequestParam boolean calRO,
-                                           @RequestParam boolean calMill,
-                                           @RequestParam String compCode, @RequestParam Integer deptId,
-                                           @RequestParam Integer macId, @RequestParam boolean summary) {
-        String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
-        String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        List<VStockBalance> list = reportService.getStockBalanceByWeight(opDate, clDate, stockCode, calSale, calPur, calRI, calRO, calMill, compCode, macId, summary);
-        if (list.isEmpty()) {
-            VStockBalance b = VStockBalance.builder()
-                    .locationName("No Stock")
-                    .unitName("No Stock.").build();
-            list.add(b);
-        }
-        return Flux.fromIterable(list).onErrorResume(throwable -> Flux.empty());
-    }
-
 
     @PostMapping(path = "/getReorderLevel")
     public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) {
@@ -447,20 +410,14 @@ public class ReportController {
         boolean calRI = filter.isCalRI();
         boolean calRO = filter.isCalRO();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String opDate = reportService.getOpeningDate(compCode, OPHis.STOCK_OP);
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        return reportR2dbcService.getReorderLevel(opDate, clDate, typeCode, catCode,
-                brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId);
-    }
-
-    @GetMapping(path = "/getSmallQty")
-    public Mono<?> getSmallQty(@RequestParam String stockCode, @RequestParam String unit, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return Mono.justOrEmpty(reportService.getSmallestQty(stockCode, unit, compCode, deptId));
+        return opHisService.getOpeningDateByLocation(compCode, locCode).flatMapMany(opDate -> reportR2dbcService.getReorderLevel(opDate, clDate, typeCode, catCode,
+                brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId));
     }
 
 
-    @GetMapping(path = "/getLandingReport")
-    public Mono<?> getLandingReport(@RequestParam String vouNo, @RequestParam String compCode) {
-        return Mono.justOrEmpty(reportService.getLandingReport(vouNo, compCode));
-    }
+//    @GetMapping(path = "/getLandingReport")
+//    public Mono<?> getLandingReport(@RequestParam String vouNo, @RequestParam String compCode) {
+//        return Mono.justOrEmpty(reportService.getLandingReport(vouNo, compCode));
+//    }
 }

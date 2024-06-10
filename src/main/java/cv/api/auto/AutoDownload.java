@@ -1,7 +1,5 @@
 package cv.api.auto;
 
-import cv.api.repo.DMSRepo;
-import cv.api.service.TraderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

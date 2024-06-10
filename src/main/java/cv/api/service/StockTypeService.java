@@ -175,6 +175,7 @@ public class StockTypeService {
                 .groupType(row.get("group_type", Integer.class))
                 .build();
     }
+
     public Mono<Boolean> isExist(String compCode) {
         String sql = """
                 SELECT count(*) count
@@ -183,7 +184,7 @@ public class StockTypeService {
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .map((row) -> row.get("count",Integer.class))
+                .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
     }

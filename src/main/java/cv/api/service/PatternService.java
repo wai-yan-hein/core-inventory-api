@@ -68,7 +68,7 @@ public class PatternService {
                         .locName(row.get("loc_name", String.class))
                         .qty(row.get("qty", Double.class))
                         .price(row.get("price", Double.class))
-                        .amount(row.get("amount",Double.class))
+                        .amount(row.get("amount", Double.class))
                         .unitCode(row.get("unit", String.class))
                         .priceTypeCode(row.get("price_type", String.class))
                         .priceTypeName(row.get("desp", String.class))
@@ -142,7 +142,7 @@ public class PatternService {
                 .bind("qty", dto.getQty())
                 .bind("unit", dto.getUnitCode())
                 .bind("price", dto.getPrice())
-                .bind("amount",dto.getAmount())
+                .bind("amount", dto.getAmount())
                 .bind("explode", Util1.getBoolean(dto.getExplode()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
                 .bind("priceType", Parameters.in(R2dbcType.VARCHAR, dto.getPriceTypeCode()))
@@ -165,7 +165,7 @@ public class PatternService {
                 .qty(row.get("qty", Double.class))
                 .price(row.get("price", Double.class))
                 .unitCode(row.get("unit", String.class))
-                .amount(row.get("amount",Double.class))
+                .amount(row.get("amount", Double.class))
                 .priceTypeCode(row.get("price_type", String.class))
                 .build();
     }

@@ -75,6 +75,4 @@ public class ReportFilter {
     private boolean draft;
 
 
-
-
 }

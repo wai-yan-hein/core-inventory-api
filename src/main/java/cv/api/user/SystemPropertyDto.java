@@ -13,4 +13,4 @@ public class SystemPropertyDto {
     private String remark;
     private LocalDateTime updatedDate;
 
-    }
+}

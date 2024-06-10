@@ -1,32 +1,24 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
-@Entity
-@Table(name = "process_his_detail")
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class ProcessHisDetail {
-    @EmbeddedId
     private ProcessHisDetailKey key;
-    @Column(name = "vou_date", columnDefinition = "TIMESTAMP")
+    private String stockCode;
+    private String locCode;
+    private Integer deptId;
     private LocalDateTime vouDate;
-    @Column(name = "qty")
-    private float qty;
-    @Column(name = "unit")
+    private Double qty;
     private String unit;
-    @Column(name = "price")
-    private Float price;
-    @Transient
+    private Double price;
     private String locName;
-    @Transient
     private String stockName;
-    @Transient
     private String stockUsrCode;
 }

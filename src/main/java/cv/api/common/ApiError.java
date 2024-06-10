@@ -6,6 +6,7 @@ import lombok.Data;
 public class ApiError {
     private String error;
     private String message;
+
     public ApiError(String message) {
         this.message = message;
     }

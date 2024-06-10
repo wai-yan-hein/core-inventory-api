@@ -4,13 +4,8 @@
  */
 package cv.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import java.io.Serializable;
-
 import lombok.Builder;
 import lombok.Data;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  *
@@ -18,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Data
 @Builder
-public class MillingHisKey{
+public class MillingHisKey {
 
     private String vouNo;
     private String compCode;

@@ -1,6 +1,5 @@
 package cv.api.entity;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,6 +13,5 @@ public class GradeDetail {
     private double minPercent;
     private double maxPercent;
     private LocalDateTime updatedDate;
-    @Transient
     private String stockName;
 }

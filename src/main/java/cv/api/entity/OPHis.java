@@ -1,13 +1,11 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -40,7 +38,6 @@ public class OPHis {
     public static final int PAYABLE = 2;
     public static final int PADDY = 3;
     public static final int CONSIGN = 4;
-
 
 
 }

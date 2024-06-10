@@ -3,7 +3,6 @@ package cv.api.service;
 import cv.api.common.Util1;
 import cv.api.entity.SaleMan;
 import cv.api.entity.SaleManKey;
-import cv.api.entity.VouStatus;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -20,6 +19,7 @@ import java.time.LocalDateTime;
 public class SaleManService {
     private final DatabaseClient client;
     private final SeqService seqService;
+
     public Mono<SaleMan> save(SaleMan dto) {
         String code = dto.getKey().getSaleManCode();
         String compCode = dto.getKey().getCompCode();
@@ -32,6 +32,7 @@ public class SaleManService {
         }
         return update(dto);
     }
+
     public Mono<SaleMan> insert(SaleMan dto) {
         String sql = """
                 INSERT INTO sale_man (saleman_code, mac_id, saleman_name, active, phone, updated_date,
@@ -63,16 +64,16 @@ public class SaleManService {
                 .bind("macId", dto.getMacId())
                 .bind("salemanName", dto.getSaleManName())
                 .bind("active", Util1.getInteger(dto.getActive()))
-                .bind("phone", Parameters.in(R2dbcType.VARCHAR,dto.getPhone()))
+                .bind("phone", Parameters.in(R2dbcType.VARCHAR, dto.getPhone()))
                 .bind("updatedDate", LocalDateTime.now())
                 .bind("genderId", Parameters.in(R2dbcType.VARCHAR, dto.getGenderId()))
                 .bind("address", Parameters.in(R2dbcType.VARCHAR, dto.getAddress()))
-                .bind("userCode", Parameters.in(R2dbcType.VARCHAR,dto.getUserCode()))
+                .bind("userCode", Parameters.in(R2dbcType.VARCHAR, dto.getUserCode()))
                 .bind("createdDate", dto.getCreatedDate())
                 .bind("createdBy", dto.getCreatedBy())
-                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR,dto.getUpdatedBy()))
+                .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("deptId", dto.getDeptId())
-                .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR,dto.getIntgUpdStatus()))
+                .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, dto.getIntgUpdStatus()))
                 .bind("deleted", Util1.getBoolean(dto.getDeleted()))
                 .fetch()
                 .rowsUpdated()
@@ -129,7 +130,7 @@ public class SaleManService {
 
     public Mono<SaleMan> findById(SaleManKey key) {
         String smCode = key.getSaleManCode();
-        if(Util1.isNullOrEmpty(smCode)){
+        if (Util1.isNullOrEmpty(smCode)) {
             return Mono.empty();
         }
         String sql = """
@@ -143,6 +144,7 @@ public class SaleManService {
                 .bind("compCode", key.getCompCode())
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
+
     public Flux<SaleMan> getSaleMan(LocalDateTime updatedDate) {
         String sql = """
                 select *

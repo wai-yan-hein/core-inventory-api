@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 /**
  * @author wai yan
  */
@@ -46,7 +44,6 @@ public class SetupController {
     private final UnitRelationService unitRelationService;
     private final ReportService reportService;
     private final TraderGroupService traderGroupService;
-    private final ConverterService converterService;
     private final AccountRepo accountRepo;
     private final AccSettingService accSettingService;
     private final OrderStatusService orderStatusService;
@@ -661,17 +658,6 @@ public class SetupController {
         return traderGroupService.findAll(compCode);
     }
 
-    @GetMapping(path = "/convert-to-unicode")
-    public Mono<?> convertToUniCode() {
-        converterService.convertToUnicode();
-        return Mono.justOrEmpty("converted.");
-    }
-
-    @GetMapping(path = "/convert-trader")
-    public Mono<?> convertTrader() {
-        converterService.trader();
-        return Mono.justOrEmpty("converted.");
-    }
 
     @GetMapping(path = "/getAccSetting")
     public Flux<AccSetting> getAccSetting(@RequestParam String compCode) {

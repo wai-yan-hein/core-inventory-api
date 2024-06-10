@@ -11,6 +11,6 @@ public class WebFluxConfiguration implements WebFluxConfigurer {
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configure) {
         configure.defaultCodecs().maxInMemorySize(5 * 1024 * 1024);//5MB
-        log.info("configureHttpMessageCodecs : 5MB");
+        //log.info("configureHttpMessageCodecs : 5MB");
     }
 }

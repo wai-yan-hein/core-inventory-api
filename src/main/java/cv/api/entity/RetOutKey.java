@@ -6,12 +6,8 @@
 package cv.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import lombok.Builder;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @author wai yan
@@ -19,7 +15,7 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Builder
-public class RetOutKey  {
+public class RetOutKey {
 
     private String vouNo;
     private Integer uniqueId;

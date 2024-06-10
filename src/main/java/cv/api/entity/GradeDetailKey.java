@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Data
 @Builder
-public class GradeDetailKey implements Serializable{
+public class GradeDetailKey implements Serializable {
     private String formulaCode;
     private String compCode;
     private String criteriaCode;

@@ -1,7 +1,6 @@
 package cv.api.service;
 
 import cv.api.common.Util1;
-import cv.api.entity.Stock;
 import cv.api.entity.StockCriteria;
 import cv.api.entity.StockCriteriaKey;
 import io.r2dbc.spi.Parameters;
@@ -51,8 +50,8 @@ public class StockCriteriaService {
                 .bind("createdDate", dto.getCreatedDate())
                 .bind("updatedBy", Parameters.in(R2dbcType.VARCHAR, dto.getUpdatedBy()))
                 .bind("updatedDate", LocalDateTime.now())
-                .bind("active", Util1.getBoolean(dto.isActive()))
-                .bind("deleted", Util1.getBoolean(dto.isDeleted()))
+                .bind("active", Util1.getBoolean(dto.getActive()))
+                .bind("deleted", Util1.getBoolean(dto.getDeleted()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
