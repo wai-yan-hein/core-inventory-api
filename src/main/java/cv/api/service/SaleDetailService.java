@@ -73,8 +73,8 @@ public class SaleDetailService {
         String sql = """
                     SELECT op.*, s.user_code, s.stock_name,s.calculate, cat.cat_name, st.stock_type_name, sb.brand_name, rel.rel_name, l.loc_name, t.trader_name
                     FROM sale_his_detail op
-                    JOIN location l ON op.loc_code = l.loc_code AND op.comp_code = l.comp_code
-                    left JOIN stock s ON op.stock_code = s.stock_code AND op.comp_code = s.comp_code
+                    LEFT JOIN location l ON op.loc_code = l.loc_code AND op.comp_code = l.comp_code
+                    LEFT JOIN stock s ON op.stock_code = s.stock_code AND op.comp_code = s.comp_code
                     LEFT JOIN unit_relation rel ON s.rel_code = rel.rel_code AND op.comp_code = rel.comp_code
                     LEFT JOIN stock_type st ON s.stock_type_code = st.stock_type_code AND op.comp_code = st.comp_code
                     LEFT JOIN category cat ON s.category_code = cat.cat_code AND op.comp_code = cat.comp_code

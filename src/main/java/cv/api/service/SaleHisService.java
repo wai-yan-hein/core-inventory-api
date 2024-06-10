@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.*;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.VSale;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
@@ -45,17 +46,33 @@ public class SaleHisService {
     private final TransactionalOperator operator;
 
 
-    public Mono<SaleHis> save(SaleHis sh) {
-        Integer deptId = sh.getDeptId();
-        if (deptId == null) {
-            log.error("deptId is null from mac id : {}", sh.getMacId());
-            return Mono.empty();
-        }
-        return operator.transactional(Mono.defer(() -> saveSale(sh)
+    public Mono<SaleHis> save(SaleHis dto) {
+        return isValid(dto).flatMap(sh -> operator.transactional(Mono.defer(() -> saveSale(sh)
                 .flatMap((saleHis) -> saveSaleExpense(saleHis)
                         .then(saveVouDiscount(saleHis))
                         .then(saveSaleOrderJoin(saleHis))
-                        .thenReturn(saleHis))));
+                        .thenReturn(saleHis)))));
+    }
+
+    private Mono<SaleHis> isValid(SaleHis sh) {
+        List<SaleHisDetail> list = Util1.nullToEmpty(sh.getListSH());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        } else if (sh.getVouTotal() <= 0) {
+            return ResponseUtil.createBadRequest("Voucher Total is zero");
+        }
+        return Mono.just(sh);
     }
 
     private Mono<Boolean> saveSaleExpense(SaleHis sh) {
@@ -86,24 +103,20 @@ public class SaleHisService {
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
         return saveOrUpdate(dto).flatMap(ri -> saleDetailService.delete(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
             List<SaleHisDetail> list = dto.getListSH();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(SaleDetailKey.builder().build());
-                            }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            detail.setDeptId(ri.getDeptId());
-                            return saleDetailService.save(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
+            return Flux.fromIterable(list)
+                    .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                    .concatMap(detail -> {
+                        if (detail.getKey() == null) {
+                            detail.setKey(SaleDetailKey.builder().build());
+                        }
+                        int uniqueId = list.indexOf(detail) + 1;
+                        detail.getKey().setUniqueId(uniqueId);
+                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                        detail.setDeptId(ri.getDeptId());
+                        return saleDetailService.save(detail);
+                    })
+                    .then(Mono.just(ri));
         }));
     }
 

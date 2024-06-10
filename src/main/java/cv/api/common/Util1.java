@@ -17,8 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author WSwe
@@ -307,5 +306,8 @@ public class Util1 {
             }
         }
         return value;
+    }
+    public static <T> List<T> nullToEmpty(List<T> list) {
+        return Optional.ofNullable(list).orElse(new ArrayList<>());
     }
 }
