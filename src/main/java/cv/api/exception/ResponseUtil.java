@@ -10,6 +10,6 @@ public class ResponseUtil {
     }
 
     public static <T> Mono<T> createConflict(String message) {
-        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, message);
+        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, message));
     }
 }
