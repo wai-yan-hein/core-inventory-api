@@ -6,15 +6,14 @@ import cv.api.entity.GRN;
 import cv.api.entity.GRNDetail;
 import cv.api.entity.GRNDetailKey;
 import cv.api.entity.GRNKey;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -30,14 +29,32 @@ public class GRNService {
     private final TransactionalOperator operator;
 
     public Mono<GRN> validSave(GRN dto) {
-        return isDuplicateBatchNo(dto)
+        return isValid(dto).flatMap(his -> isDuplicateBatchNo(his)
                 .flatMap(duplicate -> {
                     if (duplicate) {
-                        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate Batch No : " + dto.getBatchNo()));
+                        return ResponseUtil.createConflict("Duplicate Batch No : " + his.getBatchNo());
                     }
-                    return save(dto);
-                });
+                    return save(his);
+                }));
     }
+
+    private Mono<GRN> isValid(GRN sh) {
+        List<GRNDetail> list = Util1.nullToEmpty(sh.getListDetail());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
+    }
+
 
     private Mono<GRN> save(GRN dto) {
         return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)

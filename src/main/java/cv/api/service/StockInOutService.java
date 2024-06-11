@@ -13,6 +13,7 @@ import cv.api.entity.StockIOKey;
 import cv.api.entity.StockInOut;
 import cv.api.entity.StockInOutDetail;
 import cv.api.entity.StockInOutKey;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.VStockIO;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
@@ -42,30 +43,42 @@ public class StockInOutService {
     private final TransactionalOperator operator;
 
     public Mono<StockInOut> saveStockIO(StockInOut dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
                 .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
                         .flatMap(delete -> {
-                            List<StockInOutDetail> list = dto.getListSH();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
-                                        .concatMap(detail -> {
-                                            if (detail.getKey() == null) {
-                                                detail.setKey(StockInOutKey.builder().build());
-                                            }
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.getKey().setUniqueId(uniqueId);
-                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                            detail.setDeptId(ri.getDeptId());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(ri));
-                            } else {
-                                return Mono.just(ri);
-                            }
-                        }))));
+                            List<StockInOutDetail> list = his.getListSH();
+                            return Flux.fromIterable(list)
+                                    .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
+                                    .concatMap(detail -> {
+                                        if (detail.getKey() == null) {
+                                            detail.setKey(StockInOutKey.builder().build());
+                                        }
+                                        int uniqueId = list.indexOf(detail) + 1;
+                                        detail.getKey().setUniqueId(uniqueId);
+                                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                        detail.setDeptId(ri.getDeptId());
+                                        return insert(detail);
+                                    })
+                                    .then(Mono.just(ri));
+                        })))));
     }
+
+    private Mono<StockInOut> isValid(StockInOut sh) {
+        List<StockInOutDetail> list = Util1.nullToEmpty(sh.getListSH());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
+    }
+
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """

@@ -8,6 +8,7 @@ package cv.api.service;
 import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.*;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.VDescription;
 import cv.api.model.VPurchase;
 import io.r2dbc.spi.Parameters;
@@ -44,21 +45,39 @@ public class PurHisService {
     private final TransactionalOperator operator;
 
     public Mono<PurHis> save(PurHis dto) {
-        Integer deptId = dto.getDeptId();
-        String compCode = dto.getKey().getCompCode();
-        if (deptId == null) {
-            log.error("deptId is null from mac id : {}", dto.getMacId());
-            return Mono.empty();
+        return isValid(dto).flatMap(his -> {
+            String compCode = his.getKey().getCompCode();
+            return operator.transactional(Mono.defer(() -> savePurchase(his).flatMap((pur) -> savePurExpense(pur)
+                    .then(landingService.updatePost(LandingHisKey.builder()
+                                    .vouNo(his.getLandVouNo())
+                                    .compCode(compCode)
+                                    .build(), true)
+                            .then(weightService.updatePost(WeightHisKey.builder()
+                                    .vouNo(his.getWeightVouNo())
+                                    .compCode(compCode)
+                                    .build(), true))).thenReturn(pur))));
+        });
+    }
+
+    private Mono<PurHis> isValid(PurHis sh) {
+        List<PurHisDetail> list = Util1.nullToEmpty(sh.getListPD());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        } else if (sh.getVouTotal() <= 0) {
+            return ResponseUtil.createBadRequest("Voucher Total is zero");
         }
-        return operator.transactional(Mono.defer(() -> savePurchase(dto).flatMap((pur) -> savePurExpense(pur)
-                .then(landingService.updatePost(LandingHisKey.builder()
-                                .vouNo(dto.getLandVouNo())
-                                .compCode(compCode)
-                                .build(), true)
-                        .then(weightService.updatePost(WeightHisKey.builder()
-                                .vouNo(dto.getWeightVouNo())
-                                .compCode(compCode)
-                                .build(), true))).thenReturn(pur))));
+        return Mono.just(sh);
     }
 
     private Mono<Boolean> savePurExpense(PurHis ph) {
@@ -225,24 +244,20 @@ public class PurHisService {
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
         return saveOrUpdate(dto).flatMap(ri -> pdService.delete(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
             List<PurHisDetail> list = dto.getListPD();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                        .concatMap(detail -> {
-                            if (detail.getKey() == null) {
-                                detail.setKey(PurDetailKey.builder().build());
-                            }
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.getKey().setUniqueId(uniqueId);
-                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                            detail.setDeptId(ri.getDeptId());
-                            return pdService.insert(detail);
-                        })
-                        .then(Mono.just(ri));
-            } else {
-                return Mono.just(ri);
-            }
+            return Flux.fromIterable(list)
+                    .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                    .concatMap(detail -> {
+                        if (detail.getKey() == null) {
+                            detail.setKey(PurDetailKey.builder().build());
+                        }
+                        int uniqueId = list.indexOf(detail) + 1;
+                        detail.getKey().setUniqueId(uniqueId);
+                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                        detail.setDeptId(ri.getDeptId());
+                        return pdService.insert(detail);
+                    })
+                    .then(Mono.just(ri));
         }));
     }
 

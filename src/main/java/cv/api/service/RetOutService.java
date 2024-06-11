@@ -11,6 +11,7 @@ import cv.api.entity.RetOutHis;
 import cv.api.entity.RetOutHisDetail;
 import cv.api.entity.RetOutHisKey;
 import cv.api.entity.RetOutKey;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -40,29 +41,46 @@ public class RetOutService {
     private final TransactionalOperator operator;
 
     public Mono<RetOutHis> save(RetOutHis dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
                 .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
                         .flatMap(delete -> {
-                            List<RetOutHisDetail> list = dto.getListRD();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                                        .concatMap(detail -> {
-                                            if (detail.getKey() == null) {
-                                                detail.setKey(RetOutKey.builder().build());
-                                            }
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.getKey().setUniqueId(uniqueId);
-                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                            detail.setDeptId(ri.getDeptId());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(ri));
-                            } else {
-                                return Mono.just(ri);
-                            }
-                        }))));
+                            List<RetOutHisDetail> list = his.getListRD();
+                            return Flux.fromIterable(list)
+                                    .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                                    .concatMap(detail -> {
+                                        if (detail.getKey() == null) {
+                                            detail.setKey(RetOutKey.builder().build());
+                                        }
+                                        int uniqueId = list.indexOf(detail) + 1;
+                                        detail.getKey().setUniqueId(uniqueId);
+                                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                        detail.setDeptId(ri.getDeptId());
+                                        return insert(detail);
+                                    })
+                                    .then(Mono.just(ri));
+                        })))));
+    }
+
+    private Mono<RetOutHis> isValid(RetOutHis sh) {
+        List<RetOutHisDetail> list = Util1.nullToEmpty(sh.getListRD());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        } else if (sh.getVouTotal() <= 0) {
+            return ResponseUtil.createBadRequest("Voucher Total is zero");
+        }
+        return Mono.just(sh);
     }
 
     private Mono<RetOutHis> saveOrUpdate(RetOutHis dto) {

@@ -6,6 +6,7 @@ import cv.api.entity.WeightHis;
 import cv.api.entity.WeightHisDetail;
 import cv.api.entity.WeightHisDetailKey;
 import cv.api.entity.WeightHisKey;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.WeightColumn;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
@@ -35,29 +36,38 @@ public class WeightService {
     private final TransactionalOperator operator;
 
     public Mono<WeightHis> save(WeightHis dto) {
-        return operator.transactional(Mono.defer(() -> {
-            dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-            return saveOrUpdate(dto).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
-                List<WeightHisDetail> list = dto.getListDetail();
-                if (list != null && !list.isEmpty()) {
-                    return Flux.fromIterable(list)
-                            .filter(detail -> Util1.getDouble(detail.getWeight()) != 0)
-                            .concatMap(detail -> {
-                                if (detail.getKey() == null) {
-                                    detail.setKey(WeightHisDetailKey.builder().build());
-                                }
-                                int uniqueId = list.indexOf(detail) + 1;
-                                detail.getKey().setUniqueId(uniqueId);
-                                detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                return insert(detail);
-                            })
-                            .then(Mono.just(ri));
-                } else {
-                    return Mono.just(ri);
-                }
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> {
+            his.setVouDate(Util1.toDateTime(his.getVouDate()));
+            return saveOrUpdate(his).flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
+                List<WeightHisDetail> list = his.getListDetail();
+                return Flux.fromIterable(list)
+                        .filter(detail -> Util1.getDouble(detail.getWeight()) != 0)
+                        .concatMap(detail -> {
+                            if (detail.getKey() == null) {
+                                detail.setKey(WeightHisDetailKey.builder().build());
+                            }
+                            int uniqueId = list.indexOf(detail) + 1;
+                            detail.getKey().setUniqueId(uniqueId);
+                            detail.getKey().setVouNo(ri.getKey().getVouNo());
+                            detail.getKey().setCompCode(ri.getKey().getCompCode());
+                            return insert(detail);
+                        })
+                        .then(Mono.just(ri));
             }));
-        }));
+        })));
+    }
+
+    private Mono<WeightHis> isValid(WeightHis sh) {
+        List<WeightHisDetail> list = Util1.nullToEmpty(sh.getListDetail());
+        list.removeIf(t -> Util1.getDouble(t.getWeight()) == 0);
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
     }
 
     private Mono<WeightHis> saveOrUpdate(WeightHis dto) {

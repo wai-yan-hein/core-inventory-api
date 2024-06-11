@@ -6,6 +6,7 @@ import cv.api.entity.OPHis;
 import cv.api.entity.OPHisDetail;
 import cv.api.entity.OPHisDetailKey;
 import cv.api.entity.OPHisKey;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -32,31 +33,47 @@ public class OPHisService {
     private final TransactionalOperator operator;
 
     public Mono<OPHis> save(OPHis dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
                 .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
                         .flatMap(delete -> {
-                            List<OPHisDetail> list = dto.getDetailList();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
-                                        .concatMap(detail -> {
-                                            if (detail.getKey() == null) {
-                                                detail.setKey(OPHisDetailKey.builder().build());
-                                            }
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.getKey().setUniqueId(uniqueId);
-                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                            detail.setDeptId(ri.getDeptId());
-                                            detail.setLocCode(ri.getLocCode());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(ri));
-                            } else {
-                                return Mono.just(ri);
-                            }
-                        }))));
+                            List<OPHisDetail> list = his.getDetailList();
+                            return Flux.fromIterable(list)
+                                    .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
+                                    .concatMap(detail -> {
+                                        if (detail.getKey() == null) {
+                                            detail.setKey(OPHisDetailKey.builder().build());
+                                        }
+                                        int uniqueId = list.indexOf(detail) + 1;
+                                        detail.getKey().setUniqueId(uniqueId);
+                                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                        detail.setDeptId(ri.getDeptId());
+                                        detail.setLocCode(ri.getLocCode());
+                                        return insert(detail);
+                                    })
+                                    .then(Mono.just(ri));
+                        })))));
     }
+
+    private Mono<OPHis> isValid(OPHis sh) {
+        List<OPHisDetail> list = Util1.nullToEmpty(sh.getDetailList());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
+    }
+
 
     private Mono<OPHis> saveOrUpdate(OPHis dto) {
         String vouNo = dto.getKey().getVouNo();

@@ -11,6 +11,7 @@ import cv.api.entity.RetInHis;
 import cv.api.entity.RetInHisDetail;
 import cv.api.entity.RetInHisKey;
 import cv.api.entity.RetInKey;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -40,29 +41,25 @@ public class RetInService {
     private final TransactionalOperator operator;
 
     public Mono<RetInHis> save(RetInHis dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
                 .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
                         .flatMap(delete -> {
-                            List<RetInHisDetail> list = dto.getListRD();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                                        .concatMap(detail -> {
-                                            if (detail.getKey() == null) {
-                                                detail.setKey(RetInKey.builder().build());
-                                            }
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.getKey().setUniqueId(uniqueId);
-                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                            detail.setDeptId(ri.getDeptId());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(ri));
-                            } else {
-                                return Mono.just(ri);
-                            }
-                        }))));
+                            List<RetInHisDetail> list = his.getListRD();
+                            return Flux.fromIterable(list)
+                                    .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                                    .concatMap(detail -> {
+                                        if (detail.getKey() == null) {
+                                            detail.setKey(RetInKey.builder().build());
+                                        }
+                                        int uniqueId = list.indexOf(detail) + 1;
+                                        detail.getKey().setUniqueId(uniqueId);
+                                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                        detail.setDeptId(ri.getDeptId());
+                                        return insert(detail);
+                                    })
+                                    .then(Mono.just(ri));
+                        })))));
     }
 
     private Mono<RetInHis> saveOrUpdate(RetInHis dto) {
@@ -82,6 +79,27 @@ public class RetInService {
         } else {
             return update(dto);
         }
+    }
+
+    private Mono<RetInHis> isValid(RetInHis sh) {
+        List<RetInHisDetail> list = Util1.nullToEmpty(sh.getListRD());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        } else if (sh.getVouTotal() <= 0) {
+            return ResponseUtil.createBadRequest("Voucher Total is zero");
+        }
+        return Mono.just(sh);
     }
 
     private Mono<Boolean> deleteDetail(String vouNo, String compCode) {

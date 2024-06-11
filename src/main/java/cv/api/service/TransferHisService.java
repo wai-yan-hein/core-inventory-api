@@ -6,6 +6,7 @@ import cv.api.entity.THDetailKey;
 import cv.api.entity.TransferHis;
 import cv.api.entity.TransferHisDetail;
 import cv.api.entity.TransferHisKey;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.VTransfer;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
@@ -31,29 +32,40 @@ public class TransferHisService {
     private final TransactionalOperator operator;
 
     public Mono<TransferHis> saveTransfer(TransferHis dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
                 .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
                         .flatMap(delete -> {
-                            List<TransferHisDetail> list = dto.getListTD();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
-                                        .concatMap(detail -> {
-                                            if (detail.getKey() == null) {
-                                                detail.setKey(THDetailKey.builder().build());
-                                            }
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.getKey().setUniqueId(uniqueId);
-                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                            detail.setDeptId(ri.getDeptId());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(ri));
-                            } else {
-                                return Mono.just(ri);
-                            }
-                        }))));
+                            List<TransferHisDetail> list = his.getListTD();
+                            return Flux.fromIterable(list)
+                                    .filter(detail -> !Util1.isNullOrEmpty(detail.getStockCode()))
+                                    .concatMap(detail -> {
+                                        if (detail.getKey() == null) {
+                                            detail.setKey(THDetailKey.builder().build());
+                                        }
+                                        int uniqueId = list.indexOf(detail) + 1;
+                                        detail.getKey().setUniqueId(uniqueId);
+                                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                        detail.setDeptId(ri.getDeptId());
+                                        return insert(detail);
+                                    })
+                                    .then(Mono.just(ri));
+                        })))));
+    }
+
+    private Mono<TransferHis> isValid(TransferHis sh) {
+        List<TransferHisDetail> list = Util1.nullToEmpty(sh.getListTD());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
     }
 
     public Mono<Boolean> deleteDetail(String vouNo, String compCode) {

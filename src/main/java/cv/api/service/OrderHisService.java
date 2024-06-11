@@ -11,6 +11,7 @@ import cv.api.entity.OrderDetailKey;
 import cv.api.entity.OrderHis;
 import cv.api.entity.OrderHisDetail;
 import cv.api.entity.OrderHisKey;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.VDescription;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
@@ -42,30 +43,46 @@ public class OrderHisService {
     private final TransactionalOperator operator;
 
     public Mono<OrderHis> saveOrder(OrderHis dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
                 .flatMap(ri -> deleteDetail(ri.getKey().getVouNo(), ri.getKey().getCompCode())
                         .flatMap(delete -> {
-                            List<OrderHisDetail> list = dto.getListSH();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
-                                        .concatMap(detail -> {
-                                            if (detail.getKey() == null) {
-                                                detail.setKey(OrderDetailKey.builder().build());
-                                            }
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.getKey().setUniqueId(uniqueId);
-                                            detail.getKey().setVouNo(ri.getKey().getVouNo());
-                                            detail.getKey().setCompCode(ri.getKey().getCompCode());
-                                            detail.setDeptId(ri.getDeptId());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(ri));
-                            } else {
-                                return Mono.just(ri);
-                            }
-                        }))));
+                            List<OrderHisDetail> list = his.getListSH();
+                            return Flux.fromIterable(list)
+                                    .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
+                                    .concatMap(detail -> {
+                                        if (detail.getKey() == null) {
+                                            detail.setKey(OrderDetailKey.builder().build());
+                                        }
+                                        int uniqueId = list.indexOf(detail) + 1;
+                                        detail.getKey().setUniqueId(uniqueId);
+                                        detail.getKey().setVouNo(ri.getKey().getVouNo());
+                                        detail.getKey().setCompCode(ri.getKey().getCompCode());
+                                        detail.setDeptId(ri.getDeptId());
+                                        return insert(detail);
+                                    })
+                                    .then(Mono.just(ri));
+                        })))));
     }
+
+    private Mono<OrderHis> isValid(OrderHis sh) {
+        List<OrderHisDetail> list = Util1.nullToEmpty(sh.getListSH());
+        list.removeIf(t -> Util1.isNullOrEmpty(t.getStockCode()));
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
+            return ResponseUtil.createBadRequest("Location is null");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
+    }
+
 
     private Mono<Boolean> deleteDetail(String vouNo, String compCode) {
         String sql = """

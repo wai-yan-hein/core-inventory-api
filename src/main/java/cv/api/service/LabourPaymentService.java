@@ -4,6 +4,7 @@ import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.LabourPaymentDto;
 import cv.api.entity.LabourPaymentDetail;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -28,26 +29,41 @@ public class LabourPaymentService {
     private final TransactionalOperator operator;
 
     public Mono<LabourPaymentDto> save(LabourPaymentDto dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto)
-                .flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode())
-                        .flatMap(delete -> {
-                            List<LabourPaymentDetail> list = dto.getListDetail();
-                            if (list != null && !list.isEmpty()) {
-                                return Flux.fromIterable(list)
-                                        .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
-                                        .concatMap(detail -> {
-                                            int uniqueId = list.indexOf(detail) + 1;
-                                            detail.setUniqueId(uniqueId);
-                                            detail.setVouNo(payment.getVouNo());
-                                            detail.setCompCode(payment.getCompCode());
-                                            detail.setDeptId(payment.getDeptId());
-                                            return insert(detail);
-                                        })
-                                        .then(Mono.just(payment));
-                            } else {
-                                return Mono.just(payment);
-                            }
-                        }))));
+       return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his)
+               .flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode())
+                       .flatMap(delete -> {
+                           List<LabourPaymentDetail> list = his.getListDetail();
+                           if (list != null && !list.isEmpty()) {
+                               return Flux.fromIterable(list)
+                                       .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                                       .concatMap(detail -> {
+                                           int uniqueId = list.indexOf(detail) + 1;
+                                           detail.setUniqueId(uniqueId);
+                                           detail.setVouNo(payment.getVouNo());
+                                           detail.setCompCode(payment.getCompCode());
+                                           detail.setDeptId(payment.getDeptId());
+                                           return insert(detail);
+                                       })
+                                       .then(Mono.just(payment));
+                           } else {
+                               return Mono.just(payment);
+                           }
+                       })))));
+    }
+
+    private Mono<LabourPaymentDto> isValid(LabourPaymentDto sh) {
+        List<LabourPaymentDetail> list = Util1.nullToEmpty(sh.getListDetail());
+        list.removeIf(t -> Util1.getDouble(t.getAmount()) == 0);
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is null");
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
     }
 
 
@@ -57,7 +73,7 @@ public class LabourPaymentService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "LabourPayment", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.setVouNo(seqNo);

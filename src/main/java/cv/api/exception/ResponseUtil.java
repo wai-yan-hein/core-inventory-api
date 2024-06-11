@@ -8,4 +8,8 @@ public class ResponseUtil {
     public static <T> Mono<T> createBadRequest(String message) {
         return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, message));
     }
+
+    public static <T> Mono<T> createConflict(String message) {
+        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, message);
+    }
 }

@@ -4,6 +4,7 @@ import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.StockPayment;
 import cv.api.dto.StockPaymentDetail;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
@@ -27,24 +28,34 @@ public class StockPaymentService {
     private final TransactionalOperator operator;
 
     public Mono<StockPayment> save(StockPayment dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
-            List<StockPaymentDetail> list = dto.getListDetail();
-            if (list != null && !list.isEmpty()) {
-                return Flux.fromIterable(list)
-                        .filter(detail -> Util1.getDouble(detail.getPayQty()) > 0 || Util1.getDouble(detail.getPayBag()) > 0)
-                        .concatMap(detail -> {
-                            int uniqueId = list.indexOf(detail) + 1;
-                            detail.setUniqueId(uniqueId);
-                            detail.setVouNo(payment.getVouNo());
-                            detail.setCompCode(payment.getCompCode());
-                            return insertDetail(detail);
-                        })
-                        .then(Mono.just(payment));
-            } else {
-                return Mono.just(payment);
-            }
-        }))));
+        return isValid(dto)
+                .flatMap(his -> operator.transactional(Mono.defer(() -> saveOrUpdate(his).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode()).flatMap(delete -> {
+                    List<StockPaymentDetail> list = his.getListDetail();
+                    return Flux.fromIterable(list)
+                            .filter(detail -> Util1.getDouble(detail.getPayQty()) > 0 || Util1.getDouble(detail.getPayBag()) > 0)
+                            .concatMap(detail -> {
+                                int uniqueId = list.indexOf(detail) + 1;
+                                detail.setUniqueId(uniqueId);
+                                detail.setVouNo(payment.getVouNo());
+                                detail.setCompCode(payment.getCompCode());
+                                return insertDetail(detail);
+                            })
+                            .then(Mono.just(payment));
+                })))));
 
+    }
+
+    private Mono<StockPayment> isValid(StockPayment sh) {
+        List<StockPaymentDetail> list = Util1.nullToEmpty(sh.getListDetail());
+        list.removeIf(t -> Util1.getDouble(t.getPayQty()) <= 0 || Util1.getDouble(t.getPayBag()) <= 0);
+        if (list.isEmpty()) {
+            return ResponseUtil.createBadRequest("Detail is null/empty");
+        } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is null");
+        }
+        return Mono.just(sh);
     }
 
     private Mono<StockPayment> saveOrUpdate(StockPayment payment) {
