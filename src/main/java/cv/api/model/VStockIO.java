@@ -41,6 +41,7 @@ public class VStockIO {
     private String jobName;
     private String labourGroupName;
     private String traderName;
+    private Boolean post;
     private String receivedName;
     private String receivedPhone;
     private String carNo;

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * @author wai yan
  */
@@ -55,6 +57,7 @@ public class SetupController {
     private final GradeDetailService gradeDetailService;
     private final StockColorService stockColorService;
     private final CleanDataService cleanDataService;
+    private final StockUnitPriceService stockUnitPriceService;
 
     @GetMapping(path = "/hello")
     public Mono<?> hello() {
@@ -754,4 +757,17 @@ public class SetupController {
         return stockColorService.getStockColor(compCode);
     }
 
+    @PostMapping(path = "/saveStockUnitPrice")
+    public Mono<Boolean> saveStockUnitPrice(@RequestBody List<StockUnitPrice> list) {
+        return stockUnitPriceService.saveList(list);
+    }
+
+    @GetMapping(path = "/getStockUnitPrice")
+    public Flux<StockUnitPrice> getStockUnitPrice(@RequestParam String stockCode, @RequestParam String compCode) {
+        return stockUnitPriceService.generateStockUnitPrice(stockCode, compCode);
+    }
+    @GetMapping(path = "/getUpdateStockUnitPrice")
+    public Flux<StockUnitPrice> getUpdateStockUnitPrice(@RequestParam String updatedDate) {
+        return stockUnitPriceService.getStockUnitPrice(Util1.toLocalDateTime(updatedDate));
+    }
 }

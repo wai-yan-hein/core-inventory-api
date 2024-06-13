@@ -71,6 +71,7 @@ public class PurHis {
     private String refNo;
     private List<PurHisDetail> listPD;
     private List<PurExpense> listExpense;
+    private List<String> listIO;
     private ZonedDateTime vouDateTime;
 
 }

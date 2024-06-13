@@ -301,7 +301,6 @@ public class OrderHisService {
         return updateDeleteStatus(key, false);
     }
 
-    @Transactional
     public Mono<Boolean> updateOrder(OrderHisKey key, boolean post) {
         String sql = """
                 update order_his

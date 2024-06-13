@@ -60,8 +60,6 @@ public class TransferHisService {
             return ResponseUtil.createBadRequest("Detail is null/empty");
         } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
             return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
-        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
-            return ResponseUtil.createBadRequest("Trader is null");
         } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
             return ResponseUtil.createBadRequest("Voucher Date is null");
         }

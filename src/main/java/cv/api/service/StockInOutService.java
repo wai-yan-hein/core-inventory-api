@@ -9,10 +9,7 @@ import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.dto.StockInOutDetailDto;
 import cv.api.dto.StockInOutKeyDto;
-import cv.api.entity.StockIOKey;
-import cv.api.entity.StockInOut;
-import cv.api.entity.StockInOutDetail;
-import cv.api.entity.StockInOutKey;
+import cv.api.entity.*;
 import cv.api.exception.ResponseUtil;
 import cv.api.model.VStockIO;
 import io.r2dbc.spi.Parameters;
@@ -71,8 +68,6 @@ public class StockInOutService {
             return ResponseUtil.createBadRequest("Detail is null/empty");
         } else if (Util1.isNullOrEmpty(sh.getDeptId())) {
             return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
-        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
-            return ResponseUtil.createBadRequest("Trader is null");
         } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
             return ResponseUtil.createBadRequest("Voucher Date is null");
         }
@@ -191,9 +186,9 @@ public class StockInOutService {
         String traderCode = Util1.isNull(filter.getTraderCode(), "-");
         String jobNo = Util1.isNull(filter.getJobNo(), "-");
         String sql = """
-                select a.*,v.description vou_status_name
+                select a.*,v.description vou_status_name,t.trader_name
                 from (
-                select vou_date,vou_no,description,remark,vou_status,created_by,
+                select vou_date,vou_no,description,remark,vou_status,created_by,trader_code,post,
                 deleted,comp_code,dept_id,sum(ifnull(in_qty,0)) in_qty,sum(ifnull(out_qty,0)) out_qty,
                 sum(ifnull(in_bag,0)) in_bag,sum(ifnull(out_bag,0)) out_bag
                 from v_stock_io
@@ -213,6 +208,8 @@ public class StockInOutService {
                 group by vou_no)a
                 join vou_status v on a.vou_status = v.code
                 and a.comp_code = v.comp_code
+                left join trader t on a.trader_code = t.code
+                and a.comp_code = t.comp_code
                 order by vou_date desc""";
 
         return client.sql(sql)
@@ -244,6 +241,8 @@ public class StockInOutService {
                         .outQty(row.get("out_qty", Double.class))
                         .inBag(row.get("in_bag", Double.class))
                         .outBag(row.get("out_bag", Double.class))
+                        .traderName(row.get("trader_name", String.class))
+                        .post(row.get("post", Boolean.class))
                         .build()
                 ).all();
     }
@@ -452,4 +451,35 @@ public class StockInOutService {
                         .build()).all();
 
     }
+
+    public Mono<Boolean> updatePost(StockInOutKey key, boolean post) {
+        String sql = """
+                update stock_in_out
+                set post = :post
+                where vou_no = :vouNo
+                and comp_code =:compCode
+                """;
+        return client.sql(sql)
+                .bind("vouNo", key.getVouNo())
+                .bind("compCode", key.getCompCode())
+                .bind("post", post)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
+
+    public Mono<Boolean> updatePost(String purVouNo, String compCode, boolean post) {
+        String sql = """
+                update stock_in_out sio
+                join pur_io_join pij on sio.vou_no = pij.io_vou_no
+                and sio.comp_code = pij.comp_code
+                set sio.post = :post
+                where pij.pur_vou_no = :purVouNo
+                and pij.comp_code= :compCode;
+                """;
+        return client.sql(sql)
+                .bind("purVouNo", purVouNo)
+                .bind("compCode", compCode)
+                .bind("post", post)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
+
 }

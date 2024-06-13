@@ -42,21 +42,54 @@ public class PurHisService {
     private final WeightService weightService;
     private final LandingService landingService;
     private final PurExpenseService purExpenseService;
+    private final PurchaseIOJoinService purchaseIOJoinService;
+    private final StockInOutService inOutService;
     private final TransactionalOperator operator;
 
     public Mono<PurHis> save(PurHis dto) {
-        return isValid(dto).flatMap(his -> {
-            String compCode = his.getKey().getCompCode();
-            return operator.transactional(Mono.defer(() -> savePurchase(his).flatMap((pur) -> savePurExpense(pur)
-                    .then(landingService.updatePost(LandingHisKey.builder()
-                                    .vouNo(his.getLandVouNo())
-                                    .compCode(compCode)
-                                    .build(), true)
-                            .then(weightService.updatePost(WeightHisKey.builder()
-                                    .vouNo(his.getWeightVouNo())
-                                    .compCode(compCode)
-                                    .build(), true))).thenReturn(pur))));
-        });
+        return isValid(dto).flatMap(his -> operator.transactional(Mono.defer(() -> savePurchase(his)
+                .flatMap(pur -> savePurExpense(pur)
+                        .then(updateLanding(pur, true))
+                        .then(updateWeight(pur, true))
+                        .then(savePurIOJoin(pur))
+                        .thenReturn(pur)))));
+    }
+
+    private Mono<Boolean> updateLanding(PurHis his, boolean post) {
+        return landingService.updatePost(LandingHisKey.builder()
+                .vouNo(his.getLandVouNo())
+                .compCode(his.getKey().getCompCode())
+                .build(), post);
+    }
+
+    private Mono<Boolean> updateWeight(PurHis his, boolean post) {
+        return weightService.updatePost(WeightHisKey.builder()
+                .vouNo(his.getWeightVouNo())
+                .compCode(his.getKey().getCompCode())
+                .build(), post);
+    }
+
+    private Mono<Boolean> savePurIOJoin(PurHis sh) {
+        List<String> list = sh.getListIO();
+        if (list != null) {
+            String purVouNo = sh.getKey().getVouNo();
+            String compCode = sh.getKey().getCompCode();
+            return purchaseIOJoinService.delete(purVouNo, compCode)
+                    .thenMany(Flux.fromIterable(list).flatMap(ioVouNo -> {
+                        PurchaseIOJoin obj = PurchaseIOJoin.builder().build();
+                        obj.setPurVouNo(purVouNo);
+                        obj.setIoVouNo(ioVouNo);
+                        obj.setCompCode(compCode);
+                        return purchaseIOJoinService.insert(obj).flatMap(ioJoin -> {
+                            StockInOutKey key = StockInOutKey.builder().build();
+                            key.setVouNo(ioVouNo);
+                            key.setCompCode(compCode);
+                            return inOutService.updatePost(key, true);
+                        });
+                    })).then(Mono.just(true));
+        } else {
+            return Mono.just(false);
+        }
     }
 
     private Mono<PurHis> isValid(PurHis sh) {
@@ -117,14 +150,16 @@ public class PurHisService {
     }
 
     public Mono<Boolean> delete(PurHisKey key) {
-        String compCode = key.getCompCode();
-        return findById(key).flatMap(ph -> weightService.updatePost(WeightHisKey.builder()
-                        .vouNo(ph.getWeightVouNo())
-                        .compCode(compCode).build(), false)
-                .then(landingService.updatePost(LandingHisKey.builder()
-                        .vouNo(ph.getLandVouNo())
-                        .compCode(compCode)
-                        .build(), false))).then(updateDeleteStatus(key, true));
+        return operator.transactional(Mono.defer(() -> findById(key).flatMap(his -> updateDeleteStatus(key, true)
+                .then(updateWeight(his, false)
+                        .then(updateLanding(his, false))
+                        .then(updateIO(his))))));
+    }
+
+    private Mono<Boolean> updateIO(PurHis his) {
+        String vouNo = his.getKey().getVouNo();
+        String compCode = his.getKey().getCompCode();
+        return inOutService.updatePost(vouNo, compCode, false);
     }
 
 
