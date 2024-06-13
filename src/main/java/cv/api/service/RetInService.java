@@ -191,7 +191,6 @@ public class RetInService {
                 .thenReturn(ri);
     }
 
-    @Transactional
     public Mono<RetInHisDetail> insert(RetInHisDetail dto) {
         String sql = """
                 INSERT INTO ret_in_his_detail (
@@ -418,6 +417,7 @@ public class RetInService {
                         .catName(row.get("cat_name", String.class))
                         .groupName(row.get("stock_type_name", String.class))
                         .brandName(row.get("brand_name", String.class))
+                        .relCode(row.get("rel_code", String.class))
                         .relName(row.get("rel_name", String.class))
                         .weight(row.get("weight", Double.class))
                         .weightUnit(row.get("weight_unit", String.class))

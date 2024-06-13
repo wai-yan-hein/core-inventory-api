@@ -392,6 +392,7 @@ public class StockInOutService {
                         .catName(row.get("cat_name", String.class))
                         .groupName(row.get("stock_type_name", String.class))
                         .brandName(row.get("brand_name", String.class))
+                        .relCode(row.get("rel_code", String.class))
                         .relName(row.get("rel_name", String.class))
                         .costPrice(row.get("cost_price", Double.class))
                         .weight(row.get("weight", Double.class))

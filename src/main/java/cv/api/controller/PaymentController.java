@@ -42,18 +42,14 @@ public class PaymentController {
 
     @DeleteMapping(path = "/restorePayment")
     public Mono<Boolean> restorePayment(@RequestParam String vouNo, @RequestParam String compCode) {
-        paymentHisService.restore(vouNo, compCode);
-        return Mono.just(true);
+        return paymentHisService.restore(vouNo, compCode);
 
     }
 
 
     @PostMapping(path = "/savePayment")
     public Mono<PaymentHis> savePayment(@RequestBody PaymentHis ph) {
-        return paymentHisService.save(ph).flatMap(his -> {
-            accountRepo.sendPayment(his);
-            return Mono.just(his);
-        });
+        return paymentHisService.save(ph).flatMap(obj -> accountRepo.sendPayment(obj).thenReturn(obj));
     }
 
     @GetMapping(path = "/paymentReport")

@@ -69,8 +69,6 @@ public class SaleHisService {
             return ResponseUtil.createBadRequest("Trader is null");
         } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
             return ResponseUtil.createBadRequest("Voucher Date is null");
-        } else if (sh.getVouTotal() <= 0) {
-            return ResponseUtil.createBadRequest("Voucher Total is zero");
         }
         return Mono.just(sh);
     }
@@ -104,7 +102,7 @@ public class SaleHisService {
         return saveOrUpdate(dto).flatMap(ri -> saleDetailService.delete(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
             List<SaleHisDetail> list = dto.getListSH();
             return Flux.fromIterable(list)
-                    .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
+                    .filter(detail -> Util1.getDouble(detail.getQty()) != 0)
                     .concatMap(detail -> {
                         if (detail.getKey() == null) {
                             detail.setKey(SaleDetailKey.builder().build());

@@ -5,6 +5,7 @@
  */
 package cv.api.service;
 
+import cv.api.common.Util1;
 import cv.api.entity.SaleDetailKey;
 import cv.api.entity.SaleHisDetail;
 import io.r2dbc.spi.Parameters;
@@ -29,9 +30,9 @@ public class SaleDetailService {
     public Mono<SaleHisDetail> save(SaleHisDetail sh) {
         String sql = """
                     INSERT INTO sale_his_detail
-                    (vou_no,comp_code,unique_id, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, dept_id, batch_no, weight, weight_unit, design, size, std_weight, total_weight, org_price, weight_loss, wet, rice, bag, length, height, divider, total_sqft)
+                    (vou_no,comp_code,unique_id, stock_code, expire_date, qty, sale_unit, sale_price, sale_amt, loc_code, dept_id, batch_no, weight, weight_unit, design, size, std_weight, total_weight, org_price, weight_loss, wet, rice, bag, length, height, divider, total_sqft, dis_amt, foc)
                     VALUES
-                    (:vouNo,:compCode,:uniqueId, :stockCode, :expireDate, :qty, :saleUnit, :salePrice, :saleAmt, :locCode,   :deptId, :batchNo, :weight, :weightUnit, :design, :size, :stdWeight, :totalWeight, :orgPrice, :weightLoss, :wet, :rice, :bag, :length, :height, :divider, :totalSqft)
+                    (:vouNo,:compCode,:uniqueId, :stockCode, :expireDate, :qty, :saleUnit, :salePrice, :saleAmt, :locCode,   :deptId, :batchNo, :weight, :weightUnit, :design, :size, :stdWeight, :totalWeight, :orgPrice, :weightLoss, :wet, :rice, :bag, :length, :height, :divider, :totalSqft, :disAmt, :foc)
                 """;
 
         return client.sql(sql)
@@ -62,6 +63,8 @@ public class SaleDetailService {
                 .bind("height", Parameters.in(R2dbcType.DOUBLE, sh.getHeight()))
                 .bind("divider", Parameters.in(R2dbcType.DOUBLE, sh.getDivider()))
                 .bind("totalSqft", Parameters.in(R2dbcType.DOUBLE, sh.getTotalSqft()))
+                .bind("disAmt", Parameters.in(R2dbcType.DOUBLE, sh.getDisAmt()))
+                .bind("foc", Util1.getBoolean(sh.getFoc()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(sh);
@@ -71,7 +74,8 @@ public class SaleDetailService {
 
     public Flux<SaleHisDetail> search(String vouNo, String compCode) {
         String sql = """
-                    SELECT op.*, s.user_code, s.stock_name,s.calculate, cat.cat_name, st.stock_type_name, sb.brand_name, rel.rel_name, l.loc_name, t.trader_name
+                    SELECT op.*, s.user_code, s.stock_name,
+                    s.calculate, cat.cat_name, st.stock_type_name, sb.brand_name, rel.rel_name, l.loc_name, t.trader_name
                     FROM sale_his_detail op
                     LEFT JOIN location l ON op.loc_code = l.loc_code AND op.comp_code = l.comp_code
                     LEFT JOIN stock s ON op.stock_code = s.stock_code AND op.comp_code = s.comp_code
@@ -88,45 +92,58 @@ public class SaleDetailService {
         return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
-                .map((row, metadata) -> SaleHisDetail.builder()
-                        .key(SaleDetailKey.builder()
-                                .compCode(row.get("comp_code", String.class))
-                                .uniqueId(row.get("unique_id", Integer.class))
-                                .vouNo(row.get("vou_no", String.class))
-                                .build())
-                        .deptId(row.get("dept_id", Integer.class))
-                        .stockCode(row.get("stock_code", String.class))
-                        .weight(row.get("weight", Double.class))
-                        .weightUnit(row.get("weight_unit", String.class))
-                        .stdWeight(row.get("std_weight", Double.class))
-                        .totalWeight(row.get("total_weight", Double.class))
-                        .qty(row.get("qty", Double.class))
-                        .price(row.get("sale_price", Double.class))
-                        .amount(row.get("sale_amt", Double.class))
-                        .locCode(row.get("loc_code", String.class))
-                        .locName(row.get("loc_name", String.class))
-                        .unitCode(row.get("sale_unit", String.class))
-                        .userCode(row.get("user_code", String.class))
-                        .stockName(row.get("stock_name", String.class))
-                        .calculate(row.get("calculate", Boolean.class))
-                        .catName(row.get("cat_name", String.class))
-                        .groupName(row.get("stock_type_name", String.class))
-                        .brandName(row.get("brand_name", String.class))
-                        .relName(row.get("rel_name", String.class))
-                        .batchNo(row.get("batch_no", String.class))
-                        .traderName(row.get("trader_name", String.class))
-                        .orgPrice(row.get("org_price", Double.class))
-                        .weightLoss(row.get("weight_loss", Double.class))
-                        .wet(row.get("wet", Double.class))
-                        .rice(row.get("rice", Double.class))
-                        .bag(row.get("bag", Double.class))
-                        .design(row.get("design", String.class))
-                        .size(row.get("size", String.class))
-                        .length(row.get("length", Double.class))
-                        .height(row.get("height", Double.class))
-                        .divider(row.get("divider", Double.class))
-                        .totalSqft(row.get("total_sqft", Double.class))
-                        .build())
+                .map((row, metadata) -> {
+                    var d = SaleHisDetail.builder()
+                            .key(SaleDetailKey.builder()
+                                    .compCode(row.get("comp_code", String.class))
+                                    .uniqueId(row.get("unique_id", Integer.class))
+                                    .vouNo(row.get("vou_no", String.class))
+                                    .build())
+                            .deptId(row.get("dept_id", Integer.class))
+                            .stockCode(row.get("stock_code", String.class))
+                            .weight(row.get("weight", Double.class))
+                            .weightUnit(row.get("weight_unit", String.class))
+                            .stdWeight(row.get("std_weight", Double.class))
+                            .totalWeight(row.get("total_weight", Double.class))
+                            .qty(row.get("qty", Double.class))
+                            .price(row.get("sale_price", Double.class))
+                            .amount(row.get("sale_amt", Double.class))
+                            .locCode(row.get("loc_code", String.class))
+                            .locName(row.get("loc_name", String.class))
+                            .unitCode(row.get("sale_unit", String.class))
+                            .userCode(row.get("user_code", String.class))
+                            .stockName(row.get("stock_name", String.class))
+                            .calculate(row.get("calculate", Boolean.class))
+                            .catName(row.get("cat_name", String.class))
+                            .groupName(row.get("stock_type_name", String.class))
+                            .brandName(row.get("brand_name", String.class))
+                            .relName(row.get("rel_name", String.class))
+                            .batchNo(row.get("batch_no", String.class))
+                            .traderName(row.get("trader_name", String.class))
+                            .orgPrice(row.get("org_price", Double.class))
+                            .weightLoss(row.get("weight_loss", Double.class))
+                            .wet(row.get("wet", Double.class))
+                            .rice(row.get("rice", Double.class))
+                            .bag(row.get("bag", Double.class))
+                            .design(row.get("design", String.class))
+                            .size(row.get("size", String.class))
+                            .length(row.get("length", Double.class))
+                            .height(row.get("height", Double.class))
+                            .divider(row.get("divider", Double.class))
+                            .totalSqft(row.get("total_sqft", Double.class))
+                            .disAmt(row.get("dis_amt", Double.class))
+                            .foc(row.get("foc", Boolean.class))
+                            .build();
+                    boolean foc = d.getFoc();
+                    double disAmt = d.getDisAmt();
+                    if (foc) {
+                        d.setStockName(d.getStockName() + " * FOC");
+                    }
+                    if (disAmt > 0) {
+                        d.setStockName(d.getStockName() + " * DIS");
+                    }
+                    return d;
+                })
                 .all();
     }
 

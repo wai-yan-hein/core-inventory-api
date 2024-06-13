@@ -53,4 +53,6 @@ public class SaleHisDetail {
     private Double height;
     private Double divider;
     private Double totalSqft;
+    private Double disAmt;
+    private Boolean foc;
 }

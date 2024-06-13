@@ -1931,6 +1931,9 @@ create table stock_unit_price (
   primary key (stock_code,comp_code,unit)
 ) engine=innodb default charset=utf8mb3 collate=utf8mb3_general_ci;
 
+alter table sale_his_detail
+add column dis_amt double(20,3) null;
+add column foc bit(1) not null default 0;
 
 #view
 drop view if exists v_milling_output;

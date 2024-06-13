@@ -104,6 +104,7 @@ public class PurHisDetailService {
                         .catName(row.get("cat_name", String.class))
                         .groupName(row.get("stock_type_name", String.class))
                         .brandName(row.get("brand_name", String.class))
+                        .relCode(row.get("rel_code", String.class))
                         .relName(row.get("rel_name", String.class))
                         .length(row.get("length", Double.class))
                         .width(row.get("width", Double.class))

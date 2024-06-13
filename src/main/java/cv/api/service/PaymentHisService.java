@@ -4,6 +4,7 @@ import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.PaymentHis;
 import cv.api.entity.PaymentHisDetail;
+import cv.api.exception.ResponseUtil;
 import cv.api.model.VSale;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentHisService {
@@ -33,23 +32,43 @@ public class PaymentHisService {
 
 
     public Mono<PaymentHis> save(PaymentHis dto) {
-        return operator.transactional(Mono.defer(() -> saveOrUpdate(dto).flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode())
-                .flatMap(delete -> {
-                    List<PaymentHisDetail> list = dto.getListDetail();
-                    if (list != null && !list.isEmpty()) {
-                        return Flux.fromIterable(list)
-                                .filter(detail -> Util1.getDouble(detail.getPayAmt()) != 0)
-                                .concatMap(detail -> {
-                                    int uniqueId = list.indexOf(detail) + 1;
-                                    detail.setUniqueId(uniqueId);
-                                    detail.setVouNo(payment.getVouNo());
-                                    detail.setCompCode(payment.getCompCode());
-                                    detail.setDeptId(payment.getDeptId());
-                                    return updateSale(detail, true).then(insertDetail(detail));
-                                }).then(Mono.just(payment));
-                    }
-                    return Mono.empty();
-                }))));
+        return isValid(dto).flatMap(ph -> operator.transactional(Mono.defer(() -> saveOrUpdate(ph)
+                .flatMap(payment -> deleteDetail(payment.getVouNo(), payment.getCompCode())
+                        .flatMap(delete -> {
+                            List<PaymentHisDetail> list = ph.getListDetail();
+                            if (list != null && !list.isEmpty()) {
+                                return Flux.fromIterable(list)
+                                        .filter(detail -> Util1.getDouble(detail.getPayAmt()) != 0)
+                                        .concatMap(detail -> {
+                                            int uniqueId = list.indexOf(detail) + 1;
+                                            detail.setUniqueId(uniqueId);
+                                            detail.setVouNo(payment.getVouNo());
+                                            detail.setCompCode(payment.getCompCode());
+                                            detail.setDeptId(payment.getDeptId());
+                                            return updateSale(detail, true).then(insertDetail(detail));
+                                        }).then(Mono.just(payment));
+                            }
+                            return Mono.empty();
+                        })))));
+    }
+
+    private Mono<PaymentHis> isValid(PaymentHis sh) {
+        if (Util1.isNullOrEmpty(sh.getDeptId())) {
+            return ResponseUtil.createBadRequest("deptId is null from mac id : " + sh.getMacId());
+        } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
+            return ResponseUtil.createBadRequest("Voucher Date is empty");
+        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
+            return ResponseUtil.createBadRequest("Trader Code is empty");
+        } else if (Util1.isNullOrEmpty(sh.getCurCode())) {
+            return ResponseUtil.createBadRequest("Currency is empty");
+        } else if (Util1.getDouble(sh.getAmount()) <= 0) {
+            return ResponseUtil.createBadRequest("Payment Amount is zero");
+        } else if (!Util1.isNullOrEmpty(sh.getAccount())) {
+            if (Util1.isNullOrEmpty(sh.getDeptCode())) {
+                return ResponseUtil.createBadRequest("Department is empty");
+            }
+        }
+        return Mono.just(sh);
     }
 
     public Mono<PaymentHisDetail> insertDetail(PaymentHisDetail his) {
@@ -214,22 +233,6 @@ public class PaymentHisService {
         }
         return Mono.just(false);
     }
-
-
-    public Mono<PaymentHis> find(String vouNo, String compCode) {
-        String sql = """
-                select *
-                from payment_his
-                where comp_code =:compCode
-                and vou_no=:vouNo
-                """;
-        return client.sql(sql)
-                .bind("compCode", compCode)
-                .bind("vouNo", vouNo)
-                .map((row, rowMetadata) -> mapToPayment(row)).one();
-
-    }
-
 
     public Mono<Boolean> delete(String vouNo, String compCode) {
         String sql = """

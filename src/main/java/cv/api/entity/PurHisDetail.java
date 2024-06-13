@@ -49,6 +49,7 @@ public class PurHisDetail {
     private String brandName;
     private String catName;
     private String relName;
+    private String relCode;
     private String locName;
     private String landVouNo;
     private double purQty;

@@ -403,6 +403,7 @@ public class TransferHisService {
                         .groupName(row.get("stock_type_name", String.class))
                         .qty(row.get("qty", Double.class))
                         .unitCode(row.get("unit", String.class))
+                        .relCode(row.get("rel_code", String.class))
                         .relName(row.get("rel_name", String.class))
                         .weight(row.get("weight", Double.class))
                         .weightUnit(row.get("weight_unit", String.class))

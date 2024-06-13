@@ -36,6 +36,7 @@ public class RetInHisDetail {
     private String brandName;
     private String catName;
     private String relName;
+    private String relCode;
     private String locName;
     private String unit;
     private String remark;
