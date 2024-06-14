@@ -376,7 +376,7 @@ public class TransferHisService {
 
     public Flux<TransferHisDetail> search(String vouNo, String compCode) {
         String sql = """
-                select td.*,s.user_code,s.stock_name,st.stock_type_name,rel.rel_name
+                select td.*,s.user_code,s.stock_name,st.stock_type_name,rel.rel_code,rel.rel_name
                 from transfer_his_detail td
                 join stock s on td.stock_code = s.stock_code
                 and td.comp_code = s.comp_code

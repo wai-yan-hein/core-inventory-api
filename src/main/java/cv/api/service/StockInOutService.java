@@ -143,6 +143,7 @@ public class StockInOutService {
                 .carNo(row.get("car_no", String.class))
                 .traderCode(row.get("trader_code", String.class))
                 .printCount(row.get("print_count", Integer.class))
+                .post(row.get("post",Boolean.class))
                 .build();
     }
 
@@ -285,11 +286,11 @@ public class StockInOutService {
         String sql = """
                 INSERT INTO stock_in_out (vou_no, vou_date, remark, description, comp_code, mac_id, created_date,
                 created_by, updated_date, updated_by, deleted, vou_status, dept_id, intg_upd_status, labour_group_code,
-                job_code, received_name, received_phone, car_no, trader_code, print_count)
+                job_code, received_name, received_phone, car_no, trader_code, print_count, post)
                 VALUES
                 (:vouNo, :vouDate, :remark, :description, :compCode, :macId, :createdDate, :createdBy,
                 :updatedDate, :updatedBy, :deleted, :vouStatus, :deptId, :intgUpdStatus, :labourGroupCode,
-                :jobCode, :receivedName, :receivedPhone, :carNo, :traderCode, :printCount)
+                :jobCode, :receivedName, :receivedPhone, :carNo, :traderCode, :printCount, :post)
                 """;
         return executeUpdate(sql, dto);
     }
@@ -316,7 +317,8 @@ public class StockInOutService {
                     received_phone = :receivedPhone,
                     car_no = :carNo,
                     trader_code = :traderCode,
-                    print_count = :printCount
+                    print_count = :printCount,
+                    post = :post
                 WHERE vou_no = :vouNo AND comp_code = :compCode
                 """;
         return executeUpdate(sql, dto);
@@ -345,6 +347,7 @@ public class StockInOutService {
                 .bind("carNo", Parameters.in(R2dbcType.VARCHAR, dto.getCarNo()))
                 .bind("traderCode", Parameters.in(R2dbcType.VARCHAR, dto.getTraderCode()))
                 .bind("printCount", Parameters.in(R2dbcType.INTEGER, dto.getPrintCount()))
+                .bind("post",Util1.getBoolean(dto.getPost()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -353,7 +356,7 @@ public class StockInOutService {
     public Flux<StockInOutDetailDto> search(String vouNo, String compCode) {
         String sql = """
                 select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,
-                rel.rel_name,l.loc_name
+                rel.rel_code,rel.rel_name,l.loc_name
                 from stock_in_out_detail op
                 join location l on op.loc_code = l.loc_code
                 and op.comp_code = l.comp_code

@@ -62,7 +62,7 @@ public class PurHisDetailService {
 
     public Flux<PurHisDetail> search(String vouNo, String compCode) {
         String sql = """
-                select op.*,s.user_code,s.stock_name,s.calculate,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name
+                select op.*,s.user_code,s.stock_name,s.calculate,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_code,rel.rel_name,l.loc_name
                 from pur_his_detail op
                 join location l on op.loc_code = l.loc_code
                 and op.comp_code =l.comp_code

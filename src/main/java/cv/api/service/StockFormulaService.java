@@ -113,6 +113,9 @@ public class StockFormulaService {
     }
 
     public Mono<StockFormula> findById(StockFormulaKey key) {
+        if(Util1.isNullOrEmpty(key.getFormulaCode())){
+            return Mono.empty();
+        }
         String sql = """
                 select *
                 from stock_formula

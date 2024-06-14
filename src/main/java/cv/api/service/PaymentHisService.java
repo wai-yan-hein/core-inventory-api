@@ -63,6 +63,8 @@ public class PaymentHisService {
             return ResponseUtil.createBadRequest("Currency is empty");
         } else if (Util1.getDouble(sh.getAmount()) <= 0) {
             return ResponseUtil.createBadRequest("Payment Amount is zero");
+        } else if (Util1.isNullOrEmpty(sh.getCreatedBy())) {
+            return ResponseUtil.createBadRequest("Created User is empty");
         } else if (!Util1.isNullOrEmpty(sh.getAccount())) {
             if (Util1.isNullOrEmpty(sh.getDeptCode())) {
                 return ResponseUtil.createBadRequest("Department is empty");
@@ -97,7 +99,7 @@ public class PaymentHisService {
                 .bind("curCode", Parameters.in(R2dbcType.VARCHAR, his.getCurCode()))
                 .bind("remark", Parameters.in(R2dbcType.VARCHAR, his.getRemark()))
                 .bind("reference", Parameters.in(R2dbcType.VARCHAR, his.getReference()))
-                .bind("fullPaid", his.getFullPaid())
+                .bind("fullPaid", Util1.getBoolean(his.getFullPaid()))
                 .bind("vouTotal", his.getVouTotal())
                 .bind("vouBalance", his.getVouBalance())
                 .fetch().rowsUpdated().thenReturn(his);
@@ -188,7 +190,7 @@ public class PaymentHisService {
                 .bind("curCode", his.getCurCode())
                 .bind("remark", Parameters.in(R2dbcType.VARCHAR, his.getRemark()))
                 .bind("amount", his.getAmount())
-                .bind("deleted", his.getDeleted())
+                .bind("deleted", Util1.getBoolean(his.getDeleted()))
                 .bind("createdDate", his.getCreatedDate())
                 .bind("createdBy", his.getCreatedBy())
                 .bind("updatedDate", LocalDateTime.now())

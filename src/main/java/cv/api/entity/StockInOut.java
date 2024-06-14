@@ -41,6 +41,7 @@ public class StockInOut {
     private String carNo;
     private String traderCode;
     private Integer printCount;
+    private Boolean post;
     private List<StockInOutDetail> listSH;
     private ZonedDateTime vouDateTime;
 }

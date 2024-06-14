@@ -2071,7 +2071,7 @@ public class ReportService {
                 .flatMap(entry -> {
                     String table = entry.getKey();
                     String type = entry.getValue();
-                    String sql = "SELECT count(*) count FROM " + table + " WHERE stock_code = :code AND comp_code = :compCode";
+                    String sql = "SELECT count(*) count FROM " + table + " WHERE deleted = false and stock_code = :code AND comp_code = :compCode";
                     return client.sql(sql)
                             .bind("code", code)
                             .bind("compCode", compCode)

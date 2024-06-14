@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -61,11 +60,11 @@ public class StockReportService {
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag, loc_code, weight_unit,sum(amt) ttl_amt
                  from v_return_in
-                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 where s_rec = false
+                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
-                 and s_rec = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -75,11 +74,11 @@ public class StockReportService {
                     union all
                  select stock_code,sum(total_weight)*-1 weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(amt) ttl_amt
                  from v_return_out
-                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 where s_pay = false
+                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
-                 and s_pay = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -89,11 +88,11 @@ public class StockReportService {
                     union all
                  select stock_code,sum(total_weight) weight,sum(qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(bag)*-1 bag, loc_code, weight_unit,sum(sale_amt) ttl_amt
                  from v_sale
-                 where date(vou_date) >= :opDate and date(vou_date)<:fromDate
+                 where s_pay = false
+                 and date(vou_date) >= :opDate and date(vou_date)<:fromDate
                  and comp_code =:compCode
                  and deleted = false
                  and calculate = true
-                 and s_pay = false
                  and loc_code in (select f_code from f_location where mac_id =:macId )
                  and (stock_type_code = :typeCode or '-' = :typeCode)
                  and (brand_code = :brandCode or '-' = :brandCode)
@@ -219,7 +218,7 @@ public class StockReportService {
                 select 'A-Opening',tran_date,'-','Opening',stock_code,sum(ttl_qty) ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(ttl_bag) ttl_bag, ifnull(sum(ttl_weight),0) ttl_weight,sum(ttl_amt),loc_code,mac_id,comp_code,dept_id
                 from tmp_stock_opening tmp
                 where mac_id =:macId
-                group by tran_date,stock_code,mac_id,loc_code""";
+                group by tran_date,stock_code,mac_id""";
         String purSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,pur_wet,pur_rice,pur_bag,pur_weight,pur_ttl_amt,loc_code,mac_id,comp_code,dept_id)
                 select 'Purchase',vou_date vou_date,vou_no,remark,stock_code,sum(qty) ttl_qty,sum(ttl_wet) ttl_wet, sum(ttl_rice) ttl_rice, sum(bag) ttl_bag, ifnull(sum(total_weight),0) ttl_weight,sum(pur_amt),loc_code,:macId,comp_code,dept_id
@@ -829,13 +828,13 @@ public class StockReportService {
         return list;
     }
 
-    @Transactional
+    
     private Mono<Long> deleteTmpOpening(Integer macId) {
         String sql = "delete from tmp_stock_opening where mac_id =:macId";
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
     }
 
-    @Transactional
+    
     private Mono<Long> deleteTmpIO(Integer macId) {
         String sql = "delete from tmp_stock_io_column where mac_id=:macId";
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
@@ -1030,13 +1029,13 @@ public class StockReportService {
                 .rowsUpdated();
     }
 
-    @Transactional
+    
     private Mono<Long> deleteTmpClosing(Integer macId) {
         String delSql = "delete from tmp_stock_balance where mac_id =:macId";
         return client.sql(delSql).bind("macId", macId).fetch().rowsUpdated();
     }
 
-    @Transactional
+
     private Mono<Long> calculateOpeningConsign(String opDate, String fromDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String traderCode, String locCode, String compCode, Integer macId) {
@@ -1106,7 +1105,7 @@ public class StockReportService {
                 .rowsUpdated());
     }
 
-    @Transactional
+    
     private Mono<Long> calculateClosingConsign(String fromDate, String toDate, String typeCode,
                                                String catCode, String brandCode, String stockCode,
                                                String traderCode, String locCode, String compCode, Integer macId) {

@@ -53,7 +53,8 @@ public class StockRelationService {
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, pur_unit
                     FROM v_purchase
-                    WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
+                    WHERE s_rec = false
+                    AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND (calculate = true AND :calPur = false)
                     AND comp_code = :compCode
@@ -122,7 +123,8 @@ public class StockRelationService {
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, sale_unit
                     FROM v_sale
-                    WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
+                    WHERE s_pay = false
+                    AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND (calculate = true AND :calSale = false)
                     AND comp_code = :compCode
@@ -251,7 +253,8 @@ public class StockRelationService {
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id
                         from v_purchase
-                        where date(vou_date) between :fromDate and :toDate
+                        where s_rec = false
+                        and date(vou_date) between :fromDate and :toDate
                         and deleted = false
                         and (calculate = true and :calPur = false)
                         and comp_code = :compCode
@@ -321,7 +324,8 @@ public class StockRelationService {
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,sale_unit,rel_code,comp_code,dept_id
                         from v_sale
-                        where date(vou_date) between :fromDate and :toDate
+                        where s_pay =false
+                        and date(vou_date) between :fromDate and :toDate
                         and deleted = false
                         and (calculate = true and :calSale = false)
                         and comp_code = :compCode

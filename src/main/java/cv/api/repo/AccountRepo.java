@@ -187,7 +187,7 @@ public class AccountRepo {
         if (isIntegrate()) {
             String vouNo = obj.getKey().getVouNo();
             String compCode = obj.getKey().getCompCode();
-            if (obj.getDeleted()) {
+            if (Util1.getBoolean(obj.getDeleted())) {
                 deleteInvVoucher(obj.getKey());
                 return Mono.empty();
             }
@@ -402,7 +402,7 @@ public class AccountRepo {
             String vouNo = obj.getKey().getVouNo();
             String compCode = obj.getKey().getCompCode();
             String tranSource = "PURCHASE";
-            if (obj.getDeleted()) {
+            if (Util1.getBoolean(obj.getDeleted())) {
                 deleteInvVoucher(obj.getKey());
                 return Mono.empty();
             }
@@ -589,7 +589,7 @@ public class AccountRepo {
             String tranSource = "RETURN_IN";
             String vouNo = obj.getKey().getVouNo();
             String compCode = obj.getKey().getCompCode();
-            if (obj.getDeleted()) {
+            if (Util1.getBoolean(obj.getDeleted())) {
                 deleteInvVoucher(obj.getKey());
                 return Mono.empty();
             }
@@ -731,7 +731,7 @@ public class AccountRepo {
             String tranSource = "RETURN_OUT";
             String vouNo = obj.getKey().getVouNo();
             String compCode = obj.getKey().getCompCode();
-            if (obj.getDeleted()) {
+            if (Util1.getBoolean(obj.getDeleted())) {
                 deleteInvVoucher(obj.getKey());
                 return Mono.empty();
             }
@@ -871,7 +871,7 @@ public class AccountRepo {
         if (isIntegrate()) {
             String vouNo = obj.getVouNo();
             String compCode = obj.getCompCode();
-            if (obj.getDeleted()) {
+            if (Util1.getBoolean(obj.getDeleted())) {
                 deletePayment(vouNo, compCode);
                 return Mono.empty();
             }
@@ -941,7 +941,7 @@ public class AccountRepo {
             String sourceAcc = obj.getSourceAcc();
             String compCode = obj.getCompCode();
             String vouNo = obj.getVouNo();
-            if (obj.getDeleted()) {
+            if (Util1.getBoolean(obj.getDeleted())) {
                 deleteLabourPayment(vouNo, compCode);
                 return Mono.empty();
             }
@@ -950,7 +950,7 @@ public class AccountRepo {
                 LocalDateTime vouDate = obj.getVouDate();
                 String curCode = obj.getCurCode();
                 String remark = obj.getRemark();
-                boolean deleted = obj.getDeleted();
+                boolean deleted = Util1.getBoolean(obj.getDeleted());
                 return labourPaymentService.getDetail(vouNo, compCode)
                         .flatMap(detail -> {
                             Gl gl = new Gl();

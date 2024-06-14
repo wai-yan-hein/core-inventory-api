@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,7 +33,6 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class OrderHisService {
 
@@ -113,7 +111,7 @@ public class OrderHisService {
         }
     }
 
-    @Transactional
+    
     public Mono<OrderHis> insert(OrderHis dto) {
         String sql = """
                 INSERT INTO order_his
@@ -128,7 +126,7 @@ public class OrderHisService {
         return executeUpdate(sql, dto);
     }
 
-    @Transactional
+    
     public Mono<OrderHisDetail> insert(OrderHisDetail dto) {
         String sql = """
                 INSERT INTO order_his_detail
@@ -161,7 +159,7 @@ public class OrderHisService {
                 .thenReturn(dto);
     }
 
-    @Transactional
+    
     private Mono<OrderHis> update(OrderHis dto) {
         String sql = """
                 UPDATE order_his
