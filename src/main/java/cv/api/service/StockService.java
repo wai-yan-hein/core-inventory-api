@@ -146,16 +146,15 @@ public class StockService {
     }
 
 
-    public Flux<Stock> findAll(String compCode, Integer deptId) {
+    public Flux<Stock> findAll(String compCode) {
         String sql = """
                 select *
                 from stock
                 where comp_code=:compCode
-                and (dept_id =:deptId or 0 =:deptId)
+                and deleted =false
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
 
@@ -220,7 +219,7 @@ public class StockService {
         boolean deleted = filter.isDeleted();
         boolean active = filter.isActive();
         String sql = """
-                select s.*,st.stock_type_name,cat.cat_name
+                select s.*,st.stock_type_name,cat.cat_name,rel.rel_name
                 from stock s
                 left join stock_type st
                 on s.stock_type_code = st.stock_type_code
@@ -228,6 +227,9 @@ public class StockService {
                 left join category cat
                 on s.category_code = cat.cat_code
                 and s.comp_code = cat.comp_code
+                left join unit_relation rel
+                on s.rel_code = rel.rel_code
+                and s.comp_code = rel.comp_code
                 where s.comp_code = :compCode
                 and s.deleted = :deleted
                 and s.active = :active
@@ -276,6 +278,7 @@ public class StockService {
                         .userCode(row.get("user_code", String.class))
                         .macId(row.get("mac_id", Integer.class))
                         .relCode(row.get("rel_code", String.class))
+                        .relName(row.get("rel_name", String.class))
                         .calculate(row.get("calculate", Boolean.class))
                         .deptId(row.get("dept_id", Integer.class))
                         .explode(row.get("explode", Boolean.class))
@@ -484,18 +487,16 @@ public class StockService {
     }
 
 
-    public Flux<Stock> getService(String compCode, Integer deptId) {
+    public Flux<Stock> getService(String compCode) {
         String sql = """
                 select *
                 from stock
                 where calculate = false
                 and deleted = false
                 and comp_code = :compCode
-                and (dept_id = :deptId or 0 = :deptId)
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .map(row -> Stock.builder()
                         .key(StockKey.builder()
                                 .stockCode(row.get("stock_code", String.class))

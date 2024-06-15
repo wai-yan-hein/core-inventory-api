@@ -13,7 +13,6 @@ import io.r2dbc.spi.R2dbcType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +20,6 @@ import reactor.core.publisher.Mono;
  * @author wai yan
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class SaleDetailService {
     private final DatabaseClient client;
@@ -75,7 +73,7 @@ public class SaleDetailService {
     public Flux<SaleHisDetail> search(String vouNo, String compCode) {
         String sql = """
                     SELECT op.*, s.user_code, s.stock_name,
-                    s.calculate, cat.cat_name, st.stock_type_name, sb.brand_name, rel.rel_name, l.loc_name, t.trader_name
+                    s.calculate, cat.cat_name, st.stock_type_name, sb.brand_name, s.rel_code,rel.rel_name, l.loc_name, t.trader_name
                     FROM sale_his_detail op
                     LEFT JOIN location l ON op.loc_code = l.loc_code AND op.comp_code = l.comp_code
                     LEFT JOIN stock s ON op.stock_code = s.stock_code AND op.comp_code = s.comp_code
@@ -117,6 +115,7 @@ public class SaleDetailService {
                             .catName(row.get("cat_name", String.class))
                             .groupName(row.get("stock_type_name", String.class))
                             .brandName(row.get("brand_name", String.class))
+                            .relCode(row.get("rel_code", String.class))
                             .relName(row.get("rel_name", String.class))
                             .batchNo(row.get("batch_no", String.class))
                             .traderName(row.get("trader_name", String.class))
@@ -135,7 +134,7 @@ public class SaleDetailService {
                             .foc(row.get("foc", Boolean.class))
                             .build();
                     boolean foc = d.getFoc();
-                    double disAmt = d.getDisAmt();
+                    double disAmt = Util1.getDouble(d.getDisAmt());
                     if (foc) {
                         d.setStockName(d.getStockName() + " * FOC");
                     }

@@ -107,18 +107,16 @@ public class PriceOptionService {
                 .map((row, rowMetadata) -> mapRow(row)).one();
     }
 
-    public Flux<PriceOption> getPriceOptions(String option, String compCode, Integer deptId) {
+    public Flux<PriceOption> getPriceOptions(String option, String compCode) {
         String sql = """
                 SELECT *
                 FROM price_option
                 WHERE tran_option = :option
                 and compCode = :compCode
-                and deptId = :deptId
                 """;
         return client.sql(sql)
                 .bind("option", option)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .map((row, rowMetadata) -> mapRow(row)).all();
     }
 

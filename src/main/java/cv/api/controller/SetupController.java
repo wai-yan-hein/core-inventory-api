@@ -361,8 +361,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/findTraderRFID")
-    public Mono<Trader> findTraderRfId(@RequestParam String rfId, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return traderService.findByRFID(rfId, compCode, deptId);
+    public Mono<Trader> findTraderRfId(@RequestParam String rfId, @RequestParam String compCode) {
+        return traderService.findByRFID(rfId, compCode);
     }
 
     @PostMapping(path = "/saveStock")
@@ -376,8 +376,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getStock")
-    public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam Integer deptId, @RequestParam boolean active) {
-        return active ? stockService.findActiveStock(compCode) : stockService.findAll(compCode, deptId);
+    public Flux<Stock> getStock(@RequestParam String compCode, @RequestParam boolean active) {
+        return active ? stockService.findActiveStock(compCode) : stockService.findAll(compCode);
     }
 
     @GetMapping(path = "/getUpdateStock")
@@ -406,8 +406,8 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getService")
-    public Flux<Stock> getService(@RequestParam String compCode, @RequestParam Integer deptId) {
-        return stockService.getService(compCode, deptId);
+    public Flux<Stock> getService(@RequestParam String compCode) {
+        return stockService.getService(compCode);
     }
 
     @PostMapping(path = "/searchStock")
@@ -611,8 +611,9 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getPriceOption")
-    public Flux<PriceOption> getPriceOption(@RequestParam String option, @RequestParam String compCode, @RequestParam Integer deptId) {
-        return optionService.getPriceOptions(Util1.isNull(option, "-"), compCode, deptId).onErrorResume(throwable -> Flux.empty());
+    public Flux<PriceOption> getPriceOption(@RequestParam String option,
+                                            @RequestParam String compCode) {
+        return optionService.getPriceOptions(Util1.isNull(option, "-"), compCode);
     }
 
     @GetMapping(path = "/getUpdatePriceOption")

@@ -88,25 +88,22 @@ public class TraderService {
     }
 
 
-    public Mono<Trader> findByRFID(String rfId, String compCode, Integer deptId) {
+    public Mono<Trader> findByRFID(String rfId, String compCode) {
         String sql = """
                 select code,user_code,trader_name,price_type,type
                 from trader
                 where comp_code=:compCode
-                and (dept_id =:deptId or 0 =:deptId)
                 and rfid=:rfId
                 limit 1
                 """;
         return client.sql(sql)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("reId", rfId)
                 .map((row, rowMetadata) -> Trader.builder()
                         .key(TraderKey.builder()
                                 .code(row.get("code", String.class))
                                 .compCode(row.get("comp_code", String.class))
                                 .build())
-                        .deptId(deptId)
                         .userCode(row.get("user_code", String.class))
                         .traderName(row.get("trader_name", String.class))
                         .priceType(row.get("price_type", String.class))
