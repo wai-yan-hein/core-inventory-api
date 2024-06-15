@@ -244,7 +244,7 @@ public class SaleHisService {
         return discountService.getDescription(str, compCode);
     }
 
-    public Flux<VSale> getSale(ReportFilter f) {
+    public Flux<VSale> getHistory(ReportFilter f) {
         String fromDate = Util1.isNull(f.getFromDate(), "-");
         String toDate = Util1.isNull(f.getToDate(), "-");
         String vouNo = Util1.isNull(f.getVouNo(), "-");
@@ -269,7 +269,7 @@ public class SaleHisService {
         String sql = """
                 select a.*,t.trader_name,t.user_code t_user_code
                 from (
-                select vou_no,vou_date,remark,reference,created_by,paid,vou_total,vou_balance,
+                select vou_no,vou_date,remark,reference,created_by,discount,paid,vou_total,vou_balance,
                 deleted,trader_code,loc_code,comp_code,dept_id,post,sum(qty) qty,sum(bag) bag,
                 opening,outstanding,total_payment,total_balance,s_pay
                 from v_sale s
@@ -321,6 +321,7 @@ public class SaleHisService {
                         .remark(row.get("remark", String.class))
                         .reference(row.get("reference", String.class))
                         .createdBy(row.get("created_by", String.class))
+                        .discount(row.get("discount",Double.class))
                         .paid(row.get("paid", Double.class))
                         .vouTotal(row.get("vou_total", Double.class))
                         .vouBalance(row.get("vou_balance", Double.class))

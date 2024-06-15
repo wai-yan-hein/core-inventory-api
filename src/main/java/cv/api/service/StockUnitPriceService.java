@@ -88,8 +88,8 @@ public class StockUnitPriceService {
 
     private Mono<Boolean> genStockPriceByRelation(String relCode, String stockCode, String compCode) {
         String sql = """
-                insert into stock_unit_price(stock_code,comp_code,unit,unique_id)
-                select :stockCode stock_code,comp_code,unit,unique_id
+                insert into stock_unit_price(stock_code,comp_code,unit,unique_id,updated_date)
+                select :stockCode stock_code,comp_code,unit,unique_id,:updatedDate
                 from unit_relation_detail
                 where rel_code = :relCode
                 and comp_code = :compCode
@@ -98,6 +98,7 @@ public class StockUnitPriceService {
                 .bind("relCode", relCode)
                 .bind("compCode", compCode)
                 .bind("stockCode", stockCode)
+                .bind("updatedDate", LocalDateTime.now())
                 .fetch().rowsUpdated().thenReturn(true);
     }
 

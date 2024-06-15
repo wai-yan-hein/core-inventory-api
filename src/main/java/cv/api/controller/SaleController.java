@@ -40,7 +40,7 @@ public class SaleController {
 
     @PostMapping(path = "/getSale")
     public Flux<VSale> getSale(@RequestBody ReportFilter filter) {
-        return shService.getSale(filter);
+        return shService.getHistory(filter);
     }
 
     @PostMapping(path = "/deleteSale")
