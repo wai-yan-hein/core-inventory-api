@@ -7,6 +7,7 @@ package cv.api.controller;
 
 import cv.api.common.General;
 import cv.api.common.ReportFilter;
+import cv.api.common.Util1;
 import cv.api.entity.*;
 import cv.api.model.VSale;
 import cv.api.repo.AccountRepo;
@@ -110,6 +111,7 @@ public class SaleController {
         String fromDate = filter.getFromDate();
         String toDate = filter.getToDate();
         String compCode = filter.getCompCode();
-        return shService.getSaleSummaryByDepartment(fromDate, toDate, compCode);
+        Integer deptId = Util1.getInteger(filter.getDeptId());
+        return shService.getSaleSummaryByDepartment(fromDate, toDate, compCode,deptId);
     }
 }

@@ -663,26 +663,55 @@ public class SaleHisService {
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
-    public Flux<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode) {
+    public Flux<VSale> getSaleSummaryByDepartment(String fromDate, String toDate, String compCode, Integer deptId) {
         String sql = """
-                select sum(vou_total) vou_total,sum(vou_balance) vou_balance,sum(paid) paid,cur_code,dept_id,count(*) vou_count
+                select *
+                from (
+                select 1 sort_id,'SALE' tran_source,sum(vou_total) vou_total,sum(vou_balance) vou_balance,
+                sum(paid) paid,sum(discount)*-1 discount,cur_code,dept_id,count(*) vou_count
                 from sale_his
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false
-                and comp_code = :compCode
-                group by dept_id,cur_code""";
+                and comp_code =  :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                group by dept_id,cur_code
+                	union
+                select 2 sort_id,'RETURN_IN' tran_source,sum(vou_total)*-1 vou_total,sum(balance) vou_balance,
+                sum(paid)*-1 paid,sum(discount)*-1 discount,cur_code,dept_id,count(*) vou_count
+                from ret_in_his
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and comp_code =  :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                group by dept_id,cur_code
+                	union
+                select 3 sort_id,'Customer Payment' tran_source,0,0,sum(amount) paid,0,cur_code,dept_id,count(*) vou_count
+                from payment_his
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and comp_code =  :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                and tran_option ='C'
+                group by dept_id,cur_code
+                )a
+                order by dept_id,sort_id
+                """;
 
         return client.sql(sql)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .bind("compCode", compCode)
+                .bind("deptId",deptId)
                 .map(row -> {
                     VSale s = VSale.builder().build();
+                    s.setTranSource(row.get("tran_source", String.class));
                     s.setVouTotal(row.get("vou_total", Double.class));
                     s.setVouBalance(row.get("vou_balance", Double.class));
                     s.setPaid(row.get("paid", Double.class));
+                    s.setDiscount(row.get("discount", Double.class));
                     s.setDeptId(row.get("dept_id", Integer.class));
                     s.setVouCount(row.get("vou_count", Integer.class));
+                    s.setUniqueId(row.get("sort_id", Integer.class));
                     return s;
                 })
                 .all();

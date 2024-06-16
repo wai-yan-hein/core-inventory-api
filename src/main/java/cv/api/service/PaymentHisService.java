@@ -337,6 +337,7 @@ public class PaymentHisService {
                             .curCode(row.get("cur_code", String.class))
                             .createdDate(row.get("created_date", LocalDateTime.class))
                             .createdBy(row.get("created_by", String.class))
+                            .deptCode(row.get("dept_code",String.class))
                             .build())
                     .all();
 

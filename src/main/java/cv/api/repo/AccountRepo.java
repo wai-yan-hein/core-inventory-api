@@ -901,13 +901,13 @@ public class AccountRepo {
                                 if (tranOption.equals("C")) {
                                     gl.setDescription("Cash Received.");
                                     gl.setSrcAccCode(account);
-                                    gl.setAccCode(ph.getAccount());
+                                    gl.setAccCode(debtorAcc);
                                     gl.setTraderCode(traderCode);
                                     gl.setDrAmt(payAmt);
                                 } else if (tranOption.equals("S")) {
                                     gl.setDescription("Cash Payment.");
                                     gl.setSrcAccCode(account);
-                                    gl.setAccCode(account);
+                                    gl.setAccCode(debtorAcc);
                                     gl.setTraderCode(traderCode);
                                     gl.setCrAmt(payAmt);
                                 }

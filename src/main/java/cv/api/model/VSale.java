@@ -91,6 +91,7 @@ public class VSale {
     private Double creditAmt;
     private Double diffAmt;
     private String tranOption;
+    private String tranSource;
     private String saleVouNo;
     private String payDate;
     private Integer vouCount;
