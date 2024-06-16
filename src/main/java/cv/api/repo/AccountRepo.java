@@ -871,8 +871,9 @@ public class AccountRepo {
         if (isIntegrate()) {
             String vouNo = obj.getVouNo();
             String compCode = obj.getCompCode();
+            String tranSource = vouNo.startsWith("C") ? "RECEIVE" : "PAYMENT";
             if (Util1.getBoolean(obj.getDeleted())) {
-                deletePayment(vouNo, compCode);
+                deletePayment(vouNo, compCode,tranSource);
                 return Mono.empty();
             }
             return paymentHisService.generateForAcc(vouNo, compCode)
@@ -916,7 +917,7 @@ public class AccountRepo {
                                 gl.setDeptCode(deptCode);
                                 gl.setCreatedDate(LocalDateTime.now());
                                 gl.setCreatedBy(appName);
-                                gl.setTranSource("PAYMENT");
+                                gl.setTranSource(tranSource);
                                 gl.setRefNo(vouNo);
                                 gl.setDeleted(deleted);
                                 gl.setMacId(macId);
@@ -1035,12 +1036,12 @@ public class AccountRepo {
         deleteGlByVoucher(gl);
     }
 
-    public void deletePayment(String vouNo, String compCode) {
+    public void deletePayment(String vouNo, String compCode, String tranSource) {
         Gl gl = new Gl();
         GlKey glKey = new GlKey();
         glKey.setCompCode(compCode);
         gl.setKey(glKey);
-        gl.setTranSource("PAYMENT");
+        gl.setTranSource(tranSource);
         gl.setRefNo(vouNo);
         deleteGlByVoucher(gl);
     }

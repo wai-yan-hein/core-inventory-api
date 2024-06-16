@@ -35,7 +35,8 @@ public class PaymentController {
     @DeleteMapping(path = "/deletePayment")
     public Mono<Boolean> deletePayment(@RequestParam String vouNo, @RequestParam String compCode) {
         return paymentHisService.delete(vouNo, compCode).flatMap(aBoolean -> {
-            accountRepo.deletePayment(vouNo, compCode);
+            String tranSource = vouNo.startsWith("C") ? "RECEIVE" : "PAYMENT";
+            accountRepo.deletePayment(vouNo, compCode, tranSource);
             return Mono.just(true);
         });
     }
