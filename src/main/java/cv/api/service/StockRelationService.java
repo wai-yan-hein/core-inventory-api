@@ -295,9 +295,9 @@ public class StockRelationService {
 
         String stockInSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'StockIn',date(a.vou_date) vou_date,vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'StockIn',date(a.vou_date) vou_date,vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
                     from (
-                        select date(vou_date) vou_date,vou_no,description,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id
+                        select date(vou_date) vou_date,vou_no,remark,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id
                         from v_stock_io
                         where ifnull(in_qty,0)<>0 and in_unit is not null
                         and date(vou_date) between :fromDate and :toDate
@@ -389,9 +389,9 @@ public class StockRelationService {
 
         String stockOutSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'StockOut',a.vou_date,a.vou_no,a.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'StockOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
                     from (
-                        select date(vou_date) vou_date,vou_no,description,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id
+                        select date(vou_date) vou_date,vou_no,remark,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id
                         from v_stock_io
                         where ifnull(out_qty,0)<>0 and out_unit is not null
                         and date(vou_date) between :fromDate and :toDate

@@ -180,7 +180,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (in_qty>0 or in_bag>0)
+                 and (in_qty<>0 or in_bag<>0)
                  group by stock_code,loc_code
                  union all
                  select stock_code,sum(total_weight)*-1 weight,sum(out_qty)*-1 qty, sum(ttl_wet)*-1 wet, sum(ttl_rice)*-1 rice, sum(out_bag)*-1 bag, loc_code, weight_unit, sum(amount) ttl_amt
@@ -193,7 +193,7 @@ public class StockReportService {
                  and (brand_code = :brandCode or '-' = :brandCode)
                  and (category_code = :catCode or '-' = :catCode)
                  and (stock_code = :stockCode or '-' = :stockCode)
-                 and (out_qty>0 or out_bag>0)
+                 and (out_qty<>0 or out_bag<>0)
                  group by stock_code,loc_code)a
                  group by stock_code,loc_code;
                 """;
@@ -337,7 +337,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (in_qty>0 or in_bag>0)
+                and (in_qty<>0 or in_bag<>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String stockOut = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,out_wet,out_rice,out_bag,out_weight,out_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -352,7 +352,7 @@ public class StockReportService {
                 and (brand_code = :brandCode or '-' = :brandCode)
                 and (category_code = :catCode or '-' = :catCode)
                 and (stock_code = :stockCode or '-' = :stockCode)
-                and (out_qty>0 or out_bag>0)
+                and (out_qty<>0 or out_bag<>0)
                 group by date(vou_date),vou_no,stock_code,loc_code""";
         String issueSql = """
                 insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,sale_wet,sale_rice,sale_bag,sale_weight,sale_ttl_amt,loc_code,mac_id,comp_code,dept_id)
@@ -976,7 +976,7 @@ public class StockReportService {
                 from v_stock_io
                 where out_qty is not null
                 and out_unit is not null
-                and deleted = 0
+                and deleted = false
                 and date(vou_date)>=:opDate and date(vou_date)< :fromDate
                 and comp_code = :compCode
                 and (loc_code=:locCode or '-' =:locCode)

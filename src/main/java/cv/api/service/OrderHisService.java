@@ -111,7 +111,7 @@ public class OrderHisService {
         }
     }
 
-    
+
     public Mono<OrderHis> insert(OrderHis dto) {
         String sql = """
                 INSERT INTO order_his
@@ -126,7 +126,7 @@ public class OrderHisService {
         return executeUpdate(sql, dto);
     }
 
-    
+
     public Mono<OrderHisDetail> insert(OrderHisDetail dto) {
         String sql = """
                 INSERT INTO order_his_detail
@@ -159,7 +159,7 @@ public class OrderHisService {
                 .thenReturn(dto);
     }
 
-    
+
     private Mono<OrderHis> update(OrderHis dto) {
         String sql = """
                 UPDATE order_his
@@ -400,7 +400,8 @@ public class OrderHisService {
 
     public Flux<OrderHisDetail> searchDetail(String vouNo, String compCode) {
         String sql = """
-                select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,rel.rel_name,l.loc_name,t.trader_name
+                select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,
+                rel.rel_name,l.loc_name,t.trader_name
                 from order_his_detail op
                 join location l on op.loc_code = l.loc_code
                 and op.comp_code = l.comp_code
@@ -447,6 +448,7 @@ public class OrderHisService {
                         .catName(row.get("cat_name", String.class))
                         .groupName(row.get("stock_type_name", String.class))
                         .brandName(row.get("brand_name", String.class))
+                        .relCode(row.get("rel_code", String.class))
                         .relName(row.get("rel_name", String.class))
                         .traderName(row.get("trader_name", String.class))
                         .design(row.get("design", String.class))
