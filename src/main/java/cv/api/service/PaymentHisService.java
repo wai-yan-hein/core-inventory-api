@@ -48,7 +48,7 @@ public class PaymentHisService {
                                             return updateSale(detail, true).then(insertDetail(detail));
                                         }).then(Mono.just(payment));
                             }
-                            return Mono.empty();
+                            return Mono.just(payment);
                         })))));
     }
 
@@ -146,11 +146,11 @@ public class PaymentHisService {
         String sql = """
                 INSERT INTO payment_his
                 (vou_no, comp_code, dept_id, vou_date, trader_code, cur_code, remark, amount,
-                 deleted, created_date, created_by, updated_date, updated_by, mac_id, account,
+                 deleted, created_date, created_by, updated_date, updated_by, mac_id, account, dept_code,
                  project_no, intg_upd_status, tran_option)
                 VALUES
                 (:vouNo, :compCode, :deptId, :vouDate, :traderCode, :curCode, :remark, :amount,
-                 :deleted, :createdDate, :createdBy, :updatedDate, :updatedBy, :macId, :account,
+                 :deleted, :createdDate, :createdBy, :updatedDate, :updatedBy, :macId, :account, :deptCode,
                  :projectNo, :intgUpdStatus, :tranOption)
                 """;
         return executeUpdate(sql, his);
@@ -172,6 +172,7 @@ public class PaymentHisService {
                     updated_by = :updatedBy,
                     mac_id = :macId,
                     account = :account,
+                    dept_code = :deptCode,
                     project_no = :projectNo,
                     intg_upd_status = :intgUpdStatus,
                     tran_option = :tranOption
@@ -197,6 +198,7 @@ public class PaymentHisService {
                 .bind("updatedBy", Parameters.in(R2dbcType.TIMESTAMP, his.getUpdatedBy()))
                 .bind("macId", his.getMacId())
                 .bind("account", Parameters.in(R2dbcType.VARCHAR, his.getAccount()))
+                .bind("deptCode", Parameters.in(R2dbcType.VARCHAR, his.getDeptCode()))
                 .bind("projectNo", Parameters.in(R2dbcType.VARCHAR, his.getProjectNo()))
                 .bind("intgUpdStatus", Parameters.in(R2dbcType.VARCHAR, his.getIntgUpdStatus()))
                 .bind("tranOption", his.getTranOption())
@@ -220,6 +222,7 @@ public class PaymentHisService {
                 .updatedBy(row.get("updated_by", String.class))
                 .macId(row.get("mac_id", Integer.class))
                 .account(row.get("account", String.class))
+                .deptCode(row.get("dept_code", String.class))
                 .projectNo(row.get("project_no", String.class))
                 .intgUpdStatus(row.get("intg_upd_status", String.class))
                 .tranOption(row.get("tran_option", String.class))
@@ -284,10 +287,10 @@ public class PaymentHisService {
                     select a.*,t.trader_name
                     from (
                     select ph.*
-                    from payment_his ph,payment_his_detail phd
-                    where ph.vou_no = phd.vou_no
+                    from payment_his ph left join payment_his_detail phd
+                    on ph.vou_no = phd.vou_no
                     and ph.comp_code = phd.comp_code
-                    and ph.deleted =:deleted
+                    where ph.deleted =:deleted
                     and ph.comp_code =:compCode
                     and ph.cur_code = :curCode
                     and ph.tran_option =:tranOption
@@ -361,10 +364,10 @@ public class PaymentHisService {
                 from (
                 select ph.vou_date,ph.vou_no,ph.trader_code,ph.cur_code,ph.amount,phd.sale_vou_no,
                 phd.sale_vou_date,phd.vou_total,phd.pay_amt,phd.vou_balance,phd.unique_id,ph.comp_code,ph.tran_option
-                from payment_his ph, payment_his_detail phd
-                where ph.vou_no = phd.vou_no
+                from payment_his ph left join payment_his_detail phd
+                on ph.vou_no = phd.vou_no
                 and ph.comp_code = phd.comp_code
-                and ph.vou_no =:vouNo
+                where ph.vou_no =:vouNo
                 and ph.comp_code =:compCode
                 )a
                 join trader t on a.trader_code = t.code
@@ -387,8 +390,8 @@ public class PaymentHisService {
                         .vouTotal(row.get("vou_total", Double.class))
                         .payDate(Util1.toDateStr(row.get("vou_date", LocalDateTime.class), "dd/MM/yyyy"))
                         .vouDate(Util1.toDateStr(row.get("sale_vou_date", LocalDate.class), "dd/MM/yyyy"))
-                        .build()).all();
-
+                        .build())
+                .all();
     }
 
 
@@ -584,7 +587,8 @@ public class PaymentHisService {
         String sql = """
                 select ph.vou_no,ph.comp_code,ph.dept_id,ph.trader_code,
                 ph.vou_date,ph.amount,ph.cur_code,ph.remark,ph.tran_option,
-                ph.deleted,ph.project_no,ph.account,ifnull(t.account,a.bal_acc) debtor_acc,a.dep_code
+                ph.deleted,ph.project_no,ph.account,ifnull(t.account,a.bal_acc) debtor_acc,
+                ifnull(ph.dept_code,a.dep_code) dept_code
                 from payment_his ph join trader t
                 on ph.trader_code = t.code
                 and ph.comp_code = t.comp_code
@@ -610,7 +614,7 @@ public class PaymentHisService {
                         .vouNo(row.get("vou_no", String.class))
                         .account(row.get("account", String.class))
                         .debtorAcc(row.get("debtor_acc", String.class))
-                        .deptCode(row.get("dep_code", String.class))
+                        .deptCode(row.get("dept_code", String.class))
                         .tranOption(row.get("tran_option", String.class))
                         .build()).one();
     }

@@ -258,14 +258,10 @@ public class SaleHisService {
         String locCode = Util1.isNull(f.getLocCode(), "-");
         Integer deptId = f.getDeptId();
         boolean deleted = f.isDeleted();
-        String nullBatch = String.valueOf(f.isNullBatch());
         String batchNo = Util1.isNull(f.getBatchNo(), "-");
         String projectNo = Util1.isAll(f.getProjectNo());
         String curCode = Util1.isAll(f.getCurCode());
-        StringBuilder filter = new StringBuilder();
-        if (Boolean.parseBoolean(nullBatch)) {
-            filter.append(" and (batch_no is null or batch_no ='')\n");
-        }
+        int paymentType = f.getPaymentType();
         String sql = """
                 select a.*,t.trader_name,t.user_code t_user_code
                 from (
@@ -288,7 +284,7 @@ public class SaleHisService {
                 and (batch_no = :batchNo or '-' = :batchNo)
                 and (project_no = :projectNo or '-' = :projectNo)
                 and (cur_code = :curCode or '-' = :curCode)
-                """ + filter + """
+                and (payment_type = :paymentType or 0 = :paymentType)
                 group by vou_no)a
                 join trader t on a.trader_code = t.code
                 and a.comp_code = t.comp_code
@@ -311,6 +307,7 @@ public class SaleHisService {
                 .bind("batchNo", batchNo)
                 .bind("projectNo", projectNo)
                 .bind("curCode", curCode)
+                .bind("paymentType", paymentType)
                 .map((row) -> VSale.builder()
                         .vouDate(Util1.toDateStr(row.get("vou_date", LocalDateTime.class), "dd/MM/yyyy"))
                         .vouDateTime(Util1.toZonedDateTime(row.get("vou_date", LocalDateTime.class)))
@@ -321,7 +318,7 @@ public class SaleHisService {
                         .remark(row.get("remark", String.class))
                         .reference(row.get("reference", String.class))
                         .createdBy(row.get("created_by", String.class))
-                        .discount(row.get("discount",Double.class))
+                        .discount(row.get("discount", Double.class))
                         .paid(row.get("paid", Double.class))
                         .vouTotal(row.get("vou_total", Double.class))
                         .vouBalance(row.get("vou_balance", Double.class))

@@ -73,6 +73,7 @@ public class ReportFilter {
     private String orderStatus;
     private String refNo;
     private boolean draft;
+    private int paymentType;
 
 
 }
