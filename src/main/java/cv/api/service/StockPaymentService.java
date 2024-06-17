@@ -64,7 +64,7 @@ public class StockPaymentService {
         int deptId = payment.getDeptId();
         int macId = payment.getMacId();
         payment.setVouDate(Util1.toDateTime(payment.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "StockPayment", compCode, macId)
                     .flatMap(seqNo -> {
                         payment.setVouNo(seqNo);

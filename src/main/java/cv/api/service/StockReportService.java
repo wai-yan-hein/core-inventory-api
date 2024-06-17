@@ -28,7 +28,7 @@ public class StockReportService {
         //opening
         String sql = """
                  insert into tmp_stock_opening(tran_date,stock_code,ttl_qty,ttl_wet,ttl_rice,ttl_bag,ttl_weight,ttl_amt,loc_code,unit,comp_code,dept_id,mac_id)
-                 select :opDate op_date ,stock_code,sum(qty) ttl_qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, sum(weight) ttl_weight,sum(ttl_amt)ttl_amt,loc_code,ifnull(weight_unit,'-') weight_unit,:compCode,1,:macId
+                 select :fromDate op_date ,stock_code,sum(qty) ttl_qty, sum(wet) wet, sum(rice) rice, sum(bag) bag, sum(weight) ttl_weight,sum(ttl_amt)ttl_amt,loc_code,ifnull(weight_unit,'-') weight_unit,:compCode,1,:macId
                  from (
                  select stock_code,sum(total_weight) weight,sum(qty) qty, sum(ttl_wet) wet, sum(ttl_rice) rice, sum(bag) bag,loc_code, weight_unit,sum(amount) ttl_amt
                  from v_opening
@@ -1310,7 +1310,7 @@ public class StockReportService {
         String sql;
         if (summary) {
             sql = """
-                    select a.*,s.stock_name,l.loc_name
+                    select a.*,s.stock_name'All' loc_name,'All' wh_name
                     from (
                     select stock_code,loc_code,sum(ttl_weight)ttl_weight,sum(ttl_qty) ttl_qty,
                     sum(ttl_wet)ttl_wet,sum(ttl_rice)ttl_rice,sum(ttl_bag)ttl_bag,sum(ttl_amt)ttl_amt,comp_code
@@ -1320,8 +1320,6 @@ public class StockReportService {
                     )a
                     join stock s on a.stock_code = s.stock_code
                     and a.comp_code = s.comp_code
-                    join location l on a.loc_code = l.loc_code
-                    and a.comp_code = l.comp_code
                     """;
         } else {
             sql = """

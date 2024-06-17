@@ -109,10 +109,6 @@ public class ReportController {
                                 String projectNo = Util1.isAll(filter.getProjectNo());
                                 String labourGroupCode = Util1.isAll(filter.getLabourGroupCode());
                                 double creditAmt = filter.getCreditAmt();
-                                boolean calSale = filter.isCalSale();
-                                boolean calPur = filter.isCalPur();
-                                boolean calRI = filter.isCalRI();
-                                boolean calRO = filter.isCalRO();
                                 String fromDueDate = filter.getFromDueDate();
                                 String toDueDate = filter.getToDueDate();
                                 String reportName = filter.getReportName();
@@ -198,10 +194,10 @@ public class ReportController {
                                         return reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
                                     }
                                     case "StockInOutSummary", "StockIOMovementSummary" -> {
-                                        return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                        return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                                     }
                                     case "StockInOutDetail", "StockInOutDetailUnit" -> {
-                                        return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                        return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                                     }
 //                    case "StockInOutSummaryByWeight" -> {
 //                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
@@ -237,7 +233,7 @@ public class ReportController {
 //                    Util1.writeJsonFile(listBalance, exportPath);
                                     }
                                     case "StockValue" -> {
-                                        return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                        return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                                     }
                                     case "StockValueQty" -> {
                                         return stockReportService.getStockValueRO(filter);
@@ -395,6 +391,12 @@ public class ReportController {
     public Flux<ClosingBalance> getStockBalanceQty(@RequestBody ReportFilter filter) {
         return stockReportService.getStockBalanceQty(filter);
     }
+
+    @PostMapping(path = "/getStockBalanceRel")
+    public Flux<ClosingBalance> getStockBalanceRel(@RequestBody ReportFilter filter) {
+        return stockRelationService.getStockBalanceRel(filter);
+    }
+
 
     @PostMapping(path = "/getReorderLevel")
     public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) {

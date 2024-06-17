@@ -89,7 +89,7 @@ public class RetOutService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "RETURN_OUT", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.getKey().setVouNo(seqNo);

@@ -128,7 +128,7 @@ public class PaymentHisService {
         String tranOption = dto.getTranOption();
         String option = tranOption.equals("C") ? "RECEIVE" : "PAYMENT";
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, option, compCode, macId)
                     .flatMap(seqNo -> {
                         seqNo = tranOption + "-" + seqNo;

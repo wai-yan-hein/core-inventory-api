@@ -80,7 +80,7 @@ public class OPHisService {
         String compCode = dto.getKey().getCompCode();
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "OPENING", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.getKey().setVouNo(seqNo);

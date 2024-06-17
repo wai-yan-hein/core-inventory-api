@@ -59,7 +59,7 @@ public class LabourOutputService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "LabourOutput", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.setVouNo(seqNo);

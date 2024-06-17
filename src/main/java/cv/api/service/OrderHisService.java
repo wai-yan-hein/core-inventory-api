@@ -98,7 +98,7 @@ public class OrderHisService {
         int deptId = dto.getDeptId();
         int macId = dto.getMacId();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             return vouNoService.getVouNo(deptId, "ORDER", compCode, macId)
                     .flatMap(seqNo -> {
                         dto.getKey().setVouNo(seqNo);
@@ -401,7 +401,7 @@ public class OrderHisService {
     public Flux<OrderHisDetail> searchDetail(String vouNo, String compCode) {
         String sql = """
                 select op.*,s.user_code,s.stock_name,cat.cat_name,st.stock_type_name,sb.brand_name,
-                rel.rel_name,l.loc_name,t.trader_name
+                s.rel_code,rel.rel_name,l.loc_name,t.trader_name
                 from order_his_detail op
                 join location l on op.loc_code = l.loc_code
                 and op.comp_code = l.comp_code

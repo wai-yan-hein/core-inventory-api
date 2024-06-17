@@ -667,7 +667,7 @@ public class SaleHisService {
         String sql = """
                 select *
                 from (
-                select 1 sort_id,'SALE' tran_source,sum(vou_total) vou_total,sum(vou_balance) vou_balance,
+                select 1 sort_id,'Sale' tran_source,sum(vou_total) vou_total,sum(vou_balance) vou_balance,
                 sum(paid) paid,sum(discount)*-1 discount,cur_code,dept_id,count(*) vou_count
                 from sale_his
                 where date(vou_date) between :fromDate and :toDate
@@ -676,7 +676,7 @@ public class SaleHisService {
                 and (dept_id = :deptId or 0 = :deptId)
                 group by dept_id,cur_code
                 	union
-                select 2 sort_id,'RETURN_IN' tran_source,sum(vou_total)*-1 vou_total,sum(balance) vou_balance,
+                select 2 sort_id,'Return In' tran_source,sum(vou_total)*-1 vou_total,sum(balance) vou_balance,
                 sum(paid)*-1 paid,sum(discount)*-1 discount,cur_code,dept_id,count(*) vou_count
                 from ret_in_his
                 where date(vou_date) between :fromDate and :toDate
@@ -685,7 +685,7 @@ public class SaleHisService {
                 and (dept_id = :deptId or 0 = :deptId)
                 group by dept_id,cur_code
                 	union
-                select 3 sort_id,'Customer Payment' tran_source,0,0,sum(amount) paid,0,cur_code,dept_id,count(*) vou_count
+                select 3 sort_id,'Customer Received' tran_source,0,0,sum(amount) paid,0,cur_code,dept_id,count(*) vou_count
                 from payment_his
                 where date(vou_date) between :fromDate and :toDate
                 and deleted = false

@@ -63,7 +63,7 @@ public class ConsignService {
         int macId = dto.getMacId();
         int tranSource = dto.getTranSource();
         dto.setVouDate(Util1.toDateTime(dto.getVouDate()));
-        if (vouNo == null) {
+        if (Util1.isNullOrEmpty(vouNo)) {
             String option = tranSource == 1 ? "I" : "R";
             return vouNoService.getVouNo(deptId, "CONSIGN-" + option, compCode, macId)
                     .flatMap(seqNo -> {

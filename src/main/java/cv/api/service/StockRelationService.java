@@ -1,15 +1,13 @@
 package cv.api.service;
 
-import cv.api.common.ClosingBalance;
-import cv.api.common.ReturnObject;
-import cv.api.common.StockValue;
-import cv.api.common.Util1;
+import cv.api.common.*;
 import cv.api.entity.UnitRelationDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.text.DecimalFormat;
@@ -27,15 +25,16 @@ public class StockRelationService {
     private final DecimalFormat formatter = new DecimalFormat("###.##");
     private final DatabaseClient client;
     private final UnitRelationService unitRelationService;
+    private final TransactionalOperator operator;
+    private final LocationService locationService;
+    private final OPHisService opHisService;
 
     private Mono<Boolean> calculateOpening(String opDate, String fromDate, String typeCode,
                                            String catCode, String brandCode, String stockCode,
-                                           String vouStatus, boolean calSale,
-                                           boolean calPur, boolean calRI, boolean calRO,
-                                           String compCode, Integer deptId, Integer macId) {
+                                           String compCode, Integer macId) {
         String opSql = """
                 INSERT INTO tmp_stock_opening(tran_date, stock_code, ttl_qty, loc_code, unit, comp_code, dept_id, mac_id)
-                SELECT :fromDate op_date, stock_code, SUM(qty) ttl_qty, loc_code, unit, :compCode, :deptId, :macId
+                SELECT :fromDate op_date, stock_code, SUM(qty) ttl_qty, loc_code, unit, :compCode, 0, :macId
                 FROM (
                     SELECT stock_code, SUM(qty) qty, loc_code, unit
                     FROM v_opening
@@ -49,34 +48,34 @@ public class StockRelationService {
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, pur_unit
                     FROM v_purchase
                     WHERE s_rec = false
                     AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
-                    AND (calculate = true AND :calPur = false)
+                    AND calculate = true
                     AND comp_code = :compCode
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, pur_unit
+                    GROUP BY stock_code, pur_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, unit
                     FROM v_return_in
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
-                    AND (calculate = true AND :calRI = false)
+                    AND calculate = true
                     AND comp_code = :compCode
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(in_qty) qty, loc_code, in_unit
                     FROM v_stock_io
@@ -85,13 +84,12 @@ public class StockRelationService {
                     AND calculate = true
                     AND in_qty IS NOT NULL AND in_unit IS NOT NULL
                     AND comp_code = :compCode
-                    AND (vou_status = :vouStatus OR '-' = :vouStatus)
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, in_unit
+                    GROUP BY stock_code, in_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(out_qty)*-1 qty, loc_code, out_unit
                     FROM v_stock_io
@@ -100,40 +98,39 @@ public class StockRelationService {
                     AND calculate = true
                     AND out_qty IS NOT NULL AND out_unit IS NOT NULL
                     AND comp_code = :compCode
-                    AND (vou_status = :vouStatus OR '-' = :vouStatus)
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, out_unit
+                    GROUP BY stock_code, out_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
                     FROM v_return_out
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
-                    AND (calculate = true AND :calRO = false)
+                    AND calculate = true
                     AND comp_code = :compCode
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, sale_unit
                     FROM v_sale
                     WHERE s_pay = false
                     AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
-                    AND (calculate = true AND :calSale = false)
+                    AND calculate = true
                     AND comp_code = :compCode
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (cat_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, sale_unit
+                    GROUP BY stock_code, sale_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
                     FROM v_order
@@ -147,7 +144,7 @@ public class StockRelationService {
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code_from, unit
                     FROM v_transfer
@@ -161,7 +158,7 @@ public class StockRelationService {
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
                     and skip_inv = false
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code_from
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code_to, unit
                     FROM v_transfer
@@ -175,26 +172,24 @@ public class StockRelationService {
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
                     and skip_inv = false
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code_to
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
                     FROM v_process_his_detail
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND calculate = true
                     AND comp_code = :compCode
-                    AND (pt_code = :vouStatus OR '-' = :vouStatus)
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, unit
                     FROM v_process_his
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
-                    AND (pt_code = :vouStatus OR '-' = :vouStatus)
                     AND calculate = true
                     AND comp_code = :compCode
                     AND loc_code IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
@@ -202,9 +197,9 @@ public class StockRelationService {
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    GROUP BY stock_code, unit
+                    GROUP BY stock_code, unit, loc_code
                 ) x
-                GROUP BY stock_code, unit""";
+                GROUP BY stock_code, unit, loc_code""";
         return deleteTmpOpening(macId)
                 .then(client.sql(opSql)
                         .bind("opDate", opDate)
@@ -213,13 +208,7 @@ public class StockRelationService {
                         .bind("catCode", catCode)
                         .bind("brandCode", brandCode)
                         .bind("stockCode", stockCode)
-                        .bind("vouStatus", vouStatus)
-                        .bind("calSale", calSale)
-                        .bind("calPur", calPur)
-                        .bind("calRI", calRI)
-                        .bind("calRO", calRO)
                         .bind("compCode", compCode)
-                        .bind("deptId", deptId)
                         .bind("macId", macId)
                         .fetch()
                         .rowsUpdated().thenReturn(true));
@@ -227,13 +216,11 @@ public class StockRelationService {
     }
 
     private Mono<Boolean> calculateClosing(String fromDate, String toDate, String typeCode, String catCode,
-                                           String brandCode, String stockCode, String vouStatus,
-                                           boolean calSale, boolean calPur, boolean calRI,
-                                           boolean calRO, String compCode, Integer deptId,
+                                           String brandCode, String stockCode, String compCode,
                                            Integer macId) {
         String opSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'Opening',a.tran_date,'-','A-Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,:compCode,:deptId
+                    select 'Opening',a.tran_date,'-','A-Opening',a.stock_code,sum(smallest_qty) smallest_qty,a.loc_code,a.mac_id,:compCode,0
                     from (
                         select tmp.tran_date,tmp.stock_code,tmp.ttl_qty * rel.smallest_qty smallest_qty,tmp.loc_code,tmp.mac_id
                         from tmp_stock_opening tmp
@@ -249,21 +236,21 @@ public class StockRelationService {
 
         String purSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,pur_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id
                         from v_purchase
                         where s_rec = false
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
-                        and (calculate = true and :calPur = false)
+                        and calculate = true
                         and comp_code = :compCode
                         and loc_code in (select f_code from f_location where mac_id =  :macId )
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),vou_no,stock_code,pur_unit
+                        group by date(vou_date),vou_no,stock_code,pur_unit, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -272,20 +259,20 @@ public class StockRelationService {
                 """;
         String retInSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'ReturnIn',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'ReturnIn',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code,unit,comp_code,dept_id
                         from v_return_in
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
-                        and (calculate = true and :calRI = false)
+                        and calculate = true
                         and comp_code = :compCode
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,vou_no,unit
+                        group by date(vou_date),stock_code,vou_no,unit, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -295,7 +282,7 @@ public class StockRelationService {
 
         String stockInSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'StockIn',date(a.vou_date) vou_date,vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'StockIn',date(a.vou_date) vou_date,vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id
                         from v_stock_io
@@ -304,13 +291,12 @@ public class StockRelationService {
                         and deleted = false
                         and calculate = true
                         and comp_code = :compCode
-                        and (vou_status = :vouStatus or '-' = :vouStatus)
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,in_unit,vou_no
+                        group by date(vou_date),stock_code,in_unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -320,14 +306,14 @@ public class StockRelationService {
 
         String saleSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'Sale',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'Sale',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,sale_unit,rel_code,comp_code,dept_id
                         from v_sale
                         where s_pay =false
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
-                        and (calculate = true and :calSale = false)
+                        and calculate = true
                         and comp_code = :compCode
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
@@ -343,7 +329,7 @@ public class StockRelationService {
                 """;
         String orderSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,sale_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'Sale-Order',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'Sale-Order',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
                         from v_order
@@ -357,7 +343,7 @@ public class StockRelationService {
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,unit,vou_no
+                        group by date(vou_date),stock_code,unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -366,20 +352,20 @@ public class StockRelationService {
                 """;
         String returnOutSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'ReturnOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'ReturnOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
                         from v_return_out
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
-                        and (calculate = true and :calRO = false)
+                        and calculate = true
                         and comp_code = :compCode
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,unit,vou_no
+                        group by date(vou_date),stock_code,unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -389,7 +375,7 @@ public class StockRelationService {
 
         String stockOutSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'StockOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'StockOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id
                         from v_stock_io
@@ -398,13 +384,12 @@ public class StockRelationService {
                         and deleted = false
                         and calculate = true
                         and comp_code = :compCode
-                        and (vou_status = :vouStatus or '-' = :vouStatus)
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,out_unit,vou_no
+                        group by date(vou_date),stock_code,out_unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -415,7 +400,7 @@ public class StockRelationService {
         String fFSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)
                     select 'Transfer-F',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,
-                    loc_code_from,:macId,:compCode,:deptId
+                    loc_code_from,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_from,rel_code,unit,comp_code,dept_id
                         from v_transfer
@@ -429,7 +414,7 @@ public class StockRelationService {
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
                         and skip_inv = false
-                        group by date(vou_date),stock_code,unit,vou_no
+                        group by date(vou_date),stock_code,unit,vou_no, loc_code_from
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -440,7 +425,7 @@ public class StockRelationService {
         String tFSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)
                     select 'Transfer-T',a.vou_date,a.vou_no,if(ifnull(a.remark,'')='','Transfer',a.remark),a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,
-                    loc_code_to,:macId,:compCode,:deptId
+                    loc_code_to,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_to,rel_code,unit
                         from v_transfer
@@ -454,7 +439,7 @@ public class StockRelationService {
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
                         and skip_inv = false
-                        group by date(vou_date),stock_code,unit,vou_no
+                        group by date(vou_date),stock_code,unit,vou_no, loc_code_to
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.unit = rel.unit
@@ -463,7 +448,7 @@ public class StockRelationService {
 
         String pIn = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(end_date) end_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
                         from v_process_his
@@ -472,13 +457,12 @@ public class StockRelationService {
                         and calculate = true
                         and finished = true
                         and comp_code = :compCode
-                        and (pt_code = :vouStatus or '-' = :vouStatus)
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
                         and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(end_date),stock_code,unit,vou_no
+                        group by date(end_date),stock_code,unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
@@ -490,7 +474,7 @@ public class StockRelationService {
 
         String pOut = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'P-OUT',a.vou_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
+                    select 'P-OUT',a.vou_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
                         from v_process_his_detail
@@ -498,7 +482,6 @@ public class StockRelationService {
                         and deleted = false
                         and calculate = true
                         and comp_code = :compCode
-                        and (pt_code = :vouStatus or '-'=:vouStatus)
                         and loc_code in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
@@ -511,56 +494,10 @@ public class StockRelationService {
                     and a.unit = rel.unit
                     join vou_status v on a.pt_code = v.code
                     and a.comp_code = v.comp_code
-                    group by a.vou_date,a.stock_code,a.vou_no
-                """;
-        String mRawSql = """
-                    insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,out_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'UM-RAW',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,:deptId
-                    from (
-                        select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
-                        from v_milling_raw
-                        where date(vou_date) between :fromDate and :toDate
-                        and deleted = false
-                        and (calculate = true and :calRO = false)
-                        and comp_code = :compCode
-                        and loc_code in (select f_code from f_location where mac_id = :macId)
-                        and (stock_type_code = :typeCode or '-' = :typeCode)
-                        and (brand_code = :brandCode or '-' = :brandCode)
-                        and (cat_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,unit,vou_no
-                    ) a
-                    join v_relation rel on a.rel_code = rel.rel_code
-                    and a.comp_code = rel.comp_code
-                    and a.unit = rel.unit
-                    group by vou_date,stock_code,vou_no
-                """;
-
-        String mOutSql = """
-                    insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,in_qty,loc_code,mac_id,comp_code,dept_id)
-                    select 'UM-OUTPUT',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,:deptId
-                    from (
-                        select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code,unit,comp_code,dept_id
-                        from v_milling_output
-                        where date(vou_date) between :fromDate and :toDate
-                        and deleted = false
-                        and (calculate = true and :calRI = false)
-                        and comp_code = :compCode
-                        and loc_code in (select f_code from f_location where mac_id = :macId)
-                        and (stock_type_code = :typeCode or '-' = :typeCode)
-                        and (brand_code = :brandCode or '-' = :brandCode)
-                        and (cat_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
-                        group by date(vou_date),stock_code,vou_no,unit
-                    ) a
-                    join v_relation rel on a.rel_code = rel.rel_code
-                    and a.comp_code = rel.comp_code
-                    and a.unit = rel.unit
-                    group by vou_date,stock_code,vou_no
+                    group by a.vou_date,a.stock_code,a.vou_no, loc_code
                 """;
         Mono<Long> opMono = client.sql(opSql)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("macId", macId)
                 .fetch()
                 .rowsUpdated();
@@ -568,10 +505,8 @@ public class StockRelationService {
         Mono<Long> monoPur = client.sql(purSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("calPur", calPur)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -582,10 +517,8 @@ public class StockRelationService {
         Mono<Long> retInMono = client.sql(retInSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("calRI", calRI)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -595,10 +528,8 @@ public class StockRelationService {
         Mono<Long> saleMono = client.sql(saleSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("calSale", calSale)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -608,7 +539,6 @@ public class StockRelationService {
         Mono<Long> orderMono = client.sql(orderSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .bind("typeCode", typeCode)
@@ -621,10 +551,8 @@ public class StockRelationService {
         Mono<Long> returnOutMono = client.sql(returnOutSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("calRO", calRO)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -635,10 +563,8 @@ public class StockRelationService {
         Mono<Long> stockInMono = client.sql(stockInSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("vouStatus", vouStatus)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -649,10 +575,8 @@ public class StockRelationService {
         Mono<Long> stockOutMono = client.sql(stockOutSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("vouStatus", vouStatus)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -662,7 +586,6 @@ public class StockRelationService {
         Mono<Long> fFMono = client.sql(fFSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .bind("typeCode", typeCode)
@@ -674,7 +597,6 @@ public class StockRelationService {
         Mono<Long> tFMono = client.sql(tFSql)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
                 .bind("typeCode", typeCode)
@@ -686,10 +608,8 @@ public class StockRelationService {
         Mono<Long> pInMono = client.sql(pIn)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("vouStatus", vouStatus)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
@@ -700,45 +620,14 @@ public class StockRelationService {
         Mono<Long> pOutMono = client.sql(pOut)
                 .bind("macId", macId)
                 .bind("compCode", compCode)
-                .bind("deptId", deptId)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
-                .bind("vouStatus", vouStatus)
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
-
-        Mono<Long> mRawMono = client.sql(mRawSql)
-                .bind("macId", macId)
-                .bind("compCode", compCode)
-                .bind("deptId", deptId)
-                .bind("fromDate", fromDate)
-                .bind("toDate", toDate)
-                .bind("calRO", calRO)
-                .bind("typeCode", typeCode)
-                .bind("brandCode", brandCode)
-                .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
-                .fetch()
-                .rowsUpdated();
-
-        Mono<Long> mOutMono = client.sql(mOutSql)
-                .bind("macId", macId)
-                .bind("compCode", compCode)
-                .bind("deptId", deptId)
-                .bind("fromDate", fromDate)
-                .bind("toDate", toDate)
-                .bind("calRI", calRI)
-                .bind("typeCode", typeCode)
-                .bind("brandCode", brandCode)
-                .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
-                .fetch()
-                .rowsUpdated();
-
         return deleteTmpIO(macId)
                 .then(opMono)
                 .then(monoPur)
@@ -752,13 +641,10 @@ public class StockRelationService {
                 .then(tFMono)
                 .then(pInMono)
                 .then(pOutMono)
-                .then(mRawMono)
-                .then(mOutMono)
                 .thenReturn(true);
 
     }
 
-    @Transactional
     private Mono<Long> deleteTmpIO(Integer macId) {
         String sql = "delete from tmp_stock_io_column where mac_id=:macId";
         return client.sql(sql).bind("macId", macId).fetch().rowsUpdated();
@@ -766,31 +652,25 @@ public class StockRelationService {
 
     public Mono<ReturnObject> getStockInOutSummary(String opDate, String fromDate, String toDate,
                                                    String typeCode, String catCode, String brandCode,
-                                                   String stockCode, String vouStatus,
-                                                   boolean calSale, boolean calPur, boolean calRI,
-                                                   boolean calRO, String compCode, Integer deptId, Integer macId) {
-        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                                   String stockCode, String compCode, Integer macId) {
+        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return op.then(cl).then(initRelation(compCode).then(getStkInOutSummary(macId)));
     }
 
     public Mono<ReturnObject> getStockInOutDetail(String opDate, String fromDate, String toDate,
                                                   String typeCode, String catCode, String brandCode,
-                                                  String stockCode, String vouStatus,
-                                                  boolean calSale, boolean calPur, boolean calRI,
-                                                  boolean calRO, String compCode, Integer deptId, Integer macId) {
-        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                                  String stockCode, String compCode, Integer macId) {
+        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         return op.then(cl).then(initRelation(compCode)).then(getStkInOutDetail(macId, compCode));
     }
 
     public Mono<ReturnObject> getStockValue(String opDate, String fromDate, String toDate,
                                             String typeCode, String catCode, String brandCode,
-                                            String stockCode, String vouStatus,
-                                            boolean calSale, boolean calPur, boolean calRI,
-                                            boolean calRO, String compCode, Integer deptId, Integer macId) {
-        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
-        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouStatus, calSale, calPur, calRI, calRO, compCode, deptId, macId);
+                                            String stockCode, String compCode, Integer macId) {
+        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
         Mono<Boolean> price = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, macId);
         return op.then(cl).then(price).then(initRelation(compCode).then(getStkValue(macId, compCode)));
     }
@@ -1094,7 +974,6 @@ public class StockRelationService {
 
     }
 
-    @Transactional
     private Mono<Boolean> deleteTmpOpening(int macId) {
         String sql = """
                 delete from tmp_stock_opening where mac_id = :macId
@@ -1104,7 +983,6 @@ public class StockRelationService {
                 .fetch().rowsUpdated().thenReturn(true);
     }
 
-    @Transactional
     private Mono<Boolean> calculatePrice(String toDate, String opDate, String stockCode,
                                          String typeCode, String catCode, String brandCode,
                                          String compCode, Integer macId) {
@@ -1277,5 +1155,80 @@ public class StockRelationService {
                 .bind("stockCode", stockCode)
                 .fetch().rowsUpdated().thenReturn(true);
         return deleteMono.then(purMono).then(ioMono).then(purRecentMono).then(ioRecentMono);
+    }
+
+    public Flux<ClosingBalance> getStockBalanceRel(ReportFilter filter) {
+        String compCode = filter.getCompCode();
+        Integer macId = filter.getMacId();
+        return operator.transactional(Flux.defer(() ->
+                initRelation(compCode)
+                        .thenMany(locationService.insertTmp(filter.getListLocation(), compCode, macId, "-")
+                                .thenMany(opHisService.getOpeningDateByLocation(compCode, "-")
+                                        .flatMapMany(opDate -> {
+                                            filter.setOpDate(opDate);
+                                            return getStockBalance(filter);
+                                        })
+                                )
+                        )
+        ));
+    }
+
+
+    public Flux<ClosingBalance> getStockBalance(ReportFilter filter) {
+        String opDate = filter.getOpDate();
+        String toDate = Util1.addDay(filter.getToDate(), 1);
+        String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
+        String catCode = Util1.isNull(filter.getCatCode(), "-");
+        String brandCode = Util1.isNull(filter.getBrandCode(), "-");
+        String stockCode = filter.getStockCode();
+        String compCode = filter.getCompCode();
+        Integer macId = filter.getMacId();
+        boolean summary = filter.isSummary();
+        Mono<Boolean> monoOp = calculateOpening(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        String sql;
+        if (summary) {
+            sql = """
+                    select a.*,s.stock_name,s.rel_code,'All' loc_name,'All' wh_name
+                    from (
+                    select stock_code,loc_code,sum(ttl_qty) ttl_qty,comp_code
+                    from tmp_stock_opening
+                    where mac_id =:macId
+                    group by stock_code
+                    )a
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code
+                    """;
+        } else {
+            sql = """
+                    select a.*,s.stock_name,s.rel_code,l.loc_name,wh.description wh_name
+                    from (
+                    select stock_code,loc_code,ttl_qty,comp_code
+                    from tmp_stock_opening
+                    where mac_id =:macId
+                    )a
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code
+                    join location l on a.loc_code = l.loc_code
+                    and a.comp_code = l.comp_code
+                    left join warehouse wh on l.warehouse_code = wh.code
+                    and a.comp_code = wh.comp_code
+                    order by l.loc_name
+                    """;
+        }
+        Flux<ClosingBalance> flux = client.sql(sql)
+                .bind("macId", macId)
+                .map((row) -> ClosingBalance.builder()
+                        .stockCode(row.get("stock_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .locName(row.get("loc_name", String.class))
+                        .balRel(getRelStr(row.get("rel_code", String.class), row.get("ttl_qty", Double.class)))
+                        .whName(row.get("wh_name", String.class))
+                        .build())
+                .all()
+                .switchIfEmpty(Flux.defer(() -> Flux.just(ClosingBalance.builder()
+                        .stockName("No Stock.")
+                        .locName("No Stock.")
+                        .build())));
+        return monoOp.thenMany(flux);
     }
 }
