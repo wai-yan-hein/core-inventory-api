@@ -115,10 +115,10 @@ public class ReportController {
                                 //log.info("op date : {}", opDate);
                                 switch (reportName) {
                                     case "SaleByCustomerDetail" -> {
-                                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, compCode);
+                                        return reportService.getSaleByCustomerDetail(fromDate, toDate, curCode, traderCode, stockCode, deptId, compCode);
                                     }
                                     case "SaleByCustomerSummary" -> {
-                                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, compCode);
+                                        return reportService.getSaleByCustomerSummary(fromDate, toDate, typeCode, catCode, brandCode, stockCode, traderCode, deptId, compCode);
                                     }
                                     case "SaleBySaleManDetail" -> {
                                         return reportService.getSaleBySaleManDetail(fromDate, toDate, curCode, smCode, stockCode, compCode);

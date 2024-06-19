@@ -66,8 +66,6 @@ public class OPHisService {
             return ResponseUtil.createBadRequest("Currency is null");
         } else if (Util1.isNullOrEmpty(sh.getLocCode())) {
             return ResponseUtil.createBadRequest("Location is null");
-        } else if (Util1.isNullOrEmpty(sh.getTraderCode())) {
-            return ResponseUtil.createBadRequest("Trader is null");
         } else if (Util1.isNullOrEmpty(sh.getVouDate())) {
             return ResponseUtil.createBadRequest("Voucher Date is null");
         }

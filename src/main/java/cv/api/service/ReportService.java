@@ -263,7 +263,10 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String traderCode, String compCode) {
+    public Mono<ReturnObject> getSaleByCustomerSummary(String fromDate, String toDate, String typeCode, String catCode,
+                                                       String brandCode, String stockCode, String traderCode,
+                                                       Integer deptId,
+                                                       String compCode) {
         String sql = """
                 SELECT a.*, a.ttl_qty * ifnull(rel.smallest_qty,1) smallest_qty, t.user_code, t.trader_name, rel.rel_name, t.address, rel.unit
                 FROM (
@@ -272,6 +275,7 @@ public class ReportService {
                     WHERE DATE(vou_date) BETWEEN :fromDate AND :toDate
                     AND comp_code = :compCode
                     AND deleted = false
+                    AND (dept_id = :deptId OR '-' = :deptId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (cat_code = :catCode OR '-' = :catCode)
@@ -293,6 +297,7 @@ public class ReportService {
                 .bind("catCode", catCode)
                 .bind("stockCode", stockCode)
                 .bind("traderCode", traderCode)
+                .bind("deptId", deptId)
                 .map(row -> {
                     VSale s = VSale.builder().build();
                     String userCode = row.get("s_user_code", String.class);
@@ -453,7 +458,8 @@ public class ReportService {
     }
 
 
-    public Mono<ReturnObject> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode, String stockCode, String compCode) {
+    public Mono<ReturnObject> getSaleByCustomerDetail(String fromDate, String toDate, String curCode, String traderCode,
+                                                      String stockCode,Integer deptId, String compCode) {
         String sql = """
                 SELECT v.vou_date, v.vou_no, v.trader_code, t.trader_name, t.address, v.stock_name, v.qty, v.sale_unit, v.sale_price, v.sale_amt
                 FROM v_sale v JOIN trader t
@@ -462,6 +468,7 @@ public class ReportService {
                 WHERE (v.trader_code = :traderCode OR '-' = :traderCode)
                 AND v.deleted = false
                 AND v.comp_code = :compCode
+                AND (v.dept_id = :deptId OR '-' = :deptId)
                 AND (v.stock_code = :stockCode OR '-' = :stockCode)
                 AND (v.cur_code = :curCode OR '-' = :curCode)
                 AND DATE(v.vou_date) BETWEEN :fromDate AND :toDate
@@ -475,6 +482,7 @@ public class ReportService {
                 .bind("curCode", curCode)
                 .bind("fromDate", fromDate)
                 .bind("toDate", toDate)
+                .bind("deptId",deptId)
                 .map(row -> VSale.builder()
                         .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
                         .vouNo(row.get("vou_no", String.class))
