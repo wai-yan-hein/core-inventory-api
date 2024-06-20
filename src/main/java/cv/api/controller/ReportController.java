@@ -407,14 +407,9 @@ public class ReportController {
         String stockCode = Util1.isNull(filter.getStockCode(), "-");
         Integer deptId = filter.getDeptId();
         Integer macId = filter.getMacId();
-        boolean calSale = filter.isCalSale();
-        boolean calPur = filter.isCalPur();
-        boolean calRI = filter.isCalRI();
-        boolean calRO = filter.isCalRO();
         String locCode = Util1.isNull(filter.getLocCode(), "-");
         String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        return opHisService.getOpeningDateByLocation(compCode, locCode).flatMapMany(opDate -> reportR2dbcService.getReorderLevel(opDate, clDate, typeCode, catCode,
-                brandCode, stockCode, calSale, calPur, calRI, calRO, locCode, compCode, deptId, macId));
+        return Flux.empty();
     }
 
 

@@ -28,4 +28,5 @@ public class OPHisDetail {
     private String brandName;
     private String catName;
     private String relName;
+    private String relCode;
 }

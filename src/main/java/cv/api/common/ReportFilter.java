@@ -32,18 +32,13 @@ public class ReportFilter {
     private String saleManCode;
     private String vouTypeCode;
     private String batchNo;
-    private boolean calSale;
-    private boolean calPur;
-    private boolean calRI;
-    private boolean calRO;
-    private boolean calMill;
     private Integer macId;
     private String compCode;
     private Integer deptId;
     private String status;
     private String projectNo;
     private boolean orderFavorite;
-    private float creditAmt;
+    private double creditAmt;
     private String fromDueDate;
     private String toDueDate;
     private boolean deleted;
@@ -74,6 +69,5 @@ public class ReportFilter {
     private String refNo;
     private boolean draft;
     private int paymentType;
-
 
 }

@@ -5,6 +5,7 @@
  */
 package cv.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cv.api.entity.VouDiscount;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VSale {
 
     private String groupName;
