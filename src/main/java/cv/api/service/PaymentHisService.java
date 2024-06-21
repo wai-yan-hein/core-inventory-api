@@ -282,6 +282,7 @@ public class PaymentHisService {
         boolean deleted = filter.isDeleted();
         String projectNo = Util1.isAll(filter.getProjectNo());
         String curCode = Util1.isAll(filter.getCurCode());
+        int deptId = Util1.getInteger(filter.getDeptId());
         if (tranOption.equals("C") || tranOption.equals("S")) {
             String sql = """
                     select a.*,t.trader_name
@@ -294,6 +295,7 @@ public class PaymentHisService {
                     and ph.comp_code =:compCode
                     and ph.cur_code = :curCode
                     and ph.tran_option =:tranOption
+                    and (ph.dept_id = :deptId or '-' =:deptId)
                     and (ph.trader_code = :traderCode or '-' =:traderCode)
                     and (ph.project_no =:projectNo or '-' =:projectNo)
                     and (ph.vou_no =:vouNo or '-' =:vouNo)
@@ -320,6 +322,7 @@ public class PaymentHisService {
                     .bind("createdBy", userCode)
                     .bind("account", account)
                     .bind("remark", remark)
+                    .bind("deptId",deptId)
                     .map((row) -> PaymentHis.builder()
                             .vouNo(row.get("vou_no", String.class))
                             .compCode(row.get("comp_code", String.class))

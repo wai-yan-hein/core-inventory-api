@@ -71,6 +71,7 @@ public class ClosingBalance {
     private String compCode;
     private Integer deptId;
     private String relCode;
+    private String relName;
     private String weightUnit;
     private String traderCode;
     private String traderUserCode;

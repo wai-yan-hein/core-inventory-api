@@ -9,6 +9,7 @@ import cv.api.common.General;
 import cv.api.common.Util1;
 import cv.api.entity.Trader;
 import cv.api.entity.TraderKey;
+import cv.api.exception.ResponseUtil;
 import io.r2dbc.spi.Parameters;
 import io.r2dbc.spi.R2dbcType;
 import io.r2dbc.spi.Row;
@@ -148,21 +149,51 @@ public class TraderService {
 
 
     public Mono<Trader> saveTrader(Trader dto) {
-        TraderKey key = dto.getKey();
-        if (Util1.isNull(key.getCode())) {
-            String compCode = dto.getKey().getCompCode();
-            String type = dto.getType();
-            return seqService.getNextCode(type, compCode, 5)
-                    .flatMap(seqNo -> {
-                        String code = type + "-" + seqNo;
-                        dto.getKey().setCode(code);
-                        return insert(dto);
-                    });
+        return isDuplicateName(dto)
+                .flatMap(duplicate -> {
+                    if (duplicate) {
+                        return ResponseUtil.createConflict("Duplicate Name : " + dto.getTraderName());
+                    } else {
+                        TraderKey key = dto.getKey();
+                        if (Util1.isNull(key.getCode())) {
+                            String compCode = dto.getKey().getCompCode();
+                            String type = dto.getType();
+                            return seqService.getNextCode(type, compCode, 5)
+                                    .flatMap(seqNo -> {
+                                        String code = type + "-" + seqNo;
+                                        dto.getKey().setCode(code);
+                                        return insert(dto);
+                                    });
+                        } else {
+                            dto.setUpdatedDate(LocalDateTime.now());
+                            return findById(key)
+                                    .flatMap(trader -> update(dto))
+                                    .switchIfEmpty(insert(dto));
+                        }
+                    }
+                });
+    }
+
+    private Mono<Boolean> isDuplicateName(Trader dto) {
+        String traderName = dto.getTraderName();
+        String traderCode = dto.getKey().getCode();
+        //not check in update mode
+        if (!Util1.isNullOrEmpty(traderCode)) {
+            return Mono.just(false);
+        }
+        String compCode = dto.getKey().getCompCode();
+        if (Util1.isNullOrEmpty(traderName)) {
+            return Mono.just(false);
         } else {
-            dto.setUpdatedDate(LocalDateTime.now());
-            return findById(key)
-                    .flatMap(trader -> update(dto))
-                    .switchIfEmpty(insert(dto));
+            String sql = """
+                    select count(*) count from trader where deleted = false and  trader_name = :traderName and comp_code = :compCode
+                    """;
+            return client.sql(sql)
+                    .bind("traderName", traderName)
+                    .bind("compCode", compCode)
+                    .map((row, rowMetadata) -> row.get("count", Integer.class))
+                    .one()
+                    .map(integer -> integer > 0);
         }
     }
 

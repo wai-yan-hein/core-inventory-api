@@ -35,6 +35,7 @@ public class ReportController {
     private final TransferHisService transferService;
     private final StockRelationService stockRelationService;
     private final LocationService locationService;
+    private final StockService stockService;
     private final LabourOutputService labourOutputService;
     private final OPHisService opHisService;
 
@@ -91,9 +92,11 @@ public class ReportController {
             int deptId = filter.getDeptId();
             String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
             List<String> listLocation = filter.getListLocation();
+            List<String> listStock = filter.getListStock();
             String locCode = Util1.isNull(filter.getLocCode(), "-");
             return opHisService.getOpeningDateByLocation(compCode, locCode)
                     .flatMap(opDate -> locationService.insertTmp(listLocation, compCode, macId, warehouse)
+                            .flatMap(aBoolean -> stockService.insertTmp(listStock, macId))
                             .flatMap(aBoolean -> {
                                 String fromDate = filter.getFromDate();
                                 String toDate = filter.getToDate();
@@ -194,10 +197,10 @@ public class ReportController {
                                         return reportService.getOpeningByGroup(typeCode, stockCode, catCode, brandCode, macId, compCode, deptId);
                                     }
                                     case "StockInOutSummary", "StockIOMovementSummary" -> {
-                                        return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                        return stockRelationService.getStockInOutSummary(opDate, fromDate, toDate, typeCode, catCode, brandCode, compCode, macId);
                                     }
                                     case "StockInOutDetail", "StockInOutDetailUnit" -> {
-                                        return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                        return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, compCode, macId);
                                     }
 //                    case "StockInOutSummaryByWeight" -> {
 //                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
@@ -313,6 +316,9 @@ public class ReportController {
                                     }
                                     case "StockBalanceByLocation" -> {
                                         return stockReportService.getStockBalanceByLocationRO(filter);
+                                    }
+                                    case "StockBalanceByLocationRel" -> {
+                                        return stockRelationService.getStockBalanceByLocationRO(filter);
                                     }
                                 }
                                 ro.setMessage("Report Not Exists.");

@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author wai yan
@@ -539,5 +540,34 @@ public class StockService {
                 .map((row) -> row.get("count", Integer.class))
                 .one()
                 .map(count -> count > 0);
+    }
+    private Mono<Boolean> deleteTmp(int macId) {
+        String sql = """
+                delete from f_stock where mac_id =:macId
+                """;
+        return client.sql(sql)
+                .bind("macId", macId)
+                .fetch().rowsUpdated().thenReturn(true);
+    }
+    public Mono<Boolean> insertTmp(List<String> listStock,Integer macId) {
+        if (listStock == null || listStock.isEmpty()) {
+            return deleteTmp(macId);
+        } else {
+            return deleteTmp(macId)
+                    .flatMap(aBoolean -> Flux.fromIterable(listStock)
+                            .flatMap(stockCode -> {
+                                String sql = """
+                                            insert into f_stock (f_code,mac_id)
+                                            values (:stockCode,:macId);
+                                            """;
+                                return client.sql(sql)
+                                        .bind("stockCode", stockCode)
+                                        .bind("macId", macId)
+                                        .fetch()
+                                        .rowsUpdated()
+                                        .thenReturn(true);
+                            }).then(Mono.just(true)));
+
+        }
     }
 }

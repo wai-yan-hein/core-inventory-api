@@ -30,14 +30,14 @@ public class StockRelationService {
     private final OPHisService opHisService;
 
     private Mono<Boolean> calculateOpening(String opDate, String fromDate, String typeCode,
-                                           String catCode, String brandCode, String stockCode,
+                                           String catCode, String brandCode,
                                            String compCode, Integer macId) {
         String opSql = """
                 INSERT INTO tmp_stock_opening(tran_date, stock_code, ttl_qty, loc_code, unit, comp_code, dept_id, mac_id)
                 SELECT :fromDate op_date, stock_code, SUM(qty) ttl_qty, loc_code, unit, :compCode, 0, :macId
                 FROM (
                     SELECT stock_code, SUM(qty) qty, loc_code, unit
-                    FROM v_opening
+                    FROM v_opening v
                     WHERE DATE(op_date) = :opDate
                     AND comp_code = :compCode
                     AND tran_source = 1
@@ -47,11 +47,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, pur_unit
-                    FROM v_purchase
+                    FROM v_purchase v
                     WHERE s_rec = false
                     AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
@@ -61,11 +65,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, pur_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, unit
-                    FROM v_return_in
+                    FROM v_return_in v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND calculate = true
@@ -74,11 +82,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(in_qty) qty, loc_code, in_unit
-                    FROM v_stock_io
+                    FROM v_stock_io v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND calculate = true
@@ -88,11 +100,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, in_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(out_qty)*-1 qty, loc_code, out_unit
-                    FROM v_stock_io
+                    FROM v_stock_io v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND calculate = true
@@ -102,11 +118,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, out_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
-                    FROM v_return_out
+                    FROM v_return_out v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND calculate = true
@@ -115,11 +135,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, sale_unit
-                    FROM v_sale
+                    FROM v_sale v
                     WHERE s_pay = false
                     AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
@@ -129,11 +153,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (cat_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, sale_unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
-                    FROM v_order
+                    FROM v_order v
                     WHERE inv_update = true
                     AND DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
@@ -143,39 +171,52 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code_from, unit
-                    FROM v_transfer
+                    FROM v_transfer v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
+                    AND skip_inv = false
                     AND calculate = true
                     AND comp_code = :compCode
                     AND loc_code_from IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
-                    and skip_inv = false
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code_from
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code_to, unit
-                    FROM v_transfer
+                    FROM v_transfer v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND calculate = true
+                    AND skip_inv = false
                     AND comp_code = :compCode
                     AND loc_code_to IN (SELECT f_code FROM f_location WHERE mac_id = :macId)
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
                     AND (stock_code = :stockCode OR '-' = :stockCode)
-                    and skip_inv = false
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code_to
                     UNION ALL
                     SELECT stock_code, SUM(qty)*-1 qty, loc_code, unit
-                    FROM v_process_his_detail
+                    FROM v_process_his_detail v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND calculate = true
                     AND comp_code = :compCode
@@ -183,11 +224,15 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code
                     UNION ALL
                     SELECT stock_code, SUM(qty) qty, loc_code, unit
-                    FROM v_process_his
+                    FROM v_process_his v
                     WHERE DATE(vou_date) >= :opDate AND DATE(vou_date) < :fromDate
                     AND deleted = false
                     AND calculate = true
@@ -196,7 +241,11 @@ public class StockRelationService {
                     AND (stock_type_code = :typeCode OR '-' = :typeCode)
                     AND (brand_code = :brandCode OR '-' = :brandCode)
                     AND (category_code = :catCode OR '-' = :catCode)
-                    AND (stock_code = :stockCode OR '-' = :stockCode)
+                    AND (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                      )
                     GROUP BY stock_code, unit, loc_code
                 ) x
                 GROUP BY stock_code, unit, loc_code""";
@@ -207,7 +256,6 @@ public class StockRelationService {
                         .bind("typeCode", typeCode)
                         .bind("catCode", catCode)
                         .bind("brandCode", brandCode)
-                        .bind("stockCode", stockCode)
                         .bind("compCode", compCode)
                         .bind("macId", macId)
                         .fetch()
@@ -216,7 +264,7 @@ public class StockRelationService {
     }
 
     private Mono<Boolean> calculateClosing(String fromDate, String toDate, String typeCode, String catCode,
-                                           String brandCode, String stockCode, String compCode,
+                                           String brandCode, String compCode,
                                            Integer macId) {
         String opSql = """
                     insert into tmp_stock_io_column(tran_option,tran_date,vou_no,remark,stock_code,op_qty,loc_code,mac_id,comp_code,dept_id)
@@ -239,7 +287,7 @@ public class StockRelationService {
                     select 'Purchase',a.vou_date vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code, pur_unit,rel_code,comp_code,dept_id
-                        from v_purchase
+                        from v_purchase v
                         where s_rec = false
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
@@ -249,7 +297,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),vou_no,stock_code,pur_unit, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -262,7 +314,7 @@ public class StockRelationService {
                     select 'ReturnIn',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,rel_code,unit,comp_code,dept_id
-                        from v_return_in
+                        from v_return_in v
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
                         and calculate = true
@@ -271,7 +323,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,vou_no,unit, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -285,7 +341,7 @@ public class StockRelationService {
                     select 'StockIn',date(a.vou_date) vou_date,vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(in_qty) qty,loc_code,in_unit,rel_code,comp_code,dept_id
-                        from v_stock_io
+                        from v_stock_io v
                         where ifnull(in_qty,0)<>0 and in_unit is not null
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
@@ -295,7 +351,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,in_unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -309,7 +369,7 @@ public class StockRelationService {
                     select 'Sale',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,sale_unit,rel_code,comp_code,dept_id
-                        from v_sale
+                        from v_sale v
                         where s_pay =false
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
@@ -319,7 +379,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (cat_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,sale_unit,vou_no
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -332,7 +396,7 @@ public class StockRelationService {
                     select 'Sale-Order',a.vou_date ,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
-                        from v_order
+                        from v_order v
                         where inv_update = true
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
@@ -342,7 +406,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -355,7 +423,7 @@ public class StockRelationService {
                     select 'ReturnOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
-                        from v_return_out
+                        from v_return_out v
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
                         and calculate = true
@@ -364,7 +432,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -378,7 +450,7 @@ public class StockRelationService {
                     select 'StockOut',a.vou_date,a.vou_no,a.remark,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(out_qty) qty,loc_code,out_unit,rel_code,comp_code,dept_id
-                        from v_stock_io
+                        from v_stock_io v
                         where ifnull(out_qty,0)<>0 and out_unit is not null
                         and date(vou_date) between :fromDate and :toDate
                         and deleted = false
@@ -388,7 +460,11 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,out_unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -403,17 +479,21 @@ public class StockRelationService {
                     loc_code_from,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_from,rel_code,unit,comp_code,dept_id
-                        from v_transfer
+                        from v_transfer v
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
+                        and skip_inv = false
                         and calculate = true
                         and comp_code = :compCode
                         and loc_code_from in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
-                        and skip_inv = false
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,unit,vou_no, loc_code_from
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -428,17 +508,21 @@ public class StockRelationService {
                     loc_code_to,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,remark,stock_code,sum(qty) qty,loc_code_to,rel_code,unit
-                        from v_transfer
+                        from v_transfer v
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
+                        and skip_inv = false
                         and calculate = true
                         and comp_code = :compCode
                         and loc_code_to in (select f_code from f_location where mac_id = :macId)
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
-                        and skip_inv = false
+                        and (
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,unit,vou_no, loc_code_to
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -451,7 +535,7 @@ public class StockRelationService {
                     select 'P-IN',a.end_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty) smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(end_date) end_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
-                        from v_process_his
+                        from v_process_his v
                         where date(end_date) between :fromDate and :toDate
                         and deleted = false
                         and calculate = true
@@ -461,7 +545,10 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(end_date),stock_code,unit,vou_no, loc_code
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -477,7 +564,7 @@ public class StockRelationService {
                     select 'P-OUT',a.vou_date ,a.vou_no,v.description,a.stock_code,sum(a.qty * rel.smallest_qty)*-1 smallest_qty,loc_code,:macId,:compCode,0
                     from (
                         select date(vou_date) vou_date,vou_no,pt_code,stock_code,sum(qty) qty,loc_code,unit,rel_code,comp_code,dept_id
-                        from v_process_his_detail
+                        from v_process_his_detail v
                         where date(vou_date) between :fromDate and :toDate
                         and deleted = false
                         and calculate = true
@@ -486,7 +573,10 @@ public class StockRelationService {
                         and (stock_type_code = :typeCode or '-' = :typeCode)
                         and (brand_code = :brandCode or '-' = :brandCode)
                         and (category_code = :catCode or '-' = :catCode)
-                        and (stock_code = :stockCode or '-' = :stockCode)
+                        (v.stock_code in (select f_code from f_stock where mac_id = :macId))
+                        or
+                        (not exists (select 1 from f_stock where mac_id = :macId))
+                        )
                         group by date(vou_date),stock_code,unit,vou_no
                     ) a
                     join v_relation rel on a.rel_code = rel.rel_code
@@ -510,7 +600,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
 
@@ -522,7 +611,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> saleMono = client.sql(saleSql)
@@ -533,7 +621,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> orderMono = client.sql(orderSql)
@@ -544,7 +631,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
 
@@ -556,7 +642,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
 
@@ -568,7 +653,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
 
@@ -580,7 +664,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> fFMono = client.sql(fFSql)
@@ -591,7 +674,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> tFMono = client.sql(tFSql)
@@ -602,7 +684,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
         Mono<Long> pInMono = client.sql(pIn)
@@ -613,7 +694,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
 
@@ -625,7 +705,6 @@ public class StockRelationService {
                 .bind("typeCode", typeCode)
                 .bind("brandCode", brandCode)
                 .bind("catCode", catCode)
-                .bind("stockCode", stockCode)
                 .fetch()
                 .rowsUpdated();
         return deleteTmpIO(macId)
@@ -652,25 +731,25 @@ public class StockRelationService {
 
     public Mono<ReturnObject> getStockInOutSummary(String opDate, String fromDate, String toDate,
                                                    String typeCode, String catCode, String brandCode,
-                                                   String stockCode, String compCode, Integer macId) {
-        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                                   String compCode, Integer macId) {
+        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, compCode, macId);
+        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, compCode, macId);
         return op.then(cl).then(initRelation(compCode).then(getStkInOutSummary(macId)));
     }
 
     public Mono<ReturnObject> getStockInOutDetail(String opDate, String fromDate, String toDate,
                                                   String typeCode, String catCode, String brandCode,
-                                                  String stockCode, String compCode, Integer macId) {
-        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                                  String compCode, Integer macId) {
+        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, compCode, macId);
+        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, compCode, macId);
         return op.then(cl).then(initRelation(compCode)).then(getStkInOutDetail(macId, compCode));
     }
 
     public Mono<ReturnObject> getStockValue(String opDate, String fromDate, String toDate,
                                             String typeCode, String catCode, String brandCode,
                                             String stockCode, String compCode, Integer macId) {
-        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
-        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Boolean> op = calculateOpening(opDate, fromDate, typeCode, catCode, brandCode, compCode, macId);
+        Mono<Boolean> cl = calculateClosing(fromDate, toDate, typeCode, catCode, brandCode, compCode, macId);
         Mono<Boolean> price = calculatePrice(toDate, opDate, stockCode, typeCode, catCode, brandCode, compCode, macId);
         return op.then(cl).then(price).then(initRelation(compCode).then(getStkValue(macId, compCode)));
     }
@@ -1157,6 +1236,17 @@ public class StockRelationService {
         return deleteMono.then(purMono).then(ioMono).then(purRecentMono).then(ioRecentMono);
     }
 
+    public Mono<ReturnObject> getStockBalanceByLocationRO(ReportFilter filter) {
+        return getStockBalanceRel(filter)
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
+
     public Flux<ClosingBalance> getStockBalanceRel(ReportFilter filter) {
         String compCode = filter.getCompCode();
         Integer macId = filter.getMacId();
@@ -1173,22 +1263,20 @@ public class StockRelationService {
         ));
     }
 
-
     public Flux<ClosingBalance> getStockBalance(ReportFilter filter) {
         String opDate = filter.getOpDate();
         String toDate = Util1.addDay(filter.getToDate(), 1);
         String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
         String catCode = Util1.isNull(filter.getCatCode(), "-");
         String brandCode = Util1.isNull(filter.getBrandCode(), "-");
-        String stockCode = filter.getStockCode();
         String compCode = filter.getCompCode();
         Integer macId = filter.getMacId();
         boolean summary = filter.isSummary();
-        Mono<Boolean> monoOp = calculateOpening(opDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+        Mono<Boolean> monoOp = calculateOpening(opDate, toDate, typeCode, catCode, brandCode, compCode, macId);
         String sql;
         if (summary) {
             sql = """
-                    select a.*,s.stock_name,s.rel_code,'All' loc_name,'All' wh_name
+                    select a.*,s.stock_name,s.rel_code,rel.rel_name,'All' loc_name,'All' wh_name
                     from (
                     select stock_code,loc_code,sum(ttl_qty) ttl_qty,comp_code
                     from tmp_stock_opening
@@ -1197,10 +1285,13 @@ public class StockRelationService {
                     )a
                     join stock s on a.stock_code = s.stock_code
                     and a.comp_code = s.comp_code
+                    left join unit_relation rel on s.rel_code = rel.rel_code
+                    and s.comp_code = rel.comp_code
+                    and a.qty<>0
                     """;
         } else {
             sql = """
-                    select a.*,s.stock_name,s.rel_code,l.loc_name,wh.description wh_name
+                    select a.*,s.stock_name,s.rel_code,rel.rel_name,l.loc_name,wh.description wh_name
                     from (
                     select stock_code,loc_code,ttl_qty,comp_code
                     from tmp_stock_opening
@@ -1208,11 +1299,14 @@ public class StockRelationService {
                     )a
                     join stock s on a.stock_code = s.stock_code
                     and a.comp_code = s.comp_code
+                    left join unit_relation rel on s.rel_code = rel.rel_code
+                    and s.comp_code = rel.comp_code
                     join location l on a.loc_code = l.loc_code
                     and a.comp_code = l.comp_code
                     left join warehouse wh on l.warehouse_code = wh.code
                     and a.comp_code = wh.comp_code
-                    order by l.loc_name
+                    and a.qty<>0
+                    order by s.user_code,l.loc_name
                     """;
         }
         Flux<ClosingBalance> flux = client.sql(sql)
@@ -1223,6 +1317,7 @@ public class StockRelationService {
                         .locName(row.get("loc_name", String.class))
                         .balRel(getRelStr(row.get("rel_code", String.class), row.get("ttl_qty", Double.class)))
                         .whName(row.get("wh_name", String.class))
+                        .relName(row.get("rel_name",String.class))
                         .build())
                 .all()
                 .switchIfEmpty(Flux.defer(() -> Flux.just(ClosingBalance.builder()

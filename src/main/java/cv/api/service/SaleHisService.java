@@ -693,6 +693,15 @@ public class SaleHisService {
                 and (dept_id = :deptId or 0 = :deptId)
                 and tran_option ='C'
                 group by dept_id,cur_code
+                    union
+                select 4 sort_id,'Purchase' tran_source,sum(vou_total)*-1 vou_total,sum(balance)*-1 vou_balance,
+                sum(paid)*-1 paid,sum(discount) discount,cur_code,dept_id,count(*) vou_count
+                from pur_his
+                where date(vou_date) between :fromDate and :toDate
+                and deleted = false
+                and comp_code =  :compCode
+                and (dept_id = :deptId or 0 = :deptId)
+                group by dept_id,cur_code
                 )a
                 order by dept_id,sort_id
                 """;
