@@ -7,6 +7,7 @@ package cv.api.controller;
 
 import cv.api.common.*;
 import cv.api.entity.OPHis;
+import cv.api.entity.ReorderLevel;
 import cv.api.model.VPurchase;
 import cv.api.model.VSale;
 import cv.api.model.VStockIO;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +40,7 @@ public class ReportController {
     private final StockService stockService;
     private final LabourOutputService labourOutputService;
     private final OPHisService opHisService;
+    private final ReorderLevelService reorderLevelService;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<VSale> getSaleReport(@RequestParam String vouNo,
@@ -92,7 +95,11 @@ public class ReportController {
             int deptId = filter.getDeptId();
             String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
             List<String> listLocation = filter.getListLocation();
-            List<String> listStock = filter.getListStock();
+            String stockCode =filter.getStockCode();
+            List<String> listStock = Util1.nullToEmpty(filter.getListStock());
+            if(listStock.isEmpty()){
+                listStock.add(stockCode);
+            }
             String locCode = Util1.isNull(filter.getLocCode(), "-");
             return opHisService.getOpeningDateByLocation(compCode, locCode)
                     .flatMap(opDate -> locationService.insertTmp(listLocation, compCode, macId, warehouse)
@@ -101,7 +108,6 @@ public class ReportController {
                                 String fromDate = filter.getFromDate();
                                 String toDate = filter.getToDate();
                                 String curCode = filter.getCurCode();
-                                String stockCode = Util1.isNull(filter.getStockCode(), "-");
                                 String brandCode = Util1.isNull(filter.getBrandCode(), "-");
                                 String catCode = Util1.isNull(filter.getCatCode(), "-");
                                 String traderCode = Util1.isNull(filter.getTraderCode(), "-");
@@ -202,10 +208,6 @@ public class ReportController {
                                     case "StockInOutDetail", "StockInOutDetailUnit" -> {
                                         return stockRelationService.getStockInOutDetail(opDate, fromDate, toDate, typeCode, catCode, brandCode, compCode, macId);
                                     }
-//                    case "StockInOutSummaryByWeight" -> {
-//                        List<ClosingBalance> listBalance = reportService.getStockInOutSummaryByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
-//                        Util1.writeJsonFile(listBalance, exportPath);
-//                    }
                                     case "StockInOutQtySummary", "StockInOutQtySummaryByStock" -> {
                                         filter.setOpDate(opDate);
                                         return stockReportService.getStockInOutPaddy(filter, false);
@@ -229,11 +231,6 @@ public class ReportController {
                                         filter.setOpDate(opDate);
                                         filter.setReportType(1);
                                         return stockReportService.getStockInOutPaddy(filter, false);
-                                    }
-                                    case "StockInOutDetailByWeight" -> {
-//                    reportService.calculateStockInOutDetailByWeight(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, vouTypeCode, calSale, calPur, calRI, calRO, calMill, compCode, deptId, macId);
-//                    List<ClosingBalance> listBalance = reportService.getStockInOutDetailByWeight(typeCode, compCode, deptId, macId);
-//                    Util1.writeJsonFile(listBalance, exportPath);
                                     }
                                     case "StockValue" -> {
                                         return stockRelationService.getStockValue(opDate, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
@@ -318,6 +315,11 @@ public class ReportController {
                                         return stockReportService.getStockBalanceByLocationRO(filter);
                                     }
                                     case "StockBalanceByLocationRel" -> {
+                                        filter.setSummary(false);
+                                        return stockRelationService.getStockBalanceByLocationRO(filter);
+                                    }
+                                    case "StockBalanceByLocationRelSummary" -> {
+                                        filter.setSummary(true);
                                         return stockRelationService.getStockBalanceByLocationRO(filter);
                                     }
                                 }
@@ -400,22 +402,27 @@ public class ReportController {
 
     @PostMapping(path = "/getStockBalanceRel")
     public Flux<ClosingBalance> getStockBalanceRel(@RequestBody ReportFilter filter) {
-        return stockRelationService.getStockBalanceRel(filter);
+        String stockCode = filter.getStockCode();
+        Integer macId = filter.getMacId();
+        if (!Util1.isNullOrEmpty(stockCode)) {
+            List<String> listStock = new ArrayList<>();
+            listStock.add(stockCode);
+            return stockService.insertTmp(listStock, macId)
+                    .flatMapMany(aBoolean -> stockRelationService.getStockBalanceRel(filter));
+        }
+        return Flux.empty();
     }
 
 
     @PostMapping(path = "/getReorderLevel")
-    public Flux<?> getReorderLevel(@RequestBody ReportFilter filter) {
-        String compCode = filter.getCompCode();
-        String typeCode = Util1.isNull(filter.getStockTypeCode(), "-");
-        String catCode = Util1.isNull(filter.getCatCode(), "-");
-        String brandCode = Util1.isNull(filter.getBrandCode(), "-");
-        String stockCode = Util1.isNull(filter.getStockCode(), "-");
-        Integer deptId = filter.getDeptId();
+    public Flux<ReorderLevel> getReorderLevel(@RequestBody ReportFilter filter) {
+        filter.setToDate(Util1.toDateStr(Util1.getTodayDate(),"yyyy-MM-dd"));
         Integer macId = filter.getMacId();
-        String locCode = Util1.isNull(filter.getLocCode(), "-");
-        String clDate = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
-        return Flux.empty();
+        List<String> listStock = filter.getListStock();
+        return stockService.insertTmp(listStock, macId)
+                .flatMapMany(aBoolean -> stockRelationService.getStockBalanceRel(filter))
+                .collectList()
+                .flatMapMany(balances -> reorderLevelService.getReorderLevel(macId,filter.isSummary()));
     }
 
 

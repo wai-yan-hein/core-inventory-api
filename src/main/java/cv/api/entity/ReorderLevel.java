@@ -9,7 +9,6 @@ import lombok.Data;
 @Builder
 public class ReorderLevel {
     private ReorderKey key;
-    private Integer deptId;
     private Double minQty;
     private String minUnitCode;
     private Double maxQty;
@@ -26,6 +25,7 @@ public class ReorderLevel {
     private String brandName;
     private String catName;
     private String relName;
+    private String relCode;
     private String locName;
     private Integer position;
 
