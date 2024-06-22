@@ -1865,6 +1865,59 @@ public class ReportService {
                         .file(fileBytes)
                         .build());
     }
+    public Mono<ReturnObject> getStockInOutByVoucherType(String vouStatus, String fromDate, String toDate, String typeCode, String catCode, String brandCode, String stockCode, String compCode, Integer macId) {
+        String sql = """
+                select v.vou_date,v.vou_no,v.remark,v.description,s.user_code vs_user_code,
+                s.description vou_status_name,v.s_user_code,v.stock_name,l.loc_name,
+                v.in_qty,v.in_unit,v.out_qty,v.out_unit,v.cur_code
+                from v_stock_io v join vou_status s
+                on v.vou_status = s.code
+                and v.comp_code = s.comp_code
+                join location l on v.loc_code = l.loc_code
+                and v.comp_code = l.comp_code
+                where v.comp_code = :compCode
+                and v.deleted = false
+                and date(v.vou_date) between :fromDate and :toDate
+                and (v.stock_type_code = :typeCode or '-' = :typeCode)
+                and (v.category_code = :catCode or '-' = :catCode)
+                and (v.brand_code = :brandCode or '-' = :brandCode)
+                and (v.vou_status = :vouStatus or '-' = :vouStatus)
+                group by date(v.vou_date),v.vou_no,v.stock_code,v.in_unit,v.out_unit,v.cur_code
+                order by s.user_code,v.cur_code,v.vou_date,v.vou_no,v.s_user_code;
+                """;
+        return client
+                .sql(sql)
+                .bind("compCode", compCode)
+                .bind("fromDate", fromDate)
+                .bind("toDate", toDate)
+                .bind("typeCode", typeCode)
+                .bind("catCode", catCode)
+                .bind("brandCode", brandCode)
+                .bind("vouStatus", vouStatus)
+                .map(row -> VStockIO.builder()
+                        .vouDate(Util1.toDateStr(row.get("vou_date", LocalDate.class), "dd/MM/yyyy"))
+                        .vouNo(row.get("vou_no", String.class))
+                        .stockUsrCode(row.get("s_user_code", String.class))
+                        .stockName(row.get("stock_name", String.class))
+                        .remark(row.get("remark", String.class))
+                        .description(row.get("description", String.class))
+                        .vouTypeUserCode(row.get("vs_user_code", String.class))
+                        .vouTypeName(row.get("vou_status_name", String.class))
+                        .locName(row.get("loc_name", String.class))
+                        .outQty(row.get("out_qty", Double.class))
+                        .outUnit(row.get("out_unit", String.class))
+                        .inQty(row.get("in_qty", Double.class))
+                        .inUnit(row.get("in_unit", String.class))
+                        .build())
+                .all()
+                .collectList()
+                .map(Util1::convertToJsonBytes)
+                .map(fileBytes -> ReturnObject.builder()
+                        .status("success")
+                        .message("Data fetched successfully")
+                        .file(fileBytes)
+                        .build());
+    }
 
 
     public Mono<ReturnObject> getStockIOPriceCalender(String vouType, String fromDate, String toDate, String typeCode,

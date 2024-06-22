@@ -241,6 +241,9 @@ public class ReportController {
                                     case "StockOutByVoucherTypeDetail" -> {
                                         return reportService.getStockIODetailByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
                                     }
+                                    case "StockInOutByVouType" -> {
+                                        return reportService.getStockInOutByVoucherType(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, macId);
+                                    }
                                     case "StockInOutPriceCalender" -> {
                                         return reportService.getStockIOPriceCalender(vouTypeCode, fromDate, toDate, typeCode, catCode, brandCode, stockCode, compCode, deptId);
                                     }
