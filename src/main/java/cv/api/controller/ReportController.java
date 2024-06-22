@@ -95,9 +95,9 @@ public class ReportController {
             int deptId = filter.getDeptId();
             String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
             List<String> listLocation = filter.getListLocation();
-            String stockCode =filter.getStockCode();
+            String stockCode = filter.getStockCode();
             List<String> listStock = Util1.nullToEmpty(filter.getListStock());
-            if(listStock.isEmpty()){
+            if (listStock.isEmpty()) {
                 listStock.add(stockCode);
             }
             String locCode = Util1.isNull(filter.getLocCode(), "-");
@@ -416,13 +416,14 @@ public class ReportController {
 
     @PostMapping(path = "/getReorderLevel")
     public Flux<ReorderLevel> getReorderLevel(@RequestBody ReportFilter filter) {
-        filter.setToDate(Util1.toDateStr(Util1.getTodayDate(),"yyyy-MM-dd"));
+        filter.setToDate(Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd"));
         Integer macId = filter.getMacId();
+        int position = filter.getPosition();
         List<String> listStock = filter.getListStock();
         return stockService.insertTmp(listStock, macId)
                 .flatMapMany(aBoolean -> stockRelationService.getStockBalanceRel(filter))
                 .collectList()
-                .flatMapMany(balances -> reorderLevelService.getReorderLevel(macId,filter.isSummary()));
+                .flatMapMany(balances -> reorderLevelService.getReorderLevel(position, macId, filter.isSummary()));
     }
 
 

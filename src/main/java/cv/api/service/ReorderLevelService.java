@@ -50,8 +50,6 @@ public class ReorderLevelService {
                 .minUnitCode(row.get("min_unit", String.class))
                 .maxQty(row.get("max_qty", Double.class))
                 .maxUnitCode(row.get("max_unit", String.class))
-                .balSmallQty(row.get("bal_qty", Double.class))
-                .balUnit(row.get("bal_unit", String.class))
                 .build();
     }
 
@@ -88,7 +86,7 @@ public class ReorderLevelService {
                 .thenReturn(dto);
     }
 
-    public Flux<ReorderLevel> getReorderLevel(Integer macId,boolean summary) {
+    public Flux<ReorderLevel> getReorderLevel(Integer position,Integer macId,boolean summary) {
         if(summary){
             String sql= """
                     select a.*,rel.rel_name,if(bal_qty<min_small_qty,1,if(bal_qty>min_small_qty,2,if(bal_qty<max_small_qty,3,if(bal_qty> max_small_qty,4,5)))) position
@@ -109,13 +107,16 @@ public class ReorderLevelService {
                     and r.max_unit = min.unit
                     where tmp.mac_id = :macId
                     group by tmp.stock_code
+                    having min_small_qty >0
                     )a
                     join unit_relation rel on a.rel_code = rel.rel_code
                     and a.comp_code = rel.comp_code
+                    having (position = :position or 0 = :position)
                     order by position
                     """;
             return client.sql(sql)
                     .bind("macId", macId)
+                    .bind("position",position)
                     .map((row) -> ReorderLevel.builder()
                             .key(ReorderKey.builder()
                                     .stockCode(row.get("stock_code", String.class))
@@ -166,10 +167,12 @@ public class ReorderLevelService {
                 and b.comp_code = max.comp_code
                 and b.max_unit = min.unit
                 )c
+                having (position = :position or 0 = :position)
                 order by position,bal_qty
                 """;
             return client.sql(sql)
                     .bind("macId", macId)
+                    .bind("position",position)
                     .map((row) -> ReorderLevel.builder()
                             .key(ReorderKey.builder()
                                     .stockCode(row.get("stock_code", String.class))

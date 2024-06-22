@@ -69,5 +69,6 @@ public class ReportFilter {
     private String refNo;
     private boolean draft;
     private int paymentType;
+    private int position;
 
 }
