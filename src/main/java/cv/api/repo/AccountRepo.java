@@ -676,7 +676,7 @@ public class AccountRepo {
                             gl.setKey(key);
                             gl.setSrcAccCode(balAcc);
                             gl.setAccCode(disAcc);
-                            gl.setCrAmt(vouDis);
+                            gl.setDrAmt(vouDis);
                             gl.setTraderCode(traderCode);
                             gl.setGlDate(vouDate);
                             gl.setDescription(String.format("Return In Voucher Discount (%s)", vouDisPercent));
@@ -822,7 +822,6 @@ public class AccountRepo {
                             gl.setDrAmt(vouDis);
                             gl.setGlDate(vouDate);
                             gl.setDescription(String.format("Return Out Voucher Discount (%s)", vouDisPercent));
-                            gl.setTraderCode(traderCode);
                             gl.setCurCode(curCode);
                             gl.setReference(remark);
                             gl.setDeptCode(deptCode);
@@ -847,7 +846,6 @@ public class AccountRepo {
                             gl.setCrAmt(vouTax);
                             gl.setGlDate(vouDate);
                             gl.setDescription(String.format("Return Out Voucher Tax (%s)", vouTaxPercent));
-                            gl.setTraderCode(traderCode);
                             gl.setCurCode(curCode);
                             gl.setReference(remark);
                             gl.setDeptCode(deptCode);
@@ -1075,6 +1073,5 @@ public class AccountRepo {
                     log.error("deleteGlByVoucher : {}", e.getMessage());
                 }).subscribe();
     }
-
 
 }
