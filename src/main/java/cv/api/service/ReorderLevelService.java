@@ -1,5 +1,6 @@
 package cv.api.service;
 
+import cv.api.common.ReportFilter;
 import cv.api.common.Util1;
 import cv.api.entity.ReorderKey;
 import cv.api.entity.ReorderLevel;
@@ -76,9 +77,9 @@ public class ReorderLevelService {
         return client.sql(sql)
                 .bind("stockCode", dto.getKey().getStockCode())
                 .bind("minQty", Util1.getDouble(dto.getMinQty()))
-                .bind("minUnit", Parameters.in(R2dbcType.VARCHAR,dto.getMinUnitCode()))
+                .bind("minUnit", Parameters.in(R2dbcType.VARCHAR, dto.getMinUnitCode()))
                 .bind("maxQty", Util1.getDouble(dto.getMaxQty()))
-                .bind("maxUnit", Parameters.in(R2dbcType.VARCHAR,dto.getMaxUnitCode()))
+                .bind("maxUnit", Parameters.in(R2dbcType.VARCHAR, dto.getMaxUnitCode()))
                 .bind("compCode", dto.getKey().getCompCode())
                 .bind("locCode", dto.getKey().getLocCode())
                 .fetch()
@@ -86,9 +87,40 @@ public class ReorderLevelService {
                 .thenReturn(dto);
     }
 
-    public Flux<ReorderLevel> getReorderLevel(Integer position,Integer macId,boolean summary) {
-        if(summary){
-            String sql= """
+    private Mono<Boolean> generateReorder(String compCode) {
+        String sql = """
+                insert into reorder_level(stock_code, comp_code, loc_code)
+                select a.stock_code, a.comp_code, a.loc_code
+                from (
+                    select s.stock_code, s.comp_code, l.loc_code
+                    from stock s
+                    join location l on s.comp_code = l.comp_code
+                    where s.comp_code = :compCode
+                    and s.deleted = false
+                    and s.active = true
+                ) a
+                left join reorder_level r on a.stock_code = r.stock_code
+                and a.comp_code = r.comp_code
+                and a.loc_code = r.loc_code
+                where r.stock_code is null;
+                """;
+        return client.sql(sql)
+                .bind("compCode", compCode)
+                .fetch()
+                .rowsUpdated()
+                .thenReturn(true);
+
+    }
+
+    public Flux<ReorderLevel> getReorderLevel(ReportFilter filter) {
+        Integer position = filter.getPosition();
+        Integer macId = filter.getMacId();
+        String compCode = filter.getCompCode();
+        boolean summary = filter.isSummary();
+        String locCode = filter.getLocCode();
+        String stockCode = filter.getStockCode();
+        if (summary) {
+            String sql = """
                     select a.*,rel.rel_name,if(bal_qty<min_small_qty,1,if(bal_qty>min_small_qty,2,if(bal_qty<max_small_qty,3,if(bal_qty> max_small_qty,4,5)))) position
                     from (
                     select tmp.stock_code,s.user_code,s.stock_name,s.rel_code,'-' loc_code,sum(tmp.ttl_qty) bal_qty,sum(ifnull(r.min_qty,0)*ifnull(min.smallest_qty,1)) min_small_qty,
@@ -116,7 +148,7 @@ public class ReorderLevelService {
                     """;
             return client.sql(sql)
                     .bind("macId", macId)
-                    .bind("position",position)
+                    .bind("position", position)
                     .map((row) -> ReorderLevel.builder()
                             .key(ReorderKey.builder()
                                     .stockCode(row.get("stock_code", String.class))
@@ -134,45 +166,51 @@ public class ReorderLevelService {
                             .minUnitCode(stockRelationService.getRelStr(row.get("rel_code", String.class), row.get("min_small_qty", Double.class)))
                             .maxUnitCode(stockRelationService.getRelStr(row.get("rel_code", String.class), row.get("max_small_qty", Double.class)))
                             .balUnit(stockRelationService.getRelStr(row.get("rel_code", String.class), row.get("bal_qty", Double.class)))
-                            .position(row.get("position",Integer.class))
+                            .position(row.get("position", Integer.class))
                             .build())
                     .all();
-        }else{
+        } else {
             String sql = """
-                select c.*,if(bal_qty<min_small_qty,1,if(bal_qty>min_small_qty,2,if(bal_qty<max_small_qty,3,if(bal_qty> max_small_qty,4,5)))) position
-                from (
-                select b.*,(ifnull(b.min_qty,0)*ifnull(min.smallest_qty,1)) min_small_qty,
-                (ifnull(b.max_qty,0)*ifnull(max.smallest_qty,1)) max_small_qty
-                from (
-                select a.*,s.user_code,s.stock_name,s.rel_code,rel.rel_name,l.loc_name
-                from (
-                select tmp.stock_code,tmp.loc_code,tmp.ttl_qty bal_qty,r.min_qty, r.min_unit, r.max_qty, r.max_unit,tmp.comp_code
-                from tmp_stock_opening tmp
-                left join reorder_level r on tmp.stock_code = r.stock_code
-                and tmp.comp_code = r.comp_code
-                and tmp.loc_code = r.loc_code
-                where tmp.mac_id = :macId
-                )a
-                join location l on a.loc_code = l.loc_code
-                and a.comp_code = l.comp_code
-                join stock s on a.stock_code = s.stock_code
-                and a.comp_code = s.comp_code
-                left join unit_relation rel on s.rel_code = rel.rel_code
-                and s.comp_code = rel.comp_code
-                ) b
-                left join unit_relation_detail min on b.rel_code = min.rel_code
-                and b.comp_code = min.comp_code
-                and b.min_unit = min.unit
-                left join unit_relation_detail max on b.rel_code = max.rel_code
-                and b.comp_code = max.comp_code
-                and b.max_unit = min.unit
-                )c
-                having (position = :position or 0 = :position)
-                order by position,bal_qty
-                """;
-            return client.sql(sql)
+                    select c.*,if(bal_qty<min_small_qty,1,if(bal_qty>min_small_qty,2,if(bal_qty<max_small_qty,3,if(bal_qty> max_small_qty,4,5)))) position
+                    from (
+                    select b.*,(ifnull(b.min_qty,0)*ifnull(min.smallest_qty,1)) min_small_qty,
+                    (ifnull(b.max_qty,0)*ifnull(max.smallest_qty,1)) max_small_qty
+                    from (
+                    select a.*,s.user_code,s.stock_name,s.rel_code,rel.rel_name,l.loc_name
+                    from (
+                    select r.stock_code,r.loc_code,ifnull(tmp.ttl_qty,0) bal_qty,r.min_qty, r.min_unit, r.max_qty, r.max_unit,r.comp_code
+                    from reorder_level r
+                    left join tmp_stock_opening tmp on r.stock_code = tmp.stock_code
+                    and r.comp_code = tmp.comp_code
+                    and r.loc_code = tmp.loc_code
+                    and tmp.mac_id = :macId
+                    where r.comp_code = :compCode
+                    and (r.stock_code = :stockCode or '-' = :stockCode)
+                    and r.loc_code= :locCode
+                    )a
+                    join location l on a.loc_code = l.loc_code
+                    and a.comp_code = l.comp_code
+                    join stock s on a.stock_code = s.stock_code
+                    and a.comp_code = s.comp_code
+                    left join unit_relation rel on s.rel_code = rel.rel_code
+                    and s.comp_code = rel.comp_code
+                    ) b
+                    left join unit_relation_detail min on b.rel_code = min.rel_code
+                    and b.comp_code = min.comp_code
+                    and b.min_unit = min.unit
+                    left join unit_relation_detail max on b.rel_code = max.rel_code
+                    and b.comp_code = max.comp_code
+                    and b.max_unit = min.unit
+                    )c
+                    having (position = :position or 0 = :position)
+                    order by position,bal_qty
+                    """;
+            Flux<ReorderLevel> fluxResult = client.sql(sql)
                     .bind("macId", macId)
-                    .bind("position",position)
+                    .bind("position", position)
+                    .bind("compCode", compCode)
+                    .bind("stockCode", stockCode)
+                    .bind("locCode", locCode)
                     .map((row) -> ReorderLevel.builder()
                             .key(ReorderKey.builder()
                                     .stockCode(row.get("stock_code", String.class))
@@ -192,10 +230,11 @@ public class ReorderLevelService {
                             .relName(row.get("rel_name", String.class))
                             .locName(row.get("loc_name", String.class))
                             .balUnit(stockRelationService.getRelStr(row.get("rel_code", String.class), row.get("bal_qty", Double.class)))
-                            .position(row.get("position",Integer.class))
+                            .position(row.get("position", Integer.class))
                             .build())
                     .all();
+            return generateReorder(compCode)
+                    .flatMapMany(aBoolean -> fluxResult);
         }
-
     }
 }

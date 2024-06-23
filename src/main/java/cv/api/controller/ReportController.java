@@ -421,12 +421,11 @@ public class ReportController {
     public Flux<ReorderLevel> getReorderLevel(@RequestBody ReportFilter filter) {
         filter.setToDate(Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd"));
         Integer macId = filter.getMacId();
-        int position = filter.getPosition();
         List<String> listStock = filter.getListStock();
         return stockService.insertTmp(listStock, macId)
                 .flatMapMany(aBoolean -> stockRelationService.getStockBalanceRel(filter))
                 .collectList()
-                .flatMapMany(balances -> reorderLevelService.getReorderLevel(position, macId, filter.isSummary()));
+                .flatMapMany(balances -> reorderLevelService.getReorderLevel(filter));
     }
 
 
