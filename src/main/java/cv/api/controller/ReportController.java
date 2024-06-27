@@ -16,6 +16,7 @@ import cv.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -41,6 +42,7 @@ public class ReportController {
     private final LabourOutputService labourOutputService;
     private final OPHisService opHisService;
     private final ReorderLevelService reorderLevelService;
+    private final TransactionalOperator operator;
 
     @GetMapping(value = "/getSaleReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<VSale> getSaleReport(@RequestParam String vouNo,
@@ -95,13 +97,15 @@ public class ReportController {
             int deptId = filter.getDeptId();
             String warehouse = Util1.isNull(filter.getWarehouseCode(), "-");
             List<String> listLocation = filter.getListLocation();
-            String stockCode = filter.getStockCode();
+            String stockCode = Util1.isAll(filter.getStockCode());
             List<String> listStock = Util1.nullToEmpty(filter.getListStock());
             if (listStock.isEmpty()) {
-                listStock.add(stockCode);
+                if (!stockCode.equals("-")) {
+                    listStock.add(stockCode);
+                }
             }
             String locCode = Util1.isNull(filter.getLocCode(), "-");
-            return opHisService.getOpeningDateByLocation(compCode, locCode)
+            return operator.transactional(Mono.defer(() -> opHisService.getOpeningDateByLocation(compCode, locCode)
                     .flatMap(opDate -> locationService.insertTmp(listLocation, compCode, macId, warehouse)
                             .flatMap(aBoolean -> stockService.insertTmp(listStock, macId))
                             .flatMap(aBoolean -> {
@@ -328,7 +332,7 @@ public class ReportController {
                                 }
                                 ro.setMessage("Report Not Exists.");
                                 return Mono.just(ro);
-                            }));
+                            }))));
         }
         return Mono.just(ro);
     }

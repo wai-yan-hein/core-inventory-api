@@ -63,7 +63,7 @@ public class SaleManService {
                 .bind("compCode", dto.getKey().getCompCode())
                 .bind("macId", dto.getMacId())
                 .bind("salemanName", dto.getSaleManName())
-                .bind("active", Util1.getInteger(dto.getActive()))
+                .bind("active", Util1.getBoolean(dto.getActive()))
                 .bind("phone", Parameters.in(R2dbcType.VARCHAR, dto.getPhone()))
                 .bind("updatedDate", LocalDateTime.now())
                 .bind("genderId", Parameters.in(R2dbcType.VARCHAR, dto.getGenderId()))

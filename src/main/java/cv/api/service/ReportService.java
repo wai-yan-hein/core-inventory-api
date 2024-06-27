@@ -1450,6 +1450,8 @@ public class ReportService {
 
 
     public Mono<General> getSaleRecentPrice(String stockCode, String saleDate, String unit, String compCode) {
+        log.info("stockCode : {}", stockCode);
+        log.info("unit : {}", unit);
         String sql = """
                 SELECT ifnull(rel.smallest_qty,1) * smallest_price price, rel.unit
                 FROM (
