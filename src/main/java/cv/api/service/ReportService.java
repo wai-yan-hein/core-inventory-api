@@ -1476,6 +1476,8 @@ public class ReportService {
                 LEFT JOIN v_relation rel ON a.rel_code = rel.rel_code
                 AND a.comp_code = rel.comp_code
                 AND rel.unit = :unit
+                having price > 0
+                limit 1
                 """;
 
         return client.sql(sql)
