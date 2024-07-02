@@ -22,15 +22,17 @@ public class PurHisDetailService {
                     vou_no, unique_id, comp_code, dept_id, stock_code, exp_date,
                     qty, pur_unit, pur_price, pur_amt, loc_code, org_price,
                     avg_qty, std_weight, weight_unit, weight,
-                    length, width, total_weight, m_percent, rice, wet, bag
+                    length, width, total_weight, m_percent, rice, wet, bag,
+                    foc, dis_amt
                 ) VALUES (
                     :vouNo, :uniqueId, :compCode, :deptId, :stockCode, :expDate,
                     :qty, :purUnit, :purPrice, :purAmt, :locCode, :orgPrice,
                     :avgQty, :stdWeight, :weightUnit, :weight,
-                    :length, :width, :totalWeight, :mPercent, :rice, :wet, :bag
+                    :length, :width, :totalWeight, :mPercent, :rice, :wet, :bag,
+                    :foc, :disAmt
                 )
                 """;
-
+        dto.setFoc(Util1.getBoolean(dto.getFoc()));
         return client.sql(sql)
                 .bind("vouNo", dto.getKey().getVouNo())
                 .bind("uniqueId", dto.getKey().getUniqueId())
@@ -55,6 +57,8 @@ public class PurHisDetailService {
                 .bind("rice", Parameters.in(R2dbcType.DOUBLE, dto.getRice()))
                 .bind("wet", Parameters.in(R2dbcType.DOUBLE, dto.getWet()))
                 .bind("bag", Parameters.in(R2dbcType.DOUBLE, dto.getBag()))
+                .bind("foc", dto.getFoc())
+                .bind("disAmt", Parameters.in(R2dbcType.DOUBLE, dto.getDisAmt()))
                 .fetch()
                 .rowsUpdated()
                 .thenReturn(dto);
@@ -83,36 +87,49 @@ public class PurHisDetailService {
         return client.sql(sql)
                 .bind("vouNo", vouNo)
                 .bind("compCode", compCode)
-                .map(row -> PurHisDetail.builder()
-                        .deptId(row.get("dept_id", Integer.class))
-                        .stockCode(row.get("stock_code", String.class))
-                        .qty(row.get("qty", Double.class))
-                        .weightLoss(row.get("avg_qty", Double.class))
-                        .orgPrice(row.get("org_price", Double.class))
-                        .weight(row.get("weight", Double.class))
-                        .stdWeight(Util1.toNull(row.get("std_weight", Double.class)))
-                        .weightUnit(row.get("weight_unit", String.class))
-                        .totalWeight(row.get("total_weight", Double.class))
-                        .price(row.get("pur_price", Double.class))
-                        .amount(row.get("pur_amt", Double.class))
-                        .locCode(row.get("loc_code", String.class))
-                        .locName(row.get("loc_name", String.class))
-                        .unitCode(row.get("pur_unit", String.class))
-                        .userCode(row.get("user_code", String.class))
-                        .stockName(row.get("stock_name", String.class))
-                        .calculate(row.get("calculate", Boolean.class))
-                        .catName(row.get("cat_name", String.class))
-                        .groupName(row.get("stock_type_name", String.class))
-                        .brandName(row.get("brand_name", String.class))
-                        .relCode(row.get("rel_code", String.class))
-                        .relName(row.get("rel_name", String.class))
-                        .length(row.get("length", Double.class))
-                        .width(row.get("width", Double.class))
-                        .mPercent(row.get("m_percent", String.class))
-                        .wet(row.get("wet", Double.class))
-                        .rice(row.get("rice", Double.class))
-                        .bag(row.get("bag", Double.class))
-                        .build())
+                .map(row -> {
+                    var d = PurHisDetail.builder()
+                            .deptId(row.get("dept_id", Integer.class))
+                            .stockCode(row.get("stock_code", String.class))
+                            .qty(row.get("qty", Double.class))
+                            .weightLoss(row.get("avg_qty", Double.class))
+                            .orgPrice(row.get("org_price", Double.class))
+                            .weight(row.get("weight", Double.class))
+                            .stdWeight(Util1.toNull(row.get("std_weight", Double.class)))
+                            .weightUnit(row.get("weight_unit", String.class))
+                            .totalWeight(row.get("total_weight", Double.class))
+                            .price(row.get("pur_price", Double.class))
+                            .amount(row.get("pur_amt", Double.class))
+                            .locCode(row.get("loc_code", String.class))
+                            .locName(row.get("loc_name", String.class))
+                            .unitCode(row.get("pur_unit", String.class))
+                            .userCode(row.get("user_code", String.class))
+                            .stockName(row.get("stock_name", String.class))
+                            .calculate(row.get("calculate", Boolean.class))
+                            .catName(row.get("cat_name", String.class))
+                            .groupName(row.get("stock_type_name", String.class))
+                            .brandName(row.get("brand_name", String.class))
+                            .relCode(row.get("rel_code", String.class))
+                            .relName(row.get("rel_name", String.class))
+                            .length(row.get("length", Double.class))
+                            .width(row.get("width", Double.class))
+                            .mPercent(row.get("m_percent", String.class))
+                            .wet(row.get("wet", Double.class))
+                            .rice(row.get("rice", Double.class))
+                            .bag(row.get("bag", Double.class))
+                            .foc(row.get("foc", Boolean.class))
+                            .disAmt(row.get("dis_amt", Double.class))
+                            .build();
+                    boolean foc = d.getFoc();
+                    double disAmt = Util1.getDouble(d.getDisAmt());
+                    if (foc) {
+                        d.setStockName(d.getStockName() + " * FOC");
+                    }
+                    if (disAmt > 0) {
+                        d.setStockName(d.getStockName() + " * DIS");
+                    }
+                    return d;
+                })
                 .all();
     }
 

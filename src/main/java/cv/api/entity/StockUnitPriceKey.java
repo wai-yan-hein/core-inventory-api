@@ -11,5 +11,6 @@ public class StockUnitPriceKey {
     private String stockCode;
     private String compCode;
     private String unit;
+    private String relCode;
 
 }

@@ -280,7 +280,6 @@ public class PurHisService {
         return saveOrUpdate(dto).flatMap(ri -> pdService.delete(ri.getKey().getVouNo(), ri.getKey().getCompCode()).flatMap(delete -> {
             List<PurHisDetail> list = dto.getListPD();
             return Flux.fromIterable(list)
-                    .filter(detail -> Util1.getDouble(detail.getAmount()) != 0)
                     .concatMap(detail -> {
                         if (detail.getKey() == null) {
                             detail.setKey(PurDetailKey.builder().build());

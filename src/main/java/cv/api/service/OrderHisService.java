@@ -302,7 +302,7 @@ public class OrderHisService {
     public Mono<Boolean> updateOrder(OrderHisKey key, boolean post) {
         String sql = """
                 update order_his
-                set post = :post, inv_update = :invUpdate
+                set post = :post, inv_update = false
                 where vou_no = :vouNo
                 and comp_code =:compCode
                 """;
@@ -310,7 +310,6 @@ public class OrderHisService {
                 .bind("vouNo", key.getVouNo())
                 .bind("compCode", key.getCompCode())
                 .bind("post", post)
-                .bind("invUpdate", !post)
                 .fetch().rowsUpdated().thenReturn(true);
     }
 

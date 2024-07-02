@@ -227,7 +227,6 @@ public class SetupController {
         return typeService.getStockType(Util1.toLocalDateTime(updatedDate));
     }
 
-
     @DeleteMapping(path = "/deleteType")
     public Mono<Boolean> deleteType(@RequestParam StockTypeKey key) {
         return typeService.delete(key);
@@ -759,8 +758,10 @@ public class SetupController {
     }
 
     @GetMapping(path = "/getStockUnitPrice")
-    public Flux<StockUnitPrice> getStockUnitPrice(@RequestParam String stockCode, @RequestParam String compCode) {
-        return stockUnitPriceService.generateStockUnitPrice(stockCode, compCode);
+    public Flux<StockUnitPrice> getStockUnitPrice(@RequestParam String stockCode,
+                                                  @RequestParam String relCode,
+                                                  @RequestParam String compCode) {
+        return stockUnitPriceService.generateStockUnitPrice(stockCode,relCode, compCode);
     }
 
     @GetMapping(path = "/getUpdateStockUnitPrice")
